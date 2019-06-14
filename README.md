@@ -6,7 +6,7 @@ A Cheat-Menu for Grand Theft Auto SanAndreas which allows a large set of modific
 
 It's based on [Moonloader](https://gtaforums.com/topic/890987-moonloader/) and uses [Moon Imgui](https://blast.hk/threads/19292/) for its interface.
 
-
+Take a look [here](https://github.com/inanahammad/Cheat-Menu/wiki/Installation) for intallation.
 ### Official Topics
 
 - [GTA Forums](https://gtaforums.com/topic/930023-mooncheat-menu/)
