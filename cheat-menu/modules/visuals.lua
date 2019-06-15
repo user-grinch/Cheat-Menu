@@ -7,11 +7,6 @@ local resX,resY = getScreenResolution()
 
 local tdisplay = 
 {
-    text =
-    {
-        X = imgui.ImInt(math.floor(resX/100)),
-        Y = imgui.ImInt(math.floor(resY/1.16)),
-    },
     zone_names = imgui.ImBool(true),
     car_names  = imgui.ImBool(true),
 }
@@ -49,7 +44,7 @@ function module.visuals_section()
     fcommon.check_box({ address = 0x589355,name = "Health bar percentage"})
     fcommon.check_box({ address = 0x589125,name = "Body armour percentage"})
     fcommon.check_box({ address = 0x589209,name = "Breath meter percentage"})
-    fcommon.check_box({ address = 0x58DD1B,name = "Hide 0 star wanted level",value = 0x90})
+    fcommon.check_box({ address = 0x58DD1B,name = "Hide wanted level",value = 0x90})
 
     if imgui.Checkbox("Display zone names",tdisplay.zone_names) then
         displayZoneNames(tdisplay.zone_names.v)
@@ -68,16 +63,6 @@ function module.visuals_section()
     imgui.Text("Menus")
     imgui.Separator()
     imgui.Spacing() 
-    if imgui.BeginMenu("Text draws") then
-        imgui.Text("Text draws")
-        fcommon.information_tooltip("Controls the position of text draws(FPS,car health,car speed,car gear...)")
-        imgui.Separator()
-        imgui.Spacing()
-        local resX,resY = getScreenResolution()
-        if imgui.SliderInt("Set X",tdisplay.text.X,0,resX) then end
-        if imgui.SliderInt("Set Y",tdisplay.text.Y,0,resY) then end
-        imgui.EndMenu()
-    end
     if imgui.BeginMenu("Sphere Color") then
         imgui.Text("Sphere Color")
         imgui.Separator()

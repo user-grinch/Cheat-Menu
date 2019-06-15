@@ -16,8 +16,8 @@ local tmemory =
 
 function module.memory_control_section()
 
-    if isKeyDown(config.keys.control_key) 
-    and isKeyDown(config.keys.mc_paste) then
+    if isKeyDown(keys.control_key) 
+    and isKeyDown(keys.mc_paste) then
         tmemory.address.v =  imgui.GetClipboardText()
     end
 

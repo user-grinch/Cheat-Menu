@@ -4,7 +4,6 @@ local module = {}
 local tvehicles =
 {
     show = {
-        gears = imgui.ImBool(false),
         speed = imgui.ImBool(false),
         health = imgui.ImBool(false),
     },
@@ -126,8 +125,6 @@ function module.vehicles_section()
         imgui.Separator()
         imgui.Spacing()
         fcommon.ValueSwitch({ name = "Show speed",var = tvehicles.show.speed,show_help_popups = true})
-        imgui.SameLine()
-        fcommon.ValueSwitch({ name = "Show gears",var = tvehicles.show.gears,show_help_popups = true})
         imgui.SameLine()
         fcommon.ValueSwitch({ name = "Lock speed",var = tvehicles.lock_speed,show_help_popups = true})
         if imgui.InputInt("Set",tvehicles.speed) then

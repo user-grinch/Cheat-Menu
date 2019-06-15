@@ -182,15 +182,15 @@ end
 
 function module.airbreak_mode()  
     if tairbreak.bool.v then
-        if isKeyDown(config.keys.airbreak_up) then 
+        if isKeyDown(keys.airbreak_up) then 
             x,y,z = getCharCoordinates(PLAYER_PED)
             setCharCoordinates(PLAYER_PED,x,y,z+2.0)
         end
-        if isKeyDown(config.keys.airbreak_down) then 
+        if isKeyDown(keys.airbreak_down) then 
             x,y,z = getCharCoordinates(PLAYER_PED)
             setCharCoordinates(PLAYER_PED,x,y,z-2.0)
         end
-        if isKeyDown(config.keys.airbreak_forward) then 
+        if isKeyDown(keys.airbreak_forward) then 
             x,y,z = getCharCoordinates(PLAYER_PED)
             angle = getCharHeading(PLAYER_PED)
 
@@ -200,7 +200,7 @@ function module.airbreak_mode()
 
             setCharCoordinates(PLAYER_PED,x,y,z-1.0)
         end
-        if isKeyDown(config.keys.airbreak_backward) then 
+        if isKeyDown(keys.airbreak_backward) then 
             x,y,z = getCharCoordinates(PLAYER_PED)
             angle = getCharHeading(PLAYER_PED)
 
@@ -210,11 +210,11 @@ function module.airbreak_mode()
 
             setCharCoordinates(PLAYER_PED,x,y,z-1.0)
         end
-        if isKeyDown(config.keys.airbreak_left)then 
+        if isKeyDown(keys.airbreak_left)then 
             setCharHeading(PLAYER_PED,getCharHeading(PLAYER_PED)+1.0)
             setCameraBehindPlayer()
         end
-        if isKeyDown(config.keys.airbreak_right)then 
+        if isKeyDown(keys.airbreak_right)then 
             setCharHeading(PLAYER_PED,getCharHeading(PLAYER_PED)-1.0)
             setCameraBehindPlayer()
         end

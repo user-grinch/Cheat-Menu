@@ -4,7 +4,7 @@ local module = {}
 
 function module.quick_spawner()
 
-    fcommon.keywait(config.keys.control_key,config.keys.quickspawner_key)
+    fcommon.keywait(keys.control_key,keys.quickspawner_key)
 
     memory.write(0x00969110,0,1)
     result = ''

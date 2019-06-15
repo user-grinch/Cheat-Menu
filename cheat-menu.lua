@@ -2,17 +2,16 @@ script_name("Cheat Menu")
 script_author("Grinch_")
 script_description("Cheat Menu for Grnad Theft Auto San Andreas")
 script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu")
-script_dependencies("imgui","memory","MoonAdditions")
-config = {}
-config.version = {
-    release = "Public",
+script_dependencies("imgui","memory")
+version = {
+    release = "Prerelease",
     number  = 1.2,
 }
-script_version(config.version.release)
-script_version_number(config.version.number)
+script_version(version.release)
+script_version_number(version.number)
 
 -- All the command keys used throughout the Cheat-Menu
-config.keys = 
+keys = 
 {
     control_key       = 0xA2, -- LCONTROL
     menu_open_key     = 0x4D, -- M
@@ -36,7 +35,6 @@ config.keys =
 -- Script Dependencies
 imgui = require 'imgui'
 memory = require 'memory'
-mad = require 'MoonAdditions'
 glob = require 'game.globals'         
 
 -- Loading custom modules
@@ -45,7 +43,6 @@ fcheats = require 'cheat-menu.modules.cheats'
 fcommon = require 'cheat-menu.modules.common'
 fgame = require 'cheat-menu.modules.game'
 fgangs = require 'cheat-menu.modules.gangs'
-flip = require 'cheat-menu.modules.lip'
 fmain = require 'cheat-menu.modules.main'
 fmemcontrol = require 'cheat-menu.modules.memory_control'
 fmenu = require 'cheat-menu.modules.menu'
@@ -58,29 +55,33 @@ fvehicles = require 'cheat-menu.modules.vehicles'
 fvisuals = require 'cheat-menu.modules.visuals'
 fweapons = require 'cheat-menu.modules.weapons'
 ------------------------------------------------------------
-
-
-local main_window_state = imgui.ImBool(false)
+local DISTANCE = 10.0
+local corner = 0
+window = {
+    main    = imgui.ImBool(false),
+    overlay = imgui.ImBool(true),
+}
 
 cheat_menu = 
 {
-    auto_reload = imgui.ImBool(false),
-    config_path = "moonloader/Cheat Menu.ini",
+    io = imgui.GetIO(),
+    auto_reload = imgui.ImBool(false)
 }
 
-flip.save(cheat_menu.config_path,config)
+function ternary ( cond , T , F )
+    if cond then return T else return F end
+end
 
 function imgui.OnDrawFrame()
-    if  main_window_state.v then
+    if  window.main.v then
 
         -- Setting up Cheat-Menu size
-        resX,resY = getScreenResolution()
-        imgui.SetNextWindowSize(imgui.ImVec2(resX/4,resY/1.2), imgui.Cond.FirstUseEver)
+        imgui.SetNextWindowSize(imgui.ImVec2(cheat_menu.io.DisplaySize.x/4,cheat_menu.io.DisplaySize.y/1.2), imgui.Cond.FirstUseEver)
 
         imgui.RenderInMenu = fmenu.tmenu.render_in_menu.v
-        imgui.LockPlayer   = fmenu.tmenu.lock_player.v 
+        imgui.LockPlayer   = fmenu.tmenu.lock_player.v  
 
-        imgui.Begin('Cheat Menu by Grinch_', main_window_state)
+        imgui.Begin('Cheat Menu by Grinch_', window.main)
 
         if imgui.CollapsingHeader("Teleportation",true) then
            fteleport.teleportation_section()
@@ -126,6 +127,58 @@ function imgui.OnDrawFrame()
         end
         imgui.End()
     end
+
+    -- Overlay window
+    if window.overlay.v then
+        imgui.ShowCursor   = window.main.v
+
+        if (corner ~= -1) then
+            window_pos       = imgui.ImVec2(ternary((corner == 1 or corner == 3),cheat_menu.io.DisplaySize.x - DISTANCE,DISTANCE),ternary((corner == 2 or corner == 3),cheat_menu.io.DisplaySize.y - DISTANCE,DISTANCE))
+            window_pos_pivot = imgui.ImVec2(ternary((corner == 1 or corner == 3),1.0,0.0),ternary((corner == 2 or corner == 3),1.0,0.0))
+            imgui.SetNextWindowPos(window_pos,0,window_pos_pivot)
+        end
+        
+        if fgame.tfps.bool.v or fvehicles.tvehicles.show.speed.v or fvehicles.tvehicles.show.health.v then
+            imgui.PushStyleVar(imgui.StyleVar.Alpha,0.65)
+            if imgui.Begin('Overlay', window.overlay,4449) then
+                if fgame.tfps.bool.v == true then
+                    imgui.Text("Frames :" .. tostring(math.floor(cheat_menu.io.Framerate))) 
+                end
+                
+                if isCharInAnyCar(PLAYER_PED) then
+                    car = getCarCharIsUsing(PLAYER_PED)
+                    if  fvehicles.tvehicles.show.speed.v == true then
+                        speed = getCarSpeed(car)
+                        total_gears = getCarNumberOfGears(car)
+                        current_gear = getCarCurrentGear(car)
+                        imgui.Text(string.format("Speed   :%d %d/%d",math.floor(speed),current_gear,total_gears))
+                    end
+            
+                    if fvehicles.tvehicles.show.health.v == true then
+                        imgui.Text(string.format("Health  :%d",getCarHealth(car)))
+                    end
+                end
+
+                if imgui.BeginPopupContextWindow() then
+                    imgui.Text("Position")
+                    imgui.Separator()
+                    if (imgui.MenuItem("Custom",nil,corner == -1)) then corner = -1 end
+                    if (imgui.MenuItem("Top-Left",nil,corner == 0)) then corner = 0 end
+                    if (imgui.MenuItem("Top-Right",nil,corner == 1)) then corner = 1 end
+                    if (imgui.MenuItem("Bottom-Left",nil,corner == 2)) then corner = 2 end
+                    if (imgui.MenuItem("Bottom-Right",nil,corner == 3)) then corner = 3 end
+                    if imgui.MenuItem("Close") then 
+                        fgame.tfps.bool.v = false
+                        fvehicles.tvehicles.show.speed.v = false 
+                        fvehicles.tvehicles.show.health.v = false
+                    end
+                    imgui.EndPopup()
+                end
+            end
+            imgui.End()
+            imgui.PopStyleVar()
+        end
+    end
 end
 
 function main()
@@ -135,23 +188,22 @@ function main()
     fcommon.load_textures()
 
     while true do
-       
         -- This part loops every frame
-        
-        if isKeyDown(config.keys.control_key) and isKeyDown(config.keys.menu_open_key) then
-            fcommon.keywait(config.keys.control_key,config.keys.menu_open_key)
-            main_window_state.v = not main_window_state.v
+
+        if isKeyDown(keys.control_key) and isKeyDown(keys.menu_open_key) then
+            fcommon.keywait(keys.control_key,keys.menu_open_key)
+            window.main.v = not window.main.v
         end
 
         fmain.main_section()
-        
-        imgui.Process = main_window_state.v
+        imgui.Process = window.main.v or window.overlay.v
         wait(0)
     end
 end
 
+-- Automatically reload script
 function onScriptTerminate(script, quitGame)
     if script == thisScript() and quitGame == false and cheat_menu.auto_reload.v == true then
-        reloadScripts()
+        script:reload()
     end
 end

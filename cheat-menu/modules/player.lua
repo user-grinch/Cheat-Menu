@@ -8,7 +8,6 @@ local player_proofs = imgui.ImBool(false)
 local fighting_style = 0
 local walking_style = 0
 
-
 module.aim_skin_changer = aim_skin_changer
 module.player_proofs = player_proofs
 
@@ -22,7 +21,6 @@ change_player_model = function(model)
             markModelAsNoLongerNeeded(model)
             printHelpString("Skin ~g~Changed")
         end
-    
     else
         if not hasSpecialCharacterLoaded(290) then 
             loadSpecialCharacter(fpeds.tpeds.special[model],1)
@@ -30,7 +28,7 @@ change_player_model = function(model)
         end	
         setPlayerModel(PLAYER_HANDLE,290)
         clearCharTasksImmediately(PLAYER_PED)
-        unloadSpecialCharacter(model)
+        unloadSpecialCharacter(290)
         printHelpString("Skin ~g~Changed")
     end
 end
