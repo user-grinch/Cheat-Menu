@@ -42,26 +42,27 @@ function module.CBaseModelInfo(name)
     return model
 end
 
-function module.give_vehicle_to_player(model)
+function give_vehicle_to_player(model)
     if isModelAvailable(model) then
-        requestModel(model)
-        loadAllModelsNow()
-        x,y,z = getCharCoordinates(PLAYER_PED)
+        local x,y,z = getCharCoordinates(PLAYER_PED)
         if isCharInAnyCar(PLAYER_PED) then
-            car = getCarCharIsUsing(PLAYER_PED)
+            local car = getCarCharIsUsing(PLAYER_PED)
             warpCharFromCarToCoord(PLAYER_PED,x,y,z)
-            speed = getCarSpeed(car)
+            local speed = getCarSpeed(car)
             deleteCar(car)
         end
         if isThisModelAPlane(model) and tvehicles.spawn_plane_in_air.v == true then
-            z = 400
+            local z = 400
         end
-        car = createCar(model,x,y,z)
-        heading = getCharHeading(PLAYER_PED)
+        requestModel(model)
+        loadAllModelsNow()
+        local car = createCar(model,x,y,z)
+        markModelAsNoLongerNeeded(model)
+        local heading = getCharHeading(PLAYER_PED)
         warpCharIntoCar(PLAYER_PED,car)
         setCarHeading(car,heading)
         setCarForwardSpeed(car,speed)
-        markModelAsNoLongerNeeded(model)
+        markCarAsNoLongerNeeded(car)
         fcommon.CheatActivated()
     end
 end
@@ -69,7 +70,7 @@ end
 -- Creates vehicles entry
 vehicle_entry = function(model)
     if imgui.ImageButton(tvehicles.list[tostring(model)],imgui.ImVec2(70,40)) then 
-        module.give_vehicle_to_player(model,tvehicles.spawn_plane_in_air.v)
+        give_vehicle_to_player(model,tvehicles.spawn_plane_in_air.v)
     end
     if imgui.IsItemHovered() then
         imgui.BeginTooltip() 
@@ -177,7 +178,22 @@ function module.vehicles_section()
         fcommon.ValueSwitch({ name = "Show health",var = tvehicles.show.health,show_help_popups = true})
         fcommon.ValueSwitch({ name = "Stay on Bike",var = tvehicles.stay_on_bike,show_help_popups = true})
         fcommon.information_tooltip("Prevents falling from bikes.")
-        fcommon.ValueSwitch({ name = "Car hydraulic",var = tvehicles.hydraulic,show_help_popups = true})
+        
+        if isCharInAnyCar(PLAYER_PED) then
+            car = getCarCharIsUsing(PLAYER_PED)
+            tvehicles.hydraulic.v = doesCarHaveHydraulics(car)
+        end
+        if imgui.Checkbox("Car hydraulic",tvehicles.hydraulic) then
+            if isCharInAnyCar(PLAYER_PED) then
+                if fvehicles.tvehicles.hydraulic.v then
+                    setCarHydraulics(car,true)
+                    fcommon.CheatActivated()
+                else
+                    setCarHydraulics(car,false)
+                    fcommon.CheatDeactivated()
+                end
+            end
+        end
         fcommon.ValueSwitch({ name = "Lock Car health",var = tvehicles.full_health,show_help_popups = true})
         fcommon.ValueSwitch({ name = "No car visual damage",var = tvehicles.visual_damage,show_help_popups = true})
         fcommon.check_box({ address = 0x969164,name = "Tank mode"})

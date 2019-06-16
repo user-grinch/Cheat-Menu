@@ -3,7 +3,6 @@
 local module = {}
 
 function module.main_section()
-
     -- Screenshot
     if fgame.ss_shotcut.v == true 
     and isKeyDown(keys.control_key) and isKeyDown(keys.screenshot_key) then 
@@ -83,18 +82,11 @@ function module.main_section()
             setCarHeavy(car,false)
         end
 
-        if fvehicles.tvehicles.hydraulic.v then
-            setCarHydraulics(car,true)
-        else
-            setCarHydraulics(car,false)
-        end
-
         if fvehicles.tvehicles.visual_damage.v then
             setCarCanBeVisiblyDamaged(car,false)
         else
             setCarCanBeVisiblyDamaged(car,true)
         end
     end
-
 end
 return module

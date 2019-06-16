@@ -273,10 +273,9 @@ end
 function module.popup_menu(arg)
     if arg.min == nil then arg.min = 0 end
     if arg.is_float == nil then arg.is_float = false end
-
     if imgui.BeginMenu(arg.name) then
         imgui.Spacing()
-        local value = imgui.ImInt()
+        local value = imgui.ImInt(0)
         value.v = math.floor(module.rw_memory(arg.address,arg.size,nil,nil,arg.is_float))
         imgui.Text(arg.name)
         if arg.help_text ~= nil then

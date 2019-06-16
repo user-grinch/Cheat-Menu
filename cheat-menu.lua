@@ -95,6 +95,7 @@ function imgui.OnDrawFrame()
         if imgui.CollapsingHeader("Weapons",true) then
             fweapons.weapons_section()
         end
+        
         if imgui.CollapsingHeader("Vehicles",true) then
             fvehicles.vehicles_section()
         end

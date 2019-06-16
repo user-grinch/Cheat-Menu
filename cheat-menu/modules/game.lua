@@ -30,7 +30,32 @@ tairbreak =
 {
     bool = imgui.ImBool(false)
 }
-
+local tweather =
+{
+    "EXTRASUNNY LA",
+    "SUNNY LA",
+    "EXTRASUNNY SMOG LA",
+    "SUNNY SMOG LA",
+    "CLOUDY LA",
+    "SUNNY SF",
+    "EXTRASUNNY SF",
+    "CLOUDY SF",
+    "RAINY SF",
+    "FOGGY SF",
+    "SUNNY VEGAS",
+    "EXTRASUNNY VEGAS",
+    "CLOUDY VEGAS",
+    "EXTRASUNNY COUNTRYSIDE",
+    "SUNNY COUNTRYSIDE",
+    "CLOUDY COUNTRYSIDE",
+    "RAINY COUNTRYSIDE",
+    "EXTRASUNNY DESERT",
+    "SUNNY DESERT",
+    "SANDSTORM DESERT",
+    "UNDERWATER",
+    "EXTRACOLOURS 1",
+    "EXTRACOLOURS 2",
+}
 -- Game Interriors list
 local interior_names = {
     "ABATOIR",
@@ -244,9 +269,9 @@ function set_current_weekday()
 end
 
 function set_time()
-    if imgui.BeginMenu("Game Time") then
+    if imgui.BeginMenu("Time") then
         imgui.Spacing()
-        imgui.Text("Game Time")
+        imgui.Text("Time")
         imgui.Separator()
         imgui.Spacing()
 
@@ -386,8 +411,8 @@ function module.game_section()
     
     set_time()
 
-    if imgui.BeginMenu("Game FPS") then
-        imgui.Text("Game FPS")
+    if imgui.BeginMenu("FPS") then
+        imgui.Text("FPS")
         fcommon.information_tooltip("Frames Per Second")
         imgui.Separator()
         imgui.Spacing()
@@ -411,17 +436,14 @@ function module.game_section()
     fcommon.popup_menu({name = "Horseshoes Number",address = 0xB791E4,size = 1,max = 1000})
     fcommon.popup_menu({name = "Safehouse Visits Number",address = 0xB79040 ,size = 1,max = 1000})
 
-    set_weather({"EXTRASUNNY_LA","SUNNY_LA","EXTRASUNNY_SMOG_LA","SUNNY_SMOG_LA","CLOUDY_LA","SUNNY_SF","EXTRASUNNY_SF","CLOUDY_SF",
-                "RAINY_SF","FOGGY_SF","SUNNY_VEGAS","EXTRASUNNY_VEGAS","CLOUDY_VEGAS","EXTRASUNNY_COUNTRYSIDE","SUNNY_COUNTRYSIDE",
-                "CLOUDY_COUNTRYSIDE","RAINY_COUNTRYSIDE","EXTRASUNNY_DESERT","SUNNY_DESERT","SANDSTORM_DESERT","UNDERWATER","EXTRACOLOURS_1",
-                "EXTRACOLOURS_2"})
+    set_weather(tweather)
     
     if imgui.BeginMenu("Game Themes") then
         fcommon.radio_menu("Game Themes",{"Country","Beach","Ninja","Funhouse"},{0x96917D ,0x969159 ,0x96915C ,0x969176 },"vertical")
         imgui.EndMenu()
     end
 
-    fcommon.popup_menu({name = "Gravity",address = 0x863984,size = 4,max = 10,min = -10})
+    fcommon.popup_menu({name = "Gravity",address = 0x863984,size = 4,max = 1,min = -1,is_float = true})
 
     if imgui.BeginMenu("Cop Vehicles") then
         imgui.Text("Cop Vehicles")
