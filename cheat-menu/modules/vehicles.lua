@@ -36,7 +36,7 @@ module.tvehicles = tvehicles
 
 function module.CBaseModelInfo(name)
     local pInfo = allocateMemory(16)
-    callFunction(0x004C5940,2,2,name,pInfo)
+    callFunction(0x4C5940,2,2,name,pInfo)
     local model = readMemory(pInfo,4,false)
     freeMemory(pInfo)
     return model
@@ -44,21 +44,21 @@ end
 
 function give_vehicle_to_player(model)
     if isModelAvailable(model) then
-        local x,y,z = getCharCoordinates(PLAYER_PED)
+        x,y,z = getCharCoordinates(PLAYER_PED)
         if isCharInAnyCar(PLAYER_PED) then
-            local car = getCarCharIsUsing(PLAYER_PED)
+            car = getCarCharIsUsing(PLAYER_PED)
+            speed = getCarSpeed(car)
             warpCharFromCarToCoord(PLAYER_PED,x,y,z)
-            local speed = getCarSpeed(car)
             deleteCar(car)
         end
         if isThisModelAPlane(model) and tvehicles.spawn_plane_in_air.v == true then
-            local z = 400
+            z = 400
         end
         requestModel(model)
         loadAllModelsNow()
-        local car = createCar(model,x,y,z)
+        car = createCar(model,x,y,z)
         markModelAsNoLongerNeeded(model)
-        local heading = getCharHeading(PLAYER_PED)
+        heading = getCharHeading(PLAYER_PED)
         warpCharIntoCar(PLAYER_PED,car)
         setCarHeading(car,heading)
         setCarForwardSpeed(car,speed)
