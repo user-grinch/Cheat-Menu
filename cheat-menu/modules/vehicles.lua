@@ -7,9 +7,7 @@ local tvehicles =
         speed = imgui.ImBool(false),
         health = imgui.ImBool(false),
     },
-    color = {
-        rgb = imgui.ImFloat3(0.0,0.0,0.0),
-    },
+    color = imgui.ImFloat3(0.0,0.0,0.0),
     lights = 
     {
         all    = imgui.ImBool(false),
@@ -46,7 +44,7 @@ function give_vehicle_to_player(model)
     if isModelAvailable(model) then
         x,y,z = getCharCoordinates(PLAYER_PED)
         if isCharInAnyCar(PLAYER_PED) then
-            car = getCarCharIsUsing(PLAYER_PED)
+            car = storeCarCharIsInNoSave(PLAYER_PED)
             speed = getCarSpeed(car)
             warpCharFromCarToCoord(PLAYER_PED,x,y,z)
             deleteCar(car)
@@ -79,6 +77,22 @@ vehicle_entry = function(model)
     end
 end
 
+function set_car_color()
+    if isCharInAnyCar(PLAYER_PED) then
+        car = storeCarCharIsInNoSave(PLAYER_PED)
+        for _, comp in ipairs(mad.get_all_vehicle_components(car)) do
+            for _, obj in ipairs(comp:get_objects()) do
+                for _, mat in ipairs(obj:get_materials()) do
+                    local r, g, b, old_a = mat:get_color()
+                    if (r == 0x3C and g == 0xFF and b == 0x00) or (r == 0xFF and g == 0x00 and b == 0xAF) then
+                        mat:set_color(tvehicles.color.v[1]*255, tvehicles.color.v[2]*255, tvehicles.color.v[3]*255, 255.0)
+                    end
+                end
+            end
+        end
+    end
+end
+
 function module.vehicles_section()
     imgui.Spacing()
     imgui.Text("Vehicles")
@@ -87,7 +101,7 @@ function module.vehicles_section()
 
     if imgui.Button("Repair Vehicle",imgui.ImVec2(100,50)) then
         if isCharInAnyCar(PLAYER_PED) then
-            car = getCarCharIsUsing(PLAYER_PED)        
+            car = storeCarCharIsInNoSave(PLAYER_PED)        
             setCarHealth(car,1000)
             fcommon.CheatActivated()
         end
@@ -95,7 +109,7 @@ function module.vehicles_section()
     imgui.SameLine()
     if imgui.Button("Unflip Vehicle",imgui.ImVec2(100,50)) then
         if isCharInAnyCar(PLAYER_PED) then
-            car = getCarCharIsUsing(PLAYER_PED)        
+            car = storeCarCharIsInNoSave(PLAYER_PED)        
             setCarRoll(car,0)
             fcommon.CheatActivated()
         end
@@ -103,7 +117,7 @@ function module.vehicles_section()
     imgui.SameLine()
     if imgui.Button("Lock Doors",imgui.ImVec2(100,50)) then
         if isCharInAnyCar(PLAYER_PED) then
-            car = getCarCharIsUsing(PLAYER_PED)        
+            car = storeCarCharIsInNoSave(PLAYER_PED)        
             if getCarDoorLockStatus(car) == 4 then
                 lockCarDoors(car,1)
                 fcommon.CheatDeactivated()
@@ -132,14 +146,14 @@ function module.vehicles_section()
         end
         if imgui.Button("Set Speed",imgui.ImVec2(75,22)) then
             if isCharInAnyCar(PLAYER_PED) then
-                car = getCarCharIsUsing(PLAYER_PED)
+                car = storeCarCharIsInNoSave(PLAYER_PED)
                 setCarForwardSpeed(car,tvehicles.speed.v)
             end
         end
         imgui.SameLine()
         if imgui.Button("Instant Stop",imgui.ImVec2(75,22)) then
             if isCharInAnyCar(PLAYER_PED) then
-                car = getCarCharIsUsing(PLAYER_PED)
+                car = storeCarCharIsInNoSave(PLAYER_PED)
                 setCarForwardSpeed(car,0.0)
             end
         end
@@ -148,15 +162,12 @@ function module.vehicles_section()
     if imgui.BeginMenu("Vehicle Colors") then
         imgui.Spacing()
         imgui.Text("Vehicle Colors")
-        fcommon.information_tooltip("Sets player vehicle color.")
+        fcommon.information_tooltip("Sets vehicle color")
         imgui.Separator()
         imgui.Spacing()
-        if imgui.ColorEdit3('Primary Color', tvehicles.color.rgb) then
-            if isCharInAnyCar() then
-                car = getCarCharIsUsing(PLAYER_PED)
-                x,y = getCarColours(car)
-                printString(tostring(x),1000)
-            end
+        
+        if imgui.ColorPicker3("Color", tvehicles.color) then
+            set_car_color()
         end
         imgui.EndMenu()
     end
@@ -213,7 +224,7 @@ function module.vehicles_section()
 
         if imgui.Checkbox("Vehicle lights on",tvehicles.lights.all) then
             if isCharInAnyCar(PLAYER_PED) then
-                car = getCarCharIsUsing(PLAYER_PED)
+                car = storeCarCharIsInNoSave(PLAYER_PED)
                 if fvehicles.tvehicles.lights.all.v == true then
                     forceCarLights(car,2)
                     addOneOffSound(x,y,z,1052)

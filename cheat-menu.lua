@@ -2,7 +2,7 @@ script_name("Cheat Menu")
 script_author("Grinch_")
 script_description("Cheat Menu for Grnad Theft Auto San Andreas")
 script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu")
-script_dependencies("imgui","memory")
+script_dependencies("imgui","memory","MoonAdditions")
 version = {
     release = "Prerelease",
     number  = 1.2,
@@ -30,31 +30,39 @@ keys =
     airbreak_down     = 0x28, -- Arrow down - moves player down in airbreak mode
 }
 
+
+
 ------------------------------------------------------------
 
 -- Script Dependencies
-imgui = require 'imgui'
-memory = require 'memory'
-glob = require 'game.globals'         
+imgui       = require 'imgui'
+memory      = require 'memory'
+glob        = require 'game.globals'      
+mad         = require "MoonAdditions"
 
 -- Loading custom modules
-fabout = require 'cheat-menu.modules.about'
-fcheats = require 'cheat-menu.modules.cheats'
-fcommon = require 'cheat-menu.modules.common'
-fgame = require 'cheat-menu.modules.game'
-fgangs = require 'cheat-menu.modules.gangs'
-fmain = require 'cheat-menu.modules.main'
+fabout      = require 'cheat-menu.modules.about'
+fcheats     = require 'cheat-menu.modules.cheats'
+fcommon     = require 'cheat-menu.modules.common'
+fgame       = require 'cheat-menu.modules.game'
+fgangs      = require 'cheat-menu.modules.gangs'
+fmain       = require 'cheat-menu.modules.main'
 fmemcontrol = require 'cheat-menu.modules.memory_control'
-fmenu = require 'cheat-menu.modules.menu'
-fmisson = require 'cheat-menu.modules.mission'
-fpeds = require 'cheat-menu.modules.peds'
-fplayer = require 'cheat-menu.modules.player'
-fskills = require 'cheat-menu.modules.skills'
-fteleport = require 'cheat-menu.modules.teleportation'
-fvehicles = require 'cheat-menu.modules.vehicles'
-fvisuals = require 'cheat-menu.modules.visuals'
-fweapons = require 'cheat-menu.modules.weapons'
+fmenu       = require 'cheat-menu.modules.menu'
+fmisson     = require 'cheat-menu.modules.mission'
+fpeds       = require 'cheat-menu.modules.peds'
+fplayer     = require 'cheat-menu.modules.player'
+fskills     = require 'cheat-menu.modules.skills'
+fteleport   = require 'cheat-menu.modules.teleportation'
+fvehicles   = require 'cheat-menu.modules.vehicles'
+fvisuals    = require 'cheat-menu.modules.visuals'
+fweapons    = require 'cheat-menu.modules.weapons'
 ------------------------------------------------------------
+
+
+
+
+
 local DISTANCE = 10.0
 local corner = 0
 window = {
@@ -141,7 +149,7 @@ function imgui.OnDrawFrame()
         
         if fgame.tfps.bool.v or fvehicles.tvehicles.show.speed.v or fvehicles.tvehicles.show.health.v then
             imgui.PushStyleVar(imgui.StyleVar.Alpha,0.65)
-            if imgui.Begin('Overlay', window.overlay,4449) then
+            if imgui.Begin('Overlay', window.overlay,imgui.WindowFlags.NoTitleBar + imgui.WindowFlags.NoResize + imgui.WindowFlags.NoCollapse + imgui.WindowFlags.AlwaysAutoResize + imgui.WindowFlags.NoFocusOnAppearing) then
                 if fgame.tfps.bool.v == true then
                     imgui.Text("Frames :" .. tostring(math.floor(cheat_menu.io.Framerate))) 
                 end

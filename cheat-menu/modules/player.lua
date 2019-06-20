@@ -7,6 +7,7 @@ local aim_skin_changer = imgui.ImBool(false)
 local player_proofs = imgui.ImBool(false)
 local fighting_style = 0
 local walking_style = 0
+local never_wanted = imgui.ImBool(false)
 
 module.aim_skin_changer = aim_skin_changer
 module.player_proofs = player_proofs
@@ -159,9 +160,13 @@ function wanted_level_menu()
             callMethod(0x609F50 ,CPlayer,2,2,0)
         end
         imgui.SameLine()
-        if imgui.Button("Never Wanted") then
+        if imgui.Checkbox("Never wanted",never_wanted) then
             callFunction(0x4396C0,1,0,false)
-            printHelpString("Never wanted switched")
+            if never_wanted.v then
+                fcommon.CheatActivated()
+            else
+                fcommon.CheatDeactivated()
+            end
         end
         imgui.EndMenu()
     end
