@@ -6,7 +6,8 @@ local module = {}
 local tteleport =
 {
     shotcut =  imgui.ImBool(false),
-    coords  =  imgui.ImBuffer(24)
+    coords  =  imgui.ImBuffer(24),
+    current_coords = imgui.ImBool(false),
 }
 
 module.tteleport = tteleport
@@ -27,8 +28,13 @@ function module.teleportation_section()
     imgui.Text(string.format("Teleportation (Current Coordinates: %d %d %d)", math.floor(x) , math.floor(y) , math.floor(z)))  
     imgui.Separator()
     fcommon.ValueSwitch({name = "Quick teleport",var = tteleport.shotcut,help_text = "Teleport to marker can be quickly accessed by pressing (X + Y) key combinartion."})
+    imgui.SameLine()
+    fcommon.ValueSwitch({name = "Current Coordinates",var = tteleport.current_coords,help_text = "Set current coordinates"})
     if imgui.InputText("Co-ordinates",tteleport.coords,24) then
     end 
+    if tteleport.current_coords.v then
+        tteleport.coords.v = string.format("%d, %d, %d", math.floor(x) , math.floor(y) , math.floor(z))
+    end
     fcommon.information_tooltip("Enter XYZ coordinates.\nFormat : X,Y,Z")
     imgui.Dummy(imgui.ImVec2(0,10))
     if imgui.Button("Teleport to coord",imgui.ImVec2(120,0)) then

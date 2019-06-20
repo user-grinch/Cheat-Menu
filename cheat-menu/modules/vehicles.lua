@@ -7,7 +7,12 @@ local tvehicles =
         speed = imgui.ImBool(false),
         health = imgui.ImBool(false),
     },
-    color = imgui.ImFloat3(0.0,0.0,0.0),
+
+    color = 
+    {
+        rgb     = imgui.ImFloat3(0.0,0.0,0.0),
+        default = -1,
+    },
     lights = 
     {
         all    = imgui.ImBool(false),
@@ -77,7 +82,7 @@ vehicle_entry = function(model)
     end
 end
 
-function set_car_color()
+function module.set_car_color(func)
     if isCharInAnyCar(PLAYER_PED) then
         car = storeCarCharIsInNoSave(PLAYER_PED)
         for _, comp in ipairs(mad.get_all_vehicle_components(car)) do
@@ -85,11 +90,13 @@ function set_car_color()
                 for _, mat in ipairs(obj:get_materials()) do
                     local r, g, b, old_a = mat:get_color()
                     if (r == 0x3C and g == 0xFF and b == 0x00) or (r == 0xFF and g == 0x00 and b == 0xAF) then
-                        mat:set_color(tvehicles.color.v[1]*255, tvehicles.color.v[2]*255, tvehicles.color.v[3]*255, 255.0)
+                        func(mat)
+                        tvehicles.color.default = getCarColours(car)
                     end
                 end
             end
         end
+        markCarAsNoLongerNeeded(car)
     end
 end
 
@@ -165,9 +172,15 @@ function module.vehicles_section()
         fcommon.information_tooltip("Sets vehicle color")
         imgui.Separator()
         imgui.Spacing()
-        
-        if imgui.ColorPicker3("Color", tvehicles.color) then
-            set_car_color()
+        if imgui.Button("Reset car color",imgui.ImVec2(100.0,25.0)) then
+            module.set_car_color(function(mat)
+                mat:reset_color()
+            end)
+        end
+        if imgui.ColorPicker3("Color", tvehicles.color.rgb) then
+            module.set_car_color(function(mat)
+                mat:set_color(tvehicles.color.rgb.v[1]*255, tvehicles.color.rgb.v[2]*255, tvehicles.color.rgb.v[3]*255, 255.0)
+            end)
         end
         imgui.EndMenu()
     end

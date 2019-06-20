@@ -19,20 +19,20 @@ function module.main_section()
         end
     end
         
-    -- Airbreak feature
-    fgame.airbreak_mode()
-
-    -- Draw coordinates on screen
-    if fvisuals.show_coordinates.v == true then
-        x,y,z = getCharCoordinates(PLAYER_PED)
-        printString(string.format("Coordinates: %d %d %d", math.floor(x) , math.floor(y) , math.floor(z)),1000)
-        if isKeyDown(keys.control_key)
-        and isKeyDown(keys.coords_copy) then
-            fcommon.keywait(keys.control_key,keys.coords_copy)
-            setClipboardText(string.format("%d %d %d", x,y,z))
-            printHelpString("Coordinates saved to clipboard")
+    -- This is to fix car colors not being applied using opcode changecarcolours
+    if fvehicles.tvehicles.color.default ~= -1 then
+        if isCharInAnyCar(PLAYER_PED) then
+            color_id = getCarColours(car)
+            if fvehicles.tvehicles.color.default ~= color_id then
+                fvehicles.set_car_color(function(mat)
+                    mat:reset_color()
+                end)
+            end
         end
     end
+
+    -- Airbreak feature
+    fgame.airbreak_mode()
 
     if fplayer.player_proofs.v then
         setCharProofs(PLAYER_PED,true,true,true,true,true)
