@@ -3,6 +3,33 @@
 local module = {}
 local tvehicles =
 {
+    components = 
+    {
+        value = imgui.ImInt(0),
+        list = 
+        {
+            "All",
+            "wheel_rf_dummy",
+            "wheel_lb_dummy",
+            "wheel_lf_dummy",
+            "wheel_rb_dummy",
+            "chassis_dummy",
+            "chassis_vlo",
+            "exhaust_ok",
+            "chassis",
+            "ug_nitro",
+            "door_lr_dummy",
+            "bump_rear_dummy",
+            "bonnet_dummy",
+            "bump_front_dummy",
+            "door_lf_dummy",
+            "door_rf_dummy",
+            "door_rr_dummy",
+            "windscreen_dummy",
+            "boot_dummy",
+        },
+
+    },
     show = {
         speed = imgui.ImBool(false),
         health = imgui.ImBool(false),
@@ -88,11 +115,8 @@ function module.set_car_color(func)
         for _, comp in ipairs(mad.get_all_vehicle_components(car)) do
             for _, obj in ipairs(comp:get_objects()) do
                 for _, mat in ipairs(obj:get_materials()) do
-                    local r, g, b, old_a = mat:get_color()
-                    if (r == 0x3C and g == 0xFF and b == 0x00) or (r == 0xFF and g == 0x00 and b == 0xAF) then
-                        func(mat)
-                        tvehicles.color.default = getCarColours(car)
-                    end
+                    func(mat,comp)
+                    tvehicles.color.default = getCarColours(car)
                 end
             end
         end
@@ -178,10 +202,17 @@ function module.vehicles_section()
                 mat:reset_color()
             end)
         end
+        imgui.Combo("Component(s)",tvehicles.components.value,tvehicles.components.list)
         if imgui.ColorPicker3("Color", tvehicles.color.rgb) then
-            module.set_car_color(function(mat)
+            module.set_car_color(function(mat,comp)
+                local r, g, b, old_a = mat:get_color()
                 fixCar(car)
-                mat:set_color(tvehicles.color.rgb.v[1]*255, tvehicles.color.rgb.v[2]*255, tvehicles.color.rgb.v[3]*255, 255.0)
+                if tvehicles.components.value.v == 0 and (r == 0x3C and g == 0xFF and b == 0x00) or (r == 0xFF and g == 0x00 and b == 0xAF) then
+                    mat:set_color(tvehicles.color.rgb.v[1]*255, tvehicles.color.rgb.v[2]*255, tvehicles.color.rgb.v[3]*255, 255.0)
+                end
+                if comp.name == tvehicles.components.list[tvehicles.components.value.v+1] then
+                    mat:set_color(tvehicles.color.rgb.v[1]*255, tvehicles.color.rgb.v[2]*255, tvehicles.color.rgb.v[3]*255, 255.0)
+                end
             end)
         end
         imgui.EndMenu()
@@ -199,6 +230,8 @@ function module.vehicles_section()
         test = true
     end
     ]]--
+
+
     if imgui.BeginMenu("Miscellaneous") then
         imgui.Spacing()
         imgui.Text("Miscellaneous")

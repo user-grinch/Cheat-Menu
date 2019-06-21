@@ -147,7 +147,7 @@ function imgui.OnDrawFrame()
             imgui.SetNextWindowPos(window_pos,0,window_pos_pivot)
         end
         
-        if fgame.tfps.bool.v or fvehicles.tvehicles.show.speed.v or fvehicles.tvehicles.show.health.v then
+        if fgame.tfps.bool.v or fvehicles.tvehicles.show.speed.v or fvehicles.tvehicles.show.health.v or fvisuals.show_coordinates.v then
             imgui.PushStyleVar(imgui.StyleVar.Alpha,0.65)
             if imgui.Begin('Overlay', window.overlay,imgui.WindowFlags.NoTitleBar + imgui.WindowFlags.NoResize + imgui.WindowFlags.NoCollapse + imgui.WindowFlags.AlwaysAutoResize + imgui.WindowFlags.NoFocusOnAppearing) then
                 if fgame.tfps.bool.v == true then
@@ -165,6 +165,17 @@ function imgui.OnDrawFrame()
             
                     if fvehicles.tvehicles.show.health.v == true then
                         imgui.Text(string.format("Health  :%d",getCarHealth(car)))
+                    end
+                end
+                
+                if fvisuals.show_coordinates.v == true then
+                    x,y,z = getCharCoordinates(PLAYER_PED)
+                    imgui.Text(string.format("Coordinates: %d %d %d", math.floor(x) , math.floor(y) , math.floor(z)),1000)
+                    if isKeyDown(keys.control_key)
+                    and isKeyDown(keys.coords_copy) then
+                        fcommon.keywait(keys.control_key,keys.coords_copy)
+                        setClipboardText(string.format("%d %d %d", x,y,z))
+                        printHelpString("Coordinates saved to clipboard")
                     end
                 end
 
