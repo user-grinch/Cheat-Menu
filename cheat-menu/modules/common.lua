@@ -263,7 +263,7 @@ function module.list_ped_images(func)
         if imgui.ImageButton(fpeds.tpeds.list[tostring(model)],imgui.ImVec2(50,80)) then 
             func(model) 
         end
-        if model % 10 ~= 9 then
+        if model % 5 ~= 4 then
             imgui.SameLine()
         end
     end

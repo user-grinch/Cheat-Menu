@@ -109,7 +109,7 @@ function module.vehicles_section()
     if imgui.Button("Repair Vehicle",imgui.ImVec2(100,50)) then
         if isCharInAnyCar(PLAYER_PED) then
             car = storeCarCharIsInNoSave(PLAYER_PED)        
-            setCarHealth(car,1000)
+            fixCar(car)
             fcommon.CheatActivated()
         end
     end
@@ -166,6 +166,7 @@ function module.vehicles_section()
         end
         imgui.EndMenu()
     end
+
     if imgui.BeginMenu("Vehicle Colors") then
         imgui.Spacing()
         imgui.Text("Vehicle Colors")
@@ -179,12 +180,25 @@ function module.vehicles_section()
         end
         if imgui.ColorPicker3("Color", tvehicles.color.rgb) then
             module.set_car_color(function(mat)
+                fixCar(car)
                 mat:set_color(tvehicles.color.rgb.v[1]*255, tvehicles.color.rgb.v[2]*255, tvehicles.color.rgb.v[3]*255, 255.0)
             end)
         end
         imgui.EndMenu()
     end
+
+
+ --[[
+     Click to open Unfinished state
+
+    if not ( not  imgui.IsRootWindowFocused() and imgui.IsAnyWindowHovered()) and not imgui.IsItemHovered() then
+        test = false
+    end
     
+    if imgui.IsItemClicked() then
+        test = true
+    end
+    ]]--
     if imgui.BeginMenu("Miscellaneous") then
         imgui.Spacing()
         imgui.Text("Miscellaneous")
