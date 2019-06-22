@@ -18,7 +18,9 @@ function module.teleport(x,y,z)
         bool, x,y,z = getTargetBlipCoordinates()
         z = -100
     end
-    setCharCoordinates(PLAYER_PED,x,y,z) 
+    if x ~= 0 and y ~= 0 then
+        setCharCoordinates(PLAYER_PED,x,y,z) 
+    end
 end
 
 

@@ -8,7 +8,7 @@ local tvehicles =
         value = imgui.ImInt(0),
         list = 
         {
-            "All",
+            "Default",
             "wheel_rf_dummy",
             "wheel_lb_dummy",
             "wheel_lf_dummy",
