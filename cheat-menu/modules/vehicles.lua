@@ -100,7 +100,7 @@ end
 -- Creates vehicles entry
 vehicle_entry = function(model)
     if imgui.ImageButton(tvehicles.list[tostring(model)],imgui.ImVec2(70,40)) then 
-        give_vehicle_to_player(model)
+        module.give_vehicle_to_player(model)
     end
     if imgui.IsItemHovered() then
         imgui.BeginTooltip() 
