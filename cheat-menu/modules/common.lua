@@ -28,7 +28,7 @@ function module.quick_spawner()
             end
 
             local vehicle = fvehicles.CBaseModelInfo(text)
-            if fvehicles.tvehicles.quick_spawn.v == true and vehicle < 100000 then
+            if fvehicles.tvehicles.quick_spawn.v == true and vehicle > 400 and vehicle < 100000 then
                 fvehicles.give_vehicle_to_player(vehicle)
                 return
             end

@@ -66,13 +66,13 @@ module.tvehicles = tvehicles
 
 function module.CBaseModelInfo(name)
     local pInfo = allocateMemory(16)
-    callFunction(0x4C5940,2,2,name,pInfo)
+    callFunction(0x004C5940,2,2,name,pInfo)
     local model = readMemory(pInfo,4,false)
     freeMemory(pInfo)
     return model
 end
 
-function give_vehicle_to_player(model)
+function module.give_vehicle_to_player(model)
     if isModelAvailable(model) then
         x,y,z = getCharCoordinates(PLAYER_PED)
         if isCharInAnyCar(PLAYER_PED) then
@@ -100,7 +100,7 @@ end
 -- Creates vehicles entry
 vehicle_entry = function(model)
     if imgui.ImageButton(tvehicles.list[tostring(model)],imgui.ImVec2(70,40)) then 
-        give_vehicle_to_player(model,tvehicles.spawn_plane_in_air.v)
+        give_vehicle_to_player(model)
     end
     if imgui.IsItemHovered() then
         imgui.BeginTooltip() 
