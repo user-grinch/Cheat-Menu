@@ -349,7 +349,7 @@ end
 function module.game_section()
     imgui.Text("Game")
     imgui.Separator()
-    if imgui.Button("Save Game",imgui.ImVec2(155,50)) then
+    if imgui.Button("Save Game",imgui.ImVec2(fcommon.getsize(1),50)) then
         if isCharOnFoot(PLAYER_PED) then
             activateSaveMenu()
         else

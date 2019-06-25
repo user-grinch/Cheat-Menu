@@ -41,10 +41,14 @@ function module.memory_control_section()
             end
             imgui.SameLine()
         end
+        
+        imgui.Columns(2)
         imgui.Checkbox("Virtual Protect", tmemory.vp)
-        imgui.SameLine()
+        imgui.NextColumn()
         imgui.Checkbox("Clear entries", tmemory.clear_entries)
-        if imgui.Button("Read Address",imgui.ImVec2(100,20)) then --and #tmemory.address.v == 8 then
+        imgui.Columns(1)
+
+        if imgui.Button("Read Address",imgui.ImVec2(100,20)) then
             tmemory.value.v = fcommon.rw_memory(tonumber(tmemory.address.v),tmemory.size.v,nil,tmemory.vp.v,tmemory.is_float.v)
             if tmemory.clear_entries.v == 1 then
                 tmemory.value.v = 0

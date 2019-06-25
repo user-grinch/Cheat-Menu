@@ -176,7 +176,7 @@ function module.missions_section()
     imgui.Spacing()
     imgui.Separator()
     imgui.Spacing()
-    if imgui.Button("Abort Current Misson",imgui.ImVec2(155,50)) then
+    if imgui.Button("Abort Current Misson",imgui.ImVec2(fcommon.getsize(1),50)) then
         if getGameGlobal(glob.ONMISSION) == 1 then
             failCurrentMission()
             setGameGlobal(glob.ONMISSION,0)

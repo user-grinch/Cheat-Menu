@@ -9,13 +9,13 @@ function module.skills_section()
     imgui.Spacing()
 
     
-    if imgui.Button("Max Vehicle Skills",imgui.ImVec2(155,50)) then
+    if imgui.Button("Max Vehicle Skills",imgui.ImVec2(fcommon.getsize(2),50)) then
         callFunction(0x4399D0,1,1,false)
         displayNonMinigameHelpMessages(false)
         fcommon.CheatActivated()
     end
     imgui.SameLine()
-    if imgui.Button("Max Weapon Skills",imgui.ImVec2(155,50)) then     
+    if imgui.Button("Max Weapon Skills",imgui.ImVec2(fcommon.getsize(2),50)) then     
         for i=69,79,1 do
             setFloatStat(i)
         end         

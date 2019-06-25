@@ -3,6 +3,11 @@
 local module = {}
 local tvehicles =
 {
+    image_size =
+    {
+        x = resX/14,
+        y = resY/15,
+    },
     components = 
     {
         value = imgui.ImInt(0),
@@ -99,7 +104,7 @@ end
 
 -- Creates vehicles entry
 vehicle_entry = function(model)
-    if imgui.ImageButton(tvehicles.list[tostring(model)],imgui.ImVec2(70,40)) then 
+    if imgui.ImageButton(tvehicles.list[tostring(model)],imgui.ImVec2(tvehicles.image_size.x,tvehicles.image_size.y)) then 
         module.give_vehicle_to_player(model)
     end
     if imgui.IsItemHovered() then
@@ -130,7 +135,7 @@ function module.vehicles_section()
     imgui.Separator()
     imgui.Spacing()
 
-    if imgui.Button("Repair Vehicle",imgui.ImVec2(100,50)) then
+    if imgui.Button("Repair Vehicle",imgui.ImVec2(fcommon.getsize(3),50)) then
         if isCharInAnyCar(PLAYER_PED) then
             car = storeCarCharIsInNoSave(PLAYER_PED)        
             fixCar(car)
@@ -138,7 +143,7 @@ function module.vehicles_section()
         end
     end
     imgui.SameLine()
-    if imgui.Button("Unflip Vehicle",imgui.ImVec2(100,50)) then
+    if imgui.Button("Unflip Vehicle",imgui.ImVec2(fcommon.getsize(3),50)) then
         if isCharInAnyCar(PLAYER_PED) then
             car = storeCarCharIsInNoSave(PLAYER_PED)        
             setCarRoll(car,0)
@@ -146,7 +151,7 @@ function module.vehicles_section()
         end
     end
     imgui.SameLine()
-    if imgui.Button("Lock Doors",imgui.ImVec2(100,50)) then
+    if imgui.Button("Lock Doors",imgui.ImVec2(fcommon.getsize(3),50)) then
         if isCharInAnyCar(PLAYER_PED) then
             car = storeCarCharIsInNoSave(PLAYER_PED)        
             if getCarDoorLockStatus(car) == 4 then

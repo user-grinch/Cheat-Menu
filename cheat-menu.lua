@@ -5,7 +5,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu
 script_dependencies("imgui","memory","MoonAdditions")
 version = {
     release = "Prerelease",
-    number  = 1.2,
+    number  = 1.25,
 }
 script_version(version.release)
 script_version_number(version.number)
@@ -30,8 +30,7 @@ keys =
     airbreak_down     = 0x28, -- Arrow down - moves player down in airbreak mode
 }
 
-
-
+resX,resY = getScreenResolution()
 ------------------------------------------------------------
 
 -- Script Dependencies
@@ -57,10 +56,16 @@ fteleport   = require 'cheat-menu.modules.teleportation'
 fvehicles   = require 'cheat-menu.modules.vehicles'
 fvisuals    = require 'cheat-menu.modules.visuals'
 fweapons    = require 'cheat-menu.modules.weapons'
+flibweapons = require 'lib.game.weapons'
 ------------------------------------------------------------
 
 
 
+
+cheat_menu = 
+{
+    auto_reload = imgui.ImBool(false)
+}
 
 
 local DISTANCE = 10.0
@@ -70,11 +75,6 @@ window = {
     overlay = imgui.ImBool(true),
 }
 
-cheat_menu = 
-{
-    io = imgui.GetIO(),
-    auto_reload = imgui.ImBool(false)
-}
 
 function ternary ( cond , T , F )
     if cond then return T else return F end
@@ -84,13 +84,17 @@ function imgui.OnDrawFrame()
     if  window.main.v then
 
         -- Setting up Cheat-Menu size
-        imgui.SetNextWindowSize(imgui.ImVec2(cheat_menu.io.DisplaySize.x/4,cheat_menu.io.DisplaySize.y/1.2), imgui.Cond.FirstUseEver)
+        imgui.SetNextWindowSize(imgui.ImVec2(resX/4,resY/1.2), imgui.Cond.FirstUseEver)
 
         imgui.RenderInMenu = fmenu.tmenu.render_in_menu.v
         imgui.LockPlayer   = fmenu.tmenu.lock_player.v  
 
-        imgui.Begin('Cheat Menu by Grinch_', window.main)
+        imgui.Begin(string.format("Cheat Menu v%.2f by Grinch_",version.number), window.main)
 
+        if resX < 1280 or resY < 720 then
+            imgui.Text("Cheat Menu isn't optimized for your current screen resolution.")
+            imgui.Spacing()
+        end
         if imgui.CollapsingHeader("Teleportation",true) then
            fteleport.teleportation_section()
         end
@@ -142,7 +146,7 @@ function imgui.OnDrawFrame()
         imgui.ShowCursor   = window.main.v
 
         if (corner ~= -1) then
-            window_pos       = imgui.ImVec2(ternary((corner == 1 or corner == 3),cheat_menu.io.DisplaySize.x - DISTANCE,DISTANCE),ternary((corner == 2 or corner == 3),cheat_menu.io.DisplaySize.y - DISTANCE,DISTANCE))
+            window_pos       = imgui.ImVec2(ternary((corner == 1 or corner == 3),resX - DISTANCE,DISTANCE),ternary((corner == 2 or corner == 3),resY - DISTANCE,DISTANCE))
             window_pos_pivot = imgui.ImVec2(ternary((corner == 1 or corner == 3),1.0,0.0),ternary((corner == 2 or corner == 3),1.0,0.0))
             imgui.SetNextWindowPos(window_pos,0,window_pos_pivot)
         end

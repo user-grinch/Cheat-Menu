@@ -4,6 +4,11 @@ local module = {}
 
 local tweapons =
 {
+    image_size =
+    {
+        x = resX/21.3,
+        y = resY/12,
+    },
     list = {},
     path = getGameDirectory() .. "\\moonloader\\cheat-menu\\weapons\\",
     quick_spawn = imgui.ImBool(false),
@@ -18,7 +23,7 @@ local flibweapons = require 'lib.game.weapons'
 -- Creates weapon entry
 weapon_entry = function (weapon)
     model = getWeapontypeModel(weapon)
-    if imgui.ImageButton(tweapons.list[tostring(model)],imgui.ImVec2(48,48)) then 
+    if imgui.ImageButton(tweapons.list[tostring(model)],imgui.ImVec2(tweapons.image_size.x,tweapons.image_size.y)) then 
         module.give_weapon_to_player(weapon,tweapons.quick_spawn.v)
     end
     if imgui.IsItemHovered() then
@@ -49,12 +54,12 @@ function module.weapons_section()
     imgui.Separator()
     imgui.Spacing()
 
-    if imgui.Button("Remove all weapons",imgui.ImVec2(155,50)) then
+    if imgui.Button("Remove all weapons",imgui.ImVec2(fcommon.getsize(2),50)) then
         removeAllCharWeapons(PLAYER_PED)
         fcommon.CheatActivated()
     end
     imgui.SameLine()
-    if imgui.Button("Remove current weapon",imgui.ImVec2(155,50)) then
+    if imgui.Button("Remove current weapon",imgui.ImVec2(fcommon.getsize(2),50)) then
         removeWeaponFromChar(PLAYER_PED,getCurrentCharWeapon(PLAYER_PED))
         fcommon.CheatActivated()
     end
@@ -96,17 +101,17 @@ function module.weapons_section()
     imgui.Text("Weapon Sets")
     imgui.Separator()
     imgui.Spacing()
-    if imgui.Button("Weapon Set 1",imgui.ImVec2(100,25)) then
+    if imgui.Button("Weapon Set 1",imgui.ImVec2(fcommon.getsize(3),25)) then
         callFunction(0x4385B0,1,1,false)
         fcommon.CheatActivated()
     end
     imgui.SameLine()
-    if imgui.Button("Weapon Set 2",imgui.ImVec2(100,25)) then
+    if imgui.Button("Weapon Set 2",imgui.ImVec2(fcommon.getsize(3),25)) then
         callFunction(0x438890,1,1,false)
         fcommon.CheatActivated()
     end
     imgui.SameLine()
-    if imgui.Button("Weapon Set 3",imgui.ImVec2(100,25)) then
+    if imgui.Button("Weapon Set 3",imgui.ImVec2(fcommon.getsize(3),25)) then
         callFunction(0x438B30,1,1,false)
         fcommon.CheatActivated()
     end

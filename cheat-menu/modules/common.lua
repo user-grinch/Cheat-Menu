@@ -64,7 +64,12 @@ function module.ValueSwitch(arg)
     end
 end
 
-function module.entries(title,func,id)
+function module.getsize(count)
+   return (imgui.GetWindowWidth()-25) / count
+end
+
+function module.entries(title,func,id,sameline)
+    if sameline == nil then sameline = 3 end
     if imgui.BeginMenu(title) then
         imgui.Spacing()
         imgui.Text(title)
@@ -73,7 +78,7 @@ function module.entries(title,func,id)
         
         for i=1,#id,1 do
             func(id[i])
-            if (i == 1) or (i % 3 ~= 0) then
+            if (i == 1) or (i % sameline ~= 0) then
                 imgui.SameLine()
             end    
         end
@@ -255,17 +260,6 @@ function module.check_box(arg)
     end 
     if arg.help_text ~= nil then
         module.information_tooltip(arg.help_text)
-    end
-end
-
-function module.list_ped_images(func)
-    for model = 0,299,1 do
-        if imgui.ImageButton(fpeds.tpeds.list[tostring(model)],imgui.ImVec2(50,80)) then 
-            func(model) 
-        end
-        if model % 5 ~= 4 then
-            imgui.SameLine()
-        end
     end
 end
 
