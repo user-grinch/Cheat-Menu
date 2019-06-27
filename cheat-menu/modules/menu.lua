@@ -9,8 +9,6 @@ local tmenu =
 
 module.tmenu = tmenu
 
--- Custom imgui style used for the cheat-menu
-
 function module.menu_apply_style()
     imgui.SwitchContext()
     local style = imgui.GetStyle()
@@ -103,4 +101,5 @@ function module.menu_configuration_section()
         imgui.EndMenu()
     end
 end
+
 return module

@@ -102,8 +102,16 @@ function module.give_vehicle_to_player(model)
     end
 end
 
--- Creates vehicles entry
+
 vehicle_entry = function(model)
+
+    if tvehicles.list[tostring(model)] == nil then
+        lua_thread.create(fcommon.load_texture,tvehicles.list,tvehicles.path,model,".jpg")
+        while tvehicles.list[tostring(model)] == nil do
+            wait(0)
+        end
+    end
+
     if imgui.ImageButton(tvehicles.list[tostring(model)],imgui.ImVec2(tvehicles.image_size.x,tvehicles.image_size.y)) then 
         module.give_vehicle_to_player(model)
     end

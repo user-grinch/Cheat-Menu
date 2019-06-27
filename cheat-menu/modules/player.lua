@@ -210,10 +210,18 @@ function gf_menu()
     end
 end
 
-skin_entry = function(model,func)
+
+skin_entry = function(model)
+
+    if fpeds.tpeds.list[tostring(model)] == nil then
+        lua_thread.create(fcommon.load_texture,fpeds.tpeds.list,fpeds.tpeds.path,model,".jpg")
+        while fpeds.tpeds.list[tostring(model)] == nil do
+            wait(0)
+        end
+    end
+
     if imgui.ImageButton(fpeds.tpeds.list[tostring(model)],imgui.ImVec2(fpeds.tpeds.image_size.x,fpeds.tpeds.image_size.y)) then 
         change_player_model(model)
-        func(model)
     end
     if fpeds.tpeds.all[model] ~= nil and imgui.IsItemHovered() then
         imgui.BeginTooltip() 

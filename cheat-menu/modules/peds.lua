@@ -361,6 +361,14 @@ function give_ped_to_player(model)
 end
 
 ped_entry = function(model)
+
+    if tpeds.list[tostring(model)] == nil then
+        lua_thread.create(fcommon.load_texture,tpeds.list,tpeds.path,model,".jpg")
+        while tpeds.list[tostring(model)] == nil do
+            wait(0)
+        end
+    end
+
     if imgui.ImageButton(tpeds.list[tostring(model)],imgui.ImVec2(tpeds.image_size.x,tpeds.image_size.y)) then 
         give_ped_to_player(model)
     end

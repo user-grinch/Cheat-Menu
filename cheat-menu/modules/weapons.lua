@@ -23,6 +23,14 @@ local flibweapons = require 'lib.game.weapons'
 -- Creates weapon entry
 weapon_entry = function (weapon)
     model = getWeapontypeModel(weapon)
+
+    if tweapons.list[tostring(model)] == nil then
+        lua_thread.create(fcommon.load_texture,tweapons.list,tweapons.path,model,".png")
+        while tweapons.list[tostring(model)] == nil do
+            wait(0)
+        end
+    end
+
     if imgui.ImageButton(tweapons.list[tostring(model)],imgui.ImVec2(tweapons.image_size.x,tweapons.image_size.y)) then 
         module.give_weapon_to_player(weapon,tweapons.quick_spawn.v)
     end

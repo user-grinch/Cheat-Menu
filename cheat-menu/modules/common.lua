@@ -1,6 +1,8 @@
 -- This module contains all common functions used all over the menu
 
 local module = {}
+local radio_button = imgui.ImInt()
+
 
 function module.quick_spawner()
 
@@ -68,6 +70,12 @@ function module.getsize(count)
    return (imgui.GetWindowWidth()-25) / count
 end
 
+function module.load_texture(list,path,model,extention)
+    local func_path = path .. tostring(model) .. extention
+    local image = imgui.CreateTextureFromFile(func_path)
+    list[tostring(model)] = image
+end
+
 function module.entries(title,func,id,sameline)
     if sameline == nil then sameline = 3 end
     if imgui.BeginMenu(title) then
@@ -86,29 +94,6 @@ function module.entries(title,func,id,sameline)
         imgui.EndMenu()
     end
 end
-
--- Loads peds,weapons & vehicles textures
-function get_textures(path,array,extention)
-	mask = string.format( "%s*%s",path,extention)
-	
-    local handle,file = findFirstFile(mask)
-    while handle and file do 
-        local f = path .. file
-        index  = file:sub(1,(file:len()-4))
-        array[tostring(index)] = imgui.CreateTextureFromFile(f)
-        file = findNextFile(handle)
-    end
-    findClose(handle)
-end
-
-function module.load_textures()
-    get_textures(fweapons.tweapons.path,fweapons.tweapons.list,"png")
-    get_textures(fvehicles.tvehicles.path,fvehicles.tvehicles.list,"jpg")
-    get_textures(fpeds.tpeds.path,fpeds.tpeds.list,"jpg")
-end
-
-
-local radio_button = imgui.ImInt()
 
 function module.radio_menu(header_text,rb_table,addr_table,style)
     imgui.Text(header_text)

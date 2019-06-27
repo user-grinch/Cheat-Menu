@@ -34,29 +34,29 @@ resX,resY = getScreenResolution()
 ------------------------------------------------------------
 
 -- Script Dependencies
-imgui       = require 'imgui'
-memory      = require 'memory'
-glob        = require 'game.globals'      
-mad         = require "MoonAdditions"
+imgui         = require 'imgui'
+memory        = require 'memory'
+glob          = require 'game.globals'      
+mad           = require 'MoonAdditions'
 
 -- Loading custom modules
-fabout      = require 'cheat-menu.modules.about'
-fcheats     = require 'cheat-menu.modules.cheats'
-fcommon     = require 'cheat-menu.modules.common'
-fgame       = require 'cheat-menu.modules.game'
-fgangs      = require 'cheat-menu.modules.gangs'
-fmain       = require 'cheat-menu.modules.main'
-fmemcontrol = require 'cheat-menu.modules.memory_control'
-fmenu       = require 'cheat-menu.modules.menu'
-fmisson     = require 'cheat-menu.modules.mission'
-fpeds       = require 'cheat-menu.modules.peds'
-fplayer     = require 'cheat-menu.modules.player'
-fskills     = require 'cheat-menu.modules.skills'
-fteleport   = require 'cheat-menu.modules.teleportation'
-fvehicles   = require 'cheat-menu.modules.vehicles'
-fvisuals    = require 'cheat-menu.modules.visuals'
-fweapons    = require 'cheat-menu.modules.weapons'
-flibweapons = require 'lib.game.weapons'
+fabout        = require 'cheat-menu.modules.about'
+fcheats       = require 'cheat-menu.modules.cheats'
+fcommon       = require 'cheat-menu.modules.common'
+fgame         = require 'cheat-menu.modules.game'
+fgangs        = require 'cheat-menu.modules.gangs'
+fmain         = require 'cheat-menu.modules.main'
+fmemcontrol   = require 'cheat-menu.modules.memory_control'
+fmenu         = require 'cheat-menu.modules.menu'
+fmisson       = require 'cheat-menu.modules.mission'
+fpeds         = require 'cheat-menu.modules.peds'
+fplayer       = require 'cheat-menu.modules.player'
+fskills       = require 'cheat-menu.modules.skills'
+fteleport     = require 'cheat-menu.modules.teleportation'
+fvehicles     = require 'cheat-menu.modules.vehicles'
+fvisuals      = require 'cheat-menu.modules.visuals'
+fweapons      = require 'cheat-menu.modules.weapons'
+flibweapons   = require 'lib.game.weapons'
 ------------------------------------------------------------
 
 
@@ -209,7 +209,7 @@ function main()
 
     -- These will load only once
     fmenu.menu_apply_style()
-    fcommon.load_textures()
+  --  fcommon.load_textures()
 
     while true do
         -- This part loops every frame
