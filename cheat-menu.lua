@@ -155,7 +155,7 @@ function imgui.OnDrawFrame()
             imgui.PushStyleVar(imgui.StyleVar.Alpha,0.65)
             if imgui.Begin('Overlay', window.overlay,imgui.WindowFlags.NoTitleBar + imgui.WindowFlags.NoResize + imgui.WindowFlags.NoCollapse + imgui.WindowFlags.AlwaysAutoResize + imgui.WindowFlags.NoFocusOnAppearing) then
                 if fgame.tfps.bool.v == true then
-                    imgui.Text("Frames :" .. tostring(math.floor(cheat_menu.io.Framerate))) 
+                    imgui.Text("Frames :" .. tostring(math.floor(imgui.GetIO().Framerate))) 
                 end
                 
                 if isCharInAnyCar(PLAYER_PED) then
@@ -168,7 +168,7 @@ function imgui.OnDrawFrame()
                     end
             
                     if fvehicles.tvehicles.show.health.v == true then
-                        imgui.Text(string.format("Health  :%d",getCarHealth(car)))
+                        imgui.Text(string.format("Health  :%.0f%%",getCarHealth(car)/10))
                     end
                 end
                 
