@@ -103,22 +103,27 @@ function module.give_vehicle_to_player(model)
 end
 
 
-vehicle_entry = function(model)
+vehicle_entry = function(model) 
 
-    if tvehicles.list[tostring(model)] == nil then
-        lua_thread.create(fcommon.load_texture,tvehicles.list,tvehicles.path,model,".jpg")
-        while tvehicles.list[tostring(model)] == nil do
-            wait(0)
+    if tvehicles.list[tostring(model)] ~= "LOADING"  then
+
+        if tvehicles.list[tostring(model)] == nil then
+            tvehicles.list[tostring(model)] = "LOADING"
+            lua_thread.create(fcommon.load_texture,tvehicles.list,tvehicles.path,model,".jpg") 
+        else   
+
+            if imgui.ImageButton(tvehicles.list[tostring(model)],imgui.ImVec2(tvehicles.image_size.x,tvehicles.image_size.y)) then 
+                module.give_vehicle_to_player(model)
+            end
+            if imgui.IsItemHovered() then
+                imgui.BeginTooltip() 
+                imgui.SetTooltip(getNameOfVehicleModel(model))
+                imgui.EndTooltip()
+            end
+
         end
-    end
-
-    if imgui.ImageButton(tvehicles.list[tostring(model)],imgui.ImVec2(tvehicles.image_size.x,tvehicles.image_size.y)) then 
-        module.give_vehicle_to_player(model)
-    end
-    if imgui.IsItemHovered() then
-        imgui.BeginTooltip() 
-        imgui.SetTooltip(getNameOfVehicleModel(model))
-        imgui.EndTooltip()
+    else
+        imgui.Spinner("Loading", 15, 3, imgui.GetColorU32(imgui.GetStyle().Colors[imgui.Col.ButtonHovered]))
     end
 end
 
@@ -231,20 +236,6 @@ function module.vehicles_section()
         imgui.EndMenu()
     end
 
-
- --[[
-     Click to open Unfinished state
-
-    if not ( not  imgui.IsRootWindowFocused() and imgui.IsAnyWindowHovered()) and not imgui.IsItemHovered() then
-        test = false
-    end
-    
-    if imgui.IsItemClicked() then
-        test = true
-    end
-    ]]--
-
-
     if imgui.BeginMenu("Miscellaneous") then
         imgui.Spacing()
         imgui.Text("Miscellaneous")
@@ -322,22 +313,22 @@ function module.vehicles_section()
     imgui.Text("Vehicles list")
     imgui.Separator()
     imgui.Spacing()
-    fcommon.entries("Airplanes",vehicle_entry,{592,577,511,512,593,520,553,476,519,460,513})
-    fcommon.entries("Helicopters",vehicle_entry,{548,425,417,487,488,497,563,447,469})
-    fcommon.entries("Boats",vehicle_entry,{472,473,493,595,484,430,453,452,446,454})
-    fcommon.entries("Bikes",vehicle_entry,{581,509,481,462,521,463,510,522,461,448,468,586})
-    fcommon.entries("2-Door & Compact cars",vehicle_entry,{602,496,401,518,527,589,419,587,533,526,474,545,517,410,600,436,439,549,491})
-    fcommon.entries("4-Door & Luxury cars",vehicle_entry,{445,604,507,585,466,492,546,551,516,467,426,547,405,580,409,550,566,540,421,529})
-    fcommon.entries("Civil Service",vehicle_entry,{485,431,438,437,574,420,525,408,552})
-    fcommon.entries("Government Vehicles",vehicle_entry,{416,433,427,490,528,407,544,523,470,596,598,599,597,432,601,428})
-    fcommon.entries("Heavy & Utility trucks",vehicle_entry,{499,609,498,524,532,578,486,406,573,455,403,423,414,443,515,514,531,456,588})
-    fcommon.entries("Light trucks & Vans",vehicle_entry,{459,422,482,605,530,418,572,582,413,440,543,583,478,554})
-    fcommon.entries("SUVs & Wagons",vehicle_entry,{579,400,404,489,505,479,442,458})
-    fcommon.entries("Lowriders",vehicle_entry,{536,575,534,567,535,576,412})
-    fcommon.entries("Muscle Cars",vehicle_entry,{402,542,603,475})
-    fcommon.entries("Street Racers",vehicle_entry,{429,542,415,480,562,565,434,494,502,503,411,559,561,560,506,451,558,555,477})
-    fcommon.entries("RC Vehicles",vehicle_entry,{441,464,594,501,465,564})
-    fcommon.entries("Recreational",vehicle_entry,{568,424,504,457,483,508,571,500,444,556,557,471,495,539})
+    fcommon.show_entries("Airplanes",{592,577,511,512,593,520,553,476,519,460,513},3,tvehicles.list,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel)
+    fcommon.show_entries("Helicopters",{548,425,417,487,488,497,563,447,469},3,tvehicles.list,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel)
+    fcommon.show_entries("Boats",{472,473,493,595,484,430,453,452,446,454},3,tvehicles.list,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel)
+    fcommon.show_entries("Bikes",{581,509,481,462,521,463,510,522,461,448,468,586},3,tvehicles.list,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel)
+    fcommon.show_entries("2-Door & Compact cars",{602,496,401,518,527,589,419,587,533,526,474,545,517,410,600,436,439,549,491},3,tvehicles.list,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel)
+    fcommon.show_entries("4-Door & Luxury cars",{445,604,507,585,466,492,546,551,516,467,426,547,405,580,409,550,566,540,421,529},3,tvehicles.list,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel)
+    fcommon.show_entries("Civil Service",{485,431,438,437,574,420,525,408,552},3,tvehicles.list,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel)
+    fcommon.show_entries("Government Vehicles",{416,433,427,490,528,407,544,523,470,596,598,599,597,432,601,428},3,tvehicles.list,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel)
+    fcommon.show_entries("Heavy & Utility trucks",{499,609,498,524,532,578,486,406,573,455,403,423,414,443,515,514,531,456,588},3,tvehicles.list,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel)
+    fcommon.show_entries("Light trucks & Vans",{459,422,482,605,530,418,572,582,413,440,543,583,478,554},3,tvehicles.list,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel)
+    fcommon.show_entries("SUVs & Wagons",{579,400,404,489,505,479,442,458},3,tvehicles.list,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel)
+    fcommon.show_entries("Lowriders",{536,575,534,567,535,576,412},3,tvehicles.list,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel)
+    fcommon.show_entries("Muscle Cars",{402,542,603,475},3,tvehicles.list,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel)
+    fcommon.show_entries("Street Racers",{429,542,415,480,562,565,434,494,502,503,411,559,561,560,506,451,558,555,477},3,tvehicles.list,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel)
+    fcommon.show_entries("RC Vehicles",{441,464,594,501,465,564},3,tvehicles.list,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel)
+    fcommon.show_entries("Recreational",{568,424,504,457,483,508,571,500,444,556,557,471,495,539},3,tvehicles.list,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel)
 end
 
 return module

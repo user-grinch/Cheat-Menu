@@ -12,7 +12,7 @@ local never_wanted = imgui.ImBool(false)
 module.aim_skin_changer = aim_skin_changer
 module.player_proofs = player_proofs
 
-function change_player_model(model)
+function module.change_player_model(model)
     if fpeds.tpeds.special[model] == nil then      
         if isModelAvailable(model) then 
             requestModel(model)
@@ -213,14 +213,14 @@ end
 
 skin_entry = function(model)
 
-    if fpeds.tpeds.list[tostring(model)] == nil then
-        lua_thread.create(fcommon.load_texture,fpeds.tpeds.list,fpeds.tpeds.path,model,".jpg")
-        while fpeds.tpeds.list[tostring(model)] == nil do
+    if fpeds.fpeds.tpeds.list[tostring(model)] == nil then
+        lua_thread.create(fcommon.load_texture,fpeds.fpeds.tpeds.list,fpeds.fpeds.tpeds.path,model,".jpg")
+        while fpeds.fpeds.tpeds.list[tostring(model)] == nil do
             wait(0)
         end
     end
 
-    if imgui.ImageButton(fpeds.tpeds.list[tostring(model)],imgui.ImVec2(fpeds.tpeds.image_size.x,fpeds.tpeds.image_size.y)) then 
+    if imgui.ImageButton(fpeds.fpeds.tpeds.list[tostring(model)],imgui.ImVec2(fpeds.fpeds.tpeds.image_size.x,fpeds.fpeds.tpeds.image_size.y)) then 
         change_player_model(model)
     end
     if fpeds.tpeds.all[model] ~= nil and imgui.IsItemHovered() then
@@ -242,20 +242,20 @@ function skin_changer_menu()
         imgui.Text("Skin list")
         imgui.Separator()
         imgui.Spacing()
-
         if imgui.BeginMenu("Gangs") then
             imgui.Text("Gangs")
             imgui.Separator()
             imgui.Spacing()
-            fcommon.entries("Ballas",skin_entry,{102,103,104},5)
-            fcommon.entries("Da Nang Boys",skin_entry,{121,122,123},5)
-            fcommon.entries("Groove Families",skin_entry,{105,106,107,269,270,271},5)
-            fcommon.entries("Los Santos Vagos",skin_entry,{108,109,110},5)
-            fcommon.entries("Mafia",skin_entry,{111,112,113},5)
-            fcommon.entries("Russian Mafia",skin_entry,{124,125,126,127},5)
-            fcommon.entries("San Fierro Rifa",skin_entry,{173,174,175},5)
-            fcommon.entries("San Fierro Triads",skin_entry,{117,118,120},5)
-            fcommon.entries("Varrios Los Aztecas",skin_entry,{114,115,116},5)
+    
+            fcommon.show_entries("Ballas",{102,103,104},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Da Nang Boys",{121,122,123},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Groove Families",{105,106,107,269,270,271},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Los Santos Vagos",{108,109,110},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Mafia",{111,112,113},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Russian Mafia",{124,125,126,127},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("San Fierro Rifa",{173,174,175},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("San Fierro Triads",{117,118,120},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Varrios Los Aztecas",{114,115,116},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
             imgui.EndMenu()
         end
     
@@ -263,40 +263,40 @@ function skin_changer_menu()
             imgui.Text("Civillians")
             imgui.Separator()
             imgui.Spacing()
-            fcommon.entries("Antagonist",skin_entry,{290,291,292,293,294,295,296,297,298,299},5)
-            fcommon.entries("Beach",skin_entry,{18,45,138,139,140,154},5)
-            fcommon.entries("Bouncer",skin_entry,{163,164,165,166},5)
-            fcommon.entries("Boxer",skin_entry,{80,81},5)
-            fcommon.entries("Businessman",skin_entry,{17,141,147,148,150,177,227},5)
-            fcommon.entries("Country",skin_entry,{157,158,159,160,161,162,196,197,198,199,200},5)
-            fcommon.entries("Golf",skin_entry,{36,37},5)
-            fcommon.entries("Grl",skin_entry,{190,191,192,193,194,195},5)
-            fcommon.entries("Heckler",skin_entry,{258,259},5)
-            fcommon.entries("Hippie",skin_entry,{72,73},5)
-            fcommon.entries("Jogger",skin_entry,{90,96},5)
-            fcommon.entries("Karate Student",skin_entry,{203,204},5)
-            fcommon.entries("Pol",skin_entry,{66,67},5)
-            fcommon.entries("Low Class Male",skin_entry,{32,33,34,128,132,133,202},5)
-            fcommon.entries("Low Class Female",skin_entry,{31,129,130,131,151,201},5)
-            fcommon.entries("Mountain Biker",skin_entry,{51,52},5)
-            fcommon.entries("Rich Male",skin_entry,{14,20,38,43,46,57,59,94,98,185,186,221,228,235,240,295},5)
-            fcommon.entries("Rich Female",skin_entry,{9,12,40,53,55,88,91,169,215,216,219,224,231},5)
-            fcommon.entries("Roller Blade",skin_entry,{92,99},5)
-            fcommon.entries("Street Male",skin_entry,{15,22,44,48,58,60,95,101,142,170,188,222,229,236,241,242},5)
-            fcommon.entries("Street Female",skin_entry,{10,13,39,41,54,56,69,76,93,218,225,226,232,233,246,256,257},5)
-            fcommon.entries("Tramp Male",skin_entry,{78,79,134,135,136,137,212,213,230,239},5)
-            fcommon.entries("Tramp Female",skin_entry,{77,256,257},5)
-            fcommon.entries("Elvis",skin_entry,{82,83,84},5)
+            fcommon.show_entries("Antagonist",{290,291,292,293,294,295,296,297,298,299},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Beach",{18,45,138,139,140,154},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Bouncer",{163,164,165,166},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Boxer",{80,81},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Businessman",{17,141,147,148,150,177,227},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Country",{157,158,159,160,161,162,196,197,198,199,200},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Golf",{36,37},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Grl",{190,191,192,193,194,195},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Heckler",{258,259},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Hippie",{72,73},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Jogger",{90,96},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Karate Student",{203,204},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Pol",{66,67},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Low Class Male",{32,33,34,128,132,133,202},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Low Class Female",{31,129,130,131,151,201},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Mountain Biker",{51,52},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Rich Male",{14,20,38,43,46,57,59,94,98,185,186,221,228,235,240,295},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Rich Female",{9,12,40,53,55,88,91,169,215,216,219,224,231},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Roller Blade",{92,99},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Street Male",{15,22,44,48,58,60,95,101,142,170,188,222,229,236,241,242},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Street Female",{10,13,39,41,54,56,69,76,93,218,225,226,232,233,246,256,257},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Tramp Male",{78,79,134,135,136,137,212,213,230,239},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Tramp Female",{77,256,257},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Elvis",{82,83,84},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
             imgui.EndMenu()
         end
         if imgui.BeginMenu("Crime") then 
             imgui.Text("Crimes")
             imgui.Separator()
             imgui.Spacing() 
-            fcommon.entries("Biker",skin_entry,{247,248},5)
-            fcommon.entries("Body Guard",skin_entry,{24,25},5)
-            fcommon.entries("Criminal",skin_entry,{21,47,100,143,181,183,184,223,250},5)
-            fcommon.entries("Drug Dealer",skin_entry,{28,29,30,154},5)
+            fcommon.show_entries("Biker",{247,248},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Body Guard",{24,25},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Criminal",{21,47,100,143,181,183,184,223,250},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Drug Dealer",{28,29,30,154},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
             imgui.EndMenu()
         end
     
@@ -304,22 +304,22 @@ function skin_changer_menu()
             imgui.Text("Jobs")
             imgui.Separator()
             imgui.Spacing()    
-            fcommon.entries("Cab Driver",skin_entry,{182,206,220,234,261,262},5)
-            fcommon.entries("Construction",skin_entry,{27,153,260},5)
-            fcommon.entries("Croupier",skin_entry,{11,171,172},5)
-            fcommon.entries("Clothes Seller",skin_entry,{211,217},5)
-            fcommon.entries("Fire Fighter",skin_entry,{277,278,279},5)
-            fcommon.entries("Law Enforcement",skin_entry,{71,265,266,267,280,281,282,283,284,285,286,287,288},5)
-            fcommon.entries("Life Guard",skin_entry,{97,251},5)
-            fcommon.entries("Medic",skin_entry,{274,275,276},5)
-            fcommon.entries("Prostitute",skin_entry,{63,64,75,85,87,152,178,207,237,238,243,245,249},5)
-            fcommon.entries("Shop Seller",skin_entry,{205,155,156,167,168,176,177,179,180},5)
-            fcommon.entries("Valet",skin_entry,{189,252,},5)
-            fcommon.entries("Worker",skin_entry,{16,50,61,253,255},5)
+            fcommon.show_entries("Cab Driver",{182,206,220,234,261,262},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Construction",{27,153,260},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Croupier",{11,171,172},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Clothes Seller",{211,217},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Fire Fighter",{277,278,279},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Law Enforcement",{71,265,266,267,280,281,282,283,284,285,286,287,288},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Life Guard",{97,251},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Medic",{274,275,276},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Prostitute",{63,64,75,85,87,152,178,207,237,238,243,245,249},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Shop Seller",{205,155,156,167,168,176,177,179,180},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Valet",{189,252,},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+            fcommon.show_entries("Worker",{16,50,61,253,255},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
             imgui.EndMenu()
         end
-        fcommon.entries("Misc",skin_entry,{0,1,2,7,19,23,26,35,49,62,68,70,76,144,145,146,209,210,214,263,268,272},5)
-
+        fcommon.show_entries("Misc",{0,1,2,7,19,23,26,35,49,62,68,70,76,144,145,146,209,210,214,263,268,272},5,fpeds.tpeds.list,fpeds.tpeds.path,".jpg",fpeds.tpeds.image_size,fplayer.change_player_model,fpeds.get_name)
+    
         imgui.EndMenu()
     end
 end

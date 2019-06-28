@@ -83,7 +83,6 @@ end
 function imgui.OnDrawFrame()
     if  window.main.v then
 
-        -- Setting up Cheat-Menu size
         imgui.SetNextWindowSize(imgui.ImVec2(resX/4,resY/1.2), imgui.Cond.FirstUseEver)
 
         imgui.RenderInMenu = fmenu.tmenu.render_in_menu.v
@@ -107,7 +106,6 @@ function imgui.OnDrawFrame()
         if imgui.CollapsingHeader("Weapons",true) then
             fweapons.weapons_section()
         end
-        
         if imgui.CollapsingHeader("Vehicles",true) then
             fvehicles.vehicles_section()
         end
@@ -206,13 +204,9 @@ function imgui.OnDrawFrame()
 end
 
 function main()
-
-    -- These will load only once
     fmenu.menu_apply_style()
-  --  fcommon.load_textures()
-
+  
     while true do
-        -- This part loops every frame
 
         if isKeyDown(keys.control_key) and isKeyDown(keys.menu_open_key) then
             fcommon.keywait(keys.control_key,keys.menu_open_key)
@@ -225,7 +219,6 @@ function main()
     end
 end
 
--- Automatically reload script
 function onScriptTerminate(script, quitGame)
     if script == thisScript() and quitGame == false and cheat_menu.auto_reload.v == true then
         script:reload()

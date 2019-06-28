@@ -76,17 +76,37 @@ function module.load_texture(list,path,model,extention)
     list[tostring(model)] = image
 end
 
-function module.entries(title,func,id,sameline)
-    if sameline == nil then sameline = 3 end
+function module.show_entries(title,model_table,rows,store_table,image_path,image_extention,image_size,func_load_model,func_show_tooltip)
     if imgui.BeginMenu(title) then
         imgui.Spacing()
         imgui.Text(title)
         imgui.Separator()
         imgui.Spacing()
         
-        for i=1,#id,1 do
-            func(id[i])
-            if (i == 1) or (i % sameline ~= 0) then
+        for i=1,#model_table,1 do
+
+            if store_table[tostring(model_table[i])] ~= "LOADING"  then
+
+                if store_table[tostring(model_table[i])] == nil then
+                    store_table[tostring(model_table[i])] = "LOADING"
+                    lua_thread.create(module.load_texture,store_table,image_path,model_table[i],image_extention) 
+                else   
+        
+                    if imgui.ImageButton(store_table[tostring(model_table[i])],imgui.ImVec2(image_size.x,image_size.y)) then 
+                        func_load_model(model_table[i])
+                    end
+                    if imgui.IsItemHovered() then
+                        imgui.BeginTooltip() 
+                        imgui.SetTooltip(func_show_tooltip(model_table[i]))
+                        imgui.EndTooltip()
+                    end
+        
+                end
+            else
+                imgui.Spinner("Loading", 15, 3, imgui.GetColorU32(imgui.GetStyle().Colors[imgui.Col.ButtonHovered]))
+            end
+
+            if (i == 1) or (i % rows ~= 0) then
                 imgui.SameLine()
             end    
         end
@@ -129,7 +149,7 @@ function module.radio_menu(header_text,rb_table,addr_table,style)
     end
 end
 
--- A frontend menu to update player stats
+
 function module.update_stat(arg)
     if arg.min == nil then arg.min = 0 end
     if arg.max == nil then arg.max = 1000 end
@@ -174,7 +194,7 @@ function module.update_stat(arg)
     end 
 end
 
--- Reads/writes data from/to memory address
+
 function module.rw_memory(address,size,value,protect,is_float)
     if protect ~= true then protect = false end
     if is_float ~= true then is_float = false end
@@ -223,7 +243,7 @@ function module.buttons_menu(func,names,sizeX,sizeY,style)
 
 end
 
--- A simple checkbox to write byte address
+
 function module.check_box(arg)
     arg.value = arg.value or 1
     arg.value2 = arg.value2 or 0
@@ -248,7 +268,6 @@ function module.check_box(arg)
     end
 end
 
--- A frontend menu to read & write data to memory address
 function module.popup_menu(arg)
     if arg.min == nil then arg.min = 0 end
     if arg.is_float == nil then arg.is_float = false end

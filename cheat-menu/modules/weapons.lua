@@ -20,27 +20,6 @@ module.tweapons = tweapons
 
 local flibweapons = require 'lib.game.weapons'
 
--- Creates weapon entry
-weapon_entry = function (weapon)
-    model = getWeapontypeModel(weapon)
-
-    if tweapons.list[tostring(model)] == nil then
-        lua_thread.create(fcommon.load_texture,tweapons.list,tweapons.path,model,".png")
-        while tweapons.list[tostring(model)] == nil do
-            wait(0)
-        end
-    end
-
-    if imgui.ImageButton(tweapons.list[tostring(model)],imgui.ImVec2(tweapons.image_size.x,tweapons.image_size.y)) then 
-        module.give_weapon_to_player(weapon,tweapons.quick_spawn.v)
-    end
-    if imgui.IsItemHovered() then
-        imgui.BeginTooltip() 
-        imgui.SetTooltip(flibweapons.get_name(weapon))
-        imgui.EndTooltip()
-    end
-end
-
 function module.CBaseWeaponInfo(name)
     return callFunction(0x743D10,1,1,name)
 end
@@ -129,14 +108,14 @@ function module.weapons_section()
     imgui.Text("Weapon list")
     imgui.Separator()
     imgui.Spacing()
-    fcommon.entries("Melee",weapon_entry,{1,2,3,4,5,6,7,8,9})
-    fcommon.entries("Handguns",weapon_entry,{22,23,24})
-    fcommon.entries("Shotguns",weapon_entry,{25,26,27})
-    fcommon.entries("Sub-Machine Guns",weapon_entry,{28,29,32})
-    fcommon.entries("Assault Rifles",weapon_entry,{30,31})
-    fcommon.entries("Rifles",weapon_entry,{33,34})
-    fcommon.entries("Heavy Weapons",weapon_entry,{35,36,37,38})
-    fcommon.entries("Projectiles",weapon_entry,{16,17,18,39})
-    fcommon.entries("More",weapon_entry,{41,42,43,44,45,46,14,15,10,11,12})
+    fcommon.show_entries("Melee",{1,2,3,4,5,6,7,8,9},3,tweapons.list,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name)
+    fcommon.show_entries("Handguns",{22,23,24},3,tweapons.list,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name)
+    fcommon.show_entries("Shotguns",{25,26,27},3,tweapons.list,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name)
+    fcommon.show_entries("Sub-Machine Guns",{28,29,32},3,tweapons.list,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name)
+    fcommon.show_entries("Assault Rifles",{30,31},3,tweapons.list,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name)
+    fcommon.show_entries("Rifles",{33,34},3,tweapons.list,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name)
+    fcommon.show_entries("Heavy Weapons",{35,36,37,38},3,tweapons.list,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name)
+    fcommon.show_entries("Projectiles",{16,17,18,39},3,tweapons.list,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name)
+    fcommon.show_entries("More",{41,42,43,44,45,46,14,15,10,11,12},3,tweapons.list,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name)
 end
 return module
