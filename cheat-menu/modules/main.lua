@@ -14,7 +14,7 @@ function module.main_section()
 
     -- Quick Spawner
     if isKeyDown(keys.control_key) and isKeyDown(keys.quickspawner_key) then
-        if fvehicles.tvehicles.quick_spawn.v or fweapons.tweapons.quick_spawn.v then 
+        if (fvehicles.tvehicles.quick_spawn.v or fweapons.tweapons.quick_spawn.v) then 
             fcommon.quick_spawner()
         end
     end
@@ -73,6 +73,9 @@ function module.main_section()
         end
         
         if fvehicles.tvehicles.lock_speed.v then
+            if fvehicles.tvehicles.speed.v > 500 then
+                fvehicles.tvehicles.speed.v = 500 
+            end
             setCarForwardSpeed(car,fvehicles.tvehicles.speed.v)
         end
         

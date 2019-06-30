@@ -57,6 +57,7 @@ fvehicles     = require 'cheat-menu.modules.vehicles'
 fvisuals      = require 'cheat-menu.modules.visuals'
 fweapons      = require 'cheat-menu.modules.weapons'
 flibweapons   = require 'lib.game.weapons'
+imgui.Spinner = require('cheat-menu.modules.imgui_addons').Spinner
 ------------------------------------------------------------
 
 

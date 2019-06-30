@@ -9,7 +9,7 @@ local tweapons =
         x = resX/21.3,
         y = resY/12,
     },
-    list = {},
+    images = {},
     path = getGameDirectory() .. "\\moonloader\\cheat-menu\\weapons\\",
     quick_spawn = imgui.ImBool(false),
     noreload = imgui.ImBool(false),
@@ -108,14 +108,14 @@ function module.weapons_section()
     imgui.Text("Weapon list")
     imgui.Separator()
     imgui.Spacing()
-    fcommon.show_entries("Melee",{1,2,3,4,5,6,7,8,9},3,tweapons.list,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name)
-    fcommon.show_entries("Handguns",{22,23,24},3,tweapons.list,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name)
-    fcommon.show_entries("Shotguns",{25,26,27},3,tweapons.list,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name)
-    fcommon.show_entries("Sub-Machine Guns",{28,29,32},3,tweapons.list,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name)
-    fcommon.show_entries("Assault Rifles",{30,31},3,tweapons.list,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name)
-    fcommon.show_entries("Rifles",{33,34},3,tweapons.list,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name)
-    fcommon.show_entries("Heavy Weapons",{35,36,37,38},3,tweapons.list,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name)
-    fcommon.show_entries("Projectiles",{16,17,18,39},3,tweapons.list,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name)
-    fcommon.show_entries("More",{41,42,43,44,45,46,14,15,10,11,12},3,tweapons.list,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name)
+    fcommon.show_entries("Melee",{1,2,3,4,5,6,7,8,9},3,tweapons.images,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name,true)
+    fcommon.show_entries("Handguns",{22,23,24},3,tweapons.images,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name,true)
+    fcommon.show_entries("Shotguns",{25,26,27},3,tweapons.images,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name,true)
+    fcommon.show_entries("Sub-Machine Guns",{28,29,32},3,tweapons.images,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name,true)
+    fcommon.show_entries("Assault Rifles",{30,31},3,tweapons.images,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name,true)
+    fcommon.show_entries("Rifles",{33,34},3,tweapons.images,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name,true)
+    fcommon.show_entries("Heavy Weapons",{35,36,37,38},3,tweapons.images,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name,true)
+    fcommon.show_entries("Projectiles",{16,17,18,39},3,tweapons.images,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name,true)
+    fcommon.show_entries("More",{41,42,43,44,45,46,14,15,10,11,12},3,tweapons.images,tweapons.path,".png",tweapons.image_size,fweapons.give_weapon_to_player,flibweapons.get_name,true)
 end
 return module

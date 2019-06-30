@@ -3,7 +3,6 @@
 local module = {}
 local radio_button = imgui.ImInt()
 
-
 function module.quick_spawner()
 
     fcommon.keywait(keys.control_key,keys.quickspawner_key)
@@ -11,6 +10,9 @@ function module.quick_spawner()
     memory.write(0x00969110,0,1)
     result = ''
     while not wasKeyPressed(0x0D) do
+        if #result > 25 then
+            result = ''
+        end
         if wasKeyPressed(0x2E) then
             result = ''
         elseif wasKeyPressed(0x08) then
@@ -76,42 +78,66 @@ function module.load_texture(list,path,model,extention)
     list[tostring(model)] = image
 end
 
-function module.show_entries(title,model_table,rows,store_table,image_path,image_extention,image_size,func_load_model,func_show_tooltip)
-    if imgui.BeginMenu(title) then
-        imgui.Spacing()
-        imgui.Text(title)
-        imgui.Separator()
-        imgui.Spacing()
-        
-        for i=1,#model_table,1 do
-
-            if store_table[tostring(model_table[i])] ~= "LOADING"  then
-
-                if store_table[tostring(model_table[i])] == nil then
-                    store_table[tostring(model_table[i])] = "LOADING"
-                    lua_thread.create(module.load_texture,store_table,image_path,model_table[i],image_extention) 
-                else   
-        
-                    if imgui.ImageButton(store_table[tostring(model_table[i])],imgui.ImVec2(image_size.x,image_size.y)) then 
-                        func_load_model(model_table[i])
-                    end
-                    if imgui.IsItemHovered() then
-                        imgui.BeginTooltip() 
-                        imgui.SetTooltip(func_show_tooltip(model_table[i]))
-                        imgui.EndTooltip()
-                    end
-        
-                end
-            else
-                imgui.Spinner("Loading", 15, 3, imgui.GetColorU32(imgui.GetStyle().Colors[imgui.Col.ButtonHovered]))
-            end
-
-            if (i == 1) or (i % rows ~= 0) then
-                imgui.SameLine()
-            end    
+function IsValidModForVehicle(table)
+    if isCharInAnyCar(PLAYER_PED) then
+        local CVehicle =  getCarPointer(storeCarCharIsInNoSave(PLAYER_PED))
+        if callMethod(0x49B010,CVehicle,2,2,table,CVehicle) == 1 then
+             return true
         end
-
-        imgui.EndMenu()
+    else
+        return false
+    end
+end
+function module.show_entries(title,model_table,rows,store_table,image_path,image_extention,image_size,func_load_model,func_show_tooltip,skip_check)
+    
+    for j=1,#model_table,1 do
+        if IsValidModForVehicle(model_table[j]) or skip_check == true then
+            if imgui.BeginMenu(title) then
+                imgui.Spacing()
+                imgui.Text(title)
+                imgui.Separator()
+                imgui.Spacing()
+                
+                for i=1,#model_table,1 do
+    
+                    if store_table[tostring(model_table[i])] ~= "LOADING"  then
+    
+                        if store_table[tostring(model_table[i])] == nil then
+                            store_table[tostring(model_table[i])] = "LOADING"
+                            lua_thread.create(module.load_texture,store_table,image_path,model_table[i],image_extention) 
+                        else   
+                            if skip_check == false then
+                                if IsValidModForVehicle(model_table[i]) then
+                                    if imgui.ImageButton(store_table[tostring(model_table[i])],imgui.ImVec2(image_size.x,image_size.y)) then 
+                                        func_load_model(model_table[i])
+                                    end
+                                end
+                            else
+                                if imgui.ImageButton(store_table[tostring(model_table[i])],imgui.ImVec2(image_size.x,image_size.y)) then 
+                                    func_load_model(model_table[i])
+                                end
+                            end
+                            if func_show_tooltip ~= nil then
+                                if imgui.IsItemHovered() then
+                                    imgui.BeginTooltip() 
+                                    imgui.SetTooltip(func_show_tooltip(model_table[i]))
+                                    imgui.EndTooltip()
+                                end
+                            end
+                        end
+                    else
+                        imgui.Spinner("Loading", 15, 3, imgui.GetColorU32(imgui.GetStyle().Colors[imgui.Col.ButtonHovered]))
+                    end
+    
+                    if (i == 1) or (i % rows ~= 0) then
+                        imgui.SameLine()
+                    end    
+                end
+    
+                imgui.EndMenu()
+            end  
+            break  
+        end
     end
 end
 
