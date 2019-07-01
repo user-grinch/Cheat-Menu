@@ -88,7 +88,7 @@ function module.give_vehicle_to_player(model)
             warpCharFromCarToCoord(PLAYER_PED,x,y,z)
             deleteCar(car)
         end
-        if isThisModelAPlane(model) and tvehicles.spawn_plane_in_air.v == true then
+        if (isThisModelAPlane(model) or isThisModelAHeli(model)) and tvehicles.spawn_plane_in_air.v == true then
             z = 400
         end
         requestModel(model)
@@ -109,19 +109,13 @@ function module.add_component_to_vehicle(component)
     
     if isCharInAnyCar(PLAYER_PED) then
         local car = storeCarCharIsInNoSave(PLAYER_PED)
-    --    local CVehicle = getCarPointer(car)
-
-      --  if callMethod(0x6D62A0,CVehicle,2,2,CVehicle,component) == 0 then
-            if isModelAvailable(component) then
-                requestVehicleMod(component)
-                loadAllModelsNow()
-                addVehicleMod(car,component)
-                fcommon.CheatActivated()
-                markModelAsNoLongerNeeded(component)
-            end
-       -- else
-           -- removeVehicleMod(car,component)
-       -- end
+        if isModelAvailable(component) then
+            requestVehicleMod(component)
+            loadAllModelsNow()
+            addVehicleMod(car,component)
+            fcommon.CheatActivated()
+            markModelAsNoLongerNeeded(component)
+        end
     end
 end
 
@@ -159,9 +153,6 @@ function module.vehicles_section()
             car = storeCarCharIsInNoSave(PLAYER_PED)        
             setCarRoll(car,0)
             fcommon.CheatActivated()
-            requestVehicleMod(1078)
-            loadAllModelsNow()
-            addVehicleMod(car,1078)
         end
     end
     imgui.SameLine()
@@ -372,7 +363,7 @@ function module.vehicles_section()
     fcommon.show_entries("SUVs & Wagons",{579,400,404,489,505,479,442,458},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel,true)
     fcommon.show_entries("Lowriders",{536,575,534,567,535,576,412},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel,true)
     fcommon.show_entries("Muscle Cars",{402,542,603,475},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel,true)
-    fcommon.show_entries("Street Racers",{429,542,415,480,562,565,434,494,502,503,411,559,561,560,506,451,558,555,477},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel,true)
+    fcommon.show_entries("Street Racers",{429,541,542,415,480,562,565,434,494,502,503,411,559,561,560,506,451,558,555,477},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel,true)
     fcommon.show_entries("RC Vehicles",{441,464,594,501,465,564},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel,true)
     fcommon.show_entries("Recreational",{568,424,504,457,483,508,571,500,444,556,557,471,495,539},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.give_vehicle_to_player,getNameOfVehicleModel,true)
 end
