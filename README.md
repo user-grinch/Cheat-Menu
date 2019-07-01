@@ -29,6 +29,7 @@ Take a look [here](https://github.com/inanahammad/Cheat-Menu/wiki/Installation) 
 - [x] Style editor
 - [x] Teleportation - coord & marker.
 - [x] Vehicle spawner,speed,damage,gear meters
+- [x] Vehicle modifcations
 - [x] Weapon spawner
 
 - [ ] Animation manager
@@ -36,7 +37,6 @@ Take a look [here](https://github.com/inanahammad/Cheat-Menu/wiki/Installation) 
 - [ ] Configuration file 
 - [ ] Object spawner
 - [ ] Ped(mind) control
-- [ ] Vehicle modifcations
 
 ...
 
