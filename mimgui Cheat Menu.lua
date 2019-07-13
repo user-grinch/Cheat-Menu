@@ -129,6 +129,12 @@ function main()
             end
         end
 
+        if isKeyDown(keys.control_key) and isKeyDown(keys.quickspawner_key) then
+            if (fvehicles.tvehicles.quick_spawn[0]) then --or fweapons.tweapons.quick_spawn[0]) then
+                fcommon.QuickSpawner()
+            end
+        end
+
         -- Vehicle related stuff which is required to run every frame
         if isCharInAnyCar(PLAYER_PED) then
             car = getCarCharIsUsing(PLAYER_PED)
@@ -164,5 +170,13 @@ function main()
         end
 
         wait(0)
+    end
+end
+
+
+function onScriptTerminate(script, quitGame)
+    if script == thisScript() then
+        showCursor(false,false)
+        printHelpString("Cheat Menu ~r~Crashed.~w~Please provide moonloader.log in case of debugging.")
     end
 end
