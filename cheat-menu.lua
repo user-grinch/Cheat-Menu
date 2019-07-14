@@ -32,7 +32,6 @@ require 'deps'
 {
     'fyp:mimgui',
     'fyp:moonadditions',
-    'fyp:mimgui',
 }
 
 -- Script Dependencies
@@ -79,7 +78,6 @@ cheatMenu =
         current = -1,
     },
 }
-
 
 function ternary ( cond , T , F )
     if cond then return T else return F end
@@ -179,7 +177,7 @@ end)
 function main()
     while true do
 
-        if fgame.tgame.ss_shotcut[0] == true
+        if fgame.tgame.ss_shotcut[0]
         and isKeyDown(keys.control_key) and isKeyDown(keys.screenshot_key) then
             takePhoto(true)
             printHelpString("Screenshot taken ~g~successfully")
@@ -191,11 +189,11 @@ function main()
             cheatMenu.window.main[0] = not cheatMenu.window.main[0]
         end
 
-        if fteleport.tteleport.shotcut[0] == true
+        if fteleport.tteleport.shotcut[0]
         and isKeyDown(keys.teleport_key1)
         and isKeyDown(keys.teleport_key2) then
             fcommon.KeyWait(keys.teleport_key1,keys.teleport_key2)
-            fteleport.Teleport()
+            module.Teleport()
         end
 
         if fplayer.tplayer.god[0] then
@@ -278,6 +276,7 @@ end
 function onScriptTerminate(script, quitGame)
     if script == thisScript() then
         showCursor(false,false)
-        printHelpString("Cheat Menu ~r~Crashed.~w~Please provide moonloader.log in case of debugging.")
+        printHelpString("Cheat Menu ~r~Crashed & ~g~reloaded ~w~sucessfully.Please provide moonloader.log in case of debugging.")
+        script.this:reload()
     end
 end
