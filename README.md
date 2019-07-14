@@ -4,7 +4,7 @@
 
 A Cheat-Menu for Grand Theft Auto SanAndreas which allows a large set of modifications/cheats to be applied enabling a much more easier & amusing gameplay.
 
-It's based on [Moonloader](https://gtaforums.com/topic/890987-moonloader/) and uses [Moon Imgui](https://blast.hk/threads/19292/) for its interface.
+It's based on [Moonloader](https://gtaforums.com/topic/890987-moonloader/) and uses [mimgui](https://github.com/THE-FYP/mimgui) for its interface.
 
 Take a look [here](https://github.com/inanahammad/Cheat-Menu/wiki/Installation) for installation.
 ### Official Topics
@@ -40,22 +40,7 @@ Take a look [here](https://github.com/inanahammad/Cheat-Menu/wiki/Installation) 
 
 ...
 
-
-<details>
-  <summary>Screenshots</summary>
-
-![Screenshot0](https://i.imgur.com/KC60NGD.jpg)
-![Screenshot1](https://i.imgur.com/NqNBe1L.jpg)
-![Screenshot2](https://i.imgur.com/2DUuwAs.jpg)
-![Screenshot3](https://i.imgur.com/qgoKJMz.jpg)
-![Screenshot4](https://i.imgur.com/g98qsg4.jpg)
-![Screenshot5](https://i.imgur.com/QBjSNlv.jpg)
-![Screenshot6](https://i.imgur.com/SwO9HAk.jpg)
-![Screenshot7](https://i.imgur.com/gIstwa4.jpg)
-![Screenshot8](https://i.imgur.com/qW8Nwjf.jpg)
-![Screenshot9](https://i.imgur.com/vT2qBI7.jpg)
-
-</details>
+Screenshots can be found [here](https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu#p13262)
 
 
 ### License
