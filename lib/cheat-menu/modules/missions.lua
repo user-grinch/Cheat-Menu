@@ -144,14 +144,11 @@ local missions = {
     [134]	= "Buy Properties Mission",
 }
 
-function mission_menu(title,list)
-    if imgui.BeginMenu(title) then
-        imgui.Text(title)
-        imgui.Spacing()
-        imgui.Separator()
+function MissionEntry(title,list)
+    fcommon.DropDownMenu(title,function()
         imgui.Spacing()
         for _,i in ipairs(list) do
-            if imgui.MenuItem(missions[i]) then
+            if imgui.MenuItemBool(missions[i]) then
                 if getGameGlobal(glob.ONMISSION) == 1 then
                     setGameGlobal(glob.ONMISSION,0)
                     failCurrentMission()
@@ -164,95 +161,86 @@ function mission_menu(title,list)
                 loadAndLaunchMissionInternal(i)
                 lockPlayerControl(false)
                 playerMadeProgress(progress)
-                fcommon.CheatActivated() 
+                fcommon.CheatActivated()
             end
         end
-        imgui.EndMenu()
-    end
+    end)
 end
 
-function module.missions_section()
-    imgui.Text("Missons")
+function module.MissionsMain()
     imgui.Spacing()
-    imgui.Separator()
-    imgui.Spacing()
-    if imgui.Button("Abort Current Misson",imgui.ImVec2(fcommon.getsize(1),50)) then
+    if imgui.Button("Abort Current Misson",imgui.ImVec2(fcommon.GetSize(1))) then
         if getGameGlobal(glob.ONMISSION) == 1 then
+            skipCutsceneEnd()
             failCurrentMission()
             setGameGlobal(glob.ONMISSION,0)
             printBig('M_FAIL',5000,1)
-        else 
+        else
             printHelpString("Player is not in a mission.")
-        end  
+        end
     end
     imgui.Spacing()
-    imgui.Text("All missoins")
-    imgui.Separator()
-    if imgui.BeginMenu("Los Santos") then
-        imgui.Text("Los Santos Missions")
-        imgui.Spacing()
-        imgui.Separator()
-        imgui.Spacing()
-        mission_menu("Introduction",{11,12})
-        mission_menu("Sweet",{13,14,15,16,17,18,19,20,21,37,38})
-        mission_menu("Big Smoke",{27,28,29,30})
-        mission_menu("Ryder",{24,25,26})
-        mission_menu("Cesar Vialpando",{36,45,48})
-        mission_menu("OG Loc",{31,32,33,34})
-        mission_menu("Frank Tenpenny",{22,23,39})
-        mission_menu("Catalina",{40})
-        mission_menu("The Truth",{46,47})
-        mission_menu("Robbery",{41,42,43,44})
-        imgui.EndMenu()
+
+    if imgui.BeginChild("Missions list") then
+        if imgui.BeginTabBar("Missions list") then
+            if imgui.BeginTabItem("LS") then
+                imgui.Spacing()
+                MissionEntry("Introduction",{11,12})
+                MissionEntry("Sweet",{13,14,15,16,17,18,19,20,21,37,38})
+                MissionEntry("Big Smoke",{27,28,29,30})
+                MissionEntry("Ryder",{24,25,26})
+                MissionEntry("Cesar Vialpando",{36,45,48})
+                MissionEntry("OG Loc",{31,32,33,34})
+                MissionEntry("Frank Tenpenny",{22,23,39})
+                MissionEntry("Catalina",{40})
+                MissionEntry("The Truth",{46,47})
+                MissionEntry("Robbery",{41,42,43,44})
+                imgui.EndTabItem()
+        end
+            if imgui.BeginTabItem("SF") then
+                imgui.Spacing()
+                MissionEntry("Carl Johnson",{49,50,51})
+                MissionEntry("Zero",{72,73,74})
+                MissionEntry("Loco Syndicate",{58,59,60,61,62,63,64,65,66})
+                MissionEntry("Wu Zi Mu",{53,54,55,56,57})
+                MissionEntry("Frank Tenpenny",{52})
+                MissionEntry("Wang Cars",{67,68,69,70,71})
+                imgui.EndTabItem()
+            end
+            if imgui.BeginTabItem("LV") then
+                imgui.Spacing()
+                MissionEntry("The Four Dragons Casino",{84,85,86,87,88,102})
+                MissionEntry("Heist",{96,97,98,99,100,101})
+                MissionEntry("Caligula's Casino",{89,90,91,92})
+                MissionEntry("Frank Tenpenny",{93,94})
+                MissionEntry("Madd Dogg",{95})
+                imgui.EndTabItem()
+            end
+            if imgui.BeginTabItem("Desert") then
+                imgui.Spacing()
+                MissionEntry("Mike Toreno",{75,76,77,78})
+                MissionEntry("Verdant Meadows Airstrip",{79,80,81,82,83})
+                imgui.EndTabItem()
+            end
+            if imgui.BeginTabItem("Back to LS") then
+                imgui.Spacing()
+                MissionEntry("Carl Johnson",{103,104,105})
+                MissionEntry("Sweet",{106,107})
+                MissionEntry("Riot",{108,109,110,111,112})
+                imgui.EndTabItem()
+            end
+            if imgui.BeginTabItem("Others") then
+                imgui.Spacing()
+                MissionEntry("GYM Missions",{114,115,116})
+                MissionEntry("Sub Missions",{121,122,123,124,125,126,127})
+                MissionEntry("Arena Missions",{128,129})
+                MissionEntry("Miscellaneous",{113,117,118,119,120,130,131,132,133,134})
+                MissionEntry("Video Games",{3,4,5,6,7,8,9,10})
+                imgui.EndTabItem()
+            end
+            imgui.EndTabBar()
+        end
+        imgui.EndChild()
     end
-    if imgui.BeginMenu("San Fierro") then
-        imgui.Text("San Fierro Missions")
-        imgui.Spacing()
-        imgui.Separator()
-        imgui.Spacing()
-        mission_menu("Carl Johnson",{49,50,51})
-        mission_menu("Zero",{72,73,74})
-        mission_menu("Loco Syndicate",{58,59,60,61,62,63,64,65,66})
-        mission_menu("Wu Zi Mu",{53,54,55,56,57})
-        mission_menu("Frank Tenpenny",{52})
-        mission_menu("Wang Cars",{67,68,69,70,71})
-        imgui.EndMenu()
-    end
-    if imgui.BeginMenu("Desert") then
-        imgui.Text("Desert Missions")
-        imgui.Spacing()
-        imgui.Separator()
-        imgui.Spacing()
-        mission_menu("Mike Toreno",{75,76,77,78})
-        mission_menu("Verdant Meadows Airstrip",{79,80,81,82,83})
-        imgui.EndMenu()
-    end
-    if imgui.BeginMenu("Las Venturas") then
-        imgui.Text("Las Venturas Missions")
-        imgui.Spacing()
-        imgui.Separator()
-        imgui.Spacing()
-        mission_menu("The Four Dragons Casino",{84,85,86,87,88,102})
-        mission_menu("Heist",{96,97,98,99,100,101})
-        mission_menu("Caligula's Casino",{89,90,91,92})
-        mission_menu("Frank Tenpenny",{93,94})
-        mission_menu("Madd Dogg",{95})
-        imgui.EndMenu()
-    end
-    if imgui.BeginMenu("Back to Los Santos") then
-        imgui.Text("Back to Los Santos Missions")
-        imgui.Spacing()
-        imgui.Separator()
-        imgui.Spacing()
-        mission_menu("Carl Johnson",{103,104,105})
-        mission_menu("Sweet",{106,107})
-        mission_menu("Riot",{108,109,110,111,112})
-        imgui.EndMenu()
-    end
-    mission_menu("GYM Missions",{114,115,116})
-    mission_menu("Sub Missions",{121,122,123,124,125,126,127})
-    mission_menu("Arena Missions",{128,129})
-    mission_menu("Miscellaneous",{113,117,118,119,120,130,131,132,133,134})
-    mission_menu("Video Games",{3,4,5,6,7,8,9,10})
 end
 return module

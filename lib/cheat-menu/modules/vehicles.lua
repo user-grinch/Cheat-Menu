@@ -3,11 +3,6 @@
 local module = {}
 local tvehicles =
 {
-    image_size =
-    {
-        x = resX/14,
-        y = resY/15,
-    },
     components =
     {
         path   =  getGameDirectory() .. "\\moonloader\\cheat-menu\\vehicles\\components\\",
@@ -60,7 +55,7 @@ local tvehicles =
     images = {},
     spawn_plane_in_air = imgui.new.bool(true),
     quick_spawn = imgui.new.bool(false),
-    path = getGameDirectory() .. "\\moonloader\\cheat-menu\\vehicles\\",
+    path = getGameDirectory() .. "\\moonloader\\lib\\cheat-menu\\vehicles\\",
     visual_damage = imgui.new.bool(false),
     heavy = imgui.new.bool(false),
     hydraulic = imgui.new.bool(false),
@@ -91,7 +86,8 @@ function module.GiveVehicleToPlayer(model)
             warpCharFromCarToCoord(PLAYER_PED,x,y,z)
             deleteCar(car)
         end
-        if (isThisModelAPlane(model) or isThisModelAHeli(model)) and tvehicles.spawn_plane_in_air[0] == true then
+
+        if tvehicles.spawn_plane_in_air[0] and (isThisModelAHeli(model) or isThisModelAPlane(model)) then
             z = 400
         end
         requestModel(model)
@@ -178,9 +174,9 @@ function module.VehiclesMain()
             imgui.Spacing()
 
             imgui.Columns(2,nil,false)
-            fcommon.ValueSwitch("Car heavy",tvehicles.heavy,nil,true)
-            fcommon.ValueSwitch("Show health",tvehicles.show.health,nil,true)
-            fcommon.ValueSwitch("Stay on Bike",tvehicles.stay_on_bike,nil,true)
+            fcommon.CheckBox({name = "Car heavy",var = tvehicles.heavy})
+            fcommon.CheckBox({name = "Show health",var = tvehicles.show.health})
+            fcommon.CheckBox({name = "Stay on Bike",var = tvehicles.stay_on_bike,help_text = "Prevents falling from bikes."})
             fcommon.InformationTooltip("Prevents falling from bikes.")
 
             if isCharInAnyCar(PLAYER_PED) then
@@ -198,8 +194,8 @@ function module.VehiclesMain()
                     end
                 end
             end
-            fcommon.ValueSwitch("Lock Car health",tvehicles.full_health,nil,true)
-            fcommon.ValueSwitch("No car visual damage",tvehicles.visual_damage,nil,true)
+            fcommon.CheckBox({name = "Lock Car health",var = tvehicles.full_health})
+            fcommon.CheckBox({name = "No car visual damage",var = tvehicles.visual_damage})
             fcommon.CheckBox({ address = 0x969164,name = "Tank mode"})
             fcommon.CheckBox({ address = 0x96914B,name = "Wheels only",help_text = "Only can wheels are shown."})
             fcommon.CheckBox({ address = 0x96914E,name = "All lights green",help_text = "All traffic lights are always green."})
@@ -243,9 +239,9 @@ function module.VehiclesMain()
 
             fcommon.DropDownMenu("Speed",function()
                 imgui.Columns(2,nil,false)
-                fcommon.ValueSwitch("Show speed",tvehicles.show.speed,nil,true)
+                fcommon.CheckBox({name = "Show speed",var = tvehicles.show.speed})
                 imgui.NextColumn()
-                fcommon.ValueSwitch("Lock speed",tvehicles.lock_speed,nil,true)
+                fcommon.CheckBox({name = "Lock speed",var = tvehicles.lock_speed})
                 imgui.Columns(1)
                 if imgui.InputInt("Set",tvehicles.speed) then
                 end
@@ -307,20 +303,20 @@ function module.VehiclesMain()
                     end
                     fcommon.InformationTooltip("Saves vehicle mods in memory.")
 
-                    fcommon.ShowEntries("Bullbar",{1100,1109,1110,1115,1116,1123,1125},3,tvehicles.components.images,tvehicles.components.path,".jpg",tvehicles.image_size, fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries("Exhaust",{1018,1019,1020,1021,1022,1028,1029,1034,1037,1043,1044,1045,1046,1059,1064,1065,1066,1089,1092,1104,1105,1113,1114,1126,1127,1129,1132,1135,1136},3,tvehicles.components.images,tvehicles.components.path,".jpg",tvehicles.image_size, fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries("Front Bumper",{1117,1152,1153,1155,1157,1160,1165,1166,1169,1170,1171,1172,1173,1174,1175,1179,1181,1182,1185,1188,1189,1190,1191},3,tvehicles.components.images,tvehicles.components.path,".jpg",tvehicles.image_size, fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries("Front sign",{1111,1112},3,tvehicles.components.images,tvehicles.components.path,".jpg",tvehicles.image_size, fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries("Hood",{1004,1005,1011,1012},3,tvehicles.components.images,tvehicles.components.path,".jpg",tvehicles.image_size, fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries("Lamps",{1013,1024},3,tvehicles.components.images,tvehicles.components.path,".jpg",tvehicles.image_size, fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries("Misc",{1086,1087},3,tvehicles.components.images,tvehicles.components.path,".jpg",tvehicles.image_size, fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries("Nitros",{1008,1009,1010},3,tvehicles.components.images,tvehicles.components.path,".jpg",tvehicles.image_size, fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries("Rear Bumper",{1140,1141,1148,1149,1150,1151,1154,1156,1159,1161,1167,1168,1176,1177,1178,1180,1183,1184,1186,1187,1192,1193},3,tvehicles.components.images,tvehicles.components.path,".jpg",tvehicles.image_size, fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries("Roof",{1006,1032,1033,1035,1038,1053,1054,1055,1061,1067,1068,1088,1091,1103,1028,1130,1131},3,tvehicles.components.images,tvehicles.components.path,".jpg",tvehicles.image_size, fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries("Sideskirt",{1007,1017,1026,1027,1030,1031,1036,1039,1040,1041,1042,1047,1048,1051,1052,1056,1057,1062,1063,1069,1070,1071,1072,1090,1093,1094,1095,1099,1101,1102,1106,1107,1108,1118,1119,1120,1121,1122,1124,1133,1134,1137},3,tvehicles.components.images,tvehicles.components.path,".jpg",tvehicles.image_size, fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries("Spoiler",{1000,1001,1002,1003,1014,1015,1016,1023,1049,1050,1058,1060,1138,1139,1146,1147,1158,1162,1163,1164},3,tvehicles.components.images,tvehicles.components.path,".jpg",tvehicles.image_size, fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries("Vents",{1142,1143,1144,1145},3,tvehicles.components.images,tvehicles.components.path,".jpg",tvehicles.image_size, fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries("Wheels",{1025,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1096,1097,1098},3,tvehicles.components.images,tvehicles.components.path,".jpg",tvehicles.image_size, fvehicles.AddComponentToVehicle,nil,true)
+                    fcommon.ShowEntries("Bullbar",{1100,1109,1110,1115,1116,1123,1125},3,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries("Exhaust",{1018,1019,1020,1021,1022,1028,1029,1034,1037,1043,1044,1045,1046,1059,1064,1065,1066,1089,1092,1104,1105,1113,1114,1126,1127,1129,1132,1135,1136},3,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries("Front Bumper",{1117,1152,1153,1155,1157,1160,1165,1166,1169,1170,1171,1172,1173,1174,1175,1179,1181,1182,1185,1188,1189,1190,1191},3,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries("Front sign",{1111,1112},3,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries("Hood",{1004,1005,1011,1012},3,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries("Lamps",{1013,1024},3,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries("Misc",{1086,1087},3,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries("Nitros",{1008,1009,1010},3,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries("Rear Bumper",{1140,1141,1148,1149,1150,1151,1154,1156,1159,1161,1167,1168,1176,1177,1178,1180,1183,1184,1186,1187,1192,1193},3,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries("Roof",{1006,1032,1033,1035,1038,1053,1054,1055,1061,1067,1068,1088,1091,1103,1028,1130,1131},3,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries("Sideskirt",{1007,1017,1026,1027,1030,1031,1036,1039,1040,1041,1042,1047,1048,1051,1052,1056,1057,1062,1063,1069,1070,1071,1072,1090,1093,1094,1095,1099,1101,1102,1106,1107,1108,1118,1119,1120,1121,1122,1124,1133,1134,1137},3,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries("Spoiler",{1000,1001,1002,1003,1014,1015,1016,1023,1049,1050,1058,1060,1138,1139,1146,1147,1158,1162,1163,1164},3,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries("Vents",{1142,1143,1144,1145},3,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries("Wheels",{1025,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1096,1097,1098},3,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,true)
                 else
                     imgui.Text("Player not in a vehicle.")
                 end
@@ -331,31 +327,34 @@ function module.VehiclesMain()
 
             imgui.Spacing()
             imgui.Columns(2,nil,false)
-            fcommon.ValueSwitch("Quick vehicle",tvehicles.quick_spawn,"Vehicle can be spawned from quick spawner using (Left Ctrl + Q). \n\nControls:\nEnter = Stop reading key press\nDelete = Erase full string\nBackspace = Erase last character")
+            fcommon.CheckBox({name = "Quick vehicle",var = tvehicles.quick_spawn,help_text = "Vehicle can be spawned from quick spawner using (Left Ctrl + Q). \n\nControls:\nEnter = Stop reading key press\nDelete = Erase full string\nBackspace = Erase last character"})
             imgui.NextColumn()
-            fcommon.ValueSwitch("Spawn planes in air",tvehicles.spawn_plane_in_air)
+            fcommon.CheckBox({name = "Spawn planes in air",var = tvehicles.spawn_plane_in_air})
             imgui.Columns(1)
 
             imgui.Spacing()
             imgui.Text("Vehicles list")
             imgui.Separator()
             imgui.Spacing()
-            fcommon.ShowEntries("Airplanes",{592,577,511,512,593,520,553,476,519,460,513},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-            fcommon.ShowEntries("Helicopters",{548,425,417,487,488,497,563,447,469},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-            fcommon.ShowEntries("Boats",{472,473,493,595,484,430,453,452,446,454},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-            fcommon.ShowEntries("Bikes",{581,509,481,462,521,463,510,522,461,448,468,586},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-            fcommon.ShowEntries("2-Door & Compact cars",{602,496,401,518,527,589,419,587,533,526,474,545,517,410,600,436,439,549,491},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-            fcommon.ShowEntries("4-Door & Luxury cars",{445,604,507,585,466,492,546,551,516,467,426,547,405,580,409,550,566,540,421,529},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-            fcommon.ShowEntries("Civil Service",{485,431,438,437,574,420,525,408,552},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-            fcommon.ShowEntries("Government Vehicles",{416,433,427,490,528,407,544,523,470,596,598,599,597,432,601,428},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-            fcommon.ShowEntries("Heavy & Utility trucks",{499,609,498,524,532,578,486,406,573,455,403,423,414,443,515,514,531,456,588},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-            fcommon.ShowEntries("Light trucks & Vans",{459,422,482,605,530,418,572,582,413,440,543,583,478,554},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-            fcommon.ShowEntries("SUVs & Wagons",{579,400,404,489,505,479,442,458},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-            fcommon.ShowEntries("Lowriders",{536,575,534,567,535,576,412},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-            fcommon.ShowEntries("Muscle Cars",{402,542,603,475},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-            fcommon.ShowEntries("Street Racers",{429,541,542,415,480,562,565,434,494,502,503,411,559,561,560,506,451,558,555,477},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-            fcommon.ShowEntries("RC Vehicles",{441,464,594,501,465,564},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-            fcommon.ShowEntries("Recreational",{568,424,504,457,483,508,571,500,444,556,557,471,495,539},3,tvehicles.images,tvehicles.path,".jpg",tvehicles.image_size, fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+            if imgui.BeginChild("Vehicle list Window") then
+                fcommon.ShowEntries("Airplanes",{592,577,511,512,593,520,553,476,519,460,513},3,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                fcommon.ShowEntries("Helicopters",{548,425,417,487,488,497,563,447,469},3,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                fcommon.ShowEntries("Boats",{472,473,493,595,484,430,453,452,446,454},3,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                fcommon.ShowEntries("Bikes",{581,509,481,462,521,463,510,522,461,448,468,586},3,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                fcommon.ShowEntries("2-Door & Compact cars",{602,496,401,518,527,589,419,587,533,526,474,545,517,410,600,436,439,549,491},3,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                fcommon.ShowEntries("4-Door & Luxury cars",{445,604,507,585,466,492,546,551,516,467,426,547,405,580,409,550,566,540,421,529},3,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                fcommon.ShowEntries("Civil Service",{485,431,438,437,574,420,525,408,552},3,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                fcommon.ShowEntries("Government Vehicles",{416,433,427,490,528,407,544,523,470,596,598,599,597,432,601,428},3,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                fcommon.ShowEntries("Heavy & Utility trucks",{499,609,498,524,532,578,486,406,573,455,403,423,414,443,515,514,531,456,588},3,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                fcommon.ShowEntries("Light trucks & Vans",{459,422,482,605,530,418,572,582,413,440,543,583,478,554},3,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                fcommon.ShowEntries("SUVs & Wagons",{579,400,404,489,505,479,442,458},3,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                fcommon.ShowEntries("Lowriders",{536,575,534,567,535,576,412},3,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                fcommon.ShowEntries("Muscle Cars",{402,542,603,475},3,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                fcommon.ShowEntries("Street Racers",{429,541,542,415,480,562,565,434,494,502,503,411,559,561,560,506,451,558,555,477},3,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                fcommon.ShowEntries("RC Vehicles",{441,464,594,501,465,564},3,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                fcommon.ShowEntries("Recreational",{568,424,504,457,483,508,571,500,444,556,557,471,495,539},3,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                imgui.EndChild()
+            end
             imgui.EndTabItem()
         end
         imgui.EndTabBar()

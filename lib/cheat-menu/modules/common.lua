@@ -28,19 +28,19 @@ function module.QuickSpawner()
             result = ''
         elseif wasKeyPressed(0x08) then
             result = result:sub(1, -2)
-        elseif wasKeyPressed(memory.read(0x00969110,1,false)) then
+        elseif wasKeyPressed(readMemory(0x00969110,1,false)) then
             result = string.format('%s%s',result,memory.tostring(0x00969110,1,false));
         end
         printStringNow(string.format('[%s]',result),1500);
         text = result
 
         for i = 0,#result,1 do
-        --    local weapon =  fweapons.CBaseWeaponInfo(text)
-        --     if fweapons.tweapons.quick_spawn[0] == true
-        --     and fweapons.CBaseWeaponInfo(text) < 47 and weapon > 0 then
-        --         fweapons.give_weapon_to_player(weapon)
-        --         return
-        --     end
+           local weapon =  fweapons.CBaseWeaponInfo(text)
+            if fweapons.tweapons.quick_spawn[0] == true
+            and fweapons.CBaseWeaponInfo(text) < 47 and weapon > 0 then
+                fweapons.GiveWeaponToPlayer(weapon)
+                return
+            end
 
             local vehicle = fvehicles.CBaseModelInfo(text)
             if fvehicles.tvehicles.quick_spawn[0] == true and vehicle > 400 and vehicle < 100000 then
@@ -71,28 +71,11 @@ function module.CheatDeactivated()
     printHelpString("Cheat ~r~Deactivated")
 end
 
-function module.ValueSwitch(name,var,show_help_popups,help_text)
-
-    if help_text == nil then help_text = false end
-    if imgui.Checkbox(name,var) then
-        if show_help_popups then
-            if var[0] then
-                module.CheatActivated()
-            else
-                module.CheatDeactivated()
-            end
-        end
-    end
-    --if help_text ~= nil then
-      --  module.InformationTooltip(help_text)
-    --end
-end
-
 function module.GetSize(count)
     if count == 1 then
-        return ((imgui.GetWindowWidth()- 15*imgui.StyleVar.WindowPadding) / count), (imgui.GetWindowHeight()/30)
+        return ((imgui.GetWindowWidth()- 15*imgui.StyleVar.WindowPadding) / count), (imgui.GetWindowHeight()/25)
     else
-        return ((imgui.GetWindowWidth()- 2*imgui.StyleVar.WindowPadding - (count-1)*imgui.StyleVar.ItemSpacing) / count), (imgui.GetWindowHeight()/30)
+        return ((imgui.GetWindowWidth()- 2*imgui.StyleVar.WindowPadding - (count-1)*imgui.StyleVar.ItemSpacing) / count), (imgui.GetWindowHeight()/25)
     end
 end
 
@@ -145,7 +128,7 @@ function module.UiCreateButtons(names,funcs)
     end
 end
 
-function module.ShowEntries(title,model_table,rows,store_table,image_path,image_extention,image_size,func_load_model,func_show_tooltip,skip_check)
+function module.ShowEntries(title,model_table,rows,store_table,image_path,image_extention,func_load_model,func_show_tooltip,skip_check)
 
     for j=1,#model_table,1 do
         if IsValidModForVehicle(model_table[j]) or skip_check == true then
@@ -160,14 +143,14 @@ function module.ShowEntries(title,model_table,rows,store_table,image_path,image_
                             store_table[tostring(model_table[i])] = "LOADING"
                             lua_thread.create(module.LoadTexture,store_table,image_path,model_table[i],image_extention)
                         else
+                            local x,y = fcommon.GetSize(rows)
                             if skip_check == false then
                                 if IsValidModForVehicle(model_table[i]) then
-                                    if imgui.ImageButton(store_table[tostring(model_table[i])],imgui.ImVec2(image_size.x,image_size.y)) then
+                                    if imgui.ImageButton(store_table[tostring(model_table[i])],imgui.ImVec2(x,y)) then
                                         func_load_model(model_table[i])
                                     end
                                 end
                             else
-                                local x,y = fcommon.GetSize(rows)
                                 if imgui.ImageButton(store_table[tostring(model_table[i])],imgui.ImVec2(x/1.2,y*4)) then
                                     func_load_model(model_table[i])
                                 end
@@ -180,8 +163,6 @@ function module.ShowEntries(title,model_table,rows,store_table,image_path,image_
                                 end
                             end
                         end
-                    else
-                        imgui.Spinner("Loading", 15, 3, imgui.GetColorU32(imgui.GetStyle().Colors[imgui.Col.ButtonHovered]))
                     end
 
                     if (i == 1) or (i % rows ~= 0) then
@@ -189,9 +170,6 @@ function module.ShowEntries(title,model_table,rows,store_table,image_path,image_
                     end
                 end
                 imgui.NewLine()
-                imgui.Spacing()
-                imgui.Separator()
-                imgui.Spacing()
             end)
             break
         end
@@ -252,47 +230,40 @@ function module.CheatDeactivated()
     printHelpString("Cheat ~r~Deactivated")
 end
 
-function module.ButtonsMenu(func,names,sizeX,sizeY,style)
-    if imgui.BeginMenu(names[1]) then
-        imgui.Spacing()
-        imgui.Text(names[1])
-        imgui.Separator()
-        imgui.Spacing()
-
-        for i = 1, #func do
-            if imgui.Button(names[i+1],imgui.ImVec2(sizeX,sizeY)) then
-                callFunction(func[i],1,1)
-                module.CheatActivated()
-            end
-            if not (i % 4 == 0) and style == "horizantal" then
-                imgui.SameLine()
-            end
-        end
-        imgui.EndMenu()
-    end
-
-end
-
-
 function module.CheckBox(arg)
     arg.value = arg.value or 1
     arg.value2 = arg.value2 or 0
-    local func_bool= imgui.new.bool()
-    if (readMemory(arg.address,1,false)) == arg.value2 then
-        func_bool[0] = false
-    else
-        func_bool[0] = true
+    arg.var = arg.var or nil
+    arg.func = arg.func or nil
+
+    local func_bool =  arg.var or imgui.new.bool()
+    if arg.var == nil then
+        if (readMemory(arg.address,1,false)) == arg.value2 then
+            func_bool[0] = false
+        else
+            func_bool[0] = true
+        end
     end
 
     if imgui.Checkbox(arg.name,func_bool) then
-        if func_bool[0] then
-            writeMemory(arg.address,1,arg.value,false)
-            module.CheatActivated()
+        if arg.var == nil then
+            if func_bool[0] then
+                writeMemory(arg.address,1,arg.value,false)
+                module.CheatActivated()
+            else
+                writeMemory(arg.address,1,arg.value2,false)
+                module.CheatDeactivated()
+            end
         else
-            writeMemory(arg.address,1,arg.value2,false)
-            module.CheatDeactivated()
+            if arg.var[0] then
+                module.CheatActivated()
+            else
+                module.CheatDeactivated()
+            end
+            if arg.func ~= nil then arg.func() end
         end
     end
+
     if arg.help_text ~= nil then
         module.InformationTooltip(arg.help_text)
     end
@@ -357,7 +328,7 @@ function module.UpdateAddress(arg)
 
     module.DropDownMenu(arg.name,function()
 
-        local value = imgui.new.int(0)
+        local value = imgui.new.int(module.RwMemory(arg.address,arg.size,nil,nil,arg.is_float))
 
         imgui.Columns(3,nil,false)
         imgui.Text("Max = " .. arg.max)
@@ -371,33 +342,33 @@ function module.UpdateAddress(arg)
 
         imgui.PushItemWidth(imgui.GetWindowWidth()-50)
         if imgui.InputInt("Set",value) then
-         --   module.RwMemory(arg.address,arg.size,value[0],nil,arg.is_float)
+            module.RwMemory(arg.address,arg.size,value[0],nil,arg.is_float)
         end
         imgui.PopItemWidth()
 
         imgui.Spacing()
         if imgui.Button("Increase",imgui.ImVec2(fcommon.GetSize(4))) and value[0] < arg.max then
-          --  module.RwMemory(arg.address,arg.size,(value[0]+math.floor(arg.max/10)),nil,arg.is_float)
+            module.RwMemory(arg.address,arg.size,(value[0]+math.floor(arg.max/10)),nil,arg.is_float)
         end
         imgui.SameLine()
         if imgui.Button("Decrease",imgui.ImVec2(fcommon.GetSize(4)))  and value[0] > arg.min then
-           -- module.RwMemory(arg.address,arg.size,(value[0]-math.floor(arg.max/10)),nil,arg.is_float)
+            module.RwMemory(arg.address,arg.size,(value[0]-math.floor(arg.max/10)),nil,arg.is_float)
         end
         imgui.SameLine()
         if imgui.Button("Maximum",imgui.ImVec2(fcommon.GetSize(4))) then
-           -- module.RwMemory(arg.address,arg.size,arg.max,nil,arg.is_float)
+            module.RwMemory(arg.address,arg.size,arg.max,nil,arg.is_float)
         end
         imgui.SameLine()
         if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(4))) then
-          --  module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float)
+            module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float)
         end
         imgui.Spacing()
         if value[0] < arg.min then
-           -- module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float)
+            module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float)
         end
 
         if value[0] > arg.max then
-          --  module.RwMemory(arg.address,arg.size,arg.max,nil,arg.is_float)
+            module.RwMemory(arg.address,arg.size,arg.max,nil,arg.is_float)
         end
     end)
 end
