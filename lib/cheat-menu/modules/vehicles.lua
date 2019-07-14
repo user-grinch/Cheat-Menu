@@ -5,7 +5,7 @@ local tvehicles =
 {
     components =
     {
-        path   =  getGameDirectory() .. "\\moonloader\\cheat-menu\\vehicles\\components\\",
+        path   =  getGameDirectory() .. "\\moonloader\\lib\\cheat-menu\\vehicles\\components\\",
         images = {},
         value  = imgui.new.int(0),
         list   = {},
@@ -149,9 +149,6 @@ function module.VehiclesMain()
             car = storeCarCharIsInNoSave(PLAYER_PED)
             setCarRoll(car,0)
             fcommon.CheatActivated()
-            requestVehicleMod(1078)
-            loadAllModelsNow()
-            addVehicleMod(car,1078)
         end
     end
     imgui.SameLine()
