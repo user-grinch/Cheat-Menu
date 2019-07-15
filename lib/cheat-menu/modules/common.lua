@@ -3,7 +3,17 @@
 local module = {}
 
 function module.DropDownMenu(label,func)
-    if imgui.CollapsingHeader(label) then
+    if label ~= nil then
+        if imgui.CollapsingHeader(label) then
+           imgui.Spacing()
+
+            func()
+
+            imgui.Spacing()
+            imgui.Separator()
+            imgui.Spacing()
+        end
+    else
         imgui.Spacing()
 
         func()
@@ -128,49 +138,50 @@ function module.UiCreateButtons(names,funcs)
     end
 end
 
-function module.ShowEntries(title,model_table,rows,store_table,image_path,image_extention,func_load_model,func_show_tooltip,skip_check)
-
+function module.ShowEntries(title,model_table,rows,store_table,image_path,image_extention,func_load_model,func_show_tooltip,skip_check,search_text)
+    if search_text == nil then search_text = "" end
     for j=1,#model_table,1 do
         if IsValidModForVehicle(model_table[j]) or skip_check == true then
-            fcommon.DropDownMenu(title,function()
-                imgui.Spacing()
-
-                for i=1,#model_table,1 do
-
-                    if store_table[tostring(model_table[i])] ~= "LOADING"  then
-
-                        if store_table[tostring(model_table[i])] == nil then
-                            store_table[tostring(model_table[i])] = "LOADING"
-                            lua_thread.create(module.LoadTexture,store_table,image_path,model_table[i],image_extention)
-                        else
-                            local x,y = fcommon.GetSize(rows)
-                            if skip_check == false then
-                                if IsValidModForVehicle(model_table[i]) then
-                                    if imgui.ImageButton(store_table[tostring(model_table[i])],imgui.ImVec2(x,y)) then
-                                        func_load_model(model_table[i])
-                                    end
-                                end
+                fcommon.DropDownMenu(title,function()
+                    local skipped_entries = 0
+                    for i=1,#model_table,1 do
+                        if store_table[tostring(model_table[i])] ~= "LOADING"  then
+                            if store_table[tostring(model_table[i])] == nil then
+                                store_table[tostring(model_table[i])] = "LOADING"
+                                lua_thread.create(module.LoadTexture,store_table,image_path,model_table[i],image_extention)
                             else
-                                if imgui.ImageButton(store_table[tostring(model_table[i])],imgui.ImVec2(x/1.2,y*4)) then
-                                    func_load_model(model_table[i])
-                                end
-                            end
-                            if func_show_tooltip ~= nil then
-                                if imgui.IsItemHovered() then
-                                    imgui.BeginTooltip()
-                                    imgui.SetTooltip(func_show_tooltip(model_table[i]))
-                                    imgui.EndTooltip()
+                                local x,y = fcommon.GetSize(rows)
+                                if (search_text == "") or (string.upper(func_show_tooltip(model_table[i])):find(string.upper(ffi.string(search_text))) ~= nil) then
+                                    if skip_check == false then
+                                        if IsValidModForVehicle(model_table[i]) then
+                                            if imgui.ImageButton(store_table[tostring(model_table[i])],imgui.ImVec2(x,y)) then
+                                                func_load_model(model_table[i])
+                                            end
+                                        end
+                                    else
+                                        if imgui.ImageButton(store_table[tostring(model_table[i])],imgui.ImVec2(x/1.2,y*4)) then
+                                            func_load_model(model_table[i])
+                                        end
+                                    end
+                                    if func_show_tooltip ~= nil then
+                                        if imgui.IsItemHovered() then
+                                            imgui.BeginTooltip()
+                                            imgui.SetTooltip(func_show_tooltip(model_table[i]))
+                                            imgui.EndTooltip()
+                                        end
+                                    end
+                                else
+                                    skipped_entries = skipped_entries +1
                                 end
                             end
                         end
-                    end
 
-                    if (i == 1) or (i % rows ~= 0) then
-                        imgui.SameLine()
+                        if ((i-skipped_entries) % rows ~= 0) then
+                            imgui.SameLine()
+                        end
                     end
-                end
-                imgui.NewLine()
-            end)
+                    imgui.NewLine()
+                end)
             break
         end
     end

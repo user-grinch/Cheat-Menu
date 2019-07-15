@@ -336,9 +336,15 @@ local tpeds =
         [299] = "CLAUDE",
 
     },
+    models = {},
+    search_text = imgui.new.char[20](),
 }
 
 module.tpeds = tpeds
+
+for i = 0,#tpeds.names,1 do
+    table.insert(tpeds.models,i)
+end
 
 function module.GetName(model)
     if tpeds.names[model] then return tpeds.names[model] else return "" end
@@ -482,6 +488,22 @@ function module.PedsMain()
                     imgui.EndTabItem()
                 end
                 imgui.EndTabBar()
+            end
+            imgui.EndTabItem()
+        end
+        if imgui.BeginTabItem('Search') then
+            imgui.Spacing()
+            imgui.Columns(1)
+            if imgui.InputText("Search",tpeds.search_text,ffi.sizeof(tpeds.search_text)) then end
+			imgui.SameLine()
+
+			imgui.Spacing()
+			imgui.Text("Found entries:(" .. ffi.string(tpeds.search_text) .. ")")
+			imgui.Separator()
+            imgui.Spacing()
+            if imgui.BeginChild("Ped Entries") then
+                fcommon.ShowEntries(nil,tpeds.models,5,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true,tpeds.search_text)
+                imgui.EndChild()
             end
             imgui.EndTabItem()
         end

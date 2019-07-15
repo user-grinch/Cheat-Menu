@@ -66,6 +66,7 @@ cheatMenu =
             Y = resY/1.2,
         },
         main    = imgui.new.bool(false),
+        title   = string.format("%s v%s by %s",script.this.name,script.this.version,script.this.authors[1]),
         overlay =
         {
             main     = imgui.new.bool(true),
@@ -83,6 +84,20 @@ function ternary ( cond , T , F )
     if cond then return T else return F end
 end
 
+imgui.OnInitialize(function() -- Called once
+    -- Styles
+    imgui.PushStyleVarFloat(imgui.StyleVar.WindowBorderSize,0)
+    imgui.PushStyleVarFloat(imgui.StyleVar.FramePadding,3)
+    imgui.PushStyleVarFloat(imgui.StyleVar.PopupRounding,3)
+    imgui.PushStyleVarFloat(imgui.StyleVar.PopupBorderSize,0)
+    imgui.PushStyleVarFloat(imgui.StyleVar.ChildBorderSize,0)
+    imgui.PushStyleVarFloat(imgui.StyleVar.WindowRounding,3)
+    imgui.PushStyleVarFloat(imgui.StyleVar.ScrollbarRounding,3)
+    imgui.PushStyleVarFloat(imgui.StyleVar.TabRounding,3)
+    imgui.PushStyleVarVec2(imgui.StyleVar.WindowTitleAlign,imgui.ImVec2(0.5,0.5))
+    imgui.PushStyleColor(imgui.Col.Header, imgui.ImVec4(0,0,0,0))
+end)
+
 imgui.OnFrame(
 
 function() -- condition
@@ -92,32 +107,16 @@ function() -- render frame
     if cheatMenu.window.main[0] then
         imgui.SetNextWindowSize(imgui.ImVec2(cheatMenu.window.size.X,cheatMenu.window.size.Y), imgui.Cond.Once)
 
-        -- Styles
-        imgui.PushStyleVarFloat(imgui.StyleVar.WindowBorderSize,0)
-        imgui.PushStyleVarFloat(imgui.StyleVar.FramePadding,3)
-        imgui.PushStyleVarFloat(imgui.StyleVar.PopupRounding,3)
-        imgui.PushStyleVarFloat(imgui.StyleVar.PopupBorderSize,0)
-        imgui.PushStyleVarFloat(imgui.StyleVar.ChildBorderSize,0)
-        imgui.PushStyleVarFloat(imgui.StyleVar.WindowRounding,3)
-        imgui.PushStyleVarFloat(imgui.StyleVar.ScrollbarRounding,3)
-        imgui.PushStyleVarFloat(imgui.StyleVar.TabRounding,3)
-        imgui.PushStyleColor(imgui.Col.Header, imgui.ImVec4(0,0,0,0))
+        imgui.Begin(cheatMenu.window.title, cheatMenu.window.main,imgui.WindowFlags.NoCollapse)
+        fcommon.UiCreateButtons({"Teleport","Memory","Player","Vehicle","Weapon","Peds","Missions","Cheats","Game","Visuals","Menu","About"},
+        {fteleport.TeleportationMain,fmemcontrol.MemoryControlMain,fplayer.PlayerMain,fvehicles.VehiclesMain,fweapons.WeaponsMain,
+        fpeds.PedsMain,fmissions.MissionsMain,fcheats.CheatsMain,fgame.GameMain,fvisuals.VisualsMain,fmenu.MenuMain,fabout.AboutMain})
+        imgui.End()
 
-        local header = string.format("%s v%s by %s",script.this.name,script.this.version,script.this.authors[1])
-        for i=1,(imgui.GetWindowWidth() - #header)/16,1 do
-            header = ' ' .. header
-        end
-
-        if imgui.Begin(tostring(header), cheatMenu.window.main,imgui.WindowFlags.NoCollapse) then
-            fcommon.UiCreateButtons({"Teleport","Memory","Player","Vehicle","Weapon","Peds","Missions","Cheats","Game","Visuals","Menu","About"},
-            {fteleport.TeleportationMain,fmemcontrol.MemoryControlMain,fplayer.PlayerMain,fvehicles.VehiclesMain,fweapons.WeaponsMain,
-            fpeds.PedsMain,fmissions.MissionsMain,fcheats.CheatsMain,fgame.GameMain,fvisuals.VisualsMain,fmenu.MenuMain,fabout.AboutMain})
-            imgui.End()
-        end
     end
-    -- Overlay window
+
+    --Overlay window
     if cheatMenu.window.overlay.main[0] then
-        showCursor(cheatMenu.window.main[0])
         if (cheatMenu.window.overlay.corner ~= -1) then
             window_pos       = imgui.ImVec2(ternary((cheatMenu.window.overlay.corner == 1 or cheatMenu.window.overlay.corner == 3),resX - cheatMenu.window.overlay.distance,cheatMenu.window.overlay.distance),ternary((cheatMenu.window.overlay.corner == 2 or cheatMenu.window.overlay.corner == 3),resY - cheatMenu.window.overlay.distance,cheatMenu.window.overlay.distance))
             window_pos_pivot = imgui.ImVec2(ternary((cheatMenu.window.overlay.corner == 1 or cheatMenu.window.overlay.corner == 3),1.0,0.0),ternary((cheatMenu.window.overlay.corner == 2 or cheatMenu.window.overlay.corner == 3),1.0,0.0))
@@ -176,7 +175,7 @@ end)
 
 function main()
     while true do
-
+        showCursor(cheatMenu.window.main[0])
         if fgame.tgame.ss_shotcut[0]
         and isKeyDown(keys.control_key) and isKeyDown(keys.screenshot_key) then
             takePhoto(true)
@@ -193,7 +192,7 @@ function main()
         and isKeyDown(keys.teleport_key1)
         and isKeyDown(keys.teleport_key2) then
             fcommon.KeyWait(keys.teleport_key1,keys.teleport_key2)
-            module.Teleport()
+            fteleport.Teleport()
         end
 
         if fplayer.tplayer.god[0] then
@@ -261,7 +260,7 @@ function main()
                 setCarHeavy(car,false)
             end
 
-            if fvehicles.tvehicles.visual_damage[0] then
+            if fvehicles.tvehicles.visual_damage[0] == true then
                 setCarCanBeVisiblyDamaged(car,false)
             else
                 setCarCanBeVisiblyDamaged(car,true)
@@ -276,7 +275,7 @@ end
 function onScriptTerminate(script, quitGame)
     if script == thisScript() then
         showCursor(false,false)
-        printHelpString("Cheat Menu ~r~Crashed & ~g~reloaded ~w~sucessfully.Please provide moonloader.log in case of debugging.")
+        printHelpString("Cheat Menu ~r~crashed ~w~& ~g~reloaded~w~.Provide moonloader.log in case of debugging.")
         script.this:reload()
     end
 end

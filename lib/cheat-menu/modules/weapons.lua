@@ -9,7 +9,13 @@ local tweapons =
     quick_spawn = imgui.new.bool(false),
     noreload = imgui.new.bool(false),
     fast_reload = imgui.new.bool(false),
+    search_text = imgui.new.char[20](),
+    models = {},
 }
+
+for i = 1,46,1 do
+    table.insert(tweapons.models,i)
+end
 
 module.tweapons = tweapons
 
@@ -118,6 +124,22 @@ function module.WeaponsMain()
                 fcommon.ShowEntries("Heavy Weapons",{35,36,37,38},5,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true)
                 fcommon.ShowEntries("Projectiles",{16,17,18,39},5,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true)
                 fcommon.ShowEntries("More",{41,42,43,44,45,46,14,15,10,11,12},5,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true)
+                imgui.EndChild()
+            end
+            imgui.EndTabItem()
+        end
+        if imgui.BeginTabItem('Search') then
+            imgui.Spacing()
+            imgui.Columns(1)
+            if imgui.InputText("Search",tweapons.search_text,ffi.sizeof(tweapons.search_text)) then end
+            imgui.SameLine()
+
+            imgui.Spacing()
+            imgui.Text("Found entries:(" .. ffi.string(tweapons.search_text) .. ")")
+            imgui.Separator()
+            imgui.Spacing()
+            if imgui.BeginChild("Vehicle Entries") then
+                fcommon.ShowEntries(nil,tweapons.models,5,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true,tweapons.search_text)
                 imgui.EndChild()
             end
             imgui.EndTabItem()

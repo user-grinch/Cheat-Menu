@@ -8,6 +8,10 @@ local tplayer =
     aimSkinChanger = imgui.new.bool(false),
     neverWanted    = imgui.new.bool(false),
     cjBody         = imgui.new.int(),
+    skins =
+    {
+        search_text    = imgui.new.char[20](),
+    },
     style =
     {
         fighting =
@@ -281,6 +285,22 @@ function SkinChangerMenu()
             imgui.Spacing()
             if imgui.BeginChild("Other list Window") then
                 fcommon.ShowEntries("Misc",{0,1,2,7,19,23,26,35,49,62,68,70,76,144,145,146,209,210,214,263,268,272},5,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                imgui.EndChild()
+            end
+            imgui.EndTabItem()
+        end
+        if imgui.BeginTabItem('Search') then
+            imgui.Spacing()
+            imgui.Columns(1)
+            if imgui.InputText("Search",tplayer.skins.search_text,ffi.sizeof(tplayer.skins.search_text)) then end
+			imgui.SameLine()
+
+			imgui.Spacing()
+			imgui.Text("Found entries:(" .. ffi.string(tplayer.skins.search_text) .. ")")
+			imgui.Separator()
+            imgui.Spacing()
+            if imgui.BeginChild("Skin Entries") then
+                fcommon.ShowEntries(nil,fpeds.tpeds.models,5,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true,tplayer.skins.search_text)
                 imgui.EndChild()
             end
             imgui.EndTabItem()

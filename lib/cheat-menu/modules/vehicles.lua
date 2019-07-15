@@ -34,6 +34,8 @@ local tvehicles =
         },
 
     },
+    search_text = imgui.new.char[20](),
+    models = {},
     show = {
         speed = imgui.new.bool(false),
         health = imgui.new.bool(false),
@@ -68,6 +70,10 @@ local tvehicles =
 
 module.tvehicles = tvehicles
 tvehicles.components.list  = imgui.new['const char*'][#tvehicles.components.names](tvehicles.components.names)
+
+for i = 401,611,1 do
+    table.insert(tvehicles.models,i)
+end
 
 function module.CBaseModelInfo(name)
     local pInfo = allocateMemory(16)
@@ -350,6 +356,22 @@ function module.VehiclesMain()
                 fcommon.ShowEntries("Street Racers",{429,541,542,415,480,562,565,434,494,502,503,411,559,561,560,506,451,558,555,477},3,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
                 fcommon.ShowEntries("RC Vehicles",{441,464,594,501,465,564},3,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
                 fcommon.ShowEntries("Recreational",{568,424,504,457,483,508,571,500,444,556,557,471,495,539},3,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                imgui.EndChild()
+            end
+            imgui.EndTabItem()
+        end
+        if imgui.BeginTabItem('Search') then
+            imgui.Spacing()
+            imgui.Columns(1)
+            if imgui.InputText("Search",tvehicles.search_text,ffi.sizeof(tvehicles.search_text)) then end
+            imgui.SameLine()
+
+            imgui.Spacing()
+            imgui.Text("Found entries:(" .. ffi.string(tvehicles.search_text) .. ")")
+            imgui.Separator()
+            imgui.Spacing()
+            if imgui.BeginChild("Vehicle Entries") then
+                fcommon.ShowEntries(nil,tvehicles.models,3,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true,tvehicles.search_text)
                 imgui.EndChild()
             end
             imgui.EndTabItem()
