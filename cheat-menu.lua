@@ -276,10 +276,10 @@ function main()
 end
 
 
--- function onScriptTerminate(script, quitGame)
---     if script == thisScript() then
---         showCursor(false,false)
---         printHelpString("Cheat Menu ~r~crashed ~w~& ~g~reloaded~w~.Provide moonloader.log in case of debugging.")
---         script.this:reload()
---     end
--- end
+function onScriptTerminate(script, quitGame)
+    if script == thisScript() then
+        showCursor(false,false)
+        printHelpString("Cheat Menu ~r~crashed ~w~& ~g~reloaded~w~.Provide moonloader.log in case of debugging.")
+        script.this:reload()
+    end
+end
