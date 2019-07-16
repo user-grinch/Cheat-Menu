@@ -5,7 +5,6 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu
 script_dependencies("imgui","memory","MoonAdditions")
 script_version("1.5")
 
-
 -- All the command keys used throughout the Cheat-Menu
 keys =
 {
@@ -66,6 +65,7 @@ cheatMenu =
             Y = resY/1.2,
         },
         main    = imgui.new.bool(false),
+        cursor  = false,
         title   = string.format("%s v%s by %s",script.this.name,script.this.version,script.this.authors[1]),
         overlay =
         {
@@ -101,13 +101,18 @@ end)
 imgui.OnFrame(
 
 function() -- condition
-    return cheatMenu.window.main[0] or cheatMenu.window.overlay.main[0]
+    if not isGamePaused() then
+        if (cheatMenu.window.main[0] or cheatMenu.window.overlay.main[0]) then
+            return true
+        end
+    end
 end,
 function() -- render frame
     if cheatMenu.window.main[0] then
         imgui.SetNextWindowSize(imgui.ImVec2(cheatMenu.window.size.X,cheatMenu.window.size.Y), imgui.Cond.Once)
 
         imgui.Begin(cheatMenu.window.title, cheatMenu.window.main,imgui.WindowFlags.NoCollapse)
+
         fcommon.UiCreateButtons({"Teleport","Memory","Player","Vehicle","Weapon","Peds","Missions","Cheats","Game","Visuals","Menu","About"},
         {fteleport.TeleportationMain,fmemcontrol.MemoryControlMain,fplayer.PlayerMain,fvehicles.VehiclesMain,fweapons.WeaponsMain,
         fpeds.PedsMain,fmissions.MissionsMain,fcheats.CheatsMain,fgame.GameMain,fvisuals.VisualsMain,fmenu.MenuMain,fabout.AboutMain})
@@ -117,13 +122,12 @@ function() -- render frame
 
     --Overlay window
     if cheatMenu.window.overlay.main[0] then
-        if (cheatMenu.window.overlay.corner ~= -1) then
-            window_pos       = imgui.ImVec2(ternary((cheatMenu.window.overlay.corner == 1 or cheatMenu.window.overlay.corner == 3),resX - cheatMenu.window.overlay.distance,cheatMenu.window.overlay.distance),ternary((cheatMenu.window.overlay.corner == 2 or cheatMenu.window.overlay.corner == 3),resY - cheatMenu.window.overlay.distance,cheatMenu.window.overlay.distance))
-            window_pos_pivot = imgui.ImVec2(ternary((cheatMenu.window.overlay.corner == 1 or cheatMenu.window.overlay.corner == 3),1.0,0.0),ternary((cheatMenu.window.overlay.corner == 2 or cheatMenu.window.overlay.corner == 3),1.0,0.0))
-            imgui.SetNextWindowPos(window_pos,0,window_pos_pivot)
-        end
-
-        if fgame.tfps.bool[0] or fvehicles.tvehicles.show.speed[0] or fvehicles.tvehicles.show.health[0] or fvisuals.show_coordinates[0] then
+        if fgame.tfps.bool[0] or fvisuals.show_coordinates[0] or (( fvehicles.tvehicles.show.speed[0] or fvehicles.tvehicles.show.health[0]) and isCharInAnyCar(PLAYER_PED)) then
+            if (cheatMenu.window.overlay.corner ~= -1) then
+                window_pos       = imgui.ImVec2(ternary((cheatMenu.window.overlay.corner == 1 or cheatMenu.window.overlay.corner == 3),resX - cheatMenu.window.overlay.distance,cheatMenu.window.overlay.distance),ternary((cheatMenu.window.overlay.corner == 2 or cheatMenu.window.overlay.corner == 3),resY - cheatMenu.window.overlay.distance,cheatMenu.window.overlay.distance))
+                window_pos_pivot = imgui.ImVec2(ternary((cheatMenu.window.overlay.corner == 1 or cheatMenu.window.overlay.corner == 3),1.0,0.0),ternary((cheatMenu.window.overlay.corner == 2 or cheatMenu.window.overlay.corner == 3),1.0,0.0))
+                imgui.SetNextWindowPos(window_pos,0,window_pos_pivot)
+            end
             imgui.PushStyleVarFloat(imgui.StyleVar.Alpha,0.65)
             if imgui.Begin('Overlay', cheatMenu.window.overlay.main,imgui.WindowFlags.NoTitleBar + imgui.WindowFlags.NoResize + imgui.WindowFlags.NoCollapse + imgui.WindowFlags.AlwaysAutoResize + imgui.WindowFlags.NoFocusOnAppearing) then
                 if fgame.tfps.bool[0] == true then
@@ -166,12 +170,12 @@ function() -- render frame
                     imgui.EndPopup()
                 end
                 imgui.PushStyleVarFloat(imgui.StyleVar.Alpha,0.65)
+                imgui.PopStyleVar()
+                imgui.End()
             end
-            imgui.End()
-            imgui.PopStyleVar()
         end
     end
-end)
+end).HideCursor = true
 
 function main()
     while true do
@@ -272,10 +276,10 @@ function main()
 end
 
 
-function onScriptTerminate(script, quitGame)
-    if script == thisScript() then
-        showCursor(false,false)
-        printHelpString("Cheat Menu ~r~crashed ~w~& ~g~reloaded~w~.Provide moonloader.log in case of debugging.")
-        script.this:reload()
-    end
-end
+-- function onScriptTerminate(script, quitGame)
+--     if script == thisScript() then
+--         showCursor(false,false)
+--         printHelpString("Cheat Menu ~r~crashed ~w~& ~g~reloaded~w~.Provide moonloader.log in case of debugging.")
+--         script.this:reload()
+--     end
+-- end

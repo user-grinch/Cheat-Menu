@@ -23,7 +23,7 @@ local weather_list  = imgui.new['const char*'][#tgame.weather_names](tgame.weath
 -- FPS table
 local tfps =
 {
-    bool = imgui.new.bool(0),
+    bool = imgui.new.bool(false),
     total = 0,
     time = 0,
     show = 0,
