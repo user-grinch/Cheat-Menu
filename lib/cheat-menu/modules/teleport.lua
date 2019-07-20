@@ -5,10 +5,10 @@ local module = {}
 -- Teleport table
 local tteleport =
 {
-    shotcut        = imgui.new.bool(false),
+    shortcut       = imgui.new.bool(false),
     coords         = imgui.new.char[24](),
     auto_z         = imgui.new.bool(false),
-    current_coords = imgui.new.bool(false),
+    insert_coords = imgui.new.bool(false),
     search_text    = imgui.new.char[64](),
 }
 
@@ -371,21 +371,21 @@ function ShowTeleportEntry(label, x, y, z,interior_id)
 	end
 end
 
-function module.TeleportationMain()
+function module.TeleportMain()
 
     if imgui.BeginTabBar('Teleportation') then
         if imgui.BeginTabItem('Teleport') then
             imgui.Spacing()
             imgui.Columns(2,nil,false)
-            fcommon.CheckBox({name = "Quick teleport",var = fteleport.tteleport.shotcut,help_text ="Teleport to marker can be quickly accessed by pressing (X + Y) key combinartion"})
+            fcommon.CheckBox({name = "Quick teleport",var = fteleport.tteleport.shortcut,help_text ="Teleport to marker can be quickly accessed by pressing (X + Y) key combinartion"})
             fcommon.CheckBox({name = "Auto Z Coordinates",var = fteleport.tteleport.auto_z,help_text ="The script would get Z coord automatically"})
             imgui.NextColumn()
-            fcommon.CheckBox({name = "Insert Coordinates",var = fteleport.tteleport.current_coords,help_text ="Set current coordinates"})
+            fcommon.CheckBox({name = "Insert Coordinates",var = fteleport.tteleport.insert_coords,help_text ="Set current coordinates"})
             imgui.Columns(1)
 
             if imgui.InputText("Co-ordinates",tteleport.coords,ffi.sizeof(tteleport.coords)) then end
 
-            if tteleport.current_coords[0] then
+            if tteleport.insert_coords[0] then
                 local x,y,z = getCharCoordinates(PLAYER_PED)
                 imgui.StrCopy(tteleport.coords,string.format("%d, %d, %d", math.floor(x) , math.floor(y) , math.floor(z)))
             end

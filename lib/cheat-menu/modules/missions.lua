@@ -168,36 +168,30 @@ end
 
 function ShowMissionEntry(i)
     if imgui.MenuItemBool(tmissions.names[i]) then
-        if getGameGlobal(glob.ONMISSION) == 1 then
-            setGameGlobal(glob.ONMISSION,0)
-            failCurrentMission()
+        if getGameGlobal(glob.ONMISSION) == 0 then
+            clearWantedLevel(PLAYER_HANDLE)
+            lockPlayerControl(true)
+            setEveryoneIgnorePlayer(PLAYER_HANDLE,true)
+            displayHud(false)
+            displayRadar(false)
+            setLaRiots(false)
+            doFade(true,1000)
+            local progress = getProgressPercentage()
+            setProgressTotal(100)
+            loadAndLaunchMissionInternal(i)
+            lockPlayerControl(false)
+            displayHud(true)
+            displayRadar(true)
+            playerMadeProgress(progress)
+            fcommon.CheatActivated()
+        else
+            printHelpString("Already in a ~r~mission")
         end
-        clearWantedLevel(PLAYER_HANDLE)
-        lockPlayerControl(true)
-        setLaRiots(false)
-        local progress = getProgressPercentage()
-        playerMadeProgress(100)
-        loadAndLaunchMissionInternal(i)
-        lockPlayerControl(false)
-        playerMadeProgress(progress)
-        fcommon.CheatActivated()
     end
 end
 
 function module.MissionsMain()
     imgui.Spacing()
-    if imgui.Button("Abort Current Misson",imgui.ImVec2(fcommon.GetSize(1))) then
-        if getGameGlobal(glob.ONMISSION) == 1 then
-            skipCutsceneEnd()
-            failCurrentMission()
-            setGameGlobal(glob.ONMISSION,0)
-            printBig('M_FAIL',5000,1)
-        else
-            printHelpString("Player is not in a mission.")
-        end
-    end
-    imgui.Spacing()
-
     if imgui.BeginChild("Missions list") then
         if imgui.BeginTabBar("Missions list") then
             if imgui.BeginTabItem("LS") then

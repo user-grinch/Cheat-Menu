@@ -81,18 +81,29 @@ function module.CheatDeactivated()
     printHelpString("Cheat ~r~Deactivated")
 end
 
-function module.GetSize(count)
-    if count == 1 then
-        return ((imgui.GetWindowWidth()- 15*imgui.StyleVar.WindowPadding) / count), (imgui.GetWindowHeight()/25)
-    else
-        return ((imgui.GetWindowWidth()- 2*imgui.StyleVar.WindowPadding - (count-1)*imgui.StyleVar.ItemSpacing) / count), (imgui.GetWindowHeight()/25)
-    end
-end
+function module.GetSize(count,x,y)
+    -- minimum
+    if x == nil then  x = 20 end
+    if y == nil then  y = 25 end
 
-function module.LoadTexture(list,path,model,extention)
-    local func_path = path .. tostring(model) .. extention
-    local image = imgui.CreateTextureFromFile(func_path)
-    list[tostring(model)] = image
+    if count == 1 then
+        if ((imgui.GetWindowWidth()- 15*imgui.StyleVar.WindowPadding) / count) > x then
+            x = (imgui.GetWindowWidth()- 15*imgui.StyleVar.WindowPadding) / count
+        end
+
+        if ((imgui.GetWindowHeight()/25) / count) > y then
+            y = (imgui.GetWindowHeight()/25)
+        end
+    else
+        if ((imgui.GetWindowWidth()- 2*imgui.StyleVar.WindowPadding - (count-1)*imgui.StyleVar.ItemSpacing) / count) > x then
+            x = ((imgui.GetWindowWidth()- 2*imgui.StyleVar.WindowPadding - (count-1)*imgui.StyleVar.ItemSpacing) / count)
+        end
+
+        if (imgui.GetWindowHeight()/35) > y then
+            y = (imgui.GetWindowHeight()/25)
+        end
+    end
+    return x,y
 end
 
 function IsValidModForVehicle(table)
@@ -114,7 +125,7 @@ function module.UiCreateButtons(names,funcs)
         if cheatMenu.menubuttons.current == i then
             imgui.PushStyleColor(imgui.Col.Button, imgui.ImVec4(0.060,0.530,0.980,1.0))
         end
-        if imgui.Button(names[i],imgui.ImVec2(imgui.GetWindowWidth()/4 - 4*imgui.StyleVar.WindowPadding,imgui.GetWindowHeight()/30)) then
+        if imgui.Button(names[i],imgui.ImVec2(module.GetSize(4,imgui.GetWindowWidth()/4 - 4*imgui.StyleVar.WindowPadding,20))) then
             cheatMenu.menubuttons.current = i
         end
         if cheatMenu.menubuttons.current == i then
@@ -138,49 +149,65 @@ function module.UiCreateButtons(names,funcs)
     end
 end
 
-function module.ShowEntries(title,model_table,rows,store_table,image_path,image_extention,func_load_model,func_show_tooltip,skip_check,search_text)
+function LoadTexture(store_table,image_path,model_table,extention)
+    for i=1,#model_table,1 do
+        if store_table[tostring(model_table[i])] == nil then
+            local path = image_path .. tostring(model_table[i]) .. extention
+            store_table[tostring(model_table[i])] = imgui.CreateTextureFromFile(path)
+            wait(1000)
+        end
+    end
+end
+
+function module.ShowEntries(title,model_table,height,width,store_table,image_path,image_extention,func_load_model,func_show_tooltip,skip_check,search_text)
+    local rows = 0
+    for i=0,20,1 do
+        if math.floor(imgui.GetWindowWidth()/i) < width then
+            width = (imgui.GetWindowWidth()/(i*1.2))
+            if (func_load_model == fvehicles.GiveVehicleToPlayer) or (func_load_model == fvehicles.AddComponentToVehicle) then
+                rows = i
+            else
+                rows = i - 1
+            end
+            break
+        end
+    end
     if search_text == nil then search_text = "" end
+    lua_thread.create(LoadTexture,store_table,image_path,model_table,image_extention)
     for j=1,#model_table,1 do
         if IsValidModForVehicle(model_table[j]) or skip_check == true then
                 fcommon.DropDownMenu(title,function()
                     local skipped_entries = 0
                     for i=1,#model_table,1 do
-                        if store_table[tostring(model_table[i])] ~= "LOADING"  then
-                            if store_table[tostring(model_table[i])] == nil then
-                                store_table[tostring(model_table[i])] = "LOADING"
-                                lua_thread.create(module.LoadTexture,store_table,image_path,model_table[i],image_extention)
-                            else
-                                local x,y = fcommon.GetSize(rows)
-                                if (search_text == "") or (string.upper(func_show_tooltip(model_table[i])):find(string.upper(ffi.string(search_text))) ~= nil) then
-                                    if skip_check == false then
-                                        if IsValidModForVehicle(model_table[i]) then
-                                            if imgui.ImageButton(store_table[tostring(model_table[i])],imgui.ImVec2(x,y)) then
-                                                func_load_model(model_table[i])
-                                            end
-                                        end
-                                    else
-                                        if imgui.ImageButton(store_table[tostring(model_table[i])],imgui.ImVec2(x/1.2,y*4)) then
+                        if store_table[tostring(model_table[i])] ~= nil then
+                            if (search_text == "") or (string.upper(func_show_tooltip(model_table[i])):find(string.upper(ffi.string(search_text))) ~= nil) then
+                                if skip_check == false then
+                                    if IsValidModForVehicle(model_table[i]) then
+                                        if imgui.ImageButton(store_table[tostring(model_table[i])],imgui.ImVec2(width,height)) then
                                             func_load_model(model_table[i])
                                         end
                                     end
-                                    if func_show_tooltip ~= nil then
-                                        if imgui.IsItemHovered() then
-                                            imgui.BeginTooltip()
-                                            imgui.SetTooltip(func_show_tooltip(model_table[i]))
-                                            imgui.EndTooltip()
-                                        end
-                                    end
                                 else
-                                    skipped_entries = skipped_entries +1
+                                    if imgui.ImageButton(store_table[tostring(model_table[i])],imgui.ImVec2(width,height)) then
+                                        func_load_model(model_table[i])
+                                    end
                                 end
+                                if func_show_tooltip ~= nil then
+                                    if imgui.IsItemHovered() then
+                                        imgui.BeginTooltip()
+                                        imgui.SetTooltip(func_show_tooltip(model_table[i]))
+                                        imgui.EndTooltip()
+                                    end
+                                end
+                            else
+                                skipped_entries = skipped_entries +1
                             end
                         end
 
-                        if ((i-skipped_entries) % rows ~= 0) then
+                        if (i-skipped_entries) % rows ~= 0 then
                             imgui.SameLine()
                         end
                     end
-                    imgui.NewLine()
                 end)
             break
         end

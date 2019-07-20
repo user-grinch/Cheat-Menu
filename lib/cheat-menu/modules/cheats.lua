@@ -9,7 +9,7 @@ function CheatsEntry(func,names,sizeY,style)
         for i = 1, #func do
             if imgui.Button(names[i+1],imgui.ImVec2((imgui.GetWindowWidth()/#func) - 2*#func,sizeY)) then
                 callFunction(func[i],1,1)
-                module.CheatActivated()
+                fcommon.CheatActivated()
             end
             if not (i % 4 == 0) and style == "horizantal" then
                 imgui.SameLine()

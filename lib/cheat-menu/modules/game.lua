@@ -4,7 +4,7 @@ local module = {}
 
 local tgame =
 {
-    ss_shotcut = imgui.new.bool(false),
+    ss_shortcut = imgui.new.bool(false),
     keep_stuff = imgui.new.bool(false),
     unlock_interior = imgui.new.bool(false),
     current_weather = 0,
@@ -362,7 +362,7 @@ function module.GameMain()
             imgui.NextColumn()
             fcommon.CheckBox({ address = 0x969167,name = "Always Midnight"})
             fcommon.CheckBox({ address = 0xB6F065,name = "Widescreen"})
-            fcommon.CheckBox({ name = "Screenshot shotcut",var = tgame.ss_shotcut,show_help_popups = true,help_text = "Takes screenshot when (Left Ctrl + S) is pressed."})
+            fcommon.CheckBox({ name = "Screenshot shotcut",var = tgame.ss_shortcut,show_help_popups = true,help_text = "Takes screenshot when (Left Ctrl + S) is pressed."})
             imgui.Columns(1)
 
             imgui.Spacing()

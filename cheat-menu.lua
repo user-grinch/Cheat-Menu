@@ -41,16 +41,17 @@ glob          = require 'game.globals'
 mad           = require 'MoonAdditions'
 
 -- Loading custom modules
+--fconfig       = require 'cheat-menu.modules.config'
 fabout        = require 'cheat-menu.modules.about'
 fcheats       = require 'cheat-menu.modules.cheats'
 fcommon       = require 'cheat-menu.modules.common'
 fgame         = require 'cheat-menu.modules.game'
-fmemcontrol   = require 'cheat-menu.modules.memory_control'
+fmemory       = require 'cheat-menu.modules.memory'
 fmenu         = require 'cheat-menu.modules.menu'
 fmissions     = require 'cheat-menu.modules.missions'
 fpeds         = require 'cheat-menu.modules.peds'
 fplayer       = require 'cheat-menu.modules.player'
-fteleport     = require 'cheat-menu.modules.teleportation'
+fteleport     = require 'cheat-menu.modules.teleport'
 fvehicles     = require 'cheat-menu.modules.vehicles'
 fvisuals      = require 'cheat-menu.modules.visuals'
 fweapons      = require 'cheat-menu.modules.weapons'
@@ -108,13 +109,14 @@ function() -- condition
     end
 end,
 function() -- render frame
+
     if cheatMenu.window.main[0] then
         imgui.SetNextWindowSize(imgui.ImVec2(cheatMenu.window.size.X,cheatMenu.window.size.Y), imgui.Cond.Once)
 
         imgui.Begin(cheatMenu.window.title, cheatMenu.window.main,imgui.WindowFlags.NoCollapse)
 
         fcommon.UiCreateButtons({"Teleport","Memory","Player","Vehicle","Weapon","Peds","Missions","Cheats","Game","Visuals","Menu","About"},
-        {fteleport.TeleportationMain,fmemcontrol.MemoryControlMain,fplayer.PlayerMain,fvehicles.VehiclesMain,fweapons.WeaponsMain,
+        {fteleport.TeleportMain,fmemory.MemoryMain,fplayer.PlayerMain,fvehicles.VehiclesMain,fweapons.WeaponsMain,
         fpeds.PedsMain,fmissions.MissionsMain,fcheats.CheatsMain,fgame.GameMain,fvisuals.VisualsMain,fmenu.MenuMain,fabout.AboutMain})
         imgui.End()
 
@@ -166,6 +168,7 @@ function() -- render frame
                         fgame.tfps.bool[0] = false
                         fvehicles.tvehicles.show.speed[0] = false
                         fvehicles.tvehicles.show.health[0] = false
+                        fvisuals.show_coordinates[0] = false
                     end
                     imgui.EndPopup()
                 end
@@ -178,9 +181,14 @@ function() -- render frame
 end).HideCursor = true
 
 function main()
+    --fconfig.test()
     while true do
-        showCursor(cheatMenu.window.main[0])
-        if fgame.tgame.ss_shotcut[0]
+        if cheatMenu.window.main[0] then
+            showCursor(true)
+        else
+            showCursor(false)
+        end
+        if fgame.tgame.ss_shortcut[0]
         and isKeyDown(keys.control_key) and isKeyDown(keys.screenshot_key) then
             takePhoto(true)
             printHelpString("Screenshot taken ~g~successfully")
@@ -192,7 +200,7 @@ function main()
             cheatMenu.window.main[0] = not cheatMenu.window.main[0]
         end
 
-        if fteleport.tteleport.shotcut[0]
+        if fteleport.tteleport.shortcut[0]
         and isKeyDown(keys.teleport_key1)
         and isKeyDown(keys.teleport_key2) then
             fcommon.KeyWait(keys.teleport_key1,keys.teleport_key2)
@@ -279,7 +287,7 @@ end
 function onScriptTerminate(script, quitGame)
     if script == thisScript() then
         showCursor(false,false)
-        printHelpString("Cheat Menu ~r~crashed ~w~& ~g~reloaded~w~.Provide moonloader.log in case of debugging.")
-        script.this:reload()
+       printHelpString("Cheat Menu ~r~crashed ~w~& ~g~reloaded~w~.Provide moonloader.log in case of debugging.")
+       script.this:reload()
     end
 end

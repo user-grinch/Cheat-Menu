@@ -13,7 +13,7 @@ local tmemory =
     is_float = imgui.new.bool()
 }
 
-function module.MemoryControlMain()
+function module.MemoryMain()
 
     if isKeyDown(keys.control_key)
     and isKeyDown(keys.mc_paste) then
