@@ -1,10 +1,9 @@
 -- This module contains all the functions related to game tab
-
 local module = {}
 
 local tgame =
 {
-    ss_shortcut = imgui.new.bool(false),
+    ss_shortcut = imgui.new.bool(fconfig.get('tgame.ss_shortcut') or false),
     keep_stuff = imgui.new.bool(false),
     unlock_interior = imgui.new.bool(false),
     current_weather = 0,
@@ -13,31 +12,18 @@ local tgame =
                 "FOGGY SF","SUNNY VEGAS","EXTRASUNNY VEGAS","CLOUDY VEGAS","EXTRASUNNY COUNTRYSIDE","SUNNY COUNTRYSIDE","CLOUDY COUNTRYSIDE",
                 "RAINY COUNTRYSIDE","EXTRASUNNY DESERT","SUNNY DESERT","SANDSTORM DESERT","UNDERWATER","EXTRACOLOURS 1","EXTRACOLOURS 2",
               },
+    fps =
+    {
+        bool  = imgui.new.bool(fconfig.get('tgame.fps.bool') or false),
+        limit = imgui.new.int(fconfig.get('tgame.fps.limit') or 30),
+    },
+    airbreak = imgui.new.bool(false),
 }
+
 module.tgame = tgame
+
 local days_list  = imgui.new['const char*'][#tgame.day_names](tgame.day_names)
 local weather_list  = imgui.new['const char*'][#tgame.weather_names](tgame.weather_names)
-
-
-
--- FPS table
-local tfps =
-{
-    bool = imgui.new.bool(false),
-    total = 0,
-    time = 0,
-    show = 0,
-    limit = imgui.new.int(30)
-}
-
-module.tfps = tfps
-
-
--- Airbreak table
-tairbreak =
-{
-    bool = imgui.new.bool(false)
-}
 
 -- Game Interriors list
 local interior_names = {
@@ -201,16 +187,16 @@ function AddTownVehicleEntry(title,address,vehicles,rows)
 end
 
 function module.AirbreakMode()
-    if tairbreak.bool[0] then
-        if isKeyDown(keys.airbreak_up) then
+    if tgame.airbreak[0] then
+        if isKeyDown(tkeys.airbreak_up) then
             x,y,z = getCharCoordinates(PLAYER_PED)
             setCharCoordinates(PLAYER_PED,x,y,z+2.0)
         end
-        if isKeyDown(keys.airbreak_down) then
+        if isKeyDown(tkeys.airbreak_down) then
             x,y,z = getCharCoordinates(PLAYER_PED)
             setCharCoordinates(PLAYER_PED,x,y,z-2.0)
         end
-        if isKeyDown(keys.airbreak_forward) then
+        if isKeyDown(tkeys.airbreak_forward) then
             x,y,z = getCharCoordinates(PLAYER_PED)
             angle = getCharHeading(PLAYER_PED)
 
@@ -220,7 +206,7 @@ function module.AirbreakMode()
 
             setCharCoordinates(PLAYER_PED,x,y,z-1.0)
         end
-        if isKeyDown(keys.airbreak_backward) then
+        if isKeyDown(tkeys.airbreak_backward) then
             x,y,z = getCharCoordinates(PLAYER_PED)
             angle = getCharHeading(PLAYER_PED)
 
@@ -230,11 +216,11 @@ function module.AirbreakMode()
 
             setCharCoordinates(PLAYER_PED,x,y,z-1.0)
         end
-        if isKeyDown(keys.airbreak_left)then
+        if isKeyDown(tkeys.airbreak_left)then
             setCharHeading(PLAYER_PED,getCharHeading(PLAYER_PED)+1.0)
             setCameraBehindPlayer()
         end
-        if isKeyDown(keys.airbreak_right)then
+        if isKeyDown(tkeys.airbreak_right)then
             setCharHeading(PLAYER_PED,getCharHeading(PLAYER_PED)-1.0)
             setCameraBehindPlayer()
         end
@@ -321,9 +307,8 @@ function module.GameMain()
             imgui.Spacing()
             imgui.Columns(2,nil,false)
 
-            --Airbreak Button
-            fcommon.CheckBox({name = "Airbreak Mode",var = tairbreak.bool,help_text = "Controls:\nW = Forward\tS = Backward\nA  = Left  \t\tD = Right\nArrow_Up\t = Move up\nArrow_Down = Move Down" ,func = function()
-                if tairbreak.bool[0] ==  true then
+            fcommon.CheckBox({name = "Airbreak Mode",var = tgame.airbreak,help_text = "Controls:\nW = Forward\tS = Backward\nA  = Left  \t\tD = Right\nArrow_Up\t = Move up\nArrow_Down = Move Down" ,func = function()
+                if tgame.airbreak[0] ==  true then
                     lockPlayerControl(true)
                     setCharCollision(PLAYER_PED,false)
                     setCameraBehindPlayer()
@@ -384,14 +369,14 @@ function module.GameMain()
 
                 fcommon.DropDownMenu("FPS",function()
                     imgui.Spacing()
-                    if imgui.Checkbox("Show FPS",tfps.bool) then
+                    if imgui.Checkbox("Show FPS",tgame.fps.bool) then
                     end
-                    if imgui.InputInt("FPS Limit",tfps.limit) then
-                        memory.write(0xC1704C,(tfps.limit[0]+1),1)
+                    if imgui.InputInt("FPS Limit",tgame.fps.limit) then
+                        memory.write(0xC1704C,(tgame.fps.limit[0]+1),1)
                         memory.write(0xBA6794,1,1)
                     end
-                    if tfps.limit[0] < 0 then
-                        tfps.limit[0] = 0
+                    if tgame.fps.limit[0] < 0 then
+                        tgame.fps.limit[0] = 0
                     end
                 end)
                 fcommon.UpdateAddress({name = "Game Speed",address = 0xB7CB64,size = 4,max = 100,min = 0, is_float =true})

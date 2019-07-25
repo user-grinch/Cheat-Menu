@@ -1,0 +1,168 @@
+local module = {}
+
+local path  =  getGameDirectory() .. "//moonloader//config//cheat-menu.json"
+
+
+local tconfig =
+{
+    read  = {},
+    write = {},
+}
+
+module.tconfig = tconfig
+
+function module.write()
+
+    tconfig.write =
+    {
+        tcheatMenu =
+        {
+            window =
+            {
+                size =
+                {
+                    X = tcheatMenu.window.size.X,
+                    Y = tcheatMenu.window.size.Y,
+                },
+                title   = tcheatMenu.window.title,
+                overlay =
+                {
+                    main     = tcheatMenu.window.overlay.main[0],
+                    distance = tcheatMenu.window.overlay.distance,
+                    corner   = tcheatMenu.window.overlay.corner,
+                },
+            },
+
+            menubuttons =
+            {
+                current = tcheatMenu.menubuttons.current,
+            },
+        },
+
+        tteleport =
+        {
+            shortcut       = fteleport.tteleport.shortcut[0],
+            auto_z         = fteleport.tteleport.auto_z[0],
+            insert_coords  = fteleport.tteleport.insert_coords[0],
+            coords         = ffi.string(fteleport.tteleport.coords),
+            search_text    = ffi.string(fteleport.tteleport.search_text),
+        },
+        tmemory =
+        {
+            address       = ffi.string(fmemory.tmemory.address),
+            size          = fmemory.tmemory.size[0],
+            vp            = fmemory.tmemory.vp[0],
+            clear_entries = fmemory.tmemory.clear_entries[0],
+            value         = fmemory.tmemory.value[0],
+            is_float      = fmemory.tmemory.is_float[0],
+        },
+        tplayer =
+        {
+            god               = fplayer.tplayer.god[0],
+            aimSkinChanger    = fplayer.tplayer.aimSkinChanger[0],
+            neverWanted       = fplayer.tplayer.neverWanted,
+            cjBody            = fplayer.tplayer.cjBody[0],
+            skins             =
+            {
+                search_text   = ffi.string(fplayer.tplayer.skins.search_text),
+            },
+            style =
+            {
+                fighting =
+                {
+                    selected = fplayer.tplayer.style.fighting.selected[0],
+                },
+                walking =
+                {
+                    selected = fplayer.tplayer.style.walking.selected[0],
+                },
+            },
+            stats =
+            {
+                search_text = ffi.string(fplayer.tplayer.stats.search_text),
+            },
+        },
+        tweapons =
+        {
+            quick_spawn = fweapons.tweapons.quick_spawn[0],
+            search_text = ffi.string(fweapons.tweapons.search_text),
+        },
+        tpeds  =
+        {
+            type   =
+            {
+                selected = fpeds.tpeds.type.selected[0],
+            },
+            search_text = ffi.string(fpeds.tpeds.search_text),
+        },
+        tmissions =
+        {
+            search_text = ffi.string(fmissions.tmissions.search_text),
+        },
+        tgame =
+        {
+            ss_shortcut = fgame.tgame.ss_shortcut[0],
+            fps =
+            {
+                bool  = fgame.tgame.fps.bool[0],
+                limit = fgame.tgame.fps.limit[0],
+            },
+        },
+        tvehicles =
+        {
+            quick_spawn = fvehicles.tvehicles.quick_spawn[0],
+            aircraft =
+            {
+                camera       = fvehicles.tvehicles.aircraft.camera[0],
+                spawn_in_air = fvehicles.tvehicles.aircraft.spawn_in_air[0],
+                index        = fvehicles.tvehicles.aircraft.index,
+            },
+            show = {
+                speed  = fvehicles.tvehicles.show.speed[0],
+                health = fvehicles.tvehicles.show.health[0],
+            },
+            lock_health   = fvehicles.tvehicles.lock_health[0],
+            visual_damage = fvehicles.tvehicles.visual_damage[0],
+            heavy         = fvehicles.tvehicles.heavy[0],
+            stay_on_bike  = fvehicles.tvehicles.stay_on_bike[0],
+            lock_speed    = fvehicles.tvehicles.lock_speed[0],
+            speed         = fvehicles.tvehicles.speed[0],
+            lights = {
+                all  = fvehicles.tvehicles.lights.all[0],
+            },
+        },
+        tvisuals =
+        {
+            show_coordinates = fvisuals.tvisuals.show_coordinates[0],
+        }
+    }
+
+    local file = io.open(path,'w')
+    if file then
+        file:write(encodeJson(tconfig.write))
+        io.close(file)
+    end
+end
+
+function module.read()
+    local file = io.open(path,'r')
+    if file then
+        local data = file:read("*all")
+        io.close(file)
+        if data then
+            tconfig.read = decodeJson(data)
+        end
+    end
+end
+
+function module.get(s)
+    if tconfig.read == nil then return false end
+    local t = tconfig.read
+    for key in s:gmatch('[^.]+') do
+      if t[ key ] == nil then return false end
+      t = t[ key ]
+    end
+    return t
+end
+
+return module

@@ -1,18 +1,15 @@
 -- This module contains functions for visuals tab
 
 local module = {}
-local show_coordinates = imgui.new.bool(false)
 
-local resX,resY = getScreenResolution()
-
-local tdisplay =
+local tvisuals =
 {
+    show_coordinates = imgui.new.bool(fconfig.get('tvisuals.show_coordinates') or false),
     zone_names = imgui.new.bool(true),
     car_names  = imgui.new.bool(true),
 }
 
-module.tdisplay = tdisplay
-module.show_coordinates = show_coordinates
+module.tvisuals = tvisuals
 
 function module.VisualsMain()
     if imgui.BeginTabBar("Visuals") then
@@ -31,20 +28,20 @@ function module.VisualsMain()
 
 
             imgui.NextColumn()
-            fcommon.CheckBox({ name = "Show Coordinates",var = show_coordinates,show_help_popups = true,help_text = "Draws coordinates on-screen.\n\nOptions:\nPressing (Left Ctrl + C) stores coords to clipboard."})
+            fcommon.CheckBox({ name = "Show Coordinates",var = tvisuals.show_coordinates,show_help_popups = true,help_text = "Draws coordinates on-screen.\n\nOptions:\nPressing (Left Ctrl + C) stores coords to clipboard."})
             fcommon.CheckBox({ address = 0x589355,name = "Health bar percentage"})
             fcommon.CheckBox({ address = 0x589125,name = "Body armour percentage"})
             fcommon.CheckBox({ address = 0x589209,name = "Breath meter percentage"})
             fcommon.CheckBox({ address = 0x58DD1B,name = "Hide wanted level",value = 0x90})
 
-            if imgui.Checkbox("Display zone names",tdisplay.zone_names) then
-                displayZoneNames(tdisplay.zone_names[0])
-                if tdisplay.zone_names[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
+            if imgui.Checkbox("Display zone names",tvisuals.zone_names) then
+                displayZoneNames(tvisuals.zone_names[0])
+                if tvisuals.zone_names[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
             end
 
-            if imgui.Checkbox("Display car names",tdisplay.car_names) then
-                displayCarNames(tdisplay.car_names[0])
-                if tdisplay.car_names[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
+            if imgui.Checkbox("Display car names",tvisuals.car_names) then
+                displayCarNames(tvisuals.car_names[0])
+                if tvisuals.car_names[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
             end
 
             imgui.Columns(1)

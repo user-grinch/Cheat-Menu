@@ -122,13 +122,13 @@ function module.UiCreateButtons(names,funcs)
     imgui.PushStyleVarVec2(imgui.StyleVar.ItemSpacing,imgui.ImVec2(0,0))
 
     for i=1,#names,1 do
-        if cheatMenu.menubuttons.current == i then
+        if tcheatMenu.menubuttons.current == i then
             imgui.PushStyleColor(imgui.Col.Button, imgui.ImVec4(0.060,0.530,0.980,1.0))
         end
         if imgui.Button(names[i],imgui.ImVec2(module.GetSize(4,imgui.GetWindowWidth()/4 - 4*imgui.StyleVar.WindowPadding,20))) then
-            cheatMenu.menubuttons.current = i
+            tcheatMenu.menubuttons.current = i
         end
-        if cheatMenu.menubuttons.current == i then
+        if tcheatMenu.menubuttons.current == i then
             imgui.PushStyleColor(imgui.Col.Button, imgui.ImVec4(0.260,0.590,0.980,0.400))
         end
 
@@ -141,7 +141,7 @@ function module.UiCreateButtons(names,funcs)
     imgui.Spacing()
 
     for i=1,#funcs,1 do
-        if cheatMenu.menubuttons.current == i then
+        if tcheatMenu.menubuttons.current == i then
             imgui.Spacing()
             funcs[i]()
             break
@@ -154,7 +154,7 @@ function LoadTexture(store_table,image_path,model_table,extention)
         if store_table[tostring(model_table[i])] == nil then
             local path = image_path .. tostring(model_table[i]) .. extention
             store_table[tostring(model_table[i])] = imgui.CreateTextureFromFile(path)
-            wait(1000)
+            wait(500)
         end
     end
 end
@@ -323,11 +323,16 @@ function module.UpdateStat(arg)
         local value = imgui.new.int(math.floor(getFloatStat(arg.stat)))
 
         imgui.Columns(3,nil,false)
-        imgui.Text("Max = " .. arg.max)
-        imgui.NextColumn()
         imgui.Text("Current = " .. value[0])
         imgui.NextColumn()
-        imgui.Text("Min = " .. arg.min)
+        if arg.min ~= nil then
+            imgui.Text("Min = " .. arg.min)
+        end
+        imgui.NextColumn()
+        if arg.max ~= nil then
+            imgui.Text("Max = " .. arg.max)
+        end
+
         imgui.Columns(1)
 
         imgui.PushItemWidth(imgui.GetWindowWidth()-50)
@@ -361,7 +366,6 @@ function module.UpdateStat(arg)
 end
 
 function module.UpdateAddress(arg)
-    if arg.min == nil then arg.min = 0 end
     if arg.is_float == nil then arg.is_float = false end
 
     module.DropDownMenu(arg.name,function()
@@ -369,11 +373,15 @@ function module.UpdateAddress(arg)
         local value = imgui.new.int(module.RwMemory(arg.address,arg.size,nil,nil,arg.is_float))
 
         imgui.Columns(3,nil,false)
-        imgui.Text("Max = " .. arg.max)
-        imgui.NextColumn()
         imgui.Text("Current = " .. value[0])
         imgui.NextColumn()
-        imgui.Text("Min = " .. arg.min)
+        if arg.min ~= nil then
+            imgui.Text("Min = " .. arg.min)
+        end
+        imgui.NextColumn()
+        if arg.max ~= nil then
+            imgui.Text("Max = " .. arg.max)
+        end
         imgui.Columns(1)
 
         imgui.Spacing()
@@ -393,19 +401,20 @@ function module.UpdateAddress(arg)
             module.RwMemory(arg.address,arg.size,(value[0]-math.floor(arg.max/10)),nil,arg.is_float)
         end
         imgui.SameLine()
+        if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(4))) then
+            module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float)
+        end
+        imgui.SameLine()
         if imgui.Button("Maximum",imgui.ImVec2(fcommon.GetSize(4))) then
             module.RwMemory(arg.address,arg.size,arg.max,nil,arg.is_float)
         end
         imgui.SameLine()
-        if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(4))) then
-            module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float)
-        end
         imgui.Spacing()
-        if value[0] < arg.min then
+        if (arg.min ~= nil) and (value[0] < arg.min) then
             module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float)
         end
 
-        if value[0] > arg.max then
+        if (arg.max ~= nil) and (value[0] > arg.max) then
             module.RwMemory(arg.address,arg.size,arg.max,nil,arg.is_float)
         end
     end)

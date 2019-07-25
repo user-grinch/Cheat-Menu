@@ -6,10 +6,10 @@ local tweapons =
 {
     images = {},
     path = getGameDirectory() .. "\\moonloader\\lib\\cheat-menu\\weapons\\",
-    quick_spawn = imgui.new.bool(false),
+    quick_spawn = imgui.new.bool(fconfig.get('tweapons.quick_spawn') or false),
     noreload = imgui.new.bool(false),
     fast_reload = imgui.new.bool(false),
-    search_text = imgui.new.char[20](),
+    search_text = imgui.new.char[20](fconfig.get('tweapons.search_text') or ""),
     models = {},
 }
 

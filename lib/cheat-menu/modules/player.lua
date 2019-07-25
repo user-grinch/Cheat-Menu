@@ -4,32 +4,32 @@ local module = {}
 
 local tplayer =
 {
-    god         = imgui.new.bool(false),
-    aimSkinChanger = imgui.new.bool(false),
-    neverWanted    = imgui.new.bool(false),
-    cjBody         = imgui.new.int(),
+    god            = imgui.new.bool(fconfig.get('tplayer.god') or false),
+    aimSkinChanger = imgui.new.bool(fconfig.get('tplayer.aimSkinChanger') or false),
+    neverWanted    = (fconfig.get('tplayer.neverWanted') or false),
+    cjBody         = imgui.new.int(fconfig.get('tplayer.cjBody') or 0),
     skins =
     {
-        search_text    = imgui.new.char[20](),
+        search_text    = imgui.new.char[20](fconfig.get('tplayer.skins.search_text') or ""),
     },
     style =
     {
         fighting =
         {
-            selected = imgui.new.int(0),
+            selected = imgui.new.int(fconfig.get('tplayer.style.fighting.selected') or 0),
             names    = {"Default","Boxing","Kung fu","Kick Boxing","Punch Kick"},
             list     = {},
         },
         walking =
         {
-            selected = imgui.new.int(0),
+            selected = imgui.new.int(fconfig.get('tplayer.style.walking.selected') or 0),
             names    = {"man","shuffle","oldman","gang1","gang2","oldfatman","fatman","jogger","drunkman","blindman","swat","woman","shopping","busywoman","sexywoman","pro","oldwoman","fatwoman","jogwoman","oldfatwoman","skate"},
             list     = {},
         },
     },
     stats =
     {
-        search_text = imgui.new.char[20](),
+        search_text = imgui.new.char[20](fconfig.get('tplayer.stats.search_text') or ""),
         names =
         {
             [0]   = "Progress made",
@@ -690,7 +690,7 @@ function module.PlayerMain()
         end
         if imgui.BeginTabItem('Menu') then
             imgui.Spacing()
-            fcommon.UpdateAddress({name = "Money",address = 0xB7CE50,size = 4,max = 99999999,min = -99999999})
+            fcommon.UpdateAddress({name = "Money",address = 0xB7CE50,size = 4})
             HealthArmour()
             fcommon.UpdateStat({ name = "Energy",stat = 165})
             fcommon.UpdateStat({ name = "Max Health",stat = 24,max = 1450})

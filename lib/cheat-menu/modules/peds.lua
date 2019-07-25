@@ -37,7 +37,7 @@ local tpeds =
             "SPECIAL",
             "PROSTITUTE",
         },
-        selected = imgui.new.int(0),
+        selected = imgui.new.int(fconfig.get('tpeds.type.selected') or 0),
     },
     names =
     {
@@ -370,7 +370,7 @@ local tpeds =
 
     },
     models = {},
-    search_text = imgui.new.char[20](),
+    search_text = imgui.new.char[20](fconfig.get('tpeds.search_text') or ""),
 }
 
 module.tpeds = tpeds

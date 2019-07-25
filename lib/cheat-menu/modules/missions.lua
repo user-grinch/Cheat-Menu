@@ -4,7 +4,7 @@ local module = {}
 
 local tmissions =
 {
-    search_text = imgui.new.char[64](),
+    search_text = imgui.new.char[64](fconfig.get('tmissions.search_text') or ""),
     names       = {
 
         [0]	    = "Initial 1",
@@ -152,6 +152,8 @@ local tmissions =
 for i = 0,#tmissions.names,1 do
     table.insert(tmissions.list,i)
 end
+
+module.tmissions = tmissions
 
 function MissionEntry(title,list,search_text)
     if search_text == nil then search_text = "" end

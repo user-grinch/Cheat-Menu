@@ -5,6 +5,7 @@ local tvehicles =
 {
     components =
     {
+        saved = false,
         path   =  getGameDirectory() .. "\\moonloader\\lib\\cheat-menu\\vehicles\\components\\",
         images = {},
         value  = imgui.new.int(0),
@@ -34,11 +35,18 @@ local tvehicles =
         },
 
     },
+    aircraft =
+    {
+        camera = imgui.new.bool(fconfig.get('tvehicles.aircraft.camera') or false),
+        spawn_in_air = imgui.new.bool(fconfig.get('tvehicles.aircraft.spawn_in_air') or true),
+        zoom = { -5.0,-15.0,-20.0,-30.0,-40.0},
+        index = fconfig.get('tvehicles.aircraft.index') or 2,
+    },
     search_text = imgui.new.char[20](),
     models = {},
     show = {
-        speed = imgui.new.bool(false),
-        health = imgui.new.bool(false),
+        speed = imgui.new.bool(fconfig.get('tvehicles.show.speed') or false),
+        health = imgui.new.bool(fconfig.get('tvehicles.show.health') or false),
     },
 
     color =
@@ -48,23 +56,22 @@ local tvehicles =
     },
     lights =
     {
-        all    = imgui.new.bool(false),
-        fleft  = imgui.new.bool(false),
-        fright = imgui.new.bool(false),
-        bleft  = imgui.new.bool(false),
-        bright = imgui.new.bool(false),
+        all    = imgui.new.bool(fconfig.get('tvehicles.lights.all') or false),
+        --fleft  = imgui.new.bool(false),
+        --fright = imgui.new.bool(false),
+        --bleft  = imgui.new.bool(false),
+        --bright = imgui.new.bool(false),
     },
     images = {},
-    spawn_plane_in_air = imgui.new.bool(true),
-    quick_spawn = imgui.new.bool(false),
+    quick_spawn = imgui.new.bool(fconfig.get('tvehicles.quick_spawn') or false),
     path = getGameDirectory() .. "\\moonloader\\lib\\cheat-menu\\vehicles\\",
-    visual_damage = imgui.new.bool(false),
-    heavy = imgui.new.bool(false),
+    visual_damage = imgui.new.bool(fconfig.get('tvehicles.visual_damage') or false),
+    heavy = imgui.new.bool(fconfig.get('tvehicles.heavy') or false),
     hydraulic = imgui.new.bool(false),
-    full_health = imgui.new.bool(false),
-    stay_on_bike = imgui.new.bool(false),
-    speed = imgui.new.int(0),
-    lock_speed = imgui.new.bool(false),
+    lock_health = imgui.new.bool(fconfig.get('tvehicles.lock_health') or false),
+    stay_on_bike = imgui.new.bool(fconfig.get('tvehicles.stay_on_bike') or false),
+    speed = imgui.new.int(fconfig.get('tvehicles.speed') or 0),
+    lock_speed = imgui.new.bool(fconfig.get('tvehicles.lock_speed') or false),
 }
 
 
@@ -93,7 +100,7 @@ function module.GiveVehicleToPlayer(model)
             deleteCar(car)
         end
 
-        if tvehicles.spawn_plane_in_air[0] and (isThisModelAHeli(model) or isThisModelAPlane(model)) then
+        if tvehicles.aircraft.spawn_in_air[0] and (isThisModelAHeli(model) or isThisModelAPlane(model)) then
             z = 400
         end
         requestModel(model)
@@ -137,6 +144,29 @@ function module.ForEachCarComponent(func)
         end
         markCarAsNoLongerNeeded(car)
     end
+end
+
+function module.AircraftCamera()
+
+    while isCharInAnyHeli(PLAYER_PED)
+    or isCharInAnyPlane(PLAYER_PED) do
+        if tvehicles.aircraft.camera[0] == false then break end
+        local vehicle = storeCarCharIsInNoSave(PLAYER_PED)
+        local roll = getCarRoll(vehicle)
+
+        attachCameraToVehicle(vehicle,0.0,tvehicles.aircraft.zoom[tvehicles.aircraft.index],2.5,0.0,0.0,0.0,(roll*-1),2)
+        if isKeyDown(tkeys.aircraft_zoom) then
+            while isKeyDown(tkeys.aircraft_zoom) do
+                wait(0)
+            end
+            tvehicles.aircraft.index = tvehicles.aircraft.index + 1
+            if tvehicles.aircraft.index > #tvehicles.aircraft.zoom then
+                tvehicles.aircraft.index  = 0
+            end
+        end
+        wait(0)
+    end
+    restoreCameraJumpcut()
 end
 
 function module.VehiclesMain()
@@ -197,11 +227,12 @@ function module.VehiclesMain()
                     end
                 end
             end
-            fcommon.CheckBox({name = "Lock Car health",var = tvehicles.full_health})
+            fcommon.CheckBox({name = "Lock Car health",var = tvehicles.lock_health})
             fcommon.CheckBox({name = "No car visual damage",var = tvehicles.visual_damage})
             fcommon.CheckBox({ address = 0x969164,name = "Tank mode"})
             fcommon.CheckBox({ address = 0x96914B,name = "Wheels only",help_text = "Only can wheels are shown."})
             fcommon.CheckBox({ address = 0x96914E,name = "All lights green",help_text = "All traffic lights are always green."})
+            fcommon.CheckBox({name = "New aircraft camera",var = tvehicles.aircraft.camera})
 
             imgui.NextColumn()
 
@@ -216,7 +247,7 @@ function module.VehiclesMain()
             if imgui.Checkbox("Vehicle lights on",tvehicles.lights.all) then
                 if isCharInAnyCar(PLAYER_PED) then
                     car = storeCarCharIsInNoSave(PLAYER_PED)
-                    if fvehicles.tvehicles.lights.all.v == true then
+                    if fvehicles.tvehicles.lights.all[0] == true then
                         forceCarLights(car,2)
                         addOneOffSound(x,y,z,1052)
                     else
@@ -296,7 +327,7 @@ function module.VehiclesMain()
             if imgui.BeginTabItem('Tune') then
                 imgui.Spacing()
                 if imgui.Button("Restore vehicle mods",imgui.ImVec2(150,25)) then
-                    if isCharInAnyCar(PLAYER_PED) then
+                    if isCharInAnyCar(PLAYER_PED) and tvehicles.components.saved then
                         callFunction(0x49B3C0,0,0)
                     end
                 end
@@ -305,6 +336,7 @@ function module.VehiclesMain()
                 if imgui.Button("Save vehicle mods",imgui.ImVec2(150,25)) then
                     if isCharInAnyCar(PLAYER_PED) then
                         callFunction(0x49B280,0,0)
+                        tvehicles.components.saved = true
                     end
                 end
                 fcommon.InformationTooltip("Saves vehicle mods in memory.")
@@ -336,7 +368,7 @@ function module.VehiclesMain()
             imgui.Columns(2,nil,false)
             fcommon.CheckBox({name = "Quick vehicle",var = tvehicles.quick_spawn,help_text = "Vehicle can be spawned from quick spawner using (Left Ctrl + Q). \n\nControls:\nEnter = Stop reading key press\nDelete = Erase full string\nBackspace = Erase last character"})
             imgui.NextColumn()
-            fcommon.CheckBox({name = "Spawn planes in air",var = tvehicles.spawn_plane_in_air})
+            fcommon.CheckBox({name = "Spawn aircraft in air",var = tvehicles.aircraft.spawn_in_air})
             imgui.Columns(1)
 
             imgui.Spacing()
