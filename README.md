@@ -34,7 +34,6 @@ Take a look [here](https://github.com/inanahammad/Cheat-Menu/wiki/Installation) 
 
 - [ ] Animation manager
 - [ ] Cloth changer
-- [ ] Configuration file 
 - [ ] Object spawner
 - [ ] Ped(mind) control
 
