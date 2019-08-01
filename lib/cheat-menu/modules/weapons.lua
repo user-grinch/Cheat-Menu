@@ -6,10 +6,10 @@ local tweapons =
 {
     images = {},
     path = getGameDirectory() .. "\\moonloader\\lib\\cheat-menu\\weapons\\",
-    quick_spawn = imgui.new.bool(fconfig.get('tweapons.quick_spawn') or false),
+    quick_spawn = imgui.new.bool(fconfig.get('tweapons.quick_spawn',false)),
     noreload = imgui.new.bool(false),
     fast_reload = imgui.new.bool(false),
-    search_text = imgui.new.char[20](fconfig.get('tweapons.search_text') or ""),
+    search_text = imgui.new.char[20](fconfig.get('tweapons.search_text',"")),
     models = {},
 }
 
@@ -22,7 +22,13 @@ module.tweapons = tweapons
 local flibweapons = require 'lib.game.weapons'
 
 function module.CBaseWeaponInfo(name)
-    return callFunction(0x743D10,1,1,name)
+
+    local weapon = callFunction(0x743D10,1,1,name)
+    if name ~= "" and getWeapontypeModel(weapon) ~= 0 then
+        return weapon
+    else
+        return 0
+    end
 end
 
 function module.GiveWeaponToPlayer(weapon)
@@ -115,7 +121,7 @@ function module.WeaponsMain()
             imgui.Separator()
             imgui.Spacing()
             if imgui.BeginChild("Weapon list Window") then
-                fcommon.ShowEntries("Melee",{1,2,3,4,65,65,6,7,8,9},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true)
+                fcommon.ShowEntries("Melee",{1,2,3,4,6,7,8,9},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true)
                 fcommon.ShowEntries("Handguns",{22,23,24},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true)
                 fcommon.ShowEntries("Shotguns",{25,26,27},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true)
                 fcommon.ShowEntries("Sub-Machine Guns",{28,29,32},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true)
@@ -123,7 +129,7 @@ function module.WeaponsMain()
                 fcommon.ShowEntries("Rifles",{33,34},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true)
                 fcommon.ShowEntries("Heavy Weapons",{35,36,37,38},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true)
                 fcommon.ShowEntries("Projectiles",{16,17,18,39},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true)
-                fcommon.ShowEntries("More",{41,42,43,44,45,46,14,15,10,11,12},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true)
+                fcommon.ShowEntries("More",{10,11,12,14,15,41,42,43,44,45,46},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true)
                 imgui.EndChild()
             end
             imgui.EndTabItem()

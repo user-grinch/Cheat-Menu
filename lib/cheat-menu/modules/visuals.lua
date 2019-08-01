@@ -4,7 +4,7 @@ local module = {}
 
 local tvisuals =
 {
-    show_coordinates = imgui.new.bool(fconfig.get('tvisuals.show_coordinates') or false),
+    show_coordinates = imgui.new.bool(fconfig.get('tvisuals.show_coordinates',false)),
     zone_names = imgui.new.bool(true),
     car_names  = imgui.new.bool(true),
 }

@@ -5,18 +5,18 @@ local module = {}
 -- Memory table
 local tmemory =
 {
-    address = imgui.new.char[10](fconfig.get('tmemory.address') or ""),
-    size = imgui.new.int(fconfig.get('tmemory.size') or 1),
-    vp = imgui.new.bool(fconfig.get('tmemory.vp') or false),
-    clear_entries = imgui.new.bool(fconfig.get('tmemory.clear_entries') or false),
-    value = imgui.new.int(fconfig.get('tmemory.value') or 0),
-    is_float = imgui.new.bool(fconfig.get('tmemory.is_float') or false)
+    address = imgui.new.char[10](fconfig.get('tmemory.address',"")),
+    size = imgui.new.int(fconfig.get('tmemory.size',1)),
+    vp = imgui.new.bool(fconfig.get('tmemory.vp',false)),
+    clear_entries = imgui.new.bool(fconfig.get('tmemory.clear_entries',false)),
+    value = imgui.new.int(fconfig.get('tmemory.value',0)),
+    is_float = imgui.new.bool(fconfig.get('tmemory.is_float',false)),
 }
 
 module.tmemory = tmemory
 
 function module.MemoryMain()
-
+ 
     if isKeyDown(tkeys.control_key)
     and isKeyDown(tkeys.mc_paste) then
         imgui.StrCopy(tmemory.address, imgui.GetClipboardText(),ffi.sizeof(tmemory.address))

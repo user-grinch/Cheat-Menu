@@ -37,7 +37,7 @@ local tpeds =
             "SPECIAL",
             "PROSTITUTE",
         },
-        selected = imgui.new.int(fconfig.get('tpeds.type.selected') or 0),
+        selected = imgui.new.int(fconfig.get('tpeds.type.selected',0)),
     },
     names =
     {
@@ -370,7 +370,23 @@ local tpeds =
 
     },
     models = {},
-    search_text = imgui.new.char[20](fconfig.get('tpeds.search_text') or ""),
+    search_text = imgui.new.char[20](fconfig.get('tpeds.search_text',"")),  
+    gangs =
+    {
+        wars = imgui.new.bool(false),
+        density = {
+            ["Ballas"] = imgui.new.int(),
+            ["Grove Street Families"] = imgui.new.int(),
+            ["Los Santos Vagos"] = imgui.new.int(),
+            ["San Fierro Rifa"] = imgui.new.int(),
+            ["Da Nang Boys"] = imgui.new.int(),
+            ["Mafia"] = imgui.new.int(),
+            ["Mountain Cloud Triad"] = imgui.new.int(),
+            ["Varrio Los Aztecas"] = imgui.new.int(),
+            ["Gang 9"] = imgui.new.int(),
+            ["Gang 10"] = imgui.new.int(),
+        },
+    },
 }
 
 module.tpeds = tpeds
@@ -409,6 +425,18 @@ function module.GivePedToPlayer(model)
     end
 end
 
+
+function SetDensity(title,id)
+    local x,y,z = getCharCoordinates(PLAYER_PED)
+        
+    tpeds.gangs.density[title][0] = getZoneGangStrength((getNameOfInfoZone(x,y,z)),id)
+    if imgui.SliderInt(title,tpeds.gangs.density[title],0,255) then
+        setZoneGangStrength((getNameOfInfoZone(x,y,z)),id,tpeds.gangs.density[title][0])
+        clearSpecificZonesToTriggerGangWar()
+        setGangWarsActive(true)
+    end
+end
+
 function module.PedsMain()
 
     if imgui.BeginTabBar("Peds") then
@@ -416,12 +444,18 @@ function module.PedsMain()
         if imgui.BeginTabItem("Checkboxes") then
             imgui.Columns(2,nil,false)
             fcommon.CheckBox({ address = 0x969175,name = "Peds Riot"})
+            fcommon.CheckBox({ address = 0x96915D,name = "Slut magnet"})
+            fcommon.CheckBox({ address = 0x969157,name = "Elvis everywhere"})
             fcommon.CheckBox({ address = 0x969140,name = "Everyone is armed"})
             fcommon.CheckBox({ address = 0x96913F,name = "Have bounty on head"})
             imgui.NextColumn()
-            fcommon.CheckBox({ address = 0x96915D,name = "Slut magnet"})
-            fcommon.CheckBox({ address = 0x969157,name = "Elvis everywhere"})
+            fcommon.CheckBox({name = "Gang wars",var = tpeds.gangs.wars,func = function()
+                setGangWarsActive(tpeds.gangs.wars[0])
+                if tpeds.gangs.wars[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
+            end})
             fcommon.CheckBox({ address = 0x969158,name = "Peds attack with rockets"})
+            fcommon.CheckBox({ address = 0x96915B,name = "Gangs control the streets"})
+            fcommon.CheckBox({ address = 0x96915A,name = "Gang members everywhere"})
 
             imgui.Columns(1)
             imgui.Spacing()
@@ -433,6 +467,23 @@ function module.PedsMain()
         end
         if imgui.BeginTabItem("Menus") then
             fcommon.UpdateAddress({name = "Pedestrian Density",address = 0x8D2530,size = 4,max = 100,help_text = "Sets the pedestrain density in current zone."})
+            if imgui.CollapsingHeader("Zone Gang Density") then
+                imgui.Separator()
+                imgui.PushItemWidth(imgui.GetWindowWidth() - 200)
+                SetDensity("Ballas",0)
+                SetDensity("Grove Street Families",1)
+                SetDensity("Los Santos Vagos",2)
+                SetDensity("San Fierro Rifa",3)
+                SetDensity("Da Nang Boys",4)
+                SetDensity("Mafia",5)
+                SetDensity("Mountain Cloud Triad",6)
+                SetDensity("Varrio Los Aztecas",7)
+                SetDensity("Gang 9",8)
+                SetDensity("Gang 10",9)
+                imgui.PopItemWidth()
+                imgui.Spacing()
+                imgui.Text("ExGangWars plugin required to display some turf colors.")
+            end
             imgui.EndTabItem()
         end
         if imgui.BeginTabItem("Spawn") then

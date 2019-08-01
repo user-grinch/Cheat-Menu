@@ -4,7 +4,7 @@ local module = {}
 
 local tmissions =
 {
-    search_text = imgui.new.char[64](fconfig.get('tmissions.search_text') or ""),
+    search_text = imgui.new.char[64](fconfig.get('tmissions.search_text',"")),
     names       = {
 
         [0]	    = "Initial 1",

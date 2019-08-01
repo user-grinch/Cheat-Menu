@@ -26,7 +26,7 @@ end
 
 function module.QuickSpawner()
 
-    fcommon.KeyWait(keys.control_key,keys.quickspawner_key)
+    fcommon.KeyWait(tkeys.control_key,tkeys.quickspawner_key)
 
     memory.write(0x00969110,0,1)
     result = ''
@@ -41,19 +41,23 @@ function module.QuickSpawner()
         elseif wasKeyPressed(readMemory(0x00969110,1,false)) then
             result = string.format('%s%s',result,memory.tostring(0x00969110,1,false));
         end
-        printStringNow(string.format('[%s]',result),1500);
+
+        printStringNow(string.format('[%s]',result),1500)
+
         text = result
 
         for i = 0,#result,1 do
-           local weapon =  fweapons.CBaseWeaponInfo(text)
-            if fweapons.tweapons.quick_spawn[0] == true
-            and fweapons.CBaseWeaponInfo(text) < 47 and weapon > 0 then
+
+            local weapon =  fweapons.CBaseWeaponInfo(text)
+
+            if fweapons.tweapons.quick_spawn[0] == true and weapon ~= 0 then
                 fweapons.GiveWeaponToPlayer(weapon)
                 return
             end
 
             local vehicle = fvehicles.CBaseModelInfo(text)
-            if fvehicles.tvehicles.quick_spawn[0] == true and vehicle > 400 and vehicle < 100000 then
+
+            if fvehicles.tvehicles.quick_spawn[0] == true and vehicle ~= 0 then
                 fvehicles.GiveVehicleToPlayer(vehicle)
                 return
             end
@@ -64,12 +68,16 @@ function module.QuickSpawner()
 end
 
 function module.InformationTooltip(text)
-    if imgui.IsItemHovered() then
-        imgui.BeginTooltip()
-        imgui.Spacing()
-        imgui.SetTooltip(text)
-        imgui.Dummy(imgui.ImVec2(50,50))
-        imgui.EndTooltip()
+    if fmenu.tmenu.show_tooltips[0] then
+        imgui.SameLine()
+        imgui.TextColored(imgui.ImVec4(150,150,150,255),'(?)')
+        if imgui.IsItemHovered() then
+            imgui.BeginTooltip()
+            imgui.Spacing()
+            imgui.SetTooltip(text)
+            imgui.Dummy(imgui.ImVec2(50,50))
+            imgui.EndTooltip()
+        end
     end
 end
 
@@ -106,11 +114,11 @@ function module.GetSize(count,x,y)
     return x,y
 end
 
-function IsValidModForVehicle(table)
+function IsValidModForVehicle(model)
     if isCharInAnyCar(PLAYER_PED) then
-        local CVehicle =  getCarPointer(storeCarCharIsInNoSave(PLAYER_PED))
-        if callMethod(0x49B010,CVehicle,2,2,table,CVehicle) == 1 then
-             return true
+       local CVehicle =  getCarPointer(storeCarCharIsInNoSave(PLAYER_PED))
+       if callMethod(0x49B010,CVehicle,2,2,model,CVehicle) == 1 then
+            return true
         end
     else
         return false
@@ -149,18 +157,20 @@ function module.UiCreateButtons(names,funcs)
     end
 end
 
-function LoadTexture(store_table,image_path,model_table,extention)
+function LoadTextures(store_table,image_path,model_table,extention)
     for i=1,#model_table,1 do
         if store_table[tostring(model_table[i])] == nil then
             local path = image_path .. tostring(model_table[i]) .. extention
             store_table[tostring(model_table[i])] = imgui.CreateTextureFromFile(path)
-            wait(500)
         end
+        wait(0)
     end
 end
 
 function module.ShowEntries(title,model_table,height,width,store_table,image_path,image_extention,func_load_model,func_show_tooltip,skip_check,search_text)
     local rows = 0
+    local skipped_entries = 0
+    
     for i=0,20,1 do
         if math.floor(imgui.GetWindowWidth()/i) < width then
             width = (imgui.GetWindowWidth()/(i*1.2))
@@ -172,46 +182,43 @@ function module.ShowEntries(title,model_table,height,width,store_table,image_pat
             break
         end
     end
-    if search_text == nil then search_text = "" end
-    lua_thread.create(LoadTexture,store_table,image_path,model_table,image_extention)
-    for j=1,#model_table,1 do
-        if IsValidModForVehicle(model_table[j]) or skip_check == true then
-                fcommon.DropDownMenu(title,function()
-                    local skipped_entries = 0
-                    for i=1,#model_table,1 do
-                        if store_table[tostring(model_table[i])] ~= nil then
-                            if (search_text == "") or (string.upper(func_show_tooltip(model_table[i])):find(string.upper(ffi.string(search_text))) ~= nil) then
-                                if skip_check == false then
-                                    if IsValidModForVehicle(model_table[i]) then
-                                        if imgui.ImageButton(store_table[tostring(model_table[i])],imgui.ImVec2(width,height)) then
-                                            func_load_model(model_table[i])
-                                        end
-                                    end
-                                else
-                                    if imgui.ImageButton(store_table[tostring(model_table[i])],imgui.ImVec2(width,height)) then
-                                        func_load_model(model_table[i])
-                                    end
-                                end
-                                if func_show_tooltip ~= nil then
-                                    if imgui.IsItemHovered() then
-                                        imgui.BeginTooltip()
-                                        imgui.SetTooltip(func_show_tooltip(model_table[i]))
-                                        imgui.EndTooltip()
-                                    end
-                                end
-                            else
-                                skipped_entries = skipped_entries +1
-                            end
-                        end
 
-                        if (i-skipped_entries) % rows ~= 0 then
+    if search_text == nil then search_text = "" end
+
+    
+    for i=1,#model_table,1 do
+        if IsValidModForVehicle(model_table[i]) or skip_check == true then
+            fcommon.DropDownMenu(title,function()
+                for j=1,#model_table,1 do
+                    if store_table[tostring(model_table[j])] ~= nil then
+                        if (search_text == "") or (string.upper(func_show_tooltip(model_table[j])):find(string.upper(ffi.string(search_text))) ~= nil) then
+
+                            if imgui.ImageButton(store_table[tostring(model_table[j])],imgui.ImVec2(width,height),imgui.ImVec2(0,0),imgui.ImVec2(1,1),1,imgui.ImVec4(1,1,1,1),imgui.ImVec4(1,1,1,1)) then
+                                func_load_model(model_table[j])
+                            end
+
+                            if func_show_tooltip ~= nil then
+                                if imgui.IsItemHovered() then
+                                    imgui.BeginTooltip()
+                                    imgui.SetTooltip(func_show_tooltip(model_table[j]))
+                                    imgui.EndTooltip()
+                                end
+                            end
+                        else
+                            skipped_entries = skipped_entries +1
+                        end
+                        if (j-skipped_entries) % rows ~= 0 then
                             imgui.SameLine()
                         end
+                    else
+                        lua_thread.create(LoadTextures,store_table,image_path,model_table,image_extention)
                     end
-                end)
+                end
+            end)
             break
         end
     end
+
 end
 
 function module.RadioButton(label,rb_table,addr_table)
@@ -322,9 +329,7 @@ function module.UpdateStat(arg)
         local change_value = math.floor((arg.max - arg.min)/10)
         local value = imgui.new.int(math.floor(getFloatStat(arg.stat)))
 
-        imgui.Columns(3,nil,false)
-        imgui.Text("Current = " .. value[0])
-        imgui.NextColumn()
+        imgui.Columns(2,nil,false)
         if arg.min ~= nil then
             imgui.Text("Min = " .. arg.min)
         end
@@ -372,9 +377,7 @@ function module.UpdateAddress(arg)
 
         local value = imgui.new.int(module.RwMemory(arg.address,arg.size,nil,nil,arg.is_float))
 
-        imgui.Columns(3,nil,false)
-        imgui.Text("Current = " .. value[0])
-        imgui.NextColumn()
+        imgui.Columns(2,nil,false)
         if arg.min ~= nil then
             imgui.Text("Min = " .. arg.min)
         end

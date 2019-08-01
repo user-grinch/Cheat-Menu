@@ -37,16 +37,16 @@ local tvehicles =
     },
     aircraft =
     {
-        camera = imgui.new.bool(fconfig.get('tvehicles.aircraft.camera') or false),
-        spawn_in_air = imgui.new.bool(fconfig.get('tvehicles.aircraft.spawn_in_air') or true),
+        camera = imgui.new.bool(fconfig.get('tvehicles.aircraft.camera',false)),
+        spawn_in_air = imgui.new.bool(fconfig.get('tvehicles.aircraft.spawn_in_air',true)),
         zoom = { -5.0,-15.0,-20.0,-30.0,-40.0},
-        index = fconfig.get('tvehicles.aircraft.index') or 2,
+        index = fconfig.get('tvehicles.aircraft.index',2),
     },
     search_text = imgui.new.char[20](),
     models = {},
     show = {
-        speed = imgui.new.bool(fconfig.get('tvehicles.show.speed') or false),
-        health = imgui.new.bool(fconfig.get('tvehicles.show.health') or false),
+        speed = imgui.new.bool(fconfig.get('tvehicles.show.speed',false)),
+        health = imgui.new.bool(fconfig.get('tvehicles.show.health',false)),
     },
 
     color =
@@ -56,22 +56,23 @@ local tvehicles =
     },
     lights =
     {
-        all    = imgui.new.bool(fconfig.get('tvehicles.lights.all') or false),
+        all    = imgui.new.bool(fconfig.get('tvehicles.lights.all',false)),
         --fleft  = imgui.new.bool(false),
         --fright = imgui.new.bool(false),
         --bleft  = imgui.new.bool(false),
         --bright = imgui.new.bool(false),
     },
     images = {},
-    quick_spawn = imgui.new.bool(fconfig.get('tvehicles.quick_spawn') or false),
+    quick_spawn  = imgui.new.bool(fconfig.get('tvehicles.quick_spawn',false)),
+    spawn_inside = imgui.new.bool(fconfig.get('tvehicles.spawn_inside',true)),
     path = getGameDirectory() .. "\\moonloader\\lib\\cheat-menu\\vehicles\\",
-    visual_damage = imgui.new.bool(fconfig.get('tvehicles.visual_damage') or false),
-    heavy = imgui.new.bool(fconfig.get('tvehicles.heavy') or false),
+    visual_damage = imgui.new.bool(fconfig.get('tvehicles.visual_damage',false)),
+    heavy = imgui.new.bool(fconfig.get('tvehicles.heavy',false)),
     hydraulic = imgui.new.bool(false),
-    lock_health = imgui.new.bool(fconfig.get('tvehicles.lock_health') or false),
-    stay_on_bike = imgui.new.bool(fconfig.get('tvehicles.stay_on_bike') or false),
-    speed = imgui.new.int(fconfig.get('tvehicles.speed') or 0),
-    lock_speed = imgui.new.bool(fconfig.get('tvehicles.lock_speed') or false),
+    lock_health = imgui.new.bool(fconfig.get('tvehicles.lock_health',false)),
+    stay_on_bike = imgui.new.bool(fconfig.get('tvehicles.stay_on_bike',false)),
+    speed = imgui.new.int(fconfig.get('tvehicles.speed',0)),
+    lock_speed = imgui.new.bool(fconfig.get('tvehicles.lock_speed',false)),
 }
 
 
@@ -83,11 +84,17 @@ for i = 401,611,1 do
 end
 
 function module.CBaseModelInfo(name)
+
     local pInfo = allocateMemory(16)
     callFunction(0x004C5940,2,2,name,pInfo)
     local model = readMemory(pInfo,4,false)
     freeMemory(pInfo)
-    return model
+
+    if getNameOfVehicleModel(model) == name then
+        return model
+    else
+        return 0
+    end
 end
 
 function module.GiveVehicleToPlayer(model)
@@ -108,7 +115,9 @@ function module.GiveVehicleToPlayer(model)
         car = createCar(model,x,y,z)
         markModelAsNoLongerNeeded(model)
         heading = getCharHeading(PLAYER_PED)
-        warpCharIntoCar(PLAYER_PED,car)
+        if tvehicles.spawn_inside[0] then
+            warpCharIntoCar(PLAYER_PED,car)
+        end
         setCarHeading(car,heading)
         setCarForwardSpeed(car,speed)
         markCarAsNoLongerNeeded(car)
@@ -147,26 +156,28 @@ function module.ForEachCarComponent(func)
 end
 
 function module.AircraftCamera()
+    if tvehicles.aircraft.camera[0] == true then
+        while isCharInAnyHeli(PLAYER_PED)
+        or isCharInAnyPlane(PLAYER_PED) do
+            if tvehicles.aircraft.camera[0] == false then break end
 
-    while isCharInAnyHeli(PLAYER_PED)
-    or isCharInAnyPlane(PLAYER_PED) do
-        if tvehicles.aircraft.camera[0] == false then break end
-        local vehicle = storeCarCharIsInNoSave(PLAYER_PED)
-        local roll = getCarRoll(vehicle)
+            local vehicle = storeCarCharIsInNoSave(PLAYER_PED)
+            local roll = getCarRoll(vehicle)
 
-        attachCameraToVehicle(vehicle,0.0,tvehicles.aircraft.zoom[tvehicles.aircraft.index],2.5,0.0,0.0,0.0,(roll*-1),2)
-        if isKeyDown(tkeys.aircraft_zoom) then
-            while isKeyDown(tkeys.aircraft_zoom) do
-                wait(0)
+            attachCameraToVehicle(vehicle,0.0,tvehicles.aircraft.zoom[tvehicles.aircraft.index],2.5,0.0,0.0,0.0,(roll*-1),2)
+            if isKeyDown(tkeys.aircraft_zoom) then
+                while isKeyDown(tkeys.aircraft_zoom) do
+                    wait(0)
+                end
+                tvehicles.aircraft.index = tvehicles.aircraft.index + 1
+                if tvehicles.aircraft.index > #tvehicles.aircraft.zoom then
+                    tvehicles.aircraft.index  = 0
+                end
             end
-            tvehicles.aircraft.index = tvehicles.aircraft.index + 1
-            if tvehicles.aircraft.index > #tvehicles.aircraft.zoom then
-                tvehicles.aircraft.index  = 0
-            end
+            wait(0)
         end
-        wait(0)
+        restoreCameraJumpcut()
     end
-    restoreCameraJumpcut()
 end
 
 function module.VehiclesMain()
@@ -210,7 +221,6 @@ function module.VehiclesMain()
             fcommon.CheckBox({name = "Car heavy",var = tvehicles.heavy})
             fcommon.CheckBox({name = "Show health",var = tvehicles.show.health})
             fcommon.CheckBox({name = "Stay on Bike",var = tvehicles.stay_on_bike,help_text = "Prevents falling from bikes."})
-            fcommon.InformationTooltip("Prevents falling from bikes.")
 
             if isCharInAnyCar(PLAYER_PED) then
                 car = getCarCharIsUsing(PLAYER_PED)
@@ -331,7 +341,6 @@ function module.VehiclesMain()
                         callFunction(0x49B3C0,0,0)
                     end
                 end
-                fcommon.InformationTooltip("Restores vehicle mods from memory.")
                 imgui.SameLine()
                 if imgui.Button("Save vehicle mods",imgui.ImVec2(150,25)) then
                     if isCharInAnyCar(PLAYER_PED) then
@@ -339,7 +348,6 @@ function module.VehiclesMain()
                         tvehicles.components.saved = true
                     end
                 end
-                fcommon.InformationTooltip("Saves vehicle mods in memory.")
                 imgui.Spacing()
                 if imgui.BeginChild('Tune') then
                     imgui.Spacing()
@@ -367,6 +375,8 @@ function module.VehiclesMain()
             imgui.Spacing()
             imgui.Columns(2,nil,false)
             fcommon.CheckBox({name = "Quick vehicle",var = tvehicles.quick_spawn,help_text = "Vehicle can be spawned from quick spawner using (Left Ctrl + Q). \n\nControls:\nEnter = Stop reading key press\nDelete = Erase full string\nBackspace = Erase last character"})
+            fcommon.CheckBox({name = "Spawn Inside",var = tvehicles.spawn_inside,help_text = "Spawn inside vehicle as driver."})
+
             imgui.NextColumn()
             fcommon.CheckBox({name = "Spawn aircraft in air",var = tvehicles.aircraft.spawn_in_air})
             imgui.Columns(1)
@@ -389,9 +399,11 @@ function module.VehiclesMain()
                 fcommon.ShowEntries("SUVs & Wagons",{579,400,404,489,505,479,442,458},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
                 fcommon.ShowEntries("Lowriders",{536,575,534,567,535,576,412},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
                 fcommon.ShowEntries("Muscle Cars",{402,542,603,475},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-                fcommon.ShowEntries("Street Racers",{429,541,542,415,480,562,565,434,494,502,503,411,559,561,560,506,451,558,555,477},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
                 fcommon.ShowEntries("RC Vehicles",{441,464,594,501,465,564},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
                 fcommon.ShowEntries("Recreational",{568,424,504,457,483,508,571,500,444,556,557,471,495,539},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                fcommon.ShowEntries("Street Racers",{429,541,542,415,480,562,565,434,494,502,503,411,559,561,560,506,451,558,555,477},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                fcommon.ShowEntries("Trailers",{435,450,584,591,606,607,608,610,611},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                fcommon.ShowEntries("Trains",{449,537,538,569,570,590},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
                 imgui.EndChild()
             end
             imgui.EndTabItem()

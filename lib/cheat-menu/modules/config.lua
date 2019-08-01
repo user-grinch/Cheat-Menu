@@ -60,7 +60,7 @@ function module.write()
         {
             god               = fplayer.tplayer.god[0],
             aimSkinChanger    = fplayer.tplayer.aimSkinChanger[0],
-            neverWanted       = fplayer.tplayer.neverWanted,
+            neverWanted       = fplayer.tplayer.neverWanted[0],
             cjBody            = fplayer.tplayer.cjBody[0],
             skins             =
             {
@@ -111,6 +111,7 @@ function module.write()
         tvehicles =
         {
             quick_spawn = fvehicles.tvehicles.quick_spawn[0],
+            quick_spawn = fvehicles.tvehicles.spawn_inside[0],
             aircraft =
             {
                 camera       = fvehicles.tvehicles.aircraft.camera[0],
@@ -134,7 +135,13 @@ function module.write()
         tvisuals =
         {
             show_coordinates = fvisuals.tvisuals.show_coordinates[0],
-        }
+        },
+        tmenu =
+        {
+            auto_reload   = fmenu.tmenu.auto_reload[0],
+            show_tooltips = fmenu.tmenu.show_tooltips[0],
+            show_crash_message = fmenu.tmenu.show_crash_message[0],
+        },
     }
 
     local file = io.open(path,'w')
@@ -155,14 +162,21 @@ function module.read()
     end
 end
 
-function module.get(s)
-    if tconfig.read == nil then return false end
+function module.get(s,default)
+    if tconfig.read == nil then return default end
+
     local t = tconfig.read
+    
     for key in s:gmatch('[^.]+') do
-      if t[ key ] == nil then return false end
+      if t[ key ] == nil then return default end
       t = t[ key ]
     end
-    return t
+
+    if t == nil then
+        return default
+    else
+        return t
+    end
 end
 
 return module

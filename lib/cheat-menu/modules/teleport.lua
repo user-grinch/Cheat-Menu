@@ -5,11 +5,11 @@ local module = {}
 -- Teleport table
 local tteleport =
 {
-    shortcut       = imgui.new.bool(fconfig.get('tteleport.shortcut') or false),
-    coords         = imgui.new.char[24](fconfig.get('tteleport.coords') or ""),
-    auto_z         = imgui.new.bool(fconfig.get('tteleport.auto_z') or false),
-    insert_coords  = imgui.new.bool(fconfig.get('tteleport.insert_coords') or false),
-    search_text    = imgui.new.char[64](fconfig.get('tteleport.search_text') or ""),
+    shortcut       = imgui.new.bool(fconfig.get('tteleport.shortcut',false)),
+    coords         = imgui.new.char[24](fconfig.get('tteleport.coords',"")),
+    auto_z         = imgui.new.bool(fconfig.get('tteleport.auto_z',false)),
+    insert_coords  = imgui.new.bool(fconfig.get('tteleport.insert_coords',false)),
+    search_text    = imgui.new.char[64](fconfig.get('tteleport.search_text',"")),
 }
 
 module.tteleport = tteleport

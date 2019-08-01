@@ -5,8 +5,9 @@
 local module = {}
 
 function module.AboutMain()
-    imgui.BulletText(string.format("%s v%s",script.this.name,script.this.version))
+    imgui.BulletText(string.format("%s v%s(%d)",script.this.name,script.this.version,script.this.version_num))
     imgui.BulletText(string.format("Author : %s",script.this.authors[1]))
+    imgui.BulletText(string.format("Imgui  : v%s",imgui._VERSION))
     imgui.BulletText("Discord : Grinch_#3311")
     imgui.BulletText("Thanks  : Junior-Djjr,Um_Geek & GTA community.")
     imgui.BulletText("Official Topic: ")

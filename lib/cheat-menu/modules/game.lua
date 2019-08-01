@@ -3,7 +3,7 @@ local module = {}
 
 local tgame =
 {
-    ss_shortcut = imgui.new.bool(fconfig.get('tgame.ss_shortcut') or false),
+    ss_shortcut = imgui.new.bool(fconfig.get('tgame.ss_shortcut',false)),
     keep_stuff = imgui.new.bool(false),
     unlock_interior = imgui.new.bool(false),
     current_weather = 0,
@@ -14,8 +14,8 @@ local tgame =
               },
     fps =
     {
-        bool  = imgui.new.bool(fconfig.get('tgame.fps.bool') or false),
-        limit = imgui.new.int(fconfig.get('tgame.fps.limit') or 30),
+        bool  = imgui.new.bool(fconfig.get('tgame.fps.bool',false)),
+        limit = imgui.new.int(fconfig.get('tgame.fps.limit',30)),
     },
     airbreak = imgui.new.bool(false),
 }

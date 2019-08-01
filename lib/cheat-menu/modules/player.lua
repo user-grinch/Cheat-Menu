@@ -4,32 +4,32 @@ local module = {}
 
 local tplayer =
 {
-    god            = imgui.new.bool(fconfig.get('tplayer.god') or false),
-    aimSkinChanger = imgui.new.bool(fconfig.get('tplayer.aimSkinChanger') or false),
-    neverWanted    = (fconfig.get('tplayer.neverWanted') or false),
-    cjBody         = imgui.new.int(fconfig.get('tplayer.cjBody') or 0),
+    god            = imgui.new.bool(fconfig.get('tplayer.god',false)),
+    aimSkinChanger = imgui.new.bool(fconfig.get('tplayer.aimSkinChanger',false)),
+    neverWanted    = imgui.new.bool(fconfig.get('tplayer.neverWanted',false) ),
+    cjBody         = imgui.new.int(fconfig.get('tplayer.cjBody',0)),
     skins =
     {
-        search_text    = imgui.new.char[20](fconfig.get('tplayer.skins.search_text') or ""),
+        search_text    = imgui.new.char[20](fconfig.get('tplayer.skins.search_text',"")),
     },
     style =
     {
         fighting =
         {
-            selected = imgui.new.int(fconfig.get('tplayer.style.fighting.selected') or 0),
+            selected = imgui.new.int(fconfig.get('tplayer.style.fighting.selected',0)),
             names    = {"Default","Boxing","Kung fu","Kick Boxing","Punch Kick"},
             list     = {},
         },
         walking =
         {
-            selected = imgui.new.int(fconfig.get('tplayer.style.walking.selected') or 0),
+            selected = imgui.new.int(fconfig.get('tplayer.style.walking.selected',0)),
             names    = {"man","shuffle","oldman","gang1","gang2","oldfatman","fatman","jogger","drunkman","blindman","swat","woman","shopping","busywoman","sexywoman","pro","oldwoman","fatwoman","jogwoman","oldfatwoman","skate"},
             list     = {},
         },
     },
     stats =
     {
-        search_text = imgui.new.char[20](fconfig.get('tplayer.stats.search_text') or ""),
+        search_text = imgui.new.char[20](fconfig.get('tplayer.stats.search_text',"")),
         names =
         {
             [0]   = "Progress made",
@@ -373,10 +373,8 @@ function HealthArmour()
 
         health[0] = getCharHealth(PLAYER_PED)
 
-        imgui.Columns(3,nil,false)
+        imgui.Columns(2,nil,false)
         imgui.Text("Max = " .. max)
-        imgui.NextColumn()
-        imgui.Text("Current = " .. health[0])
         imgui.NextColumn()
         imgui.Text("Min = " .. min)
         imgui.Columns(1)
@@ -419,10 +417,8 @@ function HealthArmour()
         local min_armour = 0
         armour[0] = getCharArmour(PLAYER_PED)
 
-        imgui.Columns(3,nil,false)
+        imgui.Columns(2,nil,false)
         imgui.Text("Max = " .. max_armour)
-        imgui.NextColumn()
-        imgui.Text("Current = " .. armour[0])
         imgui.NextColumn()
         imgui.Text("Min = " .. min_armour)
         imgui.Columns(1)
