@@ -18,6 +18,7 @@ local tgame =
         limit = imgui.new.int(fconfig.get('tgame.fps.limit',30)),
     },
     airbreak = imgui.new.bool(false),
+    disable_help_popups = imgui.new.bool(fconfig.get('tgame.disable_help_popups',false)),
 }
 
 module.tgame = tgame
@@ -228,21 +229,21 @@ function module.AirbreakMode()
 end
 
 function SetTime()
-    fcommon.DropDownMenu("Time",function()
+    fcommon.DropDownMenu(flanguage.GetText('game.Time'),function()
         imgui.Spacing()
 
         local days_passed = imgui.new.int(memory.read(0xB79038 ,4))
         local hour = imgui.new.int(memory.read(0xB70153,1))
         local minute = imgui.new.int(memory.read(0xB70152,1))
 
-        fcommon.CheckBox({ address = 0x96913B,name = "Faster clock"})
+        fcommon.CheckBox({ address = 0x96913B,name = flangugae.GetText('game.FasterClock')})
         imgui.SameLine()
-        fcommon.CheckBox({ address = 0x969168,name = "Freeze time"})
-        if imgui.InputInt("Current hour",hour) then
+        fcommon.CheckBox({ address = 0x969168,name = flanguage.GetText('game.FreezeTime')})
+        if imgui.InputInt(flanguage.GetText('game.CurrentHour'),hour) then
             memory.write(0xB70153 ,hour[0],1)
         end
 
-        if imgui.InputInt("Current minute",minute) then
+        if imgui.InputInt(flanguage.GetText('game.CurrentMinute'),minute) then
             memory.write(0xB70152 ,minut[0],1)
         end
 
@@ -277,7 +278,7 @@ end
 function SetCurrentWeekday()
     imgui.Spacing()
     local current_day = imgui.new.int(readMemory(0xB7014E,1,false)-1)
-    if imgui.Combo("Day", current_day,days_list,#tgame.day_names) then
+    if imgui.Combo(flanguage.GetText('game.Day'), current_day,days_list,#tgame.day_names) then
         writeMemory(0xB7014E,1,current_day[0]+1,false)
         fcommon.CheatActivated()
     end
@@ -286,28 +287,28 @@ end
 function SetWeather()
     imgui.Spacing()
     local current_weather = imgui.new.int(readMemory(0xC81320,2,false))
-    if imgui.Combo("Weather", current_weather,weather_list,#tgame.weather_names) then
+    if imgui.Combo(flanguage.GetText('game.Weather'), current_weather,weather_list,#tgame.weather_names) then
         writeMemory(0xC81320,2,current_weather[0],false)
         fcommon.CheatActivated()
     end
 end
 
 function module.GameMain()
-    if imgui.Button("Save Game",imgui.ImVec2(fcommon.GetSize(1))) then
+    if imgui.Button(flanguage.GetText('game.SaveGame'),imgui.ImVec2(fcommon.GetSize(1))) then
         if isCharOnFoot(PLAYER_PED) then
             activateSaveMenu()
         else
-            printHelpString("Can't save while not on foot!")
+            printHelpString(flanguage.GetText('game.SaveGameOnFootCheckMSG'))
         end
     end
     imgui.Spacing()
     if imgui.BeginTabBar("Game") then
 
-        if imgui.BeginTabItem("Checkboxes") then
+        if imgui.BeginTabItem(flanguage.GetText('game.Checkboxes')) then
             imgui.Spacing()
             imgui.Columns(2,nil,false)
 
-            fcommon.CheckBox({name = "Airbreak Mode",var = tgame.airbreak,help_text = "Controls:\nW = Forward\tS = Backward\nA  = Left  \t\tD = Right\nArrow_Up\t = Move up\nArrow_Down = Move Down" ,func = function()
+            fcommon.CheckBox({name = flanguage.GetText('game.AirbreakMode'),var = tgame.airbreak,help_text = flanguage.GetText('game.AirbreakModeToolTip') ,func = function()
                 if tgame.airbreak[0] ==  true then
                     lockPlayerControl(true)
                     setCharCollision(PLAYER_PED,false)
@@ -319,9 +320,9 @@ function module.GameMain()
                     fcommon.CheatDeactivated()
                 end
             end})
-            fcommon.CheckBox({ address = 0x96C009,name = "Free paynspray"})
+            fcommon.CheckBox({ address = 0x96C009,name = flanguage.GetText('game.FreePNS')})
 
-            fcommon.CheckBox({name = "Keep stuff",var = tgame.keep_stuff,help_text = "Keep stuff after arrest/death" ,func = function()
+            fcommon.CheckBox({name = flanguage.GetText('game.KeepStuff'),var = tgame.keep_stuff,help_text = flanguage.GetText('game.KeepStuffToolTip') ,func = function()
                 if tgame.keep_stuff[0] == false then
                     switchArrestPenalties(true)
                     switchDeathPenalties(true)
@@ -330,11 +331,10 @@ function module.GameMain()
                     switchDeathPenalties(false)
                 end
             end})
-            fcommon.CheckBox({name = "Unlock Interior",var = tgame.unlock_interior,func = function()
+            fcommon.CheckBox({name = flanguage.GetText('game.UnlockInterior'),var = tgame.unlock_interior,func = function()
                 if tgame.unlock_interior[0] == true then
                     for _,name in ipairs(interior_names) do
                         switchEntryExit(name,1)
-                        printHelpString("Interiors Unlocked")
                         fcommon.CheatActivated()
                     end
                 else
@@ -345,9 +345,10 @@ function module.GameMain()
                 end
             end})
             imgui.NextColumn()
-            fcommon.CheckBox({ address = 0x969167,name = "Always Midnight"})
-            fcommon.CheckBox({ address = 0xB6F065,name = "Widescreen"})
-            fcommon.CheckBox({ name = "Screenshot shotcut",var = tgame.ss_shortcut,show_help_popups = true,help_text = "Takes screenshot when (Left Ctrl + S) is pressed."})
+            fcommon.CheckBox({ address = 0x969167,name = flanguage.GetText('game.AlwaysMidnight')})
+            fcommon.CheckBox({ address = 0xB6F065,name = flanguage.GetText('game.Widescreen')})
+            fcommon.CheckBox({ name = flanguage.GetText('game.ScreenshotShortcut'),var = tgame.ss_shortcut,show_help_popups = true,help_text = flanguage.GetText('game.ScreenshotShortcutToolTip')})
+            fcommon.CheckBox({ name = flanguage.GetText('game.DisableHelpPopups'),var = tgame.disable_help_popups ,show_help_popups = true,help_text = flanguage.GetText('game.DisableHelpPopupsToolTip')})
             imgui.Columns(1)
 
             imgui.Spacing()
@@ -357,21 +358,21 @@ function module.GameMain()
             SetCurrentWeekday()
             SetWeather()
             imgui.Spacing()
-            fcommon.RadioButton("Game Themes",{"Country","Beach","Ninja","Funhouse"},{0x96917D ,0x969159 ,0x96915C ,0x969176 })
+            fcommon.RadioButton(flanguage.GetText('game.GameThemes'),{flanguage.GetText('game.GameThemesCountry'),flanguage.GetText('game.GameThemesBeach'),flanguage.GetText('game.GameThemesNinja'),flanguage.GetText('game.GameThemesFunHouse')},{0x96917D ,0x969159 ,0x96915C ,0x969176 })
             imgui.EndTabItem()
         end
 
-        if imgui.BeginTabItem("Menus") then
+        if imgui.BeginTabItem(flanguage.GetText('game.Menus')) then
             if imgui.BeginChild("Game") then
                 imgui.Spacing()
 
                 SetTime()
 
-                fcommon.DropDownMenu("FPS",function()
+                fcommon.DropDownMenu(flanguage.GetText('game.FPS'),function()
                     imgui.Spacing()
-                    if imgui.Checkbox("Show FPS",tgame.fps.bool) then
+                    if imgui.Checkbox(flanguage.GetText('game.ShowFPS'),tgame.fps.bool) then
                     end
-                    if imgui.InputInt("FPS Limit",tgame.fps.limit) then
+                    if imgui.InputInt(flanguage.GetText('game.FPSLimit'),tgame.fps.limit) then
                         memory.write(0xC1704C,(tgame.fps.limit[0]+1),1)
                         memory.write(0xBA6794,1,1)
                     end
@@ -379,24 +380,19 @@ function module.GameMain()
                         tgame.fps.limit[0] = 0
                     end
                 end)
-                fcommon.UpdateAddress({name = "Game Speed",address = 0xB7CB64,size = 4,max = 100,min = 0, is_float =true})
-                fcommon.UpdateAddress({name = "Days Passed",address = 0xB79038 ,size = 4,max = 10000})
-                fcommon.UpdateAddress({name = "Vehicle Density Multiplier",address = 0x8A5B20,size = 4,max =100})
-                fcommon.UpdateAddress({name = "Photographs Taken Number",address = 0xB790B8 ,size = 1,max = 1000})
-                fcommon.UpdateAddress({name = "Tags number",address = 0xA9AD74,size = 1,max = 1000})
-                fcommon.UpdateAddress({name = "Horseshoes Number",address = 0xB791E4,size = 1,max = 1000})
-                fcommon.UpdateAddress({name = "Safehouse Visits Number",address = 0xB79040 ,size = 1,max = 1000})
+                fcommon.UpdateAddress({name = flanguage.GetText('game.GameSpeed'),address = 0xB7CB64,size = 4,max = 100,min = 0, is_float =true})
+                fcommon.UpdateAddress({name = flanguage.GetText('game.DaysPassed'),address = 0xB79038 ,size = 4,max = 10000})
+                fcommon.UpdateAddress({name = flanguage.GetText('game.VehicleDensityMultiplier'),address = 0x8A5B20,size = 4,max =100})
+                fcommon.UpdateAddress({name = flanguage.GetText('game.Gravity'),address = 0x863984,size = 4,max = 1,min = -1,is_float = true})
 
-                fcommon.UpdateAddress({name = "Gravity",address = 0x863984,size = 4,max = 1,min = -1,is_float = true})
-
-                fcommon.DropDownMenu("Cop vehicles",function()
-                    imgui.Spacing()
-                    AddTownVehicleEntry("Police Ranger",0x8a5a8c,{427,490,528,599},4)
-                    AddTownVehicleEntry("Police LS\t   ",0x8a5a90,{596,597,598},4)
-                    AddTownVehicleEntry("Police SF\t   ",0x8a5a94,{596,597,598},4)
-                    AddTownVehicleEntry("Police LV\t   ",0x8a5a98,{596,597,598},4)
-                    AddTownVehicleEntry("Police Bike\t",0x8a5a9c,{523},4)
-                end)
+                -- fcommon.DropDownMenu("Cop vehicles",function()
+                --     imgui.Spacing()
+                --     AddTownVehicleEntry("Police Ranger",0x8a5a8c,{427,490,528,599},4)
+                --     AddTownVehicleEntry("Police LS\t   ",0x8a5a90,{596,597,598},4)
+                --     AddTownVehicleEntry("Police SF\t   ",0x8a5a94,{596,597,598},4)
+                --     AddTownVehicleEntry("Police LV\t   ",0x8a5a98,{596,597,598},4)
+                --     AddTownVehicleEntry("Police Bike\t",0x8a5a9c,{523},4)
+                -- end)
                 imgui.EndChild()
             end
             imgui.EndTabItem()

@@ -169,7 +169,6 @@ end
 
 function module.ShowEntries(title,model_table,height,width,store_table,image_path,image_extention,func_load_model,func_show_tooltip,skip_check,search_text)
     local rows = 0
-    local skipped_entries = 0
     
     for i=0,20,1 do
         if math.floor(imgui.GetWindowWidth()/i) < width then
@@ -189,19 +188,21 @@ function module.ShowEntries(title,model_table,height,width,store_table,image_pat
     for i=1,#model_table,1 do
         if IsValidModForVehicle(model_table[i]) or skip_check == true then
             fcommon.DropDownMenu(title,function()
+                local skipped_entries = 0
                 for j=1,#model_table,1 do
                     if store_table[tostring(model_table[j])] ~= nil then
                         if (search_text == "") or (string.upper(func_show_tooltip(model_table[j])):find(string.upper(ffi.string(search_text))) ~= nil) then
+                            if IsValidModForVehicle(model_table[j]) or skip_check == true then
+                                if imgui.ImageButton(store_table[tostring(model_table[j])],imgui.ImVec2(width,height),imgui.ImVec2(0,0),imgui.ImVec2(1,1),1,imgui.ImVec4(1,1,1,1),imgui.ImVec4(1,1,1,1)) then
+                                    func_load_model(model_table[j])
+                                end
 
-                            if imgui.ImageButton(store_table[tostring(model_table[j])],imgui.ImVec2(width,height),imgui.ImVec2(0,0),imgui.ImVec2(1,1),1,imgui.ImVec4(1,1,1,1),imgui.ImVec4(1,1,1,1)) then
-                                func_load_model(model_table[j])
-                            end
-
-                            if func_show_tooltip ~= nil then
-                                if imgui.IsItemHovered() then
-                                    imgui.BeginTooltip()
-                                    imgui.SetTooltip(func_show_tooltip(model_table[j]))
-                                    imgui.EndTooltip()
+                                if func_show_tooltip ~= nil then
+                                    if imgui.IsItemHovered() then
+                                        imgui.BeginTooltip()
+                                        imgui.SetTooltip(func_show_tooltip(model_table[j]))
+                                        imgui.EndTooltip()
+                                    end
                                 end
                             end
                         else
@@ -215,10 +216,9 @@ function module.ShowEntries(title,model_table,height,width,store_table,image_pat
                     end
                 end
             end)
-            break
         end
+        break
     end
-
 end
 
 function module.RadioButton(label,rb_table,addr_table)
@@ -240,7 +240,7 @@ function module.RadioButton(label,rb_table,addr_table)
         end
     end
 
-    if imgui.RadioButtonIntPtr("Default " .. label,button,#addr_table + 1) then
+    if imgui.RadioButtonIntPtr("Default " .. string.lower(label),button,#addr_table + 1) then
         for j = 1,#addr_table,1 do
             writeMemory(addr_table[j],1,0,false)
         end
@@ -291,21 +291,25 @@ function module.CheckBox(arg)
     end
 
     if imgui.Checkbox(arg.name,func_bool) then
-        if arg.var == nil then
-            if func_bool[0] then
-                writeMemory(arg.address,1,arg.value,false)
-                module.CheatActivated()
+        if arg.func == nil then
+            if arg.var == nil then
+                if func_bool[0] then
+                    writeMemory(arg.address,1,arg.value,false)
+                    module.CheatActivated()
+                else
+                    writeMemory(arg.address,1,arg.value2,false)
+                    module.CheatDeactivated()
+                end
             else
-                writeMemory(arg.address,1,arg.value2,false)
-                module.CheatDeactivated()
+                if arg.var[0] then
+                    module.CheatActivated()
+                else
+                    module.CheatDeactivated()
+                end
+                if arg.func ~= nil then arg.func() end
             end
         else
-            if arg.var[0] then
-                module.CheatActivated()
-            else
-                module.CheatDeactivated()
-            end
-            if arg.func ~= nil then arg.func() end
+            arg.func()
         end
     end
 

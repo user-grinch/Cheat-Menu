@@ -62,6 +62,7 @@ local tvehicles =
         --bleft  = imgui.new.bool(false),
         --bright = imgui.new.bool(false),
     },
+    lock_doors = imgui.new.bool(false),
     images = {},
     quick_spawn  = imgui.new.bool(fconfig.get('tvehicles.quick_spawn',false)),
     spawn_inside = imgui.new.bool(fconfig.get('tvehicles.spawn_inside',true)),
@@ -183,7 +184,7 @@ end
 function module.VehiclesMain()
     imgui.Spacing()
 
-    if imgui.Button("Repair Vehicle",imgui.ImVec2(fcommon.GetSize(3))) then
+    if imgui.Button(flanguage.GetText("vehicles.RepairVehicle"),imgui.ImVec2(fcommon.GetSize(2))) then
         if isCharInAnyCar(PLAYER_PED) then
             car = storeCarCharIsInNoSave(PLAYER_PED)
             fixCar(car)
@@ -191,7 +192,7 @@ function module.VehiclesMain()
         end
     end
     imgui.SameLine()
-    if imgui.Button("Unflip Vehicle",imgui.ImVec2(fcommon.GetSize(3))) then
+    if imgui.Button(flanguage.GetText("vehicles.UnflipVehicle"),imgui.ImVec2(fcommon.GetSize(2))) then
         if isCharInAnyCar(PLAYER_PED) then
             car = storeCarCharIsInNoSave(PLAYER_PED)
             setCarRoll(car,0)
@@ -199,34 +200,19 @@ function module.VehiclesMain()
         end
     end
     imgui.SameLine()
-    if imgui.Button("Lock Doors",imgui.ImVec2(fcommon.GetSize(3))) then
-        if isCharInAnyCar(PLAYER_PED) then
-            car = storeCarCharIsInNoSave(PLAYER_PED)
-            if getCarDoorLockStatus(car) == 4 then
-                lockCarDoors(car,1)
-                fcommon.CheatDeactivated()
-            else
-                lockCarDoors(car,4)
-                fcommon.CheatActivated()
-            end
-        end
-    end
     imgui.Spacing()
     if imgui.BeginTabBar("Vehicles") then
 
-        if imgui.BeginTabItem("Checkboxes") then
+        if imgui.BeginTabItem(flanguage.GetText("vehicles.Checkboxes")) then
             imgui.Spacing()
 
             imgui.Columns(2,nil,false)
-            fcommon.CheckBox({name = "Car heavy",var = tvehicles.heavy})
-            fcommon.CheckBox({name = "Show health",var = tvehicles.show.health})
-            fcommon.CheckBox({name = "Stay on Bike",var = tvehicles.stay_on_bike,help_text = "Prevents falling from bikes."})
-
-            if isCharInAnyCar(PLAYER_PED) then
-                car = getCarCharIsUsing(PLAYER_PED)
-                tvehicles.hydraulic[0] = doesCarHaveHydraulics(car)
-            end
-            if imgui.Checkbox("Car hydraulic",tvehicles.hydraulic) then
+            
+            fcommon.CheckBox({ address = 0x96914F,name = flanguage.GetText("vehicles.AggressiveDrivers")})
+            fcommon.CheckBox({ address = 0x969153,name = flanguage.GetText("vehicles.BoatsFly")})
+            fcommon.CheckBox({ address = 0x969160,name = flanguage.GetText("vehicles.CarsFly")})
+            fcommon.CheckBox({name = flanguage.GetText("vehicles.CarHeavy"),var = tvehicles.heavy})
+            if imgui.Checkbox(flanguage.GetText("vehicles.CarHydraulic"),tvehicles.hydraulic) then
                 if isCharInAnyCar(PLAYER_PED) then
                     if fvehicles.tvehicles.hydraulic[0] then
                         setCarHydraulics(car,true)
@@ -237,24 +223,18 @@ function module.VehiclesMain()
                     end
                 end
             end
-            fcommon.CheckBox({name = "Lock Car health",var = tvehicles.lock_health})
-            fcommon.CheckBox({name = "No car visual damage",var = tvehicles.visual_damage})
-            fcommon.CheckBox({ address = 0x969164,name = "Tank mode"})
-            fcommon.CheckBox({ address = 0x96914B,name = "Wheels only",help_text = "Only can wheels are shown."})
-            fcommon.CheckBox({ address = 0x96914E,name = "All lights green",help_text = "All traffic lights are always green."})
-            fcommon.CheckBox({name = "New aircraft camera",var = tvehicles.aircraft.camera})
+            fcommon.CheckBox({ address = 0x96917A,name = flanguage.GetText("vehicles.DecreasedTraffic")})
+            fcommon.CheckBox({name = flanguage.GetText("vehicles.DontFallOffBike"),var = tvehicles.stay_on_bike})
+            fcommon.CheckBox({ address = 0x969152,name = flanguage.GetText("vehicles.DriveOnWater")})
+            fcommon.CheckBox({ address = 0x969166,name = flanguage.GetText("vehicles.FloatAwayWhenHit")})
+            fcommon.CheckBox({ address = 0x96914E,name = flanguage.GetText("vehicles.GreenTrafficLights")})
 
             imgui.NextColumn()
 
-            fcommon.CheckBox({ address = 0x969160,name = "Cars can fly"})
-            fcommon.CheckBox({ address = 0x969153,name = "Boats can fly"})
-            fcommon.CheckBox({ address = 0x96914C,name = "Perfect handling"})
-            fcommon.CheckBox({ address = 0x96917A,name = "Decreased Traffic"})
-            fcommon.CheckBox({ address = 0x96914F,name = "Aggressive drivers"})
-            fcommon.CheckBox({ address = 0x969165,name = "All cars have nitro"})
-            fcommon.CheckBox({ address = 0x969152,name = "Cars can drive on water"})
-            fcommon.CheckBox({ address = 0x969166,name = "Cars float away when hit"})
-            if imgui.Checkbox("Vehicle lights on",tvehicles.lights.all) then
+
+            fcommon.CheckBox({ address = 0x969165,name = flanguage.GetText("vehicles.HaveNitro")})
+            fcommon.CheckBox({name = flanguage.GetText("vehicles.LightsOn"),var = tvehicles.lights.all,func =
+            function()
                 if isCharInAnyCar(PLAYER_PED) then
                     car = storeCarCharIsInNoSave(PLAYER_PED)
                     if fvehicles.tvehicles.lights.all[0] == true then
@@ -265,47 +245,46 @@ function module.VehiclesMain()
                         addOneOffSound(x,y,z,1053)
                     end
                 end
-            end
+            end})
+
+            fcommon.CheckBox({name = flanguage.GetText("vehicles.LockDoors"),var = tvehicles.lock_doors,func =
+            function()
+                if isCharInAnyCar(PLAYER_PED) then
+                    if getCarDoorLockStatus(car) == 4 then
+                        lockCarDoors(car,1)
+                        fcommon.CheatDeactivated()
+                    else
+                        lockCarDoors(car,4)
+                        fcommon.CheatActivated()
+                    end
+                end
+            end})
+ 
+            fcommon.CheckBox({name = flanguage.GetText("vehicles.LockHealth"),var = tvehicles.lock_health})
+            fcommon.CheckBox({name = flanguage.GetText("vehicles.NewAircraftCamera"),var = tvehicles.aircraft.camera})
+            fcommon.CheckBox({name = flanguage.GetText("vehicles.NoVisualDamage"),var = tvehicles.visual_damage})
+            fcommon.CheckBox({ address = 0x96914C,name = flanguage.GetText("vehicles.PerfectHandling")})
+            fcommon.CheckBox({name = flanguage.GetText("vehicles.ShowHealth"),var = tvehicles.show.health})
+            fcommon.CheckBox({ address = 0x969164,name = flanguage.GetText("vehicles.TankMode")})
+            fcommon.CheckBox({ address = 0x96914B,name = flanguage.GetText("vehicles.WheelsOnly")})         
+            
+    
             imgui.Columns(1)
 
             imgui.Spacing()
             imgui.Separator()
             imgui.Spacing()
             imgui.Columns(2,nil,false)
-            fcommon.RadioButton("Traffic Type",{"Cheap Traffic","Fast Traffic","Country Traffic"},{0x96915E,0x96915F,0x96917B})
+            fcommon.RadioButton("Traffic Color",{"Black","Pink"},{0x969151,0x969150})
+            
             imgui.NextColumn()
-            fcommon.RadioButton("Traffic Color",{"Pink Traffic","Black Traffic"},{0x969150,0x969151})
+            fcommon.RadioButton("Traffic Type",{"Cheap","Country","Fast"},{0x96915E,0x96917B,0x96915F})
             imgui.Columns(1)
             imgui.EndTabItem()
         end
 
         if imgui.BeginTabItem('Menus') then
 
-            fcommon.DropDownMenu("Speed",function()
-                imgui.Columns(2,nil,false)
-                fcommon.CheckBox({name = "Show speed",var = tvehicles.show.speed})
-                imgui.NextColumn()
-                fcommon.CheckBox({name = "Lock speed",var = tvehicles.lock_speed})
-                imgui.Columns(1)
-                if imgui.InputInt("Set",tvehicles.speed) then
-                end
-                if imgui.Button("Set Speed",imgui.ImVec2(fcommon.GetSize(2))) then
-                    if tvehicles.speed[0] > 500 then
-                        tvehicles.speed[0] = 500
-                    end
-                    if isCharInAnyCar(PLAYER_PED) then
-                        car = storeCarCharIsInNoSave(PLAYER_PED)
-                        setCarForwardSpeed(car,tvehicles.speed[0])
-                    end
-                end
-                imgui.SameLine()
-                if imgui.Button("Instant Stop",imgui.ImVec2(fcommon.GetSize(2))) then
-                    if isCharInAnyCar(PLAYER_PED) then
-                        car = storeCarCharIsInNoSave(PLAYER_PED)
-                        setCarForwardSpeed(car,0.0)
-                    end
-                end
-            end)
             fcommon.DropDownMenu("Colors",function()
                 if imgui.Button("Reset car color",imgui.ImVec2(fcommon.GetSize(1))) then
                     module.ForEachCarComponent(function(mat,car)
@@ -328,6 +307,31 @@ function module.VehiclesMain()
                         end
                         tvehicles.color.default = getCarColours(car)
                     end)
+                end
+            end)
+            fcommon.DropDownMenu("Speed",function()
+                imgui.Columns(2,nil,false)
+                fcommon.CheckBox({name = "Lock speed",var = tvehicles.lock_speed})
+                imgui.NextColumn()
+                fcommon.CheckBox({name = "Show speed",var = tvehicles.show.speed})
+                imgui.Columns(1)
+                if imgui.InputInt("Set",tvehicles.speed) then
+                end
+                if imgui.Button("Set Speed",imgui.ImVec2(fcommon.GetSize(2))) then
+                    if tvehicles.speed[0] > 500 then
+                        tvehicles.speed[0] = 500
+                    end
+                    if isCharInAnyCar(PLAYER_PED) then
+                        car = storeCarCharIsInNoSave(PLAYER_PED)
+                        setCarForwardSpeed(car,tvehicles.speed[0])
+                    end
+                end
+                imgui.SameLine()
+                if imgui.Button("Instant Stop",imgui.ImVec2(fcommon.GetSize(2))) then
+                    if isCharInAnyCar(PLAYER_PED) then
+                        car = storeCarCharIsInNoSave(PLAYER_PED)
+                        setCarForwardSpeed(car,0.0)
+                    end
                 end
             end)
 

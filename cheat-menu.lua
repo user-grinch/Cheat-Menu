@@ -8,6 +8,7 @@ script_version_number(01082019) -- DDMMYYYY
 
 if getMoonloaderVersion() >= 21 then
     script_properties('work-in-pause')
+else
     print("Moonloader version doesn't meet requirement(v21).")
 end
 
@@ -52,12 +53,15 @@ mad           = require 'MoonAdditions'
 
 -- Loading custom modules
 fconfig       = require 'cheat-menu.modules.config'
-fconfig.read()
+if not pcall(fconfig.Read) then
+    printString("~r~Unable~w~ to load config file.",10000)
+end
 
 fabout        = require 'cheat-menu.modules.about'
 fcheats       = require 'cheat-menu.modules.cheats'
 fcommon       = require 'cheat-menu.modules.common'
 fgame         = require 'cheat-menu.modules.game'
+flanguage     = require 'cheat-menu.modules.language'
 fmemory       = require 'cheat-menu.modules.memory'
 fmenu         = require 'cheat-menu.modules.menu'
 fmissions     = require 'cheat-menu.modules.missions'
@@ -193,6 +197,16 @@ function() -- render frame
 end).HideCursor = true
 
 function main()
+    
+    flanguage.LoadLanguages()
+    if fgame.tgame.disable_help_popups[0] == true then
+        setGameGlobal(glob.Help_Wasted_Shown,1)
+        setGameGlobal(glob.Help_Busted_Shown,1)
+        removePickup(glob.Pickup_Info_Hospital)
+        removePickup(glob.Pickup_Info_Hospital_2)
+        removePickup(glob.Pickup_Info_Police)
+    end
+
     while true do
         if not isGamePaused() then
             if tcheatMenu.window.main[0] then
@@ -294,6 +308,14 @@ function main()
             else
                 setCarCanBeVisiblyDamaged(car,true)
             end
+
+            if getCarDoorLockStatus(car) == 4 then
+                fvehicles.tvehicles.lock_doors[0] = true
+            else
+                fvehicles.tvehicles.lock_doors[0] = false
+            end
+        else
+            fvehicles.tvehicles.lock_doors[0] = false
         end
 
         wait(0)

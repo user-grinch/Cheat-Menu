@@ -1,7 +1,7 @@
 local module = {}
 
-local path  =  getGameDirectory() .. "//moonloader//config//cheat-menu.json"
-
+local config_path    =  getGameDirectory() .. "//moonloader//config//cheat-menu.json"
+module.config_path   = config_path
 
 local tconfig =
 {
@@ -107,6 +107,7 @@ function module.write()
                 bool  = fgame.tgame.fps.bool[0],
                 limit = fgame.tgame.fps.limit[0],
             },
+            disable_help_popups = fgame.tgame.disable_help_popups[0],
         },
         tvehicles =
         {
@@ -142,17 +143,21 @@ function module.write()
             show_tooltips = fmenu.tmenu.show_tooltips[0],
             show_crash_message = fmenu.tmenu.show_crash_message[0],
         },
+        tlanguage =
+        {
+            current   = flanguage.tlanguage.current,
+        },
     }
 
-    local file = io.open(path,'w')
+    local file = io.open(config_path,'w')
     if file then
         file:write(encodeJson(tconfig.write))
         io.close(file)
     end
 end
 
-function module.read()
-    local file = io.open(path,'r')
+function module.Read()
+    local file = io.open(config_path,'r')
     if file then
         local data = file:read("*all")
         io.close(file)
