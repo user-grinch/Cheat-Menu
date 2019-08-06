@@ -12,32 +12,9 @@ Take a look [here](https://github.com/inanahammad/Cheat-Menu/wiki/Installation) 
 - [GTA Forums](https://gtaforums.com/topic/930023-mooncheat-menu/)
 - [Mixmods](https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu)
 
+## Note 
+[master](https://github.com/inanahammad/Cheat-Menu/tree/master) branch should be mostly stable and download from there to get the most upto and stable version.
 
-### Features
-
-- [x] Airbreak mode
-- [x] Change gravity,weather,day,date etc.
-- [x] Change player stats,skills,skin,money,life,vest,wanted level stamina etc.
-- [x] Fighting & walking style changer
-- [x] FPS meter
-- [x] Gang options - gang war,zone density etc.
-- [x] Hud position changer,health bar,armour bar,oxygen bar percentage viewer etc.
-- [x] Memory read/write
-- [x] Mission loader
-- [x] Original game cheats
-- [x] Pedestrians spawner
-- [x] Style editor
-- [x] Teleportation - coord & marker.
-- [x] Vehicle spawner,speed,damage,gear meters
-- [x] Vehicle modifcations
-- [x] Weapon spawner
-
-- [ ] Animation manager
-- [ ] Cloth changer
-- [ ] Object spawner
-- [ ] Ped(mind) control
-
-...
 
 Screenshots can be found [here](https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu#p13262)
 
