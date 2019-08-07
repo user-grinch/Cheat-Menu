@@ -45,7 +45,7 @@ function module.MemoryMain()
             imgui.Checkbox(flanguage.GetText("memory.ClearEntries"), tmemory.clear_entries)
             imgui.Columns(1)
 
-            if imgui.Button(flanguage.GetText("memory.ReadAddress"),imgui.ImVec2(fcommon.GetSize(1))) then
+            if imgui.Button(flanguage.GetText("memory.Read"),imgui.ImVec2(fcommon.GetSize(1))) then
 
                 if ffi.string(tmemory.address) ~= "" then
                     tmemory.value[0] = fcommon.RwMemory(tonumber(ffi.string(tmemory.address)),tmemory.size[0],nil,tmemory.vp[0],tmemory.is_float[0])
@@ -63,8 +63,9 @@ function module.MemoryMain()
         end
 
         if imgui.BeginTabItem(flanguage.GetText("memory.Write")) then
-            imgui.InputText(flanguage.GetText("memory.Address"), tmemory.address,ffi.sizeof(tmemory.address))
             imgui.InputInt(flanguage.GetText("memory.Value"), tmemory.value)
+            imgui.InputText(flanguage.GetText("memory.Address"), tmemory.address,ffi.sizeof(tmemory.address))
+            fcommon.InformationTooltip(flanguage.GetText("memory.AddressToolTip"))
             imgui.SliderInt(flanguage.GetText("memory.Size"), tmemory.size,1,4)
 
             if tmemory.size[0] == 4 then
@@ -81,7 +82,7 @@ function module.MemoryMain()
             imgui.Checkbox(flanguage.GetText("memory.ClearEntries"), tmemory.clear_entries)
             imgui.Columns(1)
 
-            if imgui.Button(flanguage.GetText("memory.WriteAddress"),imgui.ImVec2(fcommon.GetSize(1))) then
+            if imgui.Button(flanguage.GetText("memory.Write"),imgui.ImVec2(fcommon.GetSize(1))) then
                 if ffi.string(tmemory.address) ~= "" then
                     fcommon.RwMemory(tonumber(ffi.string(tmemory.address)),tmemory.size[0],tmemory.value[0],tmemory.vp[0],tmemory.is_float[0])
                     if tmemory.clear_entries[0] == 1 then

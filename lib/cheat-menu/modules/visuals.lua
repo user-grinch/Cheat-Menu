@@ -14,7 +14,7 @@ module.tvisuals = tvisuals
 function module.VisualsMain()
     if imgui.BeginTabBar("Visuals") then
         imgui.Spacing()
-        if imgui.BeginTabItem(flanguage.GetText('visuals.Checkboxes')) then
+        if imgui.BeginTabItem(flanguage.GetText('common.Checkboxes')) then
             imgui.Spacing()
 
             imgui.Columns(2,nil,false)
@@ -48,7 +48,7 @@ function module.VisualsMain()
             imgui.EndTabItem()
         end
 
-        if imgui.BeginTabItem(flanguage.GetText('visuals.Menus')) then
+        if imgui.BeginTabItem(flanguage.GetText('common.Menus')) then
             if imgui.BeginChild("Menus") then
                 imgui.Spacing()
                 imgui.Text(flanguage.GetText('visuals.TweakWithCaution'))

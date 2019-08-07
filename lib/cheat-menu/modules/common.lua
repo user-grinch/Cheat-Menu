@@ -82,11 +82,11 @@ function module.InformationTooltip(text)
 end
 
 function module.CheatActivated()
-    printHelpString("Cheat ~g~Activated")
+    printHelpString(flanguage.GetText("common.CheatActivated"))
 end
 
 function module.CheatDeactivated()
-    printHelpString("Cheat ~r~Deactivated")
+    printHelpString(flanguage.GetText("common.CheatDeactivated"))
 end
 
 function module.GetSize(count,x,y)
@@ -240,7 +240,7 @@ function module.RadioButton(label,rb_table,addr_table)
         end
     end
 
-    if imgui.RadioButtonIntPtr("Default " .. string.lower(label),button,#addr_table + 1) then
+    if imgui.RadioButtonIntPtr(flanguage.GetText("common.Default") .. string.lower(label),button,#addr_table + 1) then
         for j = 1,#addr_table,1 do
             writeMemory(addr_table[j],1,0,false)
         end
@@ -265,14 +265,6 @@ function module.RwMemory(address,size,value,protect,is_float)
             memory.write(address,value,size,protect)
         end
     end
-end
-
-function module.CheatActivated()
-    printHelpString("Cheat ~g~Activated")
-end
-
-function module.CheatDeactivated()
-    printHelpString("Cheat ~r~Deactivated")
 end
 
 function module.CheckBox(arg)
@@ -335,34 +327,35 @@ function module.UpdateStat(arg)
 
         imgui.Columns(2,nil,false)
         if arg.min ~= nil then
-            imgui.Text("Min = " .. arg.min)
+            imgui.Text(flanguage.GetText("common.Minimum") .. " = " .. arg.min)
         end
         imgui.NextColumn()
         if arg.max ~= nil then
-            imgui.Text("Max = " .. arg.max)
+            imgui.Text(flanguage.GetText("common.Maximum") .. " = " .. arg.max)
         end
 
         imgui.Columns(1)
 
         imgui.PushItemWidth(imgui.GetWindowWidth()-50)
-        if imgui.InputInt("Set",value) then
+        if imgui.InputInt(flanguage.GetText("common.Set"),value) then
             setFloatStat(arg.stat,value[0])
         end
         imgui.PopItemWidth()
 
-        if imgui.Button("Increase",imgui.ImVec2(fcommon.GetSize(4))) then
-            setFloatStat(arg.stat,(value[0]+change_value))
-        end
-        imgui.SameLine()
-        if imgui.Button("Decrease",imgui.ImVec2(fcommon.GetSize(4))) then
+        imgui.Spacing()
+        if imgui.Button(flanguage.GetText("common.Decrease"),imgui.ImVec2(fcommon.GetSize(4))) then
             setFloatStat(arg.stat,(value[0]-change_value))
         end
         imgui.SameLine()
-        if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(4))) then
+        if imgui.Button(flanguage.GetText("common.Increase"),imgui.ImVec2(fcommon.GetSize(4))) then
+            setFloatStat(arg.stat,(value[0]+change_value))
+        end  
+        imgui.SameLine()
+        if imgui.Button(flanguage.GetText("common.Minimum"),imgui.ImVec2(fcommon.GetSize(4))) then
             setFloatStat(arg.stat,arg.min)
         end
         imgui.SameLine()
-        if imgui.Button("Maximum",imgui.ImVec2(fcommon.GetSize(4))) then
+        if imgui.Button(flanguage.GetText("common.Maximum"),imgui.ImVec2(fcommon.GetSize(4))) then
             setFloatStat(arg.stat,arg.max)
         end
         if value[0] < arg.min then
@@ -383,36 +376,37 @@ function module.UpdateAddress(arg)
 
         imgui.Columns(2,nil,false)
         if arg.min ~= nil then
-            imgui.Text("Min = " .. arg.min)
+            imgui.Text(flanguage.GetText("common.Minumum") .. " = " .. arg.min)
         end
         imgui.NextColumn()
         if arg.max ~= nil then
-            imgui.Text("Max = " .. arg.max)
+            imgui.Text(flanguage.GetText("common.Maximum") .. " = " .. arg.max)
         end
         imgui.Columns(1)
 
         imgui.Spacing()
 
         imgui.PushItemWidth(imgui.GetWindowWidth()-50)
-        if imgui.InputInt("Set",value) then
+        if imgui.InputInt(flanguage.GetText("common.Set"),value) then
             module.RwMemory(arg.address,arg.size,value[0],nil,arg.is_float)
         end
         imgui.PopItemWidth()
 
+        
         imgui.Spacing()
-        if imgui.Button("Increase",imgui.ImVec2(fcommon.GetSize(4))) and value[0] < arg.max then
-            module.RwMemory(arg.address,arg.size,(value[0]+math.floor(arg.max/10)),nil,arg.is_float)
-        end
-        imgui.SameLine()
-        if imgui.Button("Decrease",imgui.ImVec2(fcommon.GetSize(4)))  and value[0] > arg.min then
+        if imgui.Button(flanguage.GetText("common.Decrease"),imgui.ImVec2(fcommon.GetSize(4)))  and value[0] > arg.min then
             module.RwMemory(arg.address,arg.size,(value[0]-math.floor(arg.max/10)),nil,arg.is_float)
         end
         imgui.SameLine()
-        if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(4))) then
+        if imgui.Button(flanguage.GetText("common.Increase"),imgui.ImVec2(fcommon.GetSize(4))) and value[0] < arg.max then
+            module.RwMemory(arg.address,arg.size,(value[0]+math.floor(arg.max/10)),nil,arg.is_float)
+        end
+        imgui.SameLine()
+        if imgui.Button(flanguage.GetText("common.Minimum"),imgui.ImVec2(fcommon.GetSize(4))) then
             module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float)
         end
         imgui.SameLine()
-        if imgui.Button("Maximum",imgui.ImVec2(fcommon.GetSize(4))) then
+        if imgui.Button(flanguage.GetText("common.Maximum"),imgui.ImVec2(fcommon.GetSize(4))) then
             module.RwMemory(arg.address,arg.size,arg.max,nil,arg.is_float)
         end
         imgui.SameLine()

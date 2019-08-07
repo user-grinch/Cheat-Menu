@@ -134,14 +134,14 @@ function module.WeaponsMain()
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem(flanguage.GetText("weapons.Search")) then
+        if imgui.BeginTabItem(flanguage.GetText("common.Search")) then
             imgui.Spacing()
             imgui.Columns(1)
-            if imgui.InputText(flanguage.GetText("weapons.Search"),tweapons.search_text,ffi.sizeof(tweapons.search_text)) then end
+            if imgui.InputText(flanguage.GetText("common.Search"),tweapons.search_text,ffi.sizeof(tweapons.search_text)) then end
             imgui.SameLine()
 
             imgui.Spacing()
-            imgui.Text(flanguage.GetText("weapons.FoundEntries") .. ":(" .. ffi.string(tweapons.search_text) .. ")")
+            imgui.Text(flanguage.GetText("common.FoundEntries") .. ":(" .. ffi.string(tweapons.search_text) .. ")")
             imgui.Separator()
             imgui.Spacing()
             if imgui.BeginChild("Weapon Entries") then

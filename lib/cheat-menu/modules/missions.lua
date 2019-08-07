@@ -194,7 +194,7 @@ end
 function module.MissionsMain()
     imgui.Spacing()
     if imgui.BeginChild("Missions list") then
-        if imgui.BeginTabBar(flanguage.GetText('MissionsList')) then
+        if imgui.BeginTabBar("MissionsList") then
             if imgui.BeginTabItem("LS") then
                 imgui.Spacing()
                 MissionEntry(flanguage.GetText('missions.Introduction'),{11,12})
@@ -250,17 +250,17 @@ function module.MissionsMain()
                 MissionEntry(flanguage.GetText('missions.VideoGames'),{3,4,5,6,7,8,9,10})
                 imgui.EndTabItem()
             end
-            if imgui.BeginTabItem(flanguage.GetText('missions.Search')) then
+            if imgui.BeginTabItem(flanguage.GetText('common.Search')) then
                 imgui.Spacing()
                 imgui.Columns(1)
-                if imgui.InputText(flanguage.GetText('missions.Search'),tmissions.search_text,ffi.sizeof(tmissions.search_text)) then end
+                if imgui.InputText(flanguage.GetText('common.Search'),tmissions.search_text,ffi.sizeof(tmissions.search_text)) then end
                 imgui.SameLine()
 
                 imgui.Spacing()
-                imgui.Text(flanguage.GetText('missions.FoundEntries') .. ":(" .. ffi.string(tmissions.search_text) .. ")")
+                imgui.Text(flanguage.GetText('common.FoundEntries') .. ":(" .. ffi.string(tmissions.search_text) .. ")")
                 imgui.Separator()
                 imgui.Spacing()
-                if imgui.BeginChild(flanguage.GetText('missions.MissionsEntries')) then
+                if imgui.BeginChild("MissionsEntries") then
                     MissionEntry(nil,tmissions.list,tmissions.search_text)
                     imgui.EndChild()
                 end

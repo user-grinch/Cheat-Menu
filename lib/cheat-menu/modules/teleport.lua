@@ -406,11 +406,11 @@ function module.TeleportMain()
         if imgui.BeginTabItem('Search') then
             imgui.Spacing()
             imgui.Columns(1)
-            if imgui.InputText(flanguage.GetText("teleport.Search"),tteleport.search_text,ffi.sizeof(tteleport.search_text)) then end
+            if imgui.InputText(flanguage.GetText("common.Search"),tteleport.search_text,ffi.sizeof(tteleport.search_text)) then end
 			imgui.SameLine()
 
 			imgui.Spacing()
-			imgui.Text(flanguage.GetText("teleport.FoundEntries") .. ":(" .. ffi.string(tteleport.search_text) .. ")")
+			imgui.Text(flanguage.GetText("common.FoundEntries") .. ":(" .. ffi.string(tteleport.search_text) .. ")")
 			imgui.Separator()
 			imgui.Spacing()
 			if imgui.BeginChild("Teleport entries") then

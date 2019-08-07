@@ -444,9 +444,9 @@ end
 
 function module.PedsMain()
 
-    if imgui.BeginTabBar(flanguage.GetText("peds.Peds")) then
+    if imgui.BeginTabBar("Peds") then
         imgui.Spacing()
-        if imgui.BeginTabItem(flanguage.GetText("peds.Checkboxes")) then
+        if imgui.BeginTabItem(flanguage.GetText("common.Checkboxes")) then
             imgui.Columns(2,nil,false)
             fcommon.CheckBox({ address = 0x969175,name = flanguage.GetText("peds.PedsRiot")})
             fcommon.CheckBox({ address = 0x96915D,name = flanguage.GetText("peds.SlutMagnet")})
@@ -470,7 +470,7 @@ function module.PedsMain()
 
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem(flanguage.GetText("peds.Menus")) then
+        if imgui.BeginTabItem(flanguage.GetText("common.Menus")) then
             fcommon.UpdateAddress({name = flanguage.GetText("peds.PedestrianDensity"),address = 0x8D2530,size = 4,max = 100})
             if imgui.CollapsingHeader(flanguage.GetText("peds.ZoneGangDensity")) then
                 imgui.Separator()
@@ -491,10 +491,10 @@ function module.PedsMain()
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem(flanguage.GetText("peds.Spawn")) then
+        if imgui.BeginTabItem(flanguage.GetText("common.Spawn")) then
             imgui.Spacing()
             if imgui.Combo(flanguage.GetText("peds.PedType"), tpeds.type.selected,tpeds.type.list,#tpeds.type.names) then end
-            imgui.Text(flanguage.GetText("peds.PedsList"))
+            imgui.Text(flanguage.GetText("common.List"))
             imgui.Separator()
             imgui.Spacing()
             if imgui.BeginTabBar("PedsList") then
@@ -573,30 +573,30 @@ function module.PedsMain()
                     end
                     imgui.EndTabItem()
                 end
-                if imgui.BeginTabItem(flanguage.GetText("peds.Misc")) then
+                if imgui.BeginTabItem(flanguage.GetText("common.Misc")) then
                     if imgui.BeginChild("Misc list Window") then
-                        fcommon.ShowEntries(flanguage.GetText("peds.Misc"),{0,1,2,7,19,23,26,35,49,62,68,70,76,144,145,146,209,210,214,263,268,272},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("common.Misc"),{0,1,2,7,19,23,26,35,49,62,68,70,76,144,145,146,209,210,214,263,268,272},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        imgui.EndChild()
+                    end
+                    imgui.EndTabItem()
+                end
+                if imgui.BeginTabItem(flanguage.GetText("common.Search")) then
+                    imgui.Spacing()
+                    imgui.Columns(1)
+                    if imgui.InputText(flanguage.GetText("common.Search"),tpeds.search_text,ffi.sizeof(tpeds.search_text)) then end
+                    imgui.SameLine()
+        
+                    imgui.Spacing()
+                    imgui.Text(flanguage.GetText("common.FoundEntries") .. ":(" .. ffi.string(tpeds.search_text) .. ")")
+                    imgui.Separator()
+                    imgui.Spacing()
+                    if imgui.BeginChild("Ped entries") then
+                        fcommon.ShowEntries(nil,tpeds.models,100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true,tpeds.search_text)
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()
                 end
                 imgui.EndTabBar()
-            end
-            imgui.EndTabItem()
-        end
-        if imgui.BeginTabItem(flanguage.GetText("peds.Search")) then
-            imgui.Spacing()
-            imgui.Columns(1)
-            if imgui.InputText(flanguage.GetText("peds.Search"),tpeds.search_text,ffi.sizeof(tpeds.search_text)) then end
-			imgui.SameLine()
-
-			imgui.Spacing()
-			imgui.Text(flanguage.GetText("peds.FoundEntries") .. ":(" .. ffi.string(tpeds.search_text) .. ")")
-			imgui.Separator()
-            imgui.Spacing()
-            if imgui.BeginChild(flanguage.GetText("peds.PedEntries")) then
-                fcommon.ShowEntries(nil,tpeds.models,100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true,tpeds.search_text)
-                imgui.EndChild()
             end
             imgui.EndTabItem()
         end

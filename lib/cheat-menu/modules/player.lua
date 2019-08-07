@@ -362,11 +362,11 @@ function module.ChangePlayerModel(model)
         setPlayerModel(PLAYER_HANDLE,290)
         unloadSpecialCharacter(290)
     end
-    printHelpString("Skin ~g~Changed")
+    printHelpString(flanguage.GetText("player.SkinChanged"))
 end
 
 function HealthArmour()
-    fcommon.DropDownMenu("Health",function()
+    fcommon.DropDownMenu(flanguage.GetText("player.Health"),function()
         local health = imgui.new.int()
         local max = math.floor(getFloatStat(24)/5.68)
         local min = 0
@@ -374,32 +374,32 @@ function HealthArmour()
         health[0] = getCharHealth(PLAYER_PED)
 
         imgui.Columns(2,nil,false)
-        imgui.Text("Max = " .. max)
+        imgui.Text(flanguage.GetText("common.Minimum") .. " = " .. min)
         imgui.NextColumn()
-        imgui.Text("Min = " .. min)
+        imgui.Text(flanguage.GetText("common.Maximum") .. " = " .. max)
         imgui.Columns(1)
 
         imgui.PushItemWidth(imgui.GetWindowWidth()-50)
-        if imgui.InputInt("Set",health) then
+        if imgui.InputInt(flanguage.GetText("common.Set"),health) then
             setCharHealth(PLAYER_PED,health[0])
         end
         imgui.PopItemWidth()
 
         imgui.Spacing()
-        if imgui.Button("Increase",imgui.ImVec2(fcommon.GetSize(4))) and health[0] <  max then
-            setCharHealth(PLAYER_PED,(health[0]+10))
-        end
-        imgui.SameLine()
-        if imgui.Button("Decrease",imgui.ImVec2(fcommon.GetSize(4)))  and health[0] > 0 then
+        if imgui.Button(flanguage.GetText("common.Decrease"),imgui.ImVec2(fcommon.GetSize(4)))  and health[0] > 0 then
             setCharHealth(PLAYER_PED,(health[0]-10))
         end
         imgui.SameLine()
-        if imgui.Button("Maximum",imgui.ImVec2(fcommon.GetSize(4))) then
-            setCharHealth(PLAYER_PED, max)
+        if imgui.Button(flanguage.GetText("common.Increase"),imgui.ImVec2(fcommon.GetSize(4))) and health[0] <  max then
+            setCharHealth(PLAYER_PED,(health[0]+10))
         end
         imgui.SameLine()
-        if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(4))) then
+        if imgui.Button(flanguage.GetText("common.Minimum"),imgui.ImVec2(fcommon.GetSize(4))) then
             setCharHealth(PLAYER_PED,0)
+        end
+        imgui.SameLine()
+        if imgui.Button(flanguage.GetText("common.Maximum"),imgui.ImVec2(fcommon.GetSize(4))) then
+            setCharHealth(PLAYER_PED, max)
         end
 
         if health[0] < 0 then
@@ -411,22 +411,22 @@ function HealthArmour()
         end
     end)
 
-    fcommon.DropDownMenu("Armour",function()
+    fcommon.DropDownMenu(flanguage.GetText("player.Armour"),function()
         local armour = imgui.new.int()
         local max_armour = 100
         local min_armour = 0
         armour[0] = getCharArmour(PLAYER_PED)
 
         imgui.Columns(2,nil,false)
-        imgui.Text("Max = " .. max_armour)
+        imgui.Text(flanguage.GetText("common.Minimum") .. " = " .. min_armour)
         imgui.NextColumn()
-        imgui.Text("Min = " .. min_armour)
+        imgui.Text(flanguage.GetText("common.Maximum") .. " = " .. max_armour)
         imgui.Columns(1)
 
         imgui.Spacing()
 
         imgui.PushItemWidth(imgui.GetWindowWidth()-50)
-        if imgui.InputInt("Set",armour) then
+        if imgui.InputInt(flanguage.GetText("common.Set"),armour) then
 
             if armour[0] < 0 then
                 armour[0] = 0
@@ -440,11 +440,7 @@ function HealthArmour()
         end
         imgui.PopItemWidth()
 
-        if imgui.Button("Increase",imgui.ImVec2(fcommon.GetSize(4))) and armour[0] <  max_armour then
-            addArmourToChar(PLAYER_PED,10)
-        end
-        imgui.SameLine()
-        if imgui.Button("Decrease",imgui.ImVec2(fcommon.GetSize(4)))  and armour[0] > 0 then
+        if imgui.Button(flanguage.GetText("common.Decrease"),imgui.ImVec2(fcommon.GetSize(4)))  and armour[0] > 0 then
 
 
             if getCharArmour(PLAYER_PED) > 10 then
@@ -454,12 +450,16 @@ function HealthArmour()
             end
         end
         imgui.SameLine()
-        if imgui.Button("Maximum",imgui.ImVec2(fcommon.GetSize(4))) then
-            addArmourToChar(PLAYER_PED, max_armour)
+        if imgui.Button(flanguage.GetText("common.Increase"),imgui.ImVec2(fcommon.GetSize(4))) and armour[0] <  max_armour then
+            addArmourToChar(PLAYER_PED,10)
+        end   
+        imgui.SameLine()
+        if imgui.Button(flanguage.GetText("common.Minimum"),imgui.ImVec2(fcommon.GetSize(4))) then
+            damageChar(PLAYER_PED,  getCharArmour(PLAYER_PED),true)
         end
         imgui.SameLine()
-        if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(4))) then
-            damageChar(PLAYER_PED,  getCharArmour(PLAYER_PED),true)
+        if imgui.Button(flanguage.GetText("common.Maximum"),imgui.ImVec2(fcommon.GetSize(4))) then
+            addArmourToChar(PLAYER_PED, max_armour)
         end
         imgui.Separator()
     end)

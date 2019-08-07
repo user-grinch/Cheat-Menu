@@ -304,7 +304,7 @@ function module.GameMain()
     imgui.Spacing()
     if imgui.BeginTabBar("Game") then
 
-        if imgui.BeginTabItem(flanguage.GetText('game.Checkboxes')) then
+        if imgui.BeginTabItem(flanguage.GetText('common.Checkboxes')) then
             imgui.Spacing()
             imgui.Columns(2,nil,false)
 
@@ -362,7 +362,7 @@ function module.GameMain()
             imgui.EndTabItem()
         end
 
-        if imgui.BeginTabItem(flanguage.GetText('game.Menus')) then
+        if imgui.BeginTabItem(flanguage.GetText('common.Menus')) then
             if imgui.BeginChild("Game") then
                 imgui.Spacing()
 
