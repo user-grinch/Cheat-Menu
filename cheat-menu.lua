@@ -203,6 +203,11 @@ function main()
         else
             showCursor(false)
         end
+        
+        if fgame.tgame.airbreak[0] then
+            fgame.AirbreakMode()
+        end
+
         if fgame.tgame.ss_shortcut[0]
         and isKeyDown(tkeys.control_key) and isKeyDown(tkeys.screenshot_key) then
             takePhoto(true)
