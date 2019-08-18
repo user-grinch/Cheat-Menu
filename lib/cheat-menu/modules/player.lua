@@ -4,10 +4,10 @@ local module = {}
 
 local tplayer =
 {
-    god            = imgui.new.bool(fconfig.get('tplayer.god',false)),
-    aimSkinChanger = imgui.new.bool(fconfig.get('tplayer.aimSkinChanger',false)),
-    neverWanted    = imgui.new.bool(fconfig.get('tplayer.neverWanted',false) ),
-    cjBody         = imgui.new.int(fconfig.get('tplayer.cjBody',0)),
+    god               = imgui.new.bool(fconfig.get('tplayer.god',false)),
+    aimSkinChanger    = imgui.new.bool(fconfig.get('tplayer.aimSkinChanger',false)),
+    neverWanted       = imgui.new.bool(fconfig.get('tplayer.neverWanted',false) ),
+    cjBody            = imgui.new.int(fconfig.get('tplayer.cjBody',0)),
     skins =
     {
         search_text    = imgui.new.char[20](fconfig.get('tplayer.skins.search_text',"")),
@@ -362,11 +362,11 @@ function module.ChangePlayerModel(model)
         setPlayerModel(PLAYER_HANDLE,290)
         unloadSpecialCharacter(290)
     end
-    printHelpString("Skin ~g~Changed")
+    printHelpString(flanguage.GetText("player.SkinChanged"))
 end
 
 function HealthArmour()
-    fcommon.DropDownMenu("Health",function()
+    fcommon.DropDownMenu(flanguage.GetText("player.Health"),function()
         local health = imgui.new.int()
         local max = math.floor(getFloatStat(24)/5.68)
         local min = 0
@@ -374,32 +374,32 @@ function HealthArmour()
         health[0] = getCharHealth(PLAYER_PED)
 
         imgui.Columns(2,nil,false)
-        imgui.Text("Max = " .. max)
+        imgui.Text(flanguage.GetText("common.Minimum") .. " = " .. min)
         imgui.NextColumn()
-        imgui.Text("Min = " .. min)
+        imgui.Text(flanguage.GetText("common.Maximum") .. " = " .. max)
         imgui.Columns(1)
 
         imgui.PushItemWidth(imgui.GetWindowWidth()-50)
-        if imgui.InputInt("Set",health) then
+        if imgui.InputInt(flanguage.GetText("common.Set"),health) then
             setCharHealth(PLAYER_PED,health[0])
         end
         imgui.PopItemWidth()
 
         imgui.Spacing()
-        if imgui.Button("Increase",imgui.ImVec2(fcommon.GetSize(4))) and health[0] <  max then
-            setCharHealth(PLAYER_PED,(health[0]+10))
-        end
-        imgui.SameLine()
-        if imgui.Button("Decrease",imgui.ImVec2(fcommon.GetSize(4)))  and health[0] > 0 then
+        if imgui.Button(flanguage.GetText("common.Decrease"),imgui.ImVec2(fcommon.GetSize(4)))  and health[0] > 0 then
             setCharHealth(PLAYER_PED,(health[0]-10))
         end
         imgui.SameLine()
-        if imgui.Button("Maximum",imgui.ImVec2(fcommon.GetSize(4))) then
-            setCharHealth(PLAYER_PED, max)
+        if imgui.Button(flanguage.GetText("common.Increase"),imgui.ImVec2(fcommon.GetSize(4))) and health[0] <  max then
+            setCharHealth(PLAYER_PED,(health[0]+10))
         end
         imgui.SameLine()
-        if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(4))) then
+        if imgui.Button(flanguage.GetText("common.Minimum"),imgui.ImVec2(fcommon.GetSize(4))) then
             setCharHealth(PLAYER_PED,0)
+        end
+        imgui.SameLine()
+        if imgui.Button(flanguage.GetText("common.Maximum"),imgui.ImVec2(fcommon.GetSize(4))) then
+            setCharHealth(PLAYER_PED, max)
         end
 
         if health[0] < 0 then
@@ -411,22 +411,22 @@ function HealthArmour()
         end
     end)
 
-    fcommon.DropDownMenu("Armour",function()
+    fcommon.DropDownMenu(flanguage.GetText("player.Armour"),function()
         local armour = imgui.new.int()
         local max_armour = 100
         local min_armour = 0
         armour[0] = getCharArmour(PLAYER_PED)
 
         imgui.Columns(2,nil,false)
-        imgui.Text("Max = " .. max_armour)
+        imgui.Text(flanguage.GetText("common.Minimum") .. " = " .. min_armour)
         imgui.NextColumn()
-        imgui.Text("Min = " .. min_armour)
+        imgui.Text(flanguage.GetText("common.Maximum") .. " = " .. max_armour)
         imgui.Columns(1)
 
         imgui.Spacing()
 
         imgui.PushItemWidth(imgui.GetWindowWidth()-50)
-        if imgui.InputInt("Set",armour) then
+        if imgui.InputInt(flanguage.GetText("common.Set"),armour) then
 
             if armour[0] < 0 then
                 armour[0] = 0
@@ -440,11 +440,7 @@ function HealthArmour()
         end
         imgui.PopItemWidth()
 
-        if imgui.Button("Increase",imgui.ImVec2(fcommon.GetSize(4))) and armour[0] <  max_armour then
-            addArmourToChar(PLAYER_PED,10)
-        end
-        imgui.SameLine()
-        if imgui.Button("Decrease",imgui.ImVec2(fcommon.GetSize(4)))  and armour[0] > 0 then
+        if imgui.Button(flanguage.GetText("common.Decrease"),imgui.ImVec2(fcommon.GetSize(4)))  and armour[0] > 0 then
 
 
             if getCharArmour(PLAYER_PED) > 10 then
@@ -454,12 +450,16 @@ function HealthArmour()
             end
         end
         imgui.SameLine()
-        if imgui.Button("Maximum",imgui.ImVec2(fcommon.GetSize(4))) then
-            addArmourToChar(PLAYER_PED, max_armour)
+        if imgui.Button(flanguage.GetText("common.Increase"),imgui.ImVec2(fcommon.GetSize(4))) and armour[0] <  max_armour then
+            addArmourToChar(PLAYER_PED,10)
+        end   
+        imgui.SameLine()
+        if imgui.Button(flanguage.GetText("common.Minimum"),imgui.ImVec2(fcommon.GetSize(4))) then
+            damageChar(PLAYER_PED,  getCharArmour(PLAYER_PED),true)
         end
         imgui.SameLine()
-        if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(4))) then
-            damageChar(PLAYER_PED,  getCharArmour(PLAYER_PED),true)
+        if imgui.Button(flanguage.GetText("common.Maximum"),imgui.ImVec2(fcommon.GetSize(4))) then
+            addArmourToChar(PLAYER_PED, max_armour)
         end
         imgui.Separator()
     end)
@@ -472,27 +472,28 @@ function WantedLevelMenu()
         local wanted_level = imgui.new.int(wl)
         local max_wanted_level = imgui.new.int(readMemory(0x58DFE4,1,false))
 
-        if imgui.SliderInt("Maximum",max_wanted_level,0,6) then
+        if imgui.SliderInt(flanguage.GetText("common.Maximum"),max_wanted_level,0,6) then
            writeMemory(0x58DFE4,1,max_wanted_level[0],false)
         end
+        
         imgui.Spacing()
 
-        if imgui.SliderInt("Current",wanted_level,0,max_wanted_level[0]) then
+        if imgui.SliderInt(flanguage.GetText("player.Current"),wanted_level,0,max_wanted_level[0]) then
             callFunction(0x4396F0,1,0,false)
             alterWantedLevel(PLAYER_HANDLE,wanted_level[0])
         end
 
-        if imgui.Button("Maximum") then
+        if imgui.Button(flanguage.GetText("common.Maximum")) then
             callFunction(0x4396F0,1,0,false)
             alterWantedLevel(PLAYER_HANDLE,max_wanted_level[0])
         end
         imgui.SameLine()
-        if imgui.Button("Minimum") then
+        if imgui.Button(flanguage.GetText("common.Minimum")) then
             callFunction(0x4396F0,1,0,false)
             alterWantedLevel(PLAYER_HANDLE,0)
         end
         imgui.SameLine()
-        fcommon.CheckBox({name = "Never wanted",var = tplayer.neverWanted,func = function()
+        fcommon.CheckBox({name = flanguage.GetText("player.NeverWanted"),var = tplayer.neverWanted,func = function()
             callFunction(0x4396C0,1,0,false)
             if tplayer.neverWanted[0] then
                 fcommon.CheatActivated()
@@ -505,106 +506,105 @@ end
 
 function SkinChangerMenu()
     imgui.Spacing()
-    fcommon.CheckBox({name = "Aim Skin Changer",var = tplayer.aimSkinChanger})
-    fcommon.InformationTooltip("Aim at a pedestrian and then press Enter/Return key to switch to that skin.")
+    fcommon.CheckBox({name = flanguage.GetText("player.AimSkinChanger"),var = tplayer.aimSkinChanger})
+    fcommon.InformationTooltip(flanguage.GetText("player.AimSkinChangerToolTip"))
 
     imgui.Spacing()
-    if imgui.BeginTabBar("Skins") then
-        if imgui.BeginTabItem('Gangs') then
+    if imgui.BeginTabBar(flanguage.GetText("player.Skins")) then
+        if imgui.BeginTabItem(flanguage.GetText('peds.Gangs')) then
             imgui.Spacing()
             if imgui.BeginChild("Gangs list Window") then
-                fcommon.ShowEntries("Ballas",{102,103,104},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Da Nang Boys",{121,122,123},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Groove Families",{105,106,107,269,270,271},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Los Santos Vagos",{108,109,110},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Mafia",{111,112,113},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Russian Mafia",{124,125,126,127},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("San Fierro Rifa",{173,174,175},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("San Fierro Triads",{117,118,120},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Varrios Los Aztecas",{114,115,116},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.Ballas"),{102,103,104},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.DaNangBoys"),{121,122,123},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.GroveStreetFamilies"),{105,106,107,269,270,271},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.LosSantosVagos"),{108,109,110},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.Mafia"),{111,112,113,124,125,126,127},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.SanFierroRifa"),{173,174,175},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.MountainCloudTriad"),{117,118,120},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.VarriosLosAztecas"),{114,115,116},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
                 imgui.EndChild()
             end
             imgui.EndTabItem()
         end
 
-        if imgui.BeginTabItem('Civillians') then
+        if imgui.BeginTabItem(flanguage.GetText('peds.Civilians')) then
             imgui.Spacing()
-            if imgui.BeginChild("Civillians list Window") then
-                fcommon.ShowEntries("Antagonist",{290,291,292,293,294,295,296,297,298,299},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Beach",{18,45,138,139,140,154},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Bouncer",{163,164,165,166},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Boxer",{80,81},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Businessman",{17,141,147,148,150,177,227},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Country",{157,158,159,160,161,162,196,197,198,199,200},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Golf",{36,37},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Grl",{190,191,192,193,194,195},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Heckler",{258,259},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Hippie",{72,73},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Jogger",{90,96},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Karate Student",{203,204},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Pol",{66,67},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Low Class Male",{32,33,34,128,132,133,202},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Low Class Female",{31,129,130,131,151,201},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Mountain Biker",{51,52},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Rich Male",{14,20,38,43,46,57,59,94,98,185,186,221,228,235,240,295},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Rich Female",{9,12,40,53,55,88,91,169,215,216,219,224,231},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Roller Blade",{92,99},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Street Male",{15,22,44,48,58,60,95,101,142,170,188,222,229,236,241,242},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Street Female",{10,13,39,41,54,56,69,76,93,218,225,226,232,233,246,256,257},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Tramp Male",{78,79,134,135,136,137,212,213,230,239},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Tramp Female",{77,256,257},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Elvis",{82,83,84},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+            if imgui.BeginChild("Civilians list Window") then
+                fcommon.ShowEntries(flanguage.GetText("peds.Antagonist"),{290,291,292,293,294,295,296,297,298,299},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.Beach"),{18,45,138,139,140,154},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.Bouncer"),{163,164,165,166},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.Boxer"),{80,81},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.Businessman"),{17,141,147,148,150,177,227},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.Country"),{157,158,159,160,161,162,196,197,198,199,200},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.Golf"),{36,37},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.Grl"),{190,191,192,193,194,195},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.Heckler"),{258,259},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.Hippie"),{72,73},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.Jogger"),{90,96},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.KarateStudent"),{203,204},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.Pol"),{66,67},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.LowClassMale"),{32,33,34,128,132,133,202},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.LowClassFemale"),{31,129,130,131,151,201},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.MountainBiker"),{51,52},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.RichMale"),{14,20,38,43,46,57,59,94,98,185,186,221,228,235,240,295},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.RichFemale"),{9,12,40,53,55,88,91,169,215,216,219,224,231},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.RollerBlade"),{92,99},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.StreetMale"),{15,22,44,48,58,60,95,101,142,170,188,222,229,236,241,242},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.StreetFemale"),{10,13,39,41,54,56,69,76,93,218,225,226,232,233,246,256,257},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.TrampMale"),{78,79,134,135,136,137,212,213,230,239},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.TrampFemale"),{77,256,257},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.Elvis"),{82,83,84},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
                 imgui.EndChild()
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem('Criminals') then
+        if imgui.BeginTabItem(flanguage.GetText('peds.Criminals')) then
             imgui.Spacing()
             if imgui.BeginChild("Criminals list Window") then
-                fcommon.ShowEntries("Biker",{247,248},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Body Guard",{24,25},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Criminal",{21,47,100,143,181,183,184,223,250},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Drug Dealer",{28,29,30,154},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.Biker"),{247,248},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.BodyGuard"),{24,25},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.Criminal"),{21,47,100,143,181,183,184,223,250},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.DrugDealer"),{28,29,30,154},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
                 imgui.EndChild()
             end
             imgui.EndTabItem()
         end
 
-        if imgui.BeginTabItem('Jobs') then
+        if imgui.BeginTabItem(flanguage.GetText('peds.Jobs')) then
             imgui.Spacing()
             if imgui.BeginChild("Jobs list Window") then
-                fcommon.ShowEntries("Cab Driver",{182,206,220,234,261,262},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Construction",{27,153,260},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Croupier",{11,171,172},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Clothes Seller",{211,217},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Fire Fighter",{277,278,279},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Law Enforcement",{71,265,266,267,280,281,282,283,284,285,286,287,288},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Life Guard",{97,251},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Medic",{274,275,276},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Prostitute",{63,64,75,85,87,152,178,207,237,238,243,245,249},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Shop Seller",{205,155,156,167,168,176,177,179,180},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Valet",{189,252,},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
-                fcommon.ShowEntries("Worker",{16,50,61,253,255},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.CabDriver"),{182,206,220,234,261,262},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.Construction"),{27,153,260},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.Croupier"),{11,171,172},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.ClothesSeller"),{211,217},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.FireFighter"),{277,278,279},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.LawEnforcement"),{71,265,266,267,280,281,282,283,284,285,286,287,288},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.LifeGuard"),{97,251},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.Medic"),{274,275,276},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.Prostitute"),{63,64,75,85,87,152,178,207,237,238,243,245,249},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.ShopSeller"),{205,155,156,167,168,176,177,179,180},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.Valet"),{189,252,},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("peds.Worker"),{16,50,61,253,255},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
                 imgui.EndChild()
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem('Other') then
+        if imgui.BeginTabItem(flanguage.GetText("common.Misc")) then
             imgui.Spacing()
             if imgui.BeginChild("Other list Window") then
-                fcommon.ShowEntries("Misc",{0,1,2,7,19,23,26,35,49,62,68,70,76,144,145,146,209,210,214,263,268,272},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("common.Misc"),{0,1,2,7,19,23,26,35,49,62,68,70,76,144,145,146,209,210,214,263,268,272},100,60,fpeds.tpeds.images,fpeds.tpeds.path,".jpg",fplayer.ChangePlayerModel,fpeds.GetName,true)
                 imgui.EndChild()
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem('Search') then
+        if imgui.BeginTabItem(flanguage.GetText('common.Search')) then
             imgui.Spacing()
             imgui.Columns(1)
-            if imgui.InputText("Search",tplayer.skins.search_text,ffi.sizeof(tplayer.skins.search_text)) then end
+            if imgui.InputText(flanguage.GetText("common.Search"),tplayer.skins.search_text,ffi.sizeof(tplayer.skins.search_text)) then end
 			imgui.SameLine()
 
 			imgui.Spacing()
-			imgui.Text("Found entries:(" .. ffi.string(tplayer.skins.search_text) .. ")")
+			imgui.Text(flanguage.GetText("common.FoundEntries") .. ":(" .. ffi.string(tplayer.skins.search_text) .. ")")
 			imgui.Separator()
             imgui.Spacing()
             if imgui.BeginChild("Skin Entries") then
@@ -619,7 +619,7 @@ function SkinChangerMenu()
 end
 
 function WalkingStyle()
-    if imgui.Combo("Walking Style", tplayer.style.walking.selected,tplayer.style.walking.list,#tplayer.style.walking.names) then
+    if imgui.Combo(flanguage.GetText("player.WalkingStyle"), tplayer.style.walking.selected,tplayer.style.walking.list,#tplayer.style.walking.names) then
         writeMemory(0x609A4E,4,-1869574000,true)
         writeMemory(0x609A52,2,37008,true)
         requestAnimation(tplayer.style.walking.names[tplayer.style.walking.selected[0]+1])
@@ -632,7 +632,7 @@ end
 
 function FightingStyle()
 
-    if imgui.Combo("Fighting Style", tplayer.style.fighting.selected,tplayer.style.fighting.list,#tplayer.style.fighting.names) then
+    if imgui.Combo(flanguage.GetText("player.FightingStyle"), tplayer.style.fighting.selected,tplayer.style.fighting.list,#tplayer.style.fighting.names) then
         giveMeleeAttackToChar(PLAYER_PED,tplayer.style.fighting.selected[0]+4,6)
         fcommon.CheatActivated()
     end
@@ -643,115 +643,116 @@ function module.PlayerMain()
 
     if imgui.BeginTabBar('Player') then
 
-        if imgui.BeginTabItem('Checkboxes') then
+        if imgui.BeginTabItem(flanguage.GetText("common.Checkboxes")) then
             imgui.Spacing()
             imgui.Columns(2,nil,false)
-
-            if imgui.Checkbox("God Mode",tplayer.god) then fcommon.CheatActivated() end
-            fcommon.CheckBox({ address = 0xB7CEE4,name = "Infinite run"})
-            fcommon.CheckBox({ address = 0x969178,name = "Infinite ammo"})
-            fcommon.CheckBox({ address = 0x96916D,name = "Infinite health"})
-            fcommon.CheckBox({ address = 0x96916E,name = "Infinite oxygen"})
-            fcommon.CheckBox({ address = getCharPointer(PLAYER_PED)+0x598,name = "Lock player control"})
+            fcommon.CheckBox({ address = 0x969179,name = flanguage.GetText("player.AimWhileDriving")})
+            fcommon.CheckBox({ address = 0xB7CEE6,name = flanguage.GetText("player.FireProof")})
+            fcommon.CheckBox({ var = tplayer.god,name  = flanguage.GetText("player.GodMode")})
+            fcommon.CheckBox({ address = 0x969161,name = flanguage.GetText("player.HigherCycleJumps")})
+            fcommon.CheckBox({ address = 0x969178,name = flanguage.GetText("player.InfiniteAmmo")}) 
+            fcommon.CheckBox({ address = 0x96916D,name = flanguage.GetText("player.InfiniteHealth")})
 
             imgui.NextColumn()
 
-            fcommon.CheckBox({ address = 0xB7CEE6,name = "Fireproof",help_text = "Player is immue to fire."})
-            fcommon.CheckBox({ address = 0x96916C,name = "Mega jump"})
-            fcommon.CheckBox({ address = 0x969173,name = "Mega punch"})
-            fcommon.CheckBox({ address = 0x969161,name = "Huge bunny hop",help_text = "Huge cycle jumps."})
-            fcommon.CheckBox({ address = 0x969174,name = "Never get hungry"})
-            fcommon.CheckBox({ address = 0x969179,name = "Aim while driving",help_text = "Player can shoot while driving."})
+            fcommon.CheckBox({ address = 0x96916E,name = flanguage.GetText("player.InfiniteOxygen")})
+            fcommon.CheckBox({ address = 0xB7CEE4,name = flanguage.GetText("player.InfiniteRun")})
+            fcommon.CheckBox({ address = getCharPointer(PLAYER_PED)+0x598,name = flanguage.GetText("player.LockPlayerControl")})
+            fcommon.CheckBox({ address = 0x96916C,name = flanguage.GetText("player.MegaJump")})
+            fcommon.CheckBox({ address = 0x969173,name = flanguage.GetText("player.MegaPunch")})
+            fcommon.CheckBox({ address = 0x969174,name = flanguage.GetText("player.NeverGetHungry")})
+           
             imgui.Columns(1)
 
             imgui.Spacing()
             imgui.Separator()
             imgui.Spacing()
-            imgui.Text("Body")
-            if imgui.RadioButtonIntPtr("Fat",tplayer.cjBody,1) then
+            imgui.Text(flanguage.GetText("player.Body"))
+            if imgui.RadioButtonIntPtr(flanguage.GetText("player.Fat"),tplayer.cjBody,1) then
                 callFunction(0x439110,1,1,false)
                 fcommon.CheatActivated()
             end
-            if imgui.RadioButtonIntPtr("Muscle",tplayer.cjBody,2) then
+            if imgui.RadioButtonIntPtr(flanguage.GetText("player.Muscle"),tplayer.cjBody,2) then
                 -- body not changing to muscular after changing to fat fix
                 callFunction(0x439190,1,1,false)
                 callFunction(0x439150,1,1,false)
                 fcommon.CheatActivated()
             end
-            if imgui.RadioButtonIntPtr("Skinny",tplayer.cjBody,3) then
+            if imgui.RadioButtonIntPtr(flanguage.GetText("player.Skinny"),tplayer.cjBody,3) then
                 callFunction(0x439190,1,1,false)
                 fcommon.CheatActivated()
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem('Menu') then
+        if imgui.BeginTabItem(flanguage.GetText("common.Menus")) then
             imgui.Spacing()
-            fcommon.UpdateAddress({name = "Money",address = 0xB7CE50,size = 4})
+            
+            fcommon.UpdateStat({ name = flanguage.GetText("player.Energy"),stat = 165})
+            fcommon.UpdateStat({ name = flanguage.GetText("player.Fat"),stat = 21})
             HealthArmour()
-            fcommon.UpdateStat({ name = "Energy",stat = 165})
-            fcommon.UpdateStat({ name = "Max Health",stat = 24,max = 1450})
+            fcommon.UpdateStat({ name = flanguage.GetText("player.LungCapacity"),stat = 225})
+            fcommon.UpdateStat({ name = flanguage.GetText("player.MaxHealth"),stat = 24,max = 1450})
+            fcommon.UpdateAddress({name = flanguage.GetText("player.Money"),address = 0xB7CE50,size = 4})
+            fcommon.UpdateStat({ name = flanguage.GetText("player.Muscle"),stat = 23})
+            fcommon.UpdateStat({ name = flanguage.GetText("player.Respect"),stat = 68,max = 2450}) 
+            fcommon.UpdateStat({ name = flanguage.GetText("player.SexAppeal"),stat = 25})
+            fcommon.UpdateStat({ name = flanguage.GetText("player.Stamina"),stat = 22})
             WantedLevelMenu()
 
-            fcommon.UpdateStat({ name = "Lung Capacity",stat = 225})
-            fcommon.UpdateStat({ name = "Fat",stat = 21})
-            fcommon.UpdateStat({ name = "Stamina",stat = 22})
-            fcommon.UpdateStat({ name = "Muscle",stat = 23})
-            fcommon.UpdateStat({ name = "Sex Appeal",stat = 25})
-            fcommon.UpdateStat({ name = "Respect",stat = 68,max = 2450})
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem('GF') then
+        if imgui.BeginTabItem(flanguage.GetText("player.GF")) then
 
             imgui.Spacing()
-            if imgui.Button("Max GF Progress",imgui.ImVec2(fcommon.GetSize(1))) then
+            if imgui.Button(flanguage.GetText("player.MaxGFProgress"),imgui.ImVec2(fcommon.GetSize(1))) then
                 for i=252,257,1 do
                     setFloatStat(i,100)
                 end
                 clearHelp()
-                printHelpString("Girlfriend progress set to maximum")
+                fcommon.CheatActivated()
             end
             imgui.Spacing()
-            imgui.Text("Progress")
+            imgui.Text(flanguage.GetText("player.Progress"))
             imgui.Separator()
             imgui.Spacing()
-            fcommon.UpdateStat({ name = "Denise",stat = 252,max = 100})
-            fcommon.UpdateStat({ name = "Michelle",stat = 253,max = 100})
-            fcommon.UpdateStat({ name = "Helena",stat = 254,max = 100})
-            fcommon.UpdateStat({ name = "Barbara",stat = 255,max = 100})
-            fcommon.UpdateStat({ name = "Katie",stat = 256,max = 100})
-            fcommon.UpdateStat({ name = "Millie",stat = 257,max = 100})
+            fcommon.UpdateStat({ name = flanguage.GetText("player.Barbara"),stat = 255,max = 100})
+            fcommon.UpdateStat({ name = flanguage.GetText("player.Denise"),stat = 252,max = 100})
+            fcommon.UpdateStat({ name = flanguage.GetText("player.Helena"),stat = 254,max = 100})
+            fcommon.UpdateStat({ name = flanguage.GetText("player.Katie"),stat = 256,max = 100})
+            fcommon.UpdateStat({ name = flanguage.GetText("player.Michelle"),stat = 253,max = 100})
+            fcommon.UpdateStat({ name = flanguage.GetText("player.Millie"),stat = 257,max = 100})
             imgui.Spacing()
-            imgui.Text("Miscellaneous")
+            imgui.Text(flanguage.GetText("common.Misc"))
             imgui.Separator()
             imgui.Spacing()
-            fcommon.UpdateStat({ name = "GF Count",stat = 184})
-            fcommon.UpdateStat({ name = "Disastrous Dates",stat = 185})
-            fcommon.UpdateStat({ name = "Girls Dated",stat = 186})
-            fcommon.UpdateStat({ name = "Scored Dates",stat = 187})
-            fcommon.UpdateStat({ name = "Successful Dates",stat = 188})
-            fcommon.UpdateStat({ name = "Girls Dumped",stat = 189})
-            fcommon.UpdateStat({ name = "Prostitutes Visited",stat = 190})
+            fcommon.UpdateStat({ name = flanguage.GetText("player.DisastrousDates"),stat = 185})
+            fcommon.UpdateStat({ name = flanguage.GetText("player.GFCount"),stat = 184})
+            fcommon.UpdateStat({ name = flanguage.GetText("player.GirlsDated"),stat = 186})
+            fcommon.UpdateStat({ name = flanguage.GetText("player.GirlsDumped"),stat = 189})
+            fcommon.UpdateStat({ name = flanguage.GetText("player.ProstitutesVisited"),stat = 190})
+            fcommon.UpdateStat({ name = flanguage.GetText("player.ScoredDates"),stat = 187})
+            fcommon.UpdateStat({ name = flanguage.GetText("player.SuccessfulDates"),stat = 188})
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem('Skins') then
+        if imgui.BeginTabItem(flanguage.GetText("player.Skins")) then
             SkinChangerMenu()
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem('Style') then
+        if imgui.BeginTabItem(flanguage.GetText("player.Styles")) then
             imgui.Spacing()
             FightingStyle()
             WalkingStyle()
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem('Stats') then
+        if imgui.BeginTabItem(flanguage.GetText("player.Stats")) then
             imgui.Spacing()
-            if imgui.Button("Max Vehicle Skills",imgui.ImVec2(fcommon.GetSize(2))) then
+            if imgui.Button(flanguage.GetText("player.MaxVehicleSkills"),imgui.ImVec2(fcommon.GetSize(2))) then
                 callFunction(0x4399D0,1,1,false)
                 displayNonMinigameHelpMessages(false)
                 fcommon.CheatActivated()
             end
             imgui.SameLine()
-            if imgui.Button("Max Weapon Skills",imgui.ImVec2(fcommon.GetSize(2))) then
+            if imgui.Button(flanguage.GetText("player.MaxWeaponSkills"),imgui.ImVec2(fcommon.GetSize(2))) then
                 for i=69,79,1 do
                     setFloatStat(i)
                 end
@@ -761,35 +762,36 @@ function module.PlayerMain()
             if imgui.BeginTabBar("Stats") then
                 imgui.Spacing()
 
-                if imgui.BeginTabItem('Vehicle') then
-                    fcommon.UpdateStat({ name = "Driving",stat = 160})
-                    fcommon.UpdateStat({ name = "Flying",stat = 223})
-                    fcommon.UpdateStat({ name = "Bike",stat = 229})
-                    fcommon.UpdateStat({ name = "Cycling",stat = 230})
+                if imgui.BeginTabItem(flanguage.GetText("player.Vehicles")) then
+                    fcommon.UpdateStat({ name = flanguage.GetText("player.Bike"),stat = 229})
+                    fcommon.UpdateStat({ name = flanguage.GetText("player.Cycling"),stat = 230})
+                    fcommon.UpdateStat({ name = flanguage.GetText("player.Driving"),stat = 160})
+                    fcommon.UpdateStat({ name = flanguage.GetText("player.Flying"),stat = 223})        
                     imgui.EndTabItem()
                 end
-                if imgui.BeginTabItem('Weapon') then
-                    fcommon.UpdateStat({ name = "Pistol",stat = 69})
-                    fcommon.UpdateStat({ name = "Silenced Pistol",stat = 70})
-                    fcommon.UpdateStat({ name = "Desert Eagle",stat = 71})
-                    fcommon.UpdateStat({ name = "Shotgun",stat = 72})
-                    fcommon.UpdateStat({ name = "Sawn-Off Shotgun",stat = 73})
-                    fcommon.UpdateStat({ name = "Combat Shotgun",stat = 74})
-                    fcommon.UpdateStat({ name = "Machine Pistol",stat = 75})
-                    fcommon.UpdateStat({ name = "SMG",stat = 76})
-                    fcommon.UpdateStat({ name = "AK-47",stat = 77})
-                    fcommon.UpdateStat({ name = "M4",stat = 78})
-                    fcommon.UpdateStat({ name = "Rifle",stat = 79})
+                if imgui.BeginTabItem(flanguage.GetText("player.Weapons")) then
+                    fcommon.UpdateStat({ name = flanguage.GetText("player.AK47"),stat = 77})
+                    fcommon.UpdateStat({ name = flanguage.GetText("player.CombatShotgun"),stat = 74})
+                    fcommon.UpdateStat({ name = flanguage.GetText("player.DesertEagle"),stat = 71})
+                    
+                    fcommon.UpdateStat({ name = flanguage.GetText("player.MachinePistol"),stat = 75})
+                    fcommon.UpdateStat({ name = flanguage.GetText("player.M4"),stat = 78})
+                    fcommon.UpdateStat({ name = flanguage.GetText("player.Pistol"),stat = 69})
+                    fcommon.UpdateStat({ name = flanguage.GetText("player.SawnOffShotgun"),stat = 73})
+                    fcommon.UpdateStat({ name = flanguage.GetText("player.Shotgun"),stat = 72})
+                    fcommon.UpdateStat({ name = flanguage.GetText("player.SilencedPistol"),stat = 70})
+                    fcommon.UpdateStat({ name = flanguage.GetText("player.SMG"),stat = 76})
+                    fcommon.UpdateStat({ name = flanguage.GetText("player.Rifle"),stat = 79})
                     imgui.EndTabItem()
                 end
-                if imgui.BeginTabItem('Search') then
+                if imgui.BeginTabItem(flanguage.GetText("common.Search")) then
                     imgui.Spacing()
                     imgui.Columns(1)
-                    if imgui.InputText("Search",tplayer.stats.search_text,ffi.sizeof(tplayer.stats.search_text)) then end
+                    if imgui.InputText(flanguage.GetText("common.Search"),tplayer.stats.search_text,ffi.sizeof(tplayer.stats.search_text)) then end
                     imgui.SameLine()
 
                     imgui.Spacing()
-                    imgui.Text("Found entries:(" .. ffi.string(tplayer.stats.search_text) .. ")")
+                    imgui.Text(flanguage.GetText("common.FoundEntries") .. ":(" .. ffi.string(tplayer.stats.search_text) .. ")")
                     imgui.Separator()
                     imgui.Spacing()
                     if imgui.BeginChild("Stat Entries") then

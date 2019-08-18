@@ -4,7 +4,7 @@ local module = {}
 
 local tpeds =
 {
-    path   = getGameDirectory() .. "\\moonloader\\lib\\cheat-menu\\peds\\",
+    path   = tcheatMenu.dir .. "peds\\",
     images = {},
     type   =
     {
@@ -298,6 +298,11 @@ local tpeds =
         [262] = "BMOCD",
         [263] = "VWFYWA2",
         [264] = "WMOICE",
+        [265] = "TENPEN",
+        [266] = "PULASKI",
+        [267] = "HERN",
+        [268] = "DWAYNE",
+        [269] = "SMOKE",
         [271] = "RYDER",
         [274] = "LAEMT1",
         [275] = "LVEMT1",
@@ -404,24 +409,24 @@ end
 
 function module.GivePedToPlayer(model)
 
-    if fpeds.tpeds.special[model] == nil then
+    if tpeds.special[model] == nil then
         if isModelAvailable(model) then
             requestModel(model)
             loadAllModelsNow()
             x,y,z = getCharCoordinates(PLAYER_PED)
             createChar(tpeds.type.selected[0]+2,model,x,y,z)
             markModelAsNoLongerNeeded(model)
-            printHelpString("Ped ~g~Spawned")
+            printHelpString(flanguage.GetText('peds.PedSpawnedMSG'))
         end
     else
-        if not hasSpecialCharacterLoaded(290) then
-            loadSpecialCharacter(fpeds.tpeds.special[model],1)
+        if not hasSpecialCharacterLoaded(model) then
+            loadSpecialCharacter(tpeds.special[model],tpeds.type.selected[0]+2)
             loadAllModelsNow()
         end
         x,y,z = getCharCoordinates(PLAYER_PED)
-        createChar(1,290,x,y,z)
-        unloadSpecialCharacter(290)
-        printHelpString("Ped ~g~Spawned")
+        createChar(tpeds.type.selected[0]+2,model,x,y,z)
+        unloadSpecialCharacter(model)
+        printHelpString(flanguage.GetText('peds.PedSpawnedMSG'))
     end
 end
 
@@ -441,157 +446,156 @@ function module.PedsMain()
 
     if imgui.BeginTabBar("Peds") then
         imgui.Spacing()
-        if imgui.BeginTabItem("Checkboxes") then
+        if imgui.BeginTabItem(flanguage.GetText("common.Checkboxes")) then
             imgui.Columns(2,nil,false)
-            fcommon.CheckBox({ address = 0x969175,name = "Peds Riot"})
-            fcommon.CheckBox({ address = 0x96915D,name = "Slut magnet"})
-            fcommon.CheckBox({ address = 0x969157,name = "Elvis everywhere"})
-            fcommon.CheckBox({ address = 0x969140,name = "Everyone is armed"})
-            fcommon.CheckBox({ address = 0x96913F,name = "Have bounty on head"})
+            fcommon.CheckBox({ address = 0x969157,name = flanguage.GetText("peds.ElvisEverywhere")})
+            fcommon.CheckBox({ address = 0x969140,name = flanguage.GetText("peds.EveryoneIsArmed")})
+            fcommon.CheckBox({ address = 0x96915B,name = flanguage.GetText("peds.GangsControlTheStreets")})
+            fcommon.CheckBox({ address = 0x96915A,name = flanguage.GetText("peds.GangMembersEverywhere")})
+            fcommon.CheckBox({ address = 0x96913F,name = flanguage.GetText("peds.HaveBountyOnHead")})
             imgui.NextColumn()
-            fcommon.CheckBox({name = "Gang wars",var = tpeds.gangs.wars,func = function()
+            fcommon.CheckBox({name = flanguage.GetText("peds.GangWars"),var = tpeds.gangs.wars,func = function()
                 setGangWarsActive(tpeds.gangs.wars[0])
                 if tpeds.gangs.wars[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
             end})
-            fcommon.CheckBox({ address = 0x969158,name = "Peds attack with rockets"})
-            fcommon.CheckBox({ address = 0x96915B,name = "Gangs control the streets"})
-            fcommon.CheckBox({ address = 0x96915A,name = "Gang members everywhere"})
+            fcommon.CheckBox({ address = 0x969158,name = flanguage.GetText("peds.PedsAttackWithRockets")})
+            fcommon.CheckBox({ address = 0x969175,name = flanguage.GetText("peds.PedsRiot")})
+            fcommon.CheckBox({ address = 0x96915D,name = flanguage.GetText("peds.SlutMagnet")})
 
             imgui.Columns(1)
             imgui.Spacing()
             imgui.Separator()
             imgui.Spacing()
-            fcommon.RadioButton("Recruit Anyone",{"9mm","AK47","Rockets"},{0x96917C,0x96917D,0x96917E})
+            fcommon.RadioButton(flanguage.GetText("peds.RecruitAnyone"),{flanguage.GetText("peds.9mm"),flanguage.GetText("peds.AK47"),flanguage.GetText("peds.Rockets")},{0x96917C,0x96917D,0x96917E})
 
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem("Menus") then
-            fcommon.UpdateAddress({name = "Pedestrian Density",address = 0x8D2530,size = 4,max = 100,help_text = "Sets the pedestrain density in current zone."})
-            if imgui.CollapsingHeader("Zone Gang Density") then
+        if imgui.BeginTabItem(flanguage.GetText("common.Menus")) then
+            fcommon.UpdateAddress({name = flanguage.GetText("peds.PedestrianDensity"),address = 0x8D2530,size = 4,max = 100})
+            if imgui.CollapsingHeader(flanguage.GetText("peds.ZoneGangDensity")) then
                 imgui.Separator()
                 imgui.PushItemWidth(imgui.GetWindowWidth() - 200)
-                SetDensity("Ballas",0)
-                SetDensity("Grove Street Families",1)
-                SetDensity("Los Santos Vagos",2)
-                SetDensity("San Fierro Rifa",3)
-                SetDensity("Da Nang Boys",4)
-                SetDensity("Mafia",5)
-                SetDensity("Mountain Cloud Triad",6)
-                SetDensity("Varrio Los Aztecas",7)
-                SetDensity("Gang 9",8)
-                SetDensity("Gang 10",9)
+                SetDensity(flanguage.GetText("peds.Ballas"),0)
+                SetDensity(flanguage.GetText("peds.DaNangBoys"),4)
+                SetDensity(flanguage.GetText("peds.Gang9"),8)
+                SetDensity(flanguage.GetText("peds.Gang10"),9)
+                SetDensity(flanguage.GetText("peds.GroveStreetFamilies"),1)
+                SetDensity(flanguage.GetText("peds.LosSantosVagos"),2)
+                SetDensity(flanguage.GetText("peds.Mafia"),5)
+                SetDensity(flanguage.GetText("peds.MountainCloudTriad"),6)
+                SetDensity(flanguage.GetText("peds.SanFierroRifa"),3)
+                SetDensity(flanguage.GetText("peds.VarrioLosAztecas"),7)
                 imgui.PopItemWidth()
                 imgui.Spacing()
-                imgui.Text("ExGangWars plugin required to display some turf colors.")
+                imgui.Text(flanguage.GetText("peds.TurfColor"))
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem("Spawn") then
+        if imgui.BeginTabItem(flanguage.GetText("common.Spawn")) then
             imgui.Spacing()
-            if imgui.Combo("Ped type", tpeds.type.selected,tpeds.type.list,#tpeds.type.names) then end
-            imgui.Text("Peds list")
+            if imgui.Combo(flanguage.GetText("peds.PedType"), tpeds.type.selected,tpeds.type.list,#tpeds.type.names) then end
+            imgui.Text(flanguage.GetText("common.List"))
             imgui.Separator()
             imgui.Spacing()
-            if imgui.BeginTabBar("Peds List") then
-                if imgui.BeginTabItem("Gangs") then
+            if imgui.BeginTabBar("PedsList") then
+                if imgui.BeginTabItem(flanguage.GetText("peds.Gangs")) then
                     if imgui.BeginChild("Gangs list Window") then
-                        fcommon.ShowEntries("Ballas",{102,103,104},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Da Nang Boys",{121,122,123},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Groove Families",{105,106,107,269,270,271},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Los Santos Vagos",{108,109,110},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Mafia",{111,112,113},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Russian Mafia",{124,125,126,127},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("San Fierro Rifa",{173,174,175},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("San Fierro Triads",{117,118,120},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Varrios Los Aztecas",{114,115,116},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Ballas"),{102,103,104},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.DaNangBoys"),{121,122,123},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.GroveStreetFamilies"),{105,106,107,269,270,271},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.LosSantosVagos"),{108,109,110},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Mafia"),{111,112,113,124,125,126,127},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.MountainCloudTriad"),{117,118,120},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.SanFierroRifa"),{173,174,175},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.VarriosLosAztecas"),{114,115,116},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()
                 end
 
-                if imgui.BeginTabItem("Civillians") then
+                if imgui.BeginTabItem(flanguage.GetText("peds.Civilians")) then
                     if imgui.BeginChild("Civillians list Window") then
-                        fcommon.ShowEntries("Antagonist",{290,291,292,293,294,295,296,297,298,299},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Beach",{18,45,138,139,140,154},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Bouncer",{163,164,165,166},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Boxer",{80,81},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Businessman",{17,141,147,148,150,177,227},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Country",{157,158,159,160,161,162,196,197,198,199,200},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Golf",{36,37},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Grl",{190,191,192,193,194,195},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Heckler",{258,259},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Hippie",{72,73},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Jogger",{90,96},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Karate Student",{203,204},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Pol",{66,67},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Low Class Male",{32,33,34,128,132,133,202},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Low Class Female",{31,129,130,131,151,201},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Mountain Biker",{51,52},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Rich Male",{14,20,38,43,46,57,59,94,98,185,186,221,228,235,240,295},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Rich Female",{9,12,40,53,55,88,91,169,215,216,219,224,231},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Roller Blade",{92,99},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Street Male",{15,22,44,48,58,60,95,101,142,170,188,222,229,236,241,242},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Street Female",{10,13,39,41,54,56,69,76,93,218,225,226,232,233,246,256,257},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Tramp Male",{78,79,134,135,136,137,212,213,230,239},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Tramp Female",{77,256,257},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Elvis",{82,83,84},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Antagonist"),{290,291,292,293,294,295,296,297,298,299},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Beach"),{18,45,138,139,140,154},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Bouncer"),{163,164,165,166},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Boxer"),{80,81},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Businessman"),{17,141,147,148,150,177,227},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Country"),{157,158,159,160,161,162,196,197,198,199,200},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Golf"),{36,37},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Grl"),{190,191,192,193,194,195},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Heckler"),{258,259},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Hippie"),{72,73},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Jogger"),{90,96},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.KarateStudent"),{203,204},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Pol"),{66,67},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.LowClassMale"),{32,33,34,128,132,133,202},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.LowClassFemale"),{31,129,130,131,151,201},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.MountainBiker"),{51,52},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.RichMale"),{14,20,38,43,46,57,59,94,98,185,186,221,228,235,240,295},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.RichFemale"),{9,12,40,53,55,88,91,169,215,216,219,224,231},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.RollerBlade"),{92,99},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.StreetMale"),{15,22,44,48,58,60,95,101,142,170,188,222,229,236,241,242},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.StreetFemale"),{10,13,39,41,54,56,69,76,93,218,225,226,232,233,246,256,257},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.TrampMale"),{78,79,134,135,136,137,212,213,230,239},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.TrampFemale"),{77,256,257},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Elvis"),{82,83,84},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()
                 end
-                if imgui.BeginTabItem("Criminals") then
+                if imgui.BeginTabItem(flanguage.GetText("peds.Criminals")) then
                     if imgui.BeginChild("Criminals list Window") then
-                        fcommon.ShowEntries("Biker",{247,248},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Body Guard",{24,25},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Criminal",{21,47,100,143,181,183,184,223,250},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Drug Dealer",{28,29,30,154},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Biker"),{247,248},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.BodyGuard"),{24,25},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Criminal"),{21,47,100,143,181,183,184,223,250},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.DrugDealer"),{28,29,30,154},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()
                 end
 
-                if imgui.BeginTabItem("Jobs") then
+                if imgui.BeginTabItem(flanguage.GetText("peds.Jobs")) then
                     if imgui.BeginChild("Jobs list Window") then
-                        fcommon.ShowEntries("Cab Driver",{182,206,220,234,261,262},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Construction",{27,153,260},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Croupier",{11,171,172},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Clothes Seller",{211,217},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Fire Fighter",{277,278,279},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Law Enforcement",{71,265,266,267,280,281,282,283,284,285,286,287,288},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Life Guard",{97,251},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Medic",{274,275,276},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Prostitute",{63,64,75,85,87,152,178,207,237,238,243,245,249},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Shop Seller",{205,155,156,167,168,176,177,179,180},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Valet",{189,252,},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
-                        fcommon.ShowEntries("Worker",{16,50,61,253,255},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.CabDriver"),{182,206,220,234,261,262},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Construction"),{27,153,260},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Croupier"),{11,171,172},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.ClothesSeller"),{211,217},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.FireFighter"),{277,278,279},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.LawEnforcement"),{71,265,266,267,280,281,282,283,284,285,286,287,288},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.LifeGuard"),{97,251},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Medic"),{274,275,276},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Prostitute"),{63,64,75,85,87,152,178,207,237,238,243,245,249},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.ShopSeller"),{205,155,156,167,168,176,177,179,180},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Valet"),{189,252,},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("peds.Worker"),{16,50,61,253,255},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()
                 end
-                if imgui.BeginTabItem("Misc") then
+                if imgui.BeginTabItem(flanguage.GetText("common.Misc")) then
                     if imgui.BeginChild("Misc list Window") then
-                        fcommon.ShowEntries("Misc",{0,1,2,7,19,23,26,35,49,62,68,70,76,144,145,146,209,210,214,263,268,272},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        fcommon.ShowEntries(flanguage.GetText("common.Misc"),{0,1,2,7,19,23,26,35,49,62,68,70,76,144,145,146,209,210,214,263,268,272},100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true)
+                        imgui.EndChild()
+                    end
+                    imgui.EndTabItem()
+                end
+                if imgui.BeginTabItem(flanguage.GetText("common.Search")) then
+                    imgui.Spacing()
+                    imgui.Columns(1)
+                    if imgui.InputText(flanguage.GetText("common.Search"),tpeds.search_text,ffi.sizeof(tpeds.search_text)) then end
+                    imgui.SameLine()
+        
+                    imgui.Spacing()
+                    imgui.Text(flanguage.GetText("common.FoundEntries") .. ":(" .. ffi.string(tpeds.search_text) .. ")")
+                    imgui.Separator()
+                    imgui.Spacing()
+                    if imgui.BeginChild("Ped entries") then
+                        fcommon.ShowEntries(nil,tpeds.models,100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true,tpeds.search_text)
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()
                 end
                 imgui.EndTabBar()
-            end
-            imgui.EndTabItem()
-        end
-        if imgui.BeginTabItem('Search') then
-            imgui.Spacing()
-            imgui.Columns(1)
-            if imgui.InputText("Search",tpeds.search_text,ffi.sizeof(tpeds.search_text)) then end
-			imgui.SameLine()
-
-			imgui.Spacing()
-			imgui.Text("Found entries:(" .. ffi.string(tpeds.search_text) .. ")")
-			imgui.Separator()
-            imgui.Spacing()
-            if imgui.BeginChild("Ped Entries") then
-                fcommon.ShowEntries(nil,tpeds.models,100,60,tpeds.images,tpeds.path,".jpg",fpeds.GivePedToPlayer,fpeds.GetName,true,tpeds.search_text)
-                imgui.EndChild()
             end
             imgui.EndTabItem()
         end
