@@ -12,12 +12,17 @@ Take a look [here](https://github.com/inanahammad/Cheat-Menu/wiki/Installation) 
 - [GTA Forums](https://gtaforums.com/topic/930023-mooncheat-menu/)
 - [Mixmods](https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu)
 
-## Note 
-[master](https://github.com/inanahammad/Cheat-Menu/tree/master) branch should be mostly stable and download from there to get the most upto and stable version.
+
+### Images
+![Image](https://i.imgur.com/zY2ij0V.jpg)
+![Image](https://i.imgur.com/YLSjCQM.jpg)
+![Image](https://i.imgur.com/tz4FsNj.jpg)
+![Image](https://i.imgur.com/9JWR9fa.jpg)
 
 
-Screenshots can be found [here](https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu#p13262)
-Youtube video [here](https://www.youtube.com/watch?v=XF1bhn74s2M)
+### Youtube
+[![Youtue Video](https://img.youtube.com/vi/XF1bhn74s2M/0.jpg)](https://www.youtube.com/watch?v=XF1bhn74s2M)
+
 
 ### License
 ![GNU v3.0](https://img.shields.io/badge/license-GNU-blue.svg?style=flat)
