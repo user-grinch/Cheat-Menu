@@ -8,6 +8,7 @@
         "Close"                     : "Close",
         "ConfigLoadFailure"         : "~r~Unable~w~ to load config file",
         "Coordinates"               : "Coordinates",
+        "CoordSave"                 : "Coordinates ~g~saved",
         "Custom"                    : "Custom",
         "FPS"                       : "Frames",
         "Game"                      : "Game",
@@ -58,7 +59,7 @@
         "InsertCoordinates"         : "Insert coordinates",       
         "InsertCoordinatesToolTip"  : "Insert current coordinates",    
         "QuickTeleport"             : "Quick teleport",     
-        "QuickTeleportToolTip"      : "Teleport to marker can be quickly accessed by pressing (X + Y) key combinartion", 
+        "QuickTeleportToolTip"      : "Teleport to marker using (X + Y) key combinartion", 
         "Teleport"                  : "Teleport",       
         "TeleportToCoord"           : "Teleport to coord",    
         "TeleportToMarker"          : "Teleport to marker"
@@ -87,8 +88,6 @@
         "AimSkinChangerToolTip"     : "Aim at a pedestrian and then press Enter/Return key to switch to that skin", 
         "AimWhileDriving"           : "Aim while driving",
         "Armour"                    : "Armour",     
-        "AttachToVehicle"           : "Attach to vehicle",
-        "AttachToVehicleToolTip"    : "You can attach player to vehicle using\n (Ctrl + A).Must be on foot.",
         "Barbara"                   : "Barbara",
         "Bike"                      : "Bike",
         "Body"                      : "Body", 
@@ -206,6 +205,7 @@
         "MuscleCars"                : "Muscle cars",            
         "NewAircraftCamera"         : "New aircraft camera",     
         "Nitros"                    : "Nitros",                 
+        "NoNearbyVehicles"          : "No nearby vehicles found",
         "NoVisualDamage"            : "No visual damage",  
         "Passenger"                 : "Passenger",   
         "PerfectHandling"           : "Perfect handling",       
@@ -481,7 +481,7 @@
         "SaveGame"                  : "Save game",
         "SaveGameOnFootCheckMSG"    : "Can't save while not on foot!",
         "ScreenshotShortcut"        : "Screenshot shortcut",
-        "ScreenshotShortcutToolTip" : "Takes screenshot when (Left Ctrl + S) is pressed.",
+        "ScreenshotShortcutToolTip" : "Take screenshot using (Left Ctrl + S) key combination",
         "ShowFPS"                   : "Show FPS",
         "Time"                      : "Time",
         "UnlockInterior"            : "Unlock Interior",
@@ -518,15 +518,17 @@
     "menu":         
     {       
         "AutoReload"                : "Auto reload",
-        "AutoReloadToolTip"         : "Script would automatically reload itself if any crash occurs.Might cause issues.",
+        "AutoReloadToolTip"         : "Script will automatically reload itself if\nany crash occurs(Might cause issues)",
         "Config"                    : "Config",
+        "Customize"                 : "Customize",
+        "DisableInSAMP"             : "Disable in SA-MP",
         "Language"                  : "Language",
         "LanguageLoaded"            : "~g~Loaded",
         "LanguageLoadFailure"       : "~r~Unable~w~ to load language",
+        "Overlay"                   : "Overlay",
         "ShowCrashMessage"          : "Show crash message",
-        "ShowTooltips"              : "Show tooltips",
-        "Customize"                 : "Customize",
-        "DisableInSAMP"             : "Disable in SA-MP"
+        "ShowTooltips"              : "Show tooltips"
+        
     },      
     
     "about":        

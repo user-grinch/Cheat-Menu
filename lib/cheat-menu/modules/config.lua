@@ -29,7 +29,7 @@ function module.write()
                 {
                     main     = tcheatMenu.window.overlay.main[0],
                     distance = tcheatMenu.window.overlay.distance,
-                    corner   = tcheatMenu.window.overlay.corner,
+                    corner   = tcheatMenu.window.overlay.corner[0],
                 },
             },
 

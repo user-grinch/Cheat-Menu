@@ -374,8 +374,7 @@ function module.GameMain()
                         memory.write(0xC1704C,(tgame.fps.limit[0]+1),1)
                         memory.write(0xBA6794,1,1)
                     end
-                    if imgui.Checkbox(flanguage.GetText('game.ShowFPS'),tgame.fps.bool) then
-                    end
+                    fcommon.CheckBox({name = flanguage.GetText('game.ShowFPS'),var = tgame.fps.bool})
                     if tgame.fps.limit[0] < 0 then
                         tgame.fps.limit[0] = 0
                     end

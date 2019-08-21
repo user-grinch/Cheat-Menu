@@ -70,7 +70,7 @@ end
 function module.InformationTooltip(text)
     if fmenu.tmenu.show_tooltips[0] then
         imgui.SameLine()
-        imgui.TextColored(imgui.ImVec4(150,150,150,255),'(?)')
+        imgui.TextColored(imgui.ImVec4(128,128,128,0.3),'(?)')
         if imgui.IsItemHovered() then
             imgui.BeginTooltip()
             imgui.Spacing()
@@ -192,16 +192,18 @@ function module.ShowEntries(title,model_table,height,width,store_table,image_pat
                 for j=1,#model_table,1 do
                     if store_table[tostring(model_table[j])] ~= nil then
                         if (search_text == "") or (string.upper(func_show_tooltip(model_table[j])):find(string.upper(ffi.string(search_text))) ~= nil) then
-                            if IsValidModForVehicle(model_table[j]) or skip_check == true then
+                            if skip_check == true or IsValidModForVehicle(model_table[j]) then
                                 if imgui.ImageButton(store_table[tostring(model_table[j])],imgui.ImVec2(width,height),imgui.ImVec2(0,0),imgui.ImVec2(1,1),1,imgui.ImVec4(1,1,1,1),imgui.ImVec4(1,1,1,1)) then
                                     func_load_model(model_table[j])
                                 end
-
+                                
                                 if func_show_tooltip ~= nil then
                                     if imgui.IsItemHovered() then
-                                        imgui.BeginTooltip()
-                                        imgui.SetTooltip(func_show_tooltip(model_table[j]))
-                                        imgui.EndTooltip()
+                                        if func_show_tooltip(model_table[j]) ~= "" then
+                                            imgui.BeginTooltip()
+                                            imgui.SetTooltip(func_show_tooltip(model_table[j]))
+                                            imgui.EndTooltip()
+                                        end
                                     end
                                 end
                             end

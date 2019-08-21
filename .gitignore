@@ -40,3 +40,5 @@ luac.out
 *.hex
 
 lib/cheat-menu/modules/tuple.lua
+lib/cheat-menu/cheat-menu.json
+lib/cheat-menu/fonts/NotoSansCJKjp-Medium.otf

@@ -19,7 +19,16 @@ end
 
 module.tweapons = tweapons
 
-local flibweapons = require 'lib.game.weapons'
+local flibweapons = require 'libstd.game.weapons'
+
+function module.GetName(id)
+    local name = flibweapons.get_name(id)
+    if name == nil then 
+        return ""
+    else
+        return name
+    end
+end
 
 function module.CBaseWeaponInfo(name)
 
@@ -32,13 +41,15 @@ function module.CBaseWeaponInfo(name)
 end
 
 function module.GiveWeaponToPlayer(weapon)
-    model = getWeapontypeModel(weapon)
-    if isModelAvailable(model) then
-        requestModel(model)
-        loadAllModelsNow()
-        giveWeaponToChar(PLAYER_PED,weapon,99999)
-        markModelAsNoLongerNeeded(model)
-        fcommon.CheatActivated()
+    if module.GetName(weapon) ~= "" then
+        model = getWeapontypeModel(weapon)
+        if isModelAvailable(model) then
+            requestModel(model)
+            loadAllModelsNow()
+            giveWeaponToChar(PLAYER_PED,weapon,99999)
+            markModelAsNoLongerNeeded(model)
+            fcommon.CheatActivated()
+        end
     end
 end
 
@@ -122,15 +133,15 @@ function module.WeaponsMain()
             imgui.Separator()
             imgui.Spacing()
             if imgui.BeginChild("Weapon list Window") then
-                fcommon.ShowEntries(flanguage.GetText("weapons.AssaultRifles"),{30,31},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true)
-                fcommon.ShowEntries(flanguage.GetText("weapons.Handguns"),{22,23,24},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true)
-                fcommon.ShowEntries(flanguage.GetText("weapons.HeavyWeapons"),{35,36,37,38},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true)
-                fcommon.ShowEntries(flanguage.GetText("weapons.Melee"),{1,2,3,4,6,7,8,9},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true)
-                fcommon.ShowEntries(flanguage.GetText("weapons.Miscellaneous"),{10,11,12,14,15,41,42,43,44,45,46},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true)
-                fcommon.ShowEntries(flanguage.GetText("weapons.Projectiles"),{16,17,18,39},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true)
-                fcommon.ShowEntries(flanguage.GetText("weapons.Shotguns"),{25,26,27},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true)
-                fcommon.ShowEntries(flanguage.GetText("weapons.SubMachineGuns"),{28,29,32},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true)
-                fcommon.ShowEntries(flanguage.GetText("weapons.Rifles"),{33,34},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true)
+                fcommon.ShowEntries(flanguage.GetText("weapons.AssaultRifles"),{30,31},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,fweapons.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("weapons.Handguns"),{22,23,24},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,fweapons.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("weapons.HeavyWeapons"),{35,36,37,38},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,fweapons.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("weapons.Melee"),{1,2,3,4,6,7,8,9},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,fweapons.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("weapons.Miscellaneous"),{10,11,12,14,15,41,42,43,44,45,46},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,fweapons.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("weapons.Projectiles"),{16,17,18,39},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,fweapons.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("weapons.Shotguns"),{25,26,27},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,fweapons.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("weapons.SubMachineGuns"),{28,29,32},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,fweapons.GetName,true)
+                fcommon.ShowEntries(flanguage.GetText("weapons.Rifles"),{33,34},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,fweapons.GetName,true)
                 imgui.EndChild()
             end
             imgui.EndTabItem()
@@ -146,7 +157,7 @@ function module.WeaponsMain()
             imgui.Separator()
             imgui.Spacing()
             if imgui.BeginChild("Weapon Entries") then
-                fcommon.ShowEntries(nil,tweapons.models,65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,flibweapons.get_name,true,tweapons.search_text)
+                fcommon.ShowEntries(nil,tweapons.models,65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,fweapons.GetName,true,tweapons.search_text)
                 imgui.EndChild()
             end
             imgui.EndTabItem()

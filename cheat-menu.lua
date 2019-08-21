@@ -25,18 +25,10 @@ tkeys =
     airbreak_up       = 0x26, -- Arrow up 
     airbreak_down     = 0x28, -- Arrow down 
     aircraft_zoom     = 0x56, -- V
+    coord_copy_key    = 0x43, -- C 
 }
 
 resX,resY = getScreenResolution()
-
-
--- Download dependencies if missing
-require 'deps'
-{
-    'fyp:mimgui',
-    'fyp:moonadditions',
-}
-
 
 -- Script Dependencies
 ffi           = require "ffi"
@@ -94,7 +86,9 @@ tcheatMenu =
         {
             main     = imgui.new.bool(true),
             distance = fconfig.get('tcheatMenu.window.overlay.distance',10.0),
-            corner   = fconfig.get('tcheatMenu.window.overlay.corner',0),
+            corner   = imgui.new.int(fconfig.get('tcheatMenu.window.overlay.corner',0)),
+            names    = {"Custom","TopLeft","TopRight","BottomLeft","BottomRight","Close"},
+            list     = {},
         },
     },
     menubuttons =
@@ -103,6 +97,8 @@ tcheatMenu =
     },
     font_path  =  tcheatMenu.dir .. "fonts//",
 }
+
+tcheatMenu.window.overlay.list = imgui.new['const char*'][#tcheatMenu.window.overlay.names](tcheatMenu.window.overlay.names)
 
 function ternary ( cond , T , F )
     if cond then return T else return F end
@@ -165,9 +161,9 @@ function() -- render frame
         --Overlay window
         if tcheatMenu.window.overlay.main[0] then
             if fgame.tgame.fps.bool[0] or fvisuals.tvisuals.show_coordinates[0] or (( fvehicles.tvehicles.show.speed[0] or fvehicles.tvehicles.show.health[0]) and isCharInAnyCar(PLAYER_PED)) then
-                if (tcheatMenu.window.overlay.corner ~= -1) then
-                    window_pos       = imgui.ImVec2(ternary((tcheatMenu.window.overlay.corner == 1 or tcheatMenu.window.overlay.corner == 3),resX - tcheatMenu.window.overlay.distance,tcheatMenu.window.overlay.distance),ternary((tcheatMenu.window.overlay.corner == 2 or tcheatMenu.window.overlay.corner == 3),resY - tcheatMenu.window.overlay.distance,tcheatMenu.window.overlay.distance))
-                    window_pos_pivot = imgui.ImVec2(ternary((tcheatMenu.window.overlay.corner == 1 or tcheatMenu.window.overlay.corner == 3),1.0,0.0),ternary((tcheatMenu.window.overlay.corner == 2 or tcheatMenu.window.overlay.corner == 3),1.0,0.0))
+                if (tcheatMenu.window.overlay.corner[0] ~= 0) then
+                    window_pos       = imgui.ImVec2(ternary((tcheatMenu.window.overlay.corner[0] == 2 or tcheatMenu.window.overlay.corner[0] == 4),resX - tcheatMenu.window.overlay.distance,tcheatMenu.window.overlay.distance),ternary((tcheatMenu.window.overlay.corner[0] == 3 or tcheatMenu.window.overlay.corner[0] == 4),resY - tcheatMenu.window.overlay.distance,tcheatMenu.window.overlay.distance))
+                    window_pos_pivot = imgui.ImVec2(ternary((tcheatMenu.window.overlay.corner[0] == 2 or tcheatMenu.window.overlay.corner[0] == 4),1.0,0.0),ternary((tcheatMenu.window.overlay.corner[0] == 3 or tcheatMenu.window.overlay.corner[0] == 4),1.0,0.0))
                     imgui.SetNextWindowPos(window_pos,0,window_pos_pivot)
                 end
                 imgui.PushStyleVarFloat(imgui.StyleVar.Alpha,0.65)
@@ -199,11 +195,11 @@ function() -- render frame
                     if imgui.BeginPopupContextWindow() then
                         imgui.Text(flanguage.GetText("cheatmenu.Position"))
                         imgui.Separator()
-                        if (imgui.MenuItemBool(flanguage.GetText("cheatmenu.Custom"),nil,tcheatMenu.window.overlay.corner == -1)) then tcheatMenu.window.overlay.corner = -1 end
-                        if (imgui.MenuItemBool(flanguage.GetText("cheatmenu.TopLeft"),nil,tcheatMenu.window.overlay.corner == 0)) then tcheatMenu.window.overlay.corner = 0 end
-                        if (imgui.MenuItemBool(flanguage.GetText("cheatmenu.TopRight"),nil,tcheatMenu.window.overlay.corner == 1)) then tcheatMenu.window.overlay.corner = 1 end
-                        if (imgui.MenuItemBool(flanguage.GetText("cheatmenu.BottomLeft"),nil,tcheatMenu.window.overlay.corner == 2)) then tcheatMenu.window.overlay.corner = 2 end
-                        if (imgui.MenuItemBool(flanguage.GetText("cheatmenu.BottomRight"),nil,tcheatMenu.window.overlay.corner == 3)) then tcheatMenu.window.overlay.corner = 3 end
+                        if (imgui.MenuItemBool(flanguage.GetText("cheatmenu.Custom"),nil,tcheatMenu.window.overlay.corner[0] == 0)) then tcheatMenu.window.overlay.corner[0] = 0 end
+                        if (imgui.MenuItemBool(flanguage.GetText("cheatmenu.TopLeft"),nil,tcheatMenu.window.overlay.corner[0] == 1)) then tcheatMenu.window.overlay.corner[0] = 1 end
+                        if (imgui.MenuItemBool(flanguage.GetText("cheatmenu.TopRight"),nil,tcheatMenu.window.overlay.corner[0] == 2)) then tcheatMenu.window.overlay.corner[0] = 2 end
+                        if (imgui.MenuItemBool(flanguage.GetText("cheatmenu.BottomLeft"),nil,tcheatMenu.window.overlay.corner[0] == 3)) then tcheatMenu.window.overlay.corner[0] = 3 end
+                        if (imgui.MenuItemBool(flanguage.GetText("cheatmenu.BottomRight"),nil,tcheatMenu.window.overlay.corner[0] == 4)) then tcheatMenu.window.overlay.corner[0] = 4 end
                         if  imgui.MenuItemBool(flanguage.GetText("cheatmenu.Close")) then
                             fgame.tgame.fps.bool[0] = false
                             fvehicles.tvehicles.show.speed[0] = false
@@ -233,12 +229,9 @@ function main()
     end
 
     while true do
-        if not isGamePaused() then
-            if tcheatMenu.window.main[0] then
-                showCursor(true)
-            else
-                showCursor(false)
-            end
+
+        if not isGamePaused() and tcheatMenu.window.main[0] then
+            showCursor(true)
         else
             showCursor(false)
         end
@@ -264,6 +257,13 @@ function main()
         and isKeyDown(tkeys.teleport_key2) then
             fcommon.KeyWait(tkeys.teleport_key1,tkeys.teleport_key2)
             fteleport.Teleport()
+        end
+
+        if isKeyDown(tkeys.control_key)
+        and isKeyDown(tkeys.coord_copy_key) then
+            fcommon.KeyWait(tkeys.control_key,tkeys.ss_shortcut)
+            setClipboardText(ffi.string(fteleport.tteleport.coords))
+            printHelpString(flanguage.GetText('cheatmenu.CoordSave'))
         end
 
         if fplayer.tplayer.god[0] then
@@ -351,7 +351,6 @@ function main()
         wait(0)
     end
 end
-
 
 function onScriptTerminate(script, quitGame)
     if script == thisScript() then

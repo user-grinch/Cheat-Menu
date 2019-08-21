@@ -353,15 +353,14 @@ function module.Teleport(x, y, z,interior_id)
 		z = getGroundZFor3dCoord(x, y, z)
 	end
 
-	if x ~= 0 and y ~= 0 then
-		setCharInterior(PLAYER_PED,interior_id)
-		setInteriorVisible(interior_id)
-		clearExtraColours(true)
-		requestCollision(x,y)
-		loadScene(x,y,z)
-		activateInteriorPeds(true)
-        setCharCoordinates(PLAYER_PED, x, y, z)
-    end
+	setCharInterior(PLAYER_PED,interior_id)
+	setInteriorVisible(interior_id)
+	clearExtraColours(true)
+	requestCollision(x,y)
+	activateInteriorPeds(true)
+	setCharCoordinates(PLAYER_PED, x, y, z)
+	--loadScene(x,y,z)
+
 end
 
 
