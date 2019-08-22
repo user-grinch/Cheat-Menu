@@ -236,7 +236,7 @@ function SetTime()
         local hour = imgui.new.int(memory.read(0xB70153,1))
         local minute = imgui.new.int(memory.read(0xB70152,1))
 
-        fcommon.CheckBox({ address = 0x96913B,name = flangugae.GetText('game.FasterClock')})
+        fcommon.CheckBox({ address = 0x96913B,name = flanguage.GetText('game.FasterClock')})
         imgui.SameLine()
         fcommon.CheckBox({ address = 0x969168,name = flanguage.GetText('game.FreezeTime')})
         if imgui.InputInt(flanguage.GetText('game.CurrentHour'),hour) then
