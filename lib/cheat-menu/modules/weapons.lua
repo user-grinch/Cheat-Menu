@@ -18,14 +18,15 @@ for i = 1,46,1 do
 end
 
 module.tweapons = tweapons
-print(tostring(getMoonloaderVersion()))
-if getMoonloaderVersion() < 27 then
-    local flibweapons = require 'lib.game.weapons'
-else
-    local flibweapons = require 'libstd.game.weapons'
-end
 
 function module.GetName(id)
+    local flibweapons = nil
+    if getMoonloaderVersion() < 27 then
+        flibweapons = require 'lib.game.weapons'
+    else
+        flibweapons = require 'libstd.game.weapons'
+    end
+
     local name = flibweapons.get_name(id)
     if name == nil then 
         return ""
