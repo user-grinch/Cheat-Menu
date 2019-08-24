@@ -4,6 +4,13 @@ local module = {}
 
 local tmenu =
 {
+	overlay = 
+	{
+		health = imgui.new.bool(fconfig.get('tmenu.overlay.health',false)),
+		speed = imgui.new.bool(fconfig.get('tmenu.overlay.speed',false)),
+		coordinates = imgui.new.bool(fconfig.get('tmenu.overlay.coordinates',false)),
+		fps  = imgui.new.bool(fconfig.get('tmenu.overlay.fps',false)),
+	},
 	auto_reload 		= imgui.new.bool(fconfig.get('tmenu.auto_reload',true)),
 	show_tooltips	    = imgui.new.bool(fconfig.get('tmenu.show_tooltips',true)),
 	show_crash_message  = imgui.new.bool(fconfig.get('tmenu.show_crash_message',true)),
@@ -31,11 +38,11 @@ function module.MenuMain()
 		if imgui.BeginTabItem(flanguage.GetText('menu.Overlay')) then
 			imgui.Columns(2,nil,false)
 			imgui.Spacing()
-			fcommon.CheckBox({ name = flanguage.GetText('visuals.ShowCoordinates'),var = fvisuals.tvisuals.show_coordinates,show_help_popups = true,help_text = "Draws coordinates on-screen.\n\nOptions:\nPressing (Left Ctrl + C) stores coords to clipboard."})
-			fcommon.CheckBox({name = flanguage.GetText('game.ShowFPS'),var = fgame.tgame.fps.bool})	
+			fcommon.CheckBox({ name = flanguage.GetText('menu.ShowCoordinates'),var = tmenu.overlay.coordinates,show_help_popups = true,help_text = "Draws coordinates on-screen.\n\nOptions:\nPressing (Left Ctrl + C) stores coords to clipboard."})
+			fcommon.CheckBox({name = flanguage.GetText('menu.ShowFPS'),var = tmenu.overlay.fps})	
 			imgui.NextColumn()
-			fcommon.CheckBox({name = flanguage.GetText("vehicles.ShowHealth"),var = fvehicles.tvehicles.show.health})
-			fcommon.CheckBox({name = flanguage.GetText("vehicles.ShowSpeed"),var = fvehicles.tvehicles.show.speed})
+			fcommon.CheckBox({name = flanguage.GetText("menu.ShowHealth"),var = tmenu.overlay.health})
+			fcommon.CheckBox({name = flanguage.GetText("menu.ShowSpeed"),var = tmenu.overlay.speed})
 			imgui.Columns(1)	
 			
 			imgui.Spacing()

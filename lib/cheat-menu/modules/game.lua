@@ -14,7 +14,6 @@ local tgame =
               },
     fps =
     {
-        bool  = imgui.new.bool(fconfig.get('tgame.fps.bool',false)),
         limit = imgui.new.int(fconfig.get('tgame.fps.limit',30)),
     },
     airbreak = imgui.new.bool(false),
@@ -367,22 +366,21 @@ function module.GameMain()
             if imgui.BeginChild("Game") then
                 imgui.Spacing()
 
-                fcommon.UpdateAddress({name = flanguage.GetText('game.DaysPassed'),address = 0xB79038 ,size = 4,max = 10000})
+                fcommon.UpdateAddress({name = flanguage.GetText('game.DaysPassed'),address = 0xB79038 ,size = 4,min = 0,max = 1000})
                 fcommon.DropDownMenu(flanguage.GetText('game.FPS'),function()
                     imgui.Spacing()
                     if imgui.InputInt(flanguage.GetText('game.FPSLimit'),tgame.fps.limit) then
                         memory.write(0xC1704C,(tgame.fps.limit[0]+1),1)
                         memory.write(0xBA6794,1,1)
                     end
-                    fcommon.CheckBox({name = flanguage.GetText('game.ShowFPS'),var = tgame.fps.bool})
                     if tgame.fps.limit[0] < 0 then
                         tgame.fps.limit[0] = 0
                     end
                 end)
-                fcommon.UpdateAddress({name = flanguage.GetText('game.GameSpeed'),address = 0xB7CB64,size = 4,max = 100,min = 0, is_float =true})
+                fcommon.UpdateAddress({name = flanguage.GetText('game.GameSpeed'),address = 0xB7CB64,size = 4,max = 100,min = 0, is_float =true, default = 1})
                 fcommon.UpdateAddress({name = flanguage.GetText('game.Gravity'),address = 0x863984,size = 4,max = 1,min = -1,is_float = true})
                 SetTime()
-                fcommon.UpdateAddress({name = flanguage.GetText('game.VehicleDensityMultiplier'),address = 0x8A5B20,size = 4,max =100})
+                fcommon.UpdateAddress({name = flanguage.GetText('game.VehicleDensityMultiplier'),address = 0x8A5B20,size = 4,min = 0,max = 100, default = 10})
                 
                 -- fcommon.DropDownMenu("Cop vehicles",function()
                 --     imgui.Spacing()

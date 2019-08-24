@@ -56,10 +56,6 @@ local tvehicles =
     },
     search_text = imgui.new.char[20](),
     models = {},
-    show = {
-        speed = imgui.new.bool(fconfig.get('tvehicles.show.speed',false)),
-        health = imgui.new.bool(fconfig.get('tvehicles.show.health',false)),
-    },
 
     color =
     {
@@ -305,7 +301,6 @@ function module.VehiclesMain()
             fcommon.CheckBox({name = flanguage.GetText("vehicles.NewAircraftCamera"),var = tvehicles.aircraft.camera})
             fcommon.CheckBox({name = flanguage.GetText("vehicles.NoVisualDamage"),var = tvehicles.visual_damage})
             fcommon.CheckBox({ address = 0x96914C,name = flanguage.GetText("vehicles.PerfectHandling")})
-            fcommon.CheckBox({name = flanguage.GetText("vehicles.ShowHealth"),var = tvehicles.show.health})
             fcommon.CheckBox({ address = 0x969164,name = flanguage.GetText("vehicles.TankMode")})
             fcommon.CheckBox({ address = 0x96914B,name = flanguage.GetText("vehicles.WheelsOnly")})         
             
@@ -418,7 +413,6 @@ function module.VehiclesMain()
                     imgui.Columns(2,nil,false)
                     fcommon.CheckBox({name = flanguage.GetText("vehicles.LockSpeed"),var = tvehicles.lock_speed})
                     imgui.NextColumn()
-                    fcommon.CheckBox({name = flanguage.GetText("vehicles.ShowSpeed"),var = tvehicles.show.speed})
                     imgui.Columns(1)
                     if imgui.InputInt(flanguage.GetText("vehicles.Set"),tvehicles.speed) then
                     end

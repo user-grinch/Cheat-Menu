@@ -81,7 +81,7 @@ tcheatMenu =
             Y = fconfig.get('tcheatMenu.window.size.Y',resY/1.2),
         },
         main    = imgui.new.bool(false),
-        title   = fconfig.get('tcheatMenu.window.title',string.format("%s v%s by %s",script.this.name,script.this.version,script.this.authors[1])),
+        title   = string.format("%s v%s by %s",script.this.name,script.this.version,script.this.authors[1]),
         overlay =
         {
             main     = imgui.new.bool(true),
@@ -160,7 +160,7 @@ function() -- render frame
 
         --Overlay window
         if tcheatMenu.window.overlay.main[0] then
-            if fgame.tgame.fps.bool[0] or fvisuals.tvisuals.show_coordinates[0] or (( fvehicles.tvehicles.show.speed[0] or fvehicles.tvehicles.show.health[0]) and isCharInAnyCar(PLAYER_PED)) then
+            if fmenu.tmenu.overlay.fps[0] or fmenu.tmenu.overlay.coordinates[0] or (( fmenu.tmenu.overlay.speed[0] or fmenu.tmenu.overlay.health[0]) and isCharInAnyCar(PLAYER_PED)) then
                 if (tcheatMenu.window.overlay.corner[0] ~= 0) then
                     window_pos       = imgui.ImVec2(ternary((tcheatMenu.window.overlay.corner[0] == 2 or tcheatMenu.window.overlay.corner[0] == 4),resX - tcheatMenu.window.overlay.distance,tcheatMenu.window.overlay.distance),ternary((tcheatMenu.window.overlay.corner[0] == 3 or tcheatMenu.window.overlay.corner[0] == 4),resY - tcheatMenu.window.overlay.distance,tcheatMenu.window.overlay.distance))
                     window_pos_pivot = imgui.ImVec2(ternary((tcheatMenu.window.overlay.corner[0] == 2 or tcheatMenu.window.overlay.corner[0] == 4),1.0,0.0),ternary((tcheatMenu.window.overlay.corner[0] == 3 or tcheatMenu.window.overlay.corner[0] == 4),1.0,0.0))
@@ -168,25 +168,25 @@ function() -- render frame
                 end
                 imgui.PushStyleVarFloat(imgui.StyleVar.Alpha,0.65)
                 if imgui.Begin('Overlay', tcheatMenu.window.overlay.main,imgui.WindowFlags.NoTitleBar + imgui.WindowFlags.NoResize + imgui.WindowFlags.NoCollapse + imgui.WindowFlags.AlwaysAutoResize + imgui.WindowFlags.NoFocusOnAppearing) then
-                    if fgame.tgame.fps.bool[0] == true then
+                    if fmenu.tmenu.overlay.fps[0] == true then
                         imgui.Text(flanguage.GetText("cheatmenu.FPS") .. " :" .. tostring(math.floor(imgui.GetIO().Framerate)))
                     end
 
                     if isCharInAnyCar(PLAYER_PED) then
                         car = getCarCharIsUsing(PLAYER_PED)
-                        if  fvehicles.tvehicles.show.speed[0] == true then
+                        if  fmenu.tmenu.overlay.speed[0] == true then
                             speed = getCarSpeed(car)
                             total_gears = getCarNumberOfGears(car)
                             current_gear = getCarCurrentGear(car)
                             imgui.Text(string.format(flanguage.GetText("cheatmenu.Speed") .. "   :%d %d/%d",math.floor(speed),current_gear,total_gears))
                         end
 
-                        if fvehicles.tvehicles.show.health[0] == true then
+                        if fmenu.tmenu.overlay.health[0] == true then
                             imgui.Text(string.format(flanguage.GetText("cheatmenu.Health") .. "  :%.0f%%",getCarHealth(car)/10))
                         end
                     end
 
-                    if fvisuals.tvisuals.show_coordinates[0] == true then
+                    if fmenu.tmenu.overlay.coordinates[0] == true then
                         x,y,z = getCharCoordinates(PLAYER_PED)
                         imgui.Text(string.format(flanguage.GetText("cheatmenu.Coordinates") .. ": %d %d %d", math.floor(x) , math.floor(y) , math.floor(z)),1000)
                     end
@@ -359,7 +359,7 @@ function onScriptTerminate(script, quitGame)
         local crash_text = flanguage.GetText("cheatmenu.MenuCrashMSG")
         if fmenu.tmenu.auto_reload[0] then
             script.this:reload()
-            crash_text = flanguage.GetText("cheatmenu.RelodedMSG")
+            crash_text = flanguage.GetText("cheatmenu.MenuCrash&RelodedMSG")
         end
         if fmenu.tmenu.show_crash_message[0] then
             printHelpString(crash_text)

@@ -24,7 +24,6 @@ function module.write()
                     X = tcheatMenu.window.size.X,
                     Y = tcheatMenu.window.size.Y,
                 },
-                title   = tcheatMenu.window.title,
                 overlay =
                 {
                     main     = tcheatMenu.window.overlay.main[0],
@@ -104,7 +103,6 @@ function module.write()
             ss_shortcut = fgame.tgame.ss_shortcut[0],
             fps =
             {
-                bool  = fgame.tgame.fps.bool[0],
                 limit = fgame.tgame.fps.limit[0],
             },
             disable_help_popups = fgame.tgame.disable_help_popups[0],
@@ -119,10 +117,6 @@ function module.write()
                 spawn_in_air = fvehicles.tvehicles.aircraft.spawn_in_air[0],
                 index        = fvehicles.tvehicles.aircraft.index,
             },
-            show = {
-                speed  = fvehicles.tvehicles.show.speed[0],
-                health = fvehicles.tvehicles.show.health[0],
-            },
             lock_health   = fvehicles.tvehicles.lock_health[0],
             visual_damage = fvehicles.tvehicles.visual_damage[0],
             heavy         = fvehicles.tvehicles.heavy[0],
@@ -133,16 +127,19 @@ function module.write()
                 all  = fvehicles.tvehicles.lights.all[0],
             },
         },
-        tvisuals =
-        {
-            show_coordinates = fvisuals.tvisuals.show_coordinates[0],
-        },
         tmenu =
         {
             auto_reload         = fmenu.tmenu.auto_reload[0],
             show_tooltips       = fmenu.tmenu.show_tooltips[0],
             show_crash_message  = fmenu.tmenu.show_crash_message[0],
             disable_in_samp     = fmenu.tmenu.disable_in_samp[0],
+            overlay = 
+            {
+                coordinates = fmenu.tmenu.overlay.coordinates[0],
+                fps         = fmenu.tmenu.overlay.fps[0],
+                health      = fmenu.tmenu.overlay.health[0],
+                speed       = fmenu.tmenu.overlay.speed[0],
+            },
         },
         tlanguage =
         {

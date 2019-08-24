@@ -367,47 +367,49 @@ end
 
 function HealthArmour()
     fcommon.DropDownMenu(flanguage.GetText("player.Health"),function()
-        local health = imgui.new.int()
-        local max = math.floor(getFloatStat(24)/5.68)
-        local min = 0
-
-        health[0] = getCharHealth(PLAYER_PED)
+        local health = imgui.new.int(getCharHealth(PLAYER_PED))
 
         imgui.Columns(2,nil,false)
-        imgui.Text(flanguage.GetText("common.Minimum") .. " = " .. min)
+        imgui.Text(flanguage.GetText("common.Minimum") .. " = " .. tostring(0))
         imgui.NextColumn()
-        imgui.Text(flanguage.GetText("common.Maximum") .. " = " .. max)
+        imgui.Text(flanguage.GetText("common.Maximum") .. " = " .. tostring(255))
         imgui.Columns(1)
 
         imgui.PushItemWidth(imgui.GetWindowWidth()-50)
         if imgui.InputInt(flanguage.GetText("common.Set"),health) then
+            if health[0] > 100 then
+                setFloatStat(24,health[0]*5.686)
+                
+            else
+                setFloatStat(24,569.0)
+            end
+
             setCharHealth(PLAYER_PED,health[0])
         end
         imgui.PopItemWidth()
 
         imgui.Spacing()
-        if imgui.Button(flanguage.GetText("common.Decrease"),imgui.ImVec2(fcommon.GetSize(4)))  and health[0] > 0 then
-            setCharHealth(PLAYER_PED,(health[0]-10))
-        end
-        imgui.SameLine()
-        if imgui.Button(flanguage.GetText("common.Increase"),imgui.ImVec2(fcommon.GetSize(4))) and health[0] <  max then
-            setCharHealth(PLAYER_PED,(health[0]+10))
-        end
-        imgui.SameLine()
-        if imgui.Button(flanguage.GetText("common.Minimum"),imgui.ImVec2(fcommon.GetSize(4))) then
+        if imgui.Button(flanguage.GetText("common.Minimum"),imgui.ImVec2(fcommon.GetSize(3))) then
+            setFloatStat(24,569.0)
             setCharHealth(PLAYER_PED,0)
         end
         imgui.SameLine()
-        if imgui.Button(flanguage.GetText("common.Maximum"),imgui.ImVec2(fcommon.GetSize(4))) then
-            setCharHealth(PLAYER_PED, max)
+        if imgui.Button(flanguage.GetText("common.Default"),imgui.ImVec2(fcommon.GetSize(3))) then
+            setFloatStat(24,569.0)
+            setCharHealth(PLAYER_PED,100)
+        end
+        imgui.SameLine()
+        if imgui.Button(flanguage.GetText("common.Maximum"),imgui.ImVec2(fcommon.GetSize(3))) then
+            setFloatStat(24,1450.0)
+            setCharHealth(PLAYER_PED,255)
         end
 
         if health[0] < 0 then
             setCharHealth(PLAYER_PED,0)
         end
 
-        if health[0] >  max then
-            setCharHealth(PLAYER_PED, max)
+        if health[0] >  255 then
+            setCharHealth(PLAYER_PED, 255)
         end
     end)
 
@@ -439,68 +441,59 @@ function HealthArmour()
             end
         end
         imgui.PopItemWidth()
-
-        if imgui.Button(flanguage.GetText("common.Decrease"),imgui.ImVec2(fcommon.GetSize(4)))  and armour[0] > 0 then
-
-
-            if getCharArmour(PLAYER_PED) > 10 then
-                damageChar(PLAYER_PED,10,1)
-            else
-                damageChar(PLAYER_PED,getCharArmour(PLAYER_PED),1)
-            end
-        end
-        imgui.SameLine()
-        if imgui.Button(flanguage.GetText("common.Increase"),imgui.ImVec2(fcommon.GetSize(4))) and armour[0] <  max_armour then
-            addArmourToChar(PLAYER_PED,10)
-        end   
-        imgui.SameLine()
-        if imgui.Button(flanguage.GetText("common.Minimum"),imgui.ImVec2(fcommon.GetSize(4))) then
+        imgui.Spacing()
+        if imgui.Button(flanguage.GetText("common.Minimum"),imgui.ImVec2(fcommon.GetSize(3))) then
             damageChar(PLAYER_PED,  getCharArmour(PLAYER_PED),true)
         end
         imgui.SameLine()
-        if imgui.Button(flanguage.GetText("common.Maximum"),imgui.ImVec2(fcommon.GetSize(4))) then
+        if imgui.Button(flanguage.GetText("common.Default"),imgui.ImVec2(fcommon.GetSize(3))) then
+            damageChar(PLAYER_PED,  getCharArmour(PLAYER_PED),true)
+        end
+        imgui.SameLine()
+        if imgui.Button(flanguage.GetText("common.Maximum"),imgui.ImVec2(fcommon.GetSize(3))) then
             addArmourToChar(PLAYER_PED, max_armour)
         end
-        imgui.Separator()
     end)
 end
 
 function WantedLevelMenu()
-    fcommon.DropDownMenu("Wanted Level",function()
-        local CPlayer = getCharPointer(PLAYER_PED)
+    
+    fcommon.DropDownMenu(flanguage.GetText("player.WantedLevel"),function()
         local  _,wl = storeWantedLevel(PLAYER_HANDLE)
         local wanted_level = imgui.new.int(wl)
         local max_wanted_level = imgui.new.int(readMemory(0x58DFE4,1,false))
-
-        if imgui.SliderInt(flanguage.GetText("common.Maximum"),max_wanted_level,0,6) then
-           writeMemory(0x58DFE4,1,max_wanted_level[0],false)
-        end
         
+        imgui.Columns(2,nil,false)
+        imgui.Text(flanguage.GetText("common.Minimum") .. " = " .. tostring(0))
+        imgui.NextColumn()
+        imgui.Text(flanguage.GetText("common.Maximum") .. " = " .. tostring(6))
+        imgui.Columns(1)
+
         imgui.Spacing()
 
-        if imgui.SliderInt(flanguage.GetText("player.Current"),wanted_level,0,max_wanted_level[0]) then
-            callFunction(0x4396F0,1,0,false)
+        imgui.PushItemWidth(imgui.GetWindowWidth()-50)
+
+        if imgui.InputInt(flanguage.GetText("common.Set"),wanted_level) then
+            callFunction(0x4396F0,1,0,false)      
             alterWantedLevel(PLAYER_HANDLE,wanted_level[0])
         end
-
-        if imgui.Button(flanguage.GetText("common.Maximum")) then
-            callFunction(0x4396F0,1,0,false)
-            alterWantedLevel(PLAYER_HANDLE,max_wanted_level[0])
-        end
-        imgui.SameLine()
-        if imgui.Button(flanguage.GetText("common.Minimum")) then
-            callFunction(0x4396F0,1,0,false)
+        imgui.PopItemWidth()
+   
+        imgui.Spacing()
+        if imgui.Button(flanguage.GetText("common.Minimum"),imgui.ImVec2(fcommon.GetSize(3))) then
+            callFunction(0x4396F0,1,0,false)      
             alterWantedLevel(PLAYER_HANDLE,0)
         end
         imgui.SameLine()
-        fcommon.CheckBox({name = flanguage.GetText("player.NeverWanted"),var = tplayer.neverWanted,func = function()
-            callFunction(0x4396C0,1,0,false)
-            if tplayer.neverWanted[0] then
-                fcommon.CheatActivated()
-            else
-                fcommon.CheatDeactivated()
-            end
-        end})
+        if imgui.Button(flanguage.GetText("common.Default"),imgui.ImVec2(fcommon.GetSize(3))) then
+            callFunction(0x4396F0,1,0,false)      
+            alterWantedLevel(PLAYER_HANDLE,0)
+        end
+        imgui.SameLine()
+        if imgui.Button(flanguage.GetText("common.Maximum"),imgui.ImVec2(fcommon.GetSize(3))) then
+            callFunction(0x4396F0,1,0,false)      
+            alterWantedLevel(PLAYER_HANDLE,max_wanted_level[0])
+        end
     end)
 end
 
@@ -652,15 +645,23 @@ function module.PlayerMain()
             fcommon.CheckBox({ address = 0x969161,name = flanguage.GetText("player.HigherCycleJumps")})
             fcommon.CheckBox({ address = 0x969178,name = flanguage.GetText("player.InfiniteAmmo")}) 
             fcommon.CheckBox({ address = 0x96916D,name = flanguage.GetText("player.InfiniteHealth")})
+            fcommon.CheckBox({ address = 0x96916E,name = flanguage.GetText("player.InfiniteOxygen")})
 
             imgui.NextColumn()
 
-            fcommon.CheckBox({ address = 0x96916E,name = flanguage.GetText("player.InfiniteOxygen")})
             fcommon.CheckBox({ address = 0xB7CEE4,name = flanguage.GetText("player.InfiniteRun")})
             fcommon.CheckBox({ address = getCharPointer(PLAYER_PED)+0x598,name = flanguage.GetText("player.LockPlayerControl")})
             fcommon.CheckBox({ address = 0x96916C,name = flanguage.GetText("player.MegaJump")})
             fcommon.CheckBox({ address = 0x969173,name = flanguage.GetText("player.MegaPunch")})
             fcommon.CheckBox({ address = 0x969174,name = flanguage.GetText("player.NeverGetHungry")})
+            fcommon.CheckBox({name = flanguage.GetText("player.NeverWanted"),var = tplayer.neverWanted,func = function()
+                callFunction(0x4396C0,1,0,false)
+                if tplayer.neverWanted[0] then
+                    fcommon.CheatActivated()
+                else
+                    fcommon.CheatDeactivated()
+                end
+            end})
            
             imgui.Columns(1)
 
@@ -691,8 +692,7 @@ function module.PlayerMain()
             fcommon.UpdateStat({ name = flanguage.GetText("player.Fat"),stat = 21})
             HealthArmour()
             fcommon.UpdateStat({ name = flanguage.GetText("player.LungCapacity"),stat = 225})
-            fcommon.UpdateStat({ name = flanguage.GetText("player.MaxHealth"),stat = 24,max = 1450})
-            fcommon.UpdateAddress({name = flanguage.GetText("player.Money"),address = 0xB7CE50,size = 4})
+            fcommon.UpdateAddress({name = flanguage.GetText("player.Money"),address = 0xB7CE50,size = 4,min = -9999999,max = 9999999})
             fcommon.UpdateStat({ name = flanguage.GetText("player.Muscle"),stat = 23})
             fcommon.UpdateStat({ name = flanguage.GetText("player.Respect"),stat = 68,max = 2450}) 
             fcommon.UpdateStat({ name = flanguage.GetText("player.SexAppeal"),stat = 25})

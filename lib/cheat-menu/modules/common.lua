@@ -316,6 +316,7 @@ end
 
 function module.UpdateStat(arg)
     if arg.min == nil then arg.min = 0 end
+    if arg.default == nil then arg.default = 0 end
     if arg.max == nil then arg.max = 1000 end
 
     module.DropDownMenu(arg.name,function()
@@ -345,19 +346,15 @@ function module.UpdateStat(arg)
         imgui.PopItemWidth()
 
         imgui.Spacing()
-        if imgui.Button(flanguage.GetText("common.Decrease"),imgui.ImVec2(fcommon.GetSize(4))) then
-            setFloatStat(arg.stat,(value[0]-change_value))
-        end
-        imgui.SameLine()
-        if imgui.Button(flanguage.GetText("common.Increase"),imgui.ImVec2(fcommon.GetSize(4))) then
-            setFloatStat(arg.stat,(value[0]+change_value))
-        end  
-        imgui.SameLine()
-        if imgui.Button(flanguage.GetText("common.Minimum"),imgui.ImVec2(fcommon.GetSize(4))) then
+        if imgui.Button(flanguage.GetText("common.Minimum"),imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(arg.stat,arg.min)
         end
         imgui.SameLine()
-        if imgui.Button(flanguage.GetText("common.Maximum"),imgui.ImVec2(fcommon.GetSize(4))) then
+        if imgui.Button(flanguage.GetText("common.Default"),imgui.ImVec2(fcommon.GetSize(3))) then
+            setFloatStat(arg.stat,arg.default)
+        end
+        imgui.SameLine()
+        if imgui.Button(flanguage.GetText("common.Maximum"),imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(arg.stat,arg.max)
         end
         if value[0] < arg.min then
@@ -371,6 +368,7 @@ end
 
 function module.UpdateAddress(arg)
     if arg.is_float == nil then arg.is_float = false end
+    if arg.default == nil then arg.default = 0 end
 
     module.DropDownMenu(arg.name,function()
 
@@ -378,7 +376,7 @@ function module.UpdateAddress(arg)
 
         imgui.Columns(2,nil,false)
         if arg.min ~= nil then
-            imgui.Text(flanguage.GetText("common.Minumum") .. " = " .. arg.min)
+            imgui.Text(flanguage.GetText("common.Minimum") .. " = " .. arg.min)
         end
         imgui.NextColumn()
         if arg.max ~= nil then
@@ -393,22 +391,17 @@ function module.UpdateAddress(arg)
             module.RwMemory(arg.address,arg.size,value[0],nil,arg.is_float)
         end
         imgui.PopItemWidth()
-
-        
+   
         imgui.Spacing()
-        if imgui.Button(flanguage.GetText("common.Decrease"),imgui.ImVec2(fcommon.GetSize(4)))  and value[0] > arg.min then
-            module.RwMemory(arg.address,arg.size,(value[0]-math.floor(arg.max/10)),nil,arg.is_float)
-        end
-        imgui.SameLine()
-        if imgui.Button(flanguage.GetText("common.Increase"),imgui.ImVec2(fcommon.GetSize(4))) and value[0] < arg.max then
-            module.RwMemory(arg.address,arg.size,(value[0]+math.floor(arg.max/10)),nil,arg.is_float)
-        end
-        imgui.SameLine()
-        if imgui.Button(flanguage.GetText("common.Minimum"),imgui.ImVec2(fcommon.GetSize(4))) then
+        if imgui.Button(flanguage.GetText("common.Minimum"),imgui.ImVec2(fcommon.GetSize(3))) then
             module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float)
         end
         imgui.SameLine()
-        if imgui.Button(flanguage.GetText("common.Maximum"),imgui.ImVec2(fcommon.GetSize(4))) then
+        if imgui.Button(flanguage.GetText("common.Default"),imgui.ImVec2(fcommon.GetSize(3))) then
+            module.RwMemory(arg.address,arg.size,arg.default,nil,arg.is_float)
+        end
+        imgui.SameLine()
+        if imgui.Button(flanguage.GetText("common.Maximum"),imgui.ImVec2(fcommon.GetSize(3))) then
             module.RwMemory(arg.address,arg.size,arg.max,nil,arg.is_float)
         end
         imgui.SameLine()

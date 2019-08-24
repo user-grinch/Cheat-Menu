@@ -379,18 +379,6 @@ local tpeds =
     gangs =
     {
         wars = imgui.new.bool(false),
-        density = {
-            ["Ballas"] = imgui.new.int(),
-            ["Grove Street Families"] = imgui.new.int(),
-            ["Los Santos Vagos"] = imgui.new.int(),
-            ["San Fierro Rifa"] = imgui.new.int(),
-            ["Da Nang Boys"] = imgui.new.int(),
-            ["Mafia"] = imgui.new.int(),
-            ["Mountain Cloud Triad"] = imgui.new.int(),
-            ["Varrio Los Aztecas"] = imgui.new.int(),
-            ["Gang 9"] = imgui.new.int(),
-            ["Gang 10"] = imgui.new.int(),
-        },
     },
 }
 
@@ -433,9 +421,9 @@ end
 function SetDensity(title,id)
     local x,y,z = getCharCoordinates(PLAYER_PED)
         
-    tpeds.gangs.density[title][0] = getZoneGangStrength((getNameOfInfoZone(x,y,z)),id)
-    if imgui.SliderInt(title,tpeds.gangs.density[title],0,255) then
-        setZoneGangStrength((getNameOfInfoZone(x,y,z)),id,tpeds.gangs.density[title][0])
+    local density = imgui.new.int(getZoneGangStrength(getNameOfInfoZone(x,y,z),id))
+    if imgui.SliderInt(title,density,0,255) then
+        setZoneGangStrength(getNameOfInfoZone(x,y,z),id,density[0])
         clearSpecificZonesToTriggerGangWar()
         setGangWarsActive(true)
     end
@@ -470,7 +458,7 @@ function module.PedsMain()
             imgui.EndTabItem()
         end
         if imgui.BeginTabItem(flanguage.GetText("common.Menus")) then
-            fcommon.UpdateAddress({name = flanguage.GetText("peds.PedestrianDensity"),address = 0x8D2530,size = 4,max = 100})
+            fcommon.UpdateAddress({name = flanguage.GetText("peds.PedestrianDensity"),address = 0x8D2530,size = 4,default = 100,max = 100})
             if imgui.CollapsingHeader(flanguage.GetText("peds.ZoneGangDensity")) then
                 imgui.Separator()
                 imgui.PushItemWidth(imgui.GetWindowWidth() - 200)
