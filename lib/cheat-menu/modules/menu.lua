@@ -4,7 +4,7 @@ local module = {}
 
 local tmenu =
 {
-	auto_reload 		= imgui.new.bool(fconfig.get('tmenu.auto_reload',false)),
+	auto_reload 		= imgui.new.bool(fconfig.get('tmenu.auto_reload',true)),
 	show_tooltips	    = imgui.new.bool(fconfig.get('tmenu.show_tooltips',true)),
 	show_crash_message  = imgui.new.bool(fconfig.get('tmenu.show_crash_message',true)),
 	disable_in_samp		= imgui.new.bool(fconfig.get('tmenu.disable_in_samp',false)),
