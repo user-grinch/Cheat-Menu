@@ -368,14 +368,46 @@ function module.GameMain()
 
                 fcommon.UpdateAddress({name = flanguage.GetText('game.DaysPassed'),address = 0xB79038 ,size = 4,min = 0,max = 1000})
                 fcommon.DropDownMenu(flanguage.GetText('game.FPS'),function()
-                    imgui.Spacing()
+
+                    imgui.Columns(2,nil,false)
+                    imgui.Text(flanguage.GetText("common.Minimum") .. " = 1")
+                    
+                    imgui.NextColumn()
+                    imgui.Text(flanguage.GetText("common.Maximum") .. " = 999")
+                    imgui.Columns(1)
+
+                    imgui.PushItemWidth(imgui.GetWindowWidth()-50)
                     if imgui.InputInt(flanguage.GetText('game.FPSLimit'),tgame.fps.limit) then
                         memory.write(0xC1704C,(tgame.fps.limit[0]+1),1)
                         memory.write(0xBA6794,1,1)
                     end
-                    if tgame.fps.limit[0] < 0 then
-                        tgame.fps.limit[0] = 0
+                    if tgame.fps.limit[0] < 1 then
+                        tgame.fps.limit[0] = 1
                     end
+
+                    imgui.PopItemWidth()
+
+                    imgui.Spacing()
+                    if imgui.Button(flanguage.GetText("common.Minimum"),imgui.ImVec2(fcommon.GetSize(3))) then
+                        memory.write(0xC1704C,1,1)
+                        memory.write(0xBA6794,1,1)
+                        tgame.fps.limit[0] = 1
+                    end
+                    imgui.SameLine()
+                    if imgui.Button(flanguage.GetText("common.Default"),imgui.ImVec2(fcommon.GetSize(3))) then
+                        memory.write(0xC1704C,30,1)
+                        memory.write(0xBA6794,1,1)
+                        tgame.fps.limit[0] = 30
+                    end
+                    imgui.SameLine()
+                    if imgui.Button(flanguage.GetText("common.Maximum"),imgui.ImVec2(fcommon.GetSize(3))) then
+                        memory.write(0xBA6794,0,1)
+                        tgame.fps.limit[0] = 999
+                    end
+
+
+
+
                 end)
                 fcommon.UpdateAddress({name = flanguage.GetText('game.GameSpeed'),address = 0xB7CB64,size = 4,max = 100,min = 0, is_float =true, default = 1})
                 fcommon.UpdateAddress({name = flanguage.GetText('game.Gravity'),address = 0x863984,size = 4,max = 1,min = -1,is_float = true})

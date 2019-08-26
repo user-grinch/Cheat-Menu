@@ -94,23 +94,14 @@ function module.GetSize(count,x,y)
     if x == nil then  x = 20 end
     if y == nil then  y = 25 end
 
-    if count == 1 then
-        if ((imgui.GetWindowWidth()- 15*imgui.StyleVar.WindowPadding) / count) > x then
-            x = (imgui.GetWindowWidth()- 15*imgui.StyleVar.WindowPadding) / count
-        end
-
-        if ((imgui.GetWindowHeight()/25) / count) > y then
-            y = (imgui.GetWindowHeight()/25)
-        end
-    else
-        if ((imgui.GetWindowWidth()- 2*imgui.StyleVar.WindowPadding - (count-1)*imgui.StyleVar.ItemSpacing) / count) > x then
-            x = ((imgui.GetWindowWidth()- 2*imgui.StyleVar.WindowPadding - (count-1)*imgui.StyleVar.ItemSpacing) / count)
-        end
-
-        if (imgui.GetWindowHeight()/35) > y then
-            y = (imgui.GetWindowHeight()/25)
-        end
+    if ((imgui.GetWindowWidth() - imgui.StyleVar.FramePadding - imgui.StyleVar.ItemSpacing) / count) > x then
+        x = (imgui.GetWindowWidth() - imgui.StyleVar.FramePadding - imgui.StyleVar.ItemSpacing) / (count-0.014)
     end
+
+    if ((imgui.GetWindowHeight()/25) / count) > y then
+        y = (imgui.GetWindowHeight()/25)
+    end
+
     return x,y
 end
 

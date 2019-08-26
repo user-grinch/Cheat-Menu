@@ -130,6 +130,7 @@ function module.write()
         tmenu =
         {
             auto_reload         = fmenu.tmenu.auto_reload[0],
+            manual_mouse        = fmenu.tmenu.manual_mouse[0],
             show_tooltips       = fmenu.tmenu.show_tooltips[0],
             show_crash_message  = fmenu.tmenu.show_crash_message[0],
             disable_in_samp     = fmenu.tmenu.disable_in_samp[0],

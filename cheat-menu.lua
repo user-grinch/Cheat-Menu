@@ -96,6 +96,11 @@ tcheatMenu =
         current =  fconfig.get('tcheatMenu.menubuttons.current',-1),
     },
     font_path  =  tcheatMenu.dir .. "fonts//",
+    cursor = 
+    {
+        state  = nil,
+        thread = false,
+    }
 }
 
 tcheatMenu.window.overlay.list = imgui.new['const char*'][#tcheatMenu.window.overlay.names](tcheatMenu.window.overlay.names)
@@ -116,7 +121,7 @@ imgui.OnInitialize(function() -- Called once
     imgui.PushStyleVarFloat(imgui.StyleVar.TabRounding,3)
     imgui.PushStyleVarVec2(imgui.StyleVar.WindowTitleAlign,imgui.ImVec2(0.5,0.5))
     imgui.PushStyleColor(imgui.Col.Header, imgui.ImVec4(0,0,0,0))
-
+    
     -- local mask = tcheatMenu.font_path .. "*.otf"
     -- local handle,file = findFirstFile(mask)
     -- if handle and file then
@@ -141,7 +146,15 @@ function() -- condition
 end,
 function() -- render frame
     if not isGamePaused() then
+
+        if fmenu.tmenu.manual_mouse[0] == true then
+            lua_thread.create(ShowHideCursor)
+        else
+            showCursor(tcheatMenu.window.main[0])
+        end
+        
         if tcheatMenu.window.main[0] then
+           
             imgui.SetNextWindowSize(imgui.ImVec2(tcheatMenu.window.size.X,tcheatMenu.window.size.Y), imgui.Cond.Once)
 
             imgui.Begin(tcheatMenu.window.title, tcheatMenu.window.main,imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoSavedSettings)
@@ -155,7 +168,6 @@ function() -- render frame
             fabout.AboutMain})
 
             imgui.End()
-
         end
 
         --Overlay window
@@ -190,7 +202,7 @@ function() -- render frame
                         x,y,z = getCharCoordinates(PLAYER_PED)
                         imgui.Text(string.format(flanguage.GetText("cheatmenu.Coordinates") .. ": %d %d %d", math.floor(x) , math.floor(y) , math.floor(z)),1000)
                     end
-
+                    
                     imgui.PushStyleVarFloat(imgui.StyleVar.Alpha,1.0)
                     if imgui.BeginPopupContextWindow() then
                         imgui.Text(flanguage.GetText("cheatmenu.Position"))
@@ -213,9 +225,21 @@ function() -- render frame
                     imgui.End()
                 end
             end
+        end   
+    end  
+end).HideCursor = true
+
+function ShowHideCursor()
+    if imgui.IsMouseDoubleClicked(1) then
+        if tcheatMenu.cursor.thread == false  then
+            tcheatMenu.cursor.thread = true
+            tcheatMenu.cursor.state = not tcheatMenu.cursor.state
+            showCursor(tcheatMenu.cursor.state)
+            wait(250)
+            tcheatMenu.cursor.thread = false
         end
     end
-end).HideCursor = true
+end
 
 function main()
     
@@ -227,14 +251,8 @@ function main()
         removePickup(glob.Pickup_Info_Hospital_2)
         removePickup(glob.Pickup_Info_Police)
     end
-
+    
     while true do
-
-        if not isGamePaused() and tcheatMenu.window.main[0] then
-            showCursor(true)
-        else
-            showCursor(false)
-        end
 
         if fgame.tgame.airbreak[0] then
             fgame.AirbreakMode()

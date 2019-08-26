@@ -640,16 +640,14 @@ function module.PlayerMain()
             imgui.Spacing()
             imgui.Columns(2,nil,false)
             fcommon.CheckBox({ address = 0x969179,name = flanguage.GetText("player.AimWhileDriving")})
-            fcommon.CheckBox({ address = 0xB7CEE6,name = flanguage.GetText("player.FireProof")})
             fcommon.CheckBox({ var = tplayer.god,name  = flanguage.GetText("player.GodMode")})
             fcommon.CheckBox({ address = 0x969161,name = flanguage.GetText("player.HigherCycleJumps")})
             fcommon.CheckBox({ address = 0x969178,name = flanguage.GetText("player.InfiniteAmmo")}) 
-            fcommon.CheckBox({ address = 0x96916D,name = flanguage.GetText("player.InfiniteHealth")})
             fcommon.CheckBox({ address = 0x96916E,name = flanguage.GetText("player.InfiniteOxygen")})
-
+            fcommon.CheckBox({ address = 0xB7CEE4,name = flanguage.GetText("player.InfiniteRun")})
+            
             imgui.NextColumn()
 
-            fcommon.CheckBox({ address = 0xB7CEE4,name = flanguage.GetText("player.InfiniteRun")})
             fcommon.CheckBox({ address = getCharPointer(PLAYER_PED)+0x598,name = flanguage.GetText("player.LockPlayerControl")})
             fcommon.CheckBox({ address = 0x96916C,name = flanguage.GetText("player.MegaJump")})
             fcommon.CheckBox({ address = 0x969173,name = flanguage.GetText("player.MegaPunch")})
