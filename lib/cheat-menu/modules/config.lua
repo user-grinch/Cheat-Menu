@@ -109,8 +109,8 @@ function module.write()
         },
         tvehicles =
         {
-            quick_spawn = fvehicles.tvehicles.quick_spawn[0],
-            quick_spawn = fvehicles.tvehicles.spawn_inside[0],
+            quick_spawn  = fvehicles.tvehicles.quick_spawn[0],
+            spawn_inside = fvehicles.tvehicles.spawn_inside[0],
             aircraft =
             {
                 camera       = fvehicles.tvehicles.aircraft.camera[0],
