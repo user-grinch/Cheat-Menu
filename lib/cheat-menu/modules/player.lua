@@ -367,6 +367,7 @@ function module.ChangePlayerModel(model)
         setPlayerModel(PLAYER_HANDLE,290)
         unloadSpecialCharacter(290)
     end
+    clearCharTasksImmediately(PLAYER_PED)
     printHelpString(flanguage.GetText("player.SkinChanged"))
 end
 
