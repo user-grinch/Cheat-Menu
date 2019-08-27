@@ -4,8 +4,8 @@ script_description("Cheat Menu for Grand Theft Auto San Andreas")
 script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu")
 script_dependencies("ffi","mimgui","memory","MoonAdditions")
 script_properties('work-in-pause')
-script_version("1.6")
-script_version_number(26082019) -- DDMMYYYY
+script_version("1.7")
+script_version_number(27082019) -- DDMMYYYY
 
 -- All the command keys used throughout the Cheat-Menu
 tkeys =
@@ -306,16 +306,6 @@ function main()
         end
 
         -- This is to fix car colors not being applied using opcode changecarcolours
-        if fvehicles.tvehicles.color.default ~= -1 then
-            if isCharInAnyCar(PLAYER_PED) then
-                local color_id = getCarColours(car)
-                if fvehicles.tvehicles.color.default ~= color_id then
-                    fvehicles.ForEachCarComponent(function(mat)
-                        mat:reset_color()
-                    end)
-                end
-            end
-        end
 
 
 
@@ -328,6 +318,14 @@ function main()
         if isCharInAnyCar(PLAYER_PED) then
             car = getCarCharIsUsing(PLAYER_PED)
 
+            if fvehicles.tvehicles.color.default ~= -1 then
+                local color_id = getCarColours(car)
+                if fvehicles.tvehicles.color.default ~= color_id then
+                    fvehicles.ForEachCarComponent(function(mat)
+                        mat:reset_color()
+                    end)
+                end
+            end
             if fvehicles.tvehicles.lock_health[0] then
                 setCarHealth(car,1000)
             end

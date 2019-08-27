@@ -236,7 +236,6 @@ function module.VehiclesMain()
             fcommon.CheatActivated()
         end
     end
-    imgui.SameLine()
     imgui.Spacing()
     if imgui.BeginTabBar("Vehicles") then
 

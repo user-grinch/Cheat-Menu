@@ -12,7 +12,7 @@ local tmenu =
 		fps  = imgui.new.bool(fconfig.get('tmenu.overlay.fps',false)),
 	},
 	auto_reload 		= imgui.new.bool(fconfig.get('tmenu.auto_reload',true)),
-	manual_mouse 		= imgui.new.bool(fconfig.get('tmenu.manual_mouse',true)),
+	manual_mouse 		= imgui.new.bool(fconfig.get('tmenu.manual_mouse',false)),
 	show_tooltips	    = imgui.new.bool(fconfig.get('tmenu.show_tooltips',true)),
 	show_crash_message  = imgui.new.bool(fconfig.get('tmenu.show_crash_message',true)),
 	disable_in_samp		= imgui.new.bool(fconfig.get('tmenu.disable_in_samp',false)),

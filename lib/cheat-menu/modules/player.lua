@@ -4,6 +4,11 @@ local module = {}
 
 local tplayer =
 {
+    clothes           = 
+    {
+        path          = tcheatMenu.dir .. "clothes\\",
+        images        = {},
+    },
     god               = imgui.new.bool(fconfig.get('tplayer.god',false)),
     aimSkinChanger    = imgui.new.bool(fconfig.get('tplayer.aimSkinChanger',false)),
     neverWanted       = imgui.new.bool(fconfig.get('tplayer.neverWanted',false) ),
@@ -456,6 +461,35 @@ function HealthArmour()
     end)
 end
 
+function module.GetClotheName(name)
+    local model, texture = name:match("([^$]+)$([^$]+)")
+    return texture
+end
+
+function module.ChangePlayerClothe(name,body_part)
+    local model, texture = name:match("([^$]+)$([^$]+)")
+    
+    setPlayerModel(PLAYER_HANDLE,0)
+    givePlayerClothesOutsideShop(PLAYER_HANDLE,0,0,body_part)
+    givePlayerClothesOutsideShop(PLAYER_HANDLE,texture,model,body_part)
+    buildPlayerModel(PLAYER_HANDLE)
+    printHelpString(flanguage.GetText("player.ClotheChanged"))
+end
+
+function ShowClothes(label,path,body_part)
+
+    local mask = path .. "*.jpg"
+    local handle,file = findFirstFile(mask)
+    local model_table = {}
+
+    while handle and file do
+        table.insert( model_table,-1,string.sub( file,1,-5))
+        file = findNextFile(handle)
+    end
+    fcommon.ShowEntries(label,model_table,100,80,tplayer.clothes.images,path,".jpg",fplayer.ChangePlayerClothe,fplayer.GetClotheName,true,nil,body_part)
+end
+
+
 function WantedLevelMenu()
     
     fcommon.DropDownMenu(flanguage.GetText("player.WantedLevel"),function()
@@ -699,41 +733,49 @@ function module.PlayerMain()
 
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem(flanguage.GetText("player.GF")) then
-
-            imgui.Spacing()
-            if imgui.Button(flanguage.GetText("player.MaxGFProgress"),imgui.ImVec2(fcommon.GetSize(1))) then
-                for i=252,257,1 do
-                    setFloatStat(i,100)
-                end
-                clearHelp()
-                fcommon.CheatActivated()
-            end
-            imgui.Spacing()
-            imgui.Text(flanguage.GetText("player.Progress"))
-            imgui.Separator()
-            imgui.Spacing()
-            fcommon.UpdateStat({ name = flanguage.GetText("player.Barbara"),stat = 255,max = 100})
-            fcommon.UpdateStat({ name = flanguage.GetText("player.Denise"),stat = 252,max = 100})
-            fcommon.UpdateStat({ name = flanguage.GetText("player.Helena"),stat = 254,max = 100})
-            fcommon.UpdateStat({ name = flanguage.GetText("player.Katie"),stat = 256,max = 100})
-            fcommon.UpdateStat({ name = flanguage.GetText("player.Michelle"),stat = 253,max = 100})
-            fcommon.UpdateStat({ name = flanguage.GetText("player.Millie"),stat = 257,max = 100})
-            imgui.Spacing()
-            imgui.Text(flanguage.GetText("common.Misc"))
-            imgui.Separator()
-            imgui.Spacing()
-            fcommon.UpdateStat({ name = flanguage.GetText("player.DisastrousDates"),stat = 185})
-            fcommon.UpdateStat({ name = flanguage.GetText("player.GFCount"),stat = 184})
-            fcommon.UpdateStat({ name = flanguage.GetText("player.GirlsDated"),stat = 186})
-            fcommon.UpdateStat({ name = flanguage.GetText("player.GirlsDumped"),stat = 189})
-            fcommon.UpdateStat({ name = flanguage.GetText("player.ProstitutesVisited"),stat = 190})
-            fcommon.UpdateStat({ name = flanguage.GetText("player.ScoredDates"),stat = 187})
-            fcommon.UpdateStat({ name = flanguage.GetText("player.SuccessfulDates"),stat = 188})
-            imgui.EndTabItem()
-        end
         if imgui.BeginTabItem(flanguage.GetText("player.Skins")) then
             SkinChangerMenu()
+            imgui.EndTabItem()
+        end
+        if imgui.BeginTabItem(flanguage.GetText("player.Clothes")) then
+            imgui.Spacing()
+            if imgui.Button(flanguage.GetText("player.RemoveClothes"),imgui.ImVec2(fcommon.GetSize(1))) then
+                for i=0, 17 do givePlayerClothes(PLAYER_HANDLE,0,0,i) end
+                buildPlayerModel(PLAYER_HANDLE)
+            end
+            imgui.Spacing()
+
+            if imgui.BeginTabBar(flanguage.GetText("common.List")) then
+                imgui.Spacing()
+                
+                if imgui.BeginTabItem(flanguage.GetText("common.List")) then
+                    if imgui.BeginChild("Clothes") then
+        
+                        ShowClothes("Extras",tplayer.clothes.path .. "Extras\\",17)   
+                        ShowClothes("Glasses",tplayer.clothes.path .. "Glasses\\",15)
+                        ShowClothes("Hats",tplayer.clothes.path .. "Hats\\",16)
+                        ShowClothes("Heads",tplayer.clothes.path .. "Heads\\",1)
+                        ShowClothes("Necklaces",tplayer.clothes.path .. "Necklaces\\",13)
+                        ShowClothes("Shirts",tplayer.clothes.path .. "Shirts\\",0)
+                        ShowClothes("Shoes",tplayer.clothes.path .. "Shoes\\",3)
+                        ShowClothes("Tattoos back",tplayer.clothes.path .. "Tattoos back\\",8)
+                        ShowClothes("Tattoos left chest",tplayer.clothes.path .. "Tattoos left chest\\",9)
+                        ShowClothes("Tattoos left lower arm",tplayer.clothes.path .. "Tattoos left lower arm\\",4)
+                        ShowClothes("Tattoos left upper arm",tplayer.clothes.path .. "Tattoos left upper arm\\",5)
+                        ShowClothes("Tattoos lower back",tplayer.clothes.path .. "Tattoos lower back\\",12)  
+                        ShowClothes("Tattoos right chest",tplayer.clothes.path .. "Tattoos right chest\\",10)
+                        ShowClothes("Tattoos right lower arm",tplayer.clothes.path .. "Tattoos right lower arm\\",7)
+                        ShowClothes("Tattoos right upper arm",tplayer.clothes.path .. "Tattoos right upper arm\\",6)
+                        ShowClothes("Tattoos stomach",tplayer.clothes.path .. "Tattoos stomach\\",11)
+                        ShowClothes("Trousers",tplayer.clothes.path .. "Trousers\\",2)
+                        ShowClothes("Watches",tplayer.clothes.path .. "Watches\\",14)
+                        
+                        imgui.EndChild()
+                    end
+                    imgui.EndTabItem()
+                end 
+                imgui.EndTabBar()
+            end
             imgui.EndTabItem()
         end
         if imgui.BeginTabItem(flanguage.GetText("player.Styles")) then
@@ -780,6 +822,28 @@ function module.PlayerMain()
                     fcommon.UpdateStat({ name = flanguage.GetText("player.SilencedPistol"),stat = 70})
                     fcommon.UpdateStat({ name = flanguage.GetText("player.SMG"),stat = 76})
                     fcommon.UpdateStat({ name = flanguage.GetText("player.Rifle"),stat = 79})
+                    imgui.EndTabItem()
+                end
+                if imgui.BeginTabItem(flanguage.GetText("player.GF")) then
+
+                    imgui.Spacing()
+                    if imgui.Button(flanguage.GetText("player.MaxGFProgress"),imgui.ImVec2(fcommon.GetSize(1))) then
+                        for i=252,257,1 do
+                            setFloatStat(i,100)
+                        end
+                        clearHelp()
+                        fcommon.CheatActivated()
+                    end
+                    imgui.Spacing()
+                    imgui.Text(flanguage.GetText("player.Progress"))
+                    imgui.Separator()
+                    imgui.Spacing()
+                    fcommon.UpdateStat({ name = flanguage.GetText("player.Barbara"),stat = 255,max = 100})
+                    fcommon.UpdateStat({ name = flanguage.GetText("player.Denise"),stat = 252,max = 100})
+                    fcommon.UpdateStat({ name = flanguage.GetText("player.Helena"),stat = 254,max = 100})
+                    fcommon.UpdateStat({ name = flanguage.GetText("player.Katie"),stat = 256,max = 100})
+                    fcommon.UpdateStat({ name = flanguage.GetText("player.Michelle"),stat = 253,max = 100})
+                    fcommon.UpdateStat({ name = flanguage.GetText("player.Millie"),stat = 257,max = 100})
                     imgui.EndTabItem()
                 end
                 if imgui.BeginTabItem(flanguage.GetText("common.Search")) then

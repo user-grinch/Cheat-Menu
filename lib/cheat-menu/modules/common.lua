@@ -106,13 +106,9 @@ function module.GetSize(count,x,y)
 end
 
 function IsValidModForVehicle(model)
-    if isCharInAnyCar(PLAYER_PED) then
-       local CVehicle =  getCarPointer(storeCarCharIsInNoSave(PLAYER_PED))
-       if callMethod(0x49B010,CVehicle,2,2,model,CVehicle) == 1 then
-            return true
-        end
-    else
-        return false
+    local CVehicle =  getCarPointer(storeCarCharIsInNoSave(PLAYER_PED))
+    if callMethod(0x49B010,CVehicle,2,2,model,CVehicle) == 1 then
+        return true
     end
 end
 
@@ -158,7 +154,7 @@ function LoadTextures(store_table,image_path,model_table,extention)
     end
 end
 
-function module.ShowEntries(title,model_table,height,width,store_table,image_path,image_extention,func_load_model,func_show_tooltip,skip_check,search_text)
+function module.ShowEntries(title,model_table,height,width,store_table,image_path,image_extention,func_load_model,func_show_tooltip,skip_check,search_text,body_part)
     local rows = 0
     
     for i=0,20,1 do
@@ -177,7 +173,7 @@ function module.ShowEntries(title,model_table,height,width,store_table,image_pat
 
     
     for i=1,#model_table,1 do
-        if IsValidModForVehicle(model_table[i]) or skip_check == true then
+        if skip_check == true or IsValidModForVehicle(model_table[i]) then
             fcommon.DropDownMenu(title,function()
                 local skipped_entries = 0
                 for j=1,#model_table,1 do
@@ -185,7 +181,11 @@ function module.ShowEntries(title,model_table,height,width,store_table,image_pat
                         if (search_text == "") or (string.upper(func_show_tooltip(model_table[j])):find(string.upper(ffi.string(search_text))) ~= nil) then
                             if skip_check == true or IsValidModForVehicle(model_table[j]) then
                                 if imgui.ImageButton(store_table[tostring(model_table[j])],imgui.ImVec2(width,height),imgui.ImVec2(0,0),imgui.ImVec2(1,1),1,imgui.ImVec4(1,1,1,1),imgui.ImVec4(1,1,1,1)) then
-                                    func_load_model(model_table[j])
+                                    if body_part == nil then
+                                        func_load_model(model_table[j])
+                                    else
+                                        func_load_model(model_table[j],body_part)
+                                    end
                                 end
                                 
                                 if func_show_tooltip ~= nil then
