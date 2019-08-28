@@ -361,11 +361,11 @@ function module.ChangePlayerModel(model)
         end
     else
         if not hasSpecialCharacterLoaded(290) then
-            loadSpecialCharacter(fpeds.tpeds.special[model],1)
-            loadAllModelsNow()
+            unloadSpecialCharacter(model)
         end
+        loadSpecialCharacter(fpeds.tpeds.special[model],1)
+        loadAllModelsNow()
         setPlayerModel(PLAYER_HANDLE,290)
-        unloadSpecialCharacter(290)
     end
     clearCharTasksImmediately(PLAYER_PED)
     printHelpString(flanguage.GetText("player.SkinChanged"))

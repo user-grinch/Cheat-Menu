@@ -395,27 +395,27 @@ function module.GetName(model)
     if tpeds.names[model] then return tpeds.names[model] else return "" end
 end
 
-function module.GivePedToPlayer(model)
-    
-    -- if tpeds.special[model] == nil then
-    --     if isModelAvailable(model) then
-    --         requestModel(model)
-    --         loadAllModelsNow()
-    --         x,y,z = getCharCoordinates(PLAYER_PED)
-    --         createChar(tpeds.type.selected[0]+2,model,x,y,z)
-    --         markModelAsNoLongerNeeded(model)
-    --         printHelpString(flanguage.GetText('peds.PedSpawnedMSG'))
-    --     end
-    -- else
-    --     if not hasSpecialCharacterLoaded(model) then
-    --         loadSpecialCharacter(tpeds.special[model],tpeds.type.selected[0]+2)
-    --         loadAllModelsNow()
-    --     end
-    --     x,y,z = getCharCoordinates(PLAYER_PED)
-    --     createChar(tpeds.type.selected[0]+2,model,x,y,z)
-    --     unloadSpecialCharacter(model)
-    --     printHelpString(flanguage.GetText('peds.PedSpawnedMSG'))
-    -- end
+function module.GivePedToPlayer(model)  
+    if tpeds.special[model] == nil then
+        if isModelAvailable(model) then
+            requestModel(model)
+            loadAllModelsNow()
+            x,y,z = getCharCoordinates(PLAYER_PED)
+            createChar(tpeds.type.selected[0]+2,model,x,y,z)
+            markModelAsNoLongerNeeded(model)
+            printHelpString(flanguage.GetText('peds.PedSpawnedMSG'))
+        end
+    else
+        if hasSpecialCharacterLoaded(model) then
+            unloadSpecialCharacter(model)
+        end
+
+        loadSpecialCharacter(tpeds.special[model],1)
+        loadAllModelsNow()
+        x,y,z = getCharCoordinates(PLAYER_PED)
+        createChar(tpeds.type.selected[0]+2,290,x,y,z)
+        printHelpString(flanguage.GetText('peds.PedSpawnedMSG'))
+    end
 end
 
 function SetDensity(title,id)
