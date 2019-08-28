@@ -101,6 +101,7 @@ function module.write()
         tgame =
         {
             ss_shortcut = fgame.tgame.ss_shortcut[0],
+            disable_cheats = fgame.tgame.disable_cheats[0],
             fps =
             {
                 limit = fgame.tgame.fps.limit[0],

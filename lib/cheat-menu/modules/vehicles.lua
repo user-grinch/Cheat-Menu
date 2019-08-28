@@ -150,33 +150,29 @@ function module.AddComponentToVehicle(component)
 end
 
 function DoorMenu(func)
-    if isCharInAnyCar(PLAYER_PED) and not (isCharOnAnyBike(PLAYER_PED) or isCharInAnyBoat(PLAYER_PED) 
-    or isCharInAnyHeli(PLAYER_PED) or isCharInAnyPlane(PLAYER_PED)) then
 
-        local vehicle = storeCarCharIsInNoSave(PLAYER_PED)
-        local seats   = getMaximumNumberOfPassengers(vehicle) + 1 -- passenger + driver 
-        
-        if seats == 4 then
-            doors = 5
-        else
-            doors = 3
-        end
-        if imgui.Button(tvehicles.doors[7],imgui.ImVec2(fcommon.GetSize(1))) then
-            for i=0,doors,1 do
-                func(vehicle,i)
-            end
-        end
-        for i=0,doors,1 do
-            if imgui.Button(tvehicles.doors[i+1],imgui.ImVec2(fcommon.GetSize(2))) then
-                func(vehicle,i)
-            end
-            if i%2 ~= 1 then
-                imgui.SameLine()
-            end
-        end
+    local vehicle = storeCarCharIsInNoSave(PLAYER_PED)
+    local seats   = getMaximumNumberOfPassengers(vehicle) + 1 -- passenger + driver 
+    
+    if seats == 4 then
+        doors = 5
     else
-        imgui.Text("Player not in car")
+        doors = 3
     end
+    if imgui.Button(tvehicles.doors[7],imgui.ImVec2(fcommon.GetSize(1))) then
+        for i=0,doors,1 do
+            func(vehicle,i)
+        end
+    end
+    for i=0,doors,1 do
+        if imgui.Button(tvehicles.doors[i+1],imgui.ImVec2(fcommon.GetSize(2))) then
+            func(vehicle,i)
+        end
+        if i%2 ~= 1 then
+            imgui.SameLine()
+        end
+    end
+
 end   
 
 function module.ForEachCarComponent(func)
@@ -271,16 +267,7 @@ function module.VehiclesMain()
             fcommon.CheckBox({ address = 0x969165,name = flanguage.GetText("vehicles.HaveNitro")})
             fcommon.CheckBox({name = flanguage.GetText("vehicles.LightsOn"),var = tvehicles.lights.all,func =
             function()
-                if isCharInAnyCar(PLAYER_PED) then
-                    car = storeCarCharIsInNoSave(PLAYER_PED)
-                    if fvehicles.tvehicles.lights.all[0] == true then
-                        forceCarLights(car,2)
-                        addOneOffSound(x,y,z,1052)
-                    else
-                        forceCarLights(car,1)
-                        addOneOffSound(x,y,z,1053)
-                    end
-                end
+                forceAllVehicleLightsOff(not(tvehicles.lights.all[0]))
             end})
 
             fcommon.CheckBox({name = flanguage.GetText("vehicles.LockDoors"),var = tvehicles.lock_doors,func =
@@ -346,42 +333,46 @@ function module.VehiclesMain()
                 end)
                 fcommon.DropDownMenu(flanguage.GetText("vehicles.Doors"),function()
                     
-                    if imgui.RadioButtonIntPtr(flanguage.GetText("vehicles.Damage"), tvehicles.door_menu_button,0) then end
-                    imgui.SameLine()
-                    if imgui.RadioButtonIntPtr(flanguage.GetText("vehicles.Fix"), tvehicles.door_menu_button,1) then end
-                    imgui.SameLine()
-                    if imgui.RadioButtonIntPtr(flanguage.GetText("vehicles.Open"), tvehicles.door_menu_button,2) then end
-                    imgui.SameLine()
-                    if imgui.RadioButtonIntPtr(flanguage.GetText("vehicles.Pop"), tvehicles.door_menu_button,3) then end
-                    imgui.Spacing()
-                    imgui.Separator()
-                    imgui.Spacing()
+                    if isCharInAnyCar(PLAYER_PED) and not (isCharOnAnyBike(PLAYER_PED) or isCharInAnyBoat(PLAYER_PED) 
+                    or isCharInAnyHeli(PLAYER_PED) or isCharInAnyPlane(PLAYER_PED)) then    
+                        if imgui.RadioButtonIntPtr(flanguage.GetText("vehicles.Damage"), tvehicles.door_menu_button,0) then end
+                        imgui.SameLine()
+                        if imgui.RadioButtonIntPtr(flanguage.GetText("vehicles.Fix"), tvehicles.door_menu_button,1) then end
+                        imgui.SameLine()
+                        if imgui.RadioButtonIntPtr(flanguage.GetText("vehicles.Open"), tvehicles.door_menu_button,2) then end
+                        imgui.SameLine()
+                        if imgui.RadioButtonIntPtr(flanguage.GetText("vehicles.Pop"), tvehicles.door_menu_button,3) then end
+                        imgui.Spacing()
+                        imgui.Separator()
+                        imgui.Spacing()
 
-                    if tvehicles.door_menu_button[0] == 0 then
-                        if tvehicles.visual_damage[0] == false then
-                            DoorMenu(function(vehicle,door)
-                                damageCarDoor(vehicle,door)
-                            end)
-                        else
-                            imgui.Text(flanguage.GetText("vehicles.NoVisualDamageEnabled"))
+                        if tvehicles.door_menu_button[0] == 0 then
+                            if tvehicles.visual_damage[0] == false then
+                                DoorMenu(function(vehicle,door)
+                                    damageCarDoor(vehicle,door)
+                                end)
+                            else
+                                imgui.Text(flanguage.GetText("vehicles.NoVisualDamageEnabled"))
+                            end
                         end
+                        if tvehicles.door_menu_button[0] == 1 then
+                            DoorMenu(function(vehicle,door)
+                                fixCarDoor(vehicle,door)
+                            end)
+                        end
+                        if tvehicles.door_menu_button[0] == 2 then
+                            DoorMenu(function(vehicle,door)
+                                openCarDoor(vehicle,door)
+                            end)
+                        end
+                        if tvehicles.door_menu_button[0] == 3 then
+                            DoorMenu(function(vehicle,door)
+                                popCarDoor(vehicle,door,true)
+                            end)
+                        end
+                    else
+                        imgui.Text(flanguage.GetText("vehicles.PlayerNotInACar"))
                     end
-                    if tvehicles.door_menu_button[0] == 1 then
-                        DoorMenu(function(vehicle,door)
-                            fixCarDoor(vehicle,door)
-                        end)
-                    end
-                    if tvehicles.door_menu_button[0] == 2 then
-                        DoorMenu(function(vehicle,door)
-                            openCarDoor(vehicle,door)
-                        end)
-                    end
-                    if tvehicles.door_menu_button[0] == 3 then
-                        DoorMenu(function(vehicle,door)
-                            popCarDoor(vehicle,door,true)
-                        end)
-                    end
-
                     
                 end)
                 fcommon.DropDownMenu(flanguage.GetText("vehicles.Enter"),function()

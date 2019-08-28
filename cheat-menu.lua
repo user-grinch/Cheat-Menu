@@ -5,7 +5,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu
 script_dependencies("ffi","mimgui","memory","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.7")
-script_version_number(27082019) -- DDMMYYYY
+script_version_number(28082019) -- DDMMYYYY
 
 -- All the command keys used throughout the Cheat-Menu
 tkeys =
@@ -250,6 +250,13 @@ function main()
         removePickup(glob.Pickup_Info_Hospital)
         removePickup(glob.Pickup_Info_Hospital_2)
         removePickup(glob.Pickup_Info_Police)
+    end
+    forceAllVehicleLightsOff(not(fvehicles.tvehicles.lights.all[0]))
+
+    if fgame.tgame.disable_cheats[0] == true then
+        writeMemory(0x004384D0 ,1,0xE9 ,false)
+        writeMemory(0x004384D1 ,4,0x000000D0 ,false)
+        writeMemory(0x004384D5 ,4,0x90909090 ,false)
     end
     
     while true do

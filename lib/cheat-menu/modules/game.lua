@@ -6,6 +6,7 @@ local tgame =
     ss_shortcut = imgui.new.bool(fconfig.get('tgame.ss_shortcut',false)),
     keep_stuff = imgui.new.bool(false),
     unlock_interior = imgui.new.bool(false),
+    disable_cheats  = imgui.new.bool(fconfig.get('tgame.disable_cheats',false)),
     current_weather = 0,
     day_names = {"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"},
     weather_names = {"EXTRASUNNY LA","SUNNY LA","EXTRASUNNY SMOG LA","SUNNY SMOG LA","CLOUDY LA","SUNNY SF","EXTRASUNNY SF","CLOUDY SF","RAINY SF",
@@ -320,6 +321,19 @@ function module.GameMain()
                 end
             end})
             fcommon.CheckBox({ address = 0x969167,name = flanguage.GetText('game.AlwaysMidnight')})
+            fcommon.CheckBox({name = flanguage.GetText('game.DisableCheats'),var = tgame.disable_cheats,func = function()
+                if tgame.disable_cheats[0] == true then
+                    writeMemory(0x004384D0 ,1,0xE9 ,false)
+                    writeMemory(0x004384D1 ,4,0x000000D0 ,false)
+                    writeMemory(0x004384D5 ,4,0x90909090 ,false)
+                    fcommon.CheatActivated()
+                else
+                    writeMemory(0x004384D0 ,1,0x83,false)
+                    writeMemory(0x004384D1 ,4,-0x7DF0F908,false)
+                    writeMemory(0x004384D5 ,4,0xCC,false)
+                    fcommon.CheatDeactivated()
+                end
+            end})
             fcommon.CheckBox({ name = flanguage.GetText('game.DisableHelpPopups'),var = tgame.disable_help_popups ,show_help_popups = true,help_text = flanguage.GetText('game.DisableHelpPopupsToolTip')})
             fcommon.CheckBox({ address = 0x96C009,name = flanguage.GetText('game.FreePNS')})
 
