@@ -99,7 +99,6 @@ tcheatMenu =
     cursor = 
     {
         state  = nil,
-        thread = false,
     }
 }
 
@@ -146,12 +145,6 @@ function() -- condition
 end,
 function() -- render frame
     if not isGamePaused() then
-
-        if fmenu.tmenu.manual_mouse[0] == true then
-            lua_thread.create(ShowHideCursor)
-        else
-            showCursor(tcheatMenu.window.main[0])
-        end
         
         if tcheatMenu.window.main[0] then
            
@@ -230,13 +223,12 @@ function() -- render frame
 end).HideCursor = true
 
 function ShowHideCursor()
-    if imgui.IsMouseDoubleClicked(1) then
-        if tcheatMenu.cursor.thread == false  then
-            tcheatMenu.cursor.thread = true
+    while true do
+        wait(0)
+        if fmenu.tmenu.manual_mouse[0] == true and imgui.IsMouseDoubleClicked(1) then
             tcheatMenu.cursor.state = not tcheatMenu.cursor.state
             showCursor(tcheatMenu.cursor.state)
             wait(250)
-            tcheatMenu.cursor.thread = false
         end
     end
 end
@@ -244,6 +236,8 @@ end
 function main()
     
     flanguage.LoadLanguages()
+    lua_thread.create(ShowHideCursor)
+
     if fgame.tgame.disable_help_popups[0] == true then
         setGameGlobal(glob.Help_Wasted_Shown,1)
         setGameGlobal(glob.Help_Busted_Shown,1)
@@ -260,6 +254,16 @@ function main()
     end
     
     while true do
+
+        if not isGamePaused() then
+            if fmenu.tmenu.manual_mouse[0] then
+                showCursor(tcheatMenu.cursor.state)
+            else
+                showCursor(tcheatMenu.window.main[0])
+            end
+        else
+            showCursor(false)
+        end
 
         if fgame.tgame.airbreak[0] then
             fgame.AirbreakMode()
