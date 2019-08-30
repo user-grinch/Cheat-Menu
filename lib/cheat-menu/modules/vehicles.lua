@@ -4,6 +4,18 @@ local module = {}
 local tvehicles =
 {
     door_menu_button = imgui.new.int(0),
+    paintjobs  = 
+    {
+        path   =  tcheatMenu.dir .. "vehicles\\paintjobs\\",
+        search_text = imgui.new.char[20](),
+        images = {},
+        texture = nil
+    },
+    color =
+    {
+        rgb     = imgui.new.float[3](0.0,0.0,0.0),
+        default = -1,
+    },
     components =
     {
         saved = false,
@@ -56,12 +68,6 @@ local tvehicles =
     },
     search_text = imgui.new.char[20](),
     models = {},
-
-    color =
-    {
-        rgb     = imgui.new.float[3](0.0,0.0,0.0),
-        default = -1,
-    },
     lights =
     {
         all    = imgui.new.bool(fconfig.get('tvehicles.lights.all',false)),
@@ -186,6 +192,8 @@ function module.ForEachCarComponent(func)
             end
         end
         markCarAsNoLongerNeeded(car)
+    else
+        printHelpString(flanguage.GetText("vehicles.PlayerNotInACar"))
     end
 end
 
@@ -212,6 +220,31 @@ function module.AircraftCamera()
         end
         restoreCameraJumpcut()
     end
+end
+
+function module.GetTextureName(name)
+    if name == nil then
+        return ""
+    else
+        return name
+    end
+end
+
+function module.ApplyTexture(filename)
+    lua_thread.create(function()
+        local fullpath = tvehicles.paintjobs.path .. filename .. ".png"
+        tvehicles.paintjobs.texture = assert(mad.load_png_texture(fullpath))
+        module.ForEachCarComponent(function(mat,comp,car)
+            local r, g, b, old_a = mat:get_color()
+            if tvehicles.components.selected[0] == 0 and (r == 0x3C and g == 0xFF and b == 0x00) or (r == 0xFF and g == 0x00 and b == 0xAF) then
+                mat:set_texture(tvehicles.paintjobs.texture)
+            end
+            if comp.name == tvehicles.components.names[tvehicles.components.selected[0]+1] then
+                mat:set_texture(tvehicles.paintjobs.texture)
+            end
+            tvehicles.color.default = getCarColours(car)
+        end)
+    end,filename)
 end
 
 function module.VehiclesMain()
@@ -307,30 +340,6 @@ function module.VehiclesMain()
 
         if imgui.BeginTabItem(flanguage.GetText('common.Menus')) then
             if imgui.BeginChild(flanguage.GetText('common.Menus')) then
-                fcommon.DropDownMenu(flanguage.GetText("vehicles.Color"),function()
-                    if imgui.Button(flanguage.GetText("vehicles.ResetColor"),imgui.ImVec2(fcommon.GetSize(1))) then
-                        module.ForEachCarComponent(function(mat,car)
-                            mat:reset_color()
-                            tvehicles.color.default = getCarColours(car)
-                        end)
-                    end
-                    imgui.Spacing()
-                    imgui.Combo(flanguage.GetText("vehicles.Component"),tvehicles.components.selected,tvehicles.components.list,#tvehicles.components.names)
-
-                    if imgui.ColorPicker3(flanguage.GetText("vehicles.Color"),tvehicles.color.rgb) then
-                        module.ForEachCarComponent(function(mat,comp,car)
-                            local r, g, b, old_a = mat:get_color()
-                            fixCar(car)
-                            if tvehicles.components.selected[0] == 0 and (r == 0x3C and g == 0xFF and b == 0x00) or (r == 0xFF and g == 0x00 and b == 0xAF) then
-                                mat:set_color(tvehicles.color.rgb[0]*255, tvehicles.color.rgb[1]*255, tvehicles.color.rgb[2]*255, 255.0)
-                            end
-                            if comp.name == tvehicles.components.names[tvehicles.components.selected[0]+1] then
-                                mat:set_color(tvehicles.color.rgb[0]*255, tvehicles.color.rgb[1]*255, tvehicles.color.rgb[2]*255, 255.0)
-                            end
-                            tvehicles.color.default = getCarColours(car)
-                        end)
-                    end
-                end)
                 fcommon.DropDownMenu(flanguage.GetText("vehicles.Doors"),function()
                     
                     if isCharInAnyCar(PLAYER_PED) and not (isCharOnAnyBike(PLAYER_PED) or isCharInAnyBoat(PLAYER_PED) 
@@ -442,27 +451,27 @@ function module.VehiclesMain()
             imgui.Spacing()
             if imgui.BeginTabBar(flanguage.GetText("vehicles.VehiclesList")) then
                 imgui.Spacing()
-                
+
                 if imgui.BeginTabItem(flanguage.GetText("common.List")) then
                     if imgui.BeginChild("Vehicles") then
-                        fcommon.ShowEntries(flanguage.GetText("vehicles.Airplanes"),{592,577,511,512,593,520,553,476,519,460,513},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-                        fcommon.ShowEntries(flanguage.GetText("vehicles.Helicopters"),{548,425,417,487,488,497,563,447,469},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-                        fcommon.ShowEntries(flanguage.GetText("vehicles.Boats"),{472,473,493,595,484,430,453,452,446,454},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-                        fcommon.ShowEntries(flanguage.GetText("vehicles.Bikes"),{581,509,481,462,521,463,510,522,461,448,468,586},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-                        fcommon.ShowEntries(flanguage.GetText("vehicles.2Door&CompactCars"),{602,496,401,518,527,589,419,587,533,526,474,545,517,410,600,436,439,549,491},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-                        fcommon.ShowEntries(flanguage.GetText("vehicles.4Door&LuxuryCars"),{445,604,507,585,466,492,546,551,516,467,426,547,405,580,409,550,566,540,421,529},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-                        fcommon.ShowEntries(flanguage.GetText("vehicles.CivilService"),{485,431,438,437,574,420,525,408,552},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-                        fcommon.ShowEntries(flanguage.GetText("vehicles.GovernmentVehicles"),{416,433,427,490,528,407,544,523,470,596,598,599,597,432,601,428},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-                        fcommon.ShowEntries(flanguage.GetText("vehicles.Heavy&UtilityTruck"),{499,609,498,524,532,578,486,406,573,455,403,423,414,443,515,514,531,456,588},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-                        fcommon.ShowEntries(flanguage.GetText("vehicles.LightTrucks&Vans"),{459,422,482,605,530,418,572,582,413,440,543,583,478,554},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-                        fcommon.ShowEntries(flanguage.GetText("vehicles.SUVs&Wagons"),{579,400,404,489,505,479,442,458},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-                        fcommon.ShowEntries(flanguage.GetText("vehicles.LowRiders"),{536,575,534,567,535,576,412},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-                        fcommon.ShowEntries(flanguage.GetText("vehicles.MuscleCars"),{402,542,603,475},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-                        fcommon.ShowEntries(flanguage.GetText("vehicles.RCVehicles"),{441,464,594,501,465,564},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-                        fcommon.ShowEntries(flanguage.GetText("vehicles.Recreational"),{568,424,504,457,483,508,571,500,444,556,557,471,495,539},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-                        fcommon.ShowEntries(flanguage.GetText("vehicles.StreetRacers"),{429,541,542,415,480,562,565,434,494,502,503,411,559,561,560,506,451,558,555,477},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-                        fcommon.ShowEntries(flanguage.GetText("vehicles.Trailers"),{435,450,584,591,606,607,608,610,611},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-                        fcommon.ShowEntries(flanguage.GetText("vehicles.Trains"),{449,537,538,569,570,590},75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                        fcommon.ShowEntries(flanguage.GetText("vehicles.Airplanes"),{592,577,511,512,593,520,553,476,519,460,513},75,100,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                        fcommon.ShowEntries(flanguage.GetText("vehicles.Helicopters"),{548,425,417,487,488,497,563,447,469},75,100,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                        fcommon.ShowEntries(flanguage.GetText("vehicles.Boats"),{472,473,493,595,484,430,453,452,446,454},75,100,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                        fcommon.ShowEntries(flanguage.GetText("vehicles.Bikes"),{581,509,481,462,521,463,510,522,461,448,468,586},75,100,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                        fcommon.ShowEntries(flanguage.GetText("vehicles.2Door&CompactCars"),{602,496,401,518,527,589,419,587,533,526,474,545,517,410,600,436,439,549,491},75,100,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                        fcommon.ShowEntries(flanguage.GetText("vehicles.4Door&LuxuryCars"),{445,604,507,585,466,492,546,551,516,467,426,547,405,580,409,550,566,540,421,529},75,100,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                        fcommon.ShowEntries(flanguage.GetText("vehicles.CivilService"),{485,431,438,437,574,420,525,408,552},75,100,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                        fcommon.ShowEntries(flanguage.GetText("vehicles.GovernmentVehicles"),{416,433,427,490,528,407,544,523,470,596,598,599,597,432,601,428},75,100,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                        fcommon.ShowEntries(flanguage.GetText("vehicles.Heavy&UtilityTruck"),{499,609,498,524,532,578,486,406,573,455,403,423,414,443,515,514,531,456,588},75,100,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                        fcommon.ShowEntries(flanguage.GetText("vehicles.LightTrucks&Vans"),{459,422,482,605,530,418,572,582,413,440,543,583,478,554},75,100,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                        fcommon.ShowEntries(flanguage.GetText("vehicles.SUVs&Wagons"),{579,400,404,489,505,479,442,458},75,100,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                        fcommon.ShowEntries(flanguage.GetText("vehicles.LowRiders"),{536,575,534,567,535,576,412},75,100,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                        fcommon.ShowEntries(flanguage.GetText("vehicles.MuscleCars"),{402,542,603,475},75,100,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                        fcommon.ShowEntries(flanguage.GetText("vehicles.RCVehicles"),{441,464,594,501,465,564},75,100,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                        fcommon.ShowEntries(flanguage.GetText("vehicles.Recreational"),{568,424,504,457,483,508,571,500,444,556,557,471,495,539},75,100,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                        fcommon.ShowEntries(flanguage.GetText("vehicles.StreetRacers"),{429,541,542,415,480,562,565,434,494,502,503,411,559,561,560,506,451,558,555,477},75,100,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                        fcommon.ShowEntries(flanguage.GetText("vehicles.Trailers"),{435,450,584,591,606,607,608,610,611},75,100,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                        fcommon.ShowEntries(flanguage.GetText("vehicles.Trains"),{449,537,538,569,570,590},75,100,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true)
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()
@@ -478,13 +487,72 @@ function module.VehiclesMain()
                     imgui.Separator()
                     imgui.Spacing()
                     if imgui.BeginChild("Vehicle Entries") then
-                        fcommon.ShowEntries(nil,tvehicles.models,75,150,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true,tvehicles.search_text)
+                        fcommon.ShowEntries(nil,tvehicles.models,75,100,tvehicles.images,tvehicles.path,".jpg", fvehicles.GiveVehicleToPlayer,getNameOfVehicleModel,true,tvehicles.search_text)
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()
                 end
                 imgui.EndTabBar()
             end
+            imgui.EndTabItem()
+        end
+        if imgui.BeginTabItem(flanguage.GetText("common.Paint")) then
+            imgui.Spacing()
+            imgui.Columns(1)
+            if imgui.InputText(flanguage.GetText("common.Search"),tvehicles.paintjobs.search_text,ffi.sizeof(tvehicles.paintjobs.search_text)) then end
+            imgui.SameLine()
+
+            imgui.Spacing()
+            imgui.Combo(flanguage.GetText("vehicles.Component"),tvehicles.components.selected,tvehicles.components.list,#tvehicles.components.names)
+            if imgui.ColorEdit3(flanguage.GetText("vehicles.Color"),tvehicles.color.rgb) then
+                module.ForEachCarComponent(function(mat,comp,car)
+                    local r, g, b, old_a = mat:get_color()
+                    fixCar(car)
+                    if tvehicles.components.selected[0] == 0 and (r == 0x3C and g == 0xFF and b == 0x00) or (r == 0xFF and g == 0x00 and b == 0xAF) then
+                        mat:set_color(tvehicles.color.rgb[0]*255, tvehicles.color.rgb[1]*255, tvehicles.color.rgb[2]*255, 255.0)
+                        mat:set_texture(tvehicles.paintjobs.texture)
+                    end
+                    if comp.name == tvehicles.components.names[tvehicles.components.selected[0]+1] then
+                        mat:set_color(tvehicles.color.rgb[0]*255, tvehicles.color.rgb[1]*255, tvehicles.color.rgb[2]*255, 255.0)
+                        mat:set_texture(tvehicles.paintjobs.texture)
+                    end
+                    tvehicles.color.default = getCarColours(car)
+                end)
+            end
+            imgui.Spacing()
+            if imgui.Button(flanguage.GetText("vehicles.ResetColor"),imgui.ImVec2(fcommon.GetSize(2))) then
+                module.ForEachCarComponent(function(mat,car)
+                    mat:reset_color()
+                    tvehicles.color.default = -1
+                end)
+            end
+            imgui.SameLine()
+            if imgui.Button(flanguage.GetText("vehicles.ResetTexture"),imgui.ImVec2(fcommon.GetSize(2))) then
+                module.ForEachCarComponent(function(mat,car)
+                    material:reset_texture()
+                end)
+            end
+            imgui.Spacing()
+            imgui.Text(flanguage.GetText("common.FoundEntries") .. ":(" .. ffi.string(tvehicles.paintjobs.search_text) .. ")")
+            imgui.Separator()
+            imgui.Spacing()
+
+            
+            local mask = tvehicles.paintjobs.path .. "*.png"
+            local handle,file = findFirstFile(mask)
+            local model_table = {}
+
+            while handle and file do
+                table.insert( model_table,#model_table+1,string.sub( file,1,-5))
+                file = findNextFile(handle)
+            end
+        
+            if imgui.BeginChild("Vehicle Entries") then
+              
+                fcommon.ShowEntries(nil,model_table,80,100,tvehicles.paintjobs.images,tvehicles.paintjobs.path,".png", fvehicles.ApplyTexture,fvehicles.GetTextureName,true,tvehicles.paintjobs.search_text)
+                imgui.EndChild()
+            end
+
             imgui.EndTabItem()
         end
         if isCharInAnyCar(PLAYER_PED) then
@@ -505,19 +573,19 @@ function module.VehiclesMain()
                 imgui.Spacing()
                 if imgui.BeginChild(flanguage.GetText("vehicles.Tune")) then
                     imgui.Spacing()
-                    fcommon.ShowEntries(flanguage.GetText("vehicles.Bullbar"),{1100,1109,1110,1115,1116,1123,1125},75,150,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries(flanguage.GetText("vehicles.Exhaust"),{1018,1019,1020,1021,1022,1028,1029,1034,1037,1043,1044,1045,1046,1059,1064,1065,1066,1089,1092,1104,1105,1113,1114,1126,1127,1129,1132,1135,1136},75,150,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries(flanguage.GetText("vehicles.FrontBumper"),{1117,1152,1153,1155,1157,1160,1165,1166,1169,1170,1171,1172,1173,1174,1175,1179,1181,1182,1185,1188,1189,1190,1191},75,150,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries(flanguage.GetText("vehicles.FrontSign"),{1111,1112},75,150,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)                    fcommon.ShowEntries(flanguage.GetText("vehicles.Hood"),{1004,1005,1011,1012},75,150,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries(flanguage.GetText("vehicles.Lamps"),{1013,1024},75,150,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries(flanguage.GetText("vehicles.Misc"),{1086,1087},75,150,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries(flanguage.GetText("vehicles.Nitros"),{1008,1009,1010},75,150,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries(flanguage.GetText("vehicles.RearBumper"),{1140,1141,1148,1149,1150,1151,1154,1156,1159,1161,1167,1168,1176,1177,1178,1180,1183,1184,1186,1187,1192,1193},75,150,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries(flanguage.GetText("vehicles.Roof"),{1006,1032,1033,1035,1038,1053,1054,1055,1061,1067,1068,1088,1091,1103,1028,1130,1131},75,150,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries(flanguage.GetText("vehicles.Sideskirt"),{1007,1017,1026,1027,1030,1031,1036,1039,1040,1041,1042,1047,1048,1051,1052,1056,1057,1062,1063,1069,1070,1071,1072,1090,1093,1094,1095,1099,1101,1102,1106,1107,1108,1118,1119,1120,1121,1122,1124,1133,1134,1137},75,150,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries(flanguage.GetText("vehicles.Spoiler"),{1000,1001,1002,1003,1014,1015,1016,1023,1049,1050,1058,1060,1138,1139,1146,1147,1158,1162,1163,1164},75,150,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries(flanguage.GetText("vehicles.Vents"),{1142,1143,1144,1145},75,150,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
-                    fcommon.ShowEntries(flanguage.GetText("vehicles.Wheels"),{1025,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1096,1097,1098},75,150,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,true)
+                    fcommon.ShowEntries(flanguage.GetText("vehicles.Bullbar"),{1100,1109,1110,1115,1116,1123,1125},75,100,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries(flanguage.GetText("vehicles.Exhaust"),{1018,1019,1020,1021,1022,1028,1029,1034,1037,1043,1044,1045,1046,1059,1064,1065,1066,1089,1092,1104,1105,1113,1114,1126,1127,1129,1132,1135,1136},75,100,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries(flanguage.GetText("vehicles.FrontBumper"),{1117,1152,1153,1155,1157,1160,1165,1166,1169,1170,1171,1172,1173,1174,1175,1179,1181,1182,1185,1188,1189,1190,1191},75,100,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries(flanguage.GetText("vehicles.FrontSign"),{1111,1112},75,100,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)                    fcommon.ShowEntries(flanguage.GetText("vehicles.Hood"),{1004,1005,1011,1012},75,100,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries(flanguage.GetText("vehicles.Lamps"),{1013,1024},75,100,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries(flanguage.GetText("vehicles.Misc"),{1086,1087},75,100,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries(flanguage.GetText("vehicles.Nitros"),{1008,1009,1010},75,100,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries(flanguage.GetText("vehicles.RearBumper"),{1140,1141,1148,1149,1150,1151,1154,1156,1159,1161,1167,1168,1176,1177,1178,1180,1183,1184,1186,1187,1192,1193},75,100,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries(flanguage.GetText("vehicles.Roof"),{1006,1032,1033,1035,1038,1053,1054,1055,1061,1067,1068,1088,1091,1103,1028,1130,1131},75,100,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries(flanguage.GetText("vehicles.Sideskirt"),{1007,1017,1026,1027,1030,1031,1036,1039,1040,1041,1042,1047,1048,1051,1052,1056,1057,1062,1063,1069,1070,1071,1072,1090,1093,1094,1095,1099,1101,1102,1106,1107,1108,1118,1119,1120,1121,1122,1124,1133,1134,1137},75,100,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries(flanguage.GetText("vehicles.Spoiler"),{1000,1001,1002,1003,1014,1015,1016,1023,1049,1050,1058,1060,1138,1139,1146,1147,1158,1162,1163,1164},75,100,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries(flanguage.GetText("vehicles.Vents"),{1142,1143,1144,1145},75,100,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,false)
+                    fcommon.ShowEntries(flanguage.GetText("vehicles.Wheels"),{1025,1073,1074,1075,1076,1077,1078,1079,1080,1081,1082,1083,1084,1085,1096,1097,1098},75,100,tvehicles.components.images,tvehicles.components.path,".jpg", fvehicles.AddComponentToVehicle,nil,true)
                     imgui.EndChild()
                 end
                 imgui.EndTabItem()

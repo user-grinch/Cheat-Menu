@@ -44,7 +44,6 @@ function module.write()
             auto_z         = fteleport.tteleport.auto_z[0],
             insert_coords  = fteleport.tteleport.insert_coords[0],
             coords         = ffi.string(fteleport.tteleport.coords),
-            search_text    = ffi.string(fteleport.tteleport.search_text),
         },
         tmemory =
         {
@@ -61,10 +60,6 @@ function module.write()
             aimSkinChanger    = fplayer.tplayer.aimSkinChanger[0],
             neverWanted       = fplayer.tplayer.neverWanted[0],
             cjBody            = fplayer.tplayer.cjBody[0],
-            skins             =
-            {
-                search_text   = ffi.string(fplayer.tplayer.skins.search_text),
-            },
             style =
             {
                 fighting =
@@ -76,15 +71,10 @@ function module.write()
                     selected = fplayer.tplayer.style.walking.selected[0],
                 },
             },
-            stats =
-            {
-                search_text = ffi.string(fplayer.tplayer.stats.search_text),
-            },
         },
         tweapons =
         {
             quick_spawn = fweapons.tweapons.quick_spawn[0],
-            search_text = ffi.string(fweapons.tweapons.search_text),
         },
         tpeds  =
         {
@@ -92,11 +82,6 @@ function module.write()
             {
                 selected = fpeds.tpeds.type.selected[0],
             },
-            search_text = ffi.string(fpeds.tpeds.search_text),
-        },
-        tmissions =
-        {
-            search_text = ffi.string(fmissions.tmissions.search_text),
         },
         tgame =
         {

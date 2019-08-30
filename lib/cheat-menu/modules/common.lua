@@ -155,19 +155,10 @@ function LoadTextures(store_table,image_path,model_table,extention)
 end
 
 function module.ShowEntries(title,model_table,height,width,store_table,image_path,image_extention,func_load_model,func_show_tooltip,skip_check,search_text,body_part)
-    local rows = 0
-    
-    for i=0,20,1 do
-        if math.floor(imgui.GetWindowWidth()/i) < width then
-            width = (imgui.GetWindowWidth()/(i*1.2))
-            if (func_load_model == fvehicles.GiveVehicleToPlayer) or (func_load_model == fvehicles.AddComponentToVehicle) then
-                rows = i
-            else
-                rows = i - 1
-            end
-            break
-        end
-    end
+
+    local content_width = (imgui.GetWindowWidth() - imgui.StyleVar.FramePadding - imgui.StyleVar.ItemSpacing)
+
+    local rows = math.floor(content_width/width)
 
     if search_text == nil then search_text = "" end
 
