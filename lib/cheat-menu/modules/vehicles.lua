@@ -529,7 +529,7 @@ function module.VehiclesMain()
             imgui.SameLine()
             if imgui.Button(flanguage.GetText("vehicles.ResetTexture"),imgui.ImVec2(fcommon.GetSize(2))) then
                 module.ForEachCarComponent(function(mat,car)
-                    material:reset_texture()
+                    mat:reset_texture()
                 end)
             end
             imgui.Spacing()
