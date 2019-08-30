@@ -510,11 +510,15 @@ function module.VehiclesMain()
                     fixCar(car)
                     if tvehicles.components.selected[0] == 0 and (r == 0x3C and g == 0xFF and b == 0x00) or (r == 0xFF and g == 0x00 and b == 0xAF) then
                         mat:set_color(tvehicles.color.rgb[0]*255, tvehicles.color.rgb[1]*255, tvehicles.color.rgb[2]*255, 255.0)
-                        mat:set_texture(tvehicles.paintjobs.texture)
+                        if tvehicles.paintjobs.texture ~= nil then
+                            mat:set_texture(tvehicles.paintjobs.texture)
+                        end
                     end
                     if comp.name == tvehicles.components.names[tvehicles.components.selected[0]+1] then
                         mat:set_color(tvehicles.color.rgb[0]*255, tvehicles.color.rgb[1]*255, tvehicles.color.rgb[2]*255, 255.0)
-                        mat:set_texture(tvehicles.paintjobs.texture)
+                        if tvehicles.paintjobs.texture ~= nil then
+                            mat:set_texture(tvehicles.paintjobs.texture)
+                        end
                     end
                     tvehicles.color.default = getCarColours(car)
                 end)
@@ -530,6 +534,7 @@ function module.VehiclesMain()
             if imgui.Button(flanguage.GetText("vehicles.ResetTexture"),imgui.ImVec2(fcommon.GetSize(2))) then
                 module.ForEachCarComponent(function(mat,car)
                     mat:reset_texture()
+                    tvehicles.paintjobs.texture = nil
                 end)
             end
             imgui.Spacing()
