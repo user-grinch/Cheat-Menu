@@ -115,7 +115,7 @@ end
 function module.UiCreateButtons(names,funcs)
 
     imgui.PushStyleVarVec2(imgui.StyleVar.ItemSpacing,imgui.ImVec2(0,0))
-
+    
     for i=1,#names,1 do
         if tcheatMenu.menubuttons.current == i then
             imgui.PushStyleColor(imgui.Col.Button, imgui.ImVec4(0.060,0.530,0.980,1.0))
@@ -124,6 +124,7 @@ function module.UiCreateButtons(names,funcs)
             tcheatMenu.menubuttons.current = i
         end
         if tcheatMenu.menubuttons.current == i then
+            imgui.GetStyleColorVec4(imgui.Col.Button)
             imgui.PushStyleColor(imgui.Col.Button, imgui.ImVec4(0.260,0.590,0.980,0.400))
         end
 

@@ -300,7 +300,16 @@ function module.VehiclesMain()
             fcommon.CheckBox({ address = 0x969165,name = flanguage.GetText("vehicles.HaveNitro")})
             fcommon.CheckBox({name = flanguage.GetText("vehicles.LightsOn"),var = tvehicles.lights.all,func =
             function()
-                forceAllVehicleLightsOff(not(tvehicles.lights.all[0]))
+                if isCharInAnyCar(PLAYER_PED) then
+                    car = storeCarCharIsInNoSave(PLAYER_PED)
+                    if fvehicles.tvehicles.lights.all[0] == true then
+                        forceCarLights(car,2)
+                        addOneOffSound(x,y,z,1052)
+                    else
+                        forceCarLights(car,1)
+                        addOneOffSound(x,y,z,1053)
+                    end
+                end
             end})
 
             fcommon.CheckBox({name = flanguage.GetText("vehicles.LockDoors"),var = tvehicles.lock_doors,func =

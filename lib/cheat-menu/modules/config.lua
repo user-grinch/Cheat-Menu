@@ -60,6 +60,11 @@ function module.write()
             aimSkinChanger    = fplayer.tplayer.aimSkinChanger[0],
             neverWanted       = fplayer.tplayer.neverWanted[0],
             cjBody            = fplayer.tplayer.cjBody[0],
+            animation =
+            {
+                loop             = fplayer.tplayer.animation.loop[0],
+                secondary        = fplayer.tplayer.animation.secondary[0],
+            },
             style =
             {
                 fighting =

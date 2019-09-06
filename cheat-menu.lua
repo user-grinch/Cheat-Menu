@@ -52,6 +52,7 @@ if not pcall(fconfig.Read) then
     printString(flanguage.GetText("cheatmenu.ConfigLoadFailure"),10000)
 end
 
+ftables       = require 'cheat-menu.modules.tables.$index'
 fabout        = require 'cheat-menu.modules.about'
 fcheats       = require 'cheat-menu.modules.cheats'
 fcommon       = require 'cheat-menu.modules.common'
@@ -200,7 +201,7 @@ function() -- render frame
                     if imgui.BeginPopupContextWindow() then
                         imgui.Text(flanguage.GetText("cheatmenu.Position"))
                         imgui.Separator()
-                        if (imgui.MenuItemBool(flanguage.GetText("cheatmenu.Custom"),nil,tcheatMenu.window.overlay.corner[0] == 0)) then tcheatMenu.window.overlay.corner[0] = 0 end
+                        if (imgui.MenuItemBool(flanguage.GetText("common.Custom"),nil,tcheatMenu.window.overlay.corner[0] == 0)) then tcheatMenu.window.overlay.corner[0] = 0 end
                         if (imgui.MenuItemBool(flanguage.GetText("cheatmenu.TopLeft"),nil,tcheatMenu.window.overlay.corner[0] == 1)) then tcheatMenu.window.overlay.corner[0] = 1 end
                         if (imgui.MenuItemBool(flanguage.GetText("cheatmenu.TopRight"),nil,tcheatMenu.window.overlay.corner[0] == 2)) then tcheatMenu.window.overlay.corner[0] = 2 end
                         if (imgui.MenuItemBool(flanguage.GetText("cheatmenu.BottomLeft"),nil,tcheatMenu.window.overlay.corner[0] == 3)) then tcheatMenu.window.overlay.corner[0] = 3 end
@@ -245,7 +246,6 @@ function main()
         removePickup(glob.Pickup_Info_Hospital_2)
         removePickup(glob.Pickup_Info_Police)
     end
-    forceAllVehicleLightsOff(not(fvehicles.tvehicles.lights.all[0]))
 
     if fgame.tgame.disable_cheats[0] == true then
         writeMemory(0x004384D0 ,1,0xE9 ,false)
@@ -373,6 +373,7 @@ function main()
             end
         else
             fvehicles.tvehicles.lock_doors[0] = false
+            fvehicles.tvehicles.lights.all[0] = false
         end
 
         wait(0)
