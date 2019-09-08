@@ -17,6 +17,7 @@
         "MenuCrash&RelodedMSG"      : "Cheat Menu ~r~crashed ~w~& ~g~reloaded~w~.Provide moonloader.log in case of debugging.",
         "MenuCrashMSG"              : "Cheat Menu ~r~crashed ~w~.Provide moonloader.log in case of debugging.",
         "Missions"                  : "Missions",
+        "NewVersionAvailableMSG"    : "New version available",
         "Peds"                      : "Peds",
         "Player"                    : "Player",
         "Position"                  : "Position",
@@ -535,7 +536,7 @@
     },      
     
     "menu":         
-    {       
+    {   "AutoCheckforUpdates"       : "Auto check for updates",
         "AutoReload"                : "Auto reload",
         "AutoReloadToolTip"         : "Script will automatically reload itself if\nany crash occurs(Might cause issues)",
         "Config"                    : "Config",
@@ -562,6 +563,7 @@
         "Discord"                   : "Discord",
         "Thanks"                    : "Thanks",
         "OfficialTopic"             : "Official topic",
+        "CheckForUpdate"            : "Check for update",
         "CopyToClipboard"           : "Copy link to clipboard",
         "CopySuccessMSG"            : "Link copy ~g~successful"
     } 

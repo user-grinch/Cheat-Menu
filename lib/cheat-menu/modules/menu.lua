@@ -11,6 +11,7 @@ local tmenu =
 		coordinates = imgui.new.bool(fconfig.get('tmenu.overlay.coordinates',false)),
 		fps  = imgui.new.bool(fconfig.get('tmenu.overlay.fps',false)),
 	},
+	auto_update_check   = imgui.new.bool(fconfig.get('tmenu.auto_update_check',true)),
 	auto_reload 		= imgui.new.bool(fconfig.get('tmenu.auto_reload',true)),
 	manual_mouse 		= imgui.new.bool(fconfig.get('tmenu.manual_mouse',false)),
 	show_tooltips	    = imgui.new.bool(fconfig.get('tmenu.show_tooltips',true)),
@@ -28,8 +29,9 @@ function module.MenuMain()
 			imgui.Spacing()
 			fcommon.CheckBox({name = flanguage.GetText('menu.AutoReload'),var = fmenu.tmenu.auto_reload,help_text = flanguage.GetText('menu.AutoReloadToolTip')})
 			fcommon.CheckBox({name = flanguage.GetText('menu.DisableInSAMP'),var = fmenu.tmenu.disable_in_samp})
-			fcommon.CheckBox({name = flanguage.GetText('menu.ManualMouse'),var = fmenu.tmenu.manual_mouse,help_text = flanguage.GetText('menu.ManualMouseToolTip')})
+			fcommon.CheckBox({name = flanguage.GetText('menu.AutoCheckforUpdates'),var = fmenu.tmenu.auto_update_check})
 			imgui.NextColumn()
+			fcommon.CheckBox({name = flanguage.GetText('menu.ManualMouse'),var = fmenu.tmenu.manual_mouse,help_text = flanguage.GetText('menu.ManualMouseToolTip')})
 			fcommon.CheckBox({name = flanguage.GetText('menu.ShowCrashMessage'),var = fmenu.tmenu.show_crash_message})
 			fcommon.CheckBox({name = flanguage.GetText('menu.ShowTooltips'),var = fmenu.tmenu.show_tooltips})
 			

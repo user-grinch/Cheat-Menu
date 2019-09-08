@@ -5,7 +5,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu
 script_dependencies("ffi","mimgui","memory","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.7")
-script_version_number(06092019) -- DDMMYYYY
+script_version_number(28082019) -- DDMMYYYY
 
 -- All the command keys used throughout the Cheat-Menu
 tkeys =
@@ -64,6 +64,7 @@ fmissions     = require 'cheat-menu.modules.missions'
 fpeds         = require 'cheat-menu.modules.peds'
 fplayer       = require 'cheat-menu.modules.player'
 fteleport     = require 'cheat-menu.modules.teleport'
+fupdate       = require 'cheat-menu.modules.update'
 fvehicles     = require 'cheat-menu.modules.vehicles'
 fvisuals      = require 'cheat-menu.modules.visuals'
 fweapons      = require 'cheat-menu.modules.weapons'
@@ -78,8 +79,8 @@ tcheatMenu =
     {
         size =
         {
-            X = fconfig.get('tcheatMenu.window.size.X',resX/4),
-            Y = fconfig.get('tcheatMenu.window.size.Y',resY/1.2),
+            X = resX/4,
+            Y = resY/1.2,
         },
         main    = imgui.new.bool(false),
         title   = string.format("%s v%s by %s",script.this.name,script.this.version,script.this.authors[1]),
@@ -100,7 +101,12 @@ tcheatMenu =
     cursor = 
     {
         state  = nil,
-    }
+    },
+    update =
+    {
+        available = false,
+        version_number = 0
+    },
 }
 
 tcheatMenu.window.overlay.list = imgui.new['const char*'][#tcheatMenu.window.overlay.names](tcheatMenu.window.overlay.names)
@@ -149,10 +155,18 @@ function() -- render frame
         
         if tcheatMenu.window.main[0] then
            
-            imgui.SetNextWindowSize(imgui.ImVec2(tcheatMenu.window.size.X,tcheatMenu.window.size.Y), imgui.Cond.Once)
+            imgui.SetNextWindowSize(imgui.ImVec2(tcheatMenu.window.size.X,tcheatMenu.window.size.Y), imgui.Cond.FirstUseEver)
 
             imgui.Begin(tcheatMenu.window.title, tcheatMenu.window.main,imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoSavedSettings)
 
+            if tcheatMenu.update.available then
+                imgui.Spacing()
+                if imgui.Button(string.format( "%s (%d)",flanguage.GetText("cheatmenu.NewVersionAvailableMSG"),tcheatMenu.update.version_number), imgui.ImVec2(fcommon.GetSize(1))) then
+                    --lua_thread.create(fupdate.DownloadUpdates)
+                    tcheatMenu.update.available = false
+                end
+                imgui.Spacing()            
+            end
             fcommon.UiCreateButtons({flanguage.GetText("cheatmenu.Teleport"),flanguage.GetText("cheatmenu.Memory"),
             flanguage.GetText("cheatmenu.Player"),flanguage.GetText("cheatmenu.Vehicle"),flanguage.GetText("cheatmenu.Weapon"),
             flanguage.GetText("cheatmenu.Peds"),flanguage.GetText("cheatmenu.Missions"),flanguage.GetText("cheatmenu.Cheats"),
@@ -235,6 +249,10 @@ function ShowHideCursor()
 end
 
 function main()
+
+    if fmenu.tmenu.auto_update_check[0] then
+        lua_thread.create(fupdate.CheckUpdates)
+    end
     
     flanguage.LoadLanguages()
     lua_thread.create(ShowHideCursor)

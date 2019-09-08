@@ -6,6 +6,10 @@ local module = {}
 
 function module.AboutMain()
     imgui.BulletText(string.format("%s v%s(%d)",script.this.name,script.this.version,script.this.version_num))
+    imgui.SameLine()
+    if imgui.Button(flanguage.GetText('about.CheckForUpdate'),imgui.ImVec2(120,20)) then
+        lua_thread.create(fupdate.CheckUpdates)
+    end
     imgui.BulletText(string.format("%s : %s",flanguage.GetText('about.Author'),script.this.authors[1]))
     imgui.BulletText(string.format("%s : v%s",flanguage.GetText('about.Imgui'),imgui._VERSION))
     imgui.BulletText(flanguage.GetText('about.Discord') .. " : Grinch_#3311")

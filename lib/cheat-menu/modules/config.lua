@@ -19,11 +19,6 @@ function module.write()
         {
             window =
             {
-                size =
-                {
-                    X = tcheatMenu.window.size.X,
-                    Y = tcheatMenu.window.size.Y,
-                },
                 overlay =
                 {
                     main     = tcheatMenu.window.overlay.main[0],
@@ -120,6 +115,7 @@ function module.write()
         },
         tmenu =
         {
+            auto_update_check   = fmenu.tmenu.auto_update_check[0],
             auto_reload         = fmenu.tmenu.auto_reload[0],
             manual_mouse        = fmenu.tmenu.manual_mouse[0],
             show_tooltips       = fmenu.tmenu.show_tooltips[0],

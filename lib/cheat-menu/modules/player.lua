@@ -495,9 +495,23 @@ function module.PlayerMain()
                 imgui.Spacing()
                 if imgui.BeginTabItem(flanguage.GetText("common.List")) then
                     if imgui.BeginChild("Stat Entries") then
-                        for key,value in pairs(ftables.animation.table) do
-                            AnimationEntry(key,value)
-                        end                 
+
+                        local menu_name = ""
+                        for key,value in ipairs(ftables.animation.table) do
+                            local temp,_ = value:match("([^$]+)$([^$]+)")
+                            if menu_name ~= temp then
+                                menu_name = temp
+                                fcommon.DropDownMenu(menu_name,function()
+                                    for key,value in pairs(ftables.animation.table) do
+                                        local file,animation = value:match("([^$]+)$([^$]+)")
+                                        if menu_name == file then
+                                            AnimationEntry(file,animation)
+                                        end
+                                    end
+                                end)
+                            end
+                        end   
+                                      
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()
@@ -516,8 +530,9 @@ function module.PlayerMain()
                     imgui.Spacing()
                     if imgui.BeginChild("Stat Entries") then
                         for key,value in pairs(ftables.animation.table) do
-                            if (string.upper(value):find(string.upper(ffi.string(tplayer.animation.search_text)))) then
-                                AnimationEntry(key,value)
+                            file, animation = value:match("([^$]+)$([^$]+)")
+                            if (string.upper(animation):find(string.upper(ffi.string(tplayer.animation.search_text)))) then
+                                AnimationEntry(file,animation)
                             end
                         end       
                         imgui.Spacing()
