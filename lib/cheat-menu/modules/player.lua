@@ -196,7 +196,7 @@ function module.ChangePlayerClothe(name,body_part)
     printHelpString(flanguage.GetText("player.ClotheChanged"))
 end
 
-function ShowClothes(label,path,body_part)
+function ShowClothes(label,path,body_part,search_text)
 
     local mask = path .. "*.jpg"
     local handle,file = findFirstFile(mask)
@@ -206,7 +206,7 @@ function ShowClothes(label,path,body_part)
         table.insert( model_table,#model_table+1,string.sub( file,1,-5))
         file = findNextFile(handle)
     end
-    fcommon.ShowEntries(label,model_table,100,80,tplayer.clothes.images,path,".jpg",fplayer.ChangePlayerClothe,fplayer.GetClotheName,true,nil,body_part)
+    fcommon.ShowEntries(label,model_table,100,80,tplayer.clothes.images,path,".jpg",fplayer.ChangePlayerClothe,fplayer.GetClotheName,true,nil,body_part,search_text)
 end
 
 
@@ -444,7 +444,7 @@ function module.PlayerMain()
             end
             imgui.Spacing()
 
-            if imgui.BeginTabBar(flanguage.GetText("common.List")) then
+            if imgui.BeginTabBar("Clothes") then
                 imgui.Spacing()
                 
                 if imgui.BeginTabItem(flanguage.GetText("common.List")) then
@@ -468,7 +468,6 @@ function module.PlayerMain()
                         ShowClothes("Tattoos stomach",tplayer.clothes.path .. "Tattoos stomach\\",11)
                         ShowClothes("Trousers",tplayer.clothes.path .. "Trousers\\",2)
                         ShowClothes("Watches",tplayer.clothes.path .. "Watches\\",14)
-                        
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()

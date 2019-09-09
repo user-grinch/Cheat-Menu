@@ -33,7 +33,7 @@ function module.Teleport(x, y, z,interior_id)
 	requestCollision(x,y)
 	activateInteriorPeds(true)
 	setCharCoordinates(PLAYER_PED, x, y, z)
-	--loadScene(x,y,z)
+	loadScene(x,y,z)
 
 end
 

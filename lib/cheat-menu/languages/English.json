@@ -554,8 +554,11 @@
         "ShowHealth"                : "Show health",       
         "ShowSpeed"                 : "Show speed",    
         "ShowTooltips"              : "Show tooltips"
-    },      
-    
+    },    
+    "update":
+    {
+        "FailedToUpdate"	    : "~g~Failed~w~ to update"
+    },    
     "about":        
     {       
         "Author"                    : "Author",

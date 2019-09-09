@@ -43,7 +43,7 @@ mad           = require 'MoonAdditions'
 
 tcheatMenu = 
 {
-    dir = string.format( "%s%s",getGameDirectory(),"//moonloader//lib//cheat-menu//")
+    dir = string.format( "%s%s",getWorkingDirectory(),"//lib//cheat-menu//")
 }
 
 -- Loading custom modules
@@ -251,7 +251,9 @@ end
 function main()
 
     if fmenu.tmenu.auto_update_check[0] then
-        lua_thread.create(fupdate.CheckUpdates)
+        if not pcall(fupdate.CheckUpdates) then
+            printHelpString(flanguage.GetText("update.FailedToUpdate"))
+        end
     end
     
     flanguage.LoadLanguages()
