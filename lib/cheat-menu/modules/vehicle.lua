@@ -6,7 +6,7 @@ local tvehicles =
     door_menu_button = imgui.new.int(0),
     paintjobs  = 
     {
-        path   =  tcheatMenu.dir .. "vehicles\\paintjobs\\",
+        path   =  tcheatmenu.dir .. "vehicles\\paintjobs\\",
         search_text = imgui.new.char[20](),
         images = {},
         texture = nil
@@ -19,7 +19,7 @@ local tvehicles =
     components =
     {
         saved = false,
-        path   =  tcheatMenu.dir .. "vehicles\\components\\",
+        path   =  tcheatmenu.dir .. "vehicles\\components\\",
         images = {},
         value  = imgui.new.int(0),
         list   = {},
@@ -80,7 +80,7 @@ local tvehicles =
     images = {},
     quick_spawn  = imgui.new.bool(fconfig.get('tvehicles.quick_spawn',false)),
     spawn_inside = imgui.new.bool(fconfig.get('tvehicles.spawn_inside',true)),
-    path = tcheatMenu.dir .. "vehicles\\",
+    path = tcheatmenu.dir .. "vehicles\\",
     visual_damage = imgui.new.bool(fconfig.get('tvehicles.visual_damage',false)),
     heavy = imgui.new.bool(fconfig.get('tvehicles.heavy',false)),
     hydraulic = imgui.new.bool(false),

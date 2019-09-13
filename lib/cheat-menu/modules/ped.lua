@@ -4,7 +4,7 @@ local module = {}
 
 local tpeds =
 {
-    path   = tcheatMenu.dir .. "peds\\",
+    path   = tcheatmenu.dir .. "peds\\",
     images = {},
     type   =
     {

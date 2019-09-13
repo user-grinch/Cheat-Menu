@@ -2,9 +2,9 @@
     "cheatmenu":
     {
         "About"                     : "About",
+        "Animation"                 : "Animation",
         "BottomLeft"                : "Bottom-Left",
         "BottomRight"               : "Bottom-Right",
-        "Cheats"                    : "Cheats",
         "Close"                     : "Close",
         "ConfigLoadFailure"         : "~r~Unable~w~ to load config file",
         "Coordinates"               : "Coordinates",
@@ -16,7 +16,7 @@
         "Menu"                      : "Menu",
         "MenuCrash&RelodedMSG"      : "Cheat Menu ~r~crashed ~w~& ~g~reloaded~w~.Provide moonloader.log in case of debugging.",
         "MenuCrashMSG"              : "Cheat Menu ~r~crashed ~w~.Provide moonloader.log in case of debugging.",
-        "Missions"                  : "Missions",
+        "Mission"                   : "Mission",
         "NewVersionAvailableMSG"    : "New version available",
         "Peds"                      : "Peds",
         "Player"                    : "Player",
@@ -27,7 +27,7 @@
         "TopLeft"                   : "Top-Left",
         "TopRight"                  : "Top-Right",
         "Vehicle"                   : "Vehicle",
-        "Visuals"                   : "Visuals",
+        "Visual"                    : "Visual",
         "Weapon"                    : "Weapon"
     },
     
@@ -82,6 +82,17 @@
         "VirtualProtect"        : "Virtual protect",    
         "Write"                 : "Write"      
     }, 
+    
+    "animation":
+    {
+        "Animation"                 : "Animation",
+        "AnimationName"             : "Animation name",
+        "FightingAnimation"         : "Fighting",      
+        "IFPName"                   : "IFP name",
+        "Loop"                      : "Loop",
+        "PlayAnimation"             : "Play animation",
+        "StopAnimation"             : "Stop animation"
+    },
 
     "player":     
     {   
@@ -89,8 +100,6 @@
         "AimSkinChanger"            : "Aim skin changer",                  
         "AimSkinChangerToolTip"     : "Aim at a pedestrian and then press Enter/Return key to switch to that skin", 
         "AimWhileDriving"           : "Aim while driving",
-        "Animation"                 : "Animation",
-        "AnimationName"             : "Animation name",
         "Armour"                    : "Armour",     
         "Barbara"                   : "Barbara",
         "Bike"                      : "Bike",
@@ -106,7 +115,6 @@
         "Driving"                   : "Driving",
         "Energy"                    : "Energy",
         "Fat"                       : "Fat",
-        "FightingAnimation"         : "Fighting",      
         "Flying"                    : "Flying",
         "GF"                        : "GF",
         "GFCount"                   : "GF count",
@@ -116,17 +124,11 @@
         "Health"                    : "Health",   
         "Helena"                    : "Helena",
         "HigherCycleJumps"          : "Higher cycle jumps",
-        "IFPName"                   : "IFP name",
         "InfiniteAmmo"              : "Infinite ammo",
         "InfiniteOxygen"            : "Infinite oxygen",
         "InfiniteRun"               : "Infinite run",
         "Katie"                     : "Katie",
-        "LockF"                     : "LockF",
-        "LockX"                     : "LockX",
-        "LockY"                     : "LockY",
-        "LockZ"                     : "LockZ",
         "LockPlayerControl"         : "Lock player control",
-        "Loop"                      : "Loop",
         "LungCapacity"              : "Lung capacity",
         "M4"                        : "M4",
         "MachinePistol"             : "Machine pistol",
@@ -144,7 +146,6 @@
         "NeverWanted"               : "Never wanted",    
         "NonInterruptable"          : "Non interruptable",
         "Pistol"                    : "Pistol",
-        "PlayAnimation"             : "Play animation",
         "Progress"                  : "Progress",
         "ProstitutesVisited"        : "Prostitutes visited",
         "RemoveClothes"             : "Remove clothes",
@@ -162,7 +163,6 @@
         "Skins"                     : "Skins",                
         "Stamina"                   : "Stamina",
         "Stats"                     : "Stats",
-        "StopAnimation"             : "Stop animation",
         "SuccessfulDates"           : "Successful dates",
         "Vehicle"                   : "Vehicle",
         "Vehicles"                  : "Vehicles",

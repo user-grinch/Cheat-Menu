@@ -107,10 +107,23 @@ function module.GetSize(count,x,y)
 end
 
 function IsValidModForVehicle(model)
-    local CVehicle =  getCarPointer(storeCarCharIsInNoSave(PLAYER_PED))
-    if callMethod(0x49B010,CVehicle,2,2,model,CVehicle) == 1 then
-        return true
+    for i=0,100,1 do
+        car = storeCarCharIsInNoSave(PLAYER_PED)
+        local x = getAvailableVehicleMod(car,i)
+        if x == 0 then
+            break
+        end
+        if x == model then
+            return true
+        end
     end
+    return false
+--     local CVehicle =  getCarPointer(storeCarCharIsInNoSave(PLAYER_PED))
+--     if callMethod(0x49B010,CVehicle,2,2,model,CVehicle) ~= 0 then
+--         return true
+--    -- else
+--      --   return false
+--     end
 end
 
 function module.UiCreateButtons(names,funcs)
@@ -118,13 +131,13 @@ function module.UiCreateButtons(names,funcs)
     imgui.PushStyleVarVec2(imgui.StyleVar.ItemSpacing,imgui.ImVec2(0,0))
     
     for i=1,#names,1 do
-        if tcheatMenu.menubuttons.current == i then
+        if tcheatmenu.menubuttons.current == i then
             imgui.PushStyleColor(imgui.Col.Button, imgui.ImVec4(0.060,0.530,0.980,1.0))
         end
         if imgui.Button(names[i],imgui.ImVec2(module.GetSize(4,imgui.GetWindowWidth()/4 - 4*imgui.StyleVar.WindowPadding,20))) then
-            tcheatMenu.menubuttons.current = i
+            tcheatmenu.menubuttons.current = i
         end
-        if tcheatMenu.menubuttons.current == i then
+        if tcheatmenu.menubuttons.current == i then
             imgui.GetStyleColorVec4(imgui.Col.Button)
             imgui.PushStyleColor(imgui.Col.Button, imgui.ImVec4(0.260,0.590,0.980,0.400))
         end
@@ -138,7 +151,7 @@ function module.UiCreateButtons(names,funcs)
     imgui.Spacing()
 
     for i=1,#funcs,1 do
-        if tcheatMenu.menubuttons.current == i then
+        if tcheatmenu.menubuttons.current == i then
             imgui.Spacing()
             funcs[i]()
             break

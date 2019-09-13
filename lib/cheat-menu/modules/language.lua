@@ -7,7 +7,7 @@ local tlanguage =
     current  = fconfig.get('tlanguage.current',"English"),
     names    = {},
     list     = {},
-    path  =  tcheatMenu.dir .. "languages//",
+    path  =  tcheatmenu.dir .. "languages//",
 }
 
 module.tlanguage = tlanguage

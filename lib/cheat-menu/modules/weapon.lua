@@ -5,7 +5,7 @@ local module = {}
 local tweapons =
 {
     images = {},
-    path = tcheatMenu.dir .. "weapons\\",
+    path = tcheatmenu.dir .. "weapons\\",
     quick_spawn = imgui.new.bool(fconfig.get('tweapons.quick_spawn',false)),
     noreload = imgui.new.bool(false),
     fast_reload = imgui.new.bool(false),

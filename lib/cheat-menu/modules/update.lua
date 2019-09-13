@@ -6,9 +6,9 @@ function module.CheckUpdates()
     local body, code, headers, status = https.request("https://raw.githubusercontent.com/inanahammad/Cheat-Menu/master/cheat-menu.lua")
     
     if not body then error(code) print(status) printHelpString(flanguage.GetText("update.FailedToUpdate")) return end
-    tcheatMenu.update.version_number = tonumber(body:match("script_version_number%((%d+)%)"))
-    if tcheatMenu.update.version_number ~= script.this.version_num then
-        tcheatMenu.update.available = true
+    tcheatmenu.update.version_number = tonumber(body:match("script_version_number%((%d+)%)"))
+    if tcheatmenu.update.version_number ~= script.this.version_num then
+        tcheatmenu.update.available = true
     end
 end
 

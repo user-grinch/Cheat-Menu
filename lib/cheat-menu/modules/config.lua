@@ -1,6 +1,6 @@
 local module = {}
 
-local config_path    =  tcheatMenu.dir ..  "cheat-menu.json"
+local config_path    =  tcheatmenu.dir ..  "cheat-menu.json"
 module.config_path   = config_path
 
 local tconfig =
@@ -15,21 +15,21 @@ function module.write()
 
     tconfig.write =
     {
-        tcheatMenu =
+        tcheatmenu =
         {
             window =
             {
                 overlay =
                 {
-                    main     = tcheatMenu.window.overlay.main[0],
-                    distance = tcheatMenu.window.overlay.distance,
-                    corner   = tcheatMenu.window.overlay.corner[0],
+                    main     = tcheatmenu.window.overlay.main[0],
+                    distance = tcheatmenu.window.overlay.distance,
+                    corner   = tcheatmenu.window.overlay.corner[0],
                 },
             },
 
             menubuttons =
             {
-                current = tcheatMenu.menubuttons.current,
+                current = tcheatmenu.menubuttons.current,
             },
         },
 
@@ -55,21 +55,18 @@ function module.write()
             aimSkinChanger    = fplayer.tplayer.aimSkinChanger[0],
             neverWanted       = fplayer.tplayer.neverWanted[0],
             cjBody            = fplayer.tplayer.cjBody[0],
-            animation =
+        },
+        tanimation =
+        {
+            loop             = fanimation.tanimation.loop[0],
+            secondary        = fanimation.tanimation.secondary[0],
+            fighting =
             {
-                loop             = fplayer.tplayer.animation.loop[0],
-                secondary        = fplayer.tplayer.animation.secondary[0],
+                selected = fanimation.tanimation.fighting.selected[0],
             },
-            style =
+            walking =
             {
-                fighting =
-                {
-                    selected = fplayer.tplayer.style.fighting.selected[0],
-                },
-                walking =
-                {
-                    selected = fplayer.tplayer.style.walking.selected[0],
-                },
+                selected = fanimation.tanimation.walking.selected[0],
             },
         },
         tweapons =
