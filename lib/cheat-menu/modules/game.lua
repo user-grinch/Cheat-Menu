@@ -9,7 +9,7 @@ local tgame =
     disable_cheats  = imgui.new.bool(fconfig.get('tgame.disable_cheats',false)),
     current_weather = 0,
     day_names = {"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"},
-    weather_names = ftables.weather.table,
+    weather_names = ftable.weather.table,
     fps =
     {
         limit = imgui.new.int(fconfig.get('tgame.fps.limit',30)),
@@ -19,7 +19,7 @@ local tgame =
     stats =
     {
         search_text = imgui.new.char[20](),
-        names = ftables.stats.table,
+        names = ftable.stats.table,
     },
 }
 
@@ -29,7 +29,7 @@ local days_list  = imgui.new['const char*'][#tgame.day_names](tgame.day_names)
 local weather_list  = imgui.new['const char*'][#tgame.weather_names](tgame.weather_names)
 
 -- Game Interriors list
-local interior_names = ftables.interiors.table
+local interior_names = ftable.interiors.table
 
 function CheatsEntry(func,names)
     

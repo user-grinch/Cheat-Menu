@@ -5,7 +5,7 @@ local module = {}
 local tmissions =
 {
     search_text = imgui.new.char[64](fconfig.get('tmissions.search_text',"")),
-    names       = ftables.missions.table,
+    names       = ftable.missions.table,
     list = {},
 }
 
@@ -47,78 +47,78 @@ function ShowMissionEntry(i)
             playerMadeProgress(progress)
             fcommon.CheatActivated()
         else
-            printHelpString(flanguage.GetText('missions.AlreadyInAMission'))
+            printHelpString('Already in a mission')
         end
     end
 end
 
-function module.MissionsMain()
+function module.MissionMain()
     imgui.Spacing()
     if imgui.BeginChild("Missions list") then
         if imgui.BeginTabBar("MissionsList") then
             if imgui.BeginTabItem("LS") then
                 imgui.Spacing()
-                MissionEntry(flanguage.GetText('missions.BigSmoke'),{27,28,29,30})
-                MissionEntry(flanguage.GetText('missions.Catalina'),{40})
-                MissionEntry(flanguage.GetText('missions.CesarVialpando'),{36,45,48})
-                MissionEntry(flanguage.GetText('missions.FrankTenpenny'),{22,23,39})
-                MissionEntry(flanguage.GetText('missions.Introduction'),{11,12})
-                MissionEntry(flanguage.GetText('missions.OGLoc'),{31,32,33,34})
-                MissionEntry(flanguage.GetText('missions.Robbery'),{41,42,43,44})
-                MissionEntry(flanguage.GetText('missions.Ryder'),{24,25,26})
-                MissionEntry(flanguage.GetText('missions.Sweet'),{13,14,15,16,17,18,19,20,21,37,38})
-                MissionEntry(flanguage.GetText('missions.TheTruth'),{46,47})
+                MissionEntry('Big smoke',{27,28,29,30})
+                MissionEntry('Catalina',{40})
+                MissionEntry('Cesar vialpando',{36,45,48})
+                MissionEntry('Frank tenpenny',{22,23,39})
+                MissionEntry('Introduction',{11,12})
+                MissionEntry('OG loc',{31,32,33,34})
+                MissionEntry('Robbery',{41,42,43,44})
+                MissionEntry('Ryder',{24,25,26})
+                MissionEntry('Sweet',{13,14,15,16,17,18,19,20,21,37,38})
+                MissionEntry('The truth',{46,47})
                 imgui.EndTabItem()
         end
-            if imgui.BeginTabItem(flanguage.GetText('missions.SF')) then
+            if imgui.BeginTabItem('SF') then
                 imgui.Spacing()
-                MissionEntry(flanguage.GetText('missions.CarlJohnson'),{49,50,51})
-                MissionEntry(flanguage.GetText('missions.FrankTenpenny'),{52})
-                MissionEntry(flanguage.GetText('missions.LocoSyndicate'),{58,59,60,61,62,63,64,65,66})
-                MissionEntry(flanguage.GetText('missions.WangCars'),{67,68,69,70,71})
-                MissionEntry(flanguage.GetText('missions.WuZiMu'),{53,54,55,56,57})
-                MissionEntry(flanguage.GetText('missions.Zero'),{72,73,74})
+                MissionEntry('Carl johnson',{49,50,51})
+                MissionEntry('Frank tenpenny',{52})
+                MissionEntry('Loco syndicate',{58,59,60,61,62,63,64,65,66})
+                MissionEntry('Wang cars',{67,68,69,70,71})
+                MissionEntry('WuZiMu',{53,54,55,56,57})
+                MissionEntry('Zero',{72,73,74})
                 imgui.EndTabItem()
             end
-            if imgui.BeginTabItem(flanguage.GetText('missions.LV')) then
+            if imgui.BeginTabItem('LV') then
                 imgui.Spacing()
-                MissionEntry(flanguage.GetText('missions.CaligulasCasino'),{89,90,91,92})
-                MissionEntry(flanguage.GetText('missions.FrankTenpenny'),{93,94})
-                MissionEntry(flanguage.GetText('missions.Heist'),{96,97,98,99,100,101})
-                MissionEntry(flanguage.GetText('missions.MaddDogg'),{95})
-                MissionEntry(flanguage.GetText('missions.TheFourDragonsCasino'),{84,85,86,87,88,102})
+                MissionEntry('Caligulas casino',{89,90,91,92})
+                MissionEntry('Frank tenpenny',{93,94})
+                MissionEntry('Heist',{96,97,98,99,100,101})
+                MissionEntry('Madd dogg',{95})
+                MissionEntry('The four dragons casino',{84,85,86,87,88,102})
                 imgui.EndTabItem()
             end
-            if imgui.BeginTabItem(flanguage.GetText('missions.Desert')) then
+            if imgui.BeginTabItem('Desert') then
                 imgui.Spacing()
-                MissionEntry(flanguage.GetText('missions.MikeToreno'),{75,76,77,78})
-                MissionEntry(flanguage.GetText('missions.VerdantMeadowsAirstrip'),{79,80,81,82,83})
+                MissionEntry('MikeToreno',{75,76,77,78})
+                MissionEntry('Verdant meadows airstrip',{79,80,81,82,83})
                 imgui.EndTabItem()
             end
-            if imgui.BeginTabItem(flanguage.GetText('missions.BackToLS')) then
+            if imgui.BeginTabItem('Back to LS') then
                 imgui.Spacing()
-                MissionEntry(flanguage.GetText('missions.CarlJohnson'),{103,104,105})
-                MissionEntry(flanguage.GetText('missions.Riot'),{108,109,110,111,112})
-                MissionEntry(flanguage.GetText('missions.Sweet'),{106,107})
+                MissionEntry('Carl johnson',{103,104,105})
+                MissionEntry('Riot',{108,109,110,111,112})
+                MissionEntry('Sweet',{106,107})
                 imgui.EndTabItem()
             end
-            if imgui.BeginTabItem(flanguage.GetText('missions.Others')) then
+            if imgui.BeginTabItem('Others') then
                 imgui.Spacing()
-                MissionEntry(flanguage.GetText('missions.ArenaMissions'),{128,129})
-                MissionEntry(flanguage.GetText('missions.GYMMissions'),{114,115,116})
-                MissionEntry(flanguage.GetText('missions.Miscellaneous'),{113,117,118,119,120,130,131,132,133,134})
-                MissionEntry(flanguage.GetText('missions.SubMissions'),{121,122,123,124,125,126,127})
-                MissionEntry(flanguage.GetText('missions.VideoGames'),{3,4,5,6,7,8,9,10})
+                MissionEntry('Arena missions',{128,129})
+                MissionEntry('GYM missions',{114,115,116})
+                MissionEntry('Miscellaneous',{113,117,118,119,120,130,131,132,133,134})
+                MissionEntry('Sub missions',{121,122,123,124,125,126,127})
+                MissionEntry('Video games',{3,4,5,6,7,8,9,10})
                 imgui.EndTabItem()
             end
-            if imgui.BeginTabItem(flanguage.GetText('common.Search')) then
+            if imgui.BeginTabItem('Search') then
                 imgui.Spacing()
                 imgui.Columns(1)
-                if imgui.InputText(flanguage.GetText('common.Search'),tmissions.search_text,ffi.sizeof(tmissions.search_text)) then end
+                if imgui.InputText('Search',tmissions.search_text,ffi.sizeof(tmissions.search_text)) then end
                 imgui.SameLine()
 
                 imgui.Spacing()
-                imgui.Text(flanguage.GetText('common.FoundEntries') .. ":(" .. ffi.string(tmissions.search_text) .. ")")
+                imgui.Text("FoundEntries :(" .. ffi.string(tmissions.search_text) .. ")")
                 imgui.Separator()
                 imgui.Spacing()
                 if imgui.BeginChild("MissionsEntries") then

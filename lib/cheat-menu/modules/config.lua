@@ -71,13 +71,13 @@ function module.write()
         },
         tweapons =
         {
-            quick_spawn = fweapons.tweapons.quick_spawn[0],
+            quick_spawn = fweapon.tweapons.quick_spawn[0],
         },
         tpeds  =
         {
             type   =
             {
-                selected = fpeds.tpeds.type.selected[0],
+                selected = fped.tpeds.type.selected[0],
             },
         },
         tgame =
@@ -92,22 +92,22 @@ function module.write()
         },
         tvehicles =
         {
-            quick_spawn  = fvehicles.tvehicles.quick_spawn[0],
-            spawn_inside = fvehicles.tvehicles.spawn_inside[0],
+            quick_spawn  = fvehicle.tvehicles.quick_spawn[0],
+            spawn_inside = fvehicle.tvehicles.spawn_inside[0],
             aircraft =
             {
-                camera       = fvehicles.tvehicles.aircraft.camera[0],
-                spawn_in_air = fvehicles.tvehicles.aircraft.spawn_in_air[0],
-                index        = fvehicles.tvehicles.aircraft.index,
+                camera       = fvehicle.tvehicles.aircraft.camera[0],
+                spawn_in_air = fvehicle.tvehicles.aircraft.spawn_in_air[0],
+                index        = fvehicle.tvehicles.aircraft.index,
             },
-            lock_health   = fvehicles.tvehicles.lock_health[0],
-            visual_damage = fvehicles.tvehicles.visual_damage[0],
-            heavy         = fvehicles.tvehicles.heavy[0],
-            stay_on_bike  = fvehicles.tvehicles.stay_on_bike[0],
-            lock_speed    = fvehicles.tvehicles.lock_speed[0],
-            speed         = fvehicles.tvehicles.speed[0],
+            lock_health   = fvehicle.tvehicles.lock_health[0],
+            visual_damage = fvehicle.tvehicles.visual_damage[0],
+            heavy         = fvehicle.tvehicles.heavy[0],
+            stay_on_bike  = fvehicle.tvehicles.stay_on_bike[0],
+            lock_speed    = fvehicle.tvehicles.lock_speed[0],
+            speed         = fvehicle.tvehicles.speed[0],
             lights = {
-                all  = fvehicles.tvehicles.lights.all[0],
+                all  = fvehicle.tvehicles.lights.all[0],
             },
         },
         tmenu =

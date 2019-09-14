@@ -62,12 +62,12 @@ function module.AnimationMain()
             if imgui.BeginChild("Stat Entries") then
 
                 local menu_name = ""
-                for key,value in ipairs(ftables.animation.table) do
+                for key,value in ipairs(ftable.animation.table) do
                     local temp,_ = value:match("([^$]+)$([^$]+)")
                     if menu_name ~= temp then
                         menu_name = temp
                         fcommon.DropDownMenu(menu_name,function()
-                            for key,value in pairs(ftables.animation.table) do
+                            for key,value in pairs(ftable.animation.table) do
                                 local file,animation = value:match("([^$]+)$([^$]+)")
                                 if menu_name == file then
                                     AnimationEntry(file,animation)
@@ -94,7 +94,7 @@ function module.AnimationMain()
             imgui.Separator()
             imgui.Spacing()
             if imgui.BeginChild("Stat Entries") then
-                for key,value in pairs(ftables.animation.table) do
+                for key,value in pairs(ftable.animation.table) do
                     file, animation = value:match("([^$]+)$([^$]+)")
                     if (string.upper(animation):find(string.upper(ffi.string(tanimation.search_text)))) then
                         AnimationEntry(file,animation)

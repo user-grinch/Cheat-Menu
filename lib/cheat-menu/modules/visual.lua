@@ -10,7 +10,7 @@ local tvisuals =
 
 module.tvisuals = tvisuals
 
-function module.VisualsMain()
+function module.VisualMain()
     if imgui.BeginTabBar("Visual") then
         imgui.Spacing()
         if imgui.BeginTabItem('Checkbox') then
@@ -26,7 +26,7 @@ function module.VisualsMain()
                 if tvisuals.zone_names[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
             end
 
-            if imgui.Checkbox('Display ca names',tvisuals.car_names) then
+            if imgui.Checkbox('Display car names',tvisuals.car_names) then
                 displayCarNames(tvisuals.car_names[0])
                 if tvisuals.car_names[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
             end

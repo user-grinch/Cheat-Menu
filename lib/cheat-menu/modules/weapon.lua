@@ -58,23 +58,23 @@ function module.GiveWeaponToPlayer(weapon)
     end
 end
 
-function module.WeaponsMain()
+function module.WeaponMain()
     imgui.Spacing()
-    if imgui.Button(flanguage.GetText("weapons.RemoveCurrentWeapon"),imgui.ImVec2(fcommon.GetSize(2))) then
+    if imgui.Button("Remove current weapon",imgui.ImVec2(fcommon.GetSize(2))) then
         removeWeaponFromChar(PLAYER_PED,getCurrentCharWeapon(PLAYER_PED))
         fcommon.CheatActivated()
     end
     imgui.SameLine()
-    if imgui.Button(flanguage.GetText("weapons.RemoveAllWeapons"),imgui.ImVec2(fcommon.GetSize(2))) then
+    if imgui.Button("Remove all weapons",imgui.ImVec2(fcommon.GetSize(2))) then
         removeAllCharWeapons(PLAYER_PED)
         fcommon.CheatActivated()
     end
     imgui.Spacing()
-    if imgui.BeginTabBar("Weapons") then
-        if imgui.BeginTabItem(flanguage.GetText("common.Checkboxes")) then
+    if imgui.BeginTabBar("Weapon") then
+        if imgui.BeginTabItem("Checkbox") then
             imgui.Spacing()
             imgui.Columns(2,nil,false)
-            fcommon.CheckBox({ name = flanguage.GetText("weapons.FastReload"),var = tweapons.fast_reload,func = function()
+            fcommon.CheckBox({ name = "Fast reload",var = tweapons.fast_reload,func = function()
                 if tweapons.fast_reload[0] then
                     setPlayerFastReload(PLAUER_HANDLE,true)
                     fcommon.CheatActivated()
@@ -84,7 +84,7 @@ function module.WeaponsMain()
                 end
             end})
             imgui.NextColumn()
-            fcommon.CheckBox({ name = flanguage.GetText("weapons.NoReloadInfAmmo"),var = tweapons.noreload,func = function()
+            fcommon.CheckBox({ name = "No reload + Inf ammo",var = tweapons.noreload,func = function()
                 if tweapons.noreload[0] then
                     writeMemory( 7600773,1,144,1)
                     writeMemory( 7600815,1,144,1)
@@ -106,42 +106,42 @@ function module.WeaponsMain()
             imgui.Columns(1)
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem(flanguage.GetText("common.Spawn")) then
+        if imgui.BeginTabItem("Spawn") then
             imgui.Spacing()
             imgui.Columns(2,nil,false)
-            fcommon.CheckBox({ name = flanguage.GetText("weapons.QuickWeapon"),var = tweapons.quick_spawn,help_text = flanguage.GetText("weapons.QuickWeaponToolTip")})
+            fcommon.CheckBox({ name = "Quick Weapon",var = tweapons.quick_spawn,help_text = "Weapon can be spawned from quick spawner using (Left Ctrl + Q). \n\nControls:\nEnter : Stop reading key press\nDelete : Erase full string\nBackspace : Erase last character"})
             imgui.NextColumn()
             imgui.Columns(1)
             imgui.Spacing()
             if imgui.BeginTabBar("Spawn") then
-                if imgui.BeginTabItem(flanguage.GetText("common.List")) then
+                if imgui.BeginTabItem("List") then
 
                     imgui.Spacing()
                     if imgui.BeginChild("Weapon list Window") then
-                        fcommon.ShowEntries(flanguage.GetText("weapons.AssaultRifles"),{30,31},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,fweapons.GetName,true)
-                        fcommon.ShowEntries(flanguage.GetText("weapons.Handguns"),{22,23,24},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,fweapons.GetName,true)
-                        fcommon.ShowEntries(flanguage.GetText("weapons.HeavyWeapons"),{35,36,37,38},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,fweapons.GetName,true)
-                        fcommon.ShowEntries(flanguage.GetText("weapons.Melee"),{1,2,3,4,6,7,8,9},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,fweapons.GetName,true)
-                        fcommon.ShowEntries(flanguage.GetText("weapons.Miscellaneous"),{10,11,12,14,15,41,42,43,44,45,46},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,fweapons.GetName,true)
-                        fcommon.ShowEntries(flanguage.GetText("weapons.Projectiles"),{16,17,18,39},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,fweapons.GetName,true)
-                        fcommon.ShowEntries(flanguage.GetText("weapons.Shotguns"),{25,26,27},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,fweapons.GetName,true)
-                        fcommon.ShowEntries(flanguage.GetText("weapons.SubMachineGuns"),{28,29,32},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,fweapons.GetName,true)
-                        fcommon.ShowEntries(flanguage.GetText("weapons.Rifles"),{33,34},65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,fweapons.GetName,true)
+                        fcommon.ShowEntries("Assault rifles",{30,31},65,65,tweapons.images,tweapons.path,".png",module.GiveWeaponToPlayer,module.GetName,true)
+                        fcommon.ShowEntries("Handguns",{22,23,24},65,65,tweapons.images,tweapons.path,".png",module.GiveWeaponToPlayer,module.GetName,true)
+                        fcommon.ShowEntries("Heavy weapons",{35,36,37,38},65,65,tweapons.images,tweapons.path,".png",module.GiveWeaponToPlayer,module.GetName,true)
+                        fcommon.ShowEntries("Melee",{1,2,3,4,6,7,8,9},65,65,tweapons.images,tweapons.path,".png",module.GiveWeaponToPlayer,module.GetName,true)
+                        fcommon.ShowEntries("Miscellaneous",{10,11,12,14,15,41,42,43,44,45,46},65,65,tweapons.images,tweapons.path,".png",module.GiveWeaponToPlayer,module.GetName,true)
+                        fcommon.ShowEntries("Projectiles",{16,17,18,39},65,65,tweapons.images,tweapons.path,".png",module.GiveWeaponToPlayer,module.GetName,true)
+                        fcommon.ShowEntries("Shotguns",{25,26,27},65,65,tweapons.images,tweapons.path,".png",module.GiveWeaponToPlayer,module.GetName,true)
+                        fcommon.ShowEntries("Sub machine guns",{28,29,32},65,65,tweapons.images,tweapons.path,".png",module.GiveWeaponToPlayer,module.GetName,true)
+                        fcommon.ShowEntries("Rifles",{33,34},65,65,tweapons.images,tweapons.path,".png",module.GiveWeaponToPlayer,module.GetName,true)
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()
                 end
-                if imgui.BeginTabItem(flanguage.GetText("common.Search")) then
+                if imgui.BeginTabItem("Search") then
                     imgui.Spacing()
-                    if imgui.InputText(flanguage.GetText("common.Search"),tweapons.search_text,ffi.sizeof(tweapons.search_text)) then end
+                    if imgui.InputText("Search",tweapons.search_text,ffi.sizeof(tweapons.search_text)) then end
                     imgui.SameLine()
         
                     imgui.Spacing()
-                    imgui.Text(flanguage.GetText("common.FoundEntries") .. ":(" .. ffi.string(tweapons.search_text) .. ")")
+                    imgui.Text("Found entries :(" .. ffi.string(tweapons.search_text) .. ")")
                     imgui.Separator()
                     imgui.Spacing()
                     if imgui.BeginChild("Weapon Entries") then
-                        fcommon.ShowEntries(nil,tweapons.models,65,65,tweapons.images,tweapons.path,".png",fweapons.GiveWeaponToPlayer,fweapons.GetName,true,tweapons.search_text)
+                        fcommon.ShowEntries(nil,tweapons.models,65,65,tweapons.images,tweapons.path,".png",module.GiveWeaponToPlayer,module.GetName,true,tweapons.search_text)
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()

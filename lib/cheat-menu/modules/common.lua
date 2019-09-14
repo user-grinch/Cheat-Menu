@@ -83,11 +83,11 @@ function module.InformationTooltip(text)
 end
 
 function module.CheatActivated()
-    printHelpString(flanguage.GetText("common.CheatActivated"))
+    printHelpString("Cheat ~g~Activated")
 end
 
 function module.CheatDeactivated()
-    printHelpString(flanguage.GetText("common.CheatDeactivated"))
+    printHelpString("Cheat ~r~Deactivated")
 end
 
 function module.GetSize(count,x,y)
@@ -104,26 +104,6 @@ function module.GetSize(count,x,y)
     end
 
     return x,y
-end
-
-function IsValidModForVehicle(model)
-    for i=0,100,1 do
-        car = storeCarCharIsInNoSave(PLAYER_PED)
-        local x = getAvailableVehicleMod(car,i)
-        if x == 0 then
-            break
-        end
-        if x == model then
-            return true
-        end
-    end
-    return false
---     local CVehicle =  getCarPointer(storeCarCharIsInNoSave(PLAYER_PED))
---     if callMethod(0x49B010,CVehicle,2,2,model,CVehicle) ~= 0 then
---         return true
---    -- else
---      --   return false
---     end
 end
 
 function module.UiCreateButtons(names,funcs)
@@ -179,13 +159,13 @@ function module.ShowEntries(title,model_table,height,width,store_table,image_pat
 
     
     for i=1,#model_table,1 do
-        if skip_check == true or IsValidModForVehicle(model_table[i]) then
+        if skip_check == true or fvehicle.IsValidModForVehicle(model_table[i]) then
             fcommon.DropDownMenu(title,function()
                 local skipped_entries = 0
                 for j=1,#model_table,1 do
                     if store_table[tostring(model_table[j])] ~= nil then
                         if (search_text == "") or (string.upper(func_show_tooltip(model_table[j])):find(string.upper(ffi.string(search_text))) ~= nil) then
-                            if skip_check == true or IsValidModForVehicle(model_table[j]) then
+                            if skip_check == true or fvehicle.IsValidModForVehicle(model_table[j]) then
                                 if imgui.ImageButton(store_table[tostring(model_table[j])],imgui.ImVec2(width,height),imgui.ImVec2(0,0),imgui.ImVec2(1,1),1,imgui.ImVec4(1,1,1,1),imgui.ImVec4(1,1,1,1)) then
                                     if body_part == nil then
                                         func_load_model(model_table[j])
@@ -239,7 +219,7 @@ function module.RadioButton(label,rb_table,addr_table)
         end
     end
 
-    if imgui.RadioButtonIntPtr(flanguage.GetText("common.Default") .." ".. string.lower(label),button,#addr_table + 1) then
+    if imgui.RadioButtonIntPtr("Default ".. string.lower(label),button,#addr_table + 1) then
         for j = 1,#addr_table,1 do
             writeMemory(addr_table[j],1,0,false)
         end
