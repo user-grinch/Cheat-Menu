@@ -1,4 +1,4 @@
-# Cheat Menu      ![GNU v3.0](https://img.shields.io/badge/license-GNU-blue.svg?style=flat)
+# Cheat Menu      [![GNU v3.0](https://img.shields.io/badge/license-GNU-blue.svg?style=flat)](https://github.com/inanahammad/Cheat-Menu/blob/master/LICENSE)
 
 ## Introduction
 
