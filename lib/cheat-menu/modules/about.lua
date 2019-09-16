@@ -1,11 +1,26 @@
---[[ This file contains about tab functions
+-- Cheat Menu -  Cheat menu for Grand Theft Auto SanAndreas
+-- Copyright (C) 2019 Grinch_
 
-    Please don't remove credits below.
-]]--
+-- This program is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU General Public License as published by
+-- the Free Software Foundation, either version 3 of the License, or
+-- (at your option) any later version.
+
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU General Public License for more details.
+
+-- You should have received a copy of the GNU General Public License
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+-- Please don't remove credits below.
+
 local module = {}
 
 function module.AboutMain()
-    imgui.BulletText(string.format("%s v%s(%d)",script.this.name,script.this.version,script.this.version_num))
+    imgui.BulletText(string.format("%s v%s",script.this.name,script.this.version))
+    imgui.BulletText(string.format("Version number : %d",script.this.version_num))
     imgui.SameLine()
     if imgui.Button("Check for update",imgui.ImVec2(120,20)) then
         if not pcall(fupdate.CheckUpdates) then

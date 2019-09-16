@@ -1,4 +1,18 @@
--- This module contains all common functions used all over the menu
+-- Cheat Menu -  Cheat menu for Grand Theft Auto SanAndreas
+-- Copyright (C) 2019 Grinch_
+
+-- This program is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU General Public License as published by
+-- the Free Software Foundation, either version 3 of the License, or
+-- (at your option) any later version.
+
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU General Public License for more details.
+
+-- You should have received a copy of the GNU General Public License
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 local module = {}
 
@@ -307,31 +321,31 @@ function module.UpdateStat(arg)
 
         imgui.Columns(2,nil,false)
         if arg.min ~= nil then
-            imgui.Text(flanguage.GetText("common.Minimum") .. " = " .. arg.min)
+            imgui.Text("Minimum = " .. arg.min)
         end
         imgui.NextColumn()
         if arg.max ~= nil then
-            imgui.Text(flanguage.GetText("common.Maximum") .. " = " .. arg.max)
+            imgui.Text("Maximum = " .. arg.max)
         end
 
         imgui.Columns(1)
 
         imgui.PushItemWidth(imgui.GetWindowWidth()-50)
-        if imgui.InputInt(flanguage.GetText("common.Set"),value) then
+        if imgui.InputInt("Set",value) then
             setFloatStat(arg.stat,value[0])
         end
         imgui.PopItemWidth()
 
         imgui.Spacing()
-        if imgui.Button(flanguage.GetText("common.Minimum"),imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(arg.stat,arg.min)
         end
         imgui.SameLine()
-        if imgui.Button(flanguage.GetText("common.Default"),imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Default",imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(arg.stat,arg.default)
         end
         imgui.SameLine()
-        if imgui.Button(flanguage.GetText("common.Maximum"),imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Maximum",imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(arg.stat,arg.max)
         end
         if value[0] < arg.min then
@@ -353,32 +367,32 @@ function module.UpdateAddress(arg)
 
         imgui.Columns(2,nil,false)
         if arg.min ~= nil then
-            imgui.Text(flanguage.GetText("common.Minimum") .. " = " .. arg.min)
+            imgui.Text("Minimum = " .. arg.min)
         end
         imgui.NextColumn()
         if arg.max ~= nil then
-            imgui.Text(flanguage.GetText("common.Maximum") .. " = " .. arg.max)
+            imgui.Text("Maximum = " .. arg.max)
         end
         imgui.Columns(1)
 
         imgui.Spacing()
 
         imgui.PushItemWidth(imgui.GetWindowWidth()-50)
-        if imgui.InputInt(flanguage.GetText("common.Set"),value) then
+        if imgui.InputInt("Set",value) then
             module.RwMemory(arg.address,arg.size,value[0],nil,arg.is_float)
         end
         imgui.PopItemWidth()
    
         imgui.Spacing()
-        if imgui.Button(flanguage.GetText("common.Minimum"),imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(3))) then
             module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float)
         end
         imgui.SameLine()
-        if imgui.Button(flanguage.GetText("common.Default"),imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Default",imgui.ImVec2(fcommon.GetSize(3))) then
             module.RwMemory(arg.address,arg.size,arg.default,nil,arg.is_float)
         end
         imgui.SameLine()
-        if imgui.Button(flanguage.GetText("common.Maximum"),imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Maximum",imgui.ImVec2(fcommon.GetSize(3))) then
             module.RwMemory(arg.address,arg.size,arg.max,nil,arg.is_float)
         end
         imgui.SameLine()

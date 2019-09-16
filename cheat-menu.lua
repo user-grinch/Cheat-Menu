@@ -1,11 +1,27 @@
+-- Cheat Menu -  Cheat menu for Grand Theft Auto SanAndreas
+-- Copyright (C) 2019 Grinch_
+
+-- This program is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU General Public License as published by
+-- the Free Software Foundation, either version 3 of the License, or
+-- (at your option) any later version.
+
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU General Public License for more details.
+
+-- You should have received a copy of the GNU General Public License
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 script_name 'Cheat Menu'
 script_author("Grinch_")
 script_description("Cheat Menu for Grand Theft Auto San Andreas")
 script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu")
 script_dependencies("ffi","mimgui","memory","MoonAdditions")
 script_properties('work-in-pause')
-script_version("1.7")
-script_version_number(15092019) -- DDMMYYYY
+script_version("1.7-staging")
+script_version_number(16092019) -- DDMMYYYY
 
 -- All the command keys used throughout the Cheat-Menu
 tkeys =
@@ -144,7 +160,7 @@ function() -- render frame
 
             if tcheatmenu.update.available then
                 imgui.Spacing()
-                if imgui.Button(string.format( "%s (%d)","New version available | Click to hide",tcheatmenu.update.version_number), imgui.ImVec2(fcommon.GetSize(1))) then
+                if imgui.Button(string.format( "New version available %d | Click to hide",tcheatmenu.update.version_number), imgui.ImVec2(fcommon.GetSize(1))) then
                     --lua_thread.create(fupdate.DownloadUpdates)
                     tcheatmenu.update.available = false
                 end
@@ -169,7 +185,7 @@ function() -- render frame
                 imgui.PushStyleVarFloat(imgui.StyleVar.Alpha,0.65)
                 if imgui.Begin('Overlay', tcheatmenu.window.overlay.main,imgui.WindowFlags.NoTitleBar + imgui.WindowFlags.NoResize + imgui.WindowFlags.NoCollapse + imgui.WindowFlags.AlwaysAutoResize + imgui.WindowFlags.NoFocusOnAppearing) then
                     if fmenu.tmenu.overlay.fps[0] == true then
-                        imgui.Text("FPS :" .. tostring(math.floor(imgui.GetIO().Framerate)))
+                        imgui.Text("Frames :" .. tostring(math.floor(imgui.GetIO().Framerate)))
                     end
 
                     if isCharInAnyCar(PLAYER_PED) then
