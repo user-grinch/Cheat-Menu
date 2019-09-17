@@ -75,6 +75,7 @@ function module.write()
         tanimation =
         {
             loop             = fanimation.tanimation.loop[0],
+            ped              = fanimation.tanimation.ped[0],
             secondary        = fanimation.tanimation.secondary[0],
             fighting =
             {
@@ -141,10 +142,6 @@ function module.write()
                 health      = fmenu.tmenu.overlay.health[0],
                 speed       = fmenu.tmenu.overlay.speed[0],
             },
-        },
-        tlanguage =
-        {
-            current   = flanguage.tlanguage.current,
         },
     }
 

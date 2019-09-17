@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu
 script_dependencies("ffi","mimgui","memory","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.7-staging")
-script_version_number(16092019) -- DDMMYYYY
+script_version_number(17092019) -- DDMMYYYY
 
 -- All the command keys used throughout the Cheat-Menu
 tkeys =
@@ -172,6 +172,14 @@ function() -- render frame
             fabout.AboutMain})
 
             imgui.End()
+        end
+
+        if fanimation.tanimation.ped[0] == true then
+            bool, ped = getCharPlayerIsTargeting(PLAYER_HANDLE)
+
+            if bool == true then
+                fanimation.tanimation.selected_ped = ped
+            end
         end
 
         --Overlay window

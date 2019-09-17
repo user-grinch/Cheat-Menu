@@ -334,7 +334,7 @@ function module.PlayerMain()
 
     if imgui.BeginTabBar('Player') then
 
-        if imgui.BeginTabItem("Checkboxe") then
+        if imgui.BeginTabItem("Checkbox") then
             imgui.Spacing()
             imgui.Columns(2,nil,false)
             fcommon.CheckBox({ address = 0x969179,name = "Aim while driving"})

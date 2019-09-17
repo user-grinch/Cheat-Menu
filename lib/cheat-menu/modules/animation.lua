@@ -35,6 +35,8 @@ local tanimation =
         names    = {"man","shuffle","oldman","gang1","gang2","oldfatman","fatman","jogger","drunkman","blindman","swat","woman","shopping","busywoman","sexywoman","pro","oldwoman","fatwoman","jogwoman","oldfatwoman","skate"},
         list     = {},
     },
+    ped = imgui.new.bool(fconfig.get('tanimation.ped',false)),
+    selected_ped = nil,
 }
 module.tanimation = tanimation
 
@@ -44,13 +46,20 @@ tanimation.walking.list  = imgui.new['const char*'][#tanimation.walking.names](t
 
 function AnimationEntry(file,animation)
     if imgui.MenuItemBool(animation)then
+        local char = nil
         requestAnimation(file)
         loadAllModelsNow()
-        
-        if tplayer.animation.secondary[0] == true then
-            taskPlayAnimSecondary(PLAYER_PED,animation,file,4.0,tplayer.animation.loop[0],0,0,0,-1)
+
+        if fanimation.tanimation.ped[0] == true then
+            char = fanimation.tanimation.selected_ped
         else
-            taskPlayAnim(PLAYER_PED,animation,file,4.0,tplayer.animation.loop[0],0,0,0,-1)
+            char = PLAYER_PED
+        end
+
+        if tanimation.secondary[0] == true then
+            taskPlayAnimSecondary(char,animation,file,4.0,tanimation.loop[0],0,0,0,-1)  
+        else
+            taskPlayAnim(char,animation,file,4.0,tanimation.loop[0],0,0,0,-1)
         end
         removeAnimation(animation)
     end
@@ -65,6 +74,7 @@ function module.AnimationMain()
     imgui.Spacing()
     imgui.Columns(2,nil,false)
     fcommon.CheckBox({name = "Loop",var = tanimation.loop})
+    fcommon.CheckBox({name = "Ped",var = tanimation.ped,help_text = "Play animations on peds.Aim with a gun to select."})
     imgui.NextColumn()
     fcommon.CheckBox({name = "Secondary",var = tanimation.secondary})
     imgui.Columns(1)

@@ -166,11 +166,21 @@ function module.AddComponentToVehicle(component)
 end
 
 
-function module.IsValidModForVehicle(model)
-    local CVehicle =  getCarPointer(storeCarCharIsInNoSave(PLAYER_PED))
-    if callMethod(0x49B010,CVehicle,2,2,model,CVehicle) ~= 0 then
-        return true
+function module.IsValidModForVehicle(component)
+    pVehModelInfo = callFunction(0x00403DA0,1,1,getCarModel(storeCarCharIsInNoSave(PLAYER_PED))) -- CModelInfo__GetModelInfo
+    pVehMod = pVehModelInfo + 0x2D6
+
+    for i=1,18,1 do
+        _component =  readMemory(pVehMod,2,false)
+        pVehMod = pVehMod + 0x2
+        if _component ~= 65535 then
+            print(tostring(_component))
+        end
     end
+    -- local CVehicle =  getCarPointer(storeCarCharIsInNoSave(PLAYER_PED))
+    -- if callMethod(0x49B010,CVehicle,2,2,model,CVehicle) ~= 0 then
+    --     return true
+    -- end
 end
 
 function DoorMenu(func)
