@@ -23,13 +23,15 @@ local tteleport =
     coords         = imgui.new.char[24](fconfig.get('tteleport.coords',"")),
     auto_z         = imgui.new.bool(fconfig.get('tteleport.auto_z',false)),
     insert_coords  = imgui.new.bool(fconfig.get('tteleport.insert_coords',false)),
-    search_text    = imgui.new.char[64](fconfig.get('tteleport.search_text',"")),
+	search_text    = imgui.new.char[64](""),
+	coord_name     = imgui.new.char[64](""),
+	show_add_entry_elements = false
 }
 
 module.tteleport = tteleport
 
 
-local coordinates = ftable.coordinates.table
+local coordinates = fsave.LoadJson("coordinate")
 
 
 function module.Teleport(x, y, z,interior_id)
@@ -55,6 +57,12 @@ end
 function ShowTeleportEntry(label, x, y, z,interior_id)
 	if imgui.MenuItemBool(label) then
 		module.Teleport(x, y, z,interior_id)
+	end
+	if imgui.IsItemClicked(1) then
+		coordinates[label] = nil
+		fsave.SaveJson("coordinate",coordinates)
+		coordinates = fsave.LoadJson("coordinate")
+		printHelpString("Entry ~r~removed")
 	end
 end
 
@@ -91,11 +99,11 @@ function module.TeleportMain()
             imgui.EndTabItem()
         end
         if imgui.BeginTabItem("Search") then
-            imgui.Spacing()
+			imgui.Spacing()
             imgui.Columns(1)
-            if imgui.InputText("Search",tteleport.search_text,ffi.sizeof(tteleport.search_text)) then end
+			if imgui.InputText("Search",tteleport.search_text,ffi.sizeof(tteleport.search_text)) then end
+			fcommon.InformationTooltip("Right click over any of these entries to remove them.")
 			imgui.SameLine()
-
 			imgui.Spacing()
 			imgui.Text("Found entries :(" .. ffi.string(tteleport.search_text) .. ")")
 			imgui.Separator()
@@ -114,7 +122,25 @@ function module.TeleportMain()
 				imgui.EndChild()
 			end
             imgui.EndTabItem()
-        end
+		end
+		if imgui.BeginTabItem("Custom") then
+			imgui.Spacing()
+			imgui.Columns(1)
+			if imgui.InputText("Location name",tteleport.coord_name,ffi.sizeof(tteleport.coords)) then end
+			if imgui.InputText("Coordinates",tteleport.coords,ffi.sizeof(tteleport.coords)) then end
+			if tteleport.insert_coords[0] then
+                local x,y,z = getCharCoordinates(PLAYER_PED)
+                imgui.StrCopy(tteleport.coords,string.format("%d, %d, %d", math.floor(x) , math.floor(y) , math.floor(z)))
+			end
+			imgui.Spacing()
+			if imgui.Button("Save location",imgui.ImVec2(fcommon.GetSize(1))) then
+				coordinates[ffi.string(tteleport.coord_name)] = ffi.string(tteleport.coords)
+				fsave.SaveJson("coordinate",coordinates)
+				coordinates = fsave.LoadJson("coordinate")
+				printHelpString("Entry ~g~added")
+            end
+            imgui.EndTabItem()
+		end
         imgui.EndTabBar()
     end
 end
