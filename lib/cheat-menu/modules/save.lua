@@ -16,11 +16,20 @@
 
 local module = {}
 
-module.animation       = require 'cheat-menu.modules.tables.animation'
-module.interiors       = require 'cheat-menu.modules.tables.interior'
-module.missions        = require 'cheat-menu.modules.tables.mission'
-module.peds            = require 'cheat-menu.modules.tables.ped'
-module.stats           = require 'cheat-menu.modules.tables.stat'
-module.weather         = require 'cheat-menu.modules.tables.weather'
+function module.LoadJson(filename)
+    local full_path = tcheatmenu.dir .. "saves//" .. filename .. ".json"
+    local file = io.open(full_path, "r")
+    local table = decodeJson(file:read("*a"))
+    file:close()
+    return table
+end
+
+function module.SaveJson(filename,table)
+    local full_path = tcheatmenu.dir .. "saves//" .. filename .. ".json"
+    local file = assert(io.open(full_path, "w"))
+    file:write(encodeJson(table))
+    file:close()
+end
+
 
 return module

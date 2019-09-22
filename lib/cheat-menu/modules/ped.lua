@@ -52,22 +52,22 @@ end
 
 function module.SpawnPed(model)  
     if tpeds.special[model] == nil then
-        if isModelAvailable(model) then
-            requestModel(model)
-            loadAllModelsNow()
-            x,y,z = getCharCoordinates(PLAYER_PED)
-            createChar(tpeds.type.selected[0]+2,model,x,y,z)
-            markModelAsNoLongerNeeded(model)
-        end
+        requestModel(model)
+        loadAllModelsNow()
+        x,y,z = getCharCoordinates(PLAYER_PED)
+        ped = createChar(tpeds.type.selected[0]+2,model,x,y,z)
+        markModelAsNoLongerNeeded(model)
+        markCharAsNoLongerNeeded(ped)
     else
         if hasSpecialCharacterLoaded(model) then
             unloadSpecialCharacter(model)
         end
-
         loadSpecialCharacter(tpeds.special[model],1)
         loadAllModelsNow()
         x,y,z = getCharCoordinates(PLAYER_PED)
-        createChar(tpeds.type.selected[0]+2,290,x,y,z)
+        ped = createChar(tpeds.type.selected[0]+2,290,x,y,z)
+        markModelAsNoLongerNeeded(tpeds.special[model])
+        markCharAsNoLongerNeeded(ped)
     end
     printHelpString("Ped ~g~Spawned")
 end

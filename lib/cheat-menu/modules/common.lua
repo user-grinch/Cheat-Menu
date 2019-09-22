@@ -63,17 +63,17 @@ function module.QuickSpawner()
 
         for i = 0,#result,1 do
 
-            local weapon =  fweapons.CBaseWeaponInfo(text)
+            local weapon =  fweapon.CBaseWeaponInfo(text)
 
-            if fweapons.tweapons.quick_spawn[0] == true and weapon ~= 0 then
-                fweapons.GiveWeaponToPlayer(weapon)
+            if fweapon.tweapons.quick_spawn[0] == true and weapon ~= 0 then
+                fweapon.GiveWeaponToPlayer(weapon)
                 return
             end
 
-            local vehicle = fvehicles.CBaseModelInfo(text)
+            local vehicle = fvehicle.CBaseModelInfo(text)
 
-            if fvehicles.tvehicles.quick_spawn[0] == true and vehicle ~= 0 then
-                fvehicles.GiveVehicleToPlayer(vehicle)
+            if fvehicle.tvehicles.quick_spawn[0] == true and vehicle ~= 0 then
+                fvehicle.GiveVehicleToPlayer(vehicle)
                 return
             end
             text = text:sub(2)

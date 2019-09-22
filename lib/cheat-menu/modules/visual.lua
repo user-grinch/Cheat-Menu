@@ -60,7 +60,7 @@ function module.VisualMain()
         if imgui.BeginTabItem('Menu') then
             if imgui.BeginChild("") then
                 imgui.Spacing()
-                fcommon.UpdateAddress({ name = 'Active wanted starY',address = 0x858CCC,size = 4,is_float = true,min=-500,default = 12,max = 500})
+                fcommon.UpdateAddress({ name = 'Active wanted star posY',address = 0x858CCC,size = 4,is_float = true,min=-500,default = 12,max = 500})
                 fcommon.UpdateAddress({ name = 'Debt color',address = 0x58F4D4 ,size = 1,max = 9})
                 fcommon.UpdateAddress({ name = 'Money color',address = 0x58F492 ,size = 1,max = 9})
                 fcommon.UpdateAddress({ name = 'Radar X position',address = 0x858A10,size = 4,min=-999,default = 40,max = 999,is_float = true,help_text = "Changes radar vertical position"})

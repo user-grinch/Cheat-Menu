@@ -68,7 +68,13 @@ end
 function module.AnimationMain()
     imgui.Spacing()
     if imgui.Button("Stop animation",imgui.ImVec2(fcommon.GetSize(1))) then
-        clearCharTasks(PLAYER_PED)
+        local char = nil
+        if fanimation.tanimation.ped[0] == true then
+            char = fanimation.tanimation.selected_ped
+        else
+            char = PLAYER_PED
+        end
+        clearCharTasks(char)
         fcommon.CheatActivated()
     end
     imgui.Spacing()

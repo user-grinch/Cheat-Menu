@@ -53,10 +53,10 @@ memory        = require 'memory'
 glob          = require 'game.globals'
 mad           = require 'MoonAdditions'
 
-
+Dir = string.format( "%s%s",getWorkingDirectory(),"//lib//cheat-menu//")
 tcheatmenu = 
 {
-    dir = string.format( "%s%s",getWorkingDirectory(),"//lib//cheat-menu//")
+    dir = Dir,
 }
 
 -- Loading custom modules
@@ -75,6 +75,7 @@ fmenu         = require 'cheat-menu.modules.menu'
 fmission      = require 'cheat-menu.modules.mission'
 fped          = require 'cheat-menu.modules.ped'
 fplayer       = require 'cheat-menu.modules.player'
+fsave         = require 'cheat-menu.modules.save'
 fteleport     = require 'cheat-menu.modules.teleport'
 fupdate       = require 'cheat-menu.modules.update'
 fvehicle      = require 'cheat-menu.modules.vehicle'
@@ -86,7 +87,7 @@ if fmenu.tmenu.disable_in_samp[0] and isSampLoaded() then
 end
 
 tcheatmenu =
-{
+{   dir = Dir,
     window =
     {
         size =
@@ -109,7 +110,6 @@ tcheatmenu =
     {
         current =  fconfig.get('tcheatmenu.menubuttons.current',-1),
     },
-    font_path  =  tcheatmenu.dir .. "fonts//",
     cursor = 
     {
         state  = nil,

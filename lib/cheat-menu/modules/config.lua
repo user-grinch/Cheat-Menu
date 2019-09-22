@@ -16,7 +16,7 @@
 
 local module = {}
 
-local config_path    =  tcheatmenu.dir ..  "cheat-menu.json"
+local config_path    =  tcheatmenu.dir ..  "saves/cheat-menu.json"
 module.config_path   = config_path
 
 local tconfig =
