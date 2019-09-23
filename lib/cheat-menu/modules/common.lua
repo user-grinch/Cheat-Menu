@@ -82,6 +82,25 @@ function module.QuickSpawner()
     end
 end
 
+function module.LoadJson(filename)
+    local full_path = tcheatmenu.dir .. "saves//" .. filename .. ".json"
+    if doesFileExist(full_path) then
+        local file = io.open(full_path, "r")
+        local table = decodeJson(file:read("*a"))
+        file:close()
+        return table
+    end
+    return {}
+end
+
+function module.SaveJson(filename,table)
+    local full_path = tcheatmenu.dir .. "saves//" .. filename .. ".json"
+    local file = assert(io.open(full_path, "w"))
+    file:write(encodeJson(table))
+    file:close()
+end
+
+
 function module.InformationTooltip(text)
     if fmenu.tmenu.show_tooltips[0] then
         imgui.SameLine()

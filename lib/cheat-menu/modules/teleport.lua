@@ -13,7 +13,7 @@
 
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+bool = 0
 local module = {}
 
 -- Teleport table
@@ -31,7 +31,7 @@ local tteleport =
 module.tteleport = tteleport
 
 
-local coordinates = fsave.LoadJson("coordinate")
+local coordinates = fcommon.LoadJson("coordinate")
 
 
 function module.Teleport(x, y, z,interior_id)
@@ -60,8 +60,8 @@ function ShowTeleportEntry(label, x, y, z,interior_id)
 	end
 	if imgui.IsItemClicked(1) then
 		coordinates[label] = nil
-		fsave.SaveJson("coordinate",coordinates)
-		coordinates = fsave.LoadJson("coordinate")
+		fcommon.SaveJson("coordinate",coordinates)
+		coordinates = fcommon.LoadJson("coordinate")
 		printHelpString("Entry ~r~removed")
 	end
 end
@@ -128,15 +128,17 @@ function module.TeleportMain()
 			imgui.Columns(1)
 			if imgui.InputText("Location name",tteleport.coord_name,ffi.sizeof(tteleport.coords)) then end
 			if imgui.InputText("Coordinates",tteleport.coords,ffi.sizeof(tteleport.coords)) then end
+			fcommon.InformationTooltip("Enter XYZ coordinates.\nFormat : X,Y,Z")
 			if tteleport.insert_coords[0] then
-                local x,y,z = getCharCoordinates(PLAYER_PED)
+				local x,y,z = getCharCoordinates(PLAYER_PED)
+				
                 imgui.StrCopy(tteleport.coords,string.format("%d, %d, %d", math.floor(x) , math.floor(y) , math.floor(z)))
 			end
 			imgui.Spacing()
 			if imgui.Button("Save location",imgui.ImVec2(fcommon.GetSize(1))) then
-				coordinates[ffi.string(tteleport.coord_name)] = ffi.string(tteleport.coords)
-				fsave.SaveJson("coordinate",coordinates)
-				coordinates = fsave.LoadJson("coordinate")
+				coordinates[ffi.string(tteleport.coord_name)] = string.format("%d, %s",getActiveInterior(), ffi.string(tteleport.coords))   
+				fcommon.SaveJson("coordinate",coordinates)
+				coordinates = fcommon.LoadJson("coordinate")
 				printHelpString("Entry ~g~added")
             end
             imgui.EndTabItem()
