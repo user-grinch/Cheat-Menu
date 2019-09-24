@@ -1,5 +1,19 @@
--- This module contains all the functions related to teleportation tab
+-- Cheat Menu -  Cheat menu for Grand Theft Auto SanAndreas
+-- Copyright (C) 2019 Grinch_
 
+-- This program is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU General Public License as published by
+-- the Free Software Foundation, either version 3 of the License, or
+-- (at your option) any later version.
+
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU General Public License for more details.
+
+-- You should have received a copy of the GNU General Public License
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+bool = 0
 local module = {}
 
 -- Teleport table
@@ -9,13 +23,15 @@ local tteleport =
     coords         = imgui.new.char[24](fconfig.get('tteleport.coords',"")),
     auto_z         = imgui.new.bool(fconfig.get('tteleport.auto_z',false)),
     insert_coords  = imgui.new.bool(fconfig.get('tteleport.insert_coords',false)),
-    search_text    = imgui.new.char[64](fconfig.get('tteleport.search_text',"")),
+	search_text    = imgui.new.char[64](""),
+	coord_name     = imgui.new.char[64](""),
+	show_add_entry_elements = false
 }
 
 module.tteleport = tteleport
 
 
-local coordinates = ftables.coordinates.table
+local coordinates = fcommon.LoadJson("coordinate")
 
 
 function module.Teleport(x, y, z,interior_id)
@@ -42,48 +58,54 @@ function ShowTeleportEntry(label, x, y, z,interior_id)
 	if imgui.MenuItemBool(label) then
 		module.Teleport(x, y, z,interior_id)
 	end
+	if imgui.IsItemClicked(1) then
+		coordinates[label] = nil
+		fcommon.SaveJson("coordinate",coordinates)
+		coordinates = fcommon.LoadJson("coordinate")
+		printHelpString("Entry ~r~removed")
+	end
 end
 
 function module.TeleportMain()
 
     if imgui.BeginTabBar("Teleport") then
-        if imgui.BeginTabItem(flanguage.GetText("teleport.Teleport")) then
+        if imgui.BeginTabItem("Teleport") then
             imgui.Spacing()
             imgui.Columns(2,nil,false)
-            fcommon.CheckBox({name = flanguage.GetText("teleport.AutoZCoordinates"),var = fteleport.tteleport.auto_z,help_text =flanguage.GetText("teleport.AutoZCoordinatesToolTip")})
-			fcommon.CheckBox({name = flanguage.GetText("teleport.InsertCoordinates"),var = fteleport.tteleport.insert_coords,help_text =flanguage.GetText("teleport.InsertCoordinatesToolTip")})
+            fcommon.CheckBox({name = "AutoZCoordinates",var = fteleport.tteleport.auto_z,help_text ="The script would get Z coord automatically", })
+			fcommon.CheckBox({name = "InsertCoordinates",var = fteleport.tteleport.insert_coords,help_text ="Insert current coordinates"})
 			imgui.NextColumn()
-			fcommon.CheckBox({name = flanguage.GetText("teleport.QuickTeleport"),var = fteleport.tteleport.shortcut,help_text =flanguage.GetText("teleport.QuickTeleportToolTip")})
+			fcommon.CheckBox({name = "QuickTeleport",var = fteleport.tteleport.shortcut,help_text ="Teleport to marker using (X + Y) key combinartion"})
             imgui.Columns(1)
 
-            if imgui.InputText(flanguage.GetText("teleport.Coordinates"),tteleport.coords,ffi.sizeof(tteleport.coords)) then end
+            if imgui.InputText("Coordinates",tteleport.coords,ffi.sizeof(tteleport.coords)) then end
 
             if tteleport.insert_coords[0] then
                 local x,y,z = getCharCoordinates(PLAYER_PED)
                 imgui.StrCopy(tteleport.coords,string.format("%d, %d, %d", math.floor(x) , math.floor(y) , math.floor(z)))
             end
 
-            fcommon.InformationTooltip(flanguage.GetText("teleport.InputToolTip"))
+            fcommon.InformationTooltip("Enter XYZ coordinates.\nFormat : X,Y,Z")
             imgui.Dummy(imgui.ImVec2(0,10))
 
-            if imgui.Button(flanguage.GetText("teleport.TeleportToCoord"),imgui.ImVec2(fcommon.GetSize(2))) then
+            if imgui.Button("Teleport to coord",imgui.ImVec2(fcommon.GetSize(2))) then
                 local x,y,z = (ffi.string(tteleport.coords)):match("([^,]+),([^,]+),([^,]+)")
                 module.Teleport(x, y, z,0)
             end
             imgui.SameLine()
-            if imgui.Button(flanguage.GetText("teleport.TeleportToMarker"),imgui.ImVec2(fcommon.GetSize(2))) then
+            if imgui.Button("Teleport to marker",imgui.ImVec2(fcommon.GetSize(2))) then
                 module.Teleport()
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem('Search') then
-            imgui.Spacing()
-            imgui.Columns(1)
-            if imgui.InputText(flanguage.GetText("common.Search"),tteleport.search_text,ffi.sizeof(tteleport.search_text)) then end
-			imgui.SameLine()
-
+        if imgui.BeginTabItem("Search") then
 			imgui.Spacing()
-			imgui.Text(flanguage.GetText("common.FoundEntries") .. ":(" .. ffi.string(tteleport.search_text) .. ")")
+            imgui.Columns(1)
+			if imgui.InputText("Search",tteleport.search_text,ffi.sizeof(tteleport.search_text)) then end
+			fcommon.InformationTooltip("Right click over any of these entries to remove them.")
+			imgui.SameLine()
+			imgui.Spacing()
+			imgui.Text("Found entries :(" .. ffi.string(tteleport.search_text) .. ")")
 			imgui.Separator()
 			imgui.Spacing()
 			if imgui.BeginChild("Teleport entries") then
@@ -100,7 +122,27 @@ function module.TeleportMain()
 				imgui.EndChild()
 			end
             imgui.EndTabItem()
-        end
+		end
+		if imgui.BeginTabItem("Custom") then
+			imgui.Spacing()
+			imgui.Columns(1)
+			if imgui.InputText("Location name",tteleport.coord_name,ffi.sizeof(tteleport.coords)) then end
+			if imgui.InputText("Coordinates",tteleport.coords,ffi.sizeof(tteleport.coords)) then end
+			fcommon.InformationTooltip("Enter XYZ coordinates.\nFormat : X,Y,Z")
+			if tteleport.insert_coords[0] then
+				local x,y,z = getCharCoordinates(PLAYER_PED)
+				
+                imgui.StrCopy(tteleport.coords,string.format("%d, %d, %d", math.floor(x) , math.floor(y) , math.floor(z)))
+			end
+			imgui.Spacing()
+			if imgui.Button("Save location",imgui.ImVec2(fcommon.GetSize(1))) then
+				coordinates[ffi.string(tteleport.coord_name)] = string.format("%d, %s",getActiveInterior(), ffi.string(tteleport.coords))   
+				fcommon.SaveJson("coordinate",coordinates)
+				coordinates = fcommon.LoadJson("coordinate")
+				printHelpString("Entry ~g~added")
+            end
+            imgui.EndTabItem()
+		end
         imgui.EndTabBar()
     end
 end

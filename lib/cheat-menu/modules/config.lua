@@ -1,6 +1,22 @@
+-- Cheat Menu -  Cheat menu for Grand Theft Auto SanAndreas
+-- Copyright (C) 2019 Grinch_
+
+-- This program is free software: you can redistribute it and/or modify
+-- it under the terms of the GNU General Public License as published by
+-- the Free Software Foundation, either version 3 of the License, or
+-- (at your option) any later version.
+
+-- This program is distributed in the hope that it will be useful,
+-- but WITHOUT ANY WARRANTY; without even the implied warranty of
+-- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+-- GNU General Public License for more details.
+
+-- You should have received a copy of the GNU General Public License
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 local module = {}
 
-local config_path    =  tcheatMenu.dir ..  "cheat-menu.json"
+local config_path    =  tcheatmenu.dir ..  "saves/cheat-menu.json"
 module.config_path   = config_path
 
 local tconfig =
@@ -15,21 +31,21 @@ function module.write()
 
     tconfig.write =
     {
-        tcheatMenu =
+        tcheatmenu =
         {
             window =
             {
                 overlay =
                 {
-                    main     = tcheatMenu.window.overlay.main[0],
-                    distance = tcheatMenu.window.overlay.distance,
-                    corner   = tcheatMenu.window.overlay.corner[0],
+                    main     = tcheatmenu.window.overlay.main[0],
+                    distance = tcheatmenu.window.overlay.distance,
+                    corner   = tcheatmenu.window.overlay.corner[0],
                 },
             },
 
             menubuttons =
             {
-                current = tcheatMenu.menubuttons.current,
+                current = tcheatmenu.menubuttons.current,
             },
         },
 
@@ -55,32 +71,30 @@ function module.write()
             aimSkinChanger    = fplayer.tplayer.aimSkinChanger[0],
             neverWanted       = fplayer.tplayer.neverWanted[0],
             cjBody            = fplayer.tplayer.cjBody[0],
-            animation =
+        },
+        tanimation =
+        {
+            loop             = fanimation.tanimation.loop[0],
+            ped              = fanimation.tanimation.ped[0],
+            secondary        = fanimation.tanimation.secondary[0],
+            fighting =
             {
-                loop             = fplayer.tplayer.animation.loop[0],
-                secondary        = fplayer.tplayer.animation.secondary[0],
+                selected = fanimation.tanimation.fighting.selected[0],
             },
-            style =
+            walking =
             {
-                fighting =
-                {
-                    selected = fplayer.tplayer.style.fighting.selected[0],
-                },
-                walking =
-                {
-                    selected = fplayer.tplayer.style.walking.selected[0],
-                },
+                selected = fanimation.tanimation.walking.selected[0],
             },
         },
         tweapons =
         {
-            quick_spawn = fweapons.tweapons.quick_spawn[0],
+            quick_spawn = fweapon.tweapons.quick_spawn[0],
         },
         tpeds  =
         {
             type   =
             {
-                selected = fpeds.tpeds.type.selected[0],
+                selected = fped.tpeds.type.selected[0],
             },
         },
         tgame =
@@ -95,22 +109,22 @@ function module.write()
         },
         tvehicles =
         {
-            quick_spawn  = fvehicles.tvehicles.quick_spawn[0],
-            spawn_inside = fvehicles.tvehicles.spawn_inside[0],
+            quick_spawn  = fvehicle.tvehicles.quick_spawn[0],
+            spawn_inside = fvehicle.tvehicles.spawn_inside[0],
             aircraft =
             {
-                camera       = fvehicles.tvehicles.aircraft.camera[0],
-                spawn_in_air = fvehicles.tvehicles.aircraft.spawn_in_air[0],
-                index        = fvehicles.tvehicles.aircraft.index,
+                camera       = fvehicle.tvehicles.aircraft.camera[0],
+                spawn_in_air = fvehicle.tvehicles.aircraft.spawn_in_air[0],
+                index        = fvehicle.tvehicles.aircraft.index,
             },
-            lock_health   = fvehicles.tvehicles.lock_health[0],
-            visual_damage = fvehicles.tvehicles.visual_damage[0],
-            heavy         = fvehicles.tvehicles.heavy[0],
-            stay_on_bike  = fvehicles.tvehicles.stay_on_bike[0],
-            lock_speed    = fvehicles.tvehicles.lock_speed[0],
-            speed         = fvehicles.tvehicles.speed[0],
+            lock_health   = fvehicle.tvehicles.lock_health[0],
+            visual_damage = fvehicle.tvehicles.visual_damage[0],
+            heavy         = fvehicle.tvehicles.heavy[0],
+            stay_on_bike  = fvehicle.tvehicles.stay_on_bike[0],
+            lock_speed    = fvehicle.tvehicles.lock_speed[0],
+            speed         = fvehicle.tvehicles.speed[0],
             lights = {
-                all  = fvehicles.tvehicles.lights.all[0],
+                all  = fvehicle.tvehicles.lights.all[0],
             },
         },
         tmenu =
@@ -128,10 +142,6 @@ function module.write()
                 health      = fmenu.tmenu.overlay.health[0],
                 speed       = fmenu.tmenu.overlay.speed[0],
             },
-        },
-        tlanguage =
-        {
-            current   = flanguage.tlanguage.current,
         },
     }
 
