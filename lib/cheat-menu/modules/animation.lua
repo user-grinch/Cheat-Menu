@@ -36,7 +36,6 @@ local tanimation =
         list     = {},
     },
     ped = imgui.new.bool(fconfig.get('tanimation.ped',false)),
-    selected_ped = nil,
 }
 module.tanimation = tanimation
 
@@ -50,16 +49,20 @@ function AnimationEntry(file,animation)
         requestAnimation(file)
         loadAllModelsNow()
 
-        if fanimation.tanimation.ped[0] == true then
-            char = fanimation.tanimation.selected_ped
+        if fped.tped.selected ~=  nil then
+            if fanimation.tanimation.ped[0] == true then
+                char = fped.tped.selected
+            else
+                char = PLAYER_PED
+            end
+            if tanimation.secondary[0] == true then
+                taskPlayAnimSecondary(char,animation,file,4.0,tanimation.loop[0],0,0,0,-1)  
+            else
+                taskPlayAnim(char,animation,file,4.0,tanimation.loop[0],0,0,0,-1)
+            end
+            fcommon.CheatActivated()
         else
-            char = PLAYER_PED
-        end
-
-        if tanimation.secondary[0] == true then
-            taskPlayAnimSecondary(char,animation,file,4.0,tanimation.loop[0],0,0,0,-1)  
-        else
-            taskPlayAnim(char,animation,file,4.0,tanimation.loop[0],0,0,0,-1)
+            printHelpString("~r~No~w~ ped selected")
         end
         removeAnimation(animation)
     end
@@ -69,18 +72,22 @@ function module.AnimationMain()
     imgui.Spacing()
     if imgui.Button("Stop animation",imgui.ImVec2(fcommon.GetSize(1))) then
         local char = nil
-        if fanimation.tanimation.ped[0] == true then
-            char = fanimation.tanimation.selected_ped
+        if fped.tped.selected ~=  nil then
+            if fanimation.tanimation.ped[0] == true then
+                char = fped.tped.selected
+            else
+                char = PLAYER_PED
+            end
+            clearCharTasks(char)
+            fcommon.CheatActivated()
         else
-            char = PLAYER_PED
+            printHelpString("~r~No~w~ ped selected")
         end
-        clearCharTasks(char)
-        fcommon.CheatActivated()
     end
     imgui.Spacing()
     imgui.Columns(2,nil,false)
     fcommon.CheckBox({name = "Loop",var = tanimation.loop})
-    fcommon.CheckBox({name = "Ped",var = tanimation.ped,help_text = "Play animations on peds.Aim with a gun to select."})
+    fcommon.CheckBox({name = "Ped",var = tanimation.ped,help_text = "Play animation on ped.Aim with a gun to select."})
     imgui.NextColumn()
     fcommon.CheckBox({name = "Secondary",var = tanimation.secondary})
     imgui.Columns(1)

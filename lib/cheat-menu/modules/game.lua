@@ -257,7 +257,7 @@ function module.GameMain()
             if imgui.BeginChild("Game") then
                 imgui.Spacing()
 
-                fcommon.UpdateAddress({name = 'Days passed',address = 0xB79038 ,size = 4,min = 0,max = 1000})
+                fcommon.UpdateAddress({name = 'Days passed',address = 0xB79038 ,size = 4,min = 0,max = 9999})
                 fcommon.DropDownMenu('FPS',function()
 
                     imgui.Columns(2,nil,false)
@@ -300,10 +300,11 @@ function module.GameMain()
 
 
                 end)
-                fcommon.UpdateAddress({name = 'Game speed',address = 0xB7CB64,size = 4,max = 100,min = 0, is_float =true, default = 1})
-                fcommon.UpdateAddress({name = 'Gravity',address = 0x863984,size = 4,max = 1,min = -1,is_float = true})
+                fcommon.UpdateAddress({name = 'Game speed',address = 0xB7CB64,size = 4,max = 10,min = 0, is_float =true, default = 1})
+                fcommon.UpdateAddress({name = 'Gravity',address = 0x863984,size = 4,max = 1,min = -1, default = 0.008,cvalue = 0.001 ,is_float = true})
+                fcommon.UpdateAddress({name = 'Pedestrian density multiplier',address = 0x8D2530,size = 4,min = 0,max = 10, default = 1,is_float = true})
                 SetTime()
-                fcommon.UpdateAddress({name = 'Vehicle density multiplier',address = 0x8A5B20,size = 4,min = 0,max = 100, default = 10})
+                fcommon.UpdateAddress({name = 'Vehicle density multiplier',address = 0x8A5B20,size = 4,min = 0,max = 10, default = 1,is_float = true})
                
                 imgui.EndChild()
             end
