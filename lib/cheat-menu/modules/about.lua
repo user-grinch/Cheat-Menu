@@ -23,9 +23,7 @@ function module.AboutMain()
     imgui.BulletText(string.format("Version number : %d",script.this.version_num))
     imgui.SameLine()
     if imgui.Button("Check for update",imgui.ImVec2(120,20)) then
-        if not pcall(fupdate.CheckUpdates) then
-            printHelpString("Failed to update.")
-        end
+        fupdate.CheckUpdates()
     end
     imgui.BulletText(string.format("Author : %s",script.this.authors[1]))
     imgui.BulletText(string.format("Imgui : v%s",imgui._VERSION))

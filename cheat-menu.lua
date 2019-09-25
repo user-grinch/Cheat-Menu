@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu
 script_dependencies("ffi","mimgui","memory","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.7-staging")
-script_version_number(24092019) -- DDMMYYYY
+script_version_number(25092019) -- DDMMYYYY
 
 -- All the command keys used throughout the Cheat-Menu
 tkeys =
@@ -254,9 +254,7 @@ end
 function main()
 
     if fmenu.tmenu.auto_update_check[0] then
-        if not pcall(fupdate.CheckUpdates) then
-            printHelpString("~r~Failed~w~ to check for update")
-        end
+        fupdate.CheckUpdates()
     end
 
     lua_thread.create(ShowHideCursor)

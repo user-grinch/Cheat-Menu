@@ -28,13 +28,21 @@ function module.CheckUpdates()
 
     local body, code, headers, status = https.request(link)
     
-    if not body then error(code) print(status) printHelpString(flanguage.GetText("update.FailedToUpdate")) return end
     tcheatmenu.update.version_number = tonumber(body:match("script_version_number%((%d+)%)"))
-    if tcheatmenu.update.version_number ~= script.this.version_num then
-        tcheatmenu.update.available = true
+
+    if not body or tcheatmenu.update.version_number == nil then 
+        print(code) 
+        print(status) 
+        printHelpString("~r~Failed~w~ to check for update") 
     else
-        printHelpString("Using ~g~latest~w~ version")
+        if tcheatmenu.update.version_number ~= script.this.version_num then
+            tcheatmenu.update.available = true
+        else
+            printHelpString("Using ~g~latest~w~ version")
+        end
     end
+
+
 end
 
 function module.DownloadUpdates()
