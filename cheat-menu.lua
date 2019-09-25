@@ -20,7 +20,7 @@ script_description("Cheat Menu for Grand Theft Auto San Andreas")
 script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu")
 script_dependencies("ffi","mimgui","memory","MoonAdditions")
 script_properties('work-in-pause')
-script_version("1.7")
+script_version("1.7-staging")
 script_version_number(24092019) -- DDMMYYYY
 
 -- All the command keys used throughout the Cheat-Menu
@@ -75,7 +75,6 @@ fmenu         = require 'cheat-menu.modules.menu'
 fmission      = require 'cheat-menu.modules.mission'
 fped          = require 'cheat-menu.modules.ped'
 fplayer       = require 'cheat-menu.modules.player'
-fsave         = require 'cheat-menu.modules.save'
 fteleport     = require 'cheat-menu.modules.teleport'
 fupdate       = require 'cheat-menu.modules.update'
 fvehicle      = require 'cheat-menu.modules.vehicle'
@@ -102,7 +101,7 @@ tcheatmenu =
             main     = imgui.new.bool(true),
             distance = fconfig.get('tcheatmenu.window.overlay.distance',10.0),
             corner   = imgui.new.int(fconfig.get('tcheatmenu.window.overlay.corner',0)),
-            names    = {"Custom","TopLeft","TopRight","BottomLeft","BottomRight","Close"},
+            names    = {"Custom","Top Left","Top Right","Bottom Left","Bottom Right","Close"},
             list     = {},
         },
     },
@@ -178,7 +177,7 @@ function() -- render frame
             bool, ped = getCharPlayerIsTargeting(PLAYER_HANDLE)
 
             if bool == true then
-                fanimation.tanimation.selected_ped = ped
+                fped.tped.selected = ped
             end
         end
 
@@ -220,10 +219,10 @@ function() -- render frame
                         imgui.Text("Position")
                         imgui.Separator()
                         if (imgui.MenuItemBool("Custom",nil,tcheatmenu.window.overlay.corner[0] == 0)) then tcheatmenu.window.overlay.corner[0] = 0 end
-                        if (imgui.MenuItemBool("TopLeft",nil,tcheatmenu.window.overlay.corner[0] == 1)) then tcheatmenu.window.overlay.corner[0] = 1 end
-                        if (imgui.MenuItemBool("TopRight",nil,tcheatmenu.window.overlay.corner[0] == 2)) then tcheatmenu.window.overlay.corner[0] = 2 end
-                        if (imgui.MenuItemBool("BottomLeft",nil,tcheatmenu.window.overlay.corner[0] == 3)) then tcheatmenu.window.overlay.corner[0] = 3 end
-                        if (imgui.MenuItemBool("BottomRight",nil,tcheatmenu.window.overlay.corner[0] == 4)) then tcheatmenu.window.overlay.corner[0] = 4 end
+                        if (imgui.MenuItemBool("Top Left",nil,tcheatmenu.window.overlay.corner[0] == 1)) then tcheatmenu.window.overlay.corner[0] = 1 end
+                        if (imgui.MenuItemBool("Top Right",nil,tcheatmenu.window.overlay.corner[0] == 2)) then tcheatmenu.window.overlay.corner[0] = 2 end
+                        if (imgui.MenuItemBool("Bottom Left",nil,tcheatmenu.window.overlay.corner[0] == 3)) then tcheatmenu.window.overlay.corner[0] = 3 end
+                        if (imgui.MenuItemBool("Bottom Right",nil,tcheatmenu.window.overlay.corner[0] == 4)) then tcheatmenu.window.overlay.corner[0] = 4 end
                         if  imgui.MenuItemBool("Close") then
                             fgame.tgame.fps.bool[0] = false
                             fvehicle.tvehicles.show.speed[0] = false

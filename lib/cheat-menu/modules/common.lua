@@ -379,10 +379,11 @@ end
 function module.UpdateAddress(arg)
     if arg.is_float == nil then arg.is_float = false end
     if arg.default == nil then arg.default = 0 end
+    if arg.cvalue == nil then arg.cvalue = 1 end
 
     module.DropDownMenu(arg.name,function()
 
-        local value = imgui.new.int(module.RwMemory(arg.address,arg.size,nil,nil,arg.is_float))
+        local value = imgui.new.float(module.RwMemory(arg.address,arg.size,nil,nil,arg.is_float))
 
         imgui.Columns(2,nil,false)
         if arg.min ~= nil then
@@ -396,12 +397,17 @@ function module.UpdateAddress(arg)
 
         imgui.Spacing()
 
-        imgui.PushItemWidth(imgui.GetWindowWidth()-50)
-        if imgui.InputInt("Set",value) then
+        if imgui.InputFloat("Set",value) then
             module.RwMemory(arg.address,arg.size,value[0],nil,arg.is_float)
         end
-        imgui.PopItemWidth()
-   
+        imgui.SameLine()
+        if imgui.Button("-",imgui.ImVec2(fcommon.GetSize(12))) then
+            module.RwMemory(arg.address,arg.size,(value[0] - arg.cvalue),nil,arg.is_float)
+        end
+        imgui.SameLine()
+        if imgui.Button("+",imgui.ImVec2(fcommon.GetSize(12))) then
+            module.RwMemory(arg.address,arg.size,(value[0] + arg.cvalue),nil,arg.is_float)
+        end
         imgui.Spacing()
         if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(3))) then
             module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float)

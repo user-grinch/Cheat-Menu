@@ -86,15 +86,16 @@ function module.write()
                 selected = fanimation.tanimation.walking.selected[0],
             },
         },
-        tweapons =
+        tweapon =
         {
-            quick_spawn = fweapon.tweapons.quick_spawn[0],
+            quick_spawn = fweapon.tweapon.quick_spawn[0],
+            ped         = fweapon.tweapon.ped[0],
         },
-        tpeds  =
+        tped  =
         {
             type   =
             {
-                selected = fped.tpeds.type.selected[0],
+                selected = fped.tped.type.selected[0],
             },
         },
         tgame =
