@@ -173,7 +173,7 @@ function() -- render frame
             imgui.End()
         end
 
-        if fanimation.tanimation.ped[0] == true then
+        if fanimation.tanimation.ped[0] == true or fweapon.tweapon.ped[0] == true then
             bool, ped = getCharPlayerIsTargeting(PLAYER_HANDLE)
 
             if bool == true then

@@ -83,7 +83,7 @@ function module.QuickSpawner()
 end
 
 function module.LoadJson(filename)
-    local full_path = tcheatmenu.dir .. "saves//" .. filename .. ".json"
+    local full_path = tcheatmenu.dir .. "json//" .. filename .. ".json"
     if doesFileExist(full_path) then
         local file = io.open(full_path, "r")
         local table = decodeJson(file:read("*a"))
@@ -94,7 +94,7 @@ function module.LoadJson(filename)
 end
 
 function module.SaveJson(filename,table)
-    local full_path = tcheatmenu.dir .. "saves//" .. filename .. ".json"
+    local full_path = tcheatmenu.dir .. "json//" .. filename .. ".json"
     local file = assert(io.open(full_path, "w"))
     file:write(encodeJson(table))
     file:close()

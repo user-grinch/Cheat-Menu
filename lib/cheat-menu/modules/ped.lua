@@ -52,25 +52,27 @@ function module.GetName(model)
 end
 
 function module.SpawnPed(model)  
-    if tped.special[model] == nil then
-        requestModel(model)
-        loadAllModelsNow()
-        x,y,z = getCharCoordinates(PLAYER_PED)
-        ped = createChar(tped.type.selected[0]+2,model,x,y,z)
-        markModelAsNoLongerNeeded(model)
-        markCharAsNoLongerNeeded(ped)
-    else
-        if hasSpecialCharacterLoaded(model) then
-            unloadSpecialCharacter(model)
+    if  tped.names[model] ~= nil then
+        if tped.special[model] == nil then
+            requestModel(model)
+            loadAllModelsNow()
+            x,y,z = getCharCoordinates(PLAYER_PED)
+            ped = createChar(tped.type.selected[0]+2,model,x,y,z)
+            markModelAsNoLongerNeeded(model)
+            markCharAsNoLongerNeeded(ped)
+        else
+            if hasSpecialCharacterLoaded(model) then
+                unloadSpecialCharacter(model)
+            end
+            loadSpecialCharacter(tped.special[model],1)
+            loadAllModelsNow()
+            x,y,z = getCharCoordinates(PLAYER_PED)
+            ped = createChar(tped.type.selected[0]+2,290,x,y,z)
+            markModelAsNoLongerNeeded(tped.special[model])
+            markCharAsNoLongerNeeded(ped)
         end
-        loadSpecialCharacter(tped.special[model],1)
-        loadAllModelsNow()
-        x,y,z = getCharCoordinates(PLAYER_PED)
-        ped = createChar(tped.type.selected[0]+2,290,x,y,z)
-        markModelAsNoLongerNeeded(tped.special[model])
-        markCharAsNoLongerNeeded(ped)
+        printHelpString("Ped ~g~Spawned")
     end
-    printHelpString("Ped ~g~Spawned")
 end
 
 function SetDensity(title,id)
