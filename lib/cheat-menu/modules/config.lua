@@ -91,6 +91,14 @@ function module.write()
             quick_spawn = fweapon.tweapon.quick_spawn[0],
             ped         = fweapon.tweapon.ped[0],
         },
+        tvisual =
+        {
+            money =
+            {
+                positive = ffi.string(fvisual.tvisual.money.positive),
+                negative = ffi.string(fvisual.tvisual.money.negative),
+            },
+        },
         tped  =
         {
             type   =

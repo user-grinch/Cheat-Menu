@@ -469,6 +469,7 @@ function module.VehicleMain()
                         end
                     end
                 end)
+                fcommon.UpdateAddress({name = 'Vehicle density multiplier',address = 0x8A5B20,size = 4,min = 0,max = 10, default = 1,is_float = true})
 
                 imgui.EndChild()
             end

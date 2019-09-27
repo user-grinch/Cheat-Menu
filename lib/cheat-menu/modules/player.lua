@@ -65,7 +65,7 @@ function HealthArmour()
         imgui.Text("Maximum" .. " = " .. tostring(255))
         imgui.Columns(1)
 
-        imgui.PushItemWidth(imgui.GetWindowWidth()-50)
+        imgui.PushItemWidth(imgui.GetWindowWidth()-70)
         if imgui.InputInt("Set",health) then
             if health[0] > 100 then
                 setFloatStat(24,health[0]*5.686)
@@ -117,7 +117,7 @@ function HealthArmour()
 
         imgui.Spacing()
 
-        imgui.PushItemWidth(imgui.GetWindowWidth()-50)
+        imgui.PushItemWidth(imgui.GetWindowWidth()-70)
         if imgui.InputInt("Set",armour) then
 
             if armour[0] < 0 then
@@ -388,7 +388,7 @@ function module.PlayerMain()
             fcommon.UpdateStat({ name = "Fat",stat = 21})
             HealthArmour()
             fcommon.UpdateStat({ name = "Lung capacity",stat = 225})
-            fcommon.UpdateAddress({name = "Money",address = 0xB7CE50,size = 4,min = -9999999,max = 9999999})
+            fcommon.UpdateAddress({name = "Money",address = 0xB7CE50,size = 4,min = 0,max = 9999999})
             fcommon.UpdateStat({ name = "Muscle",stat = 23})
             fcommon.UpdateStat({ name = "Respect",stat = 68,max = 2450}) 
             fcommon.UpdateStat({ name = "Sex appeal",stat = 25})

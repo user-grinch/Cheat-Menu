@@ -268,7 +268,7 @@ function module.GameMain()
                     imgui.Columns(1)
 
                     imgui.PushItemWidth(imgui.GetWindowWidth()-50)
-                    if imgui.InputInt('FPSLimit',tgame.fps.limit) then
+                    if imgui.InputInt('Set',tgame.fps.limit) then
                         memory.write(0xC1704C,(tgame.fps.limit[0]+1),1)
                         memory.write(0xBA6794,1,1)
                     end
@@ -295,17 +295,11 @@ function module.GameMain()
                         memory.write(0xBA6794,0,1)
                         tgame.fps.limit[0] = 999
                     end
-
-
-
-
                 end)
                 fcommon.UpdateAddress({name = 'Game speed',address = 0xB7CB64,size = 4,max = 10,min = 0, is_float =true, default = 1})
                 fcommon.UpdateAddress({name = 'Gravity',address = 0x863984,size = 4,max = 1,min = -1, default = 0.008,cvalue = 0.001 ,is_float = true})
-                fcommon.UpdateAddress({name = 'Pedestrian density multiplier',address = 0x8D2530,size = 4,min = 0,max = 10, default = 1,is_float = true})
                 SetTime()
-                fcommon.UpdateAddress({name = 'Vehicle density multiplier',address = 0x8A5B20,size = 4,min = 0,max = 10, default = 1,is_float = true})
-               
+                
                 imgui.EndChild()
             end
             imgui.EndTabItem()

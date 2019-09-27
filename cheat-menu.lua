@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu
 script_dependencies("ffi","mimgui","memory","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.7-staging")
-script_version_number(26092019) -- DDMMYYYY
+script_version_number(27092019) -- DDMMYYYY
 
 -- All the command keys used throughout the Cheat-Menu
 tkeys =
@@ -100,7 +100,7 @@ tcheatmenu =
         {
             main     = imgui.new.bool(true),
             distance = fconfig.get('tcheatmenu.window.overlay.distance',10.0),
-            corner   = imgui.new.int(fconfig.get('tcheatmenu.window.overlay.corner',0)),
+            corner   = imgui.new.int(fconfig.get('tcheatmenu.window.overlay.corner',4)),
             names    = {"Custom","Top Left","Top Right","Bottom Left","Bottom Right","Close"},
             list     = {},
         },

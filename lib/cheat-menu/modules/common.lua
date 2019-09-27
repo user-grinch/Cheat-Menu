@@ -349,7 +349,7 @@ function module.UpdateStat(arg)
 
         imgui.Columns(1)
 
-        imgui.PushItemWidth(imgui.GetWindowWidth()-50)
+        imgui.PushItemWidth(imgui.GetWindowWidth()-70)
         if imgui.InputInt("Set",value) then
             setFloatStat(arg.stat,value[0])
         end
@@ -397,17 +397,19 @@ function module.UpdateAddress(arg)
 
         imgui.Spacing()
 
-        if imgui.InputFloat("Set",value) then
+        if imgui.InputFloat("",value) then
             module.RwMemory(arg.address,arg.size,value[0],nil,arg.is_float)
         end
-        imgui.SameLine()
-        if imgui.Button("-",imgui.ImVec2(fcommon.GetSize(12))) then
+        imgui.SameLine(0.0,4.0)
+        if imgui.Button("-",imgui.ImVec2(20,20)) then
             module.RwMemory(arg.address,arg.size,(value[0] - arg.cvalue),nil,arg.is_float)
         end
-        imgui.SameLine()
-        if imgui.Button("+",imgui.ImVec2(fcommon.GetSize(12))) then
+        imgui.SameLine(0.0,4.0)
+        if imgui.Button("+",imgui.ImVec2(20,20)) then
             module.RwMemory(arg.address,arg.size,(value[0] + arg.cvalue),nil,arg.is_float)
         end
+        imgui.SameLine(0.0,4.0)
+        imgui.Text("Set")
         imgui.Spacing()
         if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(3))) then
             module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float)

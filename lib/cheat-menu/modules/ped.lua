@@ -115,9 +115,8 @@ function module.PedMain()
             imgui.EndTabItem()
         end
         if imgui.BeginTabItem("Menu") then
-            fcommon.UpdateAddress({name = "Pedestrian density",address = 0x8D2530,size = 4,default = 100,max = 100})
-            if imgui.CollapsingHeader("Gang zone density") then
-                imgui.Separator()
+            fcommon.UpdateAddress({name = 'Pedestrian density multiplier',address = 0x8D2530,size = 4,min = 0,max = 10, default = 1,is_float = true})
+            fcommon.DropDownMenu("Gang zone density",function()
                 imgui.PushItemWidth(imgui.GetWindowWidth() - 200)
                 SetDensity("Ballas",0)
                 SetDensity("Da nang boys",4)
@@ -131,8 +130,8 @@ function module.PedMain()
                 SetDensity("Varrio los aztecas",7)
                 imgui.PopItemWidth()
                 imgui.Spacing()
-                imgui.Text("Turf Color")
-            end
+                imgui.Text("You'll need ExGangWars plugin to display some turf colors")
+            end)
             imgui.EndTabItem()
         end
         if imgui.BeginTabItem("Spawn") then
