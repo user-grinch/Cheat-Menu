@@ -51,7 +51,7 @@ function module.VisualMain()
 
             imgui.NextColumn()
 
-            fcommon.CheckBox({ address = 0xA444A0,name = 'Enable hud'})
+            fcommon.CheckBox({ address = 0xBA6769,name = 'Enable hud'})
             fcommon.CheckBox({ address = 0xBA676C,name = 'Enable radar',value = 0,value2 = 2})
             fcommon.CheckBox({ address = 0xA444A4,name = 'Gray radar'})
             fcommon.CheckBox({ address = 0x589355,name = 'Health bar percentage'})

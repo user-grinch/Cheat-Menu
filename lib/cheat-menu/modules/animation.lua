@@ -46,29 +46,37 @@ tanimation.walking.list  = imgui.new['const char*'][#tanimation.walking.names](t
 function AnimationEntry(file,animation)
     if imgui.MenuItemBool(animation)then
         local char = nil
-        requestAnimation(file)
-        loadAllModelsNow()
-
-        if fanimation.tanimation.ped[0] == true then
-            if fped.tped.selected ~=  nil then
-                char = fped.tped.selected
-            else
-                printHelpString("~r~No~w~ ped selected")
-                return
-            end
-        else
-            char = PLAYER_PED
+        if file ~= "PED" then
+            requestAnimation(file)
+            loadAllModelsNow()
         end
+        PlayAnimation(file,animation)
+    end
+end
 
-        if tanimation.secondary[0] == true then
-            taskPlayAnimSecondary(char,animation,file,4.0,tanimation.loop[0],0,0,0,-1)  
+function PlayAnimation(file,animation)
+    if fanimation.tanimation.ped[0] == true then
+        if fped.tped.selected ~=  nil then
+            char = fped.tped.selected
         else
-            taskPlayAnim(char,animation,file,4.0,tanimation.loop[0],0,0,0,-1)
+            printHelpString("~r~No~w~ ped selected")
+            return
         end
-        fcommon.CheatActivated()
+    else
+        char = PLAYER_PED
+    end
+
+    if tanimation.secondary[0] == true then
+        taskPlayAnimSecondary(char,animation,file,4.0,tanimation.loop[0],0,0,0,-1)  
+    else
+        taskPlayAnim(char,animation,file,4.0,tanimation.loop[0],0,0,0,-1)
+    end
+    fcommon.CheatActivated()
+    if file ~= "ped" then
         removeAnimation(animation)
     end
 end
+
 
 function module.AnimationMain()
     imgui.Spacing()
@@ -150,11 +158,11 @@ function module.AnimationMain()
 
 
         if imgui.BeginTabItem("Misc") then
-            if imgui.Combo("Fighting animation", tanimation.fighting.selected,tanimation.fighting.list,#tanimation.fighting.names) then
+            if imgui.Combo("Fighting", tanimation.fighting.selected,tanimation.fighting.list,#tanimation.fighting.names) then
                 giveMeleeAttackToChar(PLAYER_PED,tanimation.fighting.selected[0]+4,6)
                 fcommon.CheatActivated()
             end
-            if imgui.Combo("Walking animation", tanimation.walking.selected,tanimation.walking.list,#tanimation.walking.names) then
+            if imgui.Combo("Walking", tanimation.walking.selected,tanimation.walking.list,#tanimation.walking.names) then
                 writeMemory(0x609A4E,4,-1869574000,true)
                 writeMemory(0x609A52,2,37008,true)
                 requestAnimation(tanimation.walking.names[tanimation.walking.selected[0]+1])

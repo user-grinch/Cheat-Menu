@@ -36,23 +36,32 @@ local tplayer =
 module.tplayer = tplayer
 
 function module.ChangePlayerModel(model)
-    if fped.tped.special[model] == nil then
-        if isModelAvailable(model) then
-            requestModel(model)
+    if  fped.tped.names[model] ~= nil then
+        if fped.tped.special[model] == nil then
+            if isModelAvailable(model) then
+                requestModel(model)
+                loadAllModelsNow()
+                setPlayerModel(PLAYER_HANDLE,model)
+                markModelAsNoLongerNeeded(model)
+            end
+        else
+            if not hasSpecialCharacterLoaded(290) then
+                unloadSpecialCharacter(model)
+            end
+            loadSpecialCharacter(fped.tped.special[model],1)
             loadAllModelsNow()
-            setPlayerModel(PLAYER_HANDLE,model)
-            markModelAsNoLongerNeeded(model)
+            setPlayerModel(PLAYER_HANDLE,290)
         end
-    else
-        if not hasSpecialCharacterLoaded(290) then
-            unloadSpecialCharacter(model)
+        local car = nil
+        if isCharInAnyCar(PLAYER_PED) then
+            car = storeCarCharIsInNoSave(PLAYER_PED)
         end
-        loadSpecialCharacter(fped.tped.special[model],1)
-        loadAllModelsNow()
-        setPlayerModel(PLAYER_HANDLE,290)
+        clearCharTasksImmediately(PLAYER_PED)
+        if car ~= nil then
+            taskWarpCharIntoCarAsDriver(PLAYER_PED,car)
+        end
+        printHelpString("Skin changed")
     end
-    clearCharTasksImmediately(PLAYER_PED)
-    printHelpString("Skin changed")
 end
 
 function HealthArmour()
@@ -227,13 +236,13 @@ function SkinChangerMenu()
             imgui.Spacing()
             if imgui.BeginChild("Gangs list Window") then
                 fcommon.ShowEntries("Ballas",{102,103,104},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("DaNangBoys",{121,122,123},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("GroveStreetFamilies",{105,106,107,269,270,271},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("LosSantosVagos",{108,109,110},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Da nang boys",{121,122,123},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Grove street families",{105,106,107,269,270,271},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Los santos vagos",{108,109,110},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
                 fcommon.ShowEntries("Mafia",{111,112,113,124,125,126,127},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("SanFierroRifa",{173,174,175},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("MountainCloudTriad",{117,118,120},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("VarriosLosAztecas",{114,115,116},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("San fierro rifa",{173,174,175},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Mountain cloud triad",{117,118,120},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Varrios los aztecas",{114,115,116},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
                 imgui.EndChild()
             end
             imgui.EndTabItem()
@@ -253,18 +262,18 @@ function SkinChangerMenu()
                 fcommon.ShowEntries("Heckler",{258,259},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
                 fcommon.ShowEntries("Hippie",{72,73},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
                 fcommon.ShowEntries("Jogger",{90,96},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("KarateStudent",{203,204},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Karate student",{203,204},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
                 fcommon.ShowEntries("Pol",{66,67},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("LowClassMale",{32,33,34,128,132,133,202},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("LowClassFemale",{31,129,130,131,151,201},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("MountainBiker",{51,52},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("RichMale",{14,20,38,43,46,57,59,94,98,185,186,221,228,235,240,295},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("RichFemale",{9,12,40,53,55,88,91,169,215,216,219,224,231},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("RollerBlade",{92,99},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("StreetMale",{15,22,44,48,58,60,95,101,142,170,188,222,229,236,241,242},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("StreetFemale",{10,13,39,41,54,56,69,76,93,218,225,226,232,233,246,256,257},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("TrampMale",{78,79,134,135,136,137,212,213,230,239},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("TrampFemale",{77,256,257},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Low class male",{32,33,34,128,132,133,202},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Low class female",{31,129,130,131,151,201},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Mountainbiker",{51,52},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Richmale",{14,20,38,43,46,57,59,94,98,185,186,221,228,235,240,295},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Rich female",{9,12,40,53,55,88,91,169,215,216,219,224,231},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Roller blade",{92,99},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Street male",{15,22,44,48,58,60,95,101,142,170,188,222,229,236,241,242},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Street female",{10,13,39,41,54,56,69,76,93,218,225,226,232,233,246,256,257},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Tramp male",{78,79,134,135,136,137,212,213,230,239},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Tramp female",{77,256,257},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
                 fcommon.ShowEntries("Elvis",{82,83,84},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
                 imgui.EndChild()
             end
@@ -274,9 +283,9 @@ function SkinChangerMenu()
             imgui.Spacing()
             if imgui.BeginChild("Criminals list Window") then
                 fcommon.ShowEntries("Biker",{247,248},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("BodyGuard",{24,25},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Body guard",{24,25},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
                 fcommon.ShowEntries("Criminal",{21,47,100,143,181,183,184,223,250},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("DrugDealer",{28,29,30,154},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Drug dealer",{28,29,30,154},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
                 imgui.EndChild()
             end
             imgui.EndTabItem()
@@ -285,16 +294,16 @@ function SkinChangerMenu()
         if imgui.BeginTabItem('Jobs') then
             imgui.Spacing()
             if imgui.BeginChild("Jobs list Window") then
-                fcommon.ShowEntries("CabDriver",{182,206,220,234,261,262},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Cab driver",{182,206,220,234,261,262},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
                 fcommon.ShowEntries("Construction",{27,153,260},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
                 fcommon.ShowEntries("Croupier",{11,171,172},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("ClothesSeller",{211,217},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("FireFighter",{277,278,279},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("LawEnforcement",{71,265,266,267,280,281,282,283,284,285,286,287,288},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("LifeGuard",{97,251},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Clothes seller",{211,217},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Fire fighter",{277,278,279},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Law enforcement",{71,265,266,267,280,281,282,283,284,285,286,287,288},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Life guard",{97,251},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
                 fcommon.ShowEntries("Medic",{274,275,276},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
                 fcommon.ShowEntries("Prostitute",{63,64,75,85,87,152,178,207,237,238,243,245,249},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                fcommon.ShowEntries("ShopSeller",{205,155,156,167,168,176,177,179,180},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
+                fcommon.ShowEntries("Shop seller",{205,155,156,167,168,176,177,179,180},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
                 fcommon.ShowEntries("Valet",{189,252,},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
                 fcommon.ShowEntries("Worker",{16,50,61,253,255},110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
                 imgui.EndChild()

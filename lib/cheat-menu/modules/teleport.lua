@@ -72,10 +72,10 @@ function module.TeleportMain()
         if imgui.BeginTabItem("Teleport") then
             imgui.Spacing()
             imgui.Columns(2,nil,false)
-            fcommon.CheckBox({name = "AutoZCoordinates",var = fteleport.tteleport.auto_z,help_text ="The script would get Z coord automatically", })
-			fcommon.CheckBox({name = "InsertCoordinates",var = fteleport.tteleport.insert_coords,help_text ="Insert current coordinates"})
+            fcommon.CheckBox({name = "Auto Z coordinates",var = fteleport.tteleport.auto_z,help_text ="The script would get Z coord automatically", })
+			fcommon.CheckBox({name = "Insert coordinates",var = fteleport.tteleport.insert_coords,help_text ="Insert current coordinates"})
 			imgui.NextColumn()
-			fcommon.CheckBox({name = "QuickTeleport",var = fteleport.tteleport.shortcut,help_text ="Teleport to marker using (X + Y) key combinartion"})
+			fcommon.CheckBox({name = "Quick teleport",var = fteleport.tteleport.shortcut,help_text ="Teleport to marker using (X + Y) key combinartion"})
             imgui.Columns(1)
 
             if imgui.InputText("Coordinates",tteleport.coords,ffi.sizeof(tteleport.coords)) then end
@@ -136,6 +136,9 @@ function module.TeleportMain()
 			end
 			imgui.Spacing()
 			if imgui.Button("Save location",imgui.ImVec2(fcommon.GetSize(1))) then
+				if ffi.string(tteleport.coord_name) == "" then 
+					imgui.StrCopy(tteleport.coord_name,"Untitled")
+				end
 				coordinates[ffi.string(tteleport.coord_name)] = string.format("%d, %s",getActiveInterior(), ffi.string(tteleport.coords))   
 				fcommon.SaveJson("coordinate",coordinates)
 				coordinates = fcommon.LoadJson("coordinate")

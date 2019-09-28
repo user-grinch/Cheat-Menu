@@ -94,15 +94,16 @@ local tvehicles =
     visual_damage = imgui.new.bool(fconfig.get('tvehicles.visual_damage',false)),
     heavy = imgui.new.bool(fconfig.get('tvehicles.heavy',false)),
     hydraulic = imgui.new.bool(false),
-    lock_health = imgui.new.bool(fconfig.get('tvehicles.lock_health',false)),
+    no_damage = imgui.new.bool(fconfig.get('tvehicles.no_damage',false)),
     stay_on_bike = imgui.new.bool(fconfig.get('tvehicles.stay_on_bike',false)),
     speed = imgui.new.int(fconfig.get('tvehicles.speed',0)),
     lock_speed = imgui.new.bool(fconfig.get('tvehicles.lock_speed',false)),
 }
 
-
 module.tvehicles = tvehicles
 tvehicles.components.list  = imgui.new['const char*'][#tvehicles.components.names](tvehicles.components.names)
+
+module.IsValidModForVehicle = ffi.cast('bool(*)(int model, int cvehicle)',0x49B010)
 
 for i = 401,611,1 do
     table.insert(tvehicles.models,i)
@@ -162,24 +163,6 @@ function module.AddComponentToVehicle(component)
             fcommon.CheatActivated()
             markModelAsNoLongerNeeded(component)
         end
-    end
-end
-
-
-function module.IsValidModForVehicle(component)
-    -- pVehModelInfo = callFunction(0x00403DA0,1,1,getCarModel(storeCarCharIsInNoSave(PLAYER_PED))) -- CModelInfo__GetModelInfo
-    -- pVehMod = pVehModelInfo + 0x2D6
-
-    -- for i=1,18,1 do
-    --     _component =  readMemory(pVehMod,2,false)
-    --     pVehMod = pVehMod + 0x2
-    --     if _component ~= 65535 then
-    --         print(tostring(_component))
-    --     end
-    -- end
-    local CVehicle =  getCarPointer(storeCarCharIsInNoSave(PLAYER_PED))
-    if callMethod(0x49B010,CVehicle,2,2,model,CVehicle) ~= 0 then
-        return true
     end
 end
 
@@ -353,8 +336,8 @@ function module.VehicleMain()
                 end
             end})
  
-            fcommon.CheckBox({name = "Lock health",var = tvehicles.lock_health})
             fcommon.CheckBox({name = "New aircraft camera",var = tvehicles.aircraft.camera})
+            fcommon.CheckBox({name = "No damage",var = tvehicles.no_damage})
             fcommon.CheckBox({name = "No visual damage",var = tvehicles.visual_damage})
             fcommon.CheckBox({ address = 0x96914C,name = "Perfect handling"})
             fcommon.CheckBox({ address = 0x969164,name = "Tank mode"})
@@ -613,6 +596,7 @@ function module.VehicleMain()
                         tvehicles.components.saved = true
                     end
                 end
+                fcommon.InformationTooltip("Left click to add component\nRight click to remove component")
                 imgui.Spacing()
                 if imgui.BeginChild("Tune") then
                     imgui.Spacing()

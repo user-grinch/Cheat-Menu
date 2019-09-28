@@ -105,7 +105,7 @@ function module.MissionMain()
             end
             if imgui.BeginTabItem('Desert') then
                 imgui.Spacing()
-                ShowMissionEntries('MikeToreno',{75,76,77,78})
+                ShowMissionEntries('Mike toreno',{75,76,77,78})
                 ShowMissionEntries('Verdant meadows airstrip',{79,80,81,82,83})
                 imgui.EndTabItem()
             end
@@ -118,11 +118,9 @@ function module.MissionMain()
             end
             if imgui.BeginTabItem('Others') then
                 imgui.Spacing()
-                ShowMissionEntries('Arena missions',{128,129})
-                ShowMissionEntries('GYM missions',{114,115,116})
-                ShowMissionEntries('Miscellaneous',{113,117,118,119,120,130,131,132,133,134})
-                ShowMissionEntries('Sub missions',{121,122,123,124,125,126,127})
-                ShowMissionEntries('Video games',{3,4,5,6,7,8,9,10})
+                ShowMissionEntries('Arena missions',{128,129,130})
+                ShowMissionEntries('Miscellaneous',{117,118})
+                ShowMissionEntries('Video games',{3,4,5,6,7,9,10})
                 imgui.EndTabItem()
             end
             if imgui.BeginTabItem('Search') then

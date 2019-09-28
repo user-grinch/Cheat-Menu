@@ -33,16 +33,6 @@ function module.write()
     {
         tcheatmenu =
         {
-            window =
-            {
-                overlay =
-                {
-                    main     = tcheatmenu.window.overlay.main[0],
-                    distance = tcheatmenu.window.overlay.distance,
-                    corner   = tcheatmenu.window.overlay.corner[0],
-                },
-            },
-
             menubuttons =
             {
                 current = tcheatmenu.menubuttons.current,
@@ -126,7 +116,7 @@ function module.write()
                 spawn_in_air = fvehicle.tvehicles.aircraft.spawn_in_air[0],
                 index        = fvehicle.tvehicles.aircraft.index,
             },
-            lock_health   = fvehicle.tvehicles.lock_health[0],
+            no_damage     = fvehicle.tvehicles.no_damage[0],
             visual_damage = fvehicle.tvehicles.visual_damage[0],
             heavy         = fvehicle.tvehicles.heavy[0],
             stay_on_bike  = fvehicle.tvehicles.stay_on_bike[0],
@@ -140,16 +130,18 @@ function module.write()
         {
             auto_update_check   = fmenu.tmenu.auto_update_check[0],
             auto_reload         = fmenu.tmenu.auto_reload[0],
-            manual_mouse        = fmenu.tmenu.manual_mouse[0],
             show_tooltips       = fmenu.tmenu.show_tooltips[0],
             show_crash_message  = fmenu.tmenu.show_crash_message[0],
             disable_in_samp     = fmenu.tmenu.disable_in_samp[0],
+            lock_player         = fmenu.tmenu.lock_player[0],
             overlay = 
             {
-                coordinates = fmenu.tmenu.overlay.coordinates[0],
-                fps         = fmenu.tmenu.overlay.fps[0],
-                health      = fmenu.tmenu.overlay.health[0],
-                speed       = fmenu.tmenu.overlay.speed[0],
+                show            = fmenu.tmenu.overlay.show[0],
+                position_index  = fmenu.tmenu.overlay.position_index[0],
+                coordinates     = fmenu.tmenu.overlay.coordinates[0],
+                fps             = fmenu.tmenu.overlay.fps[0],
+                health          = fmenu.tmenu.overlay.health[0],
+                speed           = fmenu.tmenu.overlay.speed[0],
             },
         },
     }

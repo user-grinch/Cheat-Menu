@@ -190,20 +190,25 @@ function module.ShowEntries(title,model_table,height,width,store_table,image_pat
 
     if search_text == nil then search_text = "" end
 
-    
+    local car = storeCarCharIsInNoSave(PLAYER_PED)
     for i=1,#model_table,1 do
-        if skip_check == true or fvehicle.IsValidModForVehicle(model_table[i]) then
+        if skip_check == true or fvehicle.IsValidModForVehicle(model_table[i],getCarPointer(car)) then
             fcommon.DropDownMenu(title,function()
                 local skipped_entries = 0
                 for j=1,#model_table,1 do
                     if store_table[tostring(model_table[j])] ~= nil then
                         if (search_text == "") or (string.upper(func_show_tooltip(model_table[j])):find(string.upper(ffi.string(search_text))) ~= nil) then
-                            if skip_check == true or fvehicle.IsValidModForVehicle(model_table[j]) then
+                            if skip_check == true or fvehicle.IsValidModForVehicle(model_table[j],getCarPointer(car)) then
                                 if imgui.ImageButton(store_table[tostring(model_table[j])],imgui.ImVec2(width,height),imgui.ImVec2(0,0),imgui.ImVec2(1,1),1,imgui.ImVec4(1,1,1,1),imgui.ImVec4(1,1,1,1)) then
                                     if body_part == nil then
                                         func_load_model(model_table[j])
                                     else
                                         func_load_model(model_table[j],body_part)
+                                    end
+                                end
+                                if func_show_tooltip == nil then
+                                    if imgui.IsMouseClicked(1) then
+                                        removeVehicleMod(car,model_table[j])
                                     end
                                 end
                                 
