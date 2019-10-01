@@ -18,13 +18,13 @@ local module = {}
 
 local tvisual =
 {
-    zone_names = imgui.new.bool(true),
     car_names  = imgui.new.bool(true),
     money =
     {
-        positive = imgui.new.char[20](fconfig.get('tvisual.money.positive',memory.tostring(readMemory(0x58F4C8,4,false)))),
-        negative = imgui.new.char[20](fconfig.get('tvisual.money.negative',memory.tostring(readMemory(0x58F50A,4,false)))),
+        negative = imgui.new.char[20](memory.tostring(readMemory(0x58F50A,4,false))),
+        positive = imgui.new.char[20](memory.tostring(readMemory(0x58F4C8,4,false))),
     },
+    zone_names = imgui.new.bool(true),
 }
 
 module.tvisual = tvisual
@@ -74,24 +74,21 @@ function module.VisualMain()
                         local var = allocateMemory(4)
                         ffi.copy(ffi.cast("char*", var), ffi.string(tvisual.money.positive))
                         writeMemory(0x58F4C8,4,var,false)
-                        freeMemory(var)
                     end
                     if imgui.InputText("Negative",tvisual.money.negative,ffi.sizeof(tvisual.money.negative)) then
                         local var = allocateMemory(4)
                         ffi.copy(ffi.cast("char*", var), ffi.string(tvisual.money.negative))
                         writeMemory(0x58F50A,4,var,false)
-                        freeMemory(var)
                     end
                     
                     if imgui.Button("Reset to default",imgui.ImVec2(fcommon.GetSize(1))) then
                         local var = allocateMemory(4)
-                        ffi.copy(ffi.cast("char*", var), "-$%07d")
+                        ffi.copy(ffi.cast("char(*)", var), "-$%07d")
                         imgui.StrCopy(tvisual.money.negative,"-$%07d",ffi.sizeof(tvisual.money.negative))
                         writeMemory(0x58F4C8,4,var,false)
-                        ffi.copy(ffi.cast("char*", var), "$%08d")
+                        ffi.copy(ffi.cast("char(*)", var), "$%08d")
                         imgui.StrCopy(tvisual.money.positive,"$%08d",ffi.sizeof(tvisual.money.positive))
                         writeMemory(0x58F50A,4,var,false)
-                        freeMemory(var)
                     end                    
 
                 end)

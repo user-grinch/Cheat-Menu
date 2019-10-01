@@ -16,31 +16,30 @@
 
 local module = {}
 
-local tanimation =
+module.tanimation =
 {
-    loop             = imgui.new.bool(fconfig.get('tanimation.loop',false)),
-    secondary        = imgui.new.bool(fconfig.get('tanimation.secondary',false)),
-    search_text      = imgui.new.char[20](),
-    name             = imgui.new.char[20](),
-    ifp_name         = imgui.new.char[20](),
-    fighting =
+    fighting      =
     {
-        selected = imgui.new.int(fconfig.get('tanimation.fighting.selected',0)),
-        names    = {"Default","Boxing","Kung fu","Kick Boxing","Punch Kick"},
-        list     = {},
+        selected  = imgui.new.int(fconfig.get('tanimation.fighting.selected',0)),
+        names     = {"Default","Boxing","Kung fu","Kick Boxing","Punch Kick"},
+        array     = {},
+    }, 
+    ifp_name      = imgui.new.char[20](),
+    loop          = imgui.new.bool(fconfig.get('tanimation.loop',false)),
+    name          = imgui.new.char[20](),
+    ped           = imgui.new.bool(fconfig.get('tanimation.ped',false)),
+    secondary     = imgui.new.bool(fconfig.get('tanimation.secondary',false)),
+    search_text   = imgui.new.char[20](),
+    walking       = 
+    { 
+        selected  = imgui.new.int(fconfig.get('tanimation.walking.selected',0)),
+        names     = {"man","shuffle","oldman","gang1","gang2","oldfatman","fatman","jogger","drunkman","blindman","swat","woman","shopping","busywoman","sexywoman","pro","oldwoman","fatwoman","jogwoman","oldfatwoman","skate"},
+        array     = {},
     },
-    walking =
-    {
-        selected = imgui.new.int(fconfig.get('tanimation.walking.selected',0)),
-        names    = {"man","shuffle","oldman","gang1","gang2","oldfatman","fatman","jogger","drunkman","blindman","swat","woman","shopping","busywoman","sexywoman","pro","oldwoman","fatwoman","jogwoman","oldfatwoman","skate"},
-        list     = {},
-    },
-    ped = imgui.new.bool(fconfig.get('tanimation.ped',false)),
 }
-module.tanimation = tanimation
 
-tanimation.fighting.list = imgui.new['const char*'][#tanimation.fighting.names](tanimation.fighting.names)
-tanimation.walking.list  = imgui.new['const char*'][#tanimation.walking.names](tanimation.walking.names)
+module.tanimation.fighting.array = imgui.new['const char*'][#module.tanimation.fighting.names](module.tanimation.fighting.names)
+module.tanimation.walking.array  = imgui.new['const char*'][#module.tanimation.walking.names](module.tanimation.walking.names)
 
 
 function AnimationEntry(file,animation)
@@ -55,7 +54,7 @@ function AnimationEntry(file,animation)
 end
 
 function PlayAnimation(file,animation)
-    if fanimation.tanimation.ped[0] == true then
+    if module.tanimation.ped[0] == true then
         if fped.tped.selected ~=  nil then
             char = fped.tped.selected
         else
@@ -66,10 +65,10 @@ function PlayAnimation(file,animation)
         char = PLAYER_PED
     end
 
-    if tanimation.secondary[0] == true then
-        taskPlayAnimSecondary(char,animation,file,4.0,tanimation.loop[0],0,0,0,-1)  
+    if module.tanimation.secondary[0] == true then
+        taskPlayAnimSecondary(char,animation,file,4.0,module.tanimation.loop[0],0,0,0,-1)  
     else
-        taskPlayAnim(char,animation,file,4.0,tanimation.loop[0],0,0,0,-1)
+        taskPlayAnim(char,animation,file,4.0,module.tanimation.loop[0],0,0,0,-1)
     end
     fcommon.CheatActivated()
     if file ~= "ped" then
@@ -82,7 +81,7 @@ function module.AnimationMain()
     imgui.Spacing()
     if imgui.Button("Stop animation",imgui.ImVec2(fcommon.GetSize(1))) then
         local char = nil
-        if fanimation.tanimation.ped[0] == true then
+        if module.tanimation.ped[0] == true then
             if fped.tped.selected ~=  nil then
                 char = fped.tped.selected
             else
@@ -97,10 +96,10 @@ function module.AnimationMain()
     end
     imgui.Spacing()
     imgui.Columns(2,nil,false)
-    fcommon.CheckBox({name = "Loop",var = tanimation.loop})
-    fcommon.CheckBox({name = "Ped",var = tanimation.ped,help_text = "Play animation on ped.Aim with a gun to select."})
+    fcommon.CheckBox({name = "Loop",var = module.tanimation.loop})
+    fcommon.CheckBox({name = "Ped",var = module.tanimation.ped,help_text = "Play animation on ped.Aim with a gun to select."})
     imgui.NextColumn()
-    fcommon.CheckBox({name = "Secondary",var = tanimation.secondary})
+    fcommon.CheckBox({name = "Secondary",var = module.tanimation.secondary})
     imgui.Columns(1)
     imgui.Spacing() 
     if imgui.BeginTabBar("Animation") then
@@ -135,17 +134,17 @@ function module.AnimationMain()
 
             imgui.Spacing()
             imgui.Columns(1)
-            if imgui.InputText("Search",tanimation.search_text,ffi.sizeof(tanimation.search_text)) then end
+            if imgui.InputText("Search",module.tanimation.search_text,ffi.sizeof(module.tanimation.search_text)) then end
             imgui.SameLine()
 
             imgui.Spacing()
-            imgui.Text("Found entries :(" .. ffi.string(tanimation.search_text) .. ")")
+            imgui.Text("Found entries :(" .. ffi.string(module.tanimation.search_text) .. ")")
             imgui.Separator()
             imgui.Spacing()
             if imgui.BeginChild("Stat Entries") then
                 for key,value in pairs(ftable.animation.table) do
                     file, animation = value:match("([^$]+)$([^$]+)")
-                    if (string.upper(animation):find(string.upper(ffi.string(tanimation.search_text)))) then
+                    if (string.upper(animation):find(string.upper(ffi.string(module.tanimation.search_text)))) then
                         AnimationEntry(file,animation)
                     end
                 end       
@@ -158,28 +157,28 @@ function module.AnimationMain()
 
 
         if imgui.BeginTabItem("Misc") then
-            if imgui.Combo("Fighting", tanimation.fighting.selected,tanimation.fighting.list,#tanimation.fighting.names) then
-                giveMeleeAttackToChar(PLAYER_PED,tanimation.fighting.selected[0]+4,6)
+            if imgui.Combo("Fighting", module.tanimation.fighting.selected,module.tanimation.fighting.array,#module.tanimation.fighting.names) then
+                giveMeleeAttackToChar(PLAYER_PED,module.tanimation.fighting.selected[0]+4,6)
                 fcommon.CheatActivated()
             end
-            if imgui.Combo("Walking", tanimation.walking.selected,tanimation.walking.list,#tanimation.walking.names) then
+            if imgui.Combo("Walking", module.tanimation.walking.selected,module.tanimation.walking.array,#module.tanimation.walking.names) then
                 writeMemory(0x609A4E,4,-1869574000,true)
                 writeMemory(0x609A52,2,37008,true)
-                requestAnimation(tanimation.walking.names[tanimation.walking.selected[0]+1])
+                requestAnimation(module.tanimation.walking.names[module.tanimation.walking.selected[0]+1])
                 loadAllModelsNow()
-                setAnimGroupForChar(PLAYER_PED,tanimation.walking.names[tanimation.walking.selected[0]+1])
-                removeAnimation(tanimation.walking.names[tanimationwalking.selected[0]+1])
+                setAnimGroupForChar(PLAYER_PED,module.tanimation.walking.names[module.tanimation.walking.selected[0]+1])
+                removeAnimation(module.tanimation.walking.names[module.tanimation.walking.selected[0]+1])
                 fcommon.CheatActivated()
             end
             imgui.EndTabItem()
         end
 
         if imgui.BeginTabItem("Custom") then
-            if imgui.InputText("IFP name",tanimation.ifp_name,ffi.sizeof(tanimation.ifp_name)) then end
-            if imgui.InputText("Animation name",tanimation.name,ffi.sizeof(tanimation.name)) then end
+            if imgui.InputText("IFP name",module.tanimation.ifp_name,ffi.sizeof(module.tanimation.ifp_name)) then end
+            if imgui.InputText("Animation name",module.tanimation.name,ffi.sizeof(module.tanimation.name)) then end
             imgui.Spacing()
             if imgui.Button("Play animation",imgui.ImVec2(fcommon.GetSize(1))) then
-                PlayAnimation(ffi.string(tanimation.ifp_name),ffi.string(tanimation.name))
+                PlayAnimation(ffi.string(module.tanimation.ifp_name),ffi.string(module.tanimation.name))
             end
             imgui.EndTabItem()
         end

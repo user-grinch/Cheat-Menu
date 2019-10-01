@@ -17,7 +17,6 @@
 local module = {}
 
 module.animation       = require 'cheat-menu.modules.tables.animation'
-module.interiors       = require 'cheat-menu.modules.tables.interior'
 module.missions        = require 'cheat-menu.modules.tables.mission'
 module.peds            = require 'cheat-menu.modules.tables.ped'
 module.stats           = require 'cheat-menu.modules.tables.stat'

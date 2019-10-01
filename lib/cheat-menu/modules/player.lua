@@ -16,24 +16,22 @@
 
 local module = {}
 
-local tplayer =
+module.tplayer =
 {
+    aimSkinChanger    = imgui.new.bool(fconfig.get('tplayer.aimSkinChanger',false)),
+    cjBody            = imgui.new.int(fconfig.get('tplayer.cjBody',0)),
     clothes           = 
     { 
-        path          = tcheatmenu.dir .. "clothes\\",
         images        = {},
+        path          = tcheatmenu.dir .. "clothes\\",
     },
     god               = imgui.new.bool(fconfig.get('tplayer.god',false)),
-    aimSkinChanger    = imgui.new.bool(fconfig.get('tplayer.aimSkinChanger',false)),
-    neverWanted       = imgui.new.bool(fconfig.get('tplayer.neverWanted',false) ),
-    cjBody            = imgui.new.int(fconfig.get('tplayer.cjBody',0)),
+    never_wanted      = imgui.new.bool(false),
     skins =
     {
-        search_text    = imgui.new.char[20](),
+        search_text   = imgui.new.char[20](),
     },
 }
-
-module.tplayer = tplayer
 
 function module.ChangePlayerModel(model)
     if  fped.tped.names[model] ~= nil then
@@ -60,7 +58,7 @@ function module.ChangePlayerModel(model)
         if car ~= nil then
             taskWarpCharIntoCarAsDriver(PLAYER_PED,car)
         end
-        printHelpString("Skin changed")
+        printHelpString("~g~Skin~w~ changed")
     end
 end
 
@@ -75,7 +73,7 @@ function HealthArmour()
         imgui.Columns(1)
 
         imgui.PushItemWidth(imgui.GetWindowWidth()-70)
-        if imgui.InputInt("Set",health) then
+        if imgui.InputInt("Set ##Health",health) then
             if health[0] > 100 then
                 setFloatStat(24,health[0]*5.686)
                 
@@ -88,17 +86,17 @@ function HealthArmour()
         imgui.PopItemWidth()
 
         imgui.Spacing()
-        if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Minimum ##Health",imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(24,569.0)
             setCharHealth(PLAYER_PED,0)
         end
         imgui.SameLine()
-        if imgui.Button("Default",imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Default ##Health",imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(24,569.0)
             setCharHealth(PLAYER_PED,100)
         end
         imgui.SameLine()
-        if imgui.Button("Maximum",imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Maximum ##Health",imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(24,1450.0)
             setCharHealth(PLAYER_PED,255)
         end
@@ -127,7 +125,7 @@ function HealthArmour()
         imgui.Spacing()
 
         imgui.PushItemWidth(imgui.GetWindowWidth()-70)
-        if imgui.InputInt("Set",armour) then
+        if imgui.InputInt("Set ##Armour",armour) then
 
             if armour[0] < 0 then
                 armour[0] = 0
@@ -141,15 +139,15 @@ function HealthArmour()
         end
         imgui.PopItemWidth()
         imgui.Spacing()
-        if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Minimum ##Armour",imgui.ImVec2(fcommon.GetSize(3))) then
             damageChar(PLAYER_PED,  getCharArmour(PLAYER_PED),true)
         end
         imgui.SameLine()
-        if imgui.Button("Default",imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Default ##Armour",imgui.ImVec2(fcommon.GetSize(3))) then
             damageChar(PLAYER_PED,  getCharArmour(PLAYER_PED),true)
         end
         imgui.SameLine()
-        if imgui.Button("Maximum",imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Maximum ##Armour",imgui.ImVec2(fcommon.GetSize(3))) then
             addArmourToChar(PLAYER_PED, max_armour)
         end
     end)
@@ -167,7 +165,7 @@ function module.ChangePlayerClothe(name,body_part)
     givePlayerClothesOutsideShop(PLAYER_HANDLE,0,0,body_part)
     givePlayerClothesOutsideShop(PLAYER_HANDLE,texture,model,body_part)
     buildPlayerModel(PLAYER_HANDLE)
-    printHelpString("Clothe changed")
+    printHelpString("Clothes changed")
 end
 
 function ShowClothes(label,path,body_part,search_text)
@@ -180,7 +178,7 @@ function ShowClothes(label,path,body_part,search_text)
         table.insert( model_table,#model_table+1,string.sub( file,1,-5))
         file = findNextFile(handle)
     end
-    fcommon.ShowEntries(label,model_table,100,80,tplayer.clothes.images,path,".jpg",fplayer.ChangePlayerClothe,fplayer.GetClotheName,true,nil,body_part,search_text)
+    fcommon.ShowEntries(label,model_table,100,80,module.tplayer.clothes.images,path,".jpg",fplayer.ChangePlayerClothe,fplayer.GetClotheName,true,nil,body_part,search_text)
 end
 
 
@@ -227,8 +225,8 @@ end
 
 function SkinChangerMenu()
     imgui.Spacing()
-    fcommon.CheckBox({name = "Aim skin changer",var = tplayer.aimSkinChanger})
-    fcommon.InformationTooltip("Aim skin changer tooltip")
+    fcommon.CheckBox({name = "Aim skin changer",var = module.tplayer.aimSkinChanger})
+    fcommon.InformationTooltip("Aim ped with a gun & press enter")
 
     imgui.Spacing()
     if imgui.BeginTabBar("Skins") then
@@ -321,15 +319,15 @@ function SkinChangerMenu()
         if imgui.BeginTabItem('Search') then
             imgui.Spacing()
             imgui.Columns(1)
-            if imgui.InputText("Search",tplayer.skins.search_text,ffi.sizeof(tplayer.skins.search_text)) then end
+            if imgui.InputText("Search",module.tplayer.skins.search_text,ffi.sizeof(module.tplayer.skins.search_text)) then end
 			imgui.SameLine()
 
 			imgui.Spacing()
-			imgui.Text("Found entries :(" .. ffi.string(tplayer.skins.search_text) .. ")")
+			imgui.Text("Found entries :(" .. ffi.string(module.tplayer.skins.search_text) .. ")")
 			imgui.Separator()
             imgui.Spacing()
             if imgui.BeginChild("Skin Entries") then
-                fcommon.ShowEntries(nil,fped.tped.models,110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true,tplayer.skins.search_text)
+                fcommon.ShowEntries(nil,fped.tped.models,110,55,fped.tped.images,fped.tped.path,".jpg",fplayer.ChangePlayerModel,fped.GetName,true,module.tplayer.skins.search_text)
                 imgui.EndChild()
             end
             imgui.EndTabItem()
@@ -347,7 +345,7 @@ function module.PlayerMain()
             imgui.Spacing()
             imgui.Columns(2,nil,false)
             fcommon.CheckBox({ address = 0x969179,name = "Aim while driving"})
-            fcommon.CheckBox({ var = tplayer.god,name  = "God mode"})
+            fcommon.CheckBox({ var = module.tplayer.god,name  = "God mode"})
             fcommon.CheckBox({ address = 0x969161,name = "Higher cycle jumps"})
             fcommon.CheckBox({ address = 0x969178,name = "Infinite ammo"}) 
             fcommon.CheckBox({ address = 0x96916E,name = "Infinite oxygen"})
@@ -359,12 +357,14 @@ function module.PlayerMain()
             fcommon.CheckBox({ address = 0x96916C,name = "Mega jump"})
             fcommon.CheckBox({ address = 0x969173,name = "Mega punch"})
             fcommon.CheckBox({ address = 0x969174,name = "Never get hungry"})
-            fcommon.CheckBox({name = "Never wanted",var = tplayer.neverWanted,func = function()
+
+            module.tplayer.never_wanted[0] = readMemory(0x969171 ,1,false)
+            fcommon.CheckBox({name = "Never wanted",var = module.tplayer.never_wanted,func = function()
                 callFunction(0x4396C0,1,0,false)
-                if tplayer.neverWanted[0] then
+                if module.tplayer.never_wanted[0] then
                     fcommon.CheatActivated()
                 else
-                    fCheatDeactivated()
+                    fcommon.CheatDeactivated()
                 end
             end})
            
@@ -374,17 +374,17 @@ function module.PlayerMain()
             imgui.Separator()
             imgui.Spacing()
             imgui.Text("Body")
-            if imgui.RadioButtonIntPtr("Fat",tplayer.cjBody,1) then
+            if imgui.RadioButtonIntPtr("Fat",module.tplayer.cjBody,1) then
                 callFunction(0x439110,1,1,false)
                 fcommon.CheatActivated()
             end
-            if imgui.RadioButtonIntPtr("Muscle",tplayer.cjBody,2) then
+            if imgui.RadioButtonIntPtr("Muscle",module.tplayer.cjBody,2) then
                 -- body not changing to muscular after changing to fat fix
                 callFunction(0x439190,1,1,false)
                 callFunction(0x439150,1,1,false)
                 fcommon.CheatActivated()
             end
-            if imgui.RadioButtonIntPtr("Skinny",tplayer.cjBody,3) then
+            if imgui.RadioButtonIntPtr("Skinny",module.tplayer.cjBody,3) then
                 callFunction(0x439190,1,1,false)
                 fcommon.CheatActivated()
             end
@@ -397,10 +397,9 @@ function module.PlayerMain()
             fcommon.UpdateStat({ name = "Fat",stat = 21})
             HealthArmour()
             fcommon.UpdateStat({ name = "Lung capacity",stat = 225})
-            fcommon.UpdateAddress({name = "Money",address = 0xB7CE50,size = 4,min = 0,max = 9999999})
+            fcommon.UpdateAddress({name = "Money",address = 0xB7CE50,size = 4,min = -9999999,max = 9999999})
             fcommon.UpdateStat({ name = "Muscle",stat = 23})
             fcommon.UpdateStat({ name = "Respect",stat = 68,max = 2450}) 
-            fcommon.UpdateStat({ name = "Sex appeal",stat = 25})
             fcommon.UpdateStat({ name = "Stamina",stat = 22})
             WantedLevelMenu()
 
@@ -410,11 +409,12 @@ function module.PlayerMain()
             SkinChangerMenu()
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem("Clothe") then
+        if imgui.BeginTabItem("Clothes") then
             imgui.Spacing()
             if imgui.Button("Remove clothes",imgui.ImVec2(fcommon.GetSize(1))) then
                 for i=0, 17 do givePlayerClothes(PLAYER_HANDLE,0,0,i) end
                 buildPlayerModel(PLAYER_HANDLE)
+                printHelpString("Clothes ~r~removed")
             end
             imgui.Spacing()
 
@@ -424,24 +424,24 @@ function module.PlayerMain()
                 if imgui.BeginTabItem("List") then
                     if imgui.BeginChild("Clothes") then
         
-                        ShowClothes("Extras",tplayer.clothes.path .. "Extras\\",17)   
-                        ShowClothes("Glasses",tplayer.clothes.path .. "Glasses\\",15)
-                        ShowClothes("Hats",tplayer.clothes.path .. "Hats\\",16)
-                        ShowClothes("Heads",tplayer.clothes.path .. "Heads\\",1)
-                        ShowClothes("Necklaces",tplayer.clothes.path .. "Necklaces\\",13)
-                        ShowClothes("Shirts",tplayer.clothes.path .. "Shirts\\",0)
-                        ShowClothes("Shoes",tplayer.clothes.path .. "Shoes\\",3)
-                        ShowClothes("Tattoos back",tplayer.clothes.path .. "Tattoos back\\",8)
-                        ShowClothes("Tattoos left chest",tplayer.clothes.path .. "Tattoos left chest\\",9)
-                        ShowClothes("Tattoos left lower arm",tplayer.clothes.path .. "Tattoos left lower arm\\",4)
-                        ShowClothes("Tattoos left upper arm",tplayer.clothes.path .. "Tattoos left upper arm\\",5)
-                        ShowClothes("Tattoos lower back",tplayer.clothes.path .. "Tattoos lower back\\",12)  
-                        ShowClothes("Tattoos right chest",tplayer.clothes.path .. "Tattoos right chest\\",10)
-                        ShowClothes("Tattoos right lower arm",tplayer.clothes.path .. "Tattoos right lower arm\\",7)
-                        ShowClothes("Tattoos right upper arm",tplayer.clothes.path .. "Tattoos right upper arm\\",6)
-                        ShowClothes("Tattoos stomach",tplayer.clothes.path .. "Tattoos stomach\\",11)
-                        ShowClothes("Trousers",tplayer.clothes.path .. "Trousers\\",2)
-                        ShowClothes("Watches",tplayer.clothes.path .. "Watches\\",14)
+                        ShowClothes("Extras",fplayer.tplayer.clothes.path .. "Extras\\",17)   
+                        ShowClothes("Glasses",fplayer.tplayer.clothes.path .. "Glasses\\",15)
+                        ShowClothes("Hats",fplayer.tplayer.clothes.path .. "Hats\\",16)
+                        ShowClothes("Heads",fplayer.tplayer.clothes.path .. "Heads\\",1)
+                        ShowClothes("Necklaces",fplayer.tplayer.clothes.path .. "Necklaces\\",13)
+                        ShowClothes("Shirts",fplayer.tplayer.clothes.path .. "Shirts\\",0)
+                        ShowClothes("Shoes",fplayer.tplayer.clothes.path .. "Shoes\\",3)
+                        ShowClothes("Tattoos back",fplayer.tplayer.clothes.path .. "Tattoos back\\",8)
+                        ShowClothes("Tattoos left chest",fplayer.tplayer.clothes.path .. "Tattoos left chest\\",9)
+                        ShowClothes("Tattoos left lower arm",fplayer.tplayer.clothes.path .. "Tattoos left lower arm\\",4)
+                        ShowClothes("Tattoos left upper arm",fplayer.tplayer.clothes.path .. "Tattoos left upper arm\\",5)
+                        ShowClothes("Tattoos lower back",fplayer.tplayer.clothes.path .. "Tattoos lower back\\",12)  
+                        ShowClothes("Tattoos right chest",fplayer.tplayer.clothes.path .. "Tattoos right chest\\",10)
+                        ShowClothes("Tattoos right lower arm",fplayer.tplayer.clothes.path .. "Tattoos right lower arm\\",7)
+                        ShowClothes("Tattoos right upper arm",fplayer.tplayer.clothes.path .. "Tattoos right upper arm\\",6)
+                        ShowClothes("Tattoos stomach",fplayer.tplayer.clothes.path .. "Tattoos stomach\\",11)
+                        ShowClothes("Trousers",fplayer.tplayer.clothes.path .. "Trousers\\",2)
+                        ShowClothes("Watches",fplayer.tplayer.clothes.path .. "Watches\\",14)
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()

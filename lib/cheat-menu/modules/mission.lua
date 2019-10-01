@@ -16,20 +16,19 @@
 
 local module = {}
 
-local tmissions =
+module.tmission =
 {
-    search_text = imgui.new.char[64](fconfig.get('tmissions.search_text',"")),
+    array       = {},
     names       = ftable.missions.table,
-    list = {},
+    search_text = imgui.new.char[20](),
 }
 
-for i = 0,#tmissions.names,1 do
-    if tmissions.names[i] ~= nil then
-        table.insert(tmissions.list,i)
+for i = 0,#module.tmission.names,1 do
+    if module.tmission.names[i] ~= nil then
+        table.insert(module.tmission.array,i)
     end
 end
 
-module.tmissions = tmissions
 
 function ShowMissionEntries(title,list,search_text)
     if search_text == nil then search_text = "" end
@@ -37,7 +36,7 @@ function ShowMissionEntries(title,list,search_text)
     fcommon.DropDownMenu(title,function()
         imgui.Spacing()
         for _,i in pairs(list) do
-            if (ffi.string(search_text) == "") or ((string.upper(tmissions.names[i])):find(string.upper(ffi.string(search_text))) ~= nil) then
+            if (ffi.string(search_text) == "") or ((string.upper(module.tmission.names[i])):find(string.upper(ffi.string(search_text))) ~= nil) then
                 MissionEntry(i)
             end
         end
@@ -45,7 +44,7 @@ function ShowMissionEntries(title,list,search_text)
 end
 
 function MissionEntry(i)
-    if imgui.MenuItemBool(tmissions.names[i]) then
+    if imgui.MenuItemBool(module.tmission.names[i]) then
         if getGameGlobal(glob.ONMISSION) == 0 then
             clearWantedLevel(PLAYER_HANDLE)
             lockPlayerControl(true)
@@ -126,15 +125,14 @@ function module.MissionMain()
             if imgui.BeginTabItem('Search') then
                 imgui.Spacing()
                 imgui.Columns(1)
-                if imgui.InputText('Search',tmissions.search_text,ffi.sizeof(tmissions.search_text)) then end
-                imgui.SameLine()
-
+                if imgui.InputText('Search ',module.tmission.search_text,ffi.sizeof(module.tmission.search_text)) then 
+                end
                 imgui.Spacing()
-                imgui.Text("FoundEntries :(" .. ffi.string(tmissions.search_text) .. ")")
+                imgui.Text("FoundEntries :(" .. ffi.string(module.tmission.search_text) .. ")")
                 imgui.Separator()
                 imgui.Spacing()
                 if imgui.BeginChild("MissionsEntries") then
-                    ShowMissionEntries(nil,tmissions.list,tmissions.search_text)
+                    ShowMissionEntries(nil,module.tmission.array,module.tmission.search_text)
                     imgui.EndChild()
                 end
                 imgui.EndTabItem()

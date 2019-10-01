@@ -16,23 +16,21 @@
 
 local module = {}
 
-local tweapon =
+module.tweapon =
 {
+    fast_reload = imgui.new.bool(fconfig.get('tweapon.fast_reload',false)),
     images = {},
-    path = tcheatmenu.dir .. "weapons\\",
-    quick_spawn = imgui.new.bool(fconfig.get('tweapon.quick_spawn',false)),
-    noreload = imgui.new.bool(false),
-    fast_reload = imgui.new.bool(false),
-    search_text = imgui.new.char[20](fconfig.get('tweapon.search_text',"")),
     models = {},
+    no_reload = imgui.new.bool(fconfig.get('tweapon.no_reload',false)),
+    path = tcheatmenu.dir .. "weapons\\",
     ped = imgui.new.bool(fconfig.get('tweapon.ped',false)),
+    quick_spawn = imgui.new.bool(fconfig.get('tweapon.quick_spawn',false)),
+    search_text = imgui.new.char[20](""),   
 }
 
 for i = 1,46,1 do
-    table.insert(tweapon.models,i)
+    table.insert(module.tweapon.models,i)
 end
-
-module.tweapon = tweapon
 
 function module.GetName(id)
     local flibweapons = nil
@@ -67,7 +65,7 @@ function module.GiveWeapon(weapon)
             requestModel(model)
             loadAllModelsNow()
 
-            if tweapon.ped[0] == true then
+            if module.tweapon.ped[0] == true then
                 if fped.tped.selected ~=  nil then
                     giveWeaponToChar(fped.tped.selected,weapon,99999)
                     fcommon.CheatActivated()
@@ -87,7 +85,7 @@ function module.WeaponMain()
     imgui.Spacing()
     if imgui.Button("Remove current weapon",imgui.ImVec2(fcommon.GetSize(2))) then
         
-            if tweapon.ped[0] == true then
+            if module.tweapon.ped[0] == true then
                 if fped.tped.selected ~=  nil then
                     removeWeaponFromChar(fped.tped.selected,getCurrentCharWeapon(fped.tped.selected))
                     fcommon.CheatActivated()
@@ -102,7 +100,7 @@ function module.WeaponMain()
     end
     imgui.SameLine()
     if imgui.Button("Remove all weapons",imgui.ImVec2(fcommon.GetSize(2))) then         
-        if tweapon.ped[0] == true then
+        if module.tweapon.ped[0] == true then
             if fped.tped.selected ~=  nil then
                 removeAllCharWeapons(fped.tped.selected)
                 fcommon.CheatActivated()
@@ -119,18 +117,17 @@ function module.WeaponMain()
         if imgui.BeginTabItem("Checkbox") then
             imgui.Spacing()
             imgui.Columns(2,nil,false)
-            fcommon.CheckBox({ name = "Fast reload",var = tweapon.fast_reload,func = function()
-                if tweapon.fast_reload[0] then
-                    setPlayerFastReload(PLAUER_HANDLE,true)
+            fcommon.CheckBox({ name = "Fast reload",var = module.tweapon.fast_reload,func = function()
+                setPlayerFastReload(PLAYER_HANDLE,module.tweapon.fast_reload[0])
+                if module.tweapon.fast_reload[0] then                  
                     fcommon.CheatActivated()
                 else
-                    setPlayerFastReload(PLAUER_HANDLE,false)
                     fcommon.CheatDeactivated()
                 end
             end})
             imgui.NextColumn()
-            fcommon.CheckBox({ name = "No reload + Inf ammo",var = tweapon.noreload,func = function()
-                if tweapon.noreload[0] then
+            fcommon.CheckBox({ name = "No reload + Inf ammo",var = module.tweapon.no_reload,func = function()
+                if module.tweapon.no_reload[0] then
                     writeMemory( 7600773,1,144,1)
                     writeMemory( 7600815,1,144,1)
                     writeMemory( 7600816,2,37008,1)
@@ -154,9 +151,9 @@ function module.WeaponMain()
         if imgui.BeginTabItem("Spawn") then
             imgui.Spacing()
             imgui.Columns(2,nil,false)
-            fcommon.CheckBox({ name = "Quick Weapon",var = tweapon.quick_spawn,help_text = "Weapon can be spawned from quick spawner using (Left Ctrl + Q). \n\nControls:\nEnter : Stop reading key press\nDelete : Erase full string\nBackspace : Erase last character"})
+            fcommon.CheckBox({ name = "Quick Weapon",var = module.tweapon.quick_spawn,help_text = "Weapon can be spawned from quick spawner using (Left Ctrl + Q). \n\nControls:\nEnter : Stop reading key press\nDelete : Erase full string\nBackspace : Erase last character"})
             imgui.NextColumn()
-            fcommon.CheckBox({name = "Ped",var = tweapon.ped,help_text = "Give weapon to ped.Aim with a gun to select."})
+            fcommon.CheckBox({name = "Ped",var = module.tweapon.ped,help_text = "Give weapon to ped.Aim with a gun to select."})
             imgui.Columns(1)
             imgui.Spacing()
             if imgui.BeginTabBar("Spawn") then
@@ -164,30 +161,30 @@ function module.WeaponMain()
 
                     imgui.Spacing()
                     if imgui.BeginChild("Weapon list Window") then
-                        fcommon.ShowEntries("Assault rifles",{30,31},65,65,tweapon.images,tweapon.path,".png",module.GiveWeapon,module.GetName,true)
-                        fcommon.ShowEntries("Handguns",{22,23,24},65,65,tweapon.images,tweapon.path,".png",module.GiveWeapon,module.GetName,true)
-                        fcommon.ShowEntries("Heavy weapons",{35,36,37,38},65,65,tweapon.images,tweapon.path,".png",module.GiveWeapon,module.GetName,true)
-                        fcommon.ShowEntries("Melee",{1,2,3,4,6,7,8,9},65,65,tweapon.images,tweapon.path,".png",module.GiveWeapon,module.GetName,true)
-                        fcommon.ShowEntries("Miscellaneous",{10,11,12,14,15,41,42,43,44,45,46},65,65,tweapon.images,tweapon.path,".png",module.GiveWeapon,module.GetName,true)
-                        fcommon.ShowEntries("Projectiles",{16,17,18,39},65,65,tweapon.images,tweapon.path,".png",module.GiveWeapon,module.GetName,true)
-                        fcommon.ShowEntries("Shotguns",{25,26,27},65,65,tweapon.images,tweapon.path,".png",module.GiveWeapon,module.GetName,true)
-                        fcommon.ShowEntries("Sub machine guns",{28,29,32},65,65,tweapon.images,tweapon.path,".png",module.GiveWeapon,module.GetName,true)
-                        fcommon.ShowEntries("Rifles",{33,34},65,65,tweapon.images,tweapon.path,".png",module.GiveWeapon,module.GetName,true)
+                        fcommon.ShowEntries("Assault rifles",{30,31},65,65,module.tweapon.images,module.tweapon.path,".png",module.GiveWeapon,module.GetName,true)
+                        fcommon.ShowEntries("Handguns",{22,23,24},65,65,module.tweapon.images,module.tweapon.path,".png",module.GiveWeapon,module.GetName,true)
+                        fcommon.ShowEntries("Heavy weapons",{35,36,37,38},65,65,module.tweapon.images,module.tweapon.path,".png",module.GiveWeapon,module.GetName,true)
+                        fcommon.ShowEntries("Melee",{1,2,3,4,6,7,8,9},65,65,module.tweapon.images,module.tweapon.path,".png",module.GiveWeapon,module.GetName,true)
+                        fcommon.ShowEntries("Miscellaneous",{10,11,12,14,15,41,42,43,44,45,46},65,65,module.tweapon.images,module.tweapon.path,".png",module.GiveWeapon,module.GetName,true)
+                        fcommon.ShowEntries("Projectiles",{16,17,18,39},65,65,module.tweapon.images,module.tweapon.path,".png",module.GiveWeapon,module.GetName,true)
+                        fcommon.ShowEntries("Shotguns",{25,26,27},65,65,module.tweapon.images,module.tweapon.path,".png",module.GiveWeapon,module.GetName,true)
+                        fcommon.ShowEntries("Sub machine guns",{28,29,32},65,65,module.tweapon.images,module.tweapon.path,".png",module.GiveWeapon,module.GetName,true)
+                        fcommon.ShowEntries("Rifles",{33,34},65,65,module.tweapon.images,module.tweapon.path,".png",module.GiveWeapon,module.GetName,true)
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()
                 end
                 if imgui.BeginTabItem("Search") then
                     imgui.Spacing()
-                    if imgui.InputText("Search",tweapon.search_text,ffi.sizeof(tweapon.search_text)) then end
+                    if imgui.InputText("Search",module.tweapon.search_text,ffi.sizeof(module.tweapon.search_text)) then end
                     imgui.SameLine()
         
                     imgui.Spacing()
-                    imgui.Text("Found entries :(" .. ffi.string(tweapon.search_text) .. ")")
+                    imgui.Text("Found entries :(" .. ffi.string(module.tweapon.search_text) .. ")")
                     imgui.Separator()
                     imgui.Spacing()
                     if imgui.BeginChild("Weapon Entries") then
-                        fcommon.ShowEntries(nil,tweapon.models,65,65,tweapon.images,tweapon.path,".png",module.GiveWeapon,module.GetName,true,tweapon.search_text)
+                        fcommon.ShowEntries(nil,module.tweapon.models,65,65,module.tweapon.images,module.tweapon.path,".png",module.GiveWeapon,module.GetName,true,module.tweapon.search_text)
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()

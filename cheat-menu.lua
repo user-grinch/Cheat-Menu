@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu
 script_dependencies("ffi","mimgui","memory","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.7-staging")
-script_version_number(28092019) -- DDMMYYYY
+script_version_number(27092019) -- DDMMYYYY
 
 -- All the command keys used throughout the Cheat-Menu
 tkeys =
@@ -45,7 +45,6 @@ tkeys =
 
 resX,resY = getScreenResolution()
 
--- Script Dependencies
 ffi           = require "ffi"
 imgui         = require 'mimgui'
 memory        = require 'memory'
@@ -84,6 +83,7 @@ if fmenu.tmenu.disable_in_samp[0] and isSampLoaded() then
     script.this:unload()
 end
 
+
 tcheatmenu =
 {   
     dir = Dir,
@@ -97,18 +97,14 @@ tcheatmenu =
         show    = imgui.new.bool(false),
         title   = string.format("%s v%s by %s",script.this.name,script.this.version,script.this.authors[1]),
     },
-    menubuttons =
-    {
-        current =  fconfig.get('tcheatmenu.menubuttons.current',1),
-    },
+    current_menu = fconfig.get('tcheatmenu.current_menu',1),
+
     update =
     {
         available = false,
         version_number = 0
     },
 }
-
-fmenu.tmenu.overlay.position_array = imgui.new['const char*'][#fmenu.tmenu.overlay.position](fmenu.tmenu.overlay.position)
 
 imgui.OnInitialize(function() -- Called once
     -- Styles
@@ -143,7 +139,7 @@ function(self) -- render frame
         imgui.Spacing()            
     end
 
-    fcommon.UiCreateButtons({"Teleport","Memory","Player","Animation","Vehicle","Weapon","Peds","Mission","Game","Visual","Menu",
+    fcommon.CreateMenus({"Teleport","Memory","Player","Animation","Vehicle","Weapon","Peds","Mission","Game","Visual","Menu",
     "About"},{fteleport.TeleportMain,fmemory.MemoryMain,fplayer.PlayerMain,fanimation.AnimationMain,fvehicle.VehicleMain,
     fweapon.WeaponMain,fped.PedMain,fmission.MissionMain,fgame.GameMain,fvisual.VisualMain,fmenu.MenuMain,
     fabout.AboutMain})
@@ -153,8 +149,8 @@ end)
 
 
 imgui.OnFrame(function() 
-    return fmenu.tmenu.overlay.show[0] and fmenu.tmenu.overlay.fps[0] and fmenu.tmenu.overlay.coordinates[0] and not isGamePaused()  
-    or ((fmenu.tmenu.overlay.speed[0] or fmenu.tmenu.overlay.health[0]) and isCharInAnyCar(PLAYER_PED)) 
+    return not isGamePaused() and (fmenu.tmenu.overlay.show[0] and fmenu.tmenu.overlay.fps[0] and fmenu.tmenu.overlay.coordinates[0]
+    or ((fmenu.tmenu.overlay.speed[0] or fmenu.tmenu.overlay.health[0]) and isCharInAnyCar(PLAYER_PED)))
 end,
 function()
     local io = imgui.GetIO()
@@ -179,7 +175,6 @@ function()
         if fmenu.tmenu.overlay.fps[0] then
             imgui.Text("Frames :" .. tostring(math.floor(imgui.GetIO().Framerate)))
         end
-
         if isCharInAnyCar(PLAYER_PED) then
             car = getCarCharIsUsing(PLAYER_PED)
             if  fmenu.tmenu.overlay.speed[0] then
@@ -220,8 +215,8 @@ function()
             end
             if  imgui.MenuItemBool("Close") then
                 fgame.tgame.fps.bool[0] = false
-                fvehicle.tvehicles.show.speed[0] = false
-                fvehicle.tvehicles.show.health[0] = false
+                fvehicle.tvehicle.show.speed[0] = false
+                fvehicle.tvehicle.show.health[0] = false
                 fvisual.tvisuals.show_coordinates[0] = false
             end
             imgui.EndPopup()        
@@ -249,7 +244,28 @@ function main()
         writeMemory(0x004384D1 ,4,0x000000D0 ,false)
         writeMemory(0x004384D5 ,4,0x90909090 ,false)
     end
-  
+
+    switchArrestPenalties(fgame.tgame.keep_stuff[0])
+    switchDeathPenalties(fgame.tgame.keep_stuff[0])
+    setGangWarsActive(fped.tped.gang_wars[0])
+    setPlayerFastReload(PLAYER_HANDLE,fweapon.tweapon.fast_reload[0])
+    
+    if fweapon.tweapon.no_reload[0] then
+        writeMemory( 7600773,1,144,1)
+        writeMemory( 7600815,1,144,1)
+        writeMemory( 7600816,2,37008,1)
+        writeMemory( 7612591,1,144,1)
+        writeMemory( 7612646,1,144,1)
+        writeMemory( 7612647,2,37008,1)
+    else
+        writeMemory( 7600773,1,72,1)
+        writeMemory( 7600815,1,255,1)
+        writeMemory( 7600816,2,3150,1)
+        writeMemory( 7612591,1,72,1)
+        writeMemory( 7612646,1,255,1)
+        writeMemory( 7612647,2,3150,1)
+    end
+
     while true do
 
         if fanimation.tanimation.ped[0] == true or fweapon.tweapon.ped[0] == true then
@@ -281,7 +297,7 @@ function main()
             fcommon.KeyWait(tkeys.teleport_key1,tkeys.teleport_key2)
             fteleport.Teleport()
         end
-
+        
         setCharProofs(PLAYER_PED,fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0])
 
         if fplayer.tplayer.aimSkinChanger[0] and isKeyDown(tkeys.asc_key) then
@@ -294,7 +310,7 @@ function main()
         end
 
         if isKeyDown(tkeys.control_key) and isKeyDown(tkeys.quickspawner_key) then
-            if (fvehicle.tvehicles.quick_spawn[0] or fweapon.tweapons.quick_spawn[0]) then
+            if (fvehicle.tvehicle.quick_spawn[0] or fweapon.tweapon.quick_spawn[0]) then
                 fcommon.QuickSpawner()
             end
         end
@@ -304,41 +320,40 @@ function main()
             lua_thread.create(fvehicle.AircraftCamera)
         end
 
-        -- Vehicle related stuff which is required to run every frame
         if isCharInAnyCar(PLAYER_PED) then
             car = getCarCharIsUsing(PLAYER_PED)
 
-            if fvehicle.tvehicles.color.default ~= -1 then
+            if fvehicle.tvehicle.color.default ~= -1 then
                 local color_id = getCarColours(car)
-                if fvehicle.tvehicles.color.default ~= color_id then
+                if fvehicle.tvehicle.color.default ~= color_id then
                     fvehicle.ForEachCarComponent(function(mat)
                         mat:reset_color()
                     end)
                 end
             end
 
-            setCarCanBeDamaged(car,not(fvehicle.tvehicles.no_damage[0]))
-            setCharCanBeKnockedOffBike(PLAYER_PED,fvehicle.tvehicles.stay_on_bike[0])
-            setCarHeavy(car,fvehicle.tvehicles.heavy[0])
+            setCarCanBeDamaged(car,not(fvehicle.tvehicle.no_damage[0]))
+            setCharCanBeKnockedOffBike(PLAYER_PED,fvehicle.tvehicle.stay_on_bike[0])
+            setCarHeavy(car,fvehicle.tvehicle.heavy[0])
 
-            if fvehicle.tvehicles.lock_speed[0] then
-                if fvehicle.tvehicles.speed[0] > 500 then
-                    fvehicle.tvehicles.speed[0] = 500
+            if fvehicle.tvehicle.lock_speed[0] then
+                if fvehicle.tvehicle.speed[0] > 500 then
+                    fvehicle.tvehicle.speed[0] = 500
                 end
-                setCarForwardSpeed(car,fvehicle.tvehicles.speed[0])
+                setCarForwardSpeed(car,fvehicle.tvehicle.speed[0])
             end
 
-            setCarCanBeVisiblyDamaged(car,not(fvehicle.tvehicles.visual_damage[0]))
+            setCarCanBeVisiblyDamaged(car,not(fvehicle.tvehicle.visual_damage[0]))
 
 
             if getCarDoorLockStatus(car) == 4 then
-                fvehicle.tvehicles.lock_doors[0] = true
+                fvehicle.tvehicle.lock_doors[0] = true
             else
-                fvehicle.tvehicles.lock_doors[0] = false
+                fvehicle.tvehicle.lock_doors[0] = false
             end
         else
-            fvehicle.tvehicles.lock_doors[0] = false
-            fvehicle.tvehicles.lights.all[0] = false
+            fvehicle.tvehicle.lock_doors[0] = false
+            fvehicle.tvehicle.lights[0] = false
         end
 
         wait(0)

@@ -16,35 +16,33 @@
 
 local module = {}
 
-local tgame =
+module.tgame                =
 {
-    ss_shortcut = imgui.new.bool(fconfig.get('tgame.ss_shortcut',false)),
-    keep_stuff = imgui.new.bool(false),
-    unlock_interior = imgui.new.bool(false),
-    disable_cheats  = imgui.new.bool(fconfig.get('tgame.disable_cheats',false)),
-    current_weather = 0,
-    day_names = {"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"},
-    weather_names = ftable.weather.table,
-    fps =
-    {
-        limit = imgui.new.int(fconfig.get('tgame.fps.limit',30)),
-    },
-    airbreak = imgui.new.bool(false),
-    disable_help_popups = imgui.new.bool(fconfig.get('tgame.disable_help_popups',false)),
-    stats =
-    {
-        search_text = imgui.new.char[20](),
-        names = ftable.stats.table,
+    airbreak                = imgui.new.bool(false),
+    day                     =
+    {    
+        names               = {"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"},
+        array               = {},
+    },    
+    disable_cheats          = imgui.new.bool(fconfig.get('tgame.disable_cheats',false)),
+    disable_help_popups     = imgui.new.bool(fconfig.get('tgame.disable_help_popups',false)),
+    fps_limit               = imgui.new.int(fconfig.get('tgame.fps_limit',30)),
+    keep_stuff              = imgui.new.bool(fconfig.get('tgame.keep_stuff',false)),
+    ss_shortcut             = imgui.new.bool(fconfig.get('tgame.ss_shortcut',false)),
+    stats                   =
+    {    
+        search_text         = imgui.new.char[20](),
+        names               = ftable.stats.table,
+    },      
+    weather                 =
+    {    
+        names               = ftable.weather.table,
+        array               = {},
     },
 }
 
-module.tgame = tgame
-
-local days_list  = imgui.new['const char*'][#tgame.day_names](tgame.day_names)
-local weather_list  = imgui.new['const char*'][#tgame.weather_names](tgame.weather_names)
-
--- Game Interriors list
-local interior_names = ftable.interiors.table
+module.tgame.day.array      = imgui.new['const char*'][#module.tgame.day.names](module.tgame.day.names)
+module.tgame.weather.array  = imgui.new['const char*'][#module.tgame.weather.names](module.tgame.weather.names)
 
 function CheatsEntry(func,names)
     
@@ -66,7 +64,7 @@ function CheatsEntry(func,names)
 end
 
 function module.AirbreakMode()
-    if tgame.airbreak[0] then
+    if module.tgame.airbreak[0] then
         if isKeyDown(tkeys.airbreak_up) then
             x,y,z = getCharCoordinates(PLAYER_PED)
             setCharCoordinates(PLAYER_PED,x,y,z+2.0)
@@ -156,7 +154,7 @@ end
 function SetCurrentWeekday()
     imgui.Spacing()
     local current_day = imgui.new.int(readMemory(0xB7014E,1,false)-1)
-    if imgui.Combo("Day", current_day,days_list,#tgame.day_names) then
+    if imgui.Combo("Day", current_day,module.tgame.day.array,#module.tgame.day.names) then
         writeMemory(0xB7014E,1,current_day[0]+1,false)
         fcommon.CheatActivated()
     end
@@ -165,7 +163,7 @@ end
 function SetWeather()
     imgui.Spacing()
     local current_weather = imgui.new.int(readMemory(0xC81320,2,false))
-    if imgui.Combo("Weather", current_weather,weather_list,#tgame.weather_names) then
+    if imgui.Combo("Weather", current_weather,module.tgame.weather.array,#module.tgame.weather.names) then
         writeMemory(0xC81320,2,current_weather[0],false)
         fcommon.CheatActivated()
     end
@@ -186,8 +184,8 @@ function module.GameMain()
             imgui.Spacing()
             imgui.Columns(2,nil,false)
 
-            fcommon.CheckBox({name = "Airbreak mode",var = tgame.airbreak,help_text = "Controls:\nW : Forward\tS : Backward\nA  : Left  \t\tD : Right\nArrow_Up\t : Move up\nArrow_Down : Move Down",func = function()
-                if tgame.airbreak[0] ==  true then
+            fcommon.CheckBox({name = "Airbreak mode",var = module.tgame.airbreak,help_text = "Controls:\nW : Forward\tS : Backward\nA  : Left  \t\tD : Right\nArrow_Up\t : Move up\nArrow_Down : Move Down",func = function()
+                if module.tgame.airbreak[0] ==  true then
                     lockPlayerControl(true)
                     setCharCollision(PLAYER_PED,false)
                     setCameraBehindPlayer()
@@ -198,8 +196,8 @@ function module.GameMain()
                     fcommon.CheatDeactivated()
                 end
             end})
-            fcommon.CheckBox({name = "Disable cheats",var = tgame.disable_cheats,func = function()
-                if tgame.disable_cheats[0] == true then
+            fcommon.CheckBox({name = "Disable cheats",var = module.tgame.disable_cheats,func = function()
+                if module.tgame.disable_cheats[0] == true then
                     writeMemory(0x004384D0 ,1,0xE9 ,false)
                     writeMemory(0x004384D1 ,4,0x000000D0 ,false)
                     writeMemory(0x004384D5 ,4,0x90909090 ,false)
@@ -211,34 +209,16 @@ function module.GameMain()
                     fcommon.CheatDeactivated()
                 end
             end})
-            fcommon.CheckBox({ name = "Disable help popups",var = tgame.disable_help_popups ,show_help_popups = true,help_text = "Disables wasted & arrested popups that\nappear in a new game.Requires restart."})
+            fcommon.CheckBox({ name = "Disable help popups",var = module.tgame.disable_help_popups ,show_help_popups = true,help_text = "Disables wasted & arrested popups that\nappear in a new game.Requires restart."})
             fcommon.CheckBox({ address = 0x96C009,name = 'Free PNS'})
 
             imgui.NextColumn()
             
-            fcommon.CheckBox({name = "Keep stuff",var = tgame.keep_stuff,help_text = "Keep stuff after arrest/death" ,func = function()
-                if tgame.keep_stuff[0] == false then
-                    switchArrestPenalties(true)
-                    switchDeathPenalties(true)
-                else
-                    switchArrestPenalties(false)
-                    switchDeathPenalties(false)
-                end
+            fcommon.CheckBox({name = "Keep stuff",var = module.tgame.keep_stuff,help_text = "Keep stuff after arrest/death" ,func = function()
+                switchArrestPenalties(module.tgame.keep_stuff[0])
+                switchDeathPenalties(module.tgame.keep_stuff[0])
             end})
-            fcommon.CheckBox({ name = 'Screenshot shortcut',var = tgame.ss_shortcut,show_help_popups = true,help_text = "Take screenshot using (Left Ctrl + S) key combination"})
-            fcommon.CheckBox({name = 'Unlock interior',var = tgame.unlock_interior,func = function()
-                if tgame.unlock_interior[0] == true then
-                    for _,name in ipairs(interior_names) do
-                        switchEntryExit(name,1)
-                        fcommon.CheatActivated()
-                    end
-                else
-                    for _,name in ipairs(interior_names) do
-                        switchEntryExit(name,0)
-                        fcommon.CheatDeactivated()
-                    end
-                end
-            end})
+            fcommon.CheckBox({ name = 'Screenshot shortcut',var = module.tgame.ss_shortcut,show_help_popups = true,help_text = "Take screenshot using (Left Ctrl + S) key combination"})
             fcommon.CheckBox({ address = 0xB6F065,name = 'Widescreen'})
             imgui.Columns(1)
 
@@ -268,12 +248,12 @@ function module.GameMain()
                     imgui.Columns(1)
 
                     imgui.PushItemWidth(imgui.GetWindowWidth()-50)
-                    if imgui.InputInt('Set',tgame.fps.limit) then
-                        memory.write(0xC1704C,(tgame.fps.limit[0]+1),1)
+                    if imgui.InputInt('Set',module.tgame.fps_limit) then
+                        memory.write(0xC1704C,(module.tgame.fps_limit[0]+1),1)
                         memory.write(0xBA6794,1,1)
                     end
-                    if tgame.fps.limit[0] < 1 then
-                        tgame.fps.limit[0] = 1
+                    if module.tgame.fps_limit[0] < 1 then
+                        module.tgame.fps_limit[0] = 1
                     end
 
                     imgui.PopItemWidth()
@@ -282,18 +262,18 @@ function module.GameMain()
                     if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(3))) then
                         memory.write(0xC1704C,1,1)
                         memory.write(0xBA6794,1,1)
-                        tgame.fps.limit[0] = 1
+                        module.tgame.fps_limit[0] = 1
                     end
                     imgui.SameLine()
                     if imgui.Button("Default",imgui.ImVec2(fcommon.GetSize(3))) then
                         memory.write(0xC1704C,30,1)
                         memory.write(0xBA6794,1,1)
-                        tgame.fps.limit[0] = 30
+                        module.tgame.fps_limit[0] = 30
                     end
                     imgui.SameLine()
                     if imgui.Button("Maximum",imgui.ImVec2(fcommon.GetSize(3))) then
                         memory.write(0xBA6794,0,1)
-                        tgame.fps.limit[0] = 999
+                        module.tgame.fps_limit[0] = 999
                     end
                 end)
                 fcommon.UpdateAddress({name = 'Game speed',address = 0xB7CB64,size = 4,max = 10,min = 0, is_float =true, default = 1})
@@ -388,18 +368,18 @@ function module.GameMain()
                 if imgui.BeginTabItem("Search") then
                     imgui.Spacing()
                     imgui.Columns(1)
-                    if imgui.InputText("Search",tgame.stats.search_text,ffi.sizeof(tgame.stats.search_text)) then end
+                    if imgui.InputText("Search",module.tgame.stats.search_text,ffi.sizeof(module.tgame.stats.search_text)) then end
                     imgui.SameLine()
 
                     imgui.Spacing()
-                    imgui.Text("Found entries :(" .. ffi.string(tgame.stats.search_text) .. ")")
+                    imgui.Text("Found entries :(" .. ffi.string(module.tgame.stats.search_text) .. ")")
                     imgui.Separator()
                     imgui.Spacing()
                     if imgui.BeginChild("Stat Entries") then
                         for i=0,342,1 do
-                            if tgame.stats.names[i] ~= nil then
-                                if (ffi.string(tgame.stats.search_text) == "") or (string.upper(tgame.stats.names[i]):find(string.upper(ffi.string(tgame.stats.search_text))) ~= nil) then
-                                    fcommon.UpdateStat({ name = tgame.stats.names[i],stat = i})
+                            if module.tgame.stats.names[i] ~= nil then
+                                if (ffi.string(module.tgame.stats.search_text) == "") or (string.upper(module.tgame.stats.names[i]):find(string.upper(ffi.string(module.tgame.stats.search_text))) ~= nil) then
+                                    fcommon.UpdateStat({ name = module.tgame.stats.names[i],stat = i})
                                 end
                             end
                         end
