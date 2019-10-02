@@ -16,34 +16,41 @@
 
 local module = {}
 
+
 function module.CheckUpdates()
 
-    require("socket")
-    local https = require("ssl.https")
+    local https = nil
+    if pcall(function()
+            require("socket")
+            https = require("ssl.https")
+            end) then
 
-    if string.find( script.this.version,"staging") then
-        link = "https://raw.githubusercontent.com/inanahammad/Cheat-Menu/staging/cheat-menu.lua"
-    else
-        link = "https://raw.githubusercontent.com/inanahammad/Cheat-Menu/master/cheat-menu.lua"
-    end
-
-    local body, code, headers, status = https.request(link)
-    
-    if not body then 
-        print(code) 
-        print(status) 
-        printHelpString("~r~Failed~w~ to check for update") 
-    else
-        tcheatmenu.update.version_number = tonumber(body:match("script_version_number%((%d+)%)"))
-        if  tcheatmenu.update.version_number ~= nil then
-            if tcheatmenu.update.version_number ~= script.this.version_num then
-                tcheatmenu.update.available = true
-            else
-                printHelpString("Using latest version")
-            end
+        if string.find( script.this.version,"staging") then
+            link = "https://raw.githubusercontent.com/inanahammad/Cheat-Menu/staging/cheat-menu.lua"
         else
-            printHelpString("Couldn't connect to github")
+            link = "https://raw.githubusercontent.com/inanahammad/Cheat-Menu/master/cheat-menu.lua"
         end
+
+        local body, code, headers, status = https.request(link)
+        
+        if not body then 
+            print(code) 
+            print(status) 
+            printHelpString("~r~Failed~w~ to check for update") 
+        else
+            tcheatmenu.update.version_number = tonumber(body:match("script_version_number%((%d+)%)"))
+            if  tcheatmenu.update.version_number ~= nil then
+                if tcheatmenu.update.version_number ~= script.this.version_num then
+                    tcheatmenu.update.available = true
+                else
+                    printHelpString("Using latest version")
+                end
+            else
+                printHelpString("Couldn't connect to github")
+            end
+        end
+    else
+        print("Update: Necessary modules not found")
     end
 
 
