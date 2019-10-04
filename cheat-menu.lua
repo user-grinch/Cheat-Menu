@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu
 script_dependencies("ffi","mimgui","memory","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.7-staging")
-script_version_number(02102019) -- DDMMYYYY
+script_version_number(04102019) -- DDMMYYYY
 
 -- All the command keys used throughout the Cheat-Menu
 tkeys =
@@ -149,7 +149,7 @@ end)
 
 
 imgui.OnFrame(function() 
-    return not isGamePaused() and (fmenu.tmenu.overlay.show[0] and fmenu.tmenu.overlay.fps[0] and fmenu.tmenu.overlay.coordinates[0]
+    return not isGamePaused() and (fmenu.tmenu.overlay.show[0] or fmenu.tmenu.overlay.fps[0] or fmenu.tmenu.overlay.coordinates[0]
     or ((fmenu.tmenu.overlay.speed[0] or fmenu.tmenu.overlay.health[0]) and isCharInAnyCar(PLAYER_PED)))
 end,
 function()

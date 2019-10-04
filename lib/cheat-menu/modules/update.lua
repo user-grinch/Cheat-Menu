@@ -50,7 +50,7 @@ function module.CheckUpdates()
             end
         end
     else
-        print("Update: Necessary modules not found")
+        printHelpString("Necessary modules not found")
     end
 
 
