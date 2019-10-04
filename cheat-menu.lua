@@ -149,7 +149,8 @@ end)
 
 
 imgui.OnFrame(function() 
-    return not isGamePaused() and (fmenu.tmenu.overlay.show[0] or fmenu.tmenu.overlay.fps[0] or fmenu.tmenu.overlay.coordinates[0]
+
+    return not isGamePaused() and fmenu.tmenu.overlay.show[0] and (fmenu.tmenu.overlay.fps[0] or fmenu.tmenu.overlay.coordinates[0]
     or ((fmenu.tmenu.overlay.speed[0] or fmenu.tmenu.overlay.health[0]) and isCharInAnyCar(PLAYER_PED)))
 end,
 function()
