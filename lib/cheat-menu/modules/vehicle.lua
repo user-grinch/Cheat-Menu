@@ -93,12 +93,23 @@ module.tvehicle =
     spawn_inside = imgui.new.bool(fconfig.get('tvehicle.spawn_inside',true)),
     speed = imgui.new.int(fconfig.get('tvehicle.speed',0)),
     stay_on_bike = imgui.new.bool(fconfig.get('tvehicle.stay_on_bike',false)),
-    visual_damage = imgui.new.bool(fconfig.get('tvehicle.visual_damage',false)), 
+    trains =
+    {
+        ["449"]     = 9,
+        ["400"]     = 9,
+        ["537"]     = 10,
+        ["569"]     = 10,
+        ["538"]     = 11,
+        ["570"]     = 11,
+    },
+    visual_damage = imgui.new.bool(fconfig.get('tvehicle.visual_damage',false)),
+
 }
 
 module.tvehicle.components.list  = imgui.new['const char*'][#module.tvehicle.components.names](module.tvehicle.components.names)
 
 module.IsValidModForVehicle = ffi.cast('bool(*)(int model, int cvehicle)',0x49B010)
+IsThisModelATrain = ffi.cast('bool(*)(int model)',0x4C5AD0)
 
 for i = 401,611,1 do
     table.insert(module.tvehicle.models,i)
@@ -122,26 +133,61 @@ function module.GiveVehicleToPlayer(model)
     if isModelAvailable(model) then
         x,y,z = getCharCoordinates(PLAYER_PED)
         if isCharInAnyCar(PLAYER_PED) then
-            car = storeCarCharIsInNoSave(PLAYER_PED)
-            speed = getCarSpeed(car)
+            vehicle = storeCarCharIsInNoSave(PLAYER_PED)
+            speed = getCarSpeed(vehicle)
             warpCharFromCarToCoord(PLAYER_PED,x,y,z)
-            deleteCar(car)
+            deleteCar(vehicle)
         end
 
         if module.tvehicle.aircraft.spawn_in_air[0] and (isThisModelAHeli(model) or isThisModelAPlane(model)) then
             z = 400
         end
-        requestModel(model)
-        loadAllModelsNow()
-        car = createCar(model,x,y,z)
-        markModelAsNoLongerNeeded(model)
-        heading = getCharHeading(PLAYER_PED)
-        if module.tvehicle.spawn_inside[0] then
-            warpCharIntoCar(PLAYER_PED,car)
+
+        if IsThisModelATrain(model) == true then
+
+            id = module.tvehicle.trains[tostring(model)]
+
+            for key,value in pairs(module.tvehicle.trains) do
+                if value == id and key ~= tostring(model) then
+                    model2 = tonumber(key)
+                    break
+                end
+            end
+
+            deleteAllTrains()
+            requestModel(model)
+            requestModel(model2)
+            loadAllModelsNow()
+            if math.random(0,1) == 0 then
+                vehicle = createMissionTrain(id,x,y,z)
+            else
+                vehicle = createMissionTrain(id,x,y,z,true)
+            end
+            if module.tvehicle.spawn_inside[0] then
+                warpCharIntoCar(PLAYER_PED,vehicle)
+            end
+            markMissionTrainAsNoLongerNeeded(vehicle)
+            markModelAsNoLongerNeeded(model2)
+        else
+            requestModel(model)
+            loadAllModelsNow()
+            if not module.tvehicle.spawn_inside[0] then
+                heading = getCharHeading(PLAYER_PED)
+                heading =  heading+90
+                x = x - 2.0 * math.cos(heading * math.pi/180) - 5
+                y = y - 2.0 * math.sin(heading * math.pi/180)
+            end
+
+            vehicle = createCar(model,x,y,z)
+            
+            if module.tvehicle.spawn_inside[0] then
+                warpCharIntoCar(PLAYER_PED,vehicle)
+            end
+            setCarHeading(vehicle,heading)
+            setCarForwardSpeed(vehicle,speed)
+            markCarAsNoLongerNeeded(vehicle)
         end
-        setCarHeading(car,heading)
-        setCarForwardSpeed(car,speed)
-        markCarAsNoLongerNeeded(car)
+        markModelAsNoLongerNeeded(model)
         fcommon.CheatActivated()
     end
 end
@@ -487,7 +533,7 @@ function module.VehicleMain()
                         fcommon.ShowEntries("Recreational",{568,424,504,457,483,508,571,500,444,556,557,471,495,539},75,100,module.tvehicle.images,module.tvehicle.path,".jpg", module.GiveVehicleToPlayer,getNameOfVehicleModel,true)
                         fcommon.ShowEntries("Street racers",{429,541,542,415,480,562,565,434,494,502,503,411,559,561,560,506,451,558,555,477},75,100,module.tvehicle.images,module.tvehicle.path,".jpg", module.GiveVehicleToPlayer,getNameOfVehicleModel,true)
                         fcommon.ShowEntries("Trailers",{435,450,584,591,606,607,608,610,611},75,100,module.tvehicle.images,module.tvehicle.path,".jpg", module.GiveVehicleToPlayer,getNameOfVehicleModel,true)
-                        fcommon.ShowEntries("Trains",{449,537,538,569,570,590},75,100,module.tvehicle.images,module.tvehicle.path,".jpg", module.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                        fcommon.ShowEntries("Trains",{449,537,538},75,100,module.tvehicle.images,module.tvehicle.path,".jpg", module.GiveVehicleToPlayer,getNameOfVehicleModel,true)
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()

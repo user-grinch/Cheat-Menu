@@ -222,7 +222,11 @@ function module.ShowEntries(title,model_table,height,width,store_table,image_pat
                             imgui.SameLine()
                         end
                     else
-                        lua_thread.create(LoadTextures,store_table,image_path,model_table,image_extention)
+                        if doesFileExist(image_path..model_table[j]..image_extention) then
+                            lua_thread.create(LoadTextures,store_table,image_path,model_table,image_extention)
+                        else
+                            skipped_entries = skipped_entries +1
+                        end
                     end
                 end
             end)
