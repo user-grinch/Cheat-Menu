@@ -132,7 +132,7 @@ end
 function module.GiveVehicleToPlayer(model)
     if isModelAvailable(model) then
         x,y,z = getCharCoordinates(PLAYER_PED)
-        if isCharInAnyCar(PLAYER_PED) then
+        if isCharInAnyCar(PLAYER_PED) and module.tvehicle.spawn_inside[0] then
             vehicle = storeCarCharIsInNoSave(PLAYER_PED)
             speed = getCarSpeed(vehicle)
             warpCharFromCarToCoord(PLAYER_PED,x,y,z)
@@ -163,6 +163,7 @@ function module.GiveVehicleToPlayer(model)
             else
                 vehicle = createMissionTrain(id,x,y,z,true)
             end
+            removeCharElegantly(getDriverOfCar(vehicle))
             if module.tvehicle.spawn_inside[0] then
                 warpCharIntoCar(PLAYER_PED,vehicle)
             end
@@ -171,20 +172,16 @@ function module.GiveVehicleToPlayer(model)
         else
             requestModel(model)
             loadAllModelsNow()
+
             if not module.tvehicle.spawn_inside[0] then
-                heading = getCharHeading(PLAYER_PED)
-                heading =  heading+90
-                x = x - 2.0 * math.cos(heading * math.pi/180) - 5
-                y = y - 2.0 * math.sin(heading * math.pi/180)
+                vehicle = spawnVehicleByCheating(model)
+            else
+                vehicle = createCar(model,x,y,z)
+                setCarHeading(vehicle,getCharHeading(PLAYER_PED))
+                warpCharIntoCar(PLAYER_PED,vehicle)
+                setCarForwardSpeed(vehicle,speed)
             end
 
-            vehicle = createCar(model,x,y,z)
-            
-            if module.tvehicle.spawn_inside[0] then
-                warpCharIntoCar(PLAYER_PED,vehicle)
-            end
-            setCarHeading(vehicle,heading)
-            setCarForwardSpeed(vehicle,speed)
             markCarAsNoLongerNeeded(vehicle)
         end
         markModelAsNoLongerNeeded(model)

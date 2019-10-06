@@ -36,9 +36,55 @@ module.tmenu =
 	},
 	show_tooltips	    = imgui.new.bool(fconfig.get('tmenu.show_tooltips',true)),
 	show_crash_message  = imgui.new.bool(fconfig.get('tmenu.show_crash_message',true)),
+    update_available = false,
 }
 
 module.tmenu.overlay.position_array = imgui.new['const char*'][#module.tmenu.overlay.position](module.tmenu.overlay.position)
+
+
+function module.CheckUpdates()
+    local https = nil
+    if pcall(function()
+            require("socket")
+            https = require("ssl.https")
+            end) then
+		
+		if string.find( script.this.version,"wip") then
+			link = "https://raw.githubusercontent.com/inanahammad/test-repo/master/cheat-menu.lua"
+		else
+			link = "https://api.github.com/repos/inanahammad/Cheat-Menu/tags"
+		end
+
+        local body, code, headers, status = https.request(link)
+        
+        if not body then 
+            print(code) 
+            print(status) 
+            printHelpString("~r~Failed~w~ to check for update") 
+		else
+			if string.find( script.this.version,"wip") then
+				repo_version = body:match("script_version_number%((%d+)%)")
+				this_version = script.this.version_num
+			else
+				repo_version = decodeJson(body)[1].name
+				this_version = script.this.version
+			end
+
+            if  repo_version ~= nil then
+                if tostring(repo_version) > tostring(this_version) then
+                    module.tmenu.update_available = true
+                else
+                    printHelpString("No updates found")
+                end
+            else
+                printHelpString("Couldn't connect to github. The rest of the menu is still functional. You can disable auto update check from 'Menu'")
+            end
+        end
+        
+    else
+        printHelpString("Failed to check for updates. The rest of the menu is still functional. You can disable auto update check from 'Menu'")
+    end
+end
 
 function module.MenuMain()
 
@@ -78,6 +124,25 @@ function module.MenuMain()
 					fvehicles.tvehicles.show.health[0] = false
 					fvisuals.tvisuals.show_coordinates[0] = false
 				end
+			end
+			imgui.EndTabItem()
+		end
+		if imgui.BeginTabItem("About") then
+			imgui.BulletText(string.format("%s v%s",script.this.name,script.this.version))
+			imgui.BulletText(string.format("Version number : %d",script.this.version_num))
+			imgui.SameLine()
+			if imgui.Button("Check for update",imgui.ImVec2(120,20)) then
+				lua_thread.create(module.CheckUpdates)
+			end
+			imgui.BulletText(string.format("Author : %s",script.this.authors[1]))
+			imgui.BulletText(string.format("Imgui : v%s",imgui._VERSION))
+			imgui.BulletText("Discord : Grinch_#3311")
+			imgui.BulletText("Thanks : Junior-Djjr,Um_Geek & GTA community.")
+			imgui.BulletText("Forum Topic : ")
+			imgui.SameLine()
+			if imgui.Button("Copy to clipboard",imgui.ImVec2(150,20)) then
+				imgui.SetClipboardText(script.this.url)
+				printHelpString("~g~Sucessfully~w~ copied to clipboard")
 			end
 			imgui.EndTabItem()
 		end

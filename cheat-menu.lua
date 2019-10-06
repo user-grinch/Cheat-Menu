@@ -20,8 +20,8 @@ script_description("Cheat Menu for Grand Theft Auto San Andreas")
 script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu")
 script_dependencies("ffi","mimgui","memory","MoonAdditions")
 script_properties('work-in-pause')
-script_version("1.7-staging")
-script_version_number(05102019) -- DDMMYYYY
+script_version("1.7")
+script_version_number(20191006) -- YYYYMMDD
 
 -- All the command keys used throughout the Cheat-Menu
 tkeys =
@@ -52,8 +52,9 @@ glob          = require 'game.globals'
 mad           = require 'MoonAdditions'
 
 Dir = string.format( "%s%s",getWorkingDirectory(),"//lib//cheat-menu//")
-tcheatmenu = 
-{
+
+tcheatmenu =
+{   
     dir = Dir,
 }
 
@@ -64,7 +65,6 @@ if not pcall(fconfig.Read) then
 end
 
 ftable        = require 'cheat-menu.modules.tables.$index'
-fabout        = require 'cheat-menu.modules.about'
 fanimation    = require 'cheat-menu.modules.animation'
 fcommon       = require 'cheat-menu.modules.common'
 fgame         = require 'cheat-menu.modules.game'
@@ -73,8 +73,8 @@ fmenu         = require 'cheat-menu.modules.menu'
 fmission      = require 'cheat-menu.modules.mission'
 fped          = require 'cheat-menu.modules.ped'
 fplayer       = require 'cheat-menu.modules.player'
+fstat         = require 'cheat-menu.modules.stat'
 fteleport     = require 'cheat-menu.modules.teleport'
-fupdate       = require 'cheat-menu.modules.update'
 fvehicle      = require 'cheat-menu.modules.vehicle'
 fvisual       = require 'cheat-menu.modules.visual'
 fweapon       = require 'cheat-menu.modules.weapon'
@@ -98,12 +98,6 @@ tcheatmenu =
         title   = string.format("%s v%s by %s",script.this.name,script.this.version,script.this.authors[1]),
     },
     current_menu = fconfig.get('tcheatmenu.current_menu',1),
-
-    update =
-    {
-        available = false,
-        version_number = 0
-    },
 }
 
 imgui.OnInitialize(function() -- Called once
@@ -131,18 +125,17 @@ function(self) -- render frame
 
     imgui.Begin(tcheatmenu.window.title, tcheatmenu.window.show,imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoSavedSettings)
 
-    if tcheatmenu.update.available then
+    if fmenu.tmenu.update_available then
         imgui.Spacing()
-        if imgui.Button(string.format( "New version available %d | Click to hide",tcheatmenu.update.version_number), imgui.ImVec2(fcommon.GetSize(1))) then
-            tcheatmenu.update.available = false
+        if imgui.Button(string.format( "New version available | Click to hide"), imgui.ImVec2(fcommon.GetSize(1))) then
+            fmenu.tmenu.update_available = false
         end
         imgui.Spacing()            
     end
 
-    fcommon.CreateMenus({"Teleport","Memory","Player","Animation","Vehicle","Weapon","Peds","Mission","Game","Visual","Menu",
-    "About"},{fteleport.TeleportMain,fmemory.MemoryMain,fplayer.PlayerMain,fanimation.AnimationMain,fvehicle.VehicleMain,
-    fweapon.WeaponMain,fped.PedMain,fmission.MissionMain,fgame.GameMain,fvisual.VisualMain,fmenu.MenuMain,
-    fabout.AboutMain})
+    fcommon.CreateMenus({"Teleport","Memory","Player","Ped","Animation","Vehicle","Weapon","Mission","Stat","Game","Visual","Menu"},
+    {fteleport.TeleportMain,fmemory.MemoryMain,fplayer.PlayerMain,fped.PedMain,fanimation.AnimationMain,fvehicle.VehicleMain,
+    fweapon.WeaponMain,fmission.MissionMain,fstat.StatMain,fgame.GameMain,fvisual.VisualMain,fmenu.MenuMain})
 
     imgui.End()
 end)
@@ -229,7 +222,7 @@ end).HideCursor = true
 function main()
 
     if fmenu.tmenu.auto_update_check[0] then
-        fupdate.CheckUpdates()
+        fmenu.CheckUpdates()
     end
 
     if fgame.tgame.disable_help_popups[0] == true then
@@ -290,6 +283,7 @@ function main()
         if isKeyDown(tkeys.control_key) and isKeyDown(tkeys.menu_open_key) then
             fcommon.KeyWait(tkeys.control_key,tkeys.menu_open_key)
             tcheatmenu.window.show[0] = not tcheatmenu.window.show[0]
+            imgui.ShowDemoWindow()
         end
 
         if fteleport.tteleport.shortcut[0]
@@ -364,10 +358,10 @@ end
 function onScriptTerminate(script, quitGame)
     if script == thisScript() then
         fconfig.write()
-        local crash_text = "Cheat menu crashed unexpectedly.Sent moonloader.log for debugging"
+        local crash_text = "Cheat menu crashed unexpectedly"
         if fmenu.tmenu.auto_reload[0] then
             script.this:reload()
-            crash_text = "Cheat menu crashed unexpectedly & reloaded.Sent moonloader.log for debugging"
+            crash_text =  crash_text + " and reloaded"
         end
         if fmenu.tmenu.show_crash_message[0] then
             printHelpString(crash_text)

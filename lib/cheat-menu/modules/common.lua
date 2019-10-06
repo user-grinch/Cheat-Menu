@@ -159,7 +159,7 @@ function module.CreateMenus(names,funcs)
     end
 
     imgui.PopStyleVar()
-    imgui.Spacing()
+    imgui.Dummy(imgui.ImVec2(0,5))
     funcs[tcheatmenu.current_menu]()
   
 end

@@ -28,12 +28,7 @@ module.tgame                =
     disable_help_popups     = imgui.new.bool(fconfig.get('tgame.disable_help_popups',false)),
     fps_limit               = imgui.new.int(fconfig.get('tgame.fps_limit',30)),
     keep_stuff              = imgui.new.bool(fconfig.get('tgame.keep_stuff',false)),
-    ss_shortcut             = imgui.new.bool(fconfig.get('tgame.ss_shortcut',false)),
-    stats                   =
-    {    
-        search_text         = imgui.new.char[20](),
-        names               = ftable.stats.table,
-    },      
+    ss_shortcut             = imgui.new.bool(fconfig.get('tgame.ss_shortcut',false)), 
     weather                 =
     {    
         names               = ftable.weather.table,
@@ -301,95 +296,6 @@ function module.GameMain()
             CheatsEntry({0x439540,0x4391D0,0x439F60,0x4395A0,0x439880},{'Misc','Stop clock','Elvis\neverywhere','Countryside\ninvasion','Predator','Adrenaline'})
             CheatsEntry({0x438E90,0x438F20,0x4396F0,0x4396C0},{'Wanted level','+2Star','Clear stars','Six star','Never wanted'})
             CheatsEntry({0x4385B0,0x438890,0x438B30},{'Weapons','Set1','Set2','Set3'})
-            imgui.EndTabItem()
-        end
-        if imgui.BeginTabItem("Stats") then
-            imgui.Spacing()
-            if imgui.Button("Max vehicle stats",imgui.ImVec2(fcommon.GetSize(2))) then
-                callFunction(0x4399D0,1,1,false)
-                displayNonMinigameHelpMessages(false)
-                fcommon.CheatActivated()
-            end
-            imgui.SameLine()
-            if imgui.Button("Max weapon stats",imgui.ImVec2(fcommon.GetSize(2))) then
-                for i=69,79,1 do
-                    setFloatStat(i)
-                end
-                fcommon.CheatActivated()
-            end
-            imgui.Spacing()
-            if imgui.BeginTabBar("Stats") then
-                imgui.Spacing()
-
-                if imgui.BeginTabItem("Vehicles") then
-                    fcommon.UpdateStat({ name = "Bike",stat = 229})
-                    fcommon.UpdateStat({ name = "Cycling",stat = 230})
-                    fcommon.UpdateStat({ name = "Driving",stat = 160})
-                    fcommon.UpdateStat({ name = "Flying",stat = 223})        
-                    imgui.EndTabItem()
-                end
-                if imgui.BeginTabItem("Weapons") then
-                    fcommon.UpdateStat({ name = "AK47",stat = 77})
-                    fcommon.UpdateStat({ name = "Combat shotgun",stat = 74})
-                    fcommon.UpdateStat({ name = "Desert eagle",stat = 71})
-                    
-                    fcommon.UpdateStat({ name = "Machine pistol",stat = 75})
-                    fcommon.UpdateStat({ name = "M4",stat = 78})
-                    fcommon.UpdateStat({ name = "Pistol",stat = 69})
-                    fcommon.UpdateStat({ name = "Sawn off shotgun",stat = 73})
-                    fcommon.UpdateStat({ name = "Shotgun",stat = 72})
-                    fcommon.UpdateStat({ name = "Silenced pistol",stat = 70})
-                    fcommon.UpdateStat({ name = "SMG",stat = 76})
-                    fcommon.UpdateStat({ name = "Rifle",stat = 79})
-                    imgui.EndTabItem()
-                end
-                if imgui.BeginTabItem("GF") then
-
-                    imgui.Spacing()
-                    if imgui.Button("Max GF progress",imgui.ImVec2(fcommon.GetSize(1))) then
-                        for i=252,257,1 do
-                            setFloatStat(i,100)
-                        end
-                        clearHelp()
-                        fcommon.CheatActivated()
-                    end
-                    imgui.Spacing()
-                    imgui.Text("Progress")
-                    imgui.Separator()
-                    imgui.Spacing()
-                    fcommon.UpdateStat({ name = "Barbara",stat = 255,max = 100})
-                    fcommon.UpdateStat({ name = "Denise",stat = 252,max = 100})
-                    fcommon.UpdateStat({ name = "Helena",stat = 254,max = 100})
-                    fcommon.UpdateStat({ name = "Katie",stat = 256,max = 100})
-                    fcommon.UpdateStat({ name = "Michelle",stat = 253,max = 100})
-                    fcommon.UpdateStat({ name = "Millie",stat = 257,max = 100})
-                    imgui.EndTabItem()
-                end
-                if imgui.BeginTabItem("Search") then
-                    imgui.Spacing()
-                    imgui.Columns(1)
-                    if imgui.InputText("Search",module.tgame.stats.search_text,ffi.sizeof(module.tgame.stats.search_text)) then end
-                    imgui.SameLine()
-
-                    imgui.Spacing()
-                    imgui.Text("Found entries :(" .. ffi.string(module.tgame.stats.search_text) .. ")")
-                    imgui.Separator()
-                    imgui.Spacing()
-                    if imgui.BeginChild("Stat Entries") then
-                        for i=0,342,1 do
-                            if module.tgame.stats.names[i] ~= nil then
-                                if (ffi.string(module.tgame.stats.search_text) == "") or (string.upper(module.tgame.stats.names[i]):find(string.upper(ffi.string(module.tgame.stats.search_text))) ~= nil) then
-                                    fcommon.UpdateStat({ name = module.tgame.stats.names[i],stat = i})
-                                end
-                            end
-                        end
-                        imgui.Spacing()
-                        imgui.EndChild()
-                    end
-                    imgui.EndTabItem()
-                end
-                imgui.EndTabBar()
-            end
             imgui.EndTabItem()
         end
         imgui.EndTabBar()
