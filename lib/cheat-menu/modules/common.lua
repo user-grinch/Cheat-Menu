@@ -65,14 +65,14 @@ function module.QuickSpawner()
 
             local weapon =  fweapon.CBaseWeaponInfo(text)
 
-            if fweapon.tweapons.quick_spawn[0] == true and weapon ~= 0 then
-                fweapon.GiveWeaponToPlayer(weapon)
+            if fweapon.tweapon.quick_spawn[0] == true and weapon ~= 0 then
+                fweapon.GiveWeapon(weapon)
                 return
             end
 
             local vehicle = fvehicle.CBaseModelInfo(text)
 
-            if fvehicle.tvehicles.quick_spawn[0] == true and vehicle ~= 0 then
+            if fvehicle.tvehicle.quick_spawn[0] == true and vehicle ~= 0 then
                 fvehicle.GiveVehicleToPlayer(vehicle)
                 return
             end
@@ -83,7 +83,7 @@ function module.QuickSpawner()
 end
 
 function module.LoadJson(filename)
-    local full_path = tcheatmenu.dir .. "saves//" .. filename .. ".json"
+    local full_path = tcheatmenu.dir .. "json//" .. filename .. ".json"
     if doesFileExist(full_path) then
         local file = io.open(full_path, "r")
         local table = decodeJson(file:read("*a"))
@@ -94,7 +94,7 @@ function module.LoadJson(filename)
 end
 
 function module.SaveJson(filename,table)
-    local full_path = tcheatmenu.dir .. "saves//" .. filename .. ".json"
+    local full_path = tcheatmenu.dir .. "json//" .. filename .. ".json"
     local file = assert(io.open(full_path, "w"))
     file:write(encodeJson(table))
     file:close()
@@ -139,22 +139,20 @@ function module.GetSize(count,x,y)
     return x,y
 end
 
-function module.UiCreateButtons(names,funcs)
+function module.CreateMenus(names,funcs)
 
     imgui.PushStyleVarVec2(imgui.StyleVar.ItemSpacing,imgui.ImVec2(0,0))
     
     for i=1,#names,1 do
-        if tcheatmenu.menubuttons.current == i then
+        if tcheatmenu.current_menu == i then
             imgui.PushStyleColor(imgui.Col.Button, imgui.ImVec4(0.060,0.530,0.980,1.0))
         end
         if imgui.Button(names[i],imgui.ImVec2(module.GetSize(4,imgui.GetWindowWidth()/4 - 4*imgui.StyleVar.WindowPadding,20))) then
-            tcheatmenu.menubuttons.current = i
+            tcheatmenu.current_menu = i
         end
-        if tcheatmenu.menubuttons.current == i then
-            imgui.GetStyleColorVec4(imgui.Col.Button)
+        if tcheatmenu.current_menu == i then
             imgui.PushStyleColor(imgui.Col.Button, imgui.ImVec4(0.260,0.590,0.980,0.400))
         end
-
         if i%4 ~= 0 then
             imgui.SameLine()
         end
@@ -162,14 +160,8 @@ function module.UiCreateButtons(names,funcs)
 
     imgui.PopStyleVar()
     imgui.Spacing()
-
-    for i=1,#funcs,1 do
-        if tcheatmenu.menubuttons.current == i then
-            imgui.Spacing()
-            funcs[i]()
-            break
-        end
-    end
+    funcs[tcheatmenu.current_menu]()
+  
 end
 
 function LoadTextures(store_table,image_path,model_table,extention)
@@ -190,20 +182,26 @@ function module.ShowEntries(title,model_table,height,width,store_table,image_pat
 
     if search_text == nil then search_text = "" end
 
-    
+    local car = storeCarCharIsInNoSave(PLAYER_PED)
     for i=1,#model_table,1 do
-        if skip_check == true or fvehicle.IsValidModForVehicle(model_table[i]) then
+        if skip_check == true or fvehicle.IsValidModForVehicle(model_table[i],getCarPointer(car)) then
             fcommon.DropDownMenu(title,function()
                 local skipped_entries = 0
                 for j=1,#model_table,1 do
                     if store_table[tostring(model_table[j])] ~= nil then
                         if (search_text == "") or (string.upper(func_show_tooltip(model_table[j])):find(string.upper(ffi.string(search_text))) ~= nil) then
-                            if skip_check == true or fvehicle.IsValidModForVehicle(model_table[j]) then
+                            if skip_check == true or fvehicle.IsValidModForVehicle(model_table[j],getCarPointer(car)) then
                                 if imgui.ImageButton(store_table[tostring(model_table[j])],imgui.ImVec2(width,height),imgui.ImVec2(0,0),imgui.ImVec2(1,1),1,imgui.ImVec4(1,1,1,1),imgui.ImVec4(1,1,1,1)) then
                                     if body_part == nil then
                                         func_load_model(model_table[j])
                                     else
                                         func_load_model(model_table[j],body_part)
+                                    end
+                                end
+                                if func_show_tooltip == nil then
+                                    if imgui.IsMouseClicked(1) then
+                                        removeVehicleMod(car,model_table[j])
+                                        printHelpString("Component ~r~removed")
                                     end
                                 end
                                 
@@ -224,7 +222,11 @@ function module.ShowEntries(title,model_table,height,width,store_table,image_pat
                             imgui.SameLine()
                         end
                     else
-                        lua_thread.create(LoadTextures,store_table,image_path,model_table,image_extention)
+                        if doesFileExist(image_path..model_table[j]..image_extention) then
+                            lua_thread.create(LoadTextures,store_table,image_path,model_table,image_extention)
+                        else
+                            skipped_entries = skipped_entries +1
+                        end
                     end
                 end
             end)
@@ -251,31 +253,11 @@ function module.RadioButton(label,rb_table,addr_table)
             module.CheatActivated()
         end
     end
-
-    if imgui.RadioButtonIntPtr("Default ".. string.lower(label),button,#addr_table + 1) then
+    if imgui.RadioButtonIntPtr("Default ##" ..label,button,#addr_table + 1) then
         for j = 1,#addr_table,1 do
             writeMemory(addr_table[j],1,0,false)
         end
         module.CheatActivated()
-    end
-end
-
-function module.RwMemory(address,size,value,protect,is_float)
-    if protect ~= true then protect = false end
-    if is_float ~= true then is_float = false end
-
-    if value == nil then
-        if is_float then
-            return memory.getfloat(address,protect)
-        else
-            return memory.read(address,size,protect)
-        end
-    else
-        if is_float then
-            memory.setfloat(address,value,protect)
-        else
-            memory.write(address,value,size,protect)
-        end
     end
 end
 
@@ -349,22 +331,22 @@ function module.UpdateStat(arg)
 
         imgui.Columns(1)
 
-        imgui.PushItemWidth(imgui.GetWindowWidth()-50)
-        if imgui.InputInt("Set",value) then
+        imgui.PushItemWidth(imgui.GetWindowWidth()-70)
+        if imgui.InputInt("Set ##".. arg.name,value) then
             setFloatStat(arg.stat,value[0])
         end
         imgui.PopItemWidth()
 
         imgui.Spacing()
-        if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Minimum ##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(arg.stat,arg.min)
         end
         imgui.SameLine()
-        if imgui.Button("Default",imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Default ##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(arg.stat,arg.default)
         end
         imgui.SameLine()
-        if imgui.Button("Maximum",imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Maximum ##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(arg.stat,arg.max)
         end
         if value[0] < arg.min then
@@ -376,8 +358,25 @@ function module.UpdateStat(arg)
     end)
 end
 
+function module.RwMemory(address,size,value,protect,is_float)
+    if protect == nil then protect = false end
+
+    if value == nil then
+        if is_float == true then
+            return memory.getfloat(address,protect)
+        else
+            return readMemory(address,size,protect)
+        end
+    else
+        if is_float == true then
+            memory.setfloat(address,value,protect)
+        else
+            memory.write(address,value,size,protect)
+        end
+    end
+end
+
 function module.UpdateAddress(arg)
-    if arg.is_float == nil then arg.is_float = false end
     if arg.default == nil then arg.default = 0 end
     if arg.cvalue == nil then arg.cvalue = 1 end
 
@@ -397,27 +396,29 @@ function module.UpdateAddress(arg)
 
         imgui.Spacing()
 
-        if imgui.InputFloat("Set",value) then
+        if imgui.InputFloat("##".. arg.name,value) then
             module.RwMemory(arg.address,arg.size,value[0],nil,arg.is_float)
         end
-        imgui.SameLine()
-        if imgui.Button("-",imgui.ImVec2(fcommon.GetSize(12))) then
+        imgui.SameLine(0.0,4.0)
+        if imgui.Button("-",imgui.ImVec2(20,20)) then
             module.RwMemory(arg.address,arg.size,(value[0] - arg.cvalue),nil,arg.is_float)
         end
-        imgui.SameLine()
-        if imgui.Button("+",imgui.ImVec2(fcommon.GetSize(12))) then
+        imgui.SameLine(0.0,4.0)
+        if imgui.Button("+",imgui.ImVec2(20,20)) then
             module.RwMemory(arg.address,arg.size,(value[0] + arg.cvalue),nil,arg.is_float)
         end
+        imgui.SameLine(0.0,4.0)
+        imgui.Text("Set")
         imgui.Spacing()
-        if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Minimum ##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
             module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float)
         end
         imgui.SameLine()
-        if imgui.Button("Default",imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Default ##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
             module.RwMemory(arg.address,arg.size,arg.default,nil,arg.is_float)
         end
         imgui.SameLine()
-        if imgui.Button("Maximum",imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Maximum ##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
             module.RwMemory(arg.address,arg.size,arg.max,nil,arg.is_float)
         end
         imgui.SameLine()

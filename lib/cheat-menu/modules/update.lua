@@ -16,40 +16,44 @@
 
 local module = {}
 
+
 function module.CheckUpdates()
-    require("socket")
-    local https = require("ssl.https")
 
-    if string.find( script.this.version,"staging") then
-        link = "https://raw.githubusercontent.com/inanahammad/Cheat-Menu/staging/cheat-menu.lua"
+    local https = nil
+    if pcall(function()
+            require("socket")
+            https = require("ssl.https")
+            end) then
+
+        if string.find( script.this.version,"staging") then
+            link = "https://raw.githubusercontent.com/inanahammad/Cheat-Menu/staging/cheat-menu.lua"
+        else
+            link = "https://raw.githubusercontent.com/inanahammad/Cheat-Menu/master/cheat-menu.lua"
+        end
+
+        local body, code, headers, status = https.request(link)
+        
+        if not body then 
+            print(code) 
+            print(status) 
+            printHelpString("~r~Failed~w~ to check for update") 
+        else
+            tcheatmenu.update.version_number = tonumber(body:match("script_version_number%((%d+)%)"))
+            if  tcheatmenu.update.version_number ~= nil then
+                if tcheatmenu.update.version_number ~= script.this.version_num then
+                    tcheatmenu.update.available = true
+                else
+                    printHelpString("Using latest version")
+                end
+            else
+                printHelpString("Couldn't connect to github")
+            end
+        end
     else
-        link = "https://raw.githubusercontent.com/inanahammad/Cheat-Menu/master/cheat-menu.lua"
+        printHelpString("Necessary modules not found")
     end
 
-    local body, code, headers, status = https.request(link)
-    
-    if not body then error(code) print(status) printHelpString(flanguage.GetText("update.FailedToUpdate")) return end
-    tcheatmenu.update.version_number = tonumber(body:match("script_version_number%((%d+)%)"))
-    if tcheatmenu.update.version_number ~= script.this.version_num then
-        tcheatmenu.update.available = true
-    else
-        printHelpString("Using ~g~latest~w~ version")
-    end
-end
 
-function module.DownloadUpdates()
-    require("socket")
-    local https = require("ssl.https")
-    local one, code, headers, status = https.request {
-        url = "https://github.com/inanahammad/Cheat-Menu/archive/master.zip",
-        protocol = "TLSv1.3",
-        options = "all",
-        verify = "none",
-      }
-    if not body then error(code) return end
-    local f = assert(io.open('master.zip', 'wb')) -- open in "binary" mode
-    f:write(body)
-    f:close()
 end
 
 return module

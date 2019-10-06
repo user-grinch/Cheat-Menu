@@ -20,8 +20,8 @@ script_description("Cheat Menu for Grand Theft Auto San Andreas")
 script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu")
 script_dependencies("ffi","mimgui","memory","MoonAdditions")
 script_properties('work-in-pause')
-script_version("1.7")
-script_version_number(26092019) -- DDMMYYYY
+script_version("1.7-staging")
+script_version_number(05102019) -- DDMMYYYY
 
 -- All the command keys used throughout the Cheat-Menu
 tkeys =
@@ -41,12 +41,10 @@ tkeys =
     airbreak_up       = 0x26, -- Arrow up 
     airbreak_down     = 0x28, -- Arrow down 
     aircraft_zoom     = 0x56, -- V
-    coord_copy_key    = 0x43, -- C 
 }
 
 resX,resY = getScreenResolution()
 
--- Script Dependencies
 ffi           = require "ffi"
 imgui         = require 'mimgui'
 memory        = require 'memory'
@@ -85,8 +83,10 @@ if fmenu.tmenu.disable_in_samp[0] and isSampLoaded() then
     script.this:unload()
 end
 
+
 tcheatmenu =
-{   dir = Dir,
+{   
+    dir = Dir,
     window =
     {
         size =
@@ -94,37 +94,17 @@ tcheatmenu =
             X = resX/4,
             Y = resY/1.2,
         },
-        main    = imgui.new.bool(false),
+        show    = imgui.new.bool(false),
         title   = string.format("%s v%s by %s",script.this.name,script.this.version,script.this.authors[1]),
-        overlay =
-        {
-            main     = imgui.new.bool(true),
-            distance = fconfig.get('tcheatmenu.window.overlay.distance',10.0),
-            corner   = imgui.new.int(fconfig.get('tcheatmenu.window.overlay.corner',0)),
-            names    = {"Custom","Top Left","Top Right","Bottom Left","Bottom Right","Close"},
-            list     = {},
-        },
     },
-    menubuttons =
-    {
-        current =  fconfig.get('tcheatmenu.menubuttons.current',-1),
-    },
-    cursor = 
-    {
-        state  = nil,
-    },
+    current_menu = fconfig.get('tcheatmenu.current_menu',1),
+
     update =
     {
         available = false,
         version_number = 0
     },
 }
-
-tcheatmenu.window.overlay.list = imgui.new['const char*'][#tcheatmenu.window.overlay.names](tcheatmenu.window.overlay.names)
-
-function ternary ( cond , T , F )
-    if cond then return T else return F end
-end
 
 imgui.OnInitialize(function() -- Called once
     -- Styles
@@ -141,125 +121,116 @@ imgui.OnInitialize(function() -- Called once
 end)
 
 imgui.OnFrame(
-
 function() -- condition
-    if (tcheatmenu.window.main[0] or tcheatmenu.window.overlay.main[0]) then
-        return true
-    end
-    return false
+    return tcheatmenu.window.show[0] and not isGamePaused() 
 end,
-function() -- render frame
-    if not isGamePaused() then
-        
-        if tcheatmenu.window.main[0] then
-           
-            imgui.SetNextWindowSize(imgui.ImVec2(tcheatmenu.window.size.X,tcheatmenu.window.size.Y), imgui.Cond.FirstUseEver)
+function(self) -- render frame
 
-            imgui.Begin(tcheatmenu.window.title, tcheatmenu.window.main,imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoSavedSettings)
+    self.LockPlayer = fmenu.tmenu.lock_player[0] 
+    imgui.SetNextWindowSize(imgui.ImVec2(tcheatmenu.window.size.X,tcheatmenu.window.size.Y), imgui.Cond.FirstUseEver)
 
-            if tcheatmenu.update.available then
-                imgui.Spacing()
-                if imgui.Button(string.format( "New version available %d | Click to hide",tcheatmenu.update.version_number), imgui.ImVec2(fcommon.GetSize(1))) then
-                    --lua_thread.create(fupdate.DownloadUpdates)
-                    tcheatmenu.update.available = false
-                end
-                imgui.Spacing()            
+    imgui.Begin(tcheatmenu.window.title, tcheatmenu.window.show,imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoSavedSettings)
+
+    if tcheatmenu.update.available then
+        imgui.Spacing()
+        if imgui.Button(string.format( "New version available %d | Click to hide",tcheatmenu.update.version_number), imgui.ImVec2(fcommon.GetSize(1))) then
+            tcheatmenu.update.available = false
+        end
+        imgui.Spacing()            
+    end
+
+    fcommon.CreateMenus({"Teleport","Memory","Player","Animation","Vehicle","Weapon","Peds","Mission","Game","Visual","Menu",
+    "About"},{fteleport.TeleportMain,fmemory.MemoryMain,fplayer.PlayerMain,fanimation.AnimationMain,fvehicle.VehicleMain,
+    fweapon.WeaponMain,fped.PedMain,fmission.MissionMain,fgame.GameMain,fvisual.VisualMain,fmenu.MenuMain,
+    fabout.AboutMain})
+
+    imgui.End()
+end)
+
+
+imgui.OnFrame(function() 
+
+    return not isGamePaused() and fmenu.tmenu.overlay.show[0] and (fmenu.tmenu.overlay.fps[0] or fmenu.tmenu.overlay.coordinates[0]
+    or ((fmenu.tmenu.overlay.speed[0] or fmenu.tmenu.overlay.health[0]) and isCharInAnyCar(PLAYER_PED)))
+end,
+function()
+    local io = imgui.GetIO()
+    local overlay = fmenu.tmenu.overlay
+    local pos = overlay.position_index[0]
+
+    if pos > 0 then
+        x = (pos == 1 or pos == 3) and overlay.offset[0] or io.DisplaySize.x - overlay.offset[0]
+        y = (pos == 1 or pos == 2) and overlay.offset[0] or io.DisplaySize.y - overlay.offset[0]
+        local window_pos_pivot = imgui.ImVec2((pos == 1 or pos == 3) and 0 or 1, (pos == 1 or pos == 2) and 0 or 1)
+        imgui.SetNextWindowPos(imgui.ImVec2(x, y), imgui.Cond.Always, window_pos_pivot)
+    end
+
+    local flags = imgui.WindowFlags.NoDecoration + imgui.WindowFlags.AlwaysAutoResize + imgui.WindowFlags.NoSavedSettings
+    if pos ~= 0 then
+        flags = flags + imgui.WindowFlags.NoMove
+    end
+
+    imgui.PushStyleVarFloat(imgui.StyleVar.Alpha,0.65)
+    imgui.Begin("", nil, flags)
+    
+        if fmenu.tmenu.overlay.fps[0] then
+            imgui.Text("Frames :" .. tostring(math.floor(imgui.GetIO().Framerate)))
+        end
+        if isCharInAnyCar(PLAYER_PED) then
+            car = getCarCharIsUsing(PLAYER_PED)
+            if  fmenu.tmenu.overlay.speed[0] then
+                speed = getCarSpeed(car)
+                total_gears = getCarNumberOfGears(car)
+                current_gear = getCarCurrentGear(car)
+                imgui.Text(string.format("Speed   :%d %d/%d",math.floor(speed),current_gear,total_gears))
             end
-            fcommon.UiCreateButtons({"Teleport","Memory","Player","Animation","Vehicle","Weapon","Peds","Mission","Game","Visual","Menu",
-            "About"},{fteleport.TeleportMain,fmemory.MemoryMain,fplayer.PlayerMain,fanimation.AnimationMain,fvehicle.VehicleMain,
-            fweapon.WeaponMain,fped.PedMain,fmission.MissionMain,fgame.GameMain,fvisual.VisualMain,fmenu.MenuMain,
-            fabout.AboutMain})
 
-            imgui.End()
+            if fmenu.tmenu.overlay.health[0] then
+                imgui.Text(string.format("Health  :%.0f%%",getCarHealth(car)/10))
+            end
         end
 
-        if fanimation.tanimation.ped[0] == true then
-            bool, ped = getCharPlayerIsTargeting(PLAYER_HANDLE)
-
-            if bool == true then
-                fped.tped.selected = ped
-            end
+        if fmenu.tmenu.overlay.coordinates[0] then
+            x,y,z = getCharCoordinates(PLAYER_PED)
+            imgui.Text(string.format("Coordinates : %d %d %d", math.floor(x) , math.floor(y) , math.floor(z)),1000)
         end
+        imgui.PopStyleVar()
+        if imgui.BeginPopupContextWindow() then
+            imgui.Text("Position")
+            imgui.Separator()
 
-        --Overlay window
-        if tcheatmenu.window.overlay.main[0] then
-            if fmenu.tmenu.overlay.fps[0] or fmenu.tmenu.overlay.coordinates[0] or (( fmenu.tmenu.overlay.speed[0] or fmenu.tmenu.overlay.health[0]) and isCharInAnyCar(PLAYER_PED)) then
-                if (tcheatmenu.window.overlay.corner[0] ~= 0) then
-                    window_pos       = imgui.ImVec2(ternary((tcheatmenu.window.overlay.corner[0] == 2 or tcheatmenu.window.overlay.corner[0] == 4),resX - tcheatmenu.window.overlay.distance,tcheatmenu.window.overlay.distance),ternary((tcheatmenu.window.overlay.corner[0] == 3 or tcheatmenu.window.overlay.corner[0] == 4),resY - tcheatmenu.window.overlay.distance,tcheatmenu.window.overlay.distance))
-                    window_pos_pivot = imgui.ImVec2(ternary((tcheatmenu.window.overlay.corner[0] == 2 or tcheatmenu.window.overlay.corner[0] == 4),1.0,0.0),ternary((tcheatmenu.window.overlay.corner[0] == 3 or tcheatmenu.window.overlay.corner[0] == 4),1.0,0.0))
-                    imgui.SetNextWindowPos(window_pos,0,window_pos_pivot)
-                end
-                imgui.PushStyleVarFloat(imgui.StyleVar.Alpha,0.65)
-                if imgui.Begin('Overlay', tcheatmenu.window.overlay.main,imgui.WindowFlags.NoTitleBar + imgui.WindowFlags.NoResize + imgui.WindowFlags.NoCollapse + imgui.WindowFlags.AlwaysAutoResize + imgui.WindowFlags.NoFocusOnAppearing) then
-                    if fmenu.tmenu.overlay.fps[0] == true then
-                        imgui.Text("Frames :" .. tostring(math.floor(imgui.GetIO().Framerate)))
-                    end
-
-                    if isCharInAnyCar(PLAYER_PED) then
-                        car = getCarCharIsUsing(PLAYER_PED)
-                        if  fmenu.tmenu.overlay.speed[0] == true then
-                            speed = getCarSpeed(car)
-                            total_gears = getCarNumberOfGears(car)
-                            current_gear = getCarCurrentGear(car)
-                            imgui.Text(string.format("Speed   :%d %d/%d",math.floor(speed),current_gear,total_gears))
-                        end
-
-                        if fmenu.tmenu.overlay.health[0] == true then
-                            imgui.Text(string.format("Health  :%.0f%%",getCarHealth(car)/10))
-                        end
-                    end
-
-                    if fmenu.tmenu.overlay.coordinates[0] == true then
-                        x,y,z = getCharCoordinates(PLAYER_PED)
-                        imgui.Text(string.format("Coordinates : %d %d %d", math.floor(x) , math.floor(y) , math.floor(z)),1000)
-                    end
-                    
-                    imgui.PushStyleVarFloat(imgui.StyleVar.Alpha,1.0)
-                    if imgui.BeginPopupContextWindow() then
-                        imgui.Text("Position")
-                        imgui.Separator()
-                        if (imgui.MenuItemBool("Custom",nil,tcheatmenu.window.overlay.corner[0] == 0)) then tcheatmenu.window.overlay.corner[0] = 0 end
-                        if (imgui.MenuItemBool("Top Left",nil,tcheatmenu.window.overlay.corner[0] == 1)) then tcheatmenu.window.overlay.corner[0] = 1 end
-                        if (imgui.MenuItemBool("Top Right",nil,tcheatmenu.window.overlay.corner[0] == 2)) then tcheatmenu.window.overlay.corner[0] = 2 end
-                        if (imgui.MenuItemBool("Bottom Left",nil,tcheatmenu.window.overlay.corner[0] == 3)) then tcheatmenu.window.overlay.corner[0] = 3 end
-                        if (imgui.MenuItemBool("Bottom Right",nil,tcheatmenu.window.overlay.corner[0] == 4)) then tcheatmenu.window.overlay.corner[0] = 4 end
-                        if  imgui.MenuItemBool("Close") then
-                            fgame.tgame.fps.bool[0] = false
-                            fvehicle.tvehicles.show.speed[0] = false
-                            fvehicle.tvehicles.show.health[0] = false
-                            fvisual.tvisuals.show_coordinates[0] = false
-                        end
-                        imgui.EndPopup()
-                    end
-                    imgui.PushStyleVarFloat(imgui.StyleVar.Alpha,0.65)
-                    imgui.PopStyleVar()
-                    imgui.End()
-                end
+            if imgui.MenuItemBool("Custom",nil,fmenu.tmenu.overlay.position_index[0] == 0) then 
+                fmenu.tmenu.overlay.position_index[0] = 0 
             end
-        end   
-    end  
+            if imgui.MenuItemBool("Top Left",nil,fmenu.tmenu.overlay.position_index[0] == 1) then 
+                fmenu.tmenu.overlay.position_index[0] = 1 
+            end
+            if imgui.MenuItemBool("Top Right",nil,fmenu.tmenu.overlay.position_index[0] == 2) then 
+                fmenu.tmenu.overlay.position_index[0] = 2 
+            end
+            if imgui.MenuItemBool("Bottom Left",nil,fmenu.tmenu.overlay.position_index[0] == 3) then 
+                fmenu.tmenu.overlay.position_index[0] = 3 
+            end
+            if imgui.MenuItemBool("Bottom Right",nil,fmenu.tmenu.overlay.position_index[0] == 4) then 
+                fmenu.tmenu.overlay.position_index[0] = 4 
+            end
+            if  imgui.MenuItemBool("Close") then
+                fgame.tgame.fps.bool[0] = false
+                fvehicle.tvehicle.show.speed[0] = false
+                fvehicle.tvehicle.show.health[0] = false
+                fvisual.tvisuals.show_coordinates[0] = false
+            end
+            imgui.EndPopup()        
+        end
+    imgui.End()
 end).HideCursor = true
 
-function ShowHideCursor()
-    while true do
-        wait(0)
-        if fmenu.tmenu.manual_mouse[0] == true and imgui.IsMouseDoubleClicked(1) then
-            tcheatmenu.cursor.state = not tcheatmenu.cursor.state
-            showCursor(tcheatmenu.cursor.state)
-            wait(250)
-        end
-    end
-end
 
 function main()
 
     if fmenu.tmenu.auto_update_check[0] then
-        if not pcall(fupdate.CheckUpdates) then
-            printHelpString("~r~Failed~w~ to check for update")
-        end
+        fupdate.CheckUpdates()
     end
-
-    lua_thread.create(ShowHideCursor)
 
     if fgame.tgame.disable_help_popups[0] == true then
         setGameGlobal(glob.Help_Wasted_Shown,1)
@@ -274,17 +245,35 @@ function main()
         writeMemory(0x004384D1 ,4,0x000000D0 ,false)
         writeMemory(0x004384D5 ,4,0x90909090 ,false)
     end
+
+    switchArrestPenalties(fgame.tgame.keep_stuff[0])
+    switchDeathPenalties(fgame.tgame.keep_stuff[0])
+    setGangWarsActive(fped.tped.gang_wars[0])
+    setPlayerFastReload(PLAYER_HANDLE,fweapon.tweapon.fast_reload[0])
     
+    if fweapon.tweapon.no_reload[0] then
+        writeMemory( 7600773,1,144,1)
+        writeMemory( 7600815,1,144,1)
+        writeMemory( 7600816,2,37008,1)
+        writeMemory( 7612591,1,144,1)
+        writeMemory( 7612646,1,144,1)
+        writeMemory( 7612647,2,37008,1)
+    else
+        writeMemory( 7600773,1,72,1)
+        writeMemory( 7600815,1,255,1)
+        writeMemory( 7600816,2,3150,1)
+        writeMemory( 7612591,1,72,1)
+        writeMemory( 7612646,1,255,1)
+        writeMemory( 7612647,2,3150,1)
+    end
+
     while true do
 
-        if not isGamePaused() then
-            if fmenu.tmenu.manual_mouse[0] then
-                showCursor(tcheatmenu.cursor.state)
-            else
-                showCursor(tcheatmenu.window.main[0])
+        if fanimation.tanimation.ped[0] == true or fweapon.tweapon.ped[0] == true then
+            bool, ped = getCharPlayerIsTargeting(PLAYER_HANDLE)
+            if bool == true then
+                fped.tped.selected = ped
             end
-        else
-            showCursor(false)
         end
 
         if fgame.tgame.airbreak[0] then
@@ -300,7 +289,7 @@ function main()
 
         if isKeyDown(tkeys.control_key) and isKeyDown(tkeys.menu_open_key) then
             fcommon.KeyWait(tkeys.control_key,tkeys.menu_open_key)
-            tcheatmenu.window.main[0] = not tcheatmenu.window.main[0]
+            tcheatmenu.window.show[0] = not tcheatmenu.window.show[0]
         end
 
         if fteleport.tteleport.shortcut[0]
@@ -309,19 +298,8 @@ function main()
             fcommon.KeyWait(tkeys.teleport_key1,tkeys.teleport_key2)
             fteleport.Teleport()
         end
-
-        if isKeyDown(tkeys.control_key)
-        and isKeyDown(tkeys.coord_copy_key) then
-            fcommon.KeyWait(tkeys.control_key,tkeys.ss_shortcut)
-            setClipboardText(ffi.string(fteleport.tteleport.coords))
-            printHelpString("~g~Saved~w~ coordinates to clipboard")
-        end
-
-        if fplayer.tplayer.god[0] then
-            setCharProofs(PLAYER_PED,true,true,true,true,true)
-        else
-            setCharProofs(PLAYER_PED,false,false,false,false,false)
-        end
+        
+        setCharProofs(PLAYER_PED,fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0])
 
         if fplayer.tplayer.aimSkinChanger[0] and isKeyDown(tkeys.asc_key) then
             fcommon.KeyWait(tkeys.asc_key,tkeys.asc_key)
@@ -333,69 +311,50 @@ function main()
         end
 
         if isKeyDown(tkeys.control_key) and isKeyDown(tkeys.quickspawner_key) then
-            if (fvehicle.tvehicles.quick_spawn[0] or fweapon.tweapons.quick_spawn[0]) then
+            if (fvehicle.tvehicle.quick_spawn[0] or fweapon.tweapon.quick_spawn[0]) then
                 fcommon.QuickSpawner()
             end
         end
-
-        -- This is to fix car colors not being applied using opcode changecarcolours
-
-
 
         if isCharInAnyHeli(PLAYER_PED)
         or isCharInAnyPlane(PLAYER_PED) then
             lua_thread.create(fvehicle.AircraftCamera)
         end
 
-        -- Vehicle related stuff which is required to run every frame
         if isCharInAnyCar(PLAYER_PED) then
             car = getCarCharIsUsing(PLAYER_PED)
 
-            if fvehicle.tvehicles.color.default ~= -1 then
+            if fvehicle.tvehicle.color.default ~= -1 then
                 local color_id = getCarColours(car)
-                if fvehicle.tvehicles.color.default ~= color_id then
+                if fvehicle.tvehicle.color.default ~= color_id then
                     fvehicle.ForEachCarComponent(function(mat)
                         mat:reset_color()
                     end)
                 end
             end
-            if fvehicle.tvehicles.lock_health[0] then
-                setCarHealth(car,1000)
-            end
 
-            if fvehicle.tvehicles.stay_on_bike[0] then
-                setCharCanBeKnockedOffBike(PLAYER_PED,true)
-            else
-                setCharCanBeKnockedOffBike(PLAYER_PED,false)
-            end
+            setCarCanBeDamaged(car,not(fvehicle.tvehicle.no_damage[0]))
+            setCharCanBeKnockedOffBike(PLAYER_PED,fvehicle.tvehicle.stay_on_bike[0])
+            setCarHeavy(car,fvehicle.tvehicle.heavy[0])
 
-            if fvehicle.tvehicles.lock_speed[0] then
-                if fvehicle.tvehicles.speed[0] > 500 then
-                    fvehicle.tvehicles.speed[0] = 500
+            if fvehicle.tvehicle.lock_speed[0] then
+                if fvehicle.tvehicle.speed[0] > 500 then
+                    fvehicle.tvehicle.speed[0] = 500
                 end
-                setCarForwardSpeed(car,fvehicle.tvehicles.speed[0])
+                setCarForwardSpeed(car,fvehicle.tvehicle.speed[0])
             end
 
-            if fvehicle.tvehicles.heavy[0] then
-                setCarHeavy(car,true)
-            else
-                setCarHeavy(car,false)
-            end
+            setCarCanBeVisiblyDamaged(car,not(fvehicle.tvehicle.visual_damage[0]))
 
-            if fvehicle.tvehicles.visual_damage[0] == true then
-                setCarCanBeVisiblyDamaged(car,false)
-            else
-                setCarCanBeVisiblyDamaged(car,true)
-            end
 
             if getCarDoorLockStatus(car) == 4 then
-                fvehicle.tvehicles.lock_doors[0] = true
+                fvehicle.tvehicle.lock_doors[0] = true
             else
-                fvehicle.tvehicles.lock_doors[0] = false
+                fvehicle.tvehicle.lock_doors[0] = false
             end
         else
-            fvehicle.tvehicles.lock_doors[0] = false
-            fvehicle.tvehicles.lights.all[0] = false
+            fvehicle.tvehicle.lock_doors[0] = false
+            fvehicle.tvehicle.lights[0] = false
         end
 
         wait(0)
@@ -404,7 +363,6 @@ end
 
 function onScriptTerminate(script, quitGame)
     if script == thisScript() then
-        showCursor(false,false)
         fconfig.write()
         local crash_text = "Cheat menu crashed unexpectedly.Sent moonloader.log for debugging"
         if fmenu.tmenu.auto_reload[0] then
