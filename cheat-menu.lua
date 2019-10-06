@@ -283,7 +283,6 @@ function main()
         if isKeyDown(tkeys.control_key) and isKeyDown(tkeys.menu_open_key) then
             fcommon.KeyWait(tkeys.control_key,tkeys.menu_open_key)
             tcheatmenu.window.show[0] = not tcheatmenu.window.show[0]
-            imgui.ShowDemoWindow()
         end
 
         if fteleport.tteleport.shortcut[0]
@@ -361,7 +360,7 @@ function onScriptTerminate(script, quitGame)
         local crash_text = "Cheat menu crashed unexpectedly"
         if fmenu.tmenu.auto_reload[0] then
             script.this:reload()
-            crash_text =  crash_text + " and reloaded"
+            crash_text =  crash_text .. " and reloaded"
         end
         if fmenu.tmenu.show_crash_message[0] then
             printHelpString(crash_text)
