@@ -14,22 +14,19 @@ For installation take a look [here](https://github.com/inanahammad/Cheat-Menu/wi
 
 
 ## Versions
-There are a few versions available to try out.
+
 ### Releases
-[Releases](https://github.com/inanahammad/Cheat-Menu/releases) act as a backup for older versions.When the master branch gets updated to a newer version the older one gets released. These backups can give me a scope of looking back at some older code. If the latest versions aren't working for you, you can give them a shot but I'll advice sticking with the latest ones tough.
+[Releases](https://github.com/inanahammad/Cheat-Menu/releases) are the most up to date & stable versions. If you want a smooth experience with minimal bugs as possible this is the one to get.contains all the recent work done to the menu. While this can be the best way to live on the edge & try the latest features out, it could come with a fair number of bugs.
 
 ### Master Branch
-[Master branch](https://github.com/inanahammad/Cheat-Menu) is the most up to date & stable version. If you want a smooth experience with minimal bugs as possible this is the version you should get.
-
-### Staging Branch
-[Staging branch](https://github.com/inanahammad/Cheat-Menu/tree/staging) contains all the recent work done to the menu. While this can be the best way to live on the edge & try the latest features out, it could come with a fair number of bugs.
+[Master branch](https://github.com/inanahammad/Cheat-Menu) contains all the recent work done to the menu. While this can be the best way to live on the edge & try the latest features out, it could come with a fair number of bugs.
 
 ## Installation
 
 1. Install [DirectX](https://www.microsoft.com/en-us/download/details.aspx?id=35) &  [Visual C++ Redistributable 2017](https://aka.ms/vs/16/release/vc_redist.x86.exe) if not already installed.
 2. If your game version isn't v1.0 then you'll need to [downgrade](https://gtaforums.com/topic/927016-san-andreas-downgrader/).
 3. Download [Moonloader](https://gtaforums.com/topic/890987-moonloader/) from [here](https://blast.hk/moonloader/files/moonloader-027.0-preview2.zip).Then extract all these files to your game folder (replace if necessary).
-4. Download [Cheat Menu](https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu) from [here](https://github.com/inanahammad/Cheat-Menu/archive/master.zip).
+4. Download [Cheat Menu](https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu) from [here](https://github.com/inanahammad/Cheat-Menu/releases).
 5. Open up that achieve file and extract 'lib' folder & 'cheat-menu.lua' into moonloader folder (replace if necessary).
 
 Now try it out in-game. If it doesn't work open an issue here or create a post in one of the topics above with 'moonloader.log'.
