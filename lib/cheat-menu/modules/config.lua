@@ -54,7 +54,9 @@ function module.write()
             disable_cheats      = fgame.tgame.disable_cheats[0],
             disable_help_popups = fgame.tgame.disable_help_popups[0],
             fps_limit           = fgame.tgame.fps_limit[0],
+            ghost_cop_cars      = fgame.tgame.ghost_cop_cars[0],
             keep_stuff          = fgame.tgame.keep_stuff[0],
+            random_cheats       = fgame.tgame.random_cheats[0], 
             ss_shortcut         = fgame.tgame.ss_shortcut[0],
         },
         tmemory =

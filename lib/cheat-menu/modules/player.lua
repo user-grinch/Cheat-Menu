@@ -52,7 +52,7 @@ function module.ChangePlayerModel(model)
         end
         local car = nil
         if isCharInAnyCar(PLAYER_PED) then
-            car = storeCarCharIsInNoSave(PLAYER_PED)
+            car = getCarCharIsUsing(PLAYER_PED)
         end
         clearCharTasksImmediately(PLAYER_PED)
         if car ~= nil then

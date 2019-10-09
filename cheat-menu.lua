@@ -20,8 +20,8 @@ script_description("Cheat Menu for Grand Theft Auto San Andreas")
 script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu")
 script_dependencies("ffi","mimgui","memory","MoonAdditions")
 script_properties('work-in-pause')
-script_version("1.7")
-script_version_number(20191006) -- YYYYMMDD
+script_version("1.8-wip")
+script_version_number(20191009) -- YYYYMMDD
 
 -- All the command keys used throughout the Cheat-Menu
 tkeys =
@@ -221,6 +221,8 @@ end).HideCursor = true
 
 function main()
 
+    math.randomseed(getGameTimer())
+
     if fmenu.tmenu.auto_update_check[0] then
         fmenu.CheckUpdates()
     end
@@ -258,6 +260,16 @@ function main()
         writeMemory( 7612591,1,72,1)
         writeMemory( 7612646,1,255,1)
         writeMemory( 7612647,2,3150,1)
+    end
+
+    lua_thread.create(fgame.RandomCheats)
+
+    for key,value in pairs(fgame.tgame.cop) do
+        if  fgame.tgame.ghost_cop_cars[0] then
+            writeMemory(tonumber(key),4,math.random(400,611),false)
+        else
+            writeMemory(tonumber(key),4,value,false)
+        end
     end
 
     while true do

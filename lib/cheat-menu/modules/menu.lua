@@ -50,7 +50,7 @@ function module.CheckUpdates()
             end) then
 		
 		if string.find( script.this.version,"wip") then
-			link = "https://raw.githubusercontent.com/inanahammad/test-repo/master/cheat-menu.lua"
+			link = "https://raw.githubusercontent.com/inanahammad/Cheat-Menu/master/cheat-menu.lua"
 		else
 			link = "https://api.github.com/repos/inanahammad/Cheat-Menu/tags"
 		end

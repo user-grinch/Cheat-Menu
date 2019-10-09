@@ -19,6 +19,14 @@ local module = {}
 module.tgame                =
 {
     airbreak                = imgui.new.bool(false),
+    cop = 
+    {
+        ["0x8a5a8c"] = 599, -- policeranger
+        ["0x8a5a90"] = 596, -- policels
+        ["0x8a5a94"] = 597, -- policesf
+        ["0x8a5a98"] = 598, -- policelv
+        ["0x8a8a9c"] = 523, -- policebike
+    },
     day                     =
     {    
         names               = {"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"},
@@ -27,7 +35,14 @@ module.tgame                =
     disable_cheats          = imgui.new.bool(fconfig.get('tgame.disable_cheats',false)),
     disable_help_popups     = imgui.new.bool(fconfig.get('tgame.disable_help_popups',false)),
     fps_limit               = imgui.new.int(fconfig.get('tgame.fps_limit',30)),
+    ghost_cop_cars          = imgui.new.bool(fconfig.get('tgame.ghost_cop_cars',false)),
     keep_stuff              = imgui.new.bool(fconfig.get('tgame.keep_stuff',false)),
+    random_cheats           = imgui.new.bool(fconfig.get('tgame.random_cheats',false)),
+    script_manager          =
+    {
+        search_text         = imgui.new.char[64](""),
+        disabled            = {},
+    },
     ss_shortcut             = imgui.new.bool(fconfig.get('tgame.ss_shortcut',false)), 
     weather                 =
     {    
@@ -146,6 +161,21 @@ function SetTime()
     end)
 end
 
+function module.RandomCheats()
+    while true do
+        if module.tgame.random_cheats[0] then
+            cheatid = math.random(1,92)
+            if cheatid ~= 29 then  -- Suicide cheat
+                callFunction(0x00438370,1,1,cheatid)
+                fcommon.CheatActivated()
+            end
+            wait(10000)
+        else
+            wait(0)
+        end
+    end
+end
+
 function SetCurrentWeekday()
     imgui.Spacing()
     local current_day = imgui.new.int(readMemory(0xB7014E,1,false)-1)
@@ -162,6 +192,78 @@ function SetWeather()
         writeMemory(0xC81320,2,current_weather[0],false)
         fcommon.CheatActivated()
     end
+end
+
+function ShowScriptDisabled(name,path,search_text)
+    fcommon.DropDownMenu(name .. "##" .. path,function()
+
+        imgui.Spacing()
+        imgui.SameLine()
+        imgui.Text("Active: false")
+        imgui.Spacing()
+        imgui.SameLine()
+        imgui.TextWrapped("Filepath: " .. path)
+        
+        if imgui.Button("Load##" .. path,imgui.ImVec2(fcommon.GetSize(1))) then
+            if doesFileExist(path) then 
+                script.load(path)
+                module.tgame.script_manager.disabled[name] = nil
+                printHelpString("Script loaded")
+            end
+        end
+    end,true)
+end
+
+function ShowScriptEnabled(script,search_text,index)
+    fcommon.DropDownMenu(script.name .. "##" .. index,function()
+        local authors = "Authors: "
+        for _,author in ipairs(script.authors) do
+            authors = authors .. author .. ", "
+        end
+        local properties = ""
+        for _,property in ipairs(script.properties) do
+            properties = properties .. property .. ", "
+        end
+        local dependencies = ""
+        for _,dependency in ipairs(script.dependencies) do
+            dependencies = dependencies .. dependency .. ", "
+        end
+
+        imgui.Columns(2,nil,false)
+        imgui.TextWrapped(string.sub(authors,1,-3))
+        imgui.Text("Version: " .. tostring(script.version))
+        imgui.Text("Version num: " .. tostring(script.version_num))
+        imgui.NextColumn()
+        imgui.Text("Script ID: " .. script.id)
+        imgui.Text("Active: " .. tostring( not script.frozen))
+        imgui.TextWrapped("Filename: " .. string.sub(script.filename,1,-5))
+        imgui.Columns(1)
+        if properties ~= "" then
+            imgui.Spacing()
+            imgui.SameLine()
+            imgui.TextWrapped("Properties: " .. string.sub(properties,1,-3))
+        end
+        if dependencies ~= "" then
+            imgui.Spacing()
+            imgui.SameLine()
+            imgui.TextWrapped("Dependencies: " .. string.sub(dependencies,1,-3))
+        end
+        if description ~= "" then
+            imgui.Spacing()
+            imgui.SameLine()
+            imgui.TextWrapped("Description: " .. script.description)
+        end
+        if imgui.Button("Reload##" .. index,imgui.ImVec2(fcommon.GetSize(2))) then
+            script:reload()
+            printHelpString("Script reloaded")
+        end
+        imgui.SameLine()
+        if imgui.Button("Unload##" .. index,imgui.ImVec2(fcommon.GetSize(2))) then
+            module.tgame.script_manager.disabled[script.name] = script.path
+            script:unload()
+            printHelpString("Script unloaded")
+        end
+    end)
 end
 
 function module.GameMain()
@@ -206,6 +308,15 @@ function module.GameMain()
             end})
             fcommon.CheckBox({ name = "Disable help popups",var = module.tgame.disable_help_popups ,show_help_popups = true,help_text = "Disables wasted & arrested popups that\nappear in a new game.Requires restart."})
             fcommon.CheckBox({ address = 0x96C009,name = 'Free PNS'})
+            fcommon.CheckBox({name = "Ghost cop vehicles",var = module.tgame.ghost_cop_cars,func = function()        
+                for key,value in pairs(module.tgame.cop) do
+                    if  module.tgame.ghost_cop_cars[0] then
+                        writeMemory(tonumber(key),4,math.random(400,611),false)
+                    else
+                        writeMemory(tonumber(key),4,value,false)
+                    end
+                end
+            end})
 
             imgui.NextColumn()
             
@@ -213,6 +324,7 @@ function module.GameMain()
                 switchArrestPenalties(module.tgame.keep_stuff[0])
                 switchDeathPenalties(module.tgame.keep_stuff[0])
             end})
+            fcommon.CheckBox({ name = "Random cheats",var = module.tgame.random_cheats ,show_help_popups = true,help_text = "Activates random cheats every 10 seconds\nSuicide cheat is excluded"})
             fcommon.CheckBox({ name = 'Screenshot shortcut',var = module.tgame.ss_shortcut,show_help_popups = true,help_text = "Take screenshot using (Left Ctrl + S) key combination"})
             fcommon.CheckBox({ address = 0xB6F065,name = 'Widescreen'})
             imgui.Columns(1)
@@ -296,6 +408,38 @@ function module.GameMain()
             CheatsEntry({0x439540,0x4391D0,0x439F60,0x4395A0,0x439880},{'Misc','Stop clock','Elvis\neverywhere','Countryside\ninvasion','Predator','Adrenaline'})
             CheatsEntry({0x438E90,0x438F20,0x4396F0,0x4396C0},{'Wanted level','+2Star','Clear stars','Six star','Never wanted'})
             CheatsEntry({0x4385B0,0x438890,0x438B30},{'Weapons','Set1','Set2','Set3'})
+            imgui.EndTabItem()
+        end
+        if imgui.BeginTabItem('Script Manager') then
+            imgui.Spacing()
+            imgui.Spacing()
+			if imgui.InputText("Search",module.tgame.script_manager.search_text,ffi.sizeof(module.tgame.script_manager.search_text)) then end
+			fcommon.InformationTooltip("Moonloader scripts manager")
+			imgui.Spacing()
+			imgui.Text("Found scripts :(" .. ffi.string(module.tgame.script_manager.search_text) .. ")")
+			imgui.Separator()
+			imgui.Spacing()
+			if imgui.BeginChild("Script entries") then
+                for index, script in ipairs(script.list()) do
+                    if ffi.string(module.tgame.script_manager.search_text) == "" then
+						ShowScriptEnabled(script,"",index)
+					else
+						if string.upper(script.name):find(string.upper(ffi.string(module.tgame.script_manager.search_text))) ~= nil  then
+							ShowScriptEnabled(script,ffi.string(module.tgame.script_manager.search_text),index)
+						end
+					end
+                end
+                for name,path in pairs(module.tgame.script_manager.disabled) do
+                    if ffi.string(module.tgame.script_manager.search_text) == "" then
+						ShowScriptDisabled(name,path,"",index)
+					else
+						if string.upper(name):find(string.upper(ffi.string(module.tgame.script_manager.search_text))) ~= nil  then
+							ShowScriptDisabled(name,path,ffi.string(module.tgame.script_manager.search_text),index)
+						end
+					end
+                end
+				imgui.EndChild()
+			end
             imgui.EndTabItem()
         end
         imgui.EndTabBar()

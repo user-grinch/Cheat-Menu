@@ -16,16 +16,26 @@
 
 local module = {}
 
-function module.DropDownMenu(label,func)
+function module.DropDownMenu(label,func,text_disabled)
     if label ~= nil then
+        if text_disabled then
+            imgui.PushStyleColor(imgui.Col.Text,imgui.ImVec4(128,128,128,0.3))
+        end
         if imgui.CollapsingHeader(label) then
-           imgui.Spacing()
+            if text_disabled then
+                imgui.PopStyleColor()
+            end
+            imgui.Spacing()
 
             func()
 
             imgui.Spacing()
             imgui.Separator()
             imgui.Spacing()
+        else
+            if text_disabled then
+                imgui.PopStyleColor()
+            end
         end
     else
         imgui.Spacing()
@@ -124,7 +134,7 @@ function module.CheatDeactivated()
 end
 
 function module.GetSize(count,x,y)
-    -- minimum
+
     if x == nil then  x = 20 end
     if y == nil then  y = 25 end
 
@@ -182,7 +192,7 @@ function module.ShowEntries(title,model_table,height,width,store_table,image_pat
 
     if search_text == nil then search_text = "" end
 
-    local car = storeCarCharIsInNoSave(PLAYER_PED)
+    local car = getCarCharIsUsing(PLAYER_PED)
     for i=1,#model_table,1 do
         if skip_check == true or fvehicle.IsValidModForVehicle(model_table[i],getCarPointer(car)) then
             fcommon.DropDownMenu(title,function()
@@ -219,7 +229,7 @@ function module.ShowEntries(title,model_table,height,width,store_table,image_pat
                             skipped_entries = skipped_entries +1
                         end
                         if (j-skipped_entries) % rows ~= 0 then
-                            imgui.SameLine()
+                            imgui.SameLine(0.0,4.0)
                         end
                     else
                         if doesFileExist(image_path..model_table[j]..image_extention) then

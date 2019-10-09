@@ -133,7 +133,7 @@ function module.GiveVehicleToPlayer(model)
     if isModelAvailable(model) then
         x,y,z = getCharCoordinates(PLAYER_PED)
         if isCharInAnyCar(PLAYER_PED) and module.tvehicle.spawn_inside[0] then
-            vehicle = storeCarCharIsInNoSave(PLAYER_PED)
+            vehicle = getCarCharIsUsing(PLAYER_PED)
             speed = getCarSpeed(vehicle)
             warpCharFromCarToCoord(PLAYER_PED,x,y,z)
             deleteCar(vehicle)
@@ -193,7 +193,7 @@ end
 function module.AddComponentToVehicle(component)
 
     if isCharInAnyCar(PLAYER_PED) then
-        local car = storeCarCharIsInNoSave(PLAYER_PED)
+        local car = getCarCharIsUsing(PLAYER_PED)
         if isModelAvailable(component) then
             requestVehicleMod(component)
             loadAllModelsNow()
@@ -206,7 +206,7 @@ end
 
 function DoorMenu(func)
 
-    local vehicle = storeCarCharIsInNoSave(PLAYER_PED)
+    local vehicle = getCarCharIsUsing(PLAYER_PED)
     local seats   = getMaximumNumberOfPassengers(vehicle) + 1 -- passenger + driver 
     
     if seats == 4 then
@@ -232,7 +232,7 @@ end
 
 function module.ForEachCarComponent(func)
     if isCharInAnyCar(PLAYER_PED) then
-        car = storeCarCharIsInNoSave(PLAYER_PED)
+        car = getCarCharIsUsing(PLAYER_PED)
         for _, comp in ipairs(mad.get_all_vehicle_components(car)) do
             for _, obj in ipairs(comp:get_objects()) do
                 for _, mat in ipairs(obj:get_materials()) do
@@ -252,7 +252,7 @@ function module.AircraftCamera()
         or isCharInAnyPlane(PLAYER_PED) do
             if module.tvehicle.aircraft.camera[0] == false then break end
 
-            local vehicle = storeCarCharIsInNoSave(PLAYER_PED)
+            local vehicle = getCarCharIsUsing(PLAYER_PED)
             local roll = getCarRoll(vehicle)
 
             attachCameraToVehicle(vehicle,0.0,module.tvehicle.aircraft.zoom[module.tvehicle.aircraft.index],2.5,0.0,0.0,0.0,(roll*-1),2)
@@ -301,7 +301,7 @@ function module.VehicleMain()
 
     if imgui.Button("Repair vehicle",imgui.ImVec2(fcommon.GetSize(2))) then
         if isCharInAnyCar(PLAYER_PED) then
-            car = storeCarCharIsInNoSave(PLAYER_PED)
+            car = getCarCharIsUsing(PLAYER_PED)
             fixCar(car)
             fcommon.CheatActivated()
         end
@@ -309,7 +309,7 @@ function module.VehicleMain()
     imgui.SameLine()
     if imgui.Button("Unflip vehicle",imgui.ImVec2(fcommon.GetSize(2))) then
         if isCharInAnyCar(PLAYER_PED) then
-            car = storeCarCharIsInNoSave(PLAYER_PED)
+            car = getCarCharIsUsing(PLAYER_PED)
             setCarRoll(car,0)
             fcommon.CheatActivated()
         end
@@ -350,7 +350,7 @@ function module.VehicleMain()
             fcommon.CheckBox({name = "Lights on",var = module.tvehicle.lights,func =
             function()
                 if isCharInAnyCar(PLAYER_PED) then
-                    car = storeCarCharIsInNoSave(PLAYER_PED)
+                    car = getCarCharIsUsing(PLAYER_PED)
                     if module.tvehicle.lights[0] == true then
                         forceCarLights(car,2)
                         addOneOffSound(x,y,z,1052)
@@ -478,14 +478,14 @@ function module.VehicleMain()
                             module.tvehicle.speed[0] = 500
                         end
                         if isCharInAnyCar(PLAYER_PED) then
-                            car = storeCarCharIsInNoSave(PLAYER_PED)
+                            car = getCarCharIsUsing(PLAYER_PED)
                             setCarForwardSpeed(car,module.tvehicle.speed[0])
                         end
                     end
                     imgui.SameLine()
                     if imgui.Button("Instant stop",imgui.ImVec2(fcommon.GetSize(2))) then
                         if isCharInAnyCar(PLAYER_PED) then
-                            car = storeCarCharIsInNoSave(PLAYER_PED)
+                            car = getCarCharIsUsing(PLAYER_PED)
                             setCarForwardSpeed(car,0.0)
                         end
                     end

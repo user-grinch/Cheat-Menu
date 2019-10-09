@@ -95,12 +95,11 @@ function module.TeleportMain()
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem("Search") then
+		if imgui.BeginTabItem("Search") then
+			print(script.list())
 			imgui.Spacing()
-            imgui.Columns(1)
 			if imgui.InputText("Search",module.tteleport.search_text,ffi.sizeof(module.tteleport.search_text)) then end
 			fcommon.InformationTooltip("Right click over any of these entries to remove them.")
-			imgui.SameLine()
 			imgui.Spacing()
 			imgui.Text("Found entries :(" .. ffi.string(module.tteleport.search_text) .. ")")
 			imgui.Separator()
