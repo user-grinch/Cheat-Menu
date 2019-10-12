@@ -467,6 +467,7 @@ function module.VehicleMain()
                     end
                 end)
                 fcommon.DropDownMenu("Speed",function()
+                    
                     imgui.Columns(2,nil,false)
                     fcommon.CheckBox({name = "Lock speed",var = module.tvehicle.lock_speed})
                     imgui.NextColumn()
@@ -474,9 +475,6 @@ function module.VehicleMain()
                     if imgui.InputInt("Set",module.tvehicle.speed) then
                     end
                     if imgui.Button("Set speed",imgui.ImVec2(fcommon.GetSize(2))) then
-                        if module.tvehicle.speed[0] > 500 then
-                            module.tvehicle.speed[0] = 500
-                        end
                         if isCharInAnyCar(PLAYER_PED) then
                             car = getCarCharIsUsing(PLAYER_PED)
                             setCarForwardSpeed(car,module.tvehicle.speed[0])
@@ -488,6 +486,12 @@ function module.VehicleMain()
                             car = getCarCharIsUsing(PLAYER_PED)
                             setCarForwardSpeed(car,0.0)
                         end
+                    end
+                    if module.tvehicle.speed[0] > 500 then
+                        module.tvehicle.speed[0] = 500
+                    end
+                    if module.tvehicle.speed[0] < 0 then
+                        module.tvehicle.speed[0] = 0
                     end
                 end)
                 fcommon.UpdateAddress({name = 'Vehicle density multiplier',address = 0x8A5B20,size = 4,min = 0,max = 10, default = 1,is_float = true})
