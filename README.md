@@ -21,6 +21,7 @@ For installation take a look [here](https://github.com/inanahammad/Cheat-Menu/wi
 ### Master Branch
 [Master branch](https://github.com/inanahammad/Cheat-Menu) contains all the recent work done to the menu. While this can be the best way to live on the edge & try the latest features out, it could come with a fair number of bugs.
 
+
 ## Installation
 
 1. Install [DirectX](https://www.microsoft.com/en-us/download/details.aspx?id=35) &  [Visual C++ Redistributable 2017](https://aka.ms/vs/16/release/vc_redist.x86.exe) if not already installed.
@@ -31,6 +32,7 @@ For installation take a look [here](https://github.com/inanahammad/Cheat-Menu/wi
 
 Now try it out in-game. If it doesn't work open an issue here or create a post in one of the topics above with 'moonloader.log'.
 
+
 ## Images
 ![Image](https://i.imgur.com/zY2ij0V.jpg)
 ![Image](https://i.imgur.com/YLSjCQM.jpg)
@@ -40,3 +42,16 @@ Now try it out in-game. If it doesn't work open an issue here or create a post i
 
 ## Youtube
 [![Youtue Video](https://img.youtube.com/vi/XF1bhn74s2M/0.jpg)](https://www.youtube.com/watch?v=XF1bhn74s2M)
+
+
+## Docs
+
+### Adding custom peds/skins
+- Version required 1.8-wip and above
+ 
+Ped/skin images are loaded from '\moonloader\lib\cheat-menu\peds\' directory. There are 2 levels of directories inside 'peds'. The first level is the tabs and the second level is the menus. Images(only jpg) should be under the second level folders and will show up under the tabs and menus in-game with the same names. Custom tabs and menus(under tabs) can also be added and will show up in-game accordingly.
+
+### Adding custom clothes
+- Version required 1.7 and above
+
+Cloth images are loaded from the 'moonloader\lib\cheat-menu\clothes' directory. The directories inside 'clothes' are only of 1 level. These directories are 'menus'.The cloth images(only jpg) should be placed according to their body parts. The naming of the images is like this 'model_name$texture_name' without quotes.
