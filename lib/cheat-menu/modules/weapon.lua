@@ -21,10 +21,12 @@ module.tweapon =
     fast_reload = imgui.new.bool(fconfig.get('tweapon.fast_reload',false)),
     images = {},
     models = {},
+    model_list = {},
     no_reload = imgui.new.bool(fconfig.get('tweapon.no_reload',false)),
     path = tcheatmenu.dir .. "weapons\\",
     ped = imgui.new.bool(fconfig.get('tweapon.ped',false)),
     quick_spawn = imgui.new.bool(fconfig.get('tweapon.quick_spawn',false)),
+    search_crawl = true,
     search_text = imgui.new.char[20](""),   
 }
 
@@ -157,19 +159,12 @@ function module.WeaponMain()
             imgui.Columns(1)
             imgui.Spacing()
             if imgui.BeginTabBar("Spawn") then
+                
                 if imgui.BeginTabItem("List") then
-
                     imgui.Spacing()
-                    if imgui.BeginChild("Weapon list Window") then
-                        fcommon.ShowEntries("Assault rifles",{30,31},65,65,module.tweapon.images,module.tweapon.path,".png",module.GiveWeapon,module.GetName,true)
-                        fcommon.ShowEntries("Handguns",{22,23,24},65,65,module.tweapon.images,module.tweapon.path,".png",module.GiveWeapon,module.GetName,true)
-                        fcommon.ShowEntries("Heavy weapons",{35,36,37,38},65,65,module.tweapon.images,module.tweapon.path,".png",module.GiveWeapon,module.GetName,true)
-                        fcommon.ShowEntries("Melee",{1,2,3,4,6,7,8,9},65,65,module.tweapon.images,module.tweapon.path,".png",module.GiveWeapon,module.GetName,true)
-                        fcommon.ShowEntries("Miscellaneous",{10,11,12,14,15,41,42,43,44,45,46},65,65,module.tweapon.images,module.tweapon.path,".png",module.GiveWeapon,module.GetName,true)
-                        fcommon.ShowEntries("Projectiles",{16,17,18,39},65,65,module.tweapon.images,module.tweapon.path,".png",module.GiveWeapon,module.GetName,true)
-                        fcommon.ShowEntries("Shotguns",{25,26,27},65,65,module.tweapon.images,module.tweapon.path,".png",module.GiveWeapon,module.GetName,true)
-                        fcommon.ShowEntries("Sub machine guns",{28,29,32},65,65,module.tweapon.images,module.tweapon.path,".png",module.GiveWeapon,module.GetName,true)
-                        fcommon.ShowEntries("Rifles",{33,34},65,65,module.tweapon.images,module.tweapon.path,".png",module.GiveWeapon,module.GetName,true)
+
+                    if imgui.BeginChild("Weapon List Child") then
+                        fcommon.ListCrawl(module.tweapon.path,module.tweapon.images,".png",65,65,module.GiveWeapon,module.GetName,true)
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()
@@ -180,11 +175,13 @@ function module.WeaponMain()
                     imgui.SameLine()
         
                     imgui.Spacing()
-                    imgui.Text("Found entries :(" .. ffi.string(module.tweapon.search_text) .. ")")
+                    imgui.Text("Found weapons :(" .. ffi.string(module.tweapon.search_text) .. ")")
                     imgui.Separator()
                     imgui.Spacing()
                     if imgui.BeginChild("Weapon Entries") then
-                        fcommon.ShowEntries(nil,module.tweapon.models,65,65,module.tweapon.images,module.tweapon.path,".png",module.GiveWeapon,module.GetName,true,module.tweapon.search_text)
+
+                        lua_thread.create(fcommon.SearchCrawl,module.tweapon.model_list,module.tweapon.path,module.tweapon.images,".png")
+                        fcommon.ShowEntries(nil,module.tweapon.model_list,65,65,module.tweapon.images,nil,".png", module.GiveWeapon,module.GetName,true,module.tweapon.search_text)
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()

@@ -103,7 +103,6 @@ function module.write()
         tteleport =
         {
             auto_z         = fteleport.tteleport.auto_z[0],
-            coords         = ffi.string(fteleport.tteleport.coords),
             insert_coords  = fteleport.tteleport.insert_coords[0],
             shortcut       = fteleport.tteleport.shortcut[0],
         },

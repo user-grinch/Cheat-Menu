@@ -38,8 +38,6 @@ function module.DropDownMenu(label,func,text_disabled)
             end
         end
     else
-        imgui.Spacing()
-
         func()
 
         imgui.Spacing()
@@ -174,7 +172,43 @@ function module.CreateMenus(names,funcs)
   
 end
 
-function LoadTextures(store_table,image_path,model_table,extention)
+function module.SearchCrawl(list,path,images,extention)
+    for dir in lfs.dir(path) do
+        if doesDirectoryExist(path .. dir) and dir ~= "." and dir ~= ".." then
+            for pic in lfs.dir(path .. dir) do
+                wait(0)
+                if doesFileExist(path .. dir .. "\\" .. pic) then
+                    temp = {}
+                    model = tonumber(string.sub(pic,1,-5))
+                    for key, value in pairs(list) do
+                        if value == model then
+                            model = nil
+                        end
+                    end
+                    table.insert(list,model)
+                    table.insert(temp,model)
+                    fcommon.LoadTextures(images,(path .. dir .. "\\"),temp,extention)
+                end
+            end
+        end
+    end
+end
+
+function module.ListCrawl(path,images,extention,img_x,img_y,func_load_model,func_show_tooltip,skip_check,func)
+    for dir in lfs.dir(path) do
+        if doesDirectoryExist(path .. dir) and dir ~= "." and dir ~= ".." then
+            list = {}
+            for pic in lfs.dir(path .. dir) do
+                if doesFileExist(path .. dir .. "\\" .. pic) then
+                    table.insert(list,tonumber(string.sub(pic,1,-5)))
+                end
+            end
+            fcommon.ShowEntries(dir,list,img_x,img_y,images,(path .. dir .. "\\"),extention, func_load_model,func_show_tooltip,skip_check)
+        end
+    end
+end
+
+function module.LoadTextures(store_table,image_path,model_table,extention)
     for i=1,#model_table,1 do
         if store_table[tostring(model_table[i])] == nil then
             local path = image_path .. tostring(model_table[i]) .. extention
@@ -224,6 +258,8 @@ function module.ShowEntries(title,model_table,height,width,store_table,image_pat
                                         end
                                     end
                                 end
+                            else
+                                skipped_entries = skipped_entries +1
                             end
                         else
                             skipped_entries = skipped_entries +1
@@ -232,10 +268,10 @@ function module.ShowEntries(title,model_table,height,width,store_table,image_pat
                             imgui.SameLine(0.0,4.0)
                         end
                     else
-                        if doesFileExist(image_path..model_table[j]..image_extention) then
-                            lua_thread.create(LoadTextures,store_table,image_path,model_table,image_extention)
+                        if image_path ~= nil and doesFileExist(image_path..model_table[j]..image_extention) then
+                            lua_thread.create(module.LoadTextures,store_table,image_path,model_table,image_extention)
                         else
-                            skipped_entries = skipped_entries +1
+                            skipped_entries = skipped_entries + 1
                         end
                     end
                 end

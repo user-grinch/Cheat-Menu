@@ -21,7 +21,8 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu
 script_dependencies("ffi","mimgui","memory","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.8-wip")
-script_version_number(20191009) -- YYYYMMDD
+script_version_number(20191015) -- YYYYMMDD
+
 
 -- All the command keys used throughout the Cheat-Menu
 tkeys =
@@ -50,6 +51,7 @@ imgui         = require 'mimgui'
 memory        = require 'memory'
 glob          = require 'game.globals'
 mad           = require 'MoonAdditions'
+lfs           = require 'lfs'
 
 Dir = string.format( "%s%s",getWorkingDirectory(),"//lib//cheat-menu//")
 
@@ -65,8 +67,8 @@ if not pcall(fconfig.Read) then
 end
 
 ftable        = require 'cheat-menu.modules.tables.$index'
-fanimation    = require 'cheat-menu.modules.animation'
 fcommon       = require 'cheat-menu.modules.common'
+fanimation    = require 'cheat-menu.modules.animation'
 fgame         = require 'cheat-menu.modules.game'
 fmemory       = require 'cheat-menu.modules.memory'
 fmenu         = require 'cheat-menu.modules.menu'
@@ -80,7 +82,7 @@ fvisual       = require 'cheat-menu.modules.visual'
 fweapon       = require 'cheat-menu.modules.weapon'
 
 if fmenu.tmenu.disable_in_samp[0] and isSampLoaded() then
-    script.this:unload()
+    script.this.unload()
 end
 
 

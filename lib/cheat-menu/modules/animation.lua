@@ -1,3 +1,4 @@
+  
 -- Cheat Menu -  Cheat menu for Grand Theft Auto SanAndreas
 -- Copyright (C) 2019 Grinch_
 
@@ -25,6 +26,7 @@ module.tanimation =
         array     = {},
     }, 
     ifp_name      = imgui.new.char[20](),
+    list          = fcommon.LoadJson("animation"),
     loop          = imgui.new.bool(fconfig.get('tanimation.loop',false)),
     name          = imgui.new.char[20](),
     ped           = imgui.new.bool(fconfig.get('tanimation.ped',false)),
@@ -51,6 +53,12 @@ function AnimationEntry(file,animation)
         end
         PlayAnimation(file,animation)
     end
+    if imgui.IsItemClicked(1) then
+		module.tanimation.list[file .. "$" .. animation] = nil
+		fcommon.SaveJson("animation",module.tanimation.list)
+		module.tanimation.list = fcommon.LoadJson("animation")
+		printHelpString("Animation ~r~removed")
+	end
 end
 
 function PlayAnimation(file,animation)
@@ -109,19 +117,28 @@ function module.AnimationMain()
         if imgui.BeginTabItem("List") then
             if imgui.BeginChild("Stat Entries") then
 
-                local menu_name = ""
-                for key,value in ipairs(ftable.animation.table) do
-                    local temp,_ = value:match("([^$]+)$([^$]+)")
-                    if menu_name ~= temp then
-                        menu_name = temp
-                        fcommon.DropDownMenu(menu_name,function()
-                            for key,value in pairs(ftable.animation.table) do
-                                local file,animation = value:match("([^$]+)$([^$]+)")
-                                if menu_name == file then
+                local menus_shown = {}
+
+                for key,value in pairs(module.tanimation.list) do
+                    local temp,_ = key:match("([^$]+)$([^$]+)")
+                    
+                    local show_menu = true
+                    for i=1,#menus_shown,1 do
+                        if menus_shown[i] == temp then
+                            show_menu = false
+                        end
+                    end
+
+                    if show_menu then
+                        fcommon.DropDownMenu(temp,function()
+                            for key,value in pairs(module.tanimation.list) do
+                                local file,animation = key:match("([^$]+)$([^$]+)")
+                                if temp == file then
                                     AnimationEntry(file,animation)
                                 end
                             end
                         end)
+                        table.insert(menus_shown,temp)
                     end
                 end   
                                 
@@ -136,14 +153,14 @@ function module.AnimationMain()
             imgui.Columns(1)
             if imgui.InputText("Search",module.tanimation.search_text,ffi.sizeof(module.tanimation.search_text)) then end
             imgui.SameLine()
-
+            fcommon.InformationTooltip("Right click over any of these entries to remove them")
             imgui.Spacing()
             imgui.Text("Found entries :(" .. ffi.string(module.tanimation.search_text) .. ")")
             imgui.Separator()
             imgui.Spacing()
             if imgui.BeginChild("Stat Entries") then
-                for key,value in pairs(ftable.animation.table) do
-                    file, animation = value:match("([^$]+)$([^$]+)")
+                for key,value in pairs(module.tanimation.list) do
+                    file, animation = key:match("([^$]+)$([^$]+)")
                     if (string.upper(animation):find(string.upper(ffi.string(module.tanimation.search_text)))) then
                         AnimationEntry(file,animation)
                     end
@@ -177,8 +194,11 @@ function module.AnimationMain()
             if imgui.InputText("IFP name",module.tanimation.ifp_name,ffi.sizeof(module.tanimation.ifp_name)) then end
             if imgui.InputText("Animation name",module.tanimation.name,ffi.sizeof(module.tanimation.name)) then end
             imgui.Spacing()
-            if imgui.Button("Play animation",imgui.ImVec2(fcommon.GetSize(1))) then
-                PlayAnimation(ffi.string(module.tanimation.ifp_name),ffi.string(module.tanimation.name))
+            if imgui.Button("Add animation",imgui.ImVec2(fcommon.GetSize(1))) then
+                module.tanimation.list[ffi.string(module.tanimation.ifp_name) .. "$" .. ffi.string(module.tanimation.name)] = "Animation"
+                fcommon.SaveJson("animation",module.tanimation.list)
+                module.tanimation.list = fcommon.LoadJson("animation")
+                printHelpString("Animation ~g~added")
             end
             imgui.EndTabItem()
         end

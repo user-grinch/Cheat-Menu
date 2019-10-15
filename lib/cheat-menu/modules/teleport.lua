@@ -19,7 +19,7 @@ local module = {}
 module.tteleport =
 {
 	auto_z                  = imgui.new.bool(fconfig.get('tteleport.auto_z',false)),
-    coords                  = imgui.new.char[24](fconfig.get('tteleport.coords',"")),
+    coords                  = imgui.new.char[24](""),
 	coord_name              = imgui.new.char[64](""),
     insert_coords           = imgui.new.bool(fconfig.get('tteleport.insert_coords',false)),
 	search_text             = imgui.new.char[64](""),
@@ -58,7 +58,7 @@ function ShowTeleportEntry(label, x, y, z,interior_id)
 		coordinates[label] = nil
 		fcommon.SaveJson("coordinate",coordinates)
 		coordinates = fcommon.LoadJson("coordinate")
-		printHelpString("Entry ~r~removed")
+		printHelpString("Coordinate ~r~removed")
 	end
 end
 
@@ -96,10 +96,9 @@ function module.TeleportMain()
             imgui.EndTabItem()
         end
 		if imgui.BeginTabItem("Search") then
-			print(script.list())
 			imgui.Spacing()
 			if imgui.InputText("Search",module.tteleport.search_text,ffi.sizeof(module.tteleport.search_text)) then end
-			fcommon.InformationTooltip("Right click over any of these entries to remove them.")
+			fcommon.InformationTooltip("Right click over any of these entries to remove them")
 			imgui.Spacing()
 			imgui.Text("Found entries :(" .. ffi.string(module.tteleport.search_text) .. ")")
 			imgui.Separator()
