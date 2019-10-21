@@ -21,7 +21,7 @@ local module = {}
 module.tstat      =
 {    
     search_text   = imgui.new.char[20](),
-    names         = ftable.stats.table,
+    names         = fcommon.LoadJson("stat"),
 }     
 
 function module.StatMain()
@@ -105,10 +105,10 @@ function module.StatMain()
             imgui.Separator()
             imgui.Spacing()
             if imgui.BeginChild("Stat Entries") then
-                for i=0,342,1 do
-                    if module.tstat.names[i] ~= nil then
-                        if (ffi.string(module.tstat.search_text) == "") or (string.upper(module.tstat.names[i]):find(string.upper(ffi.string(module.tstat.search_text))) ~= nil) then
-                            fcommon.UpdateStat({ name = module.tstat.names[i],stat = i})
+                for snum, sname in pairs(module.tstat.names) do
+                    if snum ~= "" then
+                        if (ffi.string(module.tstat.search_text) == "") or (string.upper(sname):find(string.upper(ffi.string(module.tstat.search_text))) ~= nil) then
+                            fcommon.UpdateStat({ name = sname,stat = i})
                         end
                     end
                 end

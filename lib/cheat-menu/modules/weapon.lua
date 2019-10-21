@@ -22,6 +22,7 @@ module.tweapon =
     images = {},
     models = {},
     model_list = {},
+    names = fcommon.LoadJson("model names"),
     no_reload = imgui.new.bool(fconfig.get('tweapon.no_reload',false)),
     path = tcheatmenu.dir .. "weapons\\",
     ped = imgui.new.bool(fconfig.get('tweapon.ped',false)),
@@ -34,20 +35,8 @@ for i = 1,46,1 do
     table.insert(module.tweapon.models,i)
 end
 
-function module.GetName(id)
-    local flibweapons = nil
-    if getMoonloaderVersion() < 27 then
-        flibweapons = require 'lib.game.weapons'
-    else
-        flibweapons = require 'libstd.game.weapons'
-    end
-
-    local name = flibweapons.get_name(id)
-    if name == nil then 
-        return ""
-    else
-        return name
-    end
+function module.GetModelName(id)
+    return module.tweapon.names[tostring(id)] or ""
 end
 
 function module.CBaseWeaponInfo(name)
@@ -61,25 +50,23 @@ function module.CBaseWeaponInfo(name)
 end
 
 function module.GiveWeapon(weapon)
-    if module.GetName(weapon) ~= "" then
-        model = getWeapontypeModel(weapon)
-        if isModelAvailable(model) then
-            requestModel(model)
-            loadAllModelsNow()
+    model = getWeapontypeModel(weapon)
+    if isModelAvailable(model) then
+        requestModel(model)
+        loadAllModelsNow()
 
-            if module.tweapon.ped[0] == true then
-                if fped.tped.selected ~=  nil then
-                    giveWeaponToChar(fped.tped.selected,weapon,99999)
-                    fcommon.CheatActivated()
-                else
-                    printHelpString("~r~No~w~ ped selected")
-                end
-            else
-                giveWeaponToChar(PLAYER_PED,weapon,99999)
+        if module.tweapon.ped[0] == true then
+            if fped.tped.selected ~=  nil then
+                giveWeaponToChar(fped.tped.selected,weapon,99999)
                 fcommon.CheatActivated()
-            end          
-            markModelAsNoLongerNeeded(model)
-        end
+            else
+                printHelpString("~r~No~w~ ped selected")
+            end
+        else
+            giveWeaponToChar(PLAYER_PED,weapon,99999)
+            fcommon.CheatActivated()
+        end          
+        markModelAsNoLongerNeeded(model)
     end
 end
 
@@ -164,7 +151,7 @@ function module.WeaponMain()
                     imgui.Spacing()
 
                     if imgui.BeginChild("Weapon List Child") then
-                        fcommon.ListCrawl(module.tweapon.path,module.tweapon.images,".png",65,65,module.GiveWeapon,module.GetName,true)
+                        fcommon.ListCrawl(module.tweapon.path,module.tweapon.images,".png",65,65,module.GiveWeapon,module.GetModelName,true)
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()
@@ -181,7 +168,7 @@ function module.WeaponMain()
                     if imgui.BeginChild("Weapon Entries") then
 
                         lua_thread.create(fcommon.SearchCrawl,module.tweapon.model_list,module.tweapon.path,module.tweapon.images,".png")
-                        fcommon.ShowEntries(nil,module.tweapon.model_list,65,65,module.tweapon.images,nil,".png", module.GiveWeapon,module.GetName,true,module.tweapon.search_text)
+                        fcommon.ShowEntries(nil,module.tweapon.model_list,65,65,module.tweapon.images,nil,".png", module.GiveWeapon,module.GetModelName,true,module.tweapon.search_text)
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()

@@ -19,16 +19,15 @@ local module = {}
 module.tmission =
 {
     array       = {},
-    names       = ftable.missions.table,
+    names       = fcommon.LoadJson("mission"),
     search_text = imgui.new.char[20](),
 }
 
-for i = 0,#module.tmission.names,1 do
-    if module.tmission.names[i] ~= nil then
-        table.insert(module.tmission.array,i)
+for id, name in pairs(module.tmission.names) do
+    if name ~= "" then
+        table.insert(module.tmission.array,tonumber(id))
     end
 end
-
 
 function ShowMissionEntries(title,list,search_text)
     if search_text == nil then search_text = "" end
@@ -36,25 +35,21 @@ function ShowMissionEntries(title,list,search_text)
     fcommon.DropDownMenu(title,function()
         imgui.Spacing()
         for _,i in pairs(list) do
-            if (ffi.string(search_text) == "") or ((string.upper(module.tmission.names[i])):find(string.upper(ffi.string(search_text))) ~= nil) then
-                MissionEntry(i)
+            if (ffi.string(search_text) == "") or ((string.upper(module.tmission.names[tostring(i)])):find(string.upper(ffi.string(search_text))) ~= nil) then
+                if imgui.MenuItemBool(module.tmission.names[tostring(i)]) then
+                    if getGameGlobal(glob.ONMISSION) == 0 then
+                        clearWantedLevel(PLAYER_HANDLE)
+                        lockPlayerControl(true)
+                        doFade(true,1000)
+                        loadAndLaunchMissionInternal(i)
+                        lockPlayerControl(false)
+                    else
+                        printHelpString('Already in a mission')
+                    end
+                end
             end
         end
     end)
-end
-
-function MissionEntry(i)
-    if imgui.MenuItemBool(module.tmission.names[i]) then
-        if getGameGlobal(glob.ONMISSION) == 0 then
-            clearWantedLevel(PLAYER_HANDLE)
-            lockPlayerControl(true)
-            doFade(true,1000)
-            loadAndLaunchMissionInternal(i)
-            lockPlayerControl(false)
-        else
-            printHelpString('Already in a mission')
-        end
-    end
 end
 
 function module.MissionMain()
@@ -128,7 +123,7 @@ function module.MissionMain()
                 if imgui.InputText('Search ',module.tmission.search_text,ffi.sizeof(module.tmission.search_text)) then 
                 end
                 imgui.Spacing()
-                imgui.Text("FoundEntries :(" .. ffi.string(module.tmission.search_text) .. ")")
+                imgui.Text("Found missions :(" .. ffi.string(module.tmission.search_text) .. ")")
                 imgui.Separator()
                 imgui.Spacing()
                 if imgui.BeginChild("MissionsEntries") then

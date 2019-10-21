@@ -41,12 +41,43 @@ module.tmenu =
 
 module.tmenu.overlay.position_array = imgui.new['const char*'][#module.tmenu.overlay.position](module.tmenu.overlay.position)
 
+function httpRequest(request, body, handler) -- copas.http
+    -- start polling task
+    if not copas.running then
+        copas.running = true
+        lua_thread.create(function()
+            wait(0)
+            while not copas.finished() do
+                local ok, err = copas.step(0)
+                if ok == nil then error(err) end
+                wait(0)
+            end
+            copas.running = false
+        end)
+    end
+    -- do request
+    if handler then
+        return copas.addthread(function(r, b, h)
+            copas.setErrorHandler(function(err) h(nil, err) end)
+            h(http.request(r, b))
+        end, request, body, handler)
+    else
+        local results
+        local thread = copas.addthread(function(r, b)
+            copas.setErrorHandler(function(err) results = {nil, err} end)
+            results = table.pack(http.request(r, b))
+        end, request, body)
+        while coroutine.status(thread) ~= 'dead' do wait(0) end
+        return table.unpack(results)
+    end
+end
+
 
 function module.CheckUpdates()
     local https = nil
-    if pcall(function()
-            require("socket")
-            https = require("ssl.https")
+	if pcall(function()
+			copas = require 'copas'
+			http = require 'copas.http'
             end) then
 		
 		if string.find( script.this.version,"wip") then
@@ -55,32 +86,30 @@ function module.CheckUpdates()
 			link = "https://api.github.com/repos/inanahammad/Cheat-Menu/tags"
 		end
 
-        local body, code, headers, status = https.request(link)
-        
-        if not body then 
-            print(code) 
-            print(status) 
-            printHelpString("~r~Failed~w~ to check for update") 
-		else
-			if string.find( script.this.version,"wip") then
-				repo_version = body:match("script_version_number%((%d+)%)")
-				this_version = script.this.version_num
+		httpRequest(link, nil, function(body, code, headers, status)
+			if body then
+				print(link, 'OK', status)
+				if string.find( script.this.version,"wip") then
+					repo_version = body:match("script_version_number%((%d+)%)")
+					this_version = script.this.version_num
+				else
+					repo_version = decodeJson(body)[1].name
+					this_version = script.this.version
+				end
+	
+				if  repo_version ~= nil then
+					if tostring(repo_version) > tostring(this_version) then
+						module.tmenu.update_available = true
+					else
+						printHelpString("No updates found")
+					end
+				else
+					printHelpString("Couldn't connect to github. The rest of the menu is still functional. You can disable auto update check from 'Menu'")
+				end
 			else
-				repo_version = decodeJson(body)[1].name
-				this_version = script.this.version
+				print(link, 'Error', code)
 			end
-
-            if  repo_version ~= nil then
-                if tostring(repo_version) > tostring(this_version) then
-                    module.tmenu.update_available = true
-                else
-                    printHelpString("No updates found")
-                end
-            else
-                printHelpString("Couldn't connect to github. The rest of the menu is still functional. You can disable auto update check from 'Menu'")
-            end
-        end
-        
+		end) 
     else
         printHelpString("Failed to check for updates. The rest of the menu is still functional. You can disable auto update check from 'Menu'")
     end
@@ -90,8 +119,15 @@ function module.MenuMain()
 
 	if imgui.BeginTabBar("MenuTab") then
 		if imgui.BeginTabItem("Config") then
-			imgui.Columns(2,nil,false)
+			
 			imgui.Spacing()
+			if imgui.Button("Reset to default",imgui.ImVec2(fcommon.GetSize(1))) then
+				printHelpString("Default configuration restored")
+				fconfig.tconfig.reset = true
+				thisScript():reload()
+			end
+			imgui.Dummy(imgui.ImVec2(0,5))
+			imgui.Columns(2,nil,false)
 			fcommon.CheckBox({name = "Auto check for updates",var = module.tmenu.auto_update_check})
 			fcommon.CheckBox({name = "Auto reload",var = module.tmenu.auto_reload,help_text = "Script will automatically reload itself if\nany crash occurs(Might cause issues)"})
 			fcommon.CheckBox({name = "Disable in SAMP",var = module.tmenu.disable_in_samp})
@@ -99,7 +135,6 @@ function module.MenuMain()
 			fcommon.CheckBox({name = "Lock player",var = module.tmenu.lock_player,help_text = "Lock player controls while the menu is open"})
 			fcommon.CheckBox({name = "Show crash message",var = module.tmenu.show_crash_message})
 			fcommon.CheckBox({name = "Show tooltips",var = module.tmenu.show_tooltips})
-			
 			imgui.Columns(1)
 			
 			imgui.EndTabItem()
@@ -131,8 +166,8 @@ function module.MenuMain()
 			imgui.BulletText(string.format("%s v%s",script.this.name,script.this.version))
 			imgui.BulletText(string.format("Version number : %d",script.this.version_num))
 			imgui.SameLine()
-			if imgui.Button("Check for update",imgui.ImVec2(120,20)) then
-				lua_thread.create(module.CheckUpdates)
+			if imgui.Button("Check for updates",imgui.ImVec2(120,20)) then
+				module.CheckUpdates()
 			end
 			imgui.BulletText(string.format("Author : %s",script.this.authors[1]))
 			imgui.BulletText(string.format("Imgui : v%s",imgui._VERSION))

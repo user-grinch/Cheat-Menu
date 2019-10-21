@@ -18,11 +18,10 @@ script_name 'Cheat Menu'
 script_author("Grinch_")
 script_description("Cheat Menu for Grand Theft Auto San Andreas")
 script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu")
-script_dependencies("ffi","mimgui","memory","MoonAdditions")
+script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.8-wip")
-script_version_number(20191015) -- YYYYMMDD
-
+script_version_number(20191021) -- YYYYMMDD
 
 -- All the command keys used throughout the Cheat-Menu
 tkeys =
@@ -44,8 +43,6 @@ tkeys =
     aircraft_zoom     = 0x56, -- V
 }
 
-resX,resY = getScreenResolution()
-
 ffi           = require "ffi"
 imgui         = require 'mimgui'
 memory        = require 'memory'
@@ -66,7 +63,6 @@ if not pcall(fconfig.Read) then
     printString("~r~Failed~w~ to load config file.",10000)
 end
 
-ftable        = require 'cheat-menu.modules.tables.$index'
 fcommon       = require 'cheat-menu.modules.common'
 fanimation    = require 'cheat-menu.modules.animation'
 fgame         = require 'cheat-menu.modules.game'
@@ -82,9 +78,10 @@ fvisual       = require 'cheat-menu.modules.visual'
 fweapon       = require 'cheat-menu.modules.weapon'
 
 if fmenu.tmenu.disable_in_samp[0] and isSampLoaded() then
-    script.this.unload()
+    thisScript():reload()
 end
 
+resX,resY = getScreenResolution()
 
 tcheatmenu =
 {   
@@ -93,8 +90,8 @@ tcheatmenu =
     {
         size =
         {
-            X = resX/4,
-            Y = resY/1.2,
+            X = fconfig.get('tcheatmenu.window.size.X',resX/4),
+            Y = fconfig.get('tcheatmenu.window.size.Y',resY/1.2),
         },
         show    = imgui.new.bool(false),
         title   = string.format("%s v%s by %s",script.this.name,script.this.version,script.this.authors[1]),
@@ -123,9 +120,10 @@ end,
 function(self) -- render frame
 
     self.LockPlayer = fmenu.tmenu.lock_player[0] 
-    imgui.SetNextWindowSize(imgui.ImVec2(tcheatmenu.window.size.X,tcheatmenu.window.size.Y), imgui.Cond.FirstUseEver)
-
+    imgui.SetNextWindowSize(imgui.ImVec2(tcheatmenu.window.size.X,tcheatmenu.window.size.Y),imgui.Cond.Once)
+    imgui.PushStyleVarVec2(imgui.StyleVar.WindowMinSize,imgui.ImVec2(250,500))
     imgui.Begin(tcheatmenu.window.title, tcheatmenu.window.show,imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoSavedSettings)
+    imgui.PopStyleVar()
 
     if fmenu.tmenu.update_available then
         imgui.Spacing()
@@ -139,6 +137,8 @@ function(self) -- render frame
     {fteleport.TeleportMain,fmemory.MemoryMain,fplayer.PlayerMain,fped.PedMain,fanimation.AnimationMain,fvehicle.VehicleMain,
     fweapon.WeaponMain,fmission.MissionMain,fstat.StatMain,fgame.GameMain,fvisual.VisualMain,fmenu.MenuMain})
 
+    tcheatmenu.window.size.X = imgui.GetWindowWidth()
+    tcheatmenu.window.size.Y = imgui.GetWindowHeight()
     imgui.End()
 end)
 
@@ -371,13 +371,15 @@ end
 function onScriptTerminate(script, quitGame)
     if script == thisScript() then
         fconfig.write()
-        local crash_text = "Cheat menu crashed unexpectedly"
-        if fmenu.tmenu.auto_reload[0] then
-            script.this:reload()
-            crash_text =  crash_text .. " and reloaded"
-        end
-        if fmenu.tmenu.show_crash_message[0] then
-            printHelpString(crash_text)
+        if fconfig.tconfig.reset == false then
+            local crash_text = "Cheat menu crashed unexpectedly"
+            if fmenu.tmenu.auto_reload[0] then
+                script.this:reload()
+                crash_text =  crash_text .. " and reloaded"
+            end
+            if fmenu.tmenu.show_crash_message[0] then
+                printHelpString(crash_text)
+            end
         end
     end
 end

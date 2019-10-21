@@ -131,31 +131,34 @@ function module.CheatDeactivated()
     printHelpString("Cheat ~r~Deactivated")
 end
 
-function module.GetSize(count,x,y)
-
+function module.GetSize(count,no_spacing)
+  
     if x == nil then  x = 20 end
     if y == nil then  y = 25 end
+    if count == 1 then no_spacing = true end
 
-    if ((imgui.GetWindowWidth() - imgui.StyleVar.FramePadding - imgui.StyleVar.ItemSpacing) / count) > x then
-        x = (imgui.GetWindowWidth() - imgui.StyleVar.FramePadding - imgui.StyleVar.ItemSpacing) / (count-0.014)
+
+    if no_spacing == true then 
+        x = imgui.GetWindowContentRegionWidth()/count
+    else
+        x = imgui.GetWindowContentRegionWidth() / count
     end
 
-    if ((imgui.GetWindowHeight()/25) / count) > y then
-        y = (imgui.GetWindowHeight()/25)
-    end
+    y = (imgui.GetWindowHeight()/25)
+    if y < 25 then y = 25 end
 
     return x,y
 end
 
 function module.CreateMenus(names,funcs)
 
-    imgui.PushStyleVarVec2(imgui.StyleVar.ItemSpacing,imgui.ImVec2(0,0))
+    imgui.PushStyleVarVec2(imgui.StyleVar.ItemSpacing,imgui.ImVec2(0,1))
     
     for i=1,#names,1 do
         if tcheatmenu.current_menu == i then
             imgui.PushStyleColor(imgui.Col.Button, imgui.ImVec4(0.060,0.530,0.980,1.0))
         end
-        if imgui.Button(names[i],imgui.ImVec2(module.GetSize(4,imgui.GetWindowWidth()/4 - 4*imgui.StyleVar.WindowPadding,20))) then
+        if imgui.Button(names[i],imgui.ImVec2(module.GetSize(4,true))) then
             tcheatmenu.current_menu = i
         end
         if tcheatmenu.current_menu == i then
@@ -232,8 +235,9 @@ function module.ShowEntries(title,model_table,height,width,store_table,image_pat
             fcommon.DropDownMenu(title,function()
                 local skipped_entries = 0
                 for j=1,#model_table,1 do
-                    if store_table[tostring(model_table[j])] ~= nil then
-                        if (search_text == "") or (string.upper(func_show_tooltip(model_table[j])):find(string.upper(ffi.string(search_text))) ~= nil) then
+                    local toolip = func_show_tooltip(model_table[j])
+                    if store_table[tostring(model_table[j])] ~= nil and toolip ~= nil  then
+                        if (search_text == "") or (string.upper(toolip):find(string.upper(ffi.string(search_text))) ~= nil) then
                             if skip_check == true or fvehicle.IsValidModForVehicle(model_table[j],getCarPointer(car)) then
                                 if imgui.ImageButton(store_table[tostring(model_table[j])],imgui.ImVec2(width,height),imgui.ImVec2(0,0),imgui.ImVec2(1,1),1,imgui.ImVec4(1,1,1,1),imgui.ImVec4(1,1,1,1)) then
                                     if body_part == nil then
@@ -251,7 +255,7 @@ function module.ShowEntries(title,model_table,height,width,store_table,image_pat
                                 
                                 if func_show_tooltip ~= nil then
                                     if imgui.IsItemHovered() then
-                                        if func_show_tooltip(model_table[j]) ~= "" then
+                                        if func_show_tooltip(model_table[j]) ~= nil and func_show_tooltip(model_table[j]) ~= "" then
                                             imgui.BeginTooltip()
                                             imgui.SetTooltip(func_show_tooltip(model_table[j]))
                                             imgui.EndTooltip()

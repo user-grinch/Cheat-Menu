@@ -46,7 +46,32 @@ module.tgame                =
     ss_shortcut             = imgui.new.bool(fconfig.get('tgame.ss_shortcut',false)), 
     weather                 =
     {    
-        names               = ftable.weather.table,
+        names               = 
+        {
+            "EXTRASUNNY LA",
+            "SUNNY LA",
+            "EXTRASUNNY SMOG LA",
+            "SUNNY SMOG LA",
+            "CLOUDY LA",
+            "SUNNY SF",
+            "EXTRASUNNY SF",
+            "CLOUDY SF",
+            "RAINY SF",
+            "FOGGY SF",
+            "SUNNY VEGAS",
+            "EXTRASUNNY VEGAS",
+            "CLOUDY VEGAS",
+            "EXTRASUNNY COUNTRYSIDE",
+            "SUNNY COUNTRYSIDE",
+            "CLOUDY COUNTRYSIDE",
+            "RAINY COUNTRYSIDE",
+            "EXTRASUNNY DESERT",
+            "SUNNY DESERT",
+            "SANDSTORM DESERT",
+            "UNDERWATER",
+            "EXTRACOLOURS 1",
+            "EXTRACOLOURS 2",
+        },
         array               = {},
     },
 }
@@ -56,12 +81,13 @@ module.tgame.weather.array  = imgui.new['const char*'][#module.tgame.weather.nam
 
 function CheatsEntry(func,names)
     
-    local sizeX = (imgui.GetWindowWidth() - imgui.StyleVar.FramePadding - imgui.StyleVar.ItemSpacing)/2.93
+    local sizeX = imgui.GetWindowContentRegionWidth() / 3
     local sizeY = imgui.GetWindowHeight()/15
     fcommon.DropDownMenu(names[1],function()
         imgui.Spacing()
 
         for i = 1, #func do
+
             if imgui.Button(names[i+1],imgui.ImVec2(sizeX,sizeY)) then
                 callFunction(func[i],1,1)
                 fcommon.CheatActivated()

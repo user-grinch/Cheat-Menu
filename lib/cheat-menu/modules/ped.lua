@@ -21,46 +21,67 @@ module.tped =
     gang_wars   = imgui.new.bool(fconfig.get('tped.gang_wars',false)),
     images      = {},
     models      = {},
-    model_list  = {},
-    names       = ftable.peds.list,
+    model_list  = {18,138,139,140},
+    names       = fcommon.LoadJson("ped"),
     path        = tcheatmenu.dir .. "peds\\",
     search_text = imgui.new.char[20](""),  
     selected    = nil,
-    special     = ftable.peds.special,
+    special     = fcommon.LoadJson("ped special"),
     type        =
     {
         array   = {},
-        names   = ftable.peds.types,
+        names   = 
+        {
+            "CIVMALE",
+            "CIVFEMALE",
+            "COP",
+            "Ballas",
+            "Grove Street Families",
+            "Los Santos Vagos",
+            "San Fierro Rifa",
+            "Da Nang Boys",
+            "Mafia",
+            "Mountain Cloud Triads",
+            "Varrio Los Aztecas",
+            "GANG9",
+            "GANG10",
+            "DEALER",
+            "EMERGENCY",
+            "FIREMAN",
+            "CRIMINAL",
+            "BUM",
+            "SPECIAL",
+            "PROSTITUTE"
+        },
         index   = imgui.new.int(fconfig.get('tped.type.index',0)),
     },
 }
 
-
-
 module.tped.type.array = imgui.new['const char*'][#module.tped.type.names](module.tped.type.names)
 
+
 function module.GetName(model)
-    if module.tped.names[model] then return module.tped.names[model] else return "" end
+    if module.tped.names[model] then return module.tped.names[tostring(model)] else return "" end
 end
 
 function module.SpawnPed(model)  
-    if  module.tped.names[model] ~= nil then
-        if module.tped.special[model] == nil then
+    if  module.tped.names[tostring(model)] ~= "" then
+        if module.tped.special[tostring(model)] ~= "" then
             requestModel(model)
             loadAllModelsNow()
             x,y,z = getCharCoordinates(PLAYER_PED)
-            ped = createChar(module.tped.type.index[0]+2,model,x,y,z)
+            ped = createChar(module.tped.type.index[0]+5,model,x,y,z) -- CIVMALE = PLAYER + 5 
             markModelAsNoLongerNeeded(model)
             markCharAsNoLongerNeeded(ped)
         else
             if hasSpecialCharacterLoaded(model) then
                 unloadSpecialCharacter(model)
             end
-            loadSpecialCharacter(module.tped.special[model],1)
+            loadSpecialCharacter(module.tped.special[tostring(model)],1)
             loadAllModelsNow()
             x,y,z = getCharCoordinates(PLAYER_PED)
-            ped = createChar(module.tped.type.index[0]+2,290,x,y,z)
-            markModelAsNoLongerNeeded(module.tped.special[model])
+            ped = createChar(module.tped.type.index[0]+5,290,x,y,z) -- CIVMALE = PLAYER + 5
+            markModelAsNoLongerNeeded(module.tped.special[tostring(model)])
             markCharAsNoLongerNeeded(ped)
         end
         printHelpString("Ped ~g~Spawned")
@@ -165,32 +186,29 @@ function module.PedMain()
                     imgui.Separator()
                     imgui.Spacing()
                     if imgui.BeginChild("Ped Child") then
-                        lua_thread.create(function()
-                            for dir in lfs.dir(module.tped.path) do
-                                if doesDirectoryExist(module.tped.path .. dir) and dir ~= "." and dir ~= ".." then  
-                                    for subdir in lfs.dir(module.tped.path .. dir) do
-                                        if doesDirectoryExist(module.tped.path .. dir .. "\\" .. subdir) and subdir ~= "." and subdir ~= ".." then
-                                            for pic in lfs.dir(module.tped.path .. dir .. "\\" .. subdir) do
-                                                wait(0)
-                                                if doesFileExist(module.tped.path .. dir .. "\\" .. subdir .. "\\" .. pic) then
-                                                    temp = {}
-                                                    model = tonumber(string.sub(pic,1,-5))
-                                                    for key, value in pairs(module.tped.model_list) do
-                                                        if value == model then
-                                                            model = nil
-                                                        end
+                        for dir in lfs.dir(module.tped.path) do
+                            if doesDirectoryExist(module.tped.path .. dir) and dir ~= "." and dir ~= ".." then  
+                                for subdir in lfs.dir(module.tped.path .. dir) do
+                                    if doesDirectoryExist(module.tped.path .. dir .. "\\" .. subdir) and subdir ~= "." and subdir ~= ".." then
+                                        for pic in lfs.dir(module.tped.path .. dir .. "\\" .. subdir) do
+                                            if doesFileExist(module.tped.path .. dir .. "\\" .. subdir .. "\\" .. pic) then
+                                                temp = {}
+                                                model = tonumber(string.sub(pic,1,-5))
+                                                for key, value in pairs(module.tped.model_list) do
+                                                    if value == model then
+                                                        model = nil
                                                     end
-                                                    table.insert(module.tped.model_list,model)
-                                                    table.insert(temp,model)
-                                                    fcommon.LoadTextures(module.tped.images,(module.tped.path .. dir .. "\\" .. subdir .. "\\"),temp,".jpg")
                                                 end
+                                                table.insert(module.tped.model_list,model)
+                                                table.insert(temp,model)
+                                                lua_thread.create(fcommon.LoadTextures,module.tped.images,(module.tped.path .. dir .. "\\" .. subdir .. "\\"),temp,".jpg")
                                             end
                                         end
                                     end
                                 end
                             end
-                        end)
-                        fcommon.ShowEntries(nil,module.tped.model_list,110,55,module.tped.images,nil,".jpg",module.SpawnPed,module.GetName,true,module.tped.search_text)
+                        end
+                        fcommon.ShowEntries(nil,module.tped.model_list,110,55,module.tped.images,indexlist,".jpg",module.SpawnPed,module.GetName,true,module.tped.search_text,indexlist)
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()

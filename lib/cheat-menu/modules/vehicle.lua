@@ -79,6 +79,7 @@ module.tvehicle =
     lock_doors = imgui.new.bool(false),
     lock_speed = imgui.new.bool(fconfig.get('tvehicle.lock_speed',false)),
     models = {},
+    names = fcommon.LoadJson("model names"),
     paintjobs  = 
     {
         path   =  tcheatmenu.dir .. "vehicles\\paintjobs\\",
@@ -296,6 +297,11 @@ function module.ApplyTexture(filename)
             module.tvehicle.color.default = getCarColours(car)
         end)
     end,filename)
+end
+
+function module.GetModelName(id)
+    
+    return getNameOfVehicleModel(id) or module.tvehicle.names[tostring(id)] or ""
 end
 
 function module.VehicleMain()
@@ -518,7 +524,7 @@ function module.VehicleMain()
                 imgui.Spacing()
                 if imgui.BeginTabItem("List") then
                     if imgui.BeginChild("Vehicles") then
-                        fcommon.ListCrawl(module.tvehicle.path,module.tvehicle.images,".jpg",75,100,module.GiveVehicleToPlayer,getNameOfVehicleModel,true)
+                        fcommon.ListCrawl(module.tvehicle.path,module.tvehicle.images,".jpg",75,100,module.GiveVehicleToPlayer,module.GetModelName,true)
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()
@@ -535,7 +541,7 @@ function module.VehicleMain()
                     imgui.Spacing()
                     if imgui.BeginChild("Vehicle entries") then 
                         lua_thread.create(fcommon.SearchCrawl,module.tvehicle.model_list,module.tvehicle.path,module.tvehicle.images,".jpg")
-                        fcommon.ShowEntries(nil,module.tvehicle.model_list,75,100,module.tvehicle.images,nil,".jpg", module.GiveVehicleToPlayer,getNameOfVehicleModel,true,module.tvehicle.search_text)
+                        fcommon.ShowEntries(nil,module.tvehicle.model_list,75,100,module.tvehicle.images,nil,".jpg", module.GiveVehicleToPlayer,module.GetModelName,true,module.tvehicle.search_text)
                         imgui.EndChild()
                     end
                     imgui.EndTabItem()
@@ -572,14 +578,21 @@ function module.VehicleMain()
                 end)
             end
             imgui.Spacing()
-            if imgui.Button("Reset color",imgui.ImVec2(fcommon.GetSize(2))) then
+            if imgui.Button("Reset color",imgui.ImVec2(fcommon.GetSize(3))) then
                 module.ForEachCarComponent(function(mat,car)
                     mat:reset_color()
                     module.tvehicle.color.default = -1
                 end)
             end
             imgui.SameLine()
-            if imgui.Button("Reset texture",imgui.ImVec2(fcommon.GetSize(2))) then
+            if imgui.Button("Reset texture",imgui.ImVec2(fcommon.GetSize(3))) then
+                module.ForEachCarComponent(function(mat,car)
+                    mat:reset_texture()
+                    module.tvehicle.paintjobs.texture = nil
+                end)
+            end
+            imgui.SameLine()
+            if imgui.Button("Reset texture 2",imgui.ImVec2(fcommon.GetSize(3))) then
                 module.ForEachCarComponent(function(mat,car)
                     mat:reset_texture()
                     module.tvehicle.paintjobs.texture = nil
@@ -627,7 +640,7 @@ function module.VehicleMain()
                 imgui.Spacing()
                 if imgui.BeginChild("Tune") then
                     imgui.Spacing()
-                    fcommon.ListCrawl(module.tvehicle.components.path,module.tvehicle.components.images,".jpg",80,100,module.AddComponentToVehicle,nil,false)
+                    lua_thread.create(fcommon.ListCrawl,module.tvehicle.components.path,module.tvehicle.components.images,".jpg",80,100,module.AddComponentToVehicle,nil,false)
                     imgui.EndChild()
                 end
                 imgui.EndTabItem()

@@ -34,8 +34,8 @@ module.tplayer =
 }
 
 function module.ChangePlayerModel(model)
-    if  fped.tped.names[model] ~= nil then
-        if fped.tped.special[model] == nil then
+    if  fped.tped.names[tostring(model)] ~= "" then
+        if fped.tped.special[tostring(model)] ~= "" then
             if isModelAvailable(model) then
                 requestModel(model)
                 loadAllModelsNow()
@@ -46,7 +46,7 @@ function module.ChangePlayerModel(model)
             if not hasSpecialCharacterLoaded(290) then
                 unloadSpecialCharacter(model)
             end
-            loadSpecialCharacter(fped.tped.special[model],1)
+            loadSpecialCharacter(fped.tped.special[tostring(model)],1)
             loadAllModelsNow()
             setPlayerModel(PLAYER_HANDLE,290)
         end
@@ -264,31 +264,28 @@ function SkinChangerMenu()
             imgui.Separator()
             imgui.Spacing()
             if imgui.BeginChild("Skin entries") then
-                lua_thread.create(function()
-                    for dir in lfs.dir(fped.tped.path) do
-                        if doesDirectoryExist(fped.tped.path .. dir) and dir ~= "." and dir ~= ".." then  
-                            for subdir in lfs.dir(fped.tped.path .. dir) do
-                                if doesDirectoryExist(fped.tped.path .. dir .. "\\" .. subdir) and subdir ~= "." and subdir ~= ".." then
-                                    for pic in lfs.dir(fped.tped.path .. dir .. "\\" .. subdir) do
-                                        wait(0)
-                                        if doesFileExist(fped.tped.path .. dir .. "\\" .. subdir .. "\\" .. pic) then
-                                            temp = {}
-                                            model = tonumber(string.sub(pic,1,-5))
-                                            for key, value in pairs(fped.tped.model_list) do
-                                                if value == model then
-                                                    model = nil
-                                                end
+                for dir in lfs.dir(fped.tped.path) do
+                    if doesDirectoryExist(fped.tped.path .. dir) and dir ~= "." and dir ~= ".." then  
+                        for subdir in lfs.dir(fped.tped.path .. dir) do
+                            if doesDirectoryExist(fped.tped.path .. dir .. "\\" .. subdir) and subdir ~= "." and subdir ~= ".." then
+                                for pic in lfs.dir(fped.tped.path .. dir .. "\\" .. subdir) do
+                                    if doesFileExist(fped.tped.path .. dir .. "\\" .. subdir .. "\\" .. pic) then
+                                        temp = {}
+                                        model = tonumber(string.sub(pic,1,-5))
+                                        for key, value in pairs(fped.tped.model_list) do
+                                            if value == model then
+                                                model = nil
                                             end
-                                            table.insert(fped.tped.model_list,model)
-                                            table.insert(temp,model)
-                                            fcommon.LoadTextures(fped.tped.images,(fped.tped.path .. dir .. "\\" .. subdir .. "\\"),temp,".jpg")
                                         end
+                                        table.insert(fped.tped.model_list,model)
+                                        table.insert(temp,model)
+                                        lua_thread.create(fcommon.LoadTextures,fped.tped.images,(fped.tped.path .. dir .. "\\" .. subdir .. "\\"),temp,".jpg")
                                     end
                                 end
                             end
                         end
                     end
-                end)
+                end
                 fcommon.ShowEntries(nil,fped.tped.model_list,110,55,fped.tped.images,nil,".jpg",fplayer.ChangePlayerModel,fped.GetName,true,module.tplayer.skins.search_text)
                 imgui.EndChild()
             end
