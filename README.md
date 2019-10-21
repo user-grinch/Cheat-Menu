@@ -51,12 +51,16 @@ Now try it out in-game. If it doesn't work open an issue here or create a post i
  
 Ped/skin images are loaded from '\moonloader\lib\cheat-menu\peds\' directory. There are 2 levels of directories inside 'peds'. The first level is the tabs and the second level is the menus. Images(only jpg) should be under the second level folders and will show up under the tabs and menus in-game with the same names. Image names should be of their model names. For example '340.jpg' without quotes. Custom tabs and menus(under tabs) can also be added and will show up in-game accordingly.
 
-### Adding custom vehicle images, components & paintjobs
+### Adding custom vehicle images ,components ,paintjobs & weapons
 - Version required 1.8-wip and above
 
 Vehicle images(only jpg) and component images(only jpg) are loaded from '\moonloader\lib\cheat-menu\vehicles\images' and '\moonloader\lib\cheat-menu\vehicles\components' accordingly. They're both 1 level, these directories are 'menus'. Images should be placed under these directories.
 
 Paintjobs are a bit different, there isn't any categories such as 'menus' or 'tabs' for them. These images(only png) are loaded directly from '\moonloader\lib\cheat-menu\vehicles\paintjobs' directory.
+
+Similar to vehicles weapons are loaded from ''\moonloader\lib\cheat-menu\weapons\'
+
+Tooltips (names that appear when you hover over the images) are loaded from a [JSON](https://en.wikipedia.org/wiki/JSON) file located here, '\moonloader\lib\cheat-menu\json\model names.json'. Open up that file and add your model & names.
 
 ### Adding custom clothes
 - Version required 1.7 and above
