@@ -18,24 +18,25 @@ local module = {}
 
 module.tmenu =
 {	
-	auto_update_check   = imgui.new.bool(fconfig.get('tmenu.auto_update_check',true)),
-	auto_reload 		= imgui.new.bool(fconfig.get('tmenu.auto_reload',true)),
-	disable_in_samp		= imgui.new.bool(fconfig.get('tmenu.disable_in_samp',false)),
-	lock_player   		= imgui.new.bool(fconfig.get('tmenu.lock_player',false)),
+	auto_update_check   = imgui.new.bool(fconfig.Get('tmenu.auto_update_check',true)),
+	auto_reload 		= imgui.new.bool(fconfig.Get('tmenu.auto_reload',true)),
+	crash_text          = "",
+	disable_in_samp		= imgui.new.bool(fconfig.Get('tmenu.disable_in_samp',false)),
+	lock_player   		= imgui.new.bool(fconfig.Get('tmenu.lock_player',false)),
 	overlay             = 
 	{
-		coordinates     = imgui.new.bool(fconfig.get('tmenu.overlay.coordinates',false)),
-		fps             = imgui.new.bool(fconfig.get('tmenu.overlay.fps',false)),
+		coordinates     = imgui.new.bool(fconfig.Get('tmenu.overlay.coordinates',false)),
+		fps             = imgui.new.bool(fconfig.Get('tmenu.overlay.fps',false)),
 		show            = imgui.new.bool(true),
 		offset          = imgui.new.int(10),
     	position        = {"Custom","Top Left","Top Right","Bottom Left","Bottom Right","Close"},
     	position_array  = {},
-		position_index  = imgui.new.int(fconfig.get('tmenu.overlay.position_index',4)),
-		health          = imgui.new.bool(fconfig.get('tmenu.overlay.health',false)),
-		speed           = imgui.new.bool(fconfig.get('tmenu.overlay.speed',false)),		
+		position_index  = imgui.new.int(fconfig.Get('tmenu.overlay.position_index',4)),
+		health          = imgui.new.bool(fconfig.Get('tmenu.overlay.health',false)),
+		speed           = imgui.new.bool(fconfig.Get('tmenu.overlay.speed',false)),		
 	},
-	show_tooltips	    = imgui.new.bool(fconfig.get('tmenu.show_tooltips',true)),
-	show_crash_message  = imgui.new.bool(fconfig.get('tmenu.show_crash_message',true)),
+	show_tooltips	    = imgui.new.bool(fconfig.Get('tmenu.show_tooltips',true)),
+	show_crash_message  = imgui.new.bool(fconfig.Get('tmenu.show_crash_message',true)),
     update_available = false,
 }
 
@@ -115,15 +116,21 @@ function module.CheckUpdates()
     end
 end
 
+-- Main function
 function module.MenuMain()
 
 	if imgui.BeginTabBar("MenuTab") then
 		if imgui.BeginTabItem("Config") then
 			
 			imgui.Spacing()
-			if imgui.Button("Reset to default",imgui.ImVec2(fcommon.GetSize(1))) then
-				printHelpString("Default configuration restored")
+			if imgui.Button("Reset to default",imgui.ImVec2(fcommon.GetSize(2))) then
+				module.tmenu.crash_text = "Default configuration restored"
 				fconfig.tconfig.reset = true
+				thisScript():reload()
+			end
+			imgui.SameLine()
+			if imgui.Button("Reload",imgui.ImVec2(fcommon.GetSize(2))) then
+				module.tmenu.crash_text = "Cheat Menu ~g~reloaded"
 				thisScript():reload()
 			end
 			imgui.Dummy(imgui.ImVec2(0,5))

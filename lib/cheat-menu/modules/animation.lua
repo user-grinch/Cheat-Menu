@@ -21,20 +21,20 @@ module.tanimation =
 {
     fighting      =
     {
-        selected  = imgui.new.int(fconfig.get('tanimation.fighting.selected',0)),
+        selected  = imgui.new.int(fconfig.Get('tanimation.fighting.selected',0)),
         names     = {"Default","Boxing","Kung fu","Kick Boxing","Punch Kick"},
         array     = {},
     }, 
     ifp_name      = imgui.new.char[20](),
     list          = fcommon.LoadJson("animation"),
-    loop          = imgui.new.bool(fconfig.get('tanimation.loop',false)),
+    loop          = imgui.new.bool(fconfig.Get('tanimation.loop',false)),
     name          = imgui.new.char[20](),
-    ped           = imgui.new.bool(fconfig.get('tanimation.ped',false)),
-    secondary     = imgui.new.bool(fconfig.get('tanimation.secondary',false)),
+    ped           = imgui.new.bool(fconfig.Get('tanimation.ped',false)),
+    secondary     = imgui.new.bool(fconfig.Get('tanimation.secondary',false)),
     search_text   = imgui.new.char[20](),
     walking       = 
     { 
-        selected  = imgui.new.int(fconfig.get('tanimation.walking.selected',0)),
+        selected  = imgui.new.int(fconfig.Get('tanimation.walking.selected',0)),
         names     = {"man","shuffle","oldman","gang1","gang2","oldfatman","fatman","jogger","drunkman","blindman","swat","woman","shopping","busywoman","sexywoman","pro","oldwoman","fatwoman","jogwoman","oldfatwoman","skate"},
         array     = {},
     },
@@ -47,7 +47,7 @@ module.tanimation.walking.array  = imgui.new['const char*'][#module.tanimation.w
 function AnimationEntry(file,animation)
     if imgui.MenuItemBool(animation)then
         local char = nil
-        if file ~= "PED" then
+        if file ~= "PED" then   -- don't request if animation is from ped.ifp
             requestAnimation(file)
             loadAllModelsNow()
         end
@@ -79,12 +79,12 @@ function PlayAnimation(file,animation)
         taskPlayAnim(char,animation,file,4.0,module.tanimation.loop[0],0,0,0,-1)
     end
     fcommon.CheatActivated()
-    if file ~= "ped" then
-        removeAnimation(animation)
+    if file ~= "PED" then   -- don't remove if animation is from ped.ifp
+        removeAnimation(animation)  
     end
 end
 
-
+-- Main function
 function module.AnimationMain()
     imgui.Spacing()
     if imgui.Button("Stop animation",imgui.ImVec2(fcommon.GetSize(1))) then
@@ -103,23 +103,26 @@ function module.AnimationMain()
         fcommon.CheatActivated()
     end
     imgui.Spacing()
+
+    -- Checkboxes
     imgui.Columns(2,nil,false)
     fcommon.CheckBox({name = "Loop",var = module.tanimation.loop})
     fcommon.CheckBox({name = "Ped ##Animation",var = module.tanimation.ped,help_text = "Play animation on ped.Aim with a gun to select."})
     imgui.NextColumn()
     fcommon.CheckBox({name = "Secondary",var = module.tanimation.secondary})
     imgui.Columns(1)
+
     imgui.Spacing() 
     if imgui.BeginTabBar("Animation") then
         imgui.Spacing() 
 
         imgui.Spacing()
-        if imgui.BeginTabItem("List") then
+        if imgui.BeginTabItem("List") then  -- List tab
             if imgui.BeginChild("Stat Entries") then
 
                 local menus_shown = {}
 
-                for key,value in pairs(module.tanimation.list) do
+                for key,value in fcommon.spairs(module.tanimation.list) do
                     local temp,_ = key:match("([^$]+)$([^$]+)")
                     
                     local show_menu = true
@@ -131,7 +134,7 @@ function module.AnimationMain()
 
                     if show_menu then
                         fcommon.DropDownMenu(temp,function()
-                            for key,value in pairs(module.tanimation.list) do
+                            for key,value in fcommon.spairs(module.tanimation.list) do
                                 local file,animation = key:match("([^$]+)$([^$]+)")
                                 if temp == file then
                                     AnimationEntry(file,animation)
@@ -147,7 +150,7 @@ function module.AnimationMain()
             imgui.EndTabItem()
         end
 
-        if imgui.BeginTabItem("Search") then
+        if imgui.BeginTabItem("Search") then -- Search tab
 
             imgui.Spacing()
             imgui.Columns(1)
@@ -155,7 +158,7 @@ function module.AnimationMain()
             imgui.SameLine()
             fcommon.InformationTooltip("Right click over any of these entries to remove them")
             imgui.Spacing()
-            imgui.Text("Found entries :(" .. ffi.string(module.tanimation.search_text) .. ")")
+            imgui.Text("Animations found :(" .. ffi.string(module.tanimation.search_text) .. ")")
             imgui.Separator()
             imgui.Spacing()
             if imgui.BeginChild("Stat Entries") then
@@ -190,7 +193,7 @@ function module.AnimationMain()
             imgui.EndTabItem()
         end
 
-        if imgui.BeginTabItem("Custom") then
+        if imgui.BeginTabItem("Custom") then    -- Add custom animation tab
             if imgui.InputText("IFP name",module.tanimation.ifp_name,ffi.sizeof(module.tanimation.ifp_name)) then end
             if imgui.InputText("Animation name",module.tanimation.name,ffi.sizeof(module.tanimation.name)) then end
             imgui.Spacing()

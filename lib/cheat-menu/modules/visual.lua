@@ -16,7 +16,7 @@
 
 local module = {}
 
-local tvisual =
+module.tvisual =
 {
     car_names  = imgui.new.bool(true),
     money =
@@ -27,8 +27,7 @@ local tvisual =
     zone_names = imgui.new.bool(true),
 }
 
-module.tvisual = tvisual
-
+-- Main function
 function module.VisualMain()
     if imgui.BeginTabBar("Visual") then
         imgui.Spacing()
@@ -40,13 +39,13 @@ function module.VisualMain()
             fcommon.CheckBox({ address = 0x589125,name = 'Body armour percentage'})
             fcommon.CheckBox({ address = 0x589207,name = 'Breath meter border'})
             fcommon.CheckBox({ address = 0x589209,name = 'Breath meter percentage'})
-            if imgui.Checkbox('Display zone names',tvisual.zone_names) then
-                displayZoneNames(tvisual.zone_names[0])
-                if tvisual.zone_names[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
+            if imgui.Checkbox('Display zone names',module.tvisual.zone_names) then
+                displayZoneNames(module.tvisual.zone_names[0])
+                if module.tvisual.zone_names[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
             end
-            if imgui.Checkbox('Display car names',tvisual.car_names) then
-                displayCarNames(tvisual.car_names[0])
-                if tvisual.car_names[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
+            if imgui.Checkbox('Display car names',module.tvisual.car_names) then
+                displayCarNames(module.tvisual.car_names[0])
+                if module.tvisual.car_names[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
             end
 
             imgui.NextColumn()
@@ -71,14 +70,14 @@ function module.VisualMain()
                 fcommon.UpdateAddress({ name = 'Money font outline',address = 0x58F58D,size = 1,min=0,default = 2,max = 2})
                 fcommon.UpdateAddress({ name = 'Money font style',address = 0x58F57F ,size = 1,min=0,default = 3,max = 3})
                 fcommon.DropDownMenu("Money text format",function()
-                    if imgui.InputText("Positive",tvisual.money.positive,ffi.sizeof(tvisual.money.positive)) then 
+                    if imgui.InputText("Positive",module.tvisual.money.positive,ffi.sizeof(module.tvisual.money.positive)) then 
                         local var = allocateMemory(4)
-                        ffi.copy(ffi.cast("char*", var), ffi.string(tvisual.money.positive))
+                        ffi.copy(ffi.cast("char*", var), ffi.string(module.tvisual.money.positive))
                         writeMemory(0x58F4C8,4,var,false)
                     end
-                    if imgui.InputText("Negative",tvisual.money.negative,ffi.sizeof(tvisual.money.negative)) then
+                    if imgui.InputText("Negative",module.tvisual.money.negative,ffi.sizeof(module.tvisual.money.negative)) then
                         local var = allocateMemory(4)
-                        ffi.copy(ffi.cast("char*", var), ffi.string(tvisual.money.negative))
+                        ffi.copy(ffi.cast("char*", var), ffi.string(module.tvisual.money.negative))
                         writeMemory(0x58F50A,4,var,false)
                     end
                     
@@ -86,10 +85,10 @@ function module.VisualMain()
                         local var = allocateMemory(4)
                         local var2 = allocateMemory(4)
                         ffi.copy(ffi.cast("char(*)", var), "-$%07d")
-                        imgui.StrCopy(tvisual.money.negative,"-$%07d",ffi.sizeof(tvisual.money.negative))
+                        imgui.StrCopy(module.tvisual.money.negative,"-$%07d",ffi.sizeof(module.tvisual.money.negative))
                         writeMemory(0x58F50A,4,var,false)
                         ffi.copy(ffi.cast("char(*)", var2), "$%08d")
-                        imgui.StrCopy(tvisual.money.positive,"$%08d",ffi.sizeof(tvisual.money.positive))
+                        imgui.StrCopy(module.tvisual.money.positive,"$%08d",ffi.sizeof(module.tvisual.money.positive))
                         writeMemory(0x58F4C8,4,var2,false)
                     end                    
 

@@ -16,16 +16,15 @@
 
 local module = {}
 
-local config_path    =  tcheatmenu.dir ..  "json/cheat-menu.json"
-
 module.tconfig =
 {
+    path  = tcheatmenu.dir ..  "json/cheat-menu.json",
     reset = false,
-    read  = {},
+    read  = fcommon.LoadJson("cheat-menu"),
     write = {},
 }
 
-function module.write()
+function module.Write()
 
     if module.tconfig.reset == false then
         module.tconfig.write =
@@ -149,25 +148,15 @@ function module.write()
         }
     end
 
-    local file = io.open(config_path,'w')
+    local file = io.open(module.tconfig.path,'w')
     if file then
         file:write(encodeJson(module.tconfig.write))
         io.close(file)
     end
 end
 
-function module.Read()
-    local file = io.open(config_path,'r')
-    if file then
-        local data = file:read("*all")
-        io.close(file)
-        if data then
-            module.tconfig.read = decodeJson(data)
-        end
-    end
-end
-
-function module.get(s,default)
+-- Get value from loaded config table
+function module.Get(s,default)
     if module.tconfig.read == nil then return default end
 
     local t = module.tconfig.read

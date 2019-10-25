@@ -18,14 +18,15 @@ local module = {}
 
 module.tmemory    =
 {
-    address       = imgui.new.char[10](fconfig.get('tmemory.address',"")),
-    clear_entries = imgui.new.bool(fconfig.get('tmemory.clear_entries',false)),
-    is_float      = imgui.new.bool(fconfig.get('tmemory.is_float',false)),
-    size          = imgui.new.int(fconfig.get('tmemory.size',1)),
-    value         = imgui.new.int(fconfig.get('tmemory.value',0)),
-    vp            = imgui.new.bool(fconfig.get('tmemory.vp',false)),
+    address       = imgui.new.char[10](fconfig.Get('tmemory.address',"")),
+    clear_entries = imgui.new.bool(fconfig.Get('tmemory.clear_entries',false)),
+    is_float      = imgui.new.bool(fconfig.Get('tmemory.is_float',false)),
+    size          = imgui.new.int(fconfig.Get('tmemory.size',1)),
+    value         = imgui.new.int(fconfig.Get('tmemory.value',0)),
+    vp            = imgui.new.bool(fconfig.Get('tmemory.vp',false)),
 }
 
+-- Main function
 function module.MemoryMain()
  
     if isKeyDown(tkeys.control_key)

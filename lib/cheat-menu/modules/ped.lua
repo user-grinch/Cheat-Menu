@@ -18,10 +18,8 @@ local module = {}
 
 module.tped =
 {
-    gang_wars   = imgui.new.bool(fconfig.get('tped.gang_wars',false)),
+    gang_wars   = imgui.new.bool(fconfig.Get('tped.gang_wars',false)),
     images      = {},
-    models      = {},
-    model_list  = {18,138,139,140},
     names       = fcommon.LoadJson("ped"),
     path        = tcheatmenu.dir .. "peds\\",
     search_text = imgui.new.char[20](""),  
@@ -53,20 +51,21 @@ module.tped =
             "SPECIAL",
             "PROSTITUTE"
         },
-        index   = imgui.new.int(fconfig.get('tped.type.index',0)),
+        index   = imgui.new.int(fconfig.Get('tped.type.index',0)),
     },
 }
 
 module.tped.type.array = imgui.new['const char*'][#module.tped.type.names](module.tped.type.names)
 
-
-function module.GetName(model)
-    if module.tped.names[model] then return module.tped.names[tostring(model)] else return "" end
+-- Returns ped name
+function module.GetModelName(model)
+    if module.tped.names[model] then return module.tped.names[model] else return "" end
 end
 
 function module.SpawnPed(model)  
-    if  module.tped.names[tostring(model)] ~= "" then
-        if module.tped.special[tostring(model)] ~= "" then
+    model = tonumber(model)
+    if  module.tped.names[tostring(model)] ~= nil then
+        if module.tped.special[tostring(model)] == nil then
             requestModel(model)
             loadAllModelsNow()
             x,y,z = getCharCoordinates(PLAYER_PED)
@@ -88,7 +87,7 @@ function module.SpawnPed(model)
     end
 end
 
-function SetDensity(title,id)
+function SetGangZoneDensity(title,id)
     local x,y,z = getCharCoordinates(PLAYER_PED)
         
     local density = imgui.new.int(getZoneGangStrength(getNameOfInfoZone(x,y,z),id))
@@ -131,16 +130,16 @@ function module.PedMain()
                 fcommon.UpdateAddress({name = 'Pedestrian density multiplier',address = 0x8D2530,size = 4,min = 0,max = 10, default = 1,is_float = true})
                 fcommon.DropDownMenu("Gang zone density",function()
                     imgui.PushItemWidth(imgui.GetWindowWidth() - 200)
-                    SetDensity("Ballas",0)
-                    SetDensity("Da nang boys",4)
-                    SetDensity("Gang9",8)
-                    SetDensity("Gang10",9)
-                    SetDensity("Grove street families",1)
-                    SetDensity("Los santos vagos",2)
-                    SetDensity("Mafia",5)
-                    SetDensity("Mountain cloud triad",6)
-                    SetDensity("San fierro rifa",3)
-                    SetDensity("Varrio los aztecas",7)
+                    SetGangZoneDensity("Ballas",0)
+                    SetGangZoneDensity("Da nang boys",4)
+                    SetGangZoneDensity("Gang9",8)
+                    SetGangZoneDensity("Gang10",9)
+                    SetGangZoneDensity("Grove street families",1)
+                    SetGangZoneDensity("Los santos vagos",2)
+                    SetGangZoneDensity("Mafia",5)
+                    SetGangZoneDensity("Mountain cloud triad",6)
+                    SetGangZoneDensity("San fierro rifa",3)
+                    SetGangZoneDensity("Varrio los aztecas",7)
                     imgui.PopItemWidth()
                     imgui.Spacing()
                     imgui.Text("You'll need ExGangWars plugin to display some turf colors")
@@ -151,30 +150,11 @@ function module.PedMain()
                 imgui.Spacing()
                 if imgui.Combo("Ped type", module.tped.type.index,module.tped.type.array,#module.tped.type.names) then end
                 imgui.Spacing()
-                if imgui.BeginTabBar("Peds list") then
-                                    
-                for dir in lfs.dir(module.tped.path) do
-                    if doesDirectoryExist(module.tped.path .. dir) and dir ~= "." and dir ~= ".." then
-                        if imgui.BeginTabItem(dir) then
-                            imgui.Spacing()
-                            if imgui.BeginChild("Ped list Child") then
-                                for subdir in lfs.dir(module.tped.path .. dir) do
-                                    if doesDirectoryExist(module.tped.path .. dir .. "\\" .. subdir) and subdir ~= "." and subdir ~= ".." then
-                                        list = {}
-                                        for pic in lfs.dir(module.tped.path .. dir .. "\\" .. subdir) do
-                                            if doesFileExist(module.tped.path .. dir .. "\\" .. subdir .. "\\" .. pic) then
-                                                table.insert(list,tonumber(string.sub(pic,1,-5)))
-                                            end
-                                        end
-                                        fcommon.ShowEntries(subdir,list,110,55,module.tped.images,(module.tped.path .. dir .. "\\" .. subdir .. "\\"),".jpg",module.SpawnPed,module.GetName,true)
-                                    end
-                                end
-                                imgui.EndChild()
-                            end
-                            imgui.EndTabItem()
-                        end
-                    end
-                end
+                if imgui.BeginTabBar("Peds list") then   
+                    if imgui.BeginTabItem("List") then
+                        fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.LIST,module.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.SpawnPed,nil,module.GetModelName)         
+                        imgui.EndTabItem()
+                    end    
                 if imgui.BeginTabItem("Search") then
                     imgui.Spacing()
                     imgui.Columns(1)
@@ -182,35 +162,11 @@ function module.PedMain()
                     imgui.SameLine()
         
                     imgui.Spacing()
-                    imgui.Text("Found peds :(" .. ffi.string(module.tped.search_text) .. ")")
+                    imgui.Text("Peds found :(" .. ffi.string(module.tped.search_text) .. ")")
                     imgui.Separator()
                     imgui.Spacing()
-                    if imgui.BeginChild("Ped Child") then
-                        for dir in lfs.dir(module.tped.path) do
-                            if doesDirectoryExist(module.tped.path .. dir) and dir ~= "." and dir ~= ".." then  
-                                for subdir in lfs.dir(module.tped.path .. dir) do
-                                    if doesDirectoryExist(module.tped.path .. dir .. "\\" .. subdir) and subdir ~= "." and subdir ~= ".." then
-                                        for pic in lfs.dir(module.tped.path .. dir .. "\\" .. subdir) do
-                                            if doesFileExist(module.tped.path .. dir .. "\\" .. subdir .. "\\" .. pic) then
-                                                temp = {}
-                                                model = tonumber(string.sub(pic,1,-5))
-                                                for key, value in pairs(module.tped.model_list) do
-                                                    if value == model then
-                                                        model = nil
-                                                    end
-                                                end
-                                                table.insert(module.tped.model_list,model)
-                                                table.insert(temp,model)
-                                                lua_thread.create(fcommon.LoadTextures,module.tped.images,(module.tped.path .. dir .. "\\" .. subdir .. "\\"),temp,".jpg")
-                                            end
-                                        end
-                                    end
-                                end
-                            end
-                        end
-                        fcommon.ShowEntries(nil,module.tped.model_list,110,55,module.tped.images,indexlist,".jpg",module.SpawnPed,module.GetName,true,module.tped.search_text,indexlist)
-                        imgui.EndChild()
-                    end
+                    fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.SEARCH,module.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.SpawnPed,nil,module.GetModelName,ffi.string(module.tped.search_text))
+
                     imgui.EndTabItem()
                 end
                 imgui.EndTabBar()

@@ -24,6 +24,7 @@ module.tstat      =
     names         = fcommon.LoadJson("stat"),
 }     
 
+-- Main function
 function module.StatMain()
 
     if imgui.Button("Max vehicle stats",imgui.ImVec2(fcommon.GetSize(2))) then
@@ -101,7 +102,7 @@ function module.StatMain()
             imgui.SameLine()
 
             imgui.Spacing()
-            imgui.Text("Found entries :(" .. ffi.string(module.tstat.search_text) .. ")")
+            imgui.Text("Stats found :(" .. ffi.string(module.tstat.search_text) .. ")")
             imgui.Separator()
             imgui.Spacing()
             if imgui.BeginChild("Stat Entries") then

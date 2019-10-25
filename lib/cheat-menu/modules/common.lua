@@ -16,6 +16,70 @@
 
 local module = {}
 
+-- Sorted pairs function
+function module.spairs(t, f)
+    local a = {}
+    for n in pairs(t) do table.insert(a, n) end
+    table.sort(a, f)
+    local i = 0      -- iterator variable
+    local iter = function ()   -- iterator function
+      i = i + 1
+      if a[i] == nil then return nil
+      else return a[i], t[a[i]]
+      end
+    end
+    return iter
+end
+
+-- Key spawner used to spawn vehicles & weapons trigger: Ctrl + Q
+-- Launched in a separate thread
+function module.QuickSpawner()
+
+    fcommon.KeyWait(tkeys.control_key,tkeys.quickspawner_key)
+
+    memory.write(0x00969110,0,1)
+    local result = ''
+    while not wasKeyPressed(0x0D) do
+        if #result > 25 then
+            result = ''
+        end
+        if wasKeyPressed(0x2E) then
+            result = ''
+        elseif wasKeyPressed(0x08) then
+            result = result:sub(1, -2)
+        elseif wasKeyPressed(readMemory(0x00969110,1,false)) then
+            result = string.format('%s%s',result,memory.tostring(0x00969110,1,false));
+        end
+
+        printStringNow(string.format('[%s]',result),1500)
+
+        local text = result
+
+        for i = 0,#result,1 do
+
+            local weapon =  fweapon.CBaseWeaponInfo(text)
+
+            if fweapon.tweapon.quick_spawn[0] == true and weapon ~= 0 then
+                fweapon.GiveWeapon(weapon)
+                return
+            end
+
+            local vehicle = fvehicle.CBaseModelInfo(text)
+
+            if fvehicle.tvehicle.quick_spawn[0] == true and vehicle ~= 0 then
+                fvehicle.GiveVehicleToPlayer(vehicle)
+                return
+            end
+            text = text:sub(2)
+        end
+        wait(0)
+    end
+end
+
+--------------------------------------------------
+-- imgui UI functions
+
+-- Custom imgui.CollapsingHeader
 function module.DropDownMenu(label,func,text_disabled)
     if label ~= nil then
         if text_disabled then
@@ -46,69 +110,7 @@ function module.DropDownMenu(label,func,text_disabled)
     end
 end
 
-
-function module.QuickSpawner()
-
-    fcommon.KeyWait(tkeys.control_key,tkeys.quickspawner_key)
-
-    memory.write(0x00969110,0,1)
-    result = ''
-    while not wasKeyPressed(0x0D) do
-        if #result > 25 then
-            result = ''
-        end
-        if wasKeyPressed(0x2E) then
-            result = ''
-        elseif wasKeyPressed(0x08) then
-            result = result:sub(1, -2)
-        elseif wasKeyPressed(readMemory(0x00969110,1,false)) then
-            result = string.format('%s%s',result,memory.tostring(0x00969110,1,false));
-        end
-
-        printStringNow(string.format('[%s]',result),1500)
-
-        text = result
-
-        for i = 0,#result,1 do
-
-            local weapon =  fweapon.CBaseWeaponInfo(text)
-
-            if fweapon.tweapon.quick_spawn[0] == true and weapon ~= 0 then
-                fweapon.GiveWeapon(weapon)
-                return
-            end
-
-            local vehicle = fvehicle.CBaseModelInfo(text)
-
-            if fvehicle.tvehicle.quick_spawn[0] == true and vehicle ~= 0 then
-                fvehicle.GiveVehicleToPlayer(vehicle)
-                return
-            end
-            text = text:sub(2)
-        end
-        wait(0)
-    end
-end
-
-function module.LoadJson(filename)
-    local full_path = tcheatmenu.dir .. "json//" .. filename .. ".json"
-    if doesFileExist(full_path) then
-        local file = io.open(full_path, "r")
-        local table = decodeJson(file:read("*a"))
-        file:close()
-        return table
-    end
-    return {}
-end
-
-function module.SaveJson(filename,table)
-    local full_path = tcheatmenu.dir .. "json//" .. filename .. ".json"
-    local file = assert(io.open(full_path, "w"))
-    file:write(encodeJson(table))
-    file:close()
-end
-
-
+-- Information popups used to display controls and details about elements
 function module.InformationTooltip(text)
     if fmenu.tmenu.show_tooltips[0] then
         imgui.SameLine()
@@ -123,14 +125,7 @@ function module.InformationTooltip(text)
     end
 end
 
-function module.CheatActivated()
-    printHelpString("Cheat ~g~Activated")
-end
-
-function module.CheatDeactivated()
-    printHelpString("Cheat ~r~Deactivated")
-end
-
+-- Calculates width of element(button) acoording to count
 function module.GetSize(count,no_spacing)
   
     if x == nil then  x = 20 end
@@ -141,7 +136,7 @@ function module.GetSize(count,no_spacing)
     if no_spacing == true then 
         x = imgui.GetWindowContentRegionWidth()/count
     else
-        x = imgui.GetWindowContentRegionWidth() / count
+        x = imgui.GetWindowContentRegionWidth()/count - imgui.StyleVar.ItemSpacing/(count+1)
     end
 
     y = (imgui.GetWindowHeight()/25)
@@ -150,6 +145,7 @@ function module.GetSize(count,no_spacing)
     return x,y
 end
 
+-- Creates top level menus
 function module.CreateMenus(names,funcs)
 
     imgui.PushStyleVarVec2(imgui.StyleVar.ItemSpacing,imgui.ImVec2(0,1))
@@ -175,114 +171,88 @@ function module.CreateMenus(names,funcs)
   
 end
 
-function module.SearchCrawl(list,path,images,extention)
-    for dir in lfs.dir(path) do
-        if doesDirectoryExist(path .. dir) and dir ~= "." and dir ~= ".." then
-            for pic in lfs.dir(path .. dir) do
-                wait(0)
-                if doesFileExist(path .. dir .. "\\" .. pic) then
-                    temp = {}
-                    model = tonumber(string.sub(pic,1,-5))
-                    for key, value in pairs(list) do
-                        if value == model then
-                            model = nil
-                        end
-                    end
-                    table.insert(list,model)
-                    table.insert(temp,model)
-                    fcommon.LoadTextures(images,(path .. dir .. "\\"),temp,extention)
-                end
+-- Shows loaded images with on_click and on_hover calls
+function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,search_box_text)
+        
+    if search_box_text == nil then search_box_text = "" end
+
+    local loading_a_image = false
+
+    -- Calculate image count in a row
+    local images_in_row = math.floor(imgui.GetWindowContentRegionWidth()/const_image_width)
+    local image_count   = 1
+
+    draw_image = function(identifier,image_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,search_box_text,model,image)
+        local model_name = nil
+        if func_get_name ~= nil then
+            model_name = func_get_name(model)
+        end
+        if ((search_box_text == "") or ((string.upper(model_name):find(string.upper(search_box_text))) ~= nil)) then 
+            if imgui.ImageButton(image,imgui.ImVec2(const_image_width,const_image_height),imgui.ImVec2(0,0),imgui.ImVec2(1,1),1,imgui.ImVec4(1,1,1,1),imgui.ImVec4(1,1,1,1)) then
+                func_on_left_click(model)
             end
-        end
-    end
-end
-
-function module.ListCrawl(path,images,extention,img_x,img_y,func_load_model,func_show_tooltip,skip_check,func)
-    for dir in lfs.dir(path) do
-        if doesDirectoryExist(path .. dir) and dir ~= "." and dir ~= ".." then
-            list = {}
-            for pic in lfs.dir(path .. dir) do
-                if doesFileExist(path .. dir .. "\\" .. pic) then
-                    table.insert(list,tonumber(string.sub(pic,1,-5)))
-                end
+            if imgui.IsMouseClicked(1) and func_on_right_click ~= nil then
+                func_on_right_click(model)
             end
-            fcommon.ShowEntries(dir,list,img_x,img_y,images,(path .. dir .. "\\"),extention, func_load_model,func_show_tooltip,skip_check)
-        end
-    end
-end
-
-function module.LoadTextures(store_table,image_path,model_table,extention)
-    for i=1,#model_table,1 do
-        if store_table[tostring(model_table[i])] == nil then
-            local path = image_path .. tostring(model_table[i]) .. extention
-            store_table[tostring(model_table[i])] = imgui.CreateTextureFromFile(path)
-        end
-        wait(0)
-    end
-end
-
-function module.ShowEntries(title,model_table,height,width,store_table,image_path,image_extention,func_load_model,func_show_tooltip,skip_check,search_text,body_part)
-
-    local content_width = (imgui.GetWindowWidth() - imgui.StyleVar.FramePadding - imgui.StyleVar.ItemSpacing)
-
-    local rows = math.floor(content_width/width)
-
-    if search_text == nil then search_text = "" end
-
-    local car = getCarCharIsUsing(PLAYER_PED)
-    for i=1,#model_table,1 do
-        if skip_check == true or fvehicle.IsValidModForVehicle(model_table[i],getCarPointer(car)) then
-            fcommon.DropDownMenu(title,function()
-                local skipped_entries = 0
-                for j=1,#model_table,1 do
-                    local toolip = func_show_tooltip(model_table[j])
-                    if store_table[tostring(model_table[j])] ~= nil and toolip ~= nil  then
-                        if (search_text == "") or (string.upper(toolip):find(string.upper(ffi.string(search_text))) ~= nil) then
-                            if skip_check == true or fvehicle.IsValidModForVehicle(model_table[j],getCarPointer(car)) then
-                                if imgui.ImageButton(store_table[tostring(model_table[j])],imgui.ImVec2(width,height),imgui.ImVec2(0,0),imgui.ImVec2(1,1),1,imgui.ImVec4(1,1,1,1),imgui.ImVec4(1,1,1,1)) then
-                                    if body_part == nil then
-                                        func_load_model(model_table[j])
-                                    else
-                                        func_load_model(model_table[j],body_part)
-                                    end
-                                end
-                                if func_show_tooltip == nil then
-                                    if imgui.IsMouseClicked(1) then
-                                        removeVehicleMod(car,model_table[j])
-                                        printHelpString("Component ~r~removed")
-                                    end
-                                end
-                                
-                                if func_show_tooltip ~= nil then
-                                    if imgui.IsItemHovered() then
-                                        if func_show_tooltip(model_table[j]) ~= nil and func_show_tooltip(model_table[j]) ~= "" then
-                                            imgui.BeginTooltip()
-                                            imgui.SetTooltip(func_show_tooltip(model_table[j]))
-                                            imgui.EndTooltip()
-                                        end
-                                    end
-                                end
-                            else
-                                skipped_entries = skipped_entries +1
-                            end
-                        else
-                            skipped_entries = skipped_entries +1
-                        end
-                        if (j-skipped_entries) % rows ~= 0 then
-                            imgui.SameLine(0.0,4.0)
-                        end
+        
+            if model_name ~= nil then
+                if imgui.IsItemHovered() then
+                    imgui.BeginTooltip()
+                    if identifier ~= fconst.IDENTIFIER.PAINTJOB and identifier ~= fconst.IDENTIFIER.CLOTH then
+                        imgui.SetTooltip(model .. "\n" .. model_name)
                     else
-                        if image_path ~= nil and doesFileExist(image_path..model_table[j]..image_extention) then
-                            lua_thread.create(module.LoadTextures,store_table,image_path,model_table,image_extention)
-                        else
-                            skipped_entries = skipped_entries + 1
-                        end
+                        imgui.SetTooltip(model_name)
+                    end
+                    imgui.EndTooltip()
+                end
+            end
+
+            if image_count % images_in_row ~= 0 then
+                imgui.SameLine(0.0,4.0)
+            end
+            image_count = image_count + 1
+        end
+    end
+
+    -- Draw images in a listed order for list tabs
+    if draw_type == fconst.DRAW_TYPE.LIST then
+        if imgui.BeginChild("") then 
+            for table_name,image_table in module.spairs(loaded_images_list) do
+                local valid_table = nil
+                for model,image in module.spairs(image_table) do
+                    if identifier ~= fconst.IDENTIFIER.COMPONENT or fvehicle.IsValidModForVehicle(tonumber(model),getCarPointer(getCarCharIsUsing(PLAYER_PED))) then
+                        if valid_table == nil then valid_table = {} end
+                        valid_table[model] = image
                     end
                 end
-            end)
+                if valid_table ~= nil then
+                    if imgui.CollapsingHeader(table_name) then
+                        imgui.Spacing()
+                        for model,image in pairs(valid_table) do
+                            draw_image(identifier,valid_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,search_box_text,model,image)
+                        end
+                        imgui.Spacing()
+                        imgui.Separator()
+                        imgui.Spacing()
+                    end
+                end
+            end
+            imgui.EndChild()
         end
-        break
     end
+
+    -- Draw all images one by one for search tabs
+    if draw_type == fconst.DRAW_TYPE.SEARCH then 
+        if imgui.BeginChild("") then 
+            for _,image_table in pairs(loaded_images_list) do
+                for model,image in pairs(image_table) do
+                    draw_image(identifier,image_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,search_box_text,model,image)
+                end
+            end
+            imgui.EndChild()
+        end
+    end
+    
 end
 
 function module.RadioButton(label,rb_table,addr_table)
@@ -355,7 +325,7 @@ function module.CheckBox(arg)
 end
 
 
-
+-- Provides input options to change game stats
 function module.UpdateStat(arg)
     if arg.min == nil then arg.min = 0 end
     if arg.default == nil then arg.default = 0 end
@@ -408,24 +378,8 @@ function module.UpdateStat(arg)
     end)
 end
 
-function module.RwMemory(address,size,value,protect,is_float)
-    if protect == nil then protect = false end
-
-    if value == nil then
-        if is_float == true then
-            return memory.getfloat(address,protect)
-        else
-            return readMemory(address,size,protect)
-        end
-    else
-        if is_float == true then
-            memory.setfloat(address,value,protect)
-        else
-            memory.write(address,value,size,protect)
-        end
-    end
-end
-
+-- Similar UI to the previous function
+-- Provides input options to change game memory values
 function module.UpdateAddress(arg)
     if arg.default == nil then arg.default = 0 end
     if arg.cvalue == nil then arg.cvalue = 1 end
@@ -483,11 +437,89 @@ function module.UpdateAddress(arg)
     end)
 end
 
+--------------------------------------------------
+
+
+--------------------------------------------------
+-- Functions for loading & saving json files
+
+function module.LoadJson(filename)
+    local full_path = tcheatmenu.dir .. "json//" .. filename .. ".json"
+    if doesFileExist(full_path) then
+        local file = io.open(full_path, "r")
+        local table = decodeJson(file:read("*a"))
+        file:close()
+        return table
+    end
+    return {}
+end
+
+function module.SaveJson(filename,table)
+    local full_path = tcheatmenu.dir .. "json//" .. filename .. ".json"
+    local file = assert(io.open(full_path, "w"))
+    file:write(encodeJson(table))
+    file:close()
+end
+--------------------------------------------------
+
+
+--------------------------------------------------
+-- Misc
+
+-- Loads images recursively from root directory
+function module.LoadImages(mainDir,store_image_table,req_ext,dir)
+    for file in lfs.dir(mainDir) do
+        wait(0)
+        if doesFileExist(mainDir .. "\\" .. file) then
+            local _,file_name,file_ext = string.match(mainDir .. "\\" .. file, "(.-)([^\\/]-%.?([^%.\\/]*))$") 
+            file_name = string.sub(file_name,1,-5)
+
+            if req_ext == file_ext then
+                if store_image_table[dir] == nil then
+                    store_image_table[dir] = {}
+                end
+                store_image_table[dir][file_name] = imgui.CreateTextureFromFile(mainDir .. file)
+            end
+        end
+        if doesDirectoryExist(mainDir .. "\\" .. file) and file ~= "." and file ~= ".." then
+           module.LoadImages(mainDir .. "\\" .. file .. "\\",store_image_table,req_ext,file)
+        end
+    end
+end
+
+-- Used to read/write from/to memory
+function module.RwMemory(address,size,value,protect,is_float)
+    if protect == nil then protect = false end
+
+    if value == nil then
+        if is_float == true then
+            return memory.getfloat(address,protect)
+        else
+            return readMemory(address,size,protect)
+        end
+    else
+        if is_float == true then
+            memory.setfloat(address,value,protect)
+        else
+            memory.write(address,value,size,protect)
+        end
+    end
+end
+
+function module.CheatActivated()
+    printHelpString("Cheat ~g~Activated")
+end
+
+function module.CheatDeactivated()
+    printHelpString("Cheat ~r~Deactivated")
+end
+
 function module.KeyWait(key1,key2)
     while isKeyDown(key1)
     and isKeyDown(key2) do
         wait(0)
     end
 end
+--------------------------------------------------
 
 return module

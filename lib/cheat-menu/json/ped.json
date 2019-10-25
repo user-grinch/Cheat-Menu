@@ -187,16 +187,10 @@
     "188" : "SWMYST",
     "189" : "WMYVA",
     "190" : "COPGRL1",
-    "190" : "COPGRL3",
-    "191" : "GUNGRL1",
     "191" : "GUNGRL3",
-    "192" : "MECGRL1",
     "192" : "MECGRL3",
-    "193" : "NURGRL1",
     "193" : "NURGRL3",
-    "194" : "CROGRL1",
     "194" : "CROGRL3",
-    "195" : "GANGRL3",
     "195" : "GANGRL1",
     "196" : "CWFOFR",
     "197" : "CWFOHB",
@@ -301,6 +295,5 @@
     "296" : "JIZZY",
     "297" : "MADDOGG",
     "298" : "CAT",
-    "299" : "CLAUDE",
     "299" : "CLAUDE"
 }

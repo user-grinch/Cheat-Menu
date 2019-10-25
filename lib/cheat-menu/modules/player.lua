@@ -18,14 +18,14 @@ local module = {}
 
 module.tplayer =
 {
-    aimSkinChanger    = imgui.new.bool(fconfig.get('tplayer.aimSkinChanger',false)),
-    cjBody            = imgui.new.int(fconfig.get('tplayer.cjBody',0)),
+    aimSkinChanger    = imgui.new.bool(fconfig.Get('tplayer.aimSkinChanger',false)),
+    cjBody            = imgui.new.int(fconfig.Get('tplayer.cjBody',0)),
     clothes           = 
     { 
         images        = {},
         path          = tcheatmenu.dir .. "clothes\\",
     },
-    god               = imgui.new.bool(fconfig.get('tplayer.god',false)),
+    god               = imgui.new.bool(fconfig.Get('tplayer.god',false)),
     never_wanted      = imgui.new.bool(false),
     skins =
     {
@@ -34,8 +34,9 @@ module.tplayer =
 }
 
 function module.ChangePlayerModel(model)
-    if  fped.tped.names[tostring(model)] ~= "" then
-        if fped.tped.special[tostring(model)] ~= "" then
+    model = tonumber(model)
+    if fped.tped.names[tostring(model)] ~= nil then
+        if fped.tped.special[tostring(model)] == nil then
             if isModelAvailable(model) then
                 requestModel(model)
                 loadAllModelsNow()
@@ -50,13 +51,14 @@ function module.ChangePlayerModel(model)
             loadAllModelsNow()
             setPlayerModel(PLAYER_HANDLE,290)
         end
-        local car = nil
         if isCharInAnyCar(PLAYER_PED) then
             car = getCarCharIsUsing(PLAYER_PED)
+            speed = getCarSpeed(car)
         end
         clearCharTasksImmediately(PLAYER_PED)
         if car ~= nil then
             taskWarpCharIntoCarAsDriver(PLAYER_PED,car)
+            setCarForwardSpeed(car,speed)
         end
         printHelpString("~g~Skin~w~ changed")
     end
@@ -153,35 +155,6 @@ function HealthArmour()
     end)
 end
 
-function module.GetClotheName(name)
-    local model, texture = name:match("([^$]+)$([^$]+)")
-    return texture
-end
-
-function module.ChangePlayerClothe(name,body_part)
-    local model, texture = name:match("([^$]+)$([^$]+)")
-    
-    setPlayerModel(PLAYER_HANDLE,0)
-    givePlayerClothesOutsideShop(PLAYER_HANDLE,0,0,body_part)
-    givePlayerClothesOutsideShop(PLAYER_HANDLE,texture,model,body_part)
-    buildPlayerModel(PLAYER_HANDLE)
-    printHelpString("Clothes changed")
-end
-
-function ShowClothes(label,path,body_part,search_text)
-
-    local mask = path .. "*.jpg"
-    local handle,file = findFirstFile(mask)
-    local model_table = {}
-
-    while handle and file do
-        table.insert( model_table,#model_table+1,string.sub( file,1,-5))
-        file = findNextFile(handle)
-    end
-    fcommon.ShowEntries(label,model_table,100,80,module.tplayer.clothes.images,path,".jpg",fplayer.ChangePlayerClothe,fplayer.GetClotheName,true,nil,body_part,search_text)
-end
-
-
 function WantedLevelMenu()
     
     fcommon.DropDownMenu("Wanted level",function()
@@ -230,28 +203,9 @@ function SkinChangerMenu()
 
     imgui.Spacing()
     if imgui.BeginTabBar("Skins") then
-
-        for dir in lfs.dir(fped.tped.path) do
-            if doesDirectoryExist(fped.tped.path .. dir) and dir ~= "." and dir ~= ".." then
-                if imgui.BeginTabItem(dir) then
-                    imgui.Spacing()
-                    if imgui.BeginChild("Skins##" .. dir) then
-                        for subdir in lfs.dir(fped.tped.path .. dir) do
-                            if doesDirectoryExist(fped.tped.path .. dir .. "\\" .. subdir) and subdir ~= "." and subdir ~= ".." then
-                                list = {}
-                                for pic in lfs.dir(fped.tped.path .. dir .. "\\" .. subdir) do
-                                    if doesFileExist(fped.tped.path .. dir .. "\\" .. subdir .. "\\" .. pic) then
-                                        table.insert(list,tonumber(string.sub(pic,1,-5)))
-                                    end
-                                end
-                                fcommon.ShowEntries(subdir,list,110,55,fped.tped.images,(fped.tped.path .. dir .. "\\" .. subdir .. "\\"),".jpg",fplayer.ChangePlayerModel,fped.GetName,true)
-                            end
-                        end
-                        imgui.EndChild()
-                    end
-                    imgui.EndTabItem()
-                end
-            end
+        if imgui.BeginTabItem("List") then
+            fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.LIST,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.ChangePlayerModel,nil,fped.GetModelName,ffi.string(module.tplayer.skins.search_text))
+            imgui.EndTabItem()
         end
         if imgui.BeginTabItem("Search") then
             imgui.Spacing()
@@ -260,42 +214,37 @@ function SkinChangerMenu()
             imgui.SameLine()
 
             imgui.Spacing()
-            imgui.Text("Found skins :(" .. ffi.string(module.tplayer.skins.search_text) .. ")")
+            imgui.Text("Skins found :(" .. ffi.string(module.tplayer.skins.search_text) .. ")")
             imgui.Separator()
             imgui.Spacing()
-            if imgui.BeginChild("Skin entries") then
-                for dir in lfs.dir(fped.tped.path) do
-                    if doesDirectoryExist(fped.tped.path .. dir) and dir ~= "." and dir ~= ".." then  
-                        for subdir in lfs.dir(fped.tped.path .. dir) do
-                            if doesDirectoryExist(fped.tped.path .. dir .. "\\" .. subdir) and subdir ~= "." and subdir ~= ".." then
-                                for pic in lfs.dir(fped.tped.path .. dir .. "\\" .. subdir) do
-                                    if doesFileExist(fped.tped.path .. dir .. "\\" .. subdir .. "\\" .. pic) then
-                                        temp = {}
-                                        model = tonumber(string.sub(pic,1,-5))
-                                        for key, value in pairs(fped.tped.model_list) do
-                                            if value == model then
-                                                model = nil
-                                            end
-                                        end
-                                        table.insert(fped.tped.model_list,model)
-                                        table.insert(temp,model)
-                                        lua_thread.create(fcommon.LoadTextures,fped.tped.images,(fped.tped.path .. dir .. "\\" .. subdir .. "\\"),temp,".jpg")
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-                fcommon.ShowEntries(nil,fped.tped.model_list,110,55,fped.tped.images,nil,".jpg",fplayer.ChangePlayerModel,fped.GetName,true,module.tplayer.skins.search_text)
-                imgui.EndChild()
-            end
+            fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.SEARCH,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.ChangePlayerModel,nil,fped.GetModelName,ffi.string(module.tplayer.skins.search_text))
             imgui.EndTabItem()
         end
         imgui.EndTabBar()
     end
-
 end
 
+--------------------------------------------------
+-- Cloth functions
+
+function module.GetClothName(name)
+    local body_part, model, texture = name:match("([^$]+)$([^$]+)$([^$]+)")
+    return texture
+end
+
+function module.ChangePlayerCloth(name)
+    local body_part, model, texture = name:match("([^$]+)$([^$]+)$([^$]+)")
+    
+    setPlayerModel(PLAYER_HANDLE,0)
+    givePlayerClothesOutsideShop(PLAYER_HANDLE,0,0,body_part)
+    givePlayerClothesOutsideShop(PLAYER_HANDLE,texture,model,body_part)
+    buildPlayerModel(PLAYER_HANDLE)
+    printHelpString("Clothes changed")
+    clearCharTasksImmediately(PLAYER_PED)
+end
+--------------------------------------------------
+
+-- Main function
 function module.PlayerMain()
 
     if imgui.BeginTabBar('Player') then
@@ -381,28 +330,7 @@ function module.PlayerMain()
                 imgui.Spacing()
                 
                 if imgui.BeginTabItem("List") then
-                    if imgui.BeginChild("Clothes") then
-        
-                        ShowClothes("Extras",fplayer.tplayer.clothes.path .. "Extras\\",17)   
-                        ShowClothes("Glasses",fplayer.tplayer.clothes.path .. "Glasses\\",15)
-                        ShowClothes("Hats",fplayer.tplayer.clothes.path .. "Hats\\",16)
-                        ShowClothes("Heads",fplayer.tplayer.clothes.path .. "Heads\\",1)
-                        ShowClothes("Necklaces",fplayer.tplayer.clothes.path .. "Necklaces\\",13)
-                        ShowClothes("Shirts",fplayer.tplayer.clothes.path .. "Shirts\\",0)
-                        ShowClothes("Shoes",fplayer.tplayer.clothes.path .. "Shoes\\",3)
-                        ShowClothes("Tattoos back",fplayer.tplayer.clothes.path .. "Tattoos back\\",8)
-                        ShowClothes("Tattoos left chest",fplayer.tplayer.clothes.path .. "Tattoos left chest\\",9)
-                        ShowClothes("Tattoos left lower arm",fplayer.tplayer.clothes.path .. "Tattoos left lower arm\\",4)
-                        ShowClothes("Tattoos left upper arm",fplayer.tplayer.clothes.path .. "Tattoos left upper arm\\",5)
-                        ShowClothes("Tattoos lower back",fplayer.tplayer.clothes.path .. "Tattoos lower back\\",12)  
-                        ShowClothes("Tattoos right chest",fplayer.tplayer.clothes.path .. "Tattoos right chest\\",10)
-                        ShowClothes("Tattoos right lower arm",fplayer.tplayer.clothes.path .. "Tattoos right lower arm\\",7)
-                        ShowClothes("Tattoos right upper arm",fplayer.tplayer.clothes.path .. "Tattoos right upper arm\\",6)
-                        ShowClothes("Tattoos stomach",fplayer.tplayer.clothes.path .. "Tattoos stomach\\",11)
-                        ShowClothes("Trousers",fplayer.tplayer.clothes.path .. "Trousers\\",2)
-                        ShowClothes("Watches",fplayer.tplayer.clothes.path .. "Watches\\",14)
-                        imgui.EndChild()
-                    end
+                    fcommon.DrawImages(fconst.IDENTIFIER.CLOTH,fconst.DRAW_TYPE.LIST,module.tplayer.clothes.images,fconst.CLOTH.IMAGE_HEIGHT,fconst.CLOTH.IMAGE_WIDTH,module.ChangePlayerCloth,nil,module.GetClothName)
                     imgui.EndTabItem()
                 end 
                 imgui.EndTabBar()

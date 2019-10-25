@@ -32,18 +32,18 @@ module.tgame                =
         names               = {"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"},
         array               = {},
     },    
-    disable_cheats          = imgui.new.bool(fconfig.get('tgame.disable_cheats',false)),
-    disable_help_popups     = imgui.new.bool(fconfig.get('tgame.disable_help_popups',false)),
-    fps_limit               = imgui.new.int(fconfig.get('tgame.fps_limit',30)),
-    ghost_cop_cars          = imgui.new.bool(fconfig.get('tgame.ghost_cop_cars',false)),
-    keep_stuff              = imgui.new.bool(fconfig.get('tgame.keep_stuff',false)),
-    random_cheats           = imgui.new.bool(fconfig.get('tgame.random_cheats',false)),
+    disable_cheats          = imgui.new.bool(fconfig.Get('tgame.disable_cheats',false)),
+    disable_help_popups     = imgui.new.bool(fconfig.Get('tgame.disable_help_popups',false)),
+    fps_limit               = imgui.new.int(fconfig.Get('tgame.fps_limit',30)),
+    ghost_cop_cars          = imgui.new.bool(fconfig.Get('tgame.ghost_cop_cars',false)),
+    keep_stuff              = imgui.new.bool(fconfig.Get('tgame.keep_stuff',false)),
+    random_cheats           = imgui.new.bool(fconfig.Get('tgame.random_cheats',false)),
     script_manager          =
     {
         search_text         = imgui.new.char[64](""),
         disabled            = {},
     },
-    ss_shortcut             = imgui.new.bool(fconfig.get('tgame.ss_shortcut',false)), 
+    ss_shortcut             = imgui.new.bool(fconfig.Get('tgame.ss_shortcut',false)), 
     weather                 =
     {    
         names               = 
@@ -79,25 +79,6 @@ module.tgame                =
 module.tgame.day.array      = imgui.new['const char*'][#module.tgame.day.names](module.tgame.day.names)
 module.tgame.weather.array  = imgui.new['const char*'][#module.tgame.weather.names](module.tgame.weather.names)
 
-function CheatsEntry(func,names)
-    
-    local sizeX = imgui.GetWindowContentRegionWidth() / 3
-    local sizeY = imgui.GetWindowHeight()/15
-    fcommon.DropDownMenu(names[1],function()
-        imgui.Spacing()
-
-        for i = 1, #func do
-
-            if imgui.Button(names[i+1],imgui.ImVec2(sizeX,sizeY)) then
-                callFunction(func[i],1,1)
-                fcommon.CheatActivated()
-            end
-            if i % 3 ~= 0 then
-                imgui.SameLine()
-            end
-        end
-    end)
-end
 
 function module.AirbreakMode()
     if module.tgame.airbreak[0] then
@@ -136,6 +117,40 @@ function module.AirbreakMode()
         if isKeyDown(tkeys.airbreak_right)then
             setCharHeading(PLAYER_PED,getCharHeading(PLAYER_PED)-1.0)
             setCameraBehindPlayer()
+        end
+    end
+end
+
+function CheatsEntry(func,names)
+    local sizeX = imgui.GetWindowContentRegionWidth() / 3
+    local sizeY = imgui.GetWindowHeight()/15
+    fcommon.DropDownMenu(names[1],function()
+        imgui.Spacing()
+
+        for i = 1, #func do
+
+            if imgui.Button(names[i+1],imgui.ImVec2(sizeX,sizeY)) then
+                callFunction(func[i],1,1)
+                fcommon.CheatActivated()
+            end
+            if i % 3 ~= 0 then
+                imgui.SameLine()
+            end
+        end
+    end)
+end
+
+function module.RandomCheats()
+    while true do
+        if module.tgame.random_cheats[0] then
+            cheatid = math.random(1,92)
+            if cheatid ~= 29 then  -- Suicide cheat
+                callFunction(0x00438370,1,1,cheatid)
+                fcommon.CheatActivated()
+            end
+            wait(10000)
+        else
+            wait(0)
         end
     end
 end
@@ -187,21 +202,6 @@ function SetTime()
     end)
 end
 
-function module.RandomCheats()
-    while true do
-        if module.tgame.random_cheats[0] then
-            cheatid = math.random(1,92)
-            if cheatid ~= 29 then  -- Suicide cheat
-                callFunction(0x00438370,1,1,cheatid)
-                fcommon.CheatActivated()
-            end
-            wait(10000)
-        else
-            wait(0)
-        end
-    end
-end
-
 function SetCurrentWeekday()
     imgui.Spacing()
     local current_day = imgui.new.int(readMemory(0xB7014E,1,false)-1)
@@ -219,6 +219,9 @@ function SetWeather()
         fcommon.CheatActivated()
     end
 end
+
+--------------------------------------------------
+-- Functions of script manager
 
 function ShowScriptDisabled(name,path,search_text)
     fcommon.DropDownMenu(name .. "##" .. path,function()
@@ -292,6 +295,10 @@ function ShowScriptEnabled(script,search_text,index)
     end)
 end
 
+--------------------------------------------------
+
+
+-- Main function
 function module.GameMain()
     if imgui.Button("Save game",imgui.ImVec2(fcommon.GetSize(1))) then
         if isCharOnFoot(PLAYER_PED) then
@@ -442,7 +449,7 @@ function module.GameMain()
 			if imgui.InputText("Search",module.tgame.script_manager.search_text,ffi.sizeof(module.tgame.script_manager.search_text)) then end
 			fcommon.InformationTooltip("Moonloader scripts manager")
 			imgui.Spacing()
-			imgui.Text("Found scripts :(" .. ffi.string(module.tgame.script_manager.search_text) .. ")")
+			imgui.Text("Scripts found :(" .. ffi.string(module.tgame.script_manager.search_text) .. ")")
 			imgui.Separator()
 			imgui.Spacing()
 			if imgui.BeginChild("Script entries") then

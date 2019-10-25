@@ -18,29 +18,23 @@ local module = {}
 
 module.tweapon =
 {
-    fast_reload = imgui.new.bool(fconfig.get('tweapon.fast_reload',false)),
-    images = {},
-    models = {},
-    model_list = {},
-    names = fcommon.LoadJson("model names"),
-    no_reload = imgui.new.bool(fconfig.get('tweapon.no_reload',false)),
-    path = tcheatmenu.dir .. "weapons\\",
-    ped = imgui.new.bool(fconfig.get('tweapon.ped',false)),
-    quick_spawn = imgui.new.bool(fconfig.get('tweapon.quick_spawn',false)),
-    search_crawl = true,
+    fast_reload = imgui.new.bool(fconfig.Get('tweapon.fast_reload',false)),
+    images      = {},
+    names       = fcommon.LoadJson("model names"),
+    no_reload   = imgui.new.bool(fconfig.Get('tweapon.no_reload',false)),
+    path        = tcheatmenu.dir .. "weapons",
+    ped         = imgui.new.bool(fconfig.Get('tweapon.ped',false)),
+    quick_spawn = imgui.new.bool(fconfig.Get('tweapon.quick_spawn',false)),
     search_text = imgui.new.char[20](""),   
 }
 
-for i = 1,46,1 do
-    table.insert(module.tweapon.models,i)
-end
-
+-- Returns weapon name
 function module.GetModelName(id)
-    return module.tweapon.names[tostring(id)] or ""
+    return module.tweapon.names[id] or ""
 end
 
+-- Used in quick spawner (fcommon)
 function module.CBaseWeaponInfo(name)
-
     local weapon = callFunction(0x743D10,1,1,name)
     if name ~= "" and getWeapontypeModel(weapon) ~= 0 then
         return weapon
@@ -49,7 +43,9 @@ function module.CBaseWeaponInfo(name)
     end
 end
 
+-- Gives weapon to player or ped
 function module.GiveWeapon(weapon)
+    weapon = tonumber(weapon)
     model = getWeapontypeModel(weapon)
     if isModelAvailable(model) then
         requestModel(model)
@@ -70,6 +66,7 @@ function module.GiveWeapon(weapon)
     end
 end
 
+-- Main function
 function module.WeaponMain()
     imgui.Spacing()
     if imgui.Button("Remove current weapon",imgui.ImVec2(fcommon.GetSize(2))) then
@@ -149,11 +146,7 @@ function module.WeaponMain()
                 
                 if imgui.BeginTabItem("List") then
                     imgui.Spacing()
-
-                    if imgui.BeginChild("Weapon List Child") then
-                        fcommon.ListCrawl(module.tweapon.path,module.tweapon.images,".png",65,65,module.GiveWeapon,module.GetModelName,true)
-                        imgui.EndChild()
-                    end
+                    fcommon.DrawImages(fconst.IDENTIFIER.WEAPON,fconst.DRAW_TYPE.LIST,module.tweapon.images,fconst.WEAPON.IMAGE_HEIGHT,fconst.WEAPON.IMAGE_WIDTH,module.GiveWeapon,nil,module.GetModelName)
                     imgui.EndTabItem()
                 end
                 if imgui.BeginTabItem("Search") then
@@ -162,15 +155,10 @@ function module.WeaponMain()
                     imgui.SameLine()
         
                     imgui.Spacing()
-                    imgui.Text("Found weapons :(" .. ffi.string(module.tweapon.search_text) .. ")")
+                    imgui.Text("Weapons found :(" .. ffi.string(module.tweapon.search_text) .. ")")
                     imgui.Separator()
                     imgui.Spacing()
-                    if imgui.BeginChild("Weapon Entries") then
-
-                        lua_thread.create(fcommon.SearchCrawl,module.tweapon.model_list,module.tweapon.path,module.tweapon.images,".png")
-                        fcommon.ShowEntries(nil,module.tweapon.model_list,65,65,module.tweapon.images,nil,".png", module.GiveWeapon,module.GetModelName,true,module.tweapon.search_text)
-                        imgui.EndChild()
-                    end
+                    fcommon.DrawImages(fconst.IDENTIFIER.WEAPON,fconst.DRAW_TYPE.SEARCH,module.tweapon.images,fconst.WEAPON.IMAGE_HEIGHT,fconst.WEAPON.IMAGE_WIDTH,module.GiveWeapon,nil,module.GetModelName,ffi.string(module.tweapon.search_text))
                     imgui.EndTabItem()
                 end
                 imgui.EndTabBar()

@@ -20,9 +20,9 @@ module.tvehicle =
 {
     aircraft =
     {
-        camera = imgui.new.bool(fconfig.get('tvehicle.aircraft.camera',false)),
-        index = fconfig.get('tvehicle.aircraft.index',2),
-        spawn_in_air = imgui.new.bool(fconfig.get('tvehicle.aircraft.spawn_in_air',true)),
+        camera = imgui.new.bool(fconfig.Get('tvehicle.aircraft.camera',false)),
+        index = fconfig.Get('tvehicle.aircraft.index',2),
+        spawn_in_air = imgui.new.bool(fconfig.Get('tvehicle.aircraft.spawn_in_air',true)),
         zoom = { -5.0,-15.0,-20.0,-30.0,-40.0},
     },
     color =
@@ -72,30 +72,26 @@ module.tvehicle =
         "All",
     },
     door_menu_button = imgui.new.int(0),
-    heavy = imgui.new.bool(fconfig.get('tvehicle.heavy',false)),
-    hydraulic = imgui.new.bool(false),
+    heavy = imgui.new.bool(fconfig.Get('tvehicle.heavy',false)),
     images = {},
-    lights = imgui.new.bool(fconfig.get('tvehicle.lights',false)),
+    lights = imgui.new.bool(fconfig.Get('tvehicle.lights',false)),
     lock_doors = imgui.new.bool(false),
-    lock_speed = imgui.new.bool(fconfig.get('tvehicle.lock_speed',false)),
-    models = {},
+    lock_speed = imgui.new.bool(fconfig.Get('tvehicle.lock_speed',false)),
     names = fcommon.LoadJson("model names"),
     paintjobs  = 
     {
-        path   =  tcheatmenu.dir .. "vehicles\\paintjobs\\",
+        path   =  tcheatmenu.dir .. "vehicles\\paintjobs",
         search_text = imgui.new.char[20](),
         images = {},
         texture = nil
     },
-    model_list = {},
-    no_damage = imgui.new.bool(fconfig.get('tvehicle.no_damage',false)),
-    list = {},
-    path = tcheatmenu.dir .. "vehicles\\images\\",
-    quick_spawn  = imgui.new.bool(fconfig.get('tvehicle.quick_spawn',false)),
+    no_damage = imgui.new.bool(fconfig.Get('tvehicle.no_damage',false)),
+    path = tcheatmenu.dir .. "vehicles\\images",
+    quick_spawn  = imgui.new.bool(fconfig.Get('tvehicle.quick_spawn',false)),
     search_text = imgui.new.char[20](),
-    spawn_inside = imgui.new.bool(fconfig.get('tvehicle.spawn_inside',true)),
-    speed = imgui.new.int(fconfig.get('tvehicle.speed',0)),
-    stay_on_bike = imgui.new.bool(fconfig.get('tvehicle.stay_on_bike',false)),
+    spawn_inside = imgui.new.bool(fconfig.Get('tvehicle.spawn_inside',true)),
+    speed = imgui.new.int(fconfig.Get('tvehicle.speed',0)),
+    stay_on_bike = imgui.new.bool(fconfig.Get('tvehicle.stay_on_bike',false)),
     trains =
     {
         ["449"]     = 9,
@@ -105,21 +101,18 @@ module.tvehicle =
         ["538"]     = 11,
         ["570"]     = 11,
     },
-    visual_damage = imgui.new.bool(fconfig.get('tvehicle.visual_damage',false)),
+    visual_damage = imgui.new.bool(fconfig.Get('tvehicle.visual_damage',false)),
 
 }
 
 module.tvehicle.components.list  = imgui.new['const char*'][#module.tvehicle.components.names](module.tvehicle.components.names)
 
 module.IsValidModForVehicle = ffi.cast('bool(*)(int model, int cvehicle)',0x49B010)
+
 IsThisModelATrain = ffi.cast('bool(*)(int model)',0x4C5AD0)
 
-for i = 401,611,1 do
-    table.insert(module.tvehicle.models,i)
-end
-
+-- Used in quick spawner (fcommon)
 function module.CBaseModelInfo(name)
-
     local pInfo = allocateMemory(16)
     callFunction(0x004C5940,2,2,name,pInfo)
     local model = readMemory(pInfo,4,false)
@@ -132,7 +125,14 @@ function module.CBaseModelInfo(name)
     end
 end
 
+-- Returns name of vehicle
+function module.GetModelName(id)
+    return getNameOfVehicleModel(tonumber(id)) or module.tvehicle.names[id] or ""
+end
+
+-- Spawns a vehicle for player
 function module.GiveVehicleToPlayer(model)
+    model = tonumber(model)
     if isModelAvailable(model) then
         x,y,z = getCharCoordinates(PLAYER_PED)
         if isCharInAnyCar(PLAYER_PED) and module.tvehicle.spawn_inside[0] then
@@ -192,23 +192,7 @@ function module.GiveVehicleToPlayer(model)
     end
 end
 
-
-function module.AddComponentToVehicle(component)
-
-    if isCharInAnyCar(PLAYER_PED) then
-        local car = getCarCharIsUsing(PLAYER_PED)
-        if isModelAvailable(component) then
-            requestVehicleMod(component)
-            loadAllModelsNow()
-            addVehicleMod(car,component)
-            printHelpString("Component ~g~added")
-            markModelAsNoLongerNeeded(component)
-        end
-    end
-end
-
 function DoorMenu(func)
-
     local vehicle = getCarCharIsUsing(PLAYER_PED)
     local seats   = getMaximumNumberOfPassengers(vehicle) + 1 -- passenger + driver 
     
@@ -232,22 +216,6 @@ function DoorMenu(func)
     end
 
 end   
-
-function module.ForEachCarComponent(func)
-    if isCharInAnyCar(PLAYER_PED) then
-        car = getCarCharIsUsing(PLAYER_PED)
-        for _, comp in ipairs(mad.get_all_vehicle_components(car)) do
-            for _, obj in ipairs(comp:get_objects()) do
-                for _, mat in ipairs(obj:get_materials()) do
-                    func(mat,comp,car)
-                end
-            end
-        end
-        markCarAsNoLongerNeeded(car)
-    else
-        printHelpString("Player ~r~not ~w~in car")
-    end
-end
 
 function module.AircraftCamera()
     if module.tvehicle.aircraft.camera[0] == true then
@@ -274,6 +242,25 @@ function module.AircraftCamera()
     end
 end
 
+--------------------------------------------------
+-- Vehicle Paintjobs
+
+function module.ForEachCarComponent(func)
+    if isCharInAnyCar(PLAYER_PED) then
+        car = getCarCharIsUsing(PLAYER_PED)
+        for _, comp in ipairs(mad.get_all_vehicle_components(car)) do
+            for _, obj in ipairs(comp:get_objects()) do
+                for _, mat in ipairs(obj:get_materials()) do
+                    func(mat,comp,car)
+                end
+            end
+        end
+        markCarAsNoLongerNeeded(car)
+    else
+        printHelpString("Player ~r~not ~w~in car")
+    end
+end
+
 function module.GetTextureName(name)
     if name == nil then
         return ""
@@ -284,7 +271,7 @@ end
 
 function module.ApplyTexture(filename)
     lua_thread.create(function()
-        local fullpath = module.tvehicle.paintjobs.path .. filename .. ".png"
+        local fullpath = module.tvehicle.paintjobs.path .. "\\images\\" .. filename .. ".png"
         module.tvehicle.paintjobs.texture = assert(mad.load_png_texture(fullpath))
         module.ForEachCarComponent(function(mat,comp,car)
             local r, g, b, old_a = mat:get_color()
@@ -299,11 +286,37 @@ function module.ApplyTexture(filename)
     end,filename)
 end
 
-function module.GetModelName(id)
-    
-    return getNameOfVehicleModel(id) or module.tvehicle.names[tostring(id)] or ""
+--------------------------------------------------
+
+
+--------------------------------------------------
+-- Add car component - tune
+
+function module.AddComponentToVehicle(component)
+    component = tonumber(component)
+    if isCharInAnyCar(PLAYER_PED) then
+        local car = getCarCharIsUsing(PLAYER_PED)
+        if isModelAvailable(component) then
+            requestVehicleMod(component)
+            loadAllModelsNow()
+            addVehicleMod(car,component)
+            printHelpString("Component ~g~added")
+            markModelAsNoLongerNeeded(component)
+        end
+    end
 end
 
+function module.RemoveComponentFromVehicle(model)
+
+    local car = getCarCharIsUsing(PLAYER_PED)
+    removeVehicleMod(car,tonumber(model))
+    printHelpString("Component ~r~removed")
+end
+
+--------------------------------------------------
+
+
+-- Main function
 function module.VehicleMain()
     imgui.Spacing()
 
@@ -331,30 +344,18 @@ function module.VehicleMain()
             imgui.Columns(2,nil,false)
             
             fcommon.CheckBox({ address = 0x96914F,name = "Aggressive drivers"})
+            fcommon.CheckBox({ address = 0x969165,name = "All cars have nitro"})
             fcommon.CheckBox({ address = 0x969153,name = "Boats fly"})
             fcommon.CheckBox({ address = 0x969160,name = "Cars fly"})
             fcommon.CheckBox({name = "Car heavy",var = module.tvehicle.heavy})
-            if imgui.Checkbox("Car hydraulic",module.tvehicle.hydraulic) then
-                if isCharInAnyCar(PLAYER_PED) then
-                    if module.tvehicle.hydraulic[0] then
-                        setCarHydraulics(car,true)
-                        fcommon.CheatActivated()
-                    else
-                        setCarHydraulics(car,false)
-                        fcommon.CheatDeactivated()
-                    end
-                end
-            end
             fcommon.CheckBox({ address = 0x96917A,name = "Decreased traffic"})
             fcommon.CheckBox({name = "Dont fall off bike",var = module.tvehicle.stay_on_bike})
             fcommon.CheckBox({ address = 0x969152,name = "Drive on water"})
             fcommon.CheckBox({ address = 0x969166,name = "Float away when hit"})
-            fcommon.CheckBox({ address = 0x96914E,name = "Green traffic lights"})
 
             imgui.NextColumn()
 
-
-            fcommon.CheckBox({ address = 0x969165,name = "Have nitro"})
+            fcommon.CheckBox({ address = 0x96914E,name = "Green traffic lights"})
             fcommon.CheckBox({name = "Lights on",var = module.tvehicle.lights,func =
             function()
                 if isCharInAnyCar(PLAYER_PED) then
@@ -450,12 +451,16 @@ function module.VehicleMain()
                     end
                     
                 end)
-                fcommon.DropDownMenu("Enter",function()
+                fcommon.DropDownMenu("Enter nearest vehicle as",function()
                     local vehicle,ped = storeClosestEntities(PLAYER_PED)
                     if vehicle ~= -1 then
                         local seats = getMaximumNumberOfPassengers(vehicle)
                         imgui.Spacing()
-                        imgui.Text(string.format("Total seats %d",seats+1))
+                        imgui.Columns(2,nil,false)
+                        imgui.Text("Vehicle: " .. module.GetModelName(getCarModel(vehicle)))
+                        imgui.NextColumn()
+                        imgui.Text(string.format("Total seats: %d",seats+1))
+                        imgui.Columns(1)
                         imgui.Spacing()
                         imgui.Separator()
                         imgui.Spacing()
@@ -523,10 +528,7 @@ function module.VehicleMain()
             if imgui.BeginTabBar("Vehicles list") then
                 imgui.Spacing()
                 if imgui.BeginTabItem("List") then
-                    if imgui.BeginChild("Vehicles") then
-                        fcommon.ListCrawl(module.tvehicle.path,module.tvehicle.images,".jpg",75,100,module.GiveVehicleToPlayer,module.GetModelName,true)
-                        imgui.EndChild()
-                    end
+                    fcommon.DrawImages(fconst.IDENTIFIER.VEHICLE,fconst.DRAW_TYPE.LIST,module.tvehicle.images,fconst.VEHICLE.IMAGE_HEIGHT,fconst.VEHICLE.IMAGE_WIDTH,module.GiveVehicleToPlayer,nil,module.GetModelName)
                     imgui.EndTabItem()
                 end 
                 if imgui.BeginTabItem("Search") then
@@ -536,92 +538,68 @@ function module.VehicleMain()
                     imgui.SameLine()
         
                     imgui.Spacing()
-                    imgui.Text("Found entries :(" .. ffi.string(module.tvehicle.search_text) .. ")")
+                    imgui.Text("Vehicles found :(" .. ffi.string(module.tvehicle.search_text) .. ")")
                     imgui.Separator()
                     imgui.Spacing()
-                    if imgui.BeginChild("Vehicle entries") then 
-                        lua_thread.create(fcommon.SearchCrawl,module.tvehicle.model_list,module.tvehicle.path,module.tvehicle.images,".jpg")
-                        fcommon.ShowEntries(nil,module.tvehicle.model_list,75,100,module.tvehicle.images,nil,".jpg", module.GiveVehicleToPlayer,module.GetModelName,true,module.tvehicle.search_text)
-                        imgui.EndChild()
-                    end
+
+                    fcommon.DrawImages(fconst.IDENTIFIER.VEHICLE,fconst.DRAW_TYPE.SEARCH,module.tvehicle.images,fconst.VEHICLE.IMAGE_HEIGHT,fconst.VEHICLE.IMAGE_WIDTH,module.GiveVehicleToPlayer,nil,module.GetModelName,ffi.string(module.tvehicle.search_text))
                     imgui.EndTabItem()
                 end
                 imgui.EndTabBar()
             end
             imgui.EndTabItem()
         end
-        if imgui.BeginTabItem("Paint") then
-            imgui.Spacing()
-            imgui.Columns(1)
-            if imgui.InputText("Search",module.tvehicle.paintjobs.search_text,ffi.sizeof(module.tvehicle.paintjobs.search_text)) then end
-            imgui.SameLine()
-
-            imgui.Spacing()
-            imgui.Combo("Component",module.tvehicle.components.selected,module.tvehicle.components.list,#module.tvehicle.components.names)
-            if imgui.ColorEdit3("Color",module.tvehicle.color.rgb) then
-                module.ForEachCarComponent(function(mat,comp,car)
-                    local r, g, b, old_a = mat:get_color()
-                    fixCar(car)
-                    if module.tvehicle.components.selected[0] == 0 and (r == 0x3C and g == 0xFF and b == 0x00) or (r == 0xFF and g == 0x00 and b == 0xAF) then
-                        mat:set_color(module.tvehicle.color.rgb[0]*255, module.tvehicle.color.rgb[1]*255, module.tvehicle.color.rgb[2]*255, 255.0)
-                        if module.tvehicle.paintjobs.texture ~= nil then
-                            mat:set_texture(module.tvehicle.paintjobs.texture)
-                        end
-                    end
-                    if comp.name == module.tvehicle.components.names[module.tvehicle.components.selected[0]+1] then
-                        mat:set_color(module.tvehicle.color.rgb[0]*255, module.tvehicle.color.rgb[1]*255, module.tvehicle.color.rgb[2]*255, 255.0)
-                        if module.tvehicle.paintjobs.texture ~= nil then
-                            mat:set_texture(module.tvehicle.paintjobs.texture)
-                        end
-                    end
-                    module.tvehicle.color.default = getCarColours(car)
-                end)
-            end
-            imgui.Spacing()
-            if imgui.Button("Reset color",imgui.ImVec2(fcommon.GetSize(3))) then
-                module.ForEachCarComponent(function(mat,car)
-                    mat:reset_color()
-                    module.tvehicle.color.default = -1
-                end)
-            end
-            imgui.SameLine()
-            if imgui.Button("Reset texture",imgui.ImVec2(fcommon.GetSize(3))) then
-                module.ForEachCarComponent(function(mat,car)
-                    mat:reset_texture()
-                    module.tvehicle.paintjobs.texture = nil
-                end)
-            end
-            imgui.SameLine()
-            if imgui.Button("Reset texture 2",imgui.ImVec2(fcommon.GetSize(3))) then
-                module.ForEachCarComponent(function(mat,car)
-                    mat:reset_texture()
-                    module.tvehicle.paintjobs.texture = nil
-                end)
-            end
-            imgui.Spacing()
-            imgui.Text("Found entries :(" .. ffi.string(module.tvehicle.paintjobs.search_text) .. ")")
-            imgui.Separator()
-            imgui.Spacing()
-
-            
-            local mask = module.tvehicle.paintjobs.path .. "*.png"
-            local handle,file = findFirstFile(mask)
-            local model_table = {}
-
-            while handle and file do
-                table.insert( model_table,#model_table+1,string.sub( file,1,-5))
-                file = findNextFile(handle)
-            end
-        
-            if imgui.BeginChild("Vehicle entries") then
-              
-                fcommon.ShowEntries(nil,model_table,80,100,module.tvehicle.paintjobs.images,module.tvehicle.paintjobs.path,".png", module.ApplyTexture,module.GetTextureName,true,module.tvehicle.paintjobs.search_text)
-                imgui.EndChild()
-            end
-
-            imgui.EndTabItem()
-        end
         if isCharInAnyCar(PLAYER_PED) then
+            if imgui.BeginTabItem("Paint") then
+                imgui.Spacing()
+                imgui.Columns(1)
+                if imgui.InputText("Search",module.tvehicle.paintjobs.search_text,ffi.sizeof(module.tvehicle.paintjobs.search_text)) then end
+                imgui.SameLine()
+    
+                imgui.Spacing()
+                imgui.Combo("Component",module.tvehicle.components.selected,module.tvehicle.components.list,#module.tvehicle.components.names)
+                if imgui.ColorEdit3("Color",module.tvehicle.color.rgb) then
+                    module.ForEachCarComponent(function(mat,comp,car)
+                        local r, g, b, old_a = mat:get_color()
+                        fixCar(car)
+                        if module.tvehicle.components.selected[0] == 0 and (r == 0x3C and g == 0xFF and b == 0x00) or (r == 0xFF and g == 0x00 and b == 0xAF) then
+                            mat:set_color(module.tvehicle.color.rgb[0]*255, module.tvehicle.color.rgb[1]*255, module.tvehicle.color.rgb[2]*255, 255.0)
+                            if module.tvehicle.paintjobs.texture ~= nil then
+                                mat:set_texture(module.tvehicle.paintjobs.texture)
+                            end
+                        end
+                        if comp.name == module.tvehicle.components.names[module.tvehicle.components.selected[0]+1] then
+                            mat:set_color(module.tvehicle.color.rgb[0]*255, module.tvehicle.color.rgb[1]*255, module.tvehicle.color.rgb[2]*255, 255.0)
+                            if module.tvehicle.paintjobs.texture ~= nil then
+                                mat:set_texture(module.tvehicle.paintjobs.texture)
+                            end
+                        end
+                        module.tvehicle.color.default = getCarColours(car)
+                    end)
+                end
+                imgui.Spacing()
+                if imgui.Button("Reset color",imgui.ImVec2(fcommon.GetSize(2))) then
+                    module.ForEachCarComponent(function(mat,car)
+                        mat:reset_color()
+                        module.tvehicle.color.default = -1
+                    end)
+                end
+                imgui.SameLine()
+                if imgui.Button("Reset texture",imgui.ImVec2(fcommon.GetSize(2))) then
+                    module.ForEachCarComponent(function(mat,car)
+                        mat:reset_texture()
+                        module.tvehicle.paintjobs.texture = nil
+                    end)
+                end
+                imgui.Spacing()
+                imgui.Text("Paintjobs found :(" .. ffi.string(module.tvehicle.paintjobs.search_text) .. ")")
+                imgui.Separator()
+                imgui.Spacing()
+    
+                fcommon.DrawImages(fconst.IDENTIFIER.PAINTJOB,fconst.DRAW_TYPE.SEARCH,module.tvehicle.paintjobs.images,fconst.PAINTJOB.IMAGE_HEIGHT,fconst.PAINTJOB.IMAGE_WIDTH,module.ApplyTexture,nil,module.GetTextureName,ffi.string(module.tvehicle.paintjobs.search_text))
+                        
+                imgui.EndTabItem()
+            end
             if imgui.BeginTabItem('Tune') then
                 imgui.Spacing()
                 if imgui.Button("Restore mods",imgui.ImVec2(150,25)) then
@@ -640,7 +618,7 @@ function module.VehicleMain()
                 imgui.Spacing()
                 if imgui.BeginChild("Tune") then
                     imgui.Spacing()
-                    lua_thread.create(fcommon.ListCrawl,module.tvehicle.components.path,module.tvehicle.components.images,".jpg",80,100,module.AddComponentToVehicle,nil,false)
+                    fcommon.DrawImages(fconst.IDENTIFIER.COMPONENT,fconst.DRAW_TYPE.LIST,module.tvehicle.components.images,fconst.COMPONENT.IMAGE_HEIGHT,fconst.COMPONENT.IMAGE_WIDTH,module.AddComponentToVehicle,module.RemoveComponentFromVehicle)
                     imgui.EndChild()
                 end
                 imgui.EndTabItem()

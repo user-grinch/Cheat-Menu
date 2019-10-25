@@ -21,8 +21,10 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.8-wip")
-script_version_number(20191021) -- YYYYMMDD
+script_version_number(20191025) -- YYYYMMDD
 
+
+--------------------------------------------------
 -- All the command keys used throughout the Cheat-Menu
 tkeys =
 {
@@ -43,27 +45,24 @@ tkeys =
     aircraft_zoom     = 0x56, -- V
 }
 
-ffi           = require "ffi"
-imgui         = require 'mimgui'
-memory        = require 'memory'
-glob          = require 'game.globals'
-mad           = require 'MoonAdditions'
-lfs           = require 'lfs'
-
-Dir = string.format( "%s%s",getWorkingDirectory(),"//lib//cheat-menu//")
-
 tcheatmenu =
 {   
-    dir = Dir,
+    dir = string.format( "%s%s",getWorkingDirectory(),"\\lib\\cheat-menu\\"),
 }
 
--- Loading custom modules
-fconfig       = require 'cheat-menu.modules.config'
-if not pcall(fconfig.Read) then
-    printString("~r~Failed~w~ to load config file.",10000)
-end
+--------------------------------------------------
+-- Modules
+ffi           = require "ffi"
+glob          = require 'game.globals'
+imgui         = require 'mimgui'
+lfs           = require 'lfs'
+mad           = require 'MoonAdditions'
+memory        = require 'memory'
 
 fcommon       = require 'cheat-menu.modules.common'
+fconfig       = require 'cheat-menu.modules.config'
+fconst        = require 'cheat-menu.modules.const'
+
 fanimation    = require 'cheat-menu.modules.animation'
 fgame         = require 'cheat-menu.modules.game'
 fmemory       = require 'cheat-menu.modules.memory'
@@ -76,30 +75,33 @@ fteleport     = require 'cheat-menu.modules.teleport'
 fvehicle      = require 'cheat-menu.modules.vehicle'
 fvisual       = require 'cheat-menu.modules.visual'
 fweapon       = require 'cheat-menu.modules.weapon'
+--------------------------------------------------
 
+-- Unload cheat-menu if disable_in_samp == true
 if fmenu.tmenu.disable_in_samp[0] and isSampLoaded() then
     thisScript():reload()
 end
 
-resX,resY = getScreenResolution()
+resX, resY = getScreenResolution()
 
-tcheatmenu =
+tcheatmenu       =
 {   
-    dir = Dir,
-    window =
+    dir          = tcheatmenu.dir,
+    current_menu = fconfig.Get('tcheatmenu.current_menu',1),
+    window       =
     {
-        size =
+        show     = imgui.new.bool(false),
+        size     =
         {
-            X = fconfig.get('tcheatmenu.window.size.X',resX/4),
-            Y = fconfig.get('tcheatmenu.window.size.Y',resY/1.2),
+            X    = fconfig.Get('tcheatmenu.window.size.X',resX/4),
+            Y    = fconfig.Get('tcheatmenu.window.size.Y',resY/1.2),
         },
-        show    = imgui.new.bool(false),
-        title   = string.format("%s v%s by %s",script.this.name,script.this.version,script.this.authors[1]),
+        title    = string.format("%s v%s by %s",script.this.name,script.this.version,script.this.authors[1]),
     },
-    current_menu = fconfig.get('tcheatmenu.current_menu',1),
 }
 
 imgui.OnInitialize(function() -- Called once
+    
     -- Styles
     imgui.PushStyleVarFloat(imgui.StyleVar.WindowBorderSize,0)
     imgui.PushStyleVarFloat(imgui.StyleVar.FramePadding,3)
@@ -107,12 +109,23 @@ imgui.OnInitialize(function() -- Called once
     imgui.PushStyleVarFloat(imgui.StyleVar.PopupBorderSize,0)
     imgui.PushStyleVarFloat(imgui.StyleVar.ChildBorderSize,0)
     imgui.PushStyleVarFloat(imgui.StyleVar.WindowRounding,3)
+    imgui.PushStyleVarFloat(imgui.StyleVar.ScrollbarSize,12)
     imgui.PushStyleVarFloat(imgui.StyleVar.ScrollbarRounding,3)
     imgui.PushStyleVarFloat(imgui.StyleVar.TabRounding,3)
     imgui.PushStyleVarVec2(imgui.StyleVar.WindowTitleAlign,imgui.ImVec2(0.5,0.5))
     imgui.PushStyleColor(imgui.Col.Header, imgui.ImVec4(0,0,0,0))
+
+    --Loading images
+    lua_thread.create(fcommon.LoadImages,fvehicle.tvehicle.path,fvehicle.tvehicle.images,fconst.VEHICLE.IMAGE_EXT)
+    lua_thread.create(fcommon.LoadImages,fweapon.tweapon.path,fweapon.tweapon.images,fconst.WEAPON.IMAGE_EXT)
+    lua_thread.create(fcommon.LoadImages,fvehicle.tvehicle.paintjobs.path,fvehicle.tvehicle.paintjobs.images,fconst.PAINTJOB.IMAGE_EXT)
+    lua_thread.create(fcommon.LoadImages,fvehicle.tvehicle.components.path,fvehicle.tvehicle.components.images,fconst.COMPONENT.IMAGE_EXT)
+    lua_thread.create(fcommon.LoadImages,fped.tped.path,fped.tped.images,fconst.PED.IMAGE_EXT)
+    lua_thread.create(fcommon.LoadImages,fplayer.tplayer.clothes.path,fplayer.tplayer.clothes.images,fconst.CLOTH.IMAGE_EXT)
+
 end)
 
+-- Menu window
 imgui.OnFrame(
 function() -- condition
     return tcheatmenu.window.show[0] and not isGamePaused() 
@@ -143,8 +156,8 @@ function(self) -- render frame
 end)
 
 
+-- Overlay window
 imgui.OnFrame(function() 
-
     return not isGamePaused() and fmenu.tmenu.overlay.show[0] and (fmenu.tmenu.overlay.fps[0] or fmenu.tmenu.overlay.coordinates[0]
     or ((fmenu.tmenu.overlay.speed[0] or fmenu.tmenu.overlay.health[0]) and isCharInAnyCar(PLAYER_PED)))
 end,
@@ -220,8 +233,10 @@ function()
     imgui.End()
 end).HideCursor = true
 
-
 function main()
+
+    --------------------------------------------------
+    -- Functions that need to lunch only once on startup
 
     math.randomseed(getGameTimer())
 
@@ -246,8 +261,8 @@ function main()
     switchArrestPenalties(fgame.tgame.keep_stuff[0])
     switchDeathPenalties(fgame.tgame.keep_stuff[0])
     setGangWarsActive(fped.tped.gang_wars[0])
+
     setPlayerFastReload(PLAYER_HANDLE,fweapon.tweapon.fast_reload[0])
-    
     if fweapon.tweapon.no_reload[0] then
         writeMemory( 7600773,1,144,1)
         writeMemory( 7600815,1,144,1)
@@ -266,6 +281,7 @@ function main()
 
     lua_thread.create(fgame.RandomCheats)
 
+    -- Ghost cop cars
     for key,value in pairs(fgame.tgame.cop) do
         if  fgame.tgame.ghost_cop_cars[0] then
             writeMemory(tonumber(key),4,math.random(400,611),false)
@@ -274,7 +290,12 @@ function main()
         end
     end
 
+    --------------------------------------------------
+
     while true do
+
+        --------------------------------------------------
+        -- Functions that neeed to run constantly
 
         if fanimation.tanimation.ped[0] == true or fweapon.tweapon.ped[0] == true then
             bool, ped = getCharPlayerIsTargeting(PLAYER_HANDLE)
@@ -294,11 +315,6 @@ function main()
             fcommon.KeyWait(tkeys.control_key,tkeys.screenshot_key)
         end
 
-        if isKeyDown(tkeys.control_key) and isKeyDown(tkeys.menu_open_key) then
-            fcommon.KeyWait(tkeys.control_key,tkeys.menu_open_key)
-            tcheatmenu.window.show[0] = not tcheatmenu.window.show[0]
-        end
-
         if fteleport.tteleport.shortcut[0]
         and isKeyDown(tkeys.teleport_key1)
         and isKeyDown(tkeys.teleport_key2) then
@@ -306,6 +322,7 @@ function main()
             fteleport.Teleport()
         end
         
+        -- God mode
         setCharProofs(PLAYER_PED,fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0])
 
         if fplayer.tplayer.aimSkinChanger[0] and isKeyDown(tkeys.asc_key) then
@@ -328,9 +345,11 @@ function main()
             lua_thread.create(fvehicle.AircraftCamera)
         end
 
+        -- Vehicle functions
         if isCharInAnyCar(PLAYER_PED) then
             car = getCarCharIsUsing(PLAYER_PED)
 
+            -- Reset car colors if player changed color in tune shop
             if fvehicle.tvehicle.color.default ~= -1 then
                 local color_id = getCarColours(car)
                 if fvehicle.tvehicle.color.default ~= color_id then
@@ -341,6 +360,7 @@ function main()
             end
 
             setCarCanBeDamaged(car,not(fvehicle.tvehicle.no_damage[0]))
+            setCarCanBeVisiblyDamaged(car,not(fvehicle.tvehicle.visual_damage[0]))
             setCharCanBeKnockedOffBike(PLAYER_PED,fvehicle.tvehicle.stay_on_bike[0])
             setCarHeavy(car,fvehicle.tvehicle.heavy[0])
 
@@ -350,9 +370,6 @@ function main()
                 end
                 setCarForwardSpeed(car,fvehicle.tvehicle.speed[0])
             end
-
-            setCarCanBeVisiblyDamaged(car,not(fvehicle.tvehicle.visual_damage[0]))
-
 
             if getCarDoorLockStatus(car) == 4 then
                 fvehicle.tvehicle.lock_doors[0] = true
@@ -364,22 +381,33 @@ function main()
             fvehicle.tvehicle.lights[0] = false
         end
 
+        --------------------------------------------------
+
+        -- Menu open close check
+        if isKeyDown(tkeys.control_key) and isKeyDown(tkeys.menu_open_key) then
+            fcommon.KeyWait(tkeys.control_key,tkeys.menu_open_key)
+            tcheatmenu.window.show[0] = not tcheatmenu.window.show[0]
+        end
+
         wait(0)
     end
 end
 
 function onScriptTerminate(script, quitGame)
     if script == thisScript() then
-        fconfig.write()
+        fconfig.Write()
         if fconfig.tconfig.reset == false then
-            local crash_text = "Cheat menu crashed unexpectedly"
+            if fmenu.tmenu.crash_text == "" then
+                fmenu.tmenu.crash_text = "Cheat menu crashed unexpectedly"
+            end
             if fmenu.tmenu.auto_reload[0] then
                 script.this:reload()
                 crash_text =  crash_text .. " and reloaded"
             end
-            if fmenu.tmenu.show_crash_message[0] then
-                printHelpString(crash_text)
-            end
+        end
+
+        if fmenu.tmenu.show_crash_message[0] then
+            printHelpString(fmenu.tmenu.crash_text)
         end
     end
 end

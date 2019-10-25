@@ -23,12 +23,14 @@ module.tmission =
     search_text = imgui.new.char[20](),
 }
 
+-- Generating missions list from loaded json file
 for id, name in pairs(module.tmission.names) do
     if name ~= "" then
         table.insert(module.tmission.array,tonumber(id))
     end
 end
 
+-- Display mission name as entry
 function ShowMissionEntries(title,list,search_text)
     if search_text == nil then search_text = "" end
 
@@ -52,6 +54,7 @@ function ShowMissionEntries(title,list,search_text)
     end)
 end
 
+-- Main function
 function module.MissionMain()
     imgui.Spacing()
 
@@ -123,7 +126,7 @@ function module.MissionMain()
                 if imgui.InputText('Search ',module.tmission.search_text,ffi.sizeof(module.tmission.search_text)) then 
                 end
                 imgui.Spacing()
-                imgui.Text("Found missions :(" .. ffi.string(module.tmission.search_text) .. ")")
+                imgui.Text("Missions found :(" .. ffi.string(module.tmission.search_text) .. ")")
                 imgui.Separator()
                 imgui.Spacing()
                 if imgui.BeginChild("MissionsEntries") then
