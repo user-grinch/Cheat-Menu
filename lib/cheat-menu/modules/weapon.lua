@@ -20,7 +20,7 @@ module.tweapon =
 {
     fast_reload = imgui.new.bool(fconfig.Get('tweapon.fast_reload',false)),
     images      = {},
-    names       = fcommon.LoadJson("model names"),
+    names       = fcommon.LoadJson("weapon"),
     no_reload   = imgui.new.bool(fconfig.Get('tweapon.no_reload',false)),
     path        = tcheatmenu.dir .. "weapons",
     ped         = imgui.new.bool(fconfig.Get('tweapon.ped',false)),

@@ -77,7 +77,7 @@ module.tvehicle =
     lights = imgui.new.bool(fconfig.Get('tvehicle.lights',false)),
     lock_doors = imgui.new.bool(false),
     lock_speed = imgui.new.bool(fconfig.Get('tvehicle.lock_speed',false)),
-    names = fcommon.LoadJson("model names"),
+    names = fcommon.LoadJson("vehicle"),
     paintjobs  = 
     {
         path   =  tcheatmenu.dir .. "vehicles\\paintjobs",

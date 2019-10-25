@@ -46,23 +46,30 @@ Now try it out in-game. If it doesn't work open an issue here or create a post i
 
 ## Docs
 
-### Adding custom peds/skins
+### Adding custom peds/skins images
 - Version required 1.8-wip and above
- 
-Ped/skin images are loaded from '\moonloader\lib\cheat-menu\peds\' directory. There are 2 levels of directories inside 'peds'. The first level is the tabs and the second level is the menus. Images(only jpg) should be under the second level folders and will show up under the tabs and menus in-game with the same names. Image names should be of their model names. For example '340.jpg' without quotes. Custom tabs and menus(under tabs) can also be added and will show up in-game accordingly.
+ 
+Ped/skin images (only jpg) are loaded from '\moonloader\lib\cheat-menu\peds\' directory. There are more folders inside that directory. Those folders are menus that appear on the lists tab. Images under those directories will appear both on the 'search' tab and on the 'list' tab. The image name should contain the ped model id. Names for custom peds have to be added inside '\moonloader\lib\cheat-menu\json\ped.json' file.
 
-### Adding custom vehicle images ,components ,paintjobs & weapons
+### Adding custom vehicle images 
 - Version required 1.8-wip and above
 
-Vehicle images(only jpg) and component images(only jpg) are loaded from '\moonloader\lib\cheat-menu\vehicles\images' and '\moonloader\lib\cheat-menu\vehicles\components' accordingly. They're both 1 level, these directories are 'menus'. Images should be placed under these directories.
+Vehicle images (only jpg) are loaded from '\moonloader\lib\cheat-menu\vehicles\images\' directory. There are more folders inside that directory. Those folders are menus that appear on the lists tab. Images under those directories will appear both on the 'search' tab and on the 'list' tab. The image name should contain the vehicle model id. Names for custom vehicles have to be added inside '\moonloader\lib\cheat-menu\json\vehicle.json' file.
 
-Paintjobs are a bit different, there isn't any categories such as 'menus' or 'tabs' for them. These images(only png) are loaded directly from '\moonloader\lib\cheat-menu\vehicles\paintjobs' directory.
+### Adding custom vehicle component images 
+- Version required 1.8-wip and above
 
-Similar to vehicles weapons are loaded from ''\moonloader\lib\cheat-menu\weapons\'
+Vehicle component images (only jpg) are loaded from '\moonloader\lib\cheat-menu\vehicles\component \' directory. There are more folders inside that directory. Those folders are menus that appear on the lists tab. Images under those directories will appear on the 'Tune' tab. The image name should contain the component model id.
 
-Tooltips (names that appear when you hover over the images) are loaded from a [JSON](https://en.wikipedia.org/wiki/JSON) file located here, '\moonloader\lib\cheat-menu\json\model names.json'. Open up that file and add your model & names.
+### Adding custom vehicle paint jobs images
+Paintjob images (only png) are loaded from '\moonloader\lib\cheat-menu\vehicles\paintjobs\images\' directory. Images are directly loaded from that directory and appear on the paint jobs tab. Image names can be any string and their name will show up on the menu.
+
+### Adding custom weapons images
+- Version required 1.8-wip and above
+
+Weapon images (only png) are loaded from '\moonloader\lib\cheat-menu\weapons\' directory. There are more folders inside that directory. Those folders are menus that appear on the lists tab. Images under those directories will appear both on the 'search' tab and on the 'list' tab. The image name should contain the weapon model id. Names for custom vehicles have to be added inside '\moonloader\lib\cheat-menu\json\weapon.json' file.
 
 ### Adding custom clothes
 - Version required 1.7 and above
 
-Cloth images are loaded from the 'moonloader\lib\cheat-menu\clothes' directory. The directories inside 'clothes' are only of 1 level. These directories are 'menus'. The cloth images(only jpg) should be placed according to their body parts. The naming of the images is like this 'model_name$texture_name' without quotes.
+Cloth images (only jpg) are loaded from '\moonloader\lib\cheat-menu\clothes\' directory. There are more folders inside that directory. Those folders are menus that appear on the lists tab. Images under those directories will appear both on the 'search' tab and on the 'list' tab. The image name should in this format 'body_part$model_name$texture_name'
