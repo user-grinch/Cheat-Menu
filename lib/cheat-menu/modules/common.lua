@@ -112,7 +112,7 @@ end
 
 -- Information popups used to display controls and details about elements
 function module.InformationTooltip(text)
-    if fmenu.tmenu.show_tooltips[0] then
+    if fmenu.tmenu.show_tooltips[0] and text ~= nil then
         imgui.SameLine()
         imgui.TextColored(imgui.ImVec4(128,128,128,0.3),'(?)')
         if imgui.IsItemHovered() then
@@ -175,8 +175,6 @@ end
 function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,search_box_text)
         
     if search_box_text == nil then search_box_text = "" end
-
-    local loading_a_image = false
 
     -- Calculate image count in a row
     local images_in_row = math.floor(imgui.GetWindowContentRegionWidth()/const_image_width)
@@ -281,6 +279,59 @@ function module.RadioButton(label,rb_table,addr_table)
     end
 end
 
+
+--------------------------------------------------
+-- Checkbox functions
+
+function module.CheckBoxValue(name,address,tooltip,enable_value,disable_value)
+
+    if enable_value == nil then enable_value = 1 end
+    if disable_value == nil then disable_value = 0 end
+
+    local var = imgui.new.bool(false)
+
+    if fcommon.RwMemory(address,1) == enable_value  then
+        var[0] = true
+    end
+
+    if imgui.Checkbox(name, var) then
+        if var[0] then
+            fcommon.RwMemory(address,1,enable_value)
+            fcommon.CheatActivated()
+        else
+            fcommon.RwMemory(address,1,disable_value)
+            fcommon.CheatDeactivated()
+        end
+    end
+    
+    module.InformationTooltip(tooltip)
+
+end
+
+function module.CheckBoxVar(name,var,tooltip)
+
+    if imgui.Checkbox(name, var) then
+        if var[0] then
+            fcommon.CheatActivated()
+        else
+            fcommon.CheatDeactivated()
+        end
+    end
+
+    module.InformationTooltip(tooltip)
+    
+end
+
+function module.CheckBoxFunc(name,var,func,tooltip)
+
+    if imgui.Checkbox(name, var) then
+        func()
+    end
+
+    module.InformationTooltip(tooltip)
+end
+
+-- Old function
 function module.CheckBox(arg)
     arg.value = arg.value or 1
     arg.value2 = arg.value2 or 0
@@ -324,6 +375,7 @@ function module.CheckBox(arg)
     end
 end
 
+--------------------------------------------------
 
 -- Provides input options to change game stats
 function module.UpdateStat(arg)

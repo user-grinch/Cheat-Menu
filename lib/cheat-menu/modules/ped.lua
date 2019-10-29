@@ -18,7 +18,39 @@ local module = {}
 
 module.tped =
 {
-    gang_wars   = imgui.new.bool(fconfig.Get('tped.gang_wars',false)),
+
+    gang =
+    {
+        array = {},
+        index = imgui.new.int(0),
+        list = 
+        {
+            "Ballas",
+            "Grove street families",
+            "Los santos vagos",
+            "San fierro rifa",
+            "Da nang boys",
+            "Mafia",
+            "Mountain cloud triad",
+            "Varrio los aztecas",
+            "Gang9",
+            "Gang10",
+        },
+        names = 
+        {   
+            ["Ballas"] = 0,
+            ["Da nang boys"] = 4,
+            ["Gang9"] = 8,
+            ["Gang10"] = 9,
+            ["Grove street families"] = 1,
+            ["Los santos vagos"] = 2,
+            ["Mafia"] = 5,
+            ["Mountain cloud triad"] = 6,
+            ["San fierro rifa"] = 3,
+            ["Varrio los aztecas"] = 7,
+        },  
+        wars = imgui.new.bool(fconfig.Get('tped.gang.wars',false)),
+    },
     images      = {},
     names       = fcommon.LoadJson("ped"),
     path        = tcheatmenu.dir .. "peds\\",
@@ -56,6 +88,7 @@ module.tped =
 }
 
 module.tped.type.array = imgui.new['const char*'][#module.tped.type.names](module.tped.type.names)
+module.tped.gang.array = imgui.new['const char*'][#module.tped.gang.list](module.tped.gang.list)
 
 -- Returns ped name
 function module.GetModelName(model)
@@ -94,7 +127,7 @@ function SetGangZoneDensity(title,id)
     if imgui.SliderInt(title,density,0,255) then
         setZoneGangStrength(getNameOfInfoZone(x,y,z),id,density[0])
         clearSpecificZonesToTriggerGangWar()
-        setGangWarsActive(fped.tped.gang_wars[0])
+        setGangWarsActive(fped.tped.gang.wars[0])
     end
 end
 
@@ -110,9 +143,9 @@ function module.PedMain()
                 fcommon.CheckBox({ address = 0x96915A,name = "Gang members everywhere"})
                 fcommon.CheckBox({ address = 0x96913F,name = "Have bounty on head"})
                 imgui.NextColumn()
-                fcommon.CheckBox({name = "Gang wars",var = module.tped.gang_wars,func = function()
-                    setGangWarsActive(module.tped.gang_wars[0])
-                    if module.tped.gang_wars[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
+                fcommon.CheckBox({name = "Gang wars",var = module.tped.gang.wars,func = function()
+                    setGangWarsActive(module.tped.gang.wars[0])
+                    if module.tped.gang.wars[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
                 end})
                 fcommon.CheckBox({ address = 0x969158,name = "Peds attack with rockets"})
                 fcommon.CheckBox({ address = 0x969175,name = "Peds riot"})
@@ -130,16 +163,10 @@ function module.PedMain()
                 fcommon.UpdateAddress({name = 'Pedestrian density multiplier',address = 0x8D2530,size = 4,min = 0,max = 10, default = 1,is_float = true})
                 fcommon.DropDownMenu("Gang zone density",function()
                     imgui.PushItemWidth(imgui.GetWindowWidth() - 200)
-                    SetGangZoneDensity("Ballas",0)
-                    SetGangZoneDensity("Da nang boys",4)
-                    SetGangZoneDensity("Gang9",8)
-                    SetGangZoneDensity("Gang10",9)
-                    SetGangZoneDensity("Grove street families",1)
-                    SetGangZoneDensity("Los santos vagos",2)
-                    SetGangZoneDensity("Mafia",5)
-                    SetGangZoneDensity("Mountain cloud triad",6)
-                    SetGangZoneDensity("San fierro rifa",3)
-                    SetGangZoneDensity("Varrio los aztecas",7)
+
+                    for k,v in pairs(module.tped.gang_names) do
+                        SetGangZoneDensity(k,v)
+                    end
                     imgui.PopItemWidth()
                     imgui.Spacing()
                     imgui.Text("You'll need ExGangWars plugin to display some turf colors")

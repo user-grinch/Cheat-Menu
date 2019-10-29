@@ -18,6 +18,7 @@ local module = {}
 
 module.tweapon =
 {
+    auto_aim    = imgui.new.bool(fconfig.Get('tweapon.auto_aim',false)),
     fast_reload = imgui.new.bool(fconfig.Get('tweapon.fast_reload',false)),
     images      = {},
     names       = fcommon.LoadJson("weapon"),
@@ -26,7 +27,19 @@ module.tweapon =
     ped         = imgui.new.bool(fconfig.Get('tweapon.ped',false)),
     quick_spawn = imgui.new.bool(fconfig.Get('tweapon.quick_spawn',false)),
     search_text = imgui.new.char[20](""),   
+    -- weapon_name_array = {},
+    -- gang_weapon1 = imgui.new.int(0),
+    -- gang_weapon2 = imgui.new.int(0),
+    -- gang_weapon3 = imgui.new.int(0),
 }
+
+-- local gang_list = {}
+
+-- for k, v in pairs(module.tweapon.names) do
+--     table.insert( gang_list,v)
+-- end
+
+-- module.tweapon.weapon_name_array = imgui.new['const char*'][#gang_list](gang_list)
 
 -- Returns weapon name
 function module.GetModelName(id)
@@ -63,6 +76,31 @@ function module.GiveWeapon(weapon)
             fcommon.CheatActivated()
         end          
         markModelAsNoLongerNeeded(model)
+    end
+end
+
+function module.AutoAim()
+    while true do
+        if module.tweapon.auto_aim[0] then
+            while module.tweapon.auto_aim[0] do
+                if isCharOnFoot(PLAYER_PED) then
+                    local x, y =  getPcMouseMovement()
+                    x = math.floor(x/2)
+                    y = math.floor(y/2)
+
+                    if (y ~= 0 or x ~= 0) then
+                        writeMemory(11988014,1,1,false)
+                    else
+                        if isKeyDown(2) then
+                            writeMemory(11988014,1,0,false)
+                        end
+                    end
+                end
+                wait(0)
+            end
+            writeMemory(11988014,1,1,false)
+        end
+        wait(0)
     end
 end
 
@@ -103,16 +141,20 @@ function module.WeaponMain()
         if imgui.BeginTabItem("Checkbox") then
             imgui.Spacing()
             imgui.Columns(2,nil,false)
-            fcommon.CheckBox({ name = "Fast reload",var = module.tweapon.fast_reload,func = function()
+            fcommon.CheckBoxVar("Auto aim",module.tweapon.auto_aim,"Enables joypad auto aim feature\n\nControls:\n Q = left\n E = right")
+            fcommon.CheckBoxFunc("Fast reload",module.tweapon.fast_reload,
+            function()
                 setPlayerFastReload(PLAYER_HANDLE,module.tweapon.fast_reload[0])
                 if module.tweapon.fast_reload[0] then                  
                     fcommon.CheatActivated()
                 else
                     fcommon.CheatDeactivated()
                 end
-            end})
+            end)
+            
             imgui.NextColumn()
-            fcommon.CheckBox({ name = "No reload + Inf ammo",var = module.tweapon.no_reload,func = function()
+            fcommon.CheckBoxFunc("No reload + Inf ammo",module.tweapon.no_reload,
+            function()
                 if module.tweapon.no_reload[0] then
                     writeMemory( 7600773,1,144,1)
                     writeMemory( 7600815,1,144,1)
@@ -130,7 +172,7 @@ function module.WeaponMain()
                     writeMemory( 7612647,2,3150,1)
                     fcommon.CheatDeactivated()
                 end
-            end})
+            end)
             imgui.Columns(1)
             imgui.EndTabItem()
         end
@@ -165,6 +207,20 @@ function module.WeaponMain()
             end
             imgui.EndTabItem()
         end
+        -- if imgui.BeginTabItem("Gang weapon editor") then
+        --     imgui.Spacing()
+
+        --     if imgui.Combo("Gang", fped.tped.gang.index,fped.tped.gang.array,#fped.tped.gang.list) then end
+        --     imgui.Columns(3,nil,false)
+        --     if imgui.Combo("Weapon 1", module.tweapon.gang_weapon1,module.tweapon.weapon_name_array,#gang_list) then end
+        --     imgui.NextColumn()
+        --     if imgui.Combo("Weapon 2", module.tweapon.gang_weapon2,module.tweapon.weapon_name_array,#gang_list) then end
+        --     imgui.NextColumn()
+        --     if imgui.Combo("Weapon 3", module.tweapon.gang_weapon3,module.tweapon.weapon_name_array,#gang_list) then end
+        --     imgui.Columns(1)
+
+        --     imgui.EndTabItem()
+        -- end
         imgui.EndTabBar()
     end
 end

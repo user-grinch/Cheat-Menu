@@ -18,20 +18,53 @@ local module = {}
 
 module.tplayer =
 {
-    aimSkinChanger    = imgui.new.bool(fconfig.Get('tplayer.aimSkinChanger',false)),
-    cjBody            = imgui.new.int(fconfig.Get('tplayer.cjBody',0)),
-    clothes           = 
+    aimSkinChanger      = imgui.new.bool(fconfig.Get('tplayer.aimSkinChanger',false)),
+    cjBody              = imgui.new.int(fconfig.Get('tplayer.cjBody',0)),
+    clothes             = 
     { 
-        images        = {},
-        path          = tcheatmenu.dir .. "clothes\\",
+        images          = {},
+        path            = tcheatmenu.dir .. "clothes\\",
     },
-    god               = imgui.new.bool(fconfig.Get('tplayer.god',false)),
-    never_wanted      = imgui.new.bool(false),
+    god                 = imgui.new.bool(fconfig.Get('tplayer.god',false)),
+    keep_position       = imgui.new.bool(fconfig.Get('tplayer.keep_stuff',false)),
+    never_wanted        = imgui.new.bool(false),
     skins =
     {
-        search_text   = imgui.new.char[20](),
+        search_text    = imgui.new.char[20](),
     },
+    walk_on_water      = imgui.new.bool(fconfig.Get('tplayer.walk_on_water',false)),
 }
+
+function module.KeepPosition()
+    while true do
+        if isPlayerDead(PLAYER_HANDLE) and module.tplayer.keep_position[0] then
+            local x,y,z = getCharCoordinates(PLAYER_PED)
+            wait(1000)
+            setCharCoordinates(PLAYER_PED,x,y,z)
+        end
+        wait(0)
+    end
+end
+function module.WalkOnWater()
+    local object = nil
+    while true do
+        if module.tplayer.walk_on_water[0] then
+            local x,y,z = getCharCoordinates(PLAYER_PED)
+            local water_height =  getWaterHeightAtCoords(x,y,false)
+
+            if doesObjectExist(object) then
+                deleteObject(object)
+                removeObjectElegantly(object)
+            end
+
+            if z > water_height and water_height ~= -1000 then     -- Don't create the object if player is under water/diving
+                object = createObject(3095,x,y,water_height)
+                setObjectVisible(object,false)
+            end
+        end
+        wait(0)
+    end
+end
 
 function module.ChangePlayerModel(model)
     model = tonumber(model)
@@ -246,6 +279,10 @@ end
 
 -- Main function
 function module.PlayerMain()
+    if imgui.Button("Suicide",imgui.ImVec2(fcommon.GetSize(1))) then
+        setCharHealth(PLAYER_PED,0)
+    end
+    imgui.Spacing()
 
     if imgui.BeginTabBar('Player') then
 
@@ -258,9 +295,10 @@ function module.PlayerMain()
             fcommon.CheckBox({ address = 0x969178,name = "Infinite ammo"}) 
             fcommon.CheckBox({ address = 0x96916E,name = "Infinite oxygen"})
             fcommon.CheckBox({ address = 0xB7CEE4,name = "Infinite run"})
-            
-            imgui.NextColumn()
+            fcommon.CheckBox({ var = module.tplayer.keep_position,name  = "Keep position",help_text = "Auto teleport to the position you died from"})
 
+            imgui.NextColumn()
+            
             fcommon.CheckBox({ address = getCharPointer(PLAYER_PED)+0x598,name = "Lock player control"})
             fcommon.CheckBox({ address = 0x96916C,name = "Mega jump"})
             fcommon.CheckBox({ address = 0x969173,name = "Mega punch"})
@@ -275,6 +313,7 @@ function module.PlayerMain()
                     fcommon.CheatDeactivated()
                 end
             end})
+            fcommon.CheckBox({ var = module.tplayer.walk_on_water,name  = "Walk on water"})
            
             imgui.Columns(1)
 

@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.8-wip")
-script_version_number(20191025) -- YYYYMMDD
+script_version_number(20191029) -- YYYYMMDD
 
 
 --------------------------------------------------
@@ -42,7 +42,7 @@ tkeys =
     airbreak_right    = 0x44, -- D 
     airbreak_up       = 0x26, -- Arrow up 
     airbreak_down     = 0x28, -- Arrow down 
-    aircraft_zoom     = 0x56, -- V
+    camera_zoom       = 0x56, -- V
 }
 
 tcheatmenu =
@@ -200,7 +200,7 @@ function()
 
         if fmenu.tmenu.overlay.coordinates[0] then
             x,y,z = getCharCoordinates(PLAYER_PED)
-            imgui.Text(string.format("Coordinates : %d %d %d", math.floor(x) , math.floor(y) , math.floor(z)),1000)
+            imgui.Text(string.format("Coordinates :%d %d %d", math.floor(x) , math.floor(y) , math.floor(z)),1000)
         end
         imgui.PopStyleVar()
         if imgui.BeginPopupContextWindow() then
@@ -260,7 +260,7 @@ function main()
 
     switchArrestPenalties(fgame.tgame.keep_stuff[0])
     switchDeathPenalties(fgame.tgame.keep_stuff[0])
-    setGangWarsActive(fped.tped.gang_wars[0])
+    setGangWarsActive(fped.tped.gang.wars[0])
 
     setPlayerFastReload(PLAYER_HANDLE,fweapon.tweapon.fast_reload[0])
     if fweapon.tweapon.no_reload[0] then
@@ -290,10 +290,25 @@ function main()
         end
     end
 
+    -- Disable Replay
+    if fgame.tgame.disable_replay[0] then
+        writeMemory(4588800,1,195,false)
+        fcommon.CheatActivated()
+    else
+        writeMemory(4588800,1,160,false)
+        fcommon.CheatDeactivated()
+    end
+
+         
+    lua_thread.create(fplayer.KeepPosition)
+    lua_thread.create(fplayer.WalkOnWater)
+    lua_thread.create(fvehicle.AircraftCamera)
+    lua_thread.create(fvehicle.FirstPersonCamera)
+    lua_thread.create(fweapon.AutoAim)
+
     --------------------------------------------------
 
     while true do
-
         --------------------------------------------------
         -- Functions that neeed to run constantly
 
@@ -340,14 +355,9 @@ function main()
             end
         end
 
-        if isCharInAnyHeli(PLAYER_PED)
-        or isCharInAnyPlane(PLAYER_PED) then
-            lua_thread.create(fvehicle.AircraftCamera)
-        end
-
         -- Vehicle functions
         if isCharInAnyCar(PLAYER_PED) then
-            car = getCarCharIsUsing(PLAYER_PED)
+            local car = getCarCharIsUsing(PLAYER_PED)
 
             -- Reset car colors if player changed color in tune shop
             if fvehicle.tvehicle.color.default ~= -1 then
@@ -363,6 +373,11 @@ function main()
             setCarCanBeVisiblyDamaged(car,not(fvehicle.tvehicle.visual_damage[0]))
             setCharCanBeKnockedOffBike(PLAYER_PED,fvehicle.tvehicle.stay_on_bike[0])
             setCarHeavy(car,fvehicle.tvehicle.heavy[0])
+
+            if fvehicle.tvehicle.unlimited_nitro[0] then
+                giveNonPlayerCarNitro(car)
+            end
+      
 
             if fvehicle.tvehicle.lock_speed[0] then
                 if fvehicle.tvehicle.speed[0] > 500 then
@@ -399,15 +414,16 @@ function onScriptTerminate(script, quitGame)
         if fconfig.tconfig.reset == false then
             if fmenu.tmenu.crash_text == "" then
                 fmenu.tmenu.crash_text = "Cheat menu crashed unexpectedly"
-            end
-            if fmenu.tmenu.auto_reload[0] then
-                script.this:reload()
-                crash_text =  crash_text .. " and reloaded"
+                if fmenu.tmenu.auto_reload[0] then
+                    script.this:reload()
+                    crash_text =  crash_text .. " and reloaded"
+                end
             end
         end
 
         if fmenu.tmenu.show_crash_message[0] then
             printHelpString(fmenu.tmenu.crash_text)
+            fmenu.tmenu.crash_text = ""
         end
     end
 end

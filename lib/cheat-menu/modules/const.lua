@@ -74,4 +74,10 @@ module.CLOTH =
     IMAGE_EXT    = "jpg"
 }
 
+module.TRAIN_CAM_FIX =
+{
+    ON  = 171,
+    OFF = 6,
+}
+
 return module

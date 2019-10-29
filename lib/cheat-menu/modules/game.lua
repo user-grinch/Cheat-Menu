@@ -34,6 +34,7 @@ module.tgame                =
     },    
     disable_cheats          = imgui.new.bool(fconfig.Get('tgame.disable_cheats',false)),
     disable_help_popups     = imgui.new.bool(fconfig.Get('tgame.disable_help_popups',false)),
+    disable_replay          = imgui.new.bool(fconfig.Get('tgame.disable_replay',false)),
     fps_limit               = imgui.new.int(fconfig.Get('tgame.fps_limit',30)),
     ghost_cop_cars          = imgui.new.bool(fconfig.Get('tgame.ghost_cop_cars',false)),
     keep_stuff              = imgui.new.bool(fconfig.Get('tgame.keep_stuff',false)),
@@ -78,7 +79,6 @@ module.tgame                =
 
 module.tgame.day.array      = imgui.new['const char*'][#module.tgame.day.names](module.tgame.day.names)
 module.tgame.weather.array  = imgui.new['const char*'][#module.tgame.weather.names](module.tgame.weather.names)
-
 
 function module.AirbreakMode()
     if module.tgame.airbreak[0] then
@@ -163,9 +163,9 @@ function SetTime()
         local hour = imgui.new.int(memory.read(0xB70153,1))
         local minute = imgui.new.int(memory.read(0xB70152,1))
 
-        fcommon.CheckBox({ address = 0x96913B,name = "Faster clock"})
+        fcommon.CheckBoxValue(0x96913B,"Faster clock")
         imgui.SameLine()
-        fcommon.CheckBox({ address = 0x969168,name = "Freeze time"})
+        fcommon.CheckBoxValue(0x969168,"Freeze time")
         if imgui.InputInt("Current hour",hour) then
             memory.write(0xB70153 ,hour[0],1)
         end
@@ -314,8 +314,9 @@ function module.GameMain()
             imgui.Spacing()
             imgui.Columns(2,nil,false)
 
-            fcommon.CheckBox({name = "Airbreak mode",var = module.tgame.airbreak,help_text = "Controls:\nW : Forward\tS : Backward\nA  : Left  \t\tD : Right\nArrow_Up\t : Move up\nArrow_Down : Move Down",func = function()
-                if module.tgame.airbreak[0] ==  true then
+            fcommon.CheckBoxFunc("Airbreak mode",module.tgame.airbreak,
+            function()
+                if module.tgame.airbreak[0] then
                     lockPlayerControl(true)
                     setCharCollision(PLAYER_PED,false)
                     setCameraBehindPlayer()
@@ -325,9 +326,10 @@ function module.GameMain()
                     setCharCollision(PLAYER_PED,true)
                     fcommon.CheatDeactivated()
                 end
-            end})
-            fcommon.CheckBox({name = "Disable cheats",var = module.tgame.disable_cheats,func = function()
-                if module.tgame.disable_cheats[0] == true then
+            end,"Controls:\nW : Forward\tS : Backward\nA  : Left  \t\tD : Right\nArrow_Up\t : Move up\nArrow_Down : Move Down")
+            fcommon.CheckBoxFunc("Disable cheats",module.tgame.disable_cheats,
+            function()
+                if module.tgame.disable_cheats[0] then
                     writeMemory(0x004384D0 ,1,0xE9 ,false)
                     writeMemory(0x004384D1 ,4,0x000000D0 ,false)
                     writeMemory(0x004384D5 ,4,0x90909090 ,false)
@@ -338,10 +340,22 @@ function module.GameMain()
                     writeMemory(0x004384D5 ,4,0xCC,false)
                     fcommon.CheatDeactivated()
                 end
-            end})
-            fcommon.CheckBox({ name = "Disable help popups",var = module.tgame.disable_help_popups ,show_help_popups = true,help_text = "Disables wasted & arrested popups that\nappear in a new game.Requires restart."})
-            fcommon.CheckBox({ address = 0x96C009,name = 'Free PNS'})
-            fcommon.CheckBox({name = "Ghost cop vehicles",var = module.tgame.ghost_cop_cars,func = function()        
+            end)
+            fcommon.CheckBoxVar("Disable help popups",module.tgame.disable_help_popups,"Disables wasted & arrested popups that\nappear in a new game.Requires restart")
+            fcommon.CheckBoxValue('Free PNS',0x96C009)
+            fcommon.CheckBoxFunc("Disable F1 & F3 replay",module.tgame.disable_replay,function()
+                if module.tgame.disable_replay[0] then
+                    writeMemory(4588800,1,195,false)
+                    fcommon.CheatActivated()
+                else
+                    writeMemory(4588800,1,160,false)
+                    fcommon.CheatDeactivated()
+                end
+            end)
+
+            imgui.NextColumn()
+
+            fcommon.CheckBoxFunc("Ghost cop vehicles",module.tgame.ghost_cop_cars,function()        
                 for key,value in pairs(module.tgame.cop) do
                     if  module.tgame.ghost_cop_cars[0] then
                         writeMemory(tonumber(key),4,math.random(400,611),false)
@@ -349,17 +363,15 @@ function module.GameMain()
                         writeMemory(tonumber(key),4,value,false)
                     end
                 end
-            end})
-
-            imgui.NextColumn()
-            
-            fcommon.CheckBox({name = "Keep stuff",var = module.tgame.keep_stuff,help_text = "Keep stuff after arrest/death" ,func = function()
+            end)
+            fcommon.CheckBoxFunc("Keep stuff",module.tgame.keep_stuff,
+            function()
                 switchArrestPenalties(module.tgame.keep_stuff[0])
                 switchDeathPenalties(module.tgame.keep_stuff[0])
-            end})
-            fcommon.CheckBox({ name = "Random cheats",var = module.tgame.random_cheats ,show_help_popups = true,help_text = "Activates random cheats every 10 seconds\nSuicide cheat is excluded"})
-            fcommon.CheckBox({ name = 'Screenshot shortcut',var = module.tgame.ss_shortcut,show_help_popups = true,help_text = "Take screenshot using (Left Ctrl + S) key combination"})
-            fcommon.CheckBox({ address = 0xB6F065,name = 'Widescreen'})
+            end,"Keep stuff after arrest/death")
+            fcommon.CheckBoxVar("Random cheats",module.tgame.random_cheats ,"Activates random cheats every 10 seconds\nSuicide cheat is excluded")
+            fcommon.CheckBoxVar('Screenshot shortcut',module.tgame.ss_shortcut,"Take screenshot using (Left Ctrl + S) key combination")
+            fcommon.CheckBoxValue('Widescreen',0xB6F065)
             imgui.Columns(1)
 
             imgui.Spacing()

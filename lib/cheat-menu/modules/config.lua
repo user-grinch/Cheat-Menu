@@ -59,6 +59,7 @@ function module.Write()
             {
                 disable_cheats      = fgame.tgame.disable_cheats[0],
                 disable_help_popups = fgame.tgame.disable_help_popups[0],
+                disable_replay      = fgame.tgame.disable_replay[0],
                 fps_limit           = fgame.tgame.fps_limit[0],
                 ghost_cop_cars      = fgame.tgame.ghost_cop_cars[0],
                 keep_stuff          = fgame.tgame.keep_stuff[0],
@@ -94,7 +95,10 @@ function module.Write()
             },
             tped  =
             {
-                gang_wars = fped.tped.gang_wars[0],
+                gang = 
+                {
+                    wars = fped.tped.gang.wars[0],
+                },
                 type   =
                 {
                     index = fped.tped.type.index[0],
@@ -102,9 +106,11 @@ function module.Write()
             },
             tplayer =
             {
-                aimSkinChanger    = fplayer.tplayer.aimSkinChanger[0],
-                cjBody            = fplayer.tplayer.cjBody[0],
-                god               = fplayer.tplayer.god[0],
+                aimSkinChanger      = fplayer.tplayer.aimSkinChanger[0],
+                cjBody              = fplayer.tplayer.cjBody[0],
+                god                 = fplayer.tplayer.god[0],
+                keep_position       = fplayer.tplayer.keep_position[0],
+                walk_on_water       = fplayer.tplayer.walk_on_water[0],
             },
             tteleport =
             {
@@ -120,6 +126,7 @@ function module.Write()
                     index        = fvehicle.tvehicle.aircraft.index,
                     spawn_in_air = fvehicle.tvehicle.aircraft.spawn_in_air[0],
                 },
+                first_person_camera = fvehicle.tvehicle.first_person_camera[0],
                 heavy            = fvehicle.tvehicle.heavy[0],
                 quick_spawn      = fvehicle.tvehicle.quick_spawn[0],
                 lights           = fvehicle.tvehicle.lights[0],
@@ -129,6 +136,7 @@ function module.Write()
                 speed            = fvehicle.tvehicle.speed[0],
                 stay_on_bike     = fvehicle.tvehicle.stay_on_bike[0],
                 visual_damage    = fvehicle.tvehicle.visual_damage[0],
+                unlimited_nitro  = fvehicle.tvehicle.unlimited_nitro[0],
             },
             tvisual =
             {
@@ -140,10 +148,11 @@ function module.Write()
             },
             tweapon =
             {
-                fast_reload = fweapon.tweapon.fast_reload[0],
-                no_reload   = fweapon.tweapon.no_reload[0],
-                ped         = fweapon.tweapon.ped[0],
-                quick_spawn = fweapon.tweapon.quick_spawn[0],
+                auto_aim        = fweapon.tweapon.auto_aim[0],
+                fast_reload     = fweapon.tweapon.fast_reload[0],
+                no_reload       = fweapon.tweapon.no_reload[0],
+                ped             = fweapon.tweapon.ped[0],
+                quick_spawn     = fweapon.tweapon.quick_spawn[0],
             }, 
         }
     end

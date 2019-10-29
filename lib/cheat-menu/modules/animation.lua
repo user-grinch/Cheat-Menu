@@ -106,10 +106,10 @@ function module.AnimationMain()
 
     -- Checkboxes
     imgui.Columns(2,nil,false)
-    fcommon.CheckBox({name = "Loop",var = module.tanimation.loop})
-    fcommon.CheckBox({name = "Ped ##Animation",var = module.tanimation.ped,help_text = "Play animation on ped.Aim with a gun to select."})
+    fcommon.CheckBoxVar("Loop",module.tanimation.loop)
+    fcommon.CheckBoxVar("Ped ##Animation",module.tanimation.ped,"Play animation on ped.Aim with a gun to select.")
     imgui.NextColumn()
-    fcommon.CheckBox({name = "Secondary",var = module.tanimation.secondary})
+    fcommon.CheckBoxVar("Secondary",module.tanimation.secondary)
     imgui.Columns(1)
 
     imgui.Spacing() 

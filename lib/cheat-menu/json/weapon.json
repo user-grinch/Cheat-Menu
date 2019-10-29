@@ -1,7 +1,8 @@
 {
     "Model"   : "Name",
   
-    "Weapon"  : "Names",
+	"Weapon"  : "Names",
+	"0"       : "Unarmed",
     "1"       : "Brass knuckles",
 	"2"       : "Golf club",
 	"3"       : "Night stick",
