@@ -64,6 +64,7 @@ function module.Write()
                 ghost_cop_cars      = fgame.tgame.ghost_cop_cars[0],
                 keep_stuff          = fgame.tgame.keep_stuff[0],
                 random_cheats       = fgame.tgame.random_cheats[0], 
+                solid_water         = fgame.tgame.solid_water[0],
                 ss_shortcut         = fgame.tgame.ss_shortcut[0],
             },
             tmemory =
@@ -110,7 +111,6 @@ function module.Write()
                 cjBody              = fplayer.tplayer.cjBody[0],
                 god                 = fplayer.tplayer.god[0],
                 keep_position       = fplayer.tplayer.keep_position[0],
-                walk_on_water       = fplayer.tplayer.walk_on_water[0],
             },
             tteleport =
             {

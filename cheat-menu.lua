@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.8-wip")
-script_version_number(20191029) -- YYYYMMDD
+script_version_number(20191101) -- YYYYMMDD
 
 
 --------------------------------------------------
@@ -301,7 +301,7 @@ function main()
 
          
     lua_thread.create(fplayer.KeepPosition)
-    lua_thread.create(fplayer.WalkOnWater)
+    lua_thread.create(fgame.SolidWater)
     lua_thread.create(fvehicle.AircraftCamera)
     lua_thread.create(fvehicle.FirstPersonCamera)
     lua_thread.create(fweapon.AutoAim)
@@ -415,13 +415,19 @@ function onScriptTerminate(script, quitGame)
             if fmenu.tmenu.crash_text == "" then
                 fmenu.tmenu.crash_text = "Cheat menu crashed unexpectedly"
                 if fmenu.tmenu.auto_reload[0] then
-                    script.this:reload()
-                    crash_text =  crash_text .. " and reloaded"
+                    for index, script in ipairs(script.list()) do
+                        if script.name ~= thisScript().name then
+                            script.this:reload()
+                        end
+                    end
+                    
+                    fmenu.tmenu.crash_text =  fmenu.tmenu.crash_text .. " and reloaded"
                 end
             end
         end
 
         if fmenu.tmenu.show_crash_message[0] then
+            clearHelp()
             printHelpString(fmenu.tmenu.crash_text)
             fmenu.tmenu.crash_text = ""
         end

@@ -501,7 +501,7 @@ function module.VehicleMain()
                             end)
                         end
                     else
-                        printHelpString("Player ~r~not~w~ in car")
+                        imgui.Text("Player not in car")
                     end
                     
                 end)

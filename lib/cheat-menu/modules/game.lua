@@ -44,6 +44,7 @@ module.tgame                =
         search_text         = imgui.new.char[64](""),
         disabled            = {},
     },
+    solid_water             = imgui.new.bool(fconfig.Get('tgame.solid_water',false)),
     ss_shortcut             = imgui.new.bool(fconfig.Get('tgame.ss_shortcut',false)), 
     weather                 =
     {    
@@ -121,6 +122,27 @@ function module.AirbreakMode()
     end
 end
 
+function module.SolidWater()
+    local object = nil
+    while true do
+        if module.tgame.solid_water[0] then
+            local x,y,z = getCharCoordinates(PLAYER_PED)
+            local water_height =  getWaterHeightAtCoords(x,y,false)
+
+            if doesObjectExist(object) then
+                deleteObject(object)
+                removeObjectElegantly(object)
+            end
+
+            if z > water_height and water_height ~= -1000 then     -- Don't create the object if player is under water/diving
+                object = createObject(3095,x,y,water_height)
+                setObjectVisible(object,false)
+            end
+        end
+        wait(0)
+    end
+end
+
 function CheatsEntry(func,names)
     local sizeX = imgui.GetWindowContentRegionWidth() / 3
     local sizeY = imgui.GetWindowHeight()/15
@@ -163,9 +185,9 @@ function SetTime()
         local hour = imgui.new.int(memory.read(0xB70153,1))
         local minute = imgui.new.int(memory.read(0xB70152,1))
 
-        fcommon.CheckBoxValue(0x96913B,"Faster clock")
+        fcommon.CheckBoxValue("Faster clock",0x96913B)
         imgui.SameLine()
-        fcommon.CheckBoxValue(0x969168,"Freeze time")
+        fcommon.CheckBoxValue("Freeze time",0x969168)
         if imgui.InputInt("Current hour",hour) then
             memory.write(0xB70153 ,hour[0],1)
         end
@@ -352,9 +374,6 @@ function module.GameMain()
                     fcommon.CheatDeactivated()
                 end
             end)
-
-            imgui.NextColumn()
-
             fcommon.CheckBoxFunc("Ghost cop vehicles",module.tgame.ghost_cop_cars,function()        
                 for key,value in pairs(module.tgame.cop) do
                     if  module.tgame.ghost_cop_cars[0] then
@@ -364,6 +383,9 @@ function module.GameMain()
                     end
                 end
             end)
+
+            imgui.NextColumn()
+
             fcommon.CheckBoxFunc("Keep stuff",module.tgame.keep_stuff,
             function()
                 switchArrestPenalties(module.tgame.keep_stuff[0])
@@ -371,6 +393,7 @@ function module.GameMain()
             end,"Keep stuff after arrest/death")
             fcommon.CheckBoxVar("Random cheats",module.tgame.random_cheats ,"Activates random cheats every 10 seconds\nSuicide cheat is excluded")
             fcommon.CheckBoxVar('Screenshot shortcut',module.tgame.ss_shortcut,"Take screenshot using (Left Ctrl + S) key combination")
+            fcommon.CheckBoxVar('Solid water',module.tgame.solid_water)
             fcommon.CheckBoxValue('Widescreen',0xB6F065)
             imgui.Columns(1)
 
