@@ -117,9 +117,7 @@ function module.InformationTooltip(text)
         imgui.TextColored(imgui.ImVec4(128,128,128,0.3),'(?)')
         if imgui.IsItemHovered() then
             imgui.BeginTooltip()
-            imgui.Spacing()
             imgui.SetTooltip(text)
-            imgui.Dummy(imgui.ImVec2(50,50))
             imgui.EndTooltip()
         end
     end
@@ -331,50 +329,6 @@ function module.CheckBoxFunc(name,var,func,tooltip)
     module.InformationTooltip(tooltip)
 end
 
--- Old function
-function module.CheckBox(arg)
-    arg.value = arg.value or 1
-    arg.value2 = arg.value2 or 0
-    arg.var = arg.var or nil
-    arg.func = arg.func or nil
-
-    local func_bool =  arg.var or imgui.new.bool()
-    if arg.var == nil then
-        if (readMemory(arg.address,1,false)) == arg.value2 then
-            func_bool[0] = false
-        else
-            func_bool[0] = true
-        end
-    end
-
-    if imgui.Checkbox(arg.name,func_bool) then
-        if arg.func == nil then
-            if arg.var == nil then
-                if func_bool[0] then
-                    writeMemory(arg.address,1,arg.value,false)
-                    module.CheatActivated()
-                else
-                    writeMemory(arg.address,1,arg.value2,false)
-                    module.CheatDeactivated()
-                end
-            else
-                if arg.var[0] then
-                    module.CheatActivated()
-                else
-                    module.CheatDeactivated()
-                end
-                if arg.func ~= nil then arg.func() end
-            end
-        else
-            arg.func()
-        end
-    end
-
-    if arg.help_text ~= nil then
-        module.InformationTooltip(arg.help_text)
-    end
-end
-
 --------------------------------------------------
 
 -- Provides input options to change game stats
@@ -520,21 +474,25 @@ end
 
 -- Loads images recursively from root directory
 function module.LoadImages(mainDir,store_image_table,req_ext,dir)
-    for file in lfs.dir(mainDir) do
+    for dir in lfs.dir(mainDir) do
         wait(0)
-        if doesFileExist(mainDir .. "\\" .. file) then
-            local _,file_name,file_ext = string.match(mainDir .. "\\" .. file, "(.-)([^\\/]-%.?([^%.\\/]*))$") 
-            file_name = string.sub(file_name,1,-5)
-
-            if req_ext == file_ext then
-                if store_image_table[dir] == nil then
-                    store_image_table[dir] = {}
+        local dir_path = mainDir .. "\\" .. dir
+        if doesDirectoryExist(dir_path) and dir ~= "." and dir ~= ".." then
+            for file in lfs.dir(dir_path) do
+                wait(0)
+                local file_path = dir_path .. "\\" .. file
+                if doesFileExist(file_path) then
+                    local _,file_name,file_ext = string.match(file_path, "(.-)([^\\/]-%.?([^%.\\/]*))$") 
+                    file_name = string.sub(file_name,1,-5)
+                    if req_ext == file_ext then
+                        print(file_name)
+                        if store_image_table[dir] == nil then
+                            store_image_table[dir] = {}
+                        end
+                        store_image_table[dir][file_name] = imgui.CreateTextureFromFile(file_path)
+                    end
                 end
-                store_image_table[dir][file_name] = imgui.CreateTextureFromFile(mainDir .. file)
             end
-        end
-        if doesDirectoryExist(mainDir .. "\\" .. file) and file ~= "." and file ~= ".." then
-           module.LoadImages(mainDir .. "\\" .. file .. "\\",store_image_table,req_ext,file)
         end
     end
 end

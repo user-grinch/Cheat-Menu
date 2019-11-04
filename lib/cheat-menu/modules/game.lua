@@ -126,18 +126,27 @@ function module.SolidWater()
     local object = nil
     while true do
         if module.tgame.solid_water[0] then
-            local x,y,z = getCharCoordinates(PLAYER_PED)
-            local water_height =  getWaterHeightAtCoords(x,y,false)
+            while module.tgame.solid_water[0] do
+                wait(0)
+                local x,y,z = getCharCoordinates(PLAYER_PED)
+                local water_height =  getWaterHeightAtCoords(x,y,false)
+
+                if doesObjectExist(object) then
+                    deleteObject(object)
+                    removeObjectElegantly(object)
+                end
+
+                if z > water_height and water_height ~= -1000 then     -- Don't create the object if player is under water/diving
+                    object = createObject(3095,x,y,water_height)
+                    setObjectVisible(object,false)
+                end
+            end
 
             if doesObjectExist(object) then
                 deleteObject(object)
                 removeObjectElegantly(object)
             end
-
-            if z > water_height and water_height ~= -1000 then     -- Don't create the object if player is under water/diving
-                object = createObject(3095,x,y,water_height)
-                setObjectVisible(object,false)
-            end
+            
         end
         wait(0)
     end
@@ -392,7 +401,7 @@ function module.GameMain()
                 switchDeathPenalties(module.tgame.keep_stuff[0])
             end,"Keep stuff after arrest/death")
             fcommon.CheckBoxVar("Random cheats",module.tgame.random_cheats ,"Activates random cheats every 10 seconds\nSuicide cheat is excluded")
-            fcommon.CheckBoxVar('Screenshot shortcut',module.tgame.ss_shortcut,"Take screenshot using (Left Ctrl + S) key combination")
+            fcommon.CheckBoxVar('Screenshot shortcut',module.tgame.ss_shortcut,"Take screenshot using (Left Ctrl + S)")
             fcommon.CheckBoxVar('Solid water',module.tgame.solid_water)
             fcommon.CheckBoxValue('Widescreen',0xB6F065)
             imgui.Columns(1)

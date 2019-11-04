@@ -179,9 +179,9 @@ function module.WeaponMain()
         if imgui.BeginTabItem("Spawn") then
             imgui.Spacing()
             imgui.Columns(2,nil,false)
-            fcommon.CheckBox({ name = "Quick Weapon",var = module.tweapon.quick_spawn,help_text = "Weapon can be spawned from quick spawner using (Left Ctrl + Q). \n\nControls:\nEnter : Stop reading key press\nDelete : Erase full string\nBackspace : Erase last character"})
+            fcommon.CheckBoxVar("Quick Weapon",module.tweapon.quick_spawn,"Weapon can be spawned from quick spawner using (Left Ctrl + Q)\n\nControls:\nEnter : Stop reading key press\nDelete : Erase full string\nBackspace : Erase last character")
             imgui.NextColumn()
-            fcommon.CheckBox({name = "Ped",var = module.tweapon.ped,help_text = "Give weapon to ped.Aim with a gun to select."})
+            fcommon.CheckBoxVar("Ped",module.tweapon.ped,"Give weapon to ped. Aim with a gun to select")
             imgui.Columns(1)
             imgui.Spacing()
             if imgui.BeginTabBar("Spawn") then

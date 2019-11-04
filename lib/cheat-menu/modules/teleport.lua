@@ -68,10 +68,10 @@ function module.TeleportMain()
         if imgui.BeginTabItem("Teleport") then	-- Teleport tab
             imgui.Spacing()
             imgui.Columns(2,nil,false)
-            fcommon.CheckBox({name = "Auto Z coordinates",var = module.tteleport.auto_z,help_text ="Script would get Z coord automatically\nCauses bugs sometimes", })
-			fcommon.CheckBox({name = "Insert coordinates",var = module.tteleport.insert_coords,help_text ="Insert current coordinates"})
+            fcommon.CheckBoxVar("Auto Z coordinates",module.tteleport.auto_z,"Get Z coord automatically\nCauses bugs sometimes")
+			fcommon.CheckBoxVar("Insert coordinates",module.tteleport.insert_coords,"Insert current coordinates")
 			imgui.NextColumn()
-			fcommon.CheckBox({name = "Quick teleport",var = module.tteleport.shortcut,help_text ="Teleport to marker using (X + Y) key combinartion"})
+			fcommon.CheckBoxVar("Quick teleport",module.tteleport.shortcut,"Teleport to marker using (X + Y)")
             imgui.Columns(1)
 
             if imgui.InputText("Coordinates",module.tteleport.coords,ffi.sizeof(module.tteleport.coords)) then end

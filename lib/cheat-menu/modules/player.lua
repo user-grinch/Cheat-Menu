@@ -210,7 +210,7 @@ end
 
 function SkinChangerMenu()
     imgui.Spacing()
-    fcommon.CheckBox({name = "Aim skin changer",var = module.tplayer.aimSkinChanger})
+    fcommon.CheckBoxVar("Aim skin changer", module.tplayer.aimSkinChanger)
     fcommon.InformationTooltip("Aim ped with a gun & press enter")
 
     imgui.Spacing()
@@ -268,30 +268,31 @@ function module.PlayerMain()
         if imgui.BeginTabItem("Checkbox") then
             imgui.Spacing()
             imgui.Columns(2,nil,false)
-            fcommon.CheckBox({ address = 0x969179,name = "Aim while driving"})
-            fcommon.CheckBox({ var = module.tplayer.god,name  = "God mode"})
-            fcommon.CheckBox({ address = 0x969161,name = "Higher cycle jumps"})
-            fcommon.CheckBox({ address = 0x969178,name = "Infinite ammo"}) 
-            fcommon.CheckBox({ address = 0x96916E,name = "Infinite oxygen"})
-            fcommon.CheckBox({ address = 0xB7CEE4,name = "Infinite run"})
+            fcommon.CheckBoxValue("Aim while driving",0x969179)
+            fcommon.CheckBoxVar("God mode",module.tplayer.god)
+            fcommon.CheckBoxValue("Higher cycle jumps",0x969161)
+            fcommon.CheckBoxValue("Infinite ammo",0x969178)
+            fcommon.CheckBoxValue("Infinite oxygen",0x96916E)
+            fcommon.CheckBoxValue("Infinite run",0xB7CEE4)
             
             imgui.NextColumn()
             
-            fcommon.CheckBox({ var = module.tplayer.keep_position,name  = "Keep position",help_text = "Auto teleport to the position you died from"})
-            fcommon.CheckBox({ address = getCharPointer(PLAYER_PED)+0x598,name = "Lock player control"})
-            fcommon.CheckBox({ address = 0x96916C,name = "Mega jump"})
-            fcommon.CheckBox({ address = 0x969173,name = "Mega punch"})
-            fcommon.CheckBox({ address = 0x969174,name = "Never get hungry"})
+            fcommon.CheckBoxVar("Keep position",module.tplayer.keep_position,"Auto teleport to the position you died from")
+            fcommon.CheckBoxValue("Lock player control",getCharPointer(PLAYER_PED)+0x598)
+            fcommon.CheckBoxValue("Mega jump",0x96916C)
+            fcommon.CheckBoxValue("Mega punch",0x969173)
+            fcommon.CheckBoxValue("Never get hungry",0x969174)
 
             module.tplayer.never_wanted[0] = readMemory(0x969171 ,1,false)
-            fcommon.CheckBox({name = "Never wanted",var = module.tplayer.never_wanted,func = function()
+            fcommon.CheckBoxFunc("Never wanted",module.tplayer.never_wanted,
+            function()
                 callFunction(0x4396C0,1,0,false)
                 if module.tplayer.never_wanted[0] then
                     fcommon.CheatActivated()
                 else
                     fcommon.CheatDeactivated()
                 end
-            end})
+            end)
            
             imgui.Columns(1)
 

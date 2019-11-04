@@ -35,27 +35,39 @@ function module.VisualMain()
             imgui.Spacing()
 
             imgui.Columns(2,nil,false)
-            fcommon.CheckBox({ address = 0x589123,name = 'Body armour border'})
-            fcommon.CheckBox({ address = 0x589125,name = 'Body armour percentage'})
-            fcommon.CheckBox({ address = 0x589207,name = 'Breath meter border'})
-            fcommon.CheckBox({ address = 0x589209,name = 'Breath meter percentage'})
-            if imgui.Checkbox('Display zone names',module.tvisual.zone_names) then
-                displayZoneNames(module.tvisual.zone_names[0])
-                if module.tvisual.zone_names[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
-            end
-            if imgui.Checkbox('Display car names',module.tvisual.car_names) then
-                displayCarNames(module.tvisual.car_names[0])
-                if module.tvisual.car_names[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
-            end
+            fcommon.CheckBoxValue('Body armour border',0x589123)
+            fcommon.CheckBoxValue('Body armour percentage',0x589125)
+            fcommon.CheckBoxValue('Breath meter border',0x589207)
+            fcommon.CheckBoxValue('Breath meter percentage',0x589209)
+            fcommon.CheckBoxFunc('Display zone names',module.tvisual.zone_names,
+            function()     
+                if module.tvisual.zone_names[0] then 
+                    displayZoneNames(true)
+                    fcommon.CheatActivated() 
+                else 
+                    displayZoneNames(false)
+                    fcommon.CheatDeactivated() 
+                end
+            end)
+            fcommon.CheckBoxFunc('Display car names',module.tvisual.car_names,
+            function()     
+                if module.tvisual.car_names[0] then 
+                    displayCarNames(true)
+                    fcommon.CheatActivated() 
+                else 
+                    displayCarNames(false)
+                    fcommon.CheatDeactivated() 
+                end
+            end)
 
             imgui.NextColumn()
 
-            fcommon.CheckBox({ address = 0xBA6769,name = 'Enable hud'})
-            fcommon.CheckBox({ address = 0xBA676C,name = 'Enable radar',value = 0,value2 = 2})
-            fcommon.CheckBox({ address = 0xA444A4,name = 'Gray radar'})
-            fcommon.CheckBox({ address = 0x589353,name = 'Health meter border'})
-            fcommon.CheckBox({ address = 0x589355,name = 'Health bar percentage'})
-            fcommon.CheckBox({ address = 0x58DD1B,name = 'Hide wanted level',value = 0x90})
+            fcommon.CheckBoxValue('Enable hud',0xBA6769)
+            fcommon.CheckBoxValue('Enable radar',0xBA676C,nil,0,2)
+            fcommon.CheckBoxValue('Gray radar',0xA444A4)
+            fcommon.CheckBoxValue('Health meter border',0x589353)
+            fcommon.CheckBoxValue('Health bar percentage',0x589355)
+            fcommon.CheckBoxValue('Hide wanted level',0x58DD1B,nil,0x90)
             imgui.Columns(1)
             imgui.EndTabItem()
         end

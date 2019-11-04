@@ -64,7 +64,7 @@ module.WEAPON =
 {
     IMAGE_HEIGHT = 65,
     IMAGE_WIDTH  = 65,
-    IMAGE_EXT    = "png"
+    IMAGE_EXT    = "jpg"
 }
 
 module.CLOTH =
