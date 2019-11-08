@@ -17,32 +17,32 @@
 script_name 'Cheat Menu'
 script_author("Grinch_")
 script_description("Cheat Menu for Grand Theft Auto San Andreas")
-script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu")
+script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-menu")
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.8-wip")
-script_version_number(20191104) -- YYYYMMDD
+script_version_number(20191108) -- YYYYMMDD
 
 
 --------------------------------------------------
 -- All the command keys used throughout the Cheat-Menu
 tkeys =
 {
-    control_key       = 0xA2, -- LCONTROL
-    menu_open_key     = 0x4D, -- M
-    screenshot_key    = 0x53, -- S
-    quickspawner_key  = 0x51, -- Q
-    asc_key           = 0x0D, -- RETURN/Enter - used for aim skin changer
-    teleport_key1     = 0x58, -- X - key1 for quick teleport
-    teleport_key2     = 0x59, -- Y - key2 for quick teleport
-    mc_paste          = 0x56, -- V - memory control paste memory address
-    airbreak_forward  = 0x57, -- W
-    airbreak_backward = 0x53, -- S 
-    airbreak_left     = 0x41, -- A
-    airbreak_right    = 0x44, -- D 
-    airbreak_up       = 0x26, -- Arrow up 
-    airbreak_down     = 0x28, -- Arrow down 
-    camera_zoom       = 0x56, -- V
+    asc_key              = 0x0D, -- RETURN/Enter - used for aim skin changer
+    camera_mode_down     = 0x53, -- S
+    camera_mode_extra1   = 0xA0, -- LSHIFT
+    camera_mode_extra2   = 0xA2, -- LCONTROL
+    camera_mode_forward  = 0x57, -- W
+    camera_mode_backward = 0x53, -- S
+    camera_mode_up       = 0x57, -- W
+    camera_zoom          = 0x56, -- V
+    control_key          = 0xA2, -- LCONTROL
+    mc_paste             = 0x56, -- V - memory control paste memory address
+    menu_open_key        = 0x4D, -- M
+    quickspawner_key     = 0x51, -- Q
+    screenshot_key       = 0x53, -- S
+    teleport_key1        = 0x58, -- X - key1 for quick teleport
+    teleport_key2        = 0x59, -- Y - key2 for quick teleport
 }
 
 tcheatmenu =
@@ -234,9 +234,31 @@ function()
 end).HideCursor = true
 
 function main()
-
+    freezeOnscreenTimer(true)
     --------------------------------------------------
     -- Functions that need to lunch only once on startup
+
+    -- Mission timer
+    if fgame.tgame.freeze_mission_timer[0] then
+        freezeOnscreenTimer(true)
+        fcommon.CheatActivated()
+    else
+        freezeOnscreenTimer(false)
+        fcommon.CheatDeactivated()
+    end
+
+    -- No traffic vehicles 
+    if fvehicle.tvehicle.no_vehicles[0] then
+        writeMemory(0x434237,1,0x73,false) -- change condition to unsigned (0-255)
+        writeMemory(0x434224,1,0,false)
+        writeMemory(0x484D19,1,0x83,false) -- change condition to unsigned (0-255)
+        writeMemory(0x484D17,1,0,false)
+    else
+        writeMemory(0x434237,1,-1063242627,false) -- change condition to unsigned (0-255)
+        writeMemory(0x434224,1,940431405,false)
+        writeMemory(0x484D19,1,292493,false) -- change condition to unsigned (0-255)
+        writeMemory(0x484D17,1,1988955949,false)
+    end
 
     math.randomseed(getGameTimer())
 
@@ -301,6 +323,8 @@ function main()
 
          
     lua_thread.create(fplayer.KeepPosition)
+    lua_thread.create(fgame.CameraMode)
+    lua_thread.create(fgame.FreezeTime)
     lua_thread.create(fgame.SolidWater)
     lua_thread.create(fvehicle.AircraftCamera)
     lua_thread.create(fvehicle.FirstPersonCamera)
@@ -317,10 +341,6 @@ function main()
             if bool == true then
                 fped.tped.selected = ped
             end
-        end
-
-        if fgame.tgame.airbreak[0] then
-            fgame.AirbreakMode()
         end
 
         if fgame.tgame.ss_shortcut[0]

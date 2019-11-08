@@ -146,7 +146,7 @@ end
 -- Creates top level menus
 function module.CreateMenus(names,funcs)
 
-    imgui.PushStyleVarVec2(imgui.StyleVar.ItemSpacing,imgui.ImVec2(0,1))
+    imgui.PushStyleVarVec2(imgui.StyleVar.ItemSpacing,imgui.ImVec2(0,0.5))
     
     for i=1,#names,1 do
         if tcheatmenu.current_menu == i then
@@ -176,6 +176,9 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
 
     -- Calculate image count in a row
     local images_in_row = math.floor(imgui.GetWindowContentRegionWidth()/const_image_width)
+
+    const_image_width = (imgui.GetWindowContentRegionWidth() - imgui.StyleVar.ItemSpacing*(images_in_row-0.5*images_in_row))/images_in_row
+
     local image_count   = 1
 
     draw_image = function(identifier,image_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,search_box_text,model,image)
@@ -475,7 +478,6 @@ end
 -- Loads images recursively from root directory
 function module.LoadImages(mainDir,store_image_table,req_ext,dir)
     for dir in lfs.dir(mainDir) do
-        wait(0)
         local dir_path = mainDir .. "\\" .. dir
         if doesDirectoryExist(dir_path) and dir ~= "." and dir ~= ".." then
             for file in lfs.dir(dir_path) do
@@ -485,7 +487,6 @@ function module.LoadImages(mainDir,store_image_table,req_ext,dir)
                     local _,file_name,file_ext = string.match(file_path, "(.-)([^\\/]-%.?([^%.\\/]*))$") 
                     file_name = string.sub(file_name,1,-5)
                     if req_ext == file_ext then
-                        print(file_name)
                         if store_image_table[dir] == nil then
                             store_image_table[dir] = {}
                         end

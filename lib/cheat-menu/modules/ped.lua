@@ -148,6 +148,7 @@ function module.PedMain()
                     setGangWarsActive(module.tped.gang.wars[0])
                     if module.tped.gang.wars[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
                 end)
+                fcommon.CheckBoxValue("No road peds",0x8D2538,nil,0,25)
                 fcommon.CheckBoxValue("Peds attack with rockets",0x969158)
                 fcommon.CheckBoxValue("Peds riot",0x969175)
                 fcommon.CheckBoxValue("Slut magnet",0x96915D)

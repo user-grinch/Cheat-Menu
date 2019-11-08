@@ -169,23 +169,50 @@ function module.MenuMain()
 			end
 			imgui.EndTabItem()
 		end
+		if imgui.BeginTabItem("License") then
+			imgui.TextWrapped("This program is free software: you can redistribute it and/or modify it under the terms of the \z
+			GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or \z
+			(at your option) any later version. \n\n\z
+
+			This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied \z
+			warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details. \n\n\z
+
+			You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.\n\n\n\z
+
+			Copyright (C) 2019 Grinch_ \n")
+
+			imgui.EndTabItem()
+		end
 		if imgui.BeginTabItem("About") then
-			imgui.BulletText(string.format("%s v%s",script.this.name,script.this.version))
-			imgui.BulletText(string.format("Version number : %d",script.this.version_num))
-			imgui.SameLine()
-			if imgui.Button("Check for updates",imgui.ImVec2(120,20)) then
+			imgui.Spacing()
+			if imgui.Button("Check for updates",imgui.ImVec2(fcommon.GetSize(2))) then
 				module.CheckUpdates()
 			end
-			imgui.BulletText(string.format("Author : %s",script.this.authors[1]))
-			imgui.BulletText(string.format("Imgui : v%s",imgui._VERSION))
-			imgui.BulletText("Discord : Grinch_#3311")
-			imgui.BulletText("Thanks : Junior-Djjr,Um_Geek & GTA community.")
-			imgui.BulletText("Forum Topic : ")
 			imgui.SameLine()
-			if imgui.Button("Copy to clipboard",imgui.ImVec2(150,20)) then
+			if imgui.Button("Copy forum link",imgui.ImVec2(fcommon.GetSize(2))) then
 				imgui.SetClipboardText(script.this.url)
 				printHelpString("~g~Sucessfully~w~ copied to clipboard")
 			end
+			imgui.Spacing()
+			imgui.Columns(2,nil,false)
+			imgui.Text(string.format("%s v%s",script.this.name,script.this.version))
+			imgui.Text(string.format("Build: %d",script.this.version_num))
+
+			imgui.NextColumn()
+			imgui.Text(string.format("Author: %s",script.this.authors[1]))
+			imgui.Text(string.format("Imgui:   v%s",imgui._VERSION))
+			imgui.Columns(1)
+			imgui.Dummy(imgui.ImVec2(0,10))
+			imgui.TextWrapped("Need help/ facing issues/ have suggestions?\nContact me on discord, Grinch_#3311 or on forum.")
+			imgui.Dummy(imgui.ImVec2(0,10))
+			
+			imgui.TextWrapped("Special thanks to,")
+			imgui.Columns(2,nil,false)
+			imgui.TextWrapped("Junior-Djjr")
+			imgui.NextColumn()
+			imgui.TextWrapped("Um_Geek")
+			imgui.Columns(1)
+			
 			imgui.EndTabItem()
 		end
 		imgui.EndTabBar()

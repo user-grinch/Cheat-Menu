@@ -57,12 +57,19 @@ function module.Write()
             },
             tgame =
             {
+                camera                  =
+                {
+                    speed               = fgame.tgame.camera.speed[0],
+                    rotation            = 0.0,
+                },
                 disable_cheats      = fgame.tgame.disable_cheats[0],
                 disable_help_popups = fgame.tgame.disable_help_popups[0],
                 disable_replay      = fgame.tgame.disable_replay[0],
                 fps_limit           = fgame.tgame.fps_limit[0],
                 ghost_cop_cars      = fgame.tgame.ghost_cop_cars[0],
                 keep_stuff          = fgame.tgame.keep_stuff[0],
+                freeze_mission_timer= fgame.tgame.freeze_mission_timer[0],
+                freeze_time         = fgame.tgame.freeze_time[0], 
                 random_cheats       = fgame.tgame.random_cheats[0], 
                 solid_water         = fgame.tgame.solid_water[0],
                 ss_shortcut         = fgame.tgame.ss_shortcut[0],
@@ -132,6 +139,7 @@ function module.Write()
                 lights           = fvehicle.tvehicle.lights[0],
                 lock_speed       = fvehicle.tvehicle.lock_speed[0],
                 no_damage        = fvehicle.tvehicle.no_damage[0],
+                no_vehicles      = fvehicle.tvehicle.no_vehicles[0],
                 spawn_inside     = fvehicle.tvehicle.spawn_inside[0],
                 speed            = fvehicle.tvehicle.speed[0],
                 stay_on_bike     = fvehicle.tvehicle.stay_on_bike[0],

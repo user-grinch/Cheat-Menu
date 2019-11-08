@@ -18,7 +18,12 @@ local module = {}
 
 module.tgame                =
 {
-    airbreak                = imgui.new.bool(false),
+    camera                  =
+    {
+        bool                = imgui.new.bool(false),
+        speed               = imgui.new.float(fconfig.Get('tgame.camera.speed',0.3)),
+        rotation            = 0.0,
+    },
     cop = 
     {
         ["0x8a5a8c"] = 599, -- policeranger
@@ -36,6 +41,8 @@ module.tgame                =
     disable_help_popups     = imgui.new.bool(fconfig.Get('tgame.disable_help_popups',false)),
     disable_replay          = imgui.new.bool(fconfig.Get('tgame.disable_replay',false)),
     fps_limit               = imgui.new.int(fconfig.Get('tgame.fps_limit',30)),
+    freeze_mission_timer    = imgui.new.bool(fconfig.Get('tgame.mission_timer',false)), 
+    freeze_time             = imgui.new.bool(fconfig.Get('tgame.freeze_time',false)), 
     ghost_cop_cars          = imgui.new.bool(fconfig.Get('tgame.ghost_cop_cars',false)),
     keep_stuff              = imgui.new.bool(fconfig.Get('tgame.keep_stuff',false)),
     random_cheats           = imgui.new.bool(fconfig.Get('tgame.random_cheats',false)),
@@ -81,47 +88,6 @@ module.tgame                =
 module.tgame.day.array      = imgui.new['const char*'][#module.tgame.day.names](module.tgame.day.names)
 module.tgame.weather.array  = imgui.new['const char*'][#module.tgame.weather.names](module.tgame.weather.names)
 
-function module.AirbreakMode()
-    if module.tgame.airbreak[0] then
-        if isKeyDown(tkeys.airbreak_up) then
-            x,y,z = getCharCoordinates(PLAYER_PED)
-            setCharCoordinates(PLAYER_PED,x,y,z+2.0)
-        end
-        if isKeyDown(tkeys.airbreak_down) then
-            x,y,z = getCharCoordinates(PLAYER_PED)
-            setCharCoordinates(PLAYER_PED,x,y,z-2.0)
-        end
-        if isKeyDown(tkeys.airbreak_forward) then
-            x,y,z = getCharCoordinates(PLAYER_PED)
-            angle = getCharHeading(PLAYER_PED)
-
-            angle =  angle+90
-            x = x + 2.0 * math.cos(angle * math.pi/180)
-            y = y + 2.0 * math.sin(angle * math.pi/180)
-
-            setCharCoordinates(PLAYER_PED,x,y,z-1.0)
-        end
-        if isKeyDown(tkeys.airbreak_backward) then
-            x,y,z = getCharCoordinates(PLAYER_PED)
-            angle = getCharHeading(PLAYER_PED)
-
-            angle =  angle+90
-            x = x - 2.0 * math.cos(angle * math.pi/180)
-            y = y - 2.0 * math.sin(angle * math.pi/180)
-
-            setCharCoordinates(PLAYER_PED,x,y,z-1.0)
-        end
-        if isKeyDown(tkeys.airbreak_left)then
-            setCharHeading(PLAYER_PED,getCharHeading(PLAYER_PED)+1.0)
-            setCameraBehindPlayer()
-        end
-        if isKeyDown(tkeys.airbreak_right)then
-            setCharHeading(PLAYER_PED,getCharHeading(PLAYER_PED)-1.0)
-            setCameraBehindPlayer()
-        end
-    end
-end
-
 function module.SolidWater()
     local object = nil
     while true do
@@ -147,6 +113,81 @@ function module.SolidWater()
                 removeObjectElegantly(object)
             end
             
+        end
+        wait(0)
+    end
+end
+
+function module.CameraMode()
+    while true do
+        if module.tgame.camera.bool[0] then
+            freezeCharPositionAndDontLoadCollision(PLAYER_PED,true)
+            setCharCollision(PLAYER_PED,false)
+            
+            writeMemory(0xBA676C,1,2,false) -- Radar
+            writeMemory(0xBA6769,1,0,false) -- Hud
+
+            local model_val = readMemory((getCharPointer(PLAYER_PED)+1140),4,false)
+            writeMemory(getCharPointer(PLAYER_PED)+1140,4,2,false)
+
+            local total_mouse_x = 0
+            local total_mouse_y = 0
+
+            while module.tgame.camera.bool[0] do
+                local x, y, z = getCharCoordinates(PLAYER_PED)
+
+                if not isKeyDown(tkeys.camera_mode_extra2) then -- LCONTROL
+                    if isKeyDown(tkeys.camera_mode_extra1) then -- LSHIFT
+                        
+                        if isKeyDown(tkeys.camera_mode_up) then -- W
+                            z = z+module.tgame.camera.speed[0]
+                        end
+                        
+                        if isKeyDown(tkeys.camera_mode_down) then -- S
+                            z = z-module.tgame.camera.speed[0]
+                        end
+
+                    else
+                        if isKeyDown(tkeys.camera_mode_forward) then -- W
+                            local angle = getCharHeading(PLAYER_PED) + 90
+
+                            x = x + module.tgame.camera.speed[0] * math.cos(angle * math.pi/180)
+                            y = y + module.tgame.camera.speed[0] * math.sin(angle * math.pi/180)
+                        end
+                
+                        if isKeyDown(tkeys.camera_mode_backward) then -- S
+                            local angle = getCharHeading(PLAYER_PED) + 90
+
+                            x = x - module.tgame.camera.speed[0] * math.cos(angle * math.pi/180)
+                            y = y - module.tgame.camera.speed[0] * math.sin(angle * math.pi/180) 
+                        end
+
+                    end
+                end
+
+                local mouse_x, mouse_y =  getPcMouseMovement()
+
+                total_mouse_x = total_mouse_x + mouse_x
+                total_mouse_y = total_mouse_y + mouse_y
+                setCharHeading(PLAYER_PED,total_mouse_x*-module.tgame.camera.speed[0])
+                module.tgame.camera.rotation = total_mouse_y
+                module.tgame.camera.rotation = total_mouse_y
+
+                setCharCoordinates(PLAYER_PED,x,y,z-1.0)
+                attachCameraToChar(PLAYER_PED,0.0, 0.0, 0.0, 0.0, 180, module.tgame.camera.rotation, 0.0, 2)
+
+                wait(0)
+            end
+
+            freezeCharPositionAndDontLoadCollision(PLAYER_PED,false)
+
+            setCharCollision(PLAYER_PED,true)
+
+            writeMemory(0xBA676C,1,0,false) -- Radar
+            writeMemory(0xBA6769,1,1,false) -- Hud
+
+            restoreCameraJumpcut()
+            writeMemory((getCharPointer(PLAYER_PED)+1140),4,model_val,false)
         end
         wait(0)
     end
@@ -186,6 +227,23 @@ function module.RandomCheats()
     end
 end
 
+function module.FreezeTime()
+    while true do
+        if module.tgame.freeze_time[0] then
+
+            local weather = readMemory(0xC81320,2,false) -- Weather
+            memory.write(0x969168,1,1)  -- Freeze time
+
+            while module.tgame.freeze_time[0] do
+                writeMemory(0xC81320,2,weather,false) -- Weather
+                wait(0)
+            end
+            memory.write(0x969168,0,1)  -- Freeze time
+        end
+        wait(0)
+    end
+end
+
 function SetTime()
     fcommon.DropDownMenu("Time",function()
         imgui.Spacing()
@@ -196,7 +254,7 @@ function SetTime()
 
         fcommon.CheckBoxValue("Faster clock",0x96913B)
         imgui.SameLine()
-        fcommon.CheckBoxValue("Freeze time",0x969168)
+        fcommon.CheckBoxVar("Freeze time",module.tgame.freeze_time)
         if imgui.InputInt("Current hour",hour) then
             memory.write(0xB70153 ,hour[0],1)
         end
@@ -276,7 +334,7 @@ end
 
 function ShowScriptEnabled(script,search_text,index)
     fcommon.DropDownMenu(script.name .. "##" .. index,function()
-        local authors = "Authors: "
+        local authors = ""
         for _,author in ipairs(script.authors) do
             authors = authors .. author .. ", "
         end
@@ -290,28 +348,38 @@ function ShowScriptEnabled(script,search_text,index)
         end
 
         imgui.Columns(2,nil,false)
+        imgui.Text("Authors: ")
+        imgui.SameLine(0.0,0.0)
         imgui.TextWrapped(string.sub(authors,1,-3))
         imgui.Text("Version: " .. tostring(script.version))
         imgui.Text("Version num: " .. tostring(script.version_num))
         imgui.NextColumn()
         imgui.Text("Script ID: " .. script.id)
         imgui.Text("Active: " .. tostring( not script.frozen))
-        imgui.TextWrapped("Filename: " .. string.sub(script.filename,1,-5))
+        imgui.Text("Filename: ")
+        imgui.SameLine(0.0,0.0)
+        imgui.TextWrapped(string.sub(script.filename,1,-5))
         imgui.Columns(1)
         if properties ~= "" then
             imgui.Spacing()
             imgui.SameLine()
-            imgui.TextWrapped("Properties: " .. string.sub(properties,1,-3))
+            imgui.Text("Properties: ")
+            imgui.SameLine(0.0,0.0)
+            imgui.TextWrapped(string.sub(properties,1,-3))
         end
         if dependencies ~= "" then
             imgui.Spacing()
             imgui.SameLine()
-            imgui.TextWrapped("Dependencies: " .. string.sub(dependencies,1,-3))
+            imgui.Text("Dependencies: ")
+            imgui.SameLine(0.0,0.0)
+            imgui.TextWrapped(string.sub(dependencies,1,-3))
         end
         if description ~= "" then
             imgui.Spacing()
             imgui.SameLine()
-            imgui.TextWrapped("Description: " .. script.description)
+            imgui.Text("Description: ")
+            imgui.SameLine(0.0,0.0)
+            imgui.TextWrapped(script.description)
         end
         if imgui.Button("Reload##" .. index,imgui.ImVec2(fcommon.GetSize(2))) then
             script:reload()
@@ -345,19 +413,6 @@ function module.GameMain()
             imgui.Spacing()
             imgui.Columns(2,nil,false)
 
-            fcommon.CheckBoxFunc("Airbreak mode",module.tgame.airbreak,
-            function()
-                if module.tgame.airbreak[0] then
-                    lockPlayerControl(true)
-                    setCharCollision(PLAYER_PED,false)
-                    setCameraBehindPlayer()
-                    fcommon.CheatActivated()
-                else
-                    lockPlayerControl(false)
-                    setCharCollision(PLAYER_PED,true)
-                    fcommon.CheatDeactivated()
-                end
-            end,"Controls:\nW : Forward\tS : Backward\nA  : Left  \t\tD : Right\nArrow_Up\t : Move up\nArrow_Down : Move Down")
             fcommon.CheckBoxFunc("Disable cheats",module.tgame.disable_cheats,
             function()
                 if module.tgame.disable_cheats[0] then
@@ -374,6 +429,15 @@ function module.GameMain()
             end)
             fcommon.CheckBoxVar("Disable help popups",module.tgame.disable_help_popups,"Disables wasted & arrested popups that\nappear in a new game.Requires restart")
             fcommon.CheckBoxValue('Free PNS',0x96C009)
+            fcommon.CheckBoxFunc("Freeze misson timer",module.tgame.freeze_mission_timer,function()
+                if module.tgame.mission_timer[0] then
+                    freezeOnscreenTimer(true)
+                    fcommon.CheatActivated()
+                else
+                    freezeOnscreenTimer(false)
+                    fcommon.CheatDeactivated()
+                end
+            end)
             fcommon.CheckBoxFunc("Disable F1 & F3 replay",module.tgame.disable_replay,function()
                 if module.tgame.disable_replay[0] then
                     writeMemory(4588800,1,195,false)
@@ -392,7 +456,7 @@ function module.GameMain()
                     end
                 end
             end)
-
+            
             imgui.NextColumn()
 
             fcommon.CheckBoxFunc("Keep stuff",module.tgame.keep_stuff,
@@ -421,7 +485,26 @@ function module.GameMain()
             if imgui.BeginChild("Game") then
                 imgui.Spacing()
 
+                fcommon.DropDownMenu('Camera mode',function()
+                    fcommon.CheckBoxVar("Camera mode ##Checkbox",module.tgame.camera.bool,
+                    "Controls:\nForward: W\tBackward: S\nMove up: Left Shift + W\nMove down: Left Shift + S\nRotation: Mouse")
+                    imgui.InputFloat("Speed",module.tgame.camera.speed)
+                    imgui.Spacing()
+                    if imgui.Button("Slow",imgui.ImVec2(fcommon.GetSize(3))) then
+                        module.tgame.camera.speed[0] = 0.03
+                    end
+                    imgui.SameLine()
+                    if imgui.Button("Normal",imgui.ImVec2(fcommon.GetSize(3))) then
+                        module.tgame.camera.speed[0] = 0.3
+                    end
+                    imgui.SameLine()
+                    if imgui.Button("Fast",imgui.ImVec2(fcommon.GetSize(3))) then
+                        module.tgame.camera.speed[0] = 3.0
+                    end
+                end)
+
                 fcommon.UpdateAddress({name = 'Days passed',address = 0xB79038 ,size = 4,min = 0,max = 9999})
+
                 fcommon.DropDownMenu('FPS',function()
 
                     imgui.Columns(2,nil,false)

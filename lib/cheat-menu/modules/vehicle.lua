@@ -86,6 +86,7 @@ module.tvehicle =
         images = {},
         texture = nil
     },
+    no_vehicles = imgui.new.bool(fconfig.Get('tvehicle.no_vehicles',false)),
     no_damage = imgui.new.bool(fconfig.Get('tvehicle.no_damage',false)),
     path = tcheatmenu.dir .. "vehicles\\images",
     quick_spawn  = imgui.new.bool(fconfig.Get('tvehicle.quick_spawn',false)),
@@ -438,6 +439,22 @@ function module.VehicleMain()
  
             fcommon.CheckBoxVar("New aircraft camera",module.tvehicle.aircraft.camera)
             fcommon.CheckBoxVar("No damage",module.tvehicle.no_damage)
+            fcommon.CheckBoxFunc("No traffic vehicles",module.tvehicle.no_vehicles,
+            function()
+                if module.tvehicle.no_vehicles[0] then
+                    writeMemory(0x434237,1,0x73,false) -- change condition to unsigned (0-255)
+                    writeMemory(0x434224,1,0,false)
+                    writeMemory(0x484D19,1,0x83,false) -- change condition to unsigned (0-255)
+                    writeMemory(0x484D17,1,0,false)
+                    fcommon.CheatActivateds()
+                else
+                    writeMemory(0x434237,1,-1063242627,false) -- change condition to unsigned (0-255)
+                    writeMemory(0x434224,1,940431405,false)
+                    writeMemory(0x484D19,1,292493,false) -- change condition to unsigned (0-255)
+                    writeMemory(0x484D17,1,1988955949,false)
+                    fcommon.CheatDeactivated()
+                end
+            end)
             fcommon.CheckBoxVar("No visual damage",module.tvehicle.visual_damage)
             fcommon.CheckBoxValue("Perfect handling",0x96914C)
             fcommon.CheckBoxValue("Tank mode",0x969164) 
