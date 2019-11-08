@@ -34,10 +34,10 @@ Now try it out in-game. If it doesn't work open an issue here or create a post i
 
 
 ## Images
-![Image](https://i.imgur.com/zY2ij0V.jpg)
-![Image](https://i.imgur.com/YLSjCQM.jpg)
-![Image](https://i.imgur.com/tz4FsNj.jpg)
-![Image](https://i.imgur.com/9JWR9fa.jpg)
+![Image](https://i.imgur.com/4H0xAff.jpg)
+![Image](https://i.imgur.com/wVUqbYC.jpg)
+![Image](https://i.imgur.com/0C0FQU3.jpg)
+![Image](https://i.imgur.com/Fjqd2hi.jpg)
 
 
 ## Youtube
@@ -48,7 +48,8 @@ Now try it out in-game. If it doesn't work open an issue here or create a post i
 
 ### Adding custom peds/skins images
 - Version required 1.8-wip and above
- 
+
+
 Ped/skin images (only jpg) are loaded from '\moonloader\lib\cheat-menu\peds\' directory. There are more folders inside that directory. Those folders are menus that appear on the lists tab. Images under those directories will appear both on the 'search' tab and on the 'list' tab. The image name should contain the ped model id. Names for custom peds have to be added inside '\moonloader\lib\cheat-menu\json\ped.json' file.
 
 ### Adding custom vehicle images 
@@ -69,7 +70,7 @@ Paintjob images (only png) are loaded from '\moonloader\lib\cheat-menu\vehicles\
 ### Adding custom weapons images
 - Version required 1.8-wip and above
 
-Weapon images (only png) are loaded from '\moonloader\lib\cheat-menu\weapons\' directory. There are more folders inside that directory. Those folders are menus that appear on the lists tab. Images under those directories will appear both on the 'search' tab and on the 'list' tab. The image name should contain the weapon model id. Names for custom vehicles have to be added inside '\moonloader\lib\cheat-menu\json\weapon.json' file.
+Weapon images (only jpg) are loaded from '\moonloader\lib\cheat-menu\weapons\' directory. There are more folders inside that directory. Those folders are menus that appear on the lists tab. Images under those directories will appear both on the 'search' tab and on the 'list' tab. The image name should contain the weapon model id. Names for custom vehicles have to be added inside '\moonloader\lib\cheat-menu\json\weapon.json' file.
 
 ### Adding custom clothes
 - Version required 1.8-wip and above
