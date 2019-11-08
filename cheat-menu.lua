@@ -234,7 +234,6 @@ function()
 end).HideCursor = true
 
 function main()
-    freezeOnscreenTimer(true)
     --------------------------------------------------
     -- Functions that need to lunch only once on startup
 
