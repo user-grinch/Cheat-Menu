@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.8-wip")
-script_version_number(20191112) -- YYYYMMDD
+script_version_number(20191113) -- YYYYMMDD
 
 
 --------------------------------------------------
@@ -42,6 +42,8 @@ tkeys =
     screenshot_key       = 0x53, -- S
     teleport_key1        = 0x58, -- X - key1 for quick teleport
     teleport_key2        = 0x59, -- Y - key2 for quick teleport
+
+    
 }
 
 tcheatmenu =
@@ -234,6 +236,7 @@ function()
 end).HideCursor = true
 
 function main()
+
     --------------------------------------------------
     -- Functions that need to lunch only once on startup
 
@@ -242,8 +245,6 @@ function main()
     if fplayer.tplayer.invisible[0] then
         fplayer.tplayer.model_val = readMemory((getCharPointer(PLAYER_PED)+1140),4,false)
         writeMemory(getCharPointer(PLAYER_PED)+1140,4,2,false)
-    else
-        writeMemory((getCharPointer(PLAYER_PED)+1140),4,fplayer.tplayer.model_val,false)
     end
 
     -- Mission timer

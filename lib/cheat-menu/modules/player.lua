@@ -286,7 +286,7 @@ function module.PlayerMain()
                     writeMemory((getCharPointer(PLAYER_PED)+1140),4,fplayer.tplayer.model_val,false)
                     fcommon.CheatDeactivated()
                 end
-            end)
+            end,"Player can't enter/exit vehicle")
 
             imgui.NextColumn()
             
