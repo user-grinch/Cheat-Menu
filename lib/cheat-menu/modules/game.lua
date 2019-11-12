@@ -41,7 +41,7 @@ module.tgame                =
     disable_help_popups     = imgui.new.bool(fconfig.Get('tgame.disable_help_popups',false)),
     disable_replay          = imgui.new.bool(fconfig.Get('tgame.disable_replay',false)),
     fps_limit               = imgui.new.int(fconfig.Get('tgame.fps_limit',30)),
-    freeze_mission_timer    = imgui.new.bool(fconfig.Get('tgame.mission_timer',false)), 
+    freeze_mission_timer    = imgui.new.bool(fconfig.Get('tgame.freeze_mission_timer',false)), 
     freeze_time             = imgui.new.bool(fconfig.Get('tgame.freeze_time',false)), 
     ghost_cop_cars          = imgui.new.bool(fconfig.Get('tgame.ghost_cop_cars',false)),
     keep_stuff              = imgui.new.bool(fconfig.Get('tgame.keep_stuff',false)),
@@ -136,33 +136,32 @@ function module.CameraMode()
             while module.tgame.camera.bool[0] do
                 local x, y, z = getCharCoordinates(PLAYER_PED)
 
-                if not isKeyDown(tkeys.camera_mode_extra2) then -- LCONTROL
-                    if isKeyDown(tkeys.camera_mode_extra1) then -- LSHIFT
-                        
-                        if isKeyDown(tkeys.camera_mode_up) then -- W
-                            z = z+module.tgame.camera.speed[0]
-                        end
-                        
-                        if isKeyDown(tkeys.camera_mode_down) then -- S
-                            z = z-module.tgame.camera.speed[0]
-                        end
-
-                    else
-                        if isKeyDown(tkeys.camera_mode_forward) then -- W
-                            local angle = getCharHeading(PLAYER_PED) + 90
-
-                            x = x + module.tgame.camera.speed[0] * math.cos(angle * math.pi/180)
-                            y = y + module.tgame.camera.speed[0] * math.sin(angle * math.pi/180)
-                        end
-                
-                        if isKeyDown(tkeys.camera_mode_backward) then -- S
-                            local angle = getCharHeading(PLAYER_PED) + 90
-
-                            x = x - module.tgame.camera.speed[0] * math.cos(angle * math.pi/180)
-                            y = y - module.tgame.camera.speed[0] * math.sin(angle * math.pi/180) 
-                        end
-
+               
+                if isKeyDown(tkeys.camera_mode_extra) then -- LSHIFT
+                    
+                    if isKeyDown(tkeys.camera_mode_up) then -- W
+                        z = z+module.tgame.camera.speed[0]
                     end
+                    
+                    if isKeyDown(tkeys.camera_mode_down) then -- S
+                        z = z-module.tgame.camera.speed[0]
+                    end
+
+                else
+                    if isKeyDown(tkeys.camera_mode_forward) then -- W
+                        local angle = getCharHeading(PLAYER_PED) + 90
+
+                        x = x + module.tgame.camera.speed[0] * math.cos(angle * math.pi/180)
+                        y = y + module.tgame.camera.speed[0] * math.sin(angle * math.pi/180)
+                    end
+            
+                    if isKeyDown(tkeys.camera_mode_backward) then -- S
+                        local angle = getCharHeading(PLAYER_PED) + 90
+
+                        x = x - module.tgame.camera.speed[0] * math.cos(angle * math.pi/180)
+                        y = y - module.tgame.camera.speed[0] * math.sin(angle * math.pi/180) 
+                    end
+
                 end
 
                 local mouse_x, mouse_y =  getPcMouseMovement()
@@ -430,7 +429,7 @@ function module.GameMain()
             fcommon.CheckBoxVar("Disable help popups",module.tgame.disable_help_popups,"Disables wasted & arrested popups that\nappear in a new game.Requires restart")
             fcommon.CheckBoxValue('Free PNS',0x96C009)
             fcommon.CheckBoxFunc("Freeze misson timer",module.tgame.freeze_mission_timer,function()
-                if module.tgame.mission_timer[0] then
+                if module.tgame.freeze_mission_timer[0] then
                     freezeOnscreenTimer(true)
                     fcommon.CheatActivated()
                 else

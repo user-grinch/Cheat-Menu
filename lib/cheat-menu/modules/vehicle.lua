@@ -446,7 +446,7 @@ function module.VehicleMain()
                     writeMemory(0x434224,1,0,false)
                     writeMemory(0x484D19,1,0x83,false) -- change condition to unsigned (0-255)
                     writeMemory(0x484D17,1,0,false)
-                    fcommon.CheatActivateds()
+                    fcommon.CheatActivated()
                 else
                     writeMemory(0x434237,1,-1063242627,false) -- change condition to unsigned (0-255)
                     writeMemory(0x434224,1,940431405,false)

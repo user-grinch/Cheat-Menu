@@ -166,7 +166,7 @@ function module.PedMain()
                 fcommon.DropDownMenu("Gang zone density",function()
                     imgui.PushItemWidth(imgui.GetWindowWidth() - 200)
 
-                    for k,v in pairs(module.tped.gang_names) do
+                    for k,v in pairs(module.tped.gang.names) do
                         SetGangZoneDensity(k,v)
                     end
                     imgui.PopItemWidth()

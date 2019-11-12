@@ -117,6 +117,7 @@ function module.Write()
                 aimSkinChanger      = fplayer.tplayer.aimSkinChanger[0],
                 cjBody              = fplayer.tplayer.cjBody[0],
                 god                 = fplayer.tplayer.god[0],
+                invisible           = fplayer.tplayer.invisible[0],
                 keep_position       = fplayer.tplayer.keep_position[0],
             },
             tteleport =
@@ -148,11 +149,8 @@ function module.Write()
             },
             tvisual =
             {
-                money =
-                {
-                    negative = ffi.string(fvisual.tvisual.money.negative),
-                    positive = ffi.string(fvisual.tvisual.money.positive),
-                },
+                negative         = ffi.string(fvisual.tvisual.money.negative),
+                positive         = ffi.string(fvisual.tvisual.money.positive),
             },
             tweapon =
             {

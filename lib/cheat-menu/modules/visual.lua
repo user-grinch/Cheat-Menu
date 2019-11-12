@@ -18,13 +18,15 @@ local module = {}
 
 module.tvisual =
 {
-    car_names  = imgui.new.bool(true),
+    car_names           = imgui.new.bool(true),
     money =
     {
-        negative = imgui.new.char[20](memory.tostring(readMemory(0x58F50A,4,false))),
-        positive = imgui.new.char[20](memory.tostring(readMemory(0x58F4C8,4,false))),
+        negative_memory = allocateMemory(4),
+        negative        = imgui.new.char[20](fconfig.Get('tvisual.negative',memory.tostring(readMemory(0x58F50A,4,false)))),
+        positive_memory = allocateMemory(4),
+        positive        = imgui.new.char[20](fconfig.Get('tvisual.positive',memory.tostring(readMemory(0x58F4C8,4,false)))),
     },
-    zone_names = imgui.new.bool(true),
+    zone_names          = imgui.new.bool(true),
 }
 
 -- Main function
@@ -83,25 +85,25 @@ function module.VisualMain()
                 fcommon.UpdateAddress({ name = 'Money font style',address = 0x58F57F ,size = 1,min=0,default = 3,max = 3})
                 fcommon.DropDownMenu("Money text format",function()
                     if imgui.InputText("Positive",module.tvisual.money.positive,ffi.sizeof(module.tvisual.money.positive)) then 
-                        local var = allocateMemory(4)
-                        ffi.copy(ffi.cast("char*", var), ffi.string(module.tvisual.money.positive))
-                        writeMemory(0x58F4C8,4,var,false)
+
+                        ffi.copy(ffi.cast("char*", module.tvisual.money.positive_memory), ffi.string(module.tvisual.money.positive))
+                        writeMemory(0x58F4C8,4,module.tvisual.money.positive_memory,false)
                     end
                     if imgui.InputText("Negative",module.tvisual.money.negative,ffi.sizeof(module.tvisual.money.negative)) then
-                        local var = allocateMemory(4)
-                        ffi.copy(ffi.cast("char*", var), ffi.string(module.tvisual.money.negative))
-                        writeMemory(0x58F50A,4,var,false)
+
+                        ffi.copy(ffi.cast("char*", module.tvisual.money.negative_memory), ffi.string(module.tvisual.money.negative))
+                        writeMemory(0x58F50A,4,module.tvisual.money.negative_memory,false)
                     end
                     
                     if imgui.Button("Reset to default",imgui.ImVec2(fcommon.GetSize(1))) then
-                        local var = allocateMemory(4)
-                        local var2 = allocateMemory(4)
-                        ffi.copy(ffi.cast("char(*)", var), "-$%07d")
+
+                        ffi.copy(ffi.cast("char(*)", module.tvisual.money.negative_memory), "-$%07d")
                         imgui.StrCopy(module.tvisual.money.negative,"-$%07d",ffi.sizeof(module.tvisual.money.negative))
-                        writeMemory(0x58F50A,4,var,false)
-                        ffi.copy(ffi.cast("char(*)", var2), "$%08d")
+                        writeMemory(0x58F50A,4,module.tvisual.money.negative_memory,false)
+
+                        ffi.copy(ffi.cast("char(*)", module.tvisual.money.positive_memory), "$%08d")
                         imgui.StrCopy(module.tvisual.money.positive,"$%08d",ffi.sizeof(module.tvisual.money.positive))
-                        writeMemory(0x58F4C8,4,var2,false)
+                        writeMemory(0x58F4C8,4,module.tvisual.money.positive_memory,false)
                     end                    
 
                 end)

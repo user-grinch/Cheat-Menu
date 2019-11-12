@@ -109,7 +109,7 @@ function module.StatMain()
                 for snum, sname in pairs(module.tstat.names) do
                     if snum ~= "" then
                         if (ffi.string(module.tstat.search_text) == "") or (string.upper(sname):find(string.upper(ffi.string(module.tstat.search_text))) ~= nil) then
-                            fcommon.UpdateStat({ name = sname,stat = i})
+                            fcommon.UpdateStat({ name = sname,stat = snum})
                         end
                     end
                 end

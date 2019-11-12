@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.8-wip")
-script_version_number(20191108) -- YYYYMMDD
+script_version_number(20191112) -- YYYYMMDD
 
 
 --------------------------------------------------
@@ -30,8 +30,7 @@ tkeys =
 {
     asc_key              = 0x0D, -- RETURN/Enter - used for aim skin changer
     camera_mode_down     = 0x53, -- S
-    camera_mode_extra1   = 0xA0, -- LSHIFT
-    camera_mode_extra2   = 0xA2, -- LCONTROL
+    camera_mode_extra    = 0xA0, -- LSHIFT
     camera_mode_forward  = 0x57, -- W
     camera_mode_backward = 0x53, -- S
     camera_mode_up       = 0x57, -- W
@@ -86,6 +85,7 @@ resX, resY = getScreenResolution()
 
 tcheatmenu       =
 {   
+    path_index   = {},
     dir          = tcheatmenu.dir,
     current_menu = fconfig.Get('tcheatmenu.current_menu',1),
     window       =
@@ -234,17 +234,24 @@ function()
 end).HideCursor = true
 
 function main()
-    freezeOnscreenTimer(true)
+
     --------------------------------------------------
     -- Functions that need to lunch only once on startup
+
+
+    -- Invisible player
+    if fplayer.tplayer.invisible[0] then
+        fplayer.tplayer.model_val = readMemory((getCharPointer(PLAYER_PED)+1140),4,false)
+        writeMemory(getCharPointer(PLAYER_PED)+1140,4,2,false)
+    else
+        writeMemory((getCharPointer(PLAYER_PED)+1140),4,fplayer.tplayer.model_val,false)
+    end
 
     -- Mission timer
     if fgame.tgame.freeze_mission_timer[0] then
         freezeOnscreenTimer(true)
-        fcommon.CheatActivated()
     else
         freezeOnscreenTimer(false)
-        fcommon.CheatDeactivated()
     end
 
     -- No traffic vehicles 
@@ -315,10 +322,8 @@ function main()
     -- Disable Replay
     if fgame.tgame.disable_replay[0] then
         writeMemory(4588800,1,195,false)
-        fcommon.CheatActivated()
     else
         writeMemory(4588800,1,160,false)
-        fcommon.CheatDeactivated()
     end
 
          
@@ -331,11 +336,11 @@ function main()
     lua_thread.create(fweapon.AutoAim)
 
     --------------------------------------------------
-
+    
     while true do
         --------------------------------------------------
         -- Functions that neeed to run constantly
-
+        
         if fanimation.tanimation.ped[0] == true or fweapon.tweapon.ped[0] == true then
             bool, ped = getCharPlayerIsTargeting(PLAYER_HANDLE)
             if bool == true then
@@ -435,13 +440,13 @@ function onScriptTerminate(script, quitGame)
             if fmenu.tmenu.crash_text == "" then
                 fmenu.tmenu.crash_text = "Cheat menu crashed unexpectedly"
                 if fmenu.tmenu.auto_reload[0] then
+                    
                     for index, script in ipairs(script.list()) do
                         if script.name ~= thisScript().name then
                             script.this:reload()
                         end
                     end
-                    
-                    fmenu.tmenu.crash_text =  fmenu.tmenu.crash_text .. " and reloaded"
+                    fmenu.tmenu.crash_text =  fmenu.tmenu.crash_text .. " and reloaded"
                 end
             end
         end
@@ -451,5 +456,7 @@ function onScriptTerminate(script, quitGame)
             printHelpString(fmenu.tmenu.crash_text)
             fmenu.tmenu.crash_text = ""
         end
+        freeMemory(fvisual.tvisual.money.negative_memory)
+        freeMemory(fvisual.tvisual.money.positive_memory)
     end
 end

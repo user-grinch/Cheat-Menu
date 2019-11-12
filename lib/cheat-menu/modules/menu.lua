@@ -124,7 +124,7 @@ function module.MenuMain()
 			
 			imgui.Spacing()
 			if imgui.Button("Reset to default",imgui.ImVec2(fcommon.GetSize(2))) then
-				module.tmenu.crash_text = "Default configuration restored"
+				module.tmenu.crash_text = "Default configuration ~g~restored"
 				fconfig.tconfig.reset = true
 				thisScript():reload()
 			end
@@ -191,7 +191,7 @@ function module.MenuMain()
 			imgui.SameLine()
 			if imgui.Button("Copy forum link",imgui.ImVec2(fcommon.GetSize(2))) then
 				imgui.SetClipboardText(script.this.url)
-				printHelpString("~g~Sucessfully~w~ copied to clipboard")
+				printHelpString("Copied to clipboard")
 			end
 			imgui.Spacing()
 			imgui.Columns(2,nil,false)

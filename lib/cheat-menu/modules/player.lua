@@ -26,7 +26,9 @@ module.tplayer =
         path            = tcheatmenu.dir .. "clothes\\",
     },
     god                 = imgui.new.bool(fconfig.Get('tplayer.god',false)),
+    invisible           = imgui.new.bool(fconfig.Get('tplayer.invisible',false)),
     keep_position       = imgui.new.bool(fconfig.Get('tplayer.keep_stuff',false)),
+    model_val           = nil,
     never_wanted        = imgui.new.bool(false),
     skins =
     {
@@ -274,7 +276,18 @@ function module.PlayerMain()
             fcommon.CheckBoxValue("Infinite ammo",0x969178)
             fcommon.CheckBoxValue("Infinite oxygen",0x96916E)
             fcommon.CheckBoxValue("Infinite run",0xB7CEE4)
-            
+            fcommon.CheckBoxFunc("Invisible player",module.tplayer.invisible,
+            function()
+                if module.tplayer.invisible[0] then
+                    module.tplayer.model_val = readMemory((getCharPointer(PLAYER_PED)+1140),4,false)
+                    writeMemory(getCharPointer(PLAYER_PED)+1140,4,2,false)
+                    fcommon.CheatActivated()
+                else
+                    writeMemory((getCharPointer(PLAYER_PED)+1140),4,fplayer.tplayer.model_val,false)
+                    fcommon.CheatDeactivated()
+                end
+            end)
+
             imgui.NextColumn()
             
             fcommon.CheckBoxVar("Keep position",module.tplayer.keep_position,"Auto teleport to the position you died from")

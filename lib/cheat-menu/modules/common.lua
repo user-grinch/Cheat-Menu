@@ -481,7 +481,6 @@ function module.LoadImages(mainDir,store_image_table,req_ext,dir)
         local dir_path = mainDir .. "\\" .. dir
         if doesDirectoryExist(dir_path) and dir ~= "." and dir ~= ".." then
             for file in lfs.dir(dir_path) do
-                wait(0)
                 local file_path = dir_path .. "\\" .. file
                 if doesFileExist(file_path) then
                     local _,file_name,file_ext = string.match(file_path, "(.-)([^\\/]-%.?([^%.\\/]*))$") 
@@ -493,6 +492,7 @@ function module.LoadImages(mainDir,store_image_table,req_ext,dir)
                         store_image_table[dir][file_name] = imgui.CreateTextureFromFile(file_path)
                     end
                 end
+                wait(0)
             end
         end
     end
