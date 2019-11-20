@@ -147,17 +147,18 @@ end
 function module.CreateMenus(names,funcs)
 
     imgui.PushStyleVarVec2(imgui.StyleVar.ItemSpacing,imgui.ImVec2(0,0.5))
-    
+
     for i=1,#names,1 do
         if tcheatmenu.current_menu == i then
-            imgui.PushStyleColor(imgui.Col.Button, imgui.ImVec4(0.060,0.530,0.980,1.0))
+            imgui.GetStyle().Colors[imgui.Col.Button] = imgui.GetStyle().Colors[imgui.Col.ButtonActive]
         end
         if imgui.Button(names[i],imgui.ImVec2(module.GetSize(4,true))) then
             tcheatmenu.current_menu = i
         end
         if tcheatmenu.current_menu == i then
-            imgui.PushStyleColor(imgui.Col.Button, imgui.ImVec4(0.260,0.590,0.980,0.400))
+            imgui.GetStyle().Colors[imgui.Col.Button] = imgui.GetStyle().Colors[imgui.Col.TitleBgActive] -- Uses same color as imgui.Col.Button
         end
+       
         if i%4 ~= 0 then
             imgui.SameLine()
         end
@@ -254,7 +255,25 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
     
 end
 
-function module.RadioButton(label,rb_table,addr_table)
+
+
+function module.RadioButtonFunc(label,label_table,values,memory)
+    module.DropDownMenu(label,function()
+        local button = imgui.new.int(module.RwMemory(memory,1))
+
+        for i = 1, #label_table,1 do
+            if imgui.RadioButtonIntPtr(label_table[i],button,values[i]) then
+                module.RwMemory(memory,1,values[i])
+                button[0] = i
+            end
+        end
+    end)
+end
+
+function module.RadioButton(label,rb_table,addr_table,default)
+
+    if default == nil then default = true end
+
     local button = imgui.new.int(#addr_table + 1)
 
     imgui.Text(label)
@@ -272,11 +291,14 @@ function module.RadioButton(label,rb_table,addr_table)
             module.CheatActivated()
         end
     end
-    if imgui.RadioButtonIntPtr("Default ##" ..label,button,#addr_table + 1) then
-        for j = 1,#addr_table,1 do
-            writeMemory(addr_table[j],1,0,false)
+
+    if default == true then --  unused in handling section
+        if imgui.RadioButtonIntPtr("Default ##" ..label,button,#addr_table + 1) then
+            for j = 1,#addr_table,1 do
+                writeMemory(addr_table[j],1,0,false)
+            end
+            module.CheatActivated()
         end
-        module.CheatActivated()
     end
 end
 
@@ -390,12 +412,21 @@ end
 -- Similar UI to the previous function
 -- Provides input options to change game memory values
 function module.UpdateAddress(arg)
-    if arg.default == nil then arg.default = 0 end
     if arg.cvalue == nil then arg.cvalue = 1 end
+
+    local buttons = 3
+
+    if arg.default == nil then
+        buttons = buttons - 1
+    end
+
+    if arg.max == nil then
+        buttons = buttons - 1
+    end
 
     module.DropDownMenu(arg.name,function()
 
-        local value = imgui.new.float(module.RwMemory(arg.address,arg.size,nil,nil,arg.is_float))
+        local value = imgui.new.float(module.RwMemory(arg.address,arg.size,nil,nil,arg.is_float,arg.factor))
 
         imgui.Columns(2,nil,false)
         if arg.min ~= nil then
@@ -410,38 +441,44 @@ function module.UpdateAddress(arg)
         imgui.Spacing()
 
         if imgui.InputFloat("##".. arg.name,value) then
-            module.RwMemory(arg.address,arg.size,value[0],nil,arg.is_float)
+            module.RwMemory(arg.address,arg.size,value[0],nil,arg.is_float,arg.factor)
         end
         imgui.SameLine(0.0,4.0)
         if imgui.Button("-",imgui.ImVec2(20,20)) then
-            module.RwMemory(arg.address,arg.size,(value[0] - arg.cvalue),nil,arg.is_float)
+            module.RwMemory(arg.address,arg.size,(value[0] - arg.cvalue),nil,arg.is_float,arg.factor)
         end
         imgui.SameLine(0.0,4.0)
         if imgui.Button("+",imgui.ImVec2(20,20)) then
-            module.RwMemory(arg.address,arg.size,(value[0] + arg.cvalue),nil,arg.is_float)
+            module.RwMemory(arg.address,arg.size,(value[0] + arg.cvalue),nil,arg.is_float,arg.factor)
         end
         imgui.SameLine(0.0,4.0)
         imgui.Text("Set")
         imgui.Spacing()
-        if imgui.Button("Minimum ##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
-            module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float)
+        if imgui.Button("Minimum ##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
+            module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float,arg.factor)
         end
-        imgui.SameLine()
-        if imgui.Button("Default ##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
-            module.RwMemory(arg.address,arg.size,arg.default,nil,arg.is_float)
+
+        if arg.default ~= nil then
+            imgui.SameLine()
+            if imgui.Button("Default ##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
+                module.RwMemory(arg.address,arg.size,arg.default,nil,arg.is_float,arg.factor)
+            end
         end
-        imgui.SameLine()
-        if imgui.Button("Maximum ##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
-            module.RwMemory(arg.address,arg.size,arg.max,nil,arg.is_float)
+
+        if arg.max ~= nil then
+            imgui.SameLine()
+            if imgui.Button("Maximum ##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
+                module.RwMemory(arg.address,arg.size,arg.max,nil,arg.is_float,arg.factor)
+            end
         end
         imgui.SameLine()
         imgui.Spacing()
         if (arg.min ~= nil) and (value[0] < arg.min) then
-            module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float)
+            module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float,arg.factor)
         end
 
         if (arg.max ~= nil) and (value[0] > arg.max) then
-            module.RwMemory(arg.address,arg.size,arg.max,nil,arg.is_float)
+            module.RwMemory(arg.address,arg.size,arg.max,nil,arg.is_float,arg.factor)
         end
     end)
 end
@@ -499,20 +536,24 @@ function module.LoadImages(mainDir,store_image_table,req_ext,dir)
 end
 
 -- Used to read/write from/to memory
-function module.RwMemory(address,size,value,protect,is_float)
+function module.RwMemory(address,size,value,protect,is_float,factor)
     if protect == nil then protect = false end
+    if factor == nil then factor = 1 end
 
     if value == nil then
+        local return_val = nil
         if is_float == true then
-            return memory.getfloat(address,protect)
+            return_val = memory.getfloat(address,protect)
         else
-            return readMemory(address,size,protect)
+            return_val =  readMemory(address,size,protect)
         end
+
+        return return_val/factor
     else
         if is_float == true then
-            memory.setfloat(address,value,protect)
+            memory.setfloat(address,value*factor,protect)
         else
-            memory.write(address,value,size,protect)
+            memory.write(address,value*factor,size,protect)
         end
     end
 end
