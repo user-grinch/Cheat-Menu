@@ -80,4 +80,32 @@ module.TRAIN_CAM_FIX =
     OFF = 6,
 }
 
+module.VEHICLE_COLOR =
+{
+    MAX_VALUE  = 139,
+    MIN_VALUE  = 0,
+}
+
+module.DRIVE_TYPE =
+{
+    FWD = 82,
+    RWD = 83,
+    AWD = 84,
+}
+
+module.ENGINE_TYPE =
+{
+    PETROL   = 80,
+    DISEAL   = 81,
+    ELECTRIC = 82,
+}
+
+module.LIGHTS =
+{
+    LONG  = 0,
+    SMALL = 1,
+    BIG   = 2,
+    TALL  = 3,
+}
+
 return module

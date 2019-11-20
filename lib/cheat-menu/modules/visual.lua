@@ -107,6 +107,8 @@ function module.VisualMain()
                     end                    
 
                 end)
+
+                --fcommon.UpdateAddress({ name = 'Radio station text color',address = 0xBAB24C ,size = 4,min=-999,default = 40,max = 999})
                 fcommon.UpdateAddress({ name = 'Radar X position',address = 0x858A10,size = 4,min=-999,default = 40,max = 999,is_float = true,help_text = "Changes radar vertical position"})
                 fcommon.UpdateAddress({ name = 'Radar Y position',address = 0x866B70,size = 4,min=-999,default = 104,max = 999,is_float = true,help_text = "Changes radar horizantal position"})
                 fcommon.UpdateAddress({ name = 'Wanted star border',address = 0x58DD41,size = 1,min = 0,default = 1,max = 3})

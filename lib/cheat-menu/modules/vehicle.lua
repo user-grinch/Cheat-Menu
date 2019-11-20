@@ -90,6 +90,7 @@ module.tvehicle =
     no_damage = imgui.new.bool(fconfig.Get('tvehicle.no_damage',false)),
     path = tcheatmenu.dir .. "vehicles\\images",
     quick_spawn  = imgui.new.bool(fconfig.Get('tvehicle.quick_spawn',false)),
+    random_colors = imgui.new.bool(fconfig.Get('tvehicle.random_colors',false)),
     search_text = imgui.new.char[20](),
     spawn_inside = imgui.new.bool(fconfig.Get('tvehicle.spawn_inside',true)),
     speed = imgui.new.int(fconfig.Get('tvehicle.speed',0)),
@@ -218,6 +219,25 @@ function DoorMenu(func)
     end
 
 end   
+
+
+function module.RandomColors()
+    while true do
+        if isCharInAnyCar(PLAYER_PED) and module.tvehicle.random_colors[0] then
+            local primary_color = math.random(fconst.VEHICLE_COLOR.MIN_VALUE,fconst.VEHICLE_COLOR.MAX_VALUE)
+            local secondary_color = math.random(fconst.VEHICLE_COLOR.MIN_VALUE,fconst.VEHICLE_COLOR.MAX_VALUE)
+            local car = getCarCharIsUsing(PLAYER_PED)
+            if isCharInAnyCar(PLAYER_PED) and module.tvehicle.random_colors[0] then
+                changeCarColour(car,primary_color,secondary_color)
+            else
+                break
+            end
+            wait(1000)
+        end
+        wait(0)
+    end
+end
+
 
 --------------------------------------------------
 -- Camera
@@ -401,9 +421,6 @@ function module.VehicleMain()
             fcommon.CheckBoxVar("First person camera",module.tvehicle.first_person_camera)
             fcommon.CheckBoxValue("Float away when hit",0x969166)
             fcommon.CheckBoxValue("Green traffic lights",0x96914E)
-
-            imgui.NextColumn()
-
             fcommon.CheckBoxFunc("Lights on",module.tvehicle.lights,
             function()
                 if isCharInAnyCar(PLAYER_PED) then
@@ -421,6 +438,8 @@ function module.VehicleMain()
                     printHelpString("Player ~r~not~w~ in car")
                 end
             end)
+
+            imgui.NextColumn()
 
             fcommon.CheckBoxFunc("Lock doors",module.tvehicle.lock_doors,
             function()
@@ -457,6 +476,7 @@ function module.VehicleMain()
             end)
             fcommon.CheckBoxVar("No visual damage",module.tvehicle.visual_damage)
             fcommon.CheckBoxValue("Perfect handling",0x96914C)
+            fcommon.CheckBoxVar("Random colors",module.tvehicle.random_colors,"Paints player's car with random colors every second")
             fcommon.CheckBoxValue("Tank mode",0x969164) 
             fcommon.CheckBoxValue("Train camera fix",5416239,nil,fconst.TRAIN_CAM_FIX.ON,fconst.TRAIN_CAM_FIX.OFF) 
             fcommon.CheckBoxVar("Unlimited nitro",module.tvehicle.unlimited_nitro)
@@ -478,50 +498,7 @@ function module.VehicleMain()
 
         if imgui.BeginTabItem("Menus") then
             if imgui.BeginChild("Menus") then
-                fcommon.DropDownMenu("Doors",function()
-                    
-                    if isCharInAnyCar(PLAYER_PED) and not (isCharOnAnyBike(PLAYER_PED) or isCharInAnyBoat(PLAYER_PED) 
-                    or isCharInAnyHeli(PLAYER_PED) or isCharInAnyPlane(PLAYER_PED)) then    
-                        if imgui.RadioButtonIntPtr("Damage", module.tvehicle.door_menu_button,0) then end
-                        imgui.SameLine()
-                        if imgui.RadioButtonIntPtr("Fix", module.tvehicle.door_menu_button,1) then end
-                        imgui.SameLine()
-                        if imgui.RadioButtonIntPtr("Open", module.tvehicle.door_menu_button,2) then end
-                        imgui.SameLine()
-                        if imgui.RadioButtonIntPtr("Pop", module.tvehicle.door_menu_button,3) then end
-                        imgui.Spacing()
-                        imgui.Separator()
-                        imgui.Spacing()
 
-                        if module.tvehicle.door_menu_button[0] == 0 then
-                            if module.tvehicle.visual_damage[0] == false then
-                                DoorMenu(function(vehicle,door)
-                                    damageCarDoor(vehicle,door)
-                                end)
-                            else
-                                imgui.Text("No visual damage enabled")
-                            end
-                        end
-                        if module.tvehicle.door_menu_button[0] == 1 then
-                            DoorMenu(function(vehicle,door)
-                                fixCarDoor(vehicle,door)
-                            end)
-                        end
-                        if module.tvehicle.door_menu_button[0] == 2 then
-                            DoorMenu(function(vehicle,door)
-                                openCarDoor(vehicle,door)
-                            end)
-                        end
-                        if module.tvehicle.door_menu_button[0] == 3 then
-                            DoorMenu(function(vehicle,door)
-                                popCarDoor(vehicle,door,true)
-                            end)
-                        end
-                    else
-                        imgui.Text("Player not in car")
-                    end
-                    
-                end)
                 fcommon.DropDownMenu("Enter nearest vehicle as",function()
                     local vehicle,ped = storeClosestEntities(PLAYER_PED)
                     if vehicle ~= -1 then
@@ -550,34 +527,84 @@ function module.VehicleMain()
                         imgui.Text("No near by vehicles")
                     end
                 end)
-                fcommon.DropDownMenu("Speed",function()
-                    
-                    imgui.Columns(2,nil,false)
-                    fcommon.CheckBoxVar("Lock speed",module.tvehicle.lock_speed)
-                    imgui.NextColumn()
-                    imgui.Columns(1)
-                    if imgui.InputInt("Set",module.tvehicle.speed) then
-                    end
-                    if imgui.Button("Set speed",imgui.ImVec2(fcommon.GetSize(2))) then
-                        if isCharInAnyCar(PLAYER_PED) then
-                            car = getCarCharIsUsing(PLAYER_PED)
-                            setCarForwardSpeed(car,module.tvehicle.speed[0])
+
+                if isCharInAnyCar(PLAYER_PED) then
+                    local car = getCarCharIsUsing(PLAYER_PED)
+                    fcommon.UpdateAddress({name = 'Vehicle dirt level',address = getCarPointer(car) + 1200 ,size = 4,min = 0,max = 15, default = 7.5,is_float = true})
+
+                    fcommon.DropDownMenu("Vehicle doors",function()
+                        if isCharInAnyCar(PLAYER_PED) and not (isCharOnAnyBike(PLAYER_PED) or isCharInAnyBoat(PLAYER_PED) 
+                        or isCharInAnyHeli(PLAYER_PED) or isCharInAnyPlane(PLAYER_PED)) then    
+                            if imgui.RadioButtonIntPtr("Damage", module.tvehicle.door_menu_button,0) then end
+                            imgui.SameLine()
+                            if imgui.RadioButtonIntPtr("Fix", module.tvehicle.door_menu_button,1) then end
+                            imgui.SameLine()
+                            if imgui.RadioButtonIntPtr("Open", module.tvehicle.door_menu_button,2) then end
+                            imgui.SameLine()
+                            if imgui.RadioButtonIntPtr("Pop", module.tvehicle.door_menu_button,3) then end
+                            imgui.Spacing()
+                            imgui.Separator()
+                            imgui.Spacing()
+    
+                            if module.tvehicle.door_menu_button[0] == 0 then
+                                if module.tvehicle.visual_damage[0] == false then
+                                    DoorMenu(function(vehicle,door)
+                                        damageCarDoor(vehicle,door)
+                                    end)
+                                else
+                                    imgui.Text("No visual damage enabled")
+                                end
+                            end
+                            if module.tvehicle.door_menu_button[0] == 1 then
+                                DoorMenu(function(vehicle,door)
+                                    fixCarDoor(vehicle,door)
+                                end)
+                            end
+                            if module.tvehicle.door_menu_button[0] == 2 then
+                                DoorMenu(function(vehicle,door)
+                                    openCarDoor(vehicle,door)
+                                end)
+                            end
+                            if module.tvehicle.door_menu_button[0] == 3 then
+                                DoorMenu(function(vehicle,door)
+                                    popCarDoor(vehicle,door,true)
+                                end)
+                            end
+                        else
+                            imgui.Text("Player not in car")
                         end
-                    end
-                    imgui.SameLine()
-                    if imgui.Button("Instant stop",imgui.ImVec2(fcommon.GetSize(2))) then
-                        if isCharInAnyCar(PLAYER_PED) then
-                            car = getCarCharIsUsing(PLAYER_PED)
-                            setCarForwardSpeed(car,0.0)
+                        
+                    end)
+                    fcommon.DropDownMenu("Vehicle speed",function()
+                        
+                        imgui.Columns(2,nil,false)
+                        fcommon.CheckBoxVar("Lock speed",module.tvehicle.lock_speed)
+                        imgui.NextColumn()
+                        imgui.Columns(1)
+                        if imgui.InputInt("Set",module.tvehicle.speed) then
                         end
-                    end
-                    if module.tvehicle.speed[0] > 500 then
-                        module.tvehicle.speed[0] = 500
-                    end
-                    if module.tvehicle.speed[0] < 0 then
-                        module.tvehicle.speed[0] = 0
-                    end
-                end)
+                        if imgui.Button("Set speed",imgui.ImVec2(fcommon.GetSize(2))) then
+                            if isCharInAnyCar(PLAYER_PED) then
+                                car = getCarCharIsUsing(PLAYER_PED)
+                                setCarForwardSpeed(car,module.tvehicle.speed[0])
+                            end
+                        end
+                        imgui.SameLine()
+                        if imgui.Button("Instant stop",imgui.ImVec2(fcommon.GetSize(2))) then
+                            if isCharInAnyCar(PLAYER_PED) then
+                                car = getCarCharIsUsing(PLAYER_PED)
+                                setCarForwardSpeed(car,0.0)
+                            end
+                        end
+                        if module.tvehicle.speed[0] > 500 then
+                            module.tvehicle.speed[0] = 500
+                        end
+                        if module.tvehicle.speed[0] < 0 then
+                            module.tvehicle.speed[0] = 0
+                        end
+                    end)
+                end
+                
                 fcommon.UpdateAddress({name = 'Vehicle density multiplier',address = 0x8A5B20,size = 4,min = 0,max = 10, default = 1,is_float = true})
 
                 imgui.EndChild()
@@ -621,6 +648,7 @@ function module.VehicleMain()
             imgui.EndTabItem()
         end
         if isCharInAnyCar(PLAYER_PED) then
+            local car = getCarCharIsUsing(PLAYER_PED)
             if imgui.BeginTabItem("Paint") then
                 imgui.Spacing()
                 imgui.Columns(1)
@@ -673,13 +701,13 @@ function module.VehicleMain()
             end
             if imgui.BeginTabItem('Tune') then
                 imgui.Spacing()
-                if imgui.Button("Restore mods",imgui.ImVec2(150,25)) then
+                if imgui.Button("Restore mods",imgui.ImVec2(fcommon.GetSize(2))) then
                     if isCharInAnyCar(PLAYER_PED) and module.tvehicle.components.saved then
                         callFunction(0x49B3C0,0,0)
                     end
                 end
                 imgui.SameLine()
-                if imgui.Button("Save mods",imgui.ImVec2(150,25)) then
+                if imgui.Button("Save mods",imgui.ImVec2(fcommon.GetSize(2))) then
                     if isCharInAnyCar(PLAYER_PED) then
                         callFunction(0x49B280,0,0)
                         module.tvehicle.components.saved = true
@@ -693,6 +721,64 @@ function module.VehicleMain()
                     imgui.EndChild()
                 end
                 imgui.EndTabItem()
+            end
+            if imgui.BeginTabItem("Handling") then
+                imgui.Spacing()
+                if imgui.Button("Reset handling",imgui.ImVec2(fcommon.GetSize(1))) then
+                    local cHandlingDataMgr = readMemory(0x05BFA96,4,false)
+                    callMethod(0x5BD830,cHandlingDataMgr,0,0)
+                end
+            
+                imgui.Spacing()
+
+                if imgui.BeginChild("Handling") then
+                    local address = callFunction(0x00403DA0,1,1,getCarModel(car))
+                    local phandling = readMemory((address + 0x4A),2,false)
+                    phandling = phandling * 0xE0
+                    phandling = phandling + 0xC2B9DC
+
+                    fcommon.UpdateAddress({name = 'ABS',address = phandling + 0x9C ,size = 1,min = 0,max = 1})
+                    fcommon.UpdateAddress({name = 'Brake bias',address = phandling + 0x98 ,size = 4,min = 0,max = 1,is_float = true})
+                    
+                    fcommon.UpdateAddress({name = 'Brake deceleration',address = phandling + 0x94 ,size = 4,min = 0.1,max = 10,is_float = true,factor = 3.9999999e-4})
+                    fcommon.UpdateAddress({name = 'Centre of mass X',address = phandling + 0x14 ,size = 1,min = -10.0,max = 10.0,is_float = true})
+                    fcommon.UpdateAddress({name = 'Centre of mass Y',address = phandling + 0x18 ,size = 1,min = -10.0,max = 10.0,is_float = true})
+                    fcommon.UpdateAddress({name = 'Centre of mass Z',address = phandling + 0x1C ,size = 1,min = -10.0,max = 10.0,is_float = true})
+                    fcommon.UpdateAddress({name = 'Collision damage multiplier ',address = phandling + 0xC8 ,size = 4,min = 0.2,max = 5.0,is_float = true})
+                  
+                    local CDM = readMemory((phandling + 0xC8),4,false)
+                    local fMass_in = readMemory((phandling + 0x8),4,false)
+                    CDM = CDM/2000.0
+                    CDM = CDM/fMass_in
+                    fcommon.UpdateAddress({name = 'Damage multiplier',address = phandling + CDM ,size = 4,min = 1,max = 10000,is_float = true})
+                    fcommon.UpdateAddress({name = 'Damping level',address = phandling + 0xB0 ,size = 4,is_float = true})
+                    fcommon.UpdateAddress({name = 'Drag mult',address = phandling + 0x10 ,size = 4,min = 1,max = 20.0,is_float = true})
+                    fcommon.RadioButtonFunc("Drive type",{"FWD","RWD","4WD"},{fconst.DRIVE_TYPE.FWD,fconst.DRIVE_TYPE.RWD,fconst.DRIVE_TYPE.AWD},phandling + 0x74)
+                    fcommon.UpdateAddress({name = 'Engine acceleration',address = phandling + 0x7C ,size = 4,min = 1,max = 10000,is_float = true,factor = 3.9999999e-4})
+                    fcommon.UpdateAddress({name = 'Engine inertia',address = phandling + 0x80 ,size = 4,min = 0,max = 50,is_float = true})
+                    fcommon.RadioButtonFunc("Engine type",{"Petrol","Diseal","Electric"},{fconst.ENGINE_TYPE.PETROL,fconst.ENGINE_TYPE.DISEAL,fconst.ENGINE_TYPE.ELECTRIC},phandling + 0x75)
+                    fcommon.RadioButtonFunc("Front lights",{"Long","Small","Big","Tall"},{fconst.LIGHTS.LONG,fconst.LIGHTS.SMALL,fconst.LIGHTS.BIG,fconst.LIGHTS.TALL},phandling + 0xDC)
+                    fcommon.UpdateAddress({name = 'Force level',address = phandling + 0xAC ,size = 4,is_float = true})
+                    fcommon.UpdateAddress({name = 'High speed damping',address = phandling + 0xB4 ,size = 4,is_float = true})
+                    fcommon.UpdateAddress({name = 'Lower limit',address = phandling + 0xBC ,size = 4,is_float = true})
+                    fcommon.UpdateAddress({name = 'Mass',address = phandling + 0x4 ,size = 4,min = 1,max = 50000,is_float = true})
+                    fcommon.UpdateAddress({name = 'Max velocity',address = phandling + 0x84 ,size = 4,min = 1,max = 10000,is_float = true,factor = 5.5555599e-3})
+                    fcommon.UpdateAddress({name = 'Monetary value',address = phandling + 0xD8 ,size = 4,min = 1,max = 100000})
+                    fcommon.UpdateAddress({name = 'Number of gears',address = phandling + 0x76 ,size = 1,min = 1,max = 10})
+                    fcommon.UpdateAddress({name = 'Percent submerged',address = phandling + 0x20 ,size = 1,min = 10,max = 120})
+                    fcommon.RadioButtonFunc("Rear lights",{"Long","Small","Big","Tall"},{fconst.LIGHTS.LONG,fconst.LIGHTS.SMALL,fconst.LIGHTS.BIG,fconst.LIGHTS.TALL},phandling + 0xDD)
+                    fcommon.UpdateAddress({name = 'SeatOffsetDistance',address = phandling + 0xD4 ,size = 4,is_float = true})
+                    fcommon.UpdateAddress({name = 'Steering lock',address = phandling + 0xA0 ,size = 4,min = 10,max = 40,is_float = true})
+                    fcommon.UpdateAddress({name = 'Suspension bias',address = phandling + 0xC0 ,size = 4,is_float = true})
+                    
+                    fcommon.UpdateAddress({name = 'Traction bias',address = phandling + 0xA8 ,size = 4,min = 0,max = 1,is_float = true})
+                    fcommon.UpdateAddress({name = 'Traction loss',address = phandling + 0xA4 ,size = 4,min = 0,max = 1,is_float = true})
+                    fcommon.UpdateAddress({name = 'Turn mass',address = phandling + 0xC ,size = 4,min = -50000,max = 50000,is_float = true})
+                    fcommon.UpdateAddress({name = 'Traction multiplier',address = phandling + 0x28 ,size = 4,min = 0.2,max = 2,is_float = true})
+                    fcommon.UpdateAddress({name = 'Upper limit',address = phandling + 0xB8 ,size = 4,is_float = true})
+                    fcommon.UpdateAddress({name = 'VehicleAnimGroup',address = phandling + 0xDE ,size = 1})
+                    imgui.EndChild()
+                end
             end
         end
         imgui.EndTabBar()

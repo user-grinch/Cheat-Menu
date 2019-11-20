@@ -141,6 +141,7 @@ function module.Write()
                 lock_speed       = fvehicle.tvehicle.lock_speed[0],
                 no_damage        = fvehicle.tvehicle.no_damage[0],
                 no_vehicles      = fvehicle.tvehicle.no_vehicles[0],
+                random_colors    = fvehicle.tvehicle.random_colors[0],
                 spawn_inside     = fvehicle.tvehicle.spawn_inside[0],
                 speed            = fvehicle.tvehicle.speed[0],
                 stay_on_bike     = fvehicle.tvehicle.stay_on_bike[0],

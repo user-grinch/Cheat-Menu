@@ -82,9 +82,9 @@ function module.CheckUpdates()
             end) then
 		
 		if string.find( script.this.version,"wip") then
-			link = "https://raw.githubusercontent.com/inanahammad/Cheat-Menu/master/cheat-menu.lua"
+			link = "https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/cheat-menu.lua"
 		else
-			link = "https://api.github.com/repos/inanahammad/Cheat-Menu/tags"
+			link = "https://api.github.com/repos/user-grinch/Cheat-Menu/tags"
 		end
 
 		httpRequest(link, nil, function(body, code, headers, status)
@@ -167,6 +167,16 @@ function module.MenuMain()
 					fvisuals.tvisuals.show_coordinates[0] = false
 				end
 			end
+			imgui.EndTabItem()
+		end
+		if imgui.BeginTabItem("Style") then
+			
+			imgui.Spacing()
+			if imgui.BeginChild("Style") then
+				imgui.ShowStyleEditor(imgui.GetStyle())
+				imgui.EndChild()
+			end
+
 			imgui.EndTabItem()
 		end
 		if imgui.BeginTabItem("License") then

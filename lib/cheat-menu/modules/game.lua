@@ -177,7 +177,6 @@ function module.CameraMode()
 
                 wait(0)
             end
-
             freezeCharPositionAndDontLoadCollision(PLAYER_PED,false)
 
             setCharCollision(PLAYER_PED,true)

@@ -20,9 +20,8 @@ script_description("Cheat Menu for Grand Theft Auto San Andreas")
 script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-menu")
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
-script_version("1.8")
-script_version_number(20191113) -- YYYYMMDD
-
+script_version("1.9-wip")
+script_version_number(20191120) -- YYYYMMDD
 
 --------------------------------------------------
 -- All the command keys used throughout the Cheat-Menu
@@ -84,7 +83,6 @@ if fmenu.tmenu.disable_in_samp[0] and isSampLoaded() then
 end
 
 resX, resY = getScreenResolution()
-
 tcheatmenu       =
 {   
     path_index   = {},
@@ -116,7 +114,7 @@ imgui.OnInitialize(function() -- Called once
     imgui.PushStyleVarFloat(imgui.StyleVar.TabRounding,3)
     imgui.PushStyleVarVec2(imgui.StyleVar.WindowTitleAlign,imgui.ImVec2(0.5,0.5))
     imgui.PushStyleColor(imgui.Col.Header, imgui.ImVec4(0,0,0,0))
-
+   
     --Loading images
     lua_thread.create(fcommon.LoadImages,fvehicle.tvehicle.path,fvehicle.tvehicle.images,fconst.VEHICLE.IMAGE_EXT)
     lua_thread.create(fcommon.LoadImages,fweapon.tweapon.path,fweapon.tweapon.images,fconst.WEAPON.IMAGE_EXT)
@@ -334,6 +332,7 @@ function main()
     lua_thread.create(fvehicle.AircraftCamera)
     lua_thread.create(fvehicle.FirstPersonCamera)
     lua_thread.create(fweapon.AutoAim)
+    lua_thread.create(fvehicle.RandomColors)
 
     --------------------------------------------------
     
