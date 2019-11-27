@@ -102,8 +102,9 @@ function module.SolidWater()
                     removeObjectElegantly(object)
                 end
 
-                if z > water_height and water_height ~= -1000 then     -- Don't create the object if player is under water/diving
+                if z > water_height and water_height ~= -1000 and not isCharInAnyBoat(PLAYER_PED) then     -- Don't create the object if player is under water/diving
                     object = createObject(3095,x,y,water_height)
+                    
                     setObjectVisible(object,false)
                 end
             end

@@ -21,6 +21,7 @@ module.tweapon =
     auto_aim    = imgui.new.bool(fconfig.Get('tweapon.auto_aim',false)),
     fast_reload = imgui.new.bool(fconfig.Get('tweapon.fast_reload',false)),
     images      = {},
+    long_range  = imgui.new.bool(fconfig.Get('tweapon.long_range',false)),
     names       = fcommon.LoadJson("weapon"),
     no_reload   = imgui.new.bool(fconfig.Get('tweapon.no_reload',false)),
     path        = tcheatmenu.dir .. "weapons",
@@ -79,6 +80,7 @@ function module.GiveWeapon(weapon)
     end
 end
 
+
 function module.AutoAim()
     while true do
         if module.tweapon.auto_aim[0] then
@@ -106,22 +108,39 @@ end
 
 -- Main function
 function module.WeaponMain()
+
+   
+
+
+    
+    
+    -- local pPed = getCharPointer(PLAYER_PED)
+    -- local CurWeapon = getCurrentCharWeapon(PLAYER_PED)
+
+    -- char __thiscall CPed::GetWeaponSkill(CPed *this, eWeaponType weaponType)
+    -- local skill = callMethod(0x5E3B60,pPed,1,0,CurWeapon)
+
+    -- CWeaponInfo *__cdecl CWeaponInfo::GetWeaponInfo(eWeaponType weaponID, char skill)
+    -- local pWeaponInfo = callFunction(0x743C60,2,2,CurWeapon,skill)
+    -- writeMemory(pWeaponInfo+0x4,4,100000,false)
+    -- writeMemory(pWeaponInfo+0x8,4,100000,false)
+    
     imgui.Spacing()
     if imgui.Button("Remove current weapon",imgui.ImVec2(fcommon.GetSize(2))) then
         
-            if module.tweapon.ped[0] == true then
-                if fped.tped.selected ~=  nil then
-                    removeWeaponFromChar(fped.tped.selected,getCurrentCharWeapon(fped.tped.selected))
-                    fcommon.CheatActivated()
-                else
-                    printHelpString("~r~No~w~ ped selected")
-                end
-            else
-                removeWeaponFromChar(PLAYER_PED,getCurrentCharWeapon(PLAYER_PED))
+        if module.tweapon.ped[0] == true then
+            if fped.tped.selected ~=  nil then
+                removeWeaponFromChar(fped.tped.selected,getCurrentCharWeapon(fped.tped.selected))
                 fcommon.CheatActivated()
+            else
+                printHelpString("~r~No~w~ ped selected")
             end
-            
+        else
+            removeWeaponFromChar(PLAYER_PED,getCurrentCharWeapon(PLAYER_PED))
+            fcommon.CheatActivated()
+        end
     end
+
     imgui.SameLine()
     if imgui.Button("Remove all weapons",imgui.ImVec2(fcommon.GetSize(2))) then         
         if module.tweapon.ped[0] == true then
@@ -173,6 +192,26 @@ function module.WeaponMain()
                     fcommon.CheatDeactivated()
                 end
             end)
+            -- fcommon.CheckBoxFunc("Long range",module.tweapon.long_range,
+            -- function()
+            --     if module.tweapon.long_range[0] then
+            --         writeMemory( 7600773,1,144,1)
+            --         writeMemory( 7600815,1,144,1)
+            --         writeMemory( 7600816,2,37008,1)
+            --         writeMemory( 7612591,1,144,1)
+            --         writeMemory( 7612646,1,144,1)
+            --         writeMemory( 7612647,2,37008,1)
+            --         fcommon.CheatActivated()
+            --     else
+            --         writeMemory( 7600773,1,72,1)
+            --         writeMemory( 7600815,1,255,1)
+            --         writeMemory( 7600816,2,3150,1)
+            --         writeMemory( 7612591,1,72,1)
+            --         writeMemory( 7612646,1,255,1)
+            --         writeMemory( 7612647,2,3150,1)
+            --         fcommon.CheatDeactivated()
+            --     end
+            -- end)
             imgui.Columns(1)
             imgui.EndTabItem()
         end

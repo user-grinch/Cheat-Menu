@@ -108,4 +108,11 @@ module.LIGHTS =
     TALL  = 3,
 }
 
+module.MEMORY_RB =
+{
+    NONE = 0,
+    CAR  = 1,
+    CHAR = 2,
+}
+
 return module

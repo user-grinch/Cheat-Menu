@@ -383,21 +383,21 @@ function module.UpdateStat(arg)
         imgui.Columns(1)
 
         imgui.PushItemWidth(imgui.GetWindowWidth()-70)
-        if imgui.InputInt("Set ##".. arg.name,value) then
+        if imgui.InputInt("Set##".. arg.name,value) then
             setFloatStat(arg.stat,value[0])
         end
         imgui.PopItemWidth()
 
         imgui.Spacing()
-        if imgui.Button("Minimum ##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Minimum##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(arg.stat,arg.min)
         end
         imgui.SameLine()
-        if imgui.Button("Default ##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Default##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(arg.stat,arg.default)
         end
         imgui.SameLine()
-        if imgui.Button("Maximum ##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Maximum##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(arg.stat,arg.max)
         end
         if value[0] < arg.min then
@@ -444,30 +444,30 @@ function module.UpdateAddress(arg)
             module.RwMemory(arg.address,arg.size,value[0],nil,arg.is_float,arg.factor)
         end
         imgui.SameLine(0.0,4.0)
-        if imgui.Button("-",imgui.ImVec2(20,20)) then
+        if imgui.Button("-##".. arg.name,imgui.ImVec2(20,20)) then
             module.RwMemory(arg.address,arg.size,(value[0] - arg.cvalue),nil,arg.is_float,arg.factor)
         end
         imgui.SameLine(0.0,4.0)
-        if imgui.Button("+",imgui.ImVec2(20,20)) then
+        if imgui.Button("+##".. arg.name,imgui.ImVec2(20,20)) then
             module.RwMemory(arg.address,arg.size,(value[0] + arg.cvalue),nil,arg.is_float,arg.factor)
         end
         imgui.SameLine(0.0,4.0)
         imgui.Text("Set")
         imgui.Spacing()
-        if imgui.Button("Minimum ##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
+        if imgui.Button("Minimum##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
             module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float,arg.factor)
         end
 
         if arg.default ~= nil then
             imgui.SameLine()
-            if imgui.Button("Default ##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
+            if imgui.Button("Default##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
                 module.RwMemory(arg.address,arg.size,arg.default,nil,arg.is_float,arg.factor)
             end
         end
 
         if arg.max ~= nil then
             imgui.SameLine()
-            if imgui.Button("Maximum ##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
+            if imgui.Button("Maximum##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
                 module.RwMemory(arg.address,arg.size,arg.max,nil,arg.is_float,arg.factor)
             end
         end

@@ -74,15 +74,6 @@ function module.Write()
                 solid_water         = fgame.tgame.solid_water[0],
                 ss_shortcut         = fgame.tgame.ss_shortcut[0],
             },
-            tmemory =
-            {
-                address       = ffi.string(fmemory.tmemory.address),
-                clear_entries = fmemory.tmemory.clear_entries[0],
-                is_float      = fmemory.tmemory.is_float[0],
-                size          = fmemory.tmemory.size[0],
-                value         = fmemory.tmemory.value[0],
-                vp            = fmemory.tmemory.vp[0],          
-            },
             tmenu =
             {
                 auto_update_check   = fmenu.tmenu.auto_update_check[0],
@@ -157,6 +148,7 @@ function module.Write()
             {
                 auto_aim        = fweapon.tweapon.auto_aim[0],
                 fast_reload     = fweapon.tweapon.fast_reload[0],
+                long_range      = fweapon.tweapon.long_range[0],
                 no_reload       = fweapon.tweapon.no_reload[0],
                 ped             = fweapon.tweapon.ped[0],
                 quick_spawn     = fweapon.tweapon.quick_spawn[0],
