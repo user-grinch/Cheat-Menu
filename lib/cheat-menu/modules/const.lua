@@ -115,4 +115,24 @@ module.MEMORY_RB =
     CHAR = 2,
 }
 
+module.DEFAULT_GANG_WEAPONS =
+{
+    {23,28,0}, -- Ballas
+    {23,0,0}, -- Grove
+    {23,0,0}, -- Vagos
+    {0,0,0}, -- SF Rifa
+    {23,28,0}, -- Da Nang Boys
+    {24,0,0}, -- Mafia
+    {23,30,0}, -- Triads
+    {23,28,0}, -- VLA
+    {0,0,0}, -- Gang 9 
+    {0,0,0}, -- Gang 10
+}
+
+module.NITRO_STATE =
+{
+    DISCHANGRED = -1.0,
+    EMPTY       = 0,
+    FULL        = 1.0,
+}
 return module

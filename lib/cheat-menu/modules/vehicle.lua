@@ -238,6 +238,29 @@ function module.RandomColors()
     end
 end
 
+function module.UnlimitedNitro()
+    while true do
+        if isCharInAnyCar(PLAYER_PED) and module.tvehicle.unlimited_nitro[0] then
+            local car = getCarCharIsUsing(PLAYER_PED)
+            module.AddComponentToVehicle(1010)
+            while isCharInAnyCar(PLAYER_PED) and module.tvehicle.unlimited_nitro[0] do
+                local car = getCarCharIsUsing(PLAYER_PED)
+                local pCar = getCarPointer(car) 
+                local nitro_state = fcommon.RwMemory(pCar+0x8A4,4,nil,false,true)
+
+                if nitro_state == fconst.NITRO_STATE.FULL or nitro_state == fconst.NITRO_STATE.EMPTY or nitro_state == fconst.NITRO_STATE.DISCHANGRED then
+                    giveNonPlayerCarNitro(car)
+                end
+                wait(0)
+            end
+            local car = getCarCharIsUsing(PLAYER_PED)
+            module.RemoveComponentFromVehicle(1010)
+        end
+        wait(0)
+    end
+end
+
+
 
 --------------------------------------------------
 -- Camera
@@ -531,6 +554,7 @@ function module.VehicleMain()
                 if isCharInAnyCar(PLAYER_PED) then
                     local car = getCarCharIsUsing(PLAYER_PED)
                     fcommon.UpdateAddress({name = 'Vehicle dirt level',address = getCarPointer(car) + 1200 ,size = 4,min = 0,max = 15, default = 7.5,is_float = true})
+                    fcommon.UpdateAddress({name = 'Vehicle nitro count',address = getCarPointer(car) + 0x48A ,size = 1,min = 0,max = 15, default = 7.5,is_float = false})
 
                     fcommon.DropDownMenu("Vehicle doors",function()
                         if isCharInAnyCar(PLAYER_PED) and not (isCharOnAnyBike(PLAYER_PED) or isCharInAnyBoat(PLAYER_PED) 

@@ -553,7 +553,7 @@ function module.RwMemory(address,size,value,protect,is_float,factor)
         if is_float == true then
             memory.setfloat(address,value*factor,protect)
         else
-            memory.write(address,value*factor,size,protect)
+            writeMemory(address,size,value*factor,protect)
         end
     end
 end

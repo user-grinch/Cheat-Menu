@@ -28,19 +28,72 @@ module.tweapon =
     ped         = imgui.new.bool(fconfig.Get('tweapon.ped',false)),
     quick_spawn = imgui.new.bool(fconfig.Get('tweapon.quick_spawn',false)),
     search_text = imgui.new.char[20](""),   
-    -- weapon_name_array = {},
-    -- gang_weapon1 = imgui.new.int(0),
-    -- gang_weapon2 = imgui.new.int(0),
-    -- gang_weapon3 = imgui.new.int(0),
+    gang        =
+    {
+        weapon_array = {},
+        used_weapons = fconfig.Get('tweapon.gang_weapons',fconst.DEFAULT_GANG_WEAPONS),
+        
+        weapons_names =
+        {
+            "Unarmed",
+            "Brass knuckles",
+            "Golf club",
+            "Night stick",
+            "Knife",
+            "Baseball bat",
+            "Shovel",
+            "Poolcue",
+            "Katana",
+            "Chainsaw",
+            "Purple dildo",
+            "White dildo",
+            "White vibrator",
+            "Silver vibrator",
+            "Flowers",
+            "Cane",
+            "Grenade",
+            "Teargas",
+            "Molotov",
+            "No weapon",
+            "No weapon",
+            "No weapon",
+            "Colt45",
+            "Silenced",
+            "Desert eagle",
+            "Shotgun",
+            "Sawn off shotgun",
+            "Combat shotgun",
+            "Uzi",
+            "Mp5",
+            "Ak47",
+            "M4",
+            "Tec9",
+            "Rifle",
+            "Sniper rifle",
+            "Rocket launcher",
+            "Heat seeker",
+            "Flame thrower",
+            "Minigun",
+            "Satchel charge",
+            "Detonator",
+            "Spraycan",
+            "Fire extinguisher",
+            "Camera",
+            "Night vision",
+            "Thermal vision", 
+            "Parachute",          
+        },
+        weapon1 = imgui.new.int(0),
+        weapon2 = imgui.new.int(0),
+        weapon3 = imgui.new.int(0),
+    },
 }
 
--- local gang_list = {}
 
--- for k, v in pairs(module.tweapon.names) do
---     table.insert( gang_list,v)
--- end
-
--- module.tweapon.weapon_name_array = imgui.new['const char*'][#gang_list](gang_list)
+module.tweapon.gang.weapon_array = imgui.new['const char*'][#module.tweapon.gang.weapons_names](module.tweapon.gang.weapons_names)
+module.tweapon.gang.weapon1[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][1]
+module.tweapon.gang.weapon2[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][2]
+module.tweapon.gang.weapon3[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][3]
 
 -- Returns weapon name
 function module.GetModelName(id)
@@ -246,20 +299,44 @@ function module.WeaponMain()
             end
             imgui.EndTabItem()
         end
-        -- if imgui.BeginTabItem("Gang weapon editor") then
-        --     imgui.Spacing()
+        if imgui.BeginTabItem("Gang weapon editor") then
+            imgui.Spacing()
 
-        --     if imgui.Combo("Gang", fped.tped.gang.index,fped.tped.gang.array,#fped.tped.gang.list) then end
-        --     imgui.Columns(3,nil,false)
-        --     if imgui.Combo("Weapon 1", module.tweapon.gang_weapon1,module.tweapon.weapon_name_array,#gang_list) then end
-        --     imgui.NextColumn()
-        --     if imgui.Combo("Weapon 2", module.tweapon.gang_weapon2,module.tweapon.weapon_name_array,#gang_list) then end
-        --     imgui.NextColumn()
-        --     if imgui.Combo("Weapon 3", module.tweapon.gang_weapon3,module.tweapon.weapon_name_array,#gang_list) then end
-        --     imgui.Columns(1)
+            if imgui.Combo("Gang", fped.tped.gang.index,fped.tped.gang.array,#fped.tped.gang.list) then
+                module.tweapon.gang.weapon1[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][1]
+                module.tweapon.gang.weapon2[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][2]
+                module.tweapon.gang.weapon3[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][3]
+            end
+            imgui.Dummy(imgui.ImVec2(0,10))
 
-        --     imgui.EndTabItem()
-        -- end
+            imgui.Combo("Weapon 1", module.tweapon.gang.weapon1,module.tweapon.gang.weapon_array,#module.tweapon.gang.weapons_names)
+            imgui.Combo("Weapon 2", module.tweapon.gang.weapon2,module.tweapon.gang.weapon_array,#module.tweapon.gang.weapons_names)
+            imgui.Combo("Weapon 3", module.tweapon.gang.weapon3,module.tweapon.gang.weapon_array,#module.tweapon.gang.weapons_names)
+
+
+            imgui.Dummy(imgui.ImVec2(0,10))
+            if imgui.Button("Apply changes",imgui.ImVec2(fcommon.GetSize(2))) then
+                setGangWeapons(fped.tped.gang.index[0],module.tweapon.gang.weapon1[0],module.tweapon.gang.weapon2[0],module.tweapon.gang.weapon3[0])
+                module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][1] = module.tweapon.gang.weapon1[0]
+                module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][2] = module.tweapon.gang.weapon2[0]
+                module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][3] = module.tweapon.gang.weapon3[0]
+                fcommon.CheatActivated()
+            end
+            imgui.SameLine()
+            if imgui.Button("Reset to default",imgui.ImVec2(fcommon.GetSize(2))) then
+
+                module.tweapon.gang.used_weapons = fconst.DEFAULT_GANG_WEAPONS
+
+                for x=1,10,1 do
+                    setGangWeapons(x,module.tweapon.gang.used_weapons[x][1],module.tweapon.gang.used_weapons[x][2],module.tweapon.gang.used_weapons[x][3])
+                end
+                module.tweapon.gang.weapon1[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][1]
+                module.tweapon.gang.weapon2[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][2]
+                module.tweapon.gang.weapon3[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][3]
+                printHelpString("Gang weapons reset")
+            end
+            imgui.EndTabItem()
+        end
         imgui.EndTabBar()
     end
 end

@@ -42,7 +42,7 @@ function module.Teleport(x, y, z,interior_id)
 	clearExtraColours(true)
 	requestCollision(x,y)
 	activateInteriorPeds(true)
-	setCharCoordinates(PLAYER_PED, x, y, z)
+	setCharCoordinates(PLAYER_PED, x, y, z+3.0) -- +3.0 to prevent player from teleporting under map
 	loadScene(x,y,z)
 
 end

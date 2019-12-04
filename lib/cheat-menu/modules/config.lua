@@ -148,6 +148,19 @@ function module.Write()
             {
                 auto_aim        = fweapon.tweapon.auto_aim[0],
                 fast_reload     = fweapon.tweapon.fast_reload[0],
+                gang_weapons    =
+                {
+                    {fweapon.tweapon.gang.used_weapons[1][1],fweapon.tweapon.gang.used_weapons[1][2],fweapon.tweapon.gang.used_weapons[1][3]}, -- Ballas
+                    {fweapon.tweapon.gang.used_weapons[2][1],fweapon.tweapon.gang.used_weapons[2][2],fweapon.tweapon.gang.used_weapons[2][3]}, -- Grove
+                    {fweapon.tweapon.gang.used_weapons[3][1],fweapon.tweapon.gang.used_weapons[3][2],fweapon.tweapon.gang.used_weapons[3][3]}, -- Vagos
+                    {fweapon.tweapon.gang.used_weapons[4][1],fweapon.tweapon.gang.used_weapons[4][2],fweapon.tweapon.gang.used_weapons[4][3]}, -- SF Rifa
+                    {fweapon.tweapon.gang.used_weapons[5][1],fweapon.tweapon.gang.used_weapons[5][2],fweapon.tweapon.gang.used_weapons[5][3]}, -- Da Nang Boys
+                    {fweapon.tweapon.gang.used_weapons[6][1],fweapon.tweapon.gang.used_weapons[6][2],fweapon.tweapon.gang.used_weapons[6][3]}, -- Mafia
+                    {fweapon.tweapon.gang.used_weapons[7][1],fweapon.tweapon.gang.used_weapons[7][2],fweapon.tweapon.gang.used_weapons[7][3]}, -- Triads
+                    {fweapon.tweapon.gang.used_weapons[8][1],fweapon.tweapon.gang.used_weapons[8][2],fweapon.tweapon.gang.used_weapons[8][3]}, -- VLA
+                    {fweapon.tweapon.gang.used_weapons[9][1],fweapon.tweapon.gang.used_weapons[9][2],fweapon.tweapon.gang.used_weapons[9][3]}, -- Gang 9 
+                    {fweapon.tweapon.gang.used_weapons[10][1],fweapon.tweapon.gang.used_weapons[10][2],fweapon.tweapon.gang.used_weapons[10][3]}, -- Gang 10
+                },
                 long_range      = fweapon.tweapon.long_range[0],
                 no_reload       = fweapon.tweapon.no_reload[0],
                 ped             = fweapon.tweapon.ped[0],
@@ -170,8 +183,8 @@ function module.Get(s,default)
     local t = module.tconfig.read
     
     for key in s:gmatch('[^.]+') do
-      if t[ key ] == nil then return default end
-      t = t[ key ]
+      if t[key] == nil then return default end
+      t = t[key]
     end
 
     if t == nil then
