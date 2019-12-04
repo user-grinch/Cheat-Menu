@@ -242,19 +242,22 @@ function module.UnlimitedNitro()
     while true do
         if isCharInAnyCar(PLAYER_PED) and module.tvehicle.unlimited_nitro[0] then
             local car = getCarCharIsUsing(PLAYER_PED)
-            module.AddComponentToVehicle(1010)
-            while isCharInAnyCar(PLAYER_PED) and module.tvehicle.unlimited_nitro[0] do
-                local car = getCarCharIsUsing(PLAYER_PED)
-                local pCar = getCarPointer(car) 
-                local nitro_state = fcommon.RwMemory(pCar+0x8A4,4,nil,false,true)
+            if isThisModelACar(getCarModel(car)) then
+                module.AddComponentToVehicle(1010,car,true)
+                while isCharInAnyCar(PLAYER_PED) and module.tvehicle.unlimited_nitro[0] do
+                    if not doesVehicleExist(car) then
+                        break
+                    end
+                    local pCar = getCarPointer(car) 
+                    local nitro_state = fcommon.RwMemory(pCar+0x8A4,4,nil,false,true)
 
-                if nitro_state == fconst.NITRO_STATE.FULL or nitro_state == fconst.NITRO_STATE.EMPTY or nitro_state == fconst.NITRO_STATE.DISCHANGRED then
-                    giveNonPlayerCarNitro(car)
+                    if nitro_state == fconst.NITRO_STATE.FULL or nitro_state == fconst.NITRO_STATE.EMPTY or nitro_state == fconst.NITRO_STATE.DISCHANGRED then
+                        giveNonPlayerCarNitro(car)
+                    end
+                    wait(0)
                 end
-                wait(0)
+                module.RemoveComponentFromVehicle(1010,car,true)
             end
-            local car = getCarCharIsUsing(PLAYER_PED)
-            module.RemoveComponentFromVehicle(1010)
         end
         wait(0)
     end
@@ -379,25 +382,35 @@ end
 --------------------------------------------------
 -- Add car component - tune
 
-function module.AddComponentToVehicle(component)
+function module.AddComponentToVehicle(component,car,hide_msg)
     component = tonumber(component)
     if isCharInAnyCar(PLAYER_PED) then
-        local car = getCarCharIsUsing(PLAYER_PED)
-        if isModelAvailable(component) then
+        if car == nil then
+            car = getCarCharIsUsing(PLAYER_PED)
+        end
+        if isModelAvailable(component) and doesVehicleExist(car) then
             requestVehicleMod(component)
             loadAllModelsNow()
             addVehicleMod(car,component)
-            printHelpString("Component ~g~added")
+            if hide_msg ~= true then
+                printHelpString("Component ~g~added")
+            end
             markModelAsNoLongerNeeded(component)
         end
     end
 end
 
-function module.RemoveComponentFromVehicle(model)
+function module.RemoveComponentFromVehicle(model,car,hide_msg)
 
-    local car = getCarCharIsUsing(PLAYER_PED)
-    removeVehicleMod(car,tonumber(model))
-    printHelpString("Component ~r~removed")
+    if car == nil then
+        car = getCarCharIsUsing(PLAYER_PED)
+    end
+    if doesVehicleExist(car) then
+        removeVehicleMod(car,tonumber(model))
+        if hide_msg ~= true then
+            printHelpString("Component ~r~removed")
+        end
+    end
 end
 
 --------------------------------------------------
