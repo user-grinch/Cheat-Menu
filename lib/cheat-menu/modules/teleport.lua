@@ -31,10 +31,14 @@ module.tteleport =
 function module.Teleport(x, y, z,interior_id)
 	if x == nil then
 		_, x,y,z = getTargetBlipCoordinates()
-		interior_id = 0
 	end
 	if module.tteleport.auto_z[0] then
 		z = getGroundZFor3dCoord(x, y, z)
+	end
+
+	if interior_id == nil then
+		interior_id = 0
+		z = z+3 -- +3.0 to prevent player from teleporting under map
 	end
 
 	setCharInterior(PLAYER_PED,interior_id)
@@ -42,7 +46,7 @@ function module.Teleport(x, y, z,interior_id)
 	clearExtraColours(true)
 	requestCollision(x,y)
 	activateInteriorPeds(true)
-	setCharCoordinates(PLAYER_PED, x, y, z+3.0) -- +3.0 to prevent player from teleporting under map
+	setCharCoordinates(PLAYER_PED, x, y, z) 
 	loadScene(x,y,z)
 
 end

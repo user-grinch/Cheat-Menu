@@ -242,28 +242,32 @@ function module.UnlimitedNitro()
     while true do
         if isCharInAnyCar(PLAYER_PED) and module.tvehicle.unlimited_nitro[0] then
             local car = getCarCharIsUsing(PLAYER_PED)
+            local pCar = getCarPointer(car)
             if isThisModelACar(getCarModel(car)) then
                 module.AddComponentToVehicle(1010,car,true)
-                while isCharInAnyCar(PLAYER_PED) and module.tvehicle.unlimited_nitro[0] do
-                    if not doesVehicleExist(car) then
+                
+                while module.tvehicle.unlimited_nitro[0] do
+
+                    writeMemory(0x969165,1,0,false) -- ALl cars have nitro
+                    writeMemory(0x96918B,1,0,false) -- All taxis have nitro
+
+                    if getCarCharIsUsing(PLAYER_PED) ~= car then
                         break
                     end
-                    local pCar = getCarPointer(car) 
-                    local nitro_state = fcommon.RwMemory(pCar+0x8A4,4,nil,false,true)
 
+                    local nitro_state = fcommon.RwMemory(pCar+0x8A4,4,nil,false,true)
+                    
                     if nitro_state == fconst.NITRO_STATE.FULL or nitro_state == fconst.NITRO_STATE.EMPTY or nitro_state == fconst.NITRO_STATE.DISCHANGRED then
                         giveNonPlayerCarNitro(car)
                     end
+
                     wait(0)
                 end
-                module.RemoveComponentFromVehicle(1010,car,true)
             end
         end
         wait(0)
     end
 end
-
-
 
 --------------------------------------------------
 -- Camera
@@ -448,6 +452,7 @@ function module.VehicleMain()
             
             fcommon.CheckBoxValue("Aggressive drivers",0x96914F)
             fcommon.CheckBoxValue("All cars have nitro",0x969165)
+            fcommon.CheckBoxValue("All taxis have nitro",0x96918B)
             fcommon.CheckBoxValue("Boats fly",0x969153)
             fcommon.CheckBoxValue("Cars fly",0x969160)
             fcommon.CheckBoxVar("Car heavy",module.tvehicle.heavy)
@@ -457,6 +462,9 @@ function module.VehicleMain()
             fcommon.CheckBoxVar("First person camera",module.tvehicle.first_person_camera)
             fcommon.CheckBoxValue("Float away when hit",0x969166)
             fcommon.CheckBoxValue("Green traffic lights",0x96914E)
+
+            imgui.NextColumn()
+
             fcommon.CheckBoxFunc("Lights on",module.tvehicle.lights,
             function()
                 if isCharInAnyCar(PLAYER_PED) then
@@ -474,9 +482,6 @@ function module.VehicleMain()
                     printHelpString("Player ~r~not~w~ in car")
                 end
             end)
-
-            imgui.NextColumn()
-
             fcommon.CheckBoxFunc("Lock doors",module.tvehicle.lock_doors,
             function()
                 if isCharInAnyCar(PLAYER_PED) then
@@ -515,7 +520,7 @@ function module.VehicleMain()
             fcommon.CheckBoxVar("Random colors",module.tvehicle.random_colors,"Paints player's car with random colors every second")
             fcommon.CheckBoxValue("Tank mode",0x969164) 
             fcommon.CheckBoxValue("Train camera fix",5416239,nil,fconst.TRAIN_CAM_FIX.ON,fconst.TRAIN_CAM_FIX.OFF) 
-            fcommon.CheckBoxVar("Unlimited nitro",module.tvehicle.unlimited_nitro)
+            fcommon.CheckBoxVar("Unlimited nitro",module.tvehicle.unlimited_nitro,"Enabling this would disable\n\nAll cars have nitro\nAll taxis have nitro")
             fcommon.CheckBoxValue("Wheels only",0x96914B)
     
             imgui.Columns(1)
@@ -764,6 +769,7 @@ function module.VehicleMain()
                 if imgui.Button("Reset handling",imgui.ImVec2(fcommon.GetSize(1))) then
                     local cHandlingDataMgr = readMemory(0x05BFA96,4,false)
                     callMethod(0x5BD830,cHandlingDataMgr,0,0)
+                    printHelpString("Handling reset")
                 end
             
                 imgui.Spacing()

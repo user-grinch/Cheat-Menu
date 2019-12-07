@@ -48,8 +48,9 @@ module.tgame                =
     random_cheats           = imgui.new.bool(fconfig.Get('tgame.random_cheats',false)),
     script_manager          =
     {
+        skip_auto_reload    = false,
+        not_loaded          = {},
         search_text         = imgui.new.char[64](""),
-        disabled            = {},
     },
     solid_water             = imgui.new.bool(fconfig.Get('tgame.solid_water',false)),
     ss_shortcut             = imgui.new.bool(fconfig.Get('tgame.ss_shortcut',false)), 
@@ -87,6 +88,7 @@ module.tgame                =
 
 module.tgame.day.array      = imgui.new['const char*'][#module.tgame.day.names](module.tgame.day.names)
 module.tgame.weather.array  = imgui.new['const char*'][#module.tgame.weather.names](module.tgame.weather.names)
+
 
 function module.SolidWater()
     local object = nil
@@ -311,27 +313,64 @@ end
 --------------------------------------------------
 -- Functions of script manager
 
-function ShowScriptDisabled(name,path,search_text)
+function module.MonitorScripts()
+    local mainDir  = getWorkingDirectory()
+    for file in lfs.dir(mainDir) do
+        local full_file_path = mainDir .. "\\" .. file
+        if doesFileExist(full_file_path) then
+
+            local file_path,file_name,file_ext = string.match(full_file_path, "(.-)([^\\/]-%.?([^%.\\/]*))$") 
+
+            if (file_ext == "lua" or file_ext == "neverload") and module.tgame.script_manager.not_loaded[file_name] == nil  then
+                local is_loaded = false
+                for index, script in ipairs(script.list()) do
+                    if full_file_path == script.path then
+                        is_loaded = true
+                    end
+                end
+                if is_loaded == false then
+                    module.tgame.script_manager.not_loaded[file_name] = full_file_path
+                end 
+            end
+        end
+    end
+end
+
+function ShowNotLoadedScripts(name,path,search_text)
     fcommon.DropDownMenu(name .. "##" .. path,function()
 
         imgui.Spacing()
         imgui.SameLine()
-        imgui.Text("Active: false")
+
+        local _,file_name,file_ext = string.match(path, "(.-)([^\\/]-%.?([^%.\\/]*))$") 
+
+        if file_ext ==  "lua" then
+            imgui.Text("Status: Not loaded")
+        end
+        if file_ext ==  "neverload" then
+            imgui.Text("Status: Never load")
+        end
         imgui.Spacing()
         imgui.SameLine()
         imgui.TextWrapped("Filepath: " .. path)
         
         if imgui.Button("Load##" .. path,imgui.ImVec2(fcommon.GetSize(1))) then
             if doesFileExist(path) then 
-                script.load(path)
-                module.tgame.script_manager.disabled[name] = nil
+                
+                local load_path = path
+                if file_ext ==  "neverload" then
+                    load_path = string.sub(path,1,-11)
+                    os.rename(path,load_path)
+                end
+                script.load(load_path)
+                module.tgame.script_manager.not_loaded[name] = nil
                 printHelpString("Script loaded")
             end
         end
     end,true)
 end
 
-function ShowScriptEnabled(script,search_text,index)
+function ShowLoadedScript(script,search_text,index)
     fcommon.DropDownMenu(script.name .. "##" .. index,function()
         local authors = ""
         for _,author in ipairs(script.authors) do
@@ -354,10 +393,10 @@ function ShowScriptEnabled(script,search_text,index)
         imgui.Text("Version num: " .. tostring(script.version_num))
         imgui.NextColumn()
         imgui.Text("Script ID: " .. script.id)
-        imgui.Text("Active: " .. tostring( not script.frozen))
+        imgui.Text("Status: Loaded")
         imgui.Text("Filename: ")
         imgui.SameLine(0.0,0.0)
-        imgui.TextWrapped(string.sub(script.filename,1,-5))
+        imgui.TextWrapped(script.filename)
         imgui.Columns(1)
         if properties ~= "" then
             imgui.Spacing()
@@ -380,15 +419,26 @@ function ShowScriptEnabled(script,search_text,index)
             imgui.SameLine(0.0,0.0)
             imgui.TextWrapped(script.description)
         end
-        if imgui.Button("Reload##" .. index,imgui.ImVec2(fcommon.GetSize(2))) then
-            script:reload()
-            printHelpString("Script reloaded")
+        if imgui.Button("Never load##" .. index,imgui.ImVec2(fcommon.GetSize(3))) then
+            printHelpString("Script set to never load")
+            os.rename(script.path,script.path.. ".neverload")
+            script:unload()
         end
         imgui.SameLine()
-        if imgui.Button("Unload##" .. index,imgui.ImVec2(fcommon.GetSize(2))) then
-            module.tgame.script_manager.disabled[script.name] = script.path
-            script:unload()
+        if imgui.Button("Reload##" .. index,imgui.ImVec2(fcommon.GetSize(3))) then
+            if script.name == thisScript().name then
+                module.tgame.script_manager.skip_auto_reload = true
+            end  
+            printHelpString("Script reloaded")
+            script:reload()
+        end
+        imgui.SameLine()
+        if imgui.Button("Unload##" .. index,imgui.ImVec2(fcommon.GetSize(3))) then
+            if script.name == thisScript().name then
+                module.tgame.script_manager.skip_auto_reload = true
+            end
             printHelpString("Script unloaded")
+            script:unload()
         end
     end)
 end
@@ -570,30 +620,38 @@ function module.GameMain()
             imgui.EndTabItem()
         end
         if imgui.BeginTabItem('Script Manager') then
+            
             imgui.Spacing()
+            if imgui.Button("Reload all scripts",imgui.ImVec2(fcommon.GetSize(1))) then
+                reloadScripts()
+            end
             imgui.Spacing()
+            
 			if imgui.InputText("Search",module.tgame.script_manager.search_text,ffi.sizeof(module.tgame.script_manager.search_text)) then end
 			fcommon.InformationTooltip("Moonloader scripts manager")
 			imgui.Spacing()
 			imgui.Text("Scripts found :(" .. ffi.string(module.tgame.script_manager.search_text) .. ")")
 			imgui.Separator()
 			imgui.Spacing()
-			if imgui.BeginChild("Script entries") then
+            if imgui.BeginChild("Script entries") then
+
+                module.MonitorScripts()
+
                 for index, script in ipairs(script.list()) do
                     if ffi.string(module.tgame.script_manager.search_text) == "" then
-						ShowScriptEnabled(script,"",index)
+						ShowLoadedScript(script,"",index)
 					else
 						if string.upper(script.name):find(string.upper(ffi.string(module.tgame.script_manager.search_text))) ~= nil  then
-							ShowScriptEnabled(script,ffi.string(module.tgame.script_manager.search_text),index)
+							ShowLoadedScript(script,ffi.string(module.tgame.script_manager.search_text),index)
 						end
 					end
                 end
-                for name,path in pairs(module.tgame.script_manager.disabled) do
+                for name,path in pairs(module.tgame.script_manager.not_loaded) do
                     if ffi.string(module.tgame.script_manager.search_text) == "" then
-						ShowScriptDisabled(name,path,"",index)
+						ShowNotLoadedScripts(name,path,"",index)
 					else
 						if string.upper(name):find(string.upper(ffi.string(module.tgame.script_manager.search_text))) ~= nil  then
-							ShowScriptDisabled(name,path,ffi.string(module.tgame.script_manager.search_text),index)
+							ShowNotLoadedScripts(name,path,ffi.string(module.tgame.script_manager.search_text),index)
 						end
 					end
                 end

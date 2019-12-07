@@ -142,13 +142,16 @@ function module.PedMain()
                 fcommon.CheckBoxValue("Gangs control the streets",0x96915B)
                 fcommon.CheckBoxValue("Gang members everywhere",0x96915A)
                 fcommon.CheckBoxValue("Have bounty on head",0x96913F)
-                imgui.NextColumn()
                 fcommon.CheckBoxFunc("Gang wars",module.tped.gang.wars,
                 function()
                     setGangWarsActive(module.tped.gang.wars[0])
                     if module.tped.gang.wars[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
                 end)
+                
+                imgui.NextColumn()
+                
                 fcommon.CheckBoxValue("No road peds",0x8D2538,nil,0,25)
+                fcommon.CheckBoxValue("Peds attack with golfclub",0x96913E)
                 fcommon.CheckBoxValue("Peds attack with rockets",0x969158)
                 fcommon.CheckBoxValue("Peds riot",0x969175)
                 fcommon.CheckBoxValue("Slut magnet",0x96915D)

@@ -37,7 +37,7 @@ module.tmenu =
 	},
 	show_tooltips	    = imgui.new.bool(fconfig.Get('tmenu.show_tooltips',true)),
 	show_crash_message  = imgui.new.bool(fconfig.Get('tmenu.show_crash_message',true)),
-    update_available = false,
+	update_available = false,
 }
 
 module.tmenu.overlay.position_array = imgui.new['const char*'][#module.tmenu.overlay.position](module.tmenu.overlay.position)

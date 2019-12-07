@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.9-wip")
-script_version_number(20191205) -- YYYYMMDD
+script_version_number(20191207) -- YYYYMMDD
 
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
@@ -59,6 +59,7 @@ imgui         = require 'mimgui'
 lfs           = require 'lfs'
 mad           = require 'MoonAdditions'
 memory        = require 'memory'
+os            = require 'os'
 
 fcommon       = require 'cheat-menu.modules.common'
 fconfig       = require 'cheat-menu.modules.config'
@@ -117,13 +118,15 @@ imgui.OnInitialize(function() -- Called once
     imgui.PushStyleColor(imgui.Col.Header, imgui.ImVec4(0,0,0,0))
 
     --Loading images
-    lua_thread.create(fcommon.LoadImages,fvehicle.tvehicle.path,fvehicle.tvehicle.images,fconst.VEHICLE.IMAGE_EXT)
-    lua_thread.create(fcommon.LoadImages,fweapon.tweapon.path,fweapon.tweapon.images,fconst.WEAPON.IMAGE_EXT)
-    lua_thread.create(fcommon.LoadImages,fvehicle.tvehicle.paintjobs.path,fvehicle.tvehicle.paintjobs.images,fconst.PAINTJOB.IMAGE_EXT)
-    lua_thread.create(fcommon.LoadImages,fvehicle.tvehicle.components.path,fvehicle.tvehicle.components.images,fconst.COMPONENT.IMAGE_EXT)
-    lua_thread.create(fcommon.LoadImages,fped.tped.path,fped.tped.images,fconst.PED.IMAGE_EXT)
-    lua_thread.create(fcommon.LoadImages,fplayer.tplayer.clothes.path,fplayer.tplayer.clothes.images,fconst.CLOTH.IMAGE_EXT)
-
+    lua_thread.create(
+    function() 
+        fcommon.LoadImages(fvehicle.tvehicle.path,fvehicle.tvehicle.images,fconst.VEHICLE.IMAGE_EXT)
+        fcommon.LoadImages(fweapon.tweapon.path,fweapon.tweapon.images,fconst.WEAPON.IMAGE_EXT)
+        fcommon.LoadImages(fvehicle.tvehicle.paintjobs.path,fvehicle.tvehicle.paintjobs.images,fconst.PAINTJOB.IMAGE_EXT)
+        fcommon.LoadImages(fvehicle.tvehicle.components.path,fvehicle.tvehicle.components.images,fconst.COMPONENT.IMAGE_EXT)
+        fcommon.LoadImages(fped.tped.path,fped.tped.images,fconst.PED.IMAGE_EXT)
+        fcommon.LoadImages(fplayer.tplayer.clothes.path,fplayer.tplayer.clothes.images,fconst.CLOTH.IMAGE_EXT)
+    end)
 end)
 
 -- Menu window
@@ -443,8 +446,8 @@ function onScriptTerminate(script, quitGame)
         if fconfig.tconfig.reset == false then
             if fmenu.tmenu.crash_text == "" then
                 fmenu.tmenu.crash_text = "Cheat menu crashed unexpectedly"
-                if fmenu.tmenu.auto_reload[0] then
-                    
+
+                if fmenu.tmenu.auto_reload[0] and not fgame.tgame.script_manager.skip_auto_reload then
                     for index, script in ipairs(script.list()) do
                         if script.name ~= thisScript().name then
                             script.this:reload()
@@ -452,16 +455,25 @@ function onScriptTerminate(script, quitGame)
                     end
                     fmenu.tmenu.crash_text =  fmenu.tmenu.crash_text .. " and reloaded"
                 end
+
             end
         end
 
-        if fmenu.tmenu.show_crash_message[0] then
-            if not isHelpMessageBeingDisplayed()then
-                printHelpString(fmenu.tmenu.crash_text)
-            end
-            fmenu.tmenu.crash_text = ""
+        if fmenu.tmenu.show_crash_message[0] and not fgame.tgame.script_manager.skip_auto_reload then
+            printHelpString(fmenu.tmenu.crash_text)
         end
+
+        fmenu.tmenu.crash_text = ""
+
         freeMemory(fvisual.tvisual.money.negative_memory)
         freeMemory(fvisual.tvisual.money.positive_memory)
+
+        -- Releasing Images
+        fcommon.ReleaseImages(fvehicle.tvehicle.images)
+        fcommon.ReleaseImages(fweapon.tweapon.images)
+        fcommon.ReleaseImages(fvehicle.tvehicle.paintjobs.images)
+        fcommon.ReleaseImages(fvehicle.tvehicle.components.images)
+        fcommon.ReleaseImages(fped.tped.images)
+        fcommon.ReleaseImages(fplayer.tplayer.clothes.images)
     end
 end

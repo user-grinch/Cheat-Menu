@@ -71,6 +71,10 @@ function module.Write()
                 freeze_mission_timer= fgame.tgame.freeze_mission_timer[0],
                 freeze_time         = fgame.tgame.freeze_time[0], 
                 random_cheats       = fgame.tgame.random_cheats[0], 
+                script_manager      =
+                {
+                    disabled        = encodeJson(fgame.tgame.script_manager.disabled),
+                },
                 solid_water         = fgame.tgame.solid_water[0],
                 ss_shortcut         = fgame.tgame.ss_shortcut[0],
             },

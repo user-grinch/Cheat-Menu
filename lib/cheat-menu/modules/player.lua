@@ -272,10 +272,14 @@ function module.PlayerMain()
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxValue("Aim while driving",0x969179)
             fcommon.CheckBoxVar("God mode",module.tplayer.god)
+            fcommon.CheckBoxValue("Have bounty on head",0x96913F)
             fcommon.CheckBoxValue("Higher cycle jumps",0x969161)
             fcommon.CheckBoxValue("Infinite ammo",0x969178)
             fcommon.CheckBoxValue("Infinite oxygen",0x96916E)
             fcommon.CheckBoxValue("Infinite run",0xB7CEE4)
+        
+            imgui.NextColumn()
+            
             fcommon.CheckBoxFunc("Invisible player",module.tplayer.invisible,
             function()
                 if module.tplayer.invisible[0] then
@@ -287,9 +291,6 @@ function module.PlayerMain()
                     fcommon.CheatDeactivated()
                 end
             end,"Player can't enter/exit vehicle")
-
-            imgui.NextColumn()
-            
             fcommon.CheckBoxVar("Keep position",module.tplayer.keep_position,"Auto teleport to the position you died from")
             fcommon.CheckBoxValue("Lock player control",getCharPointer(PLAYER_PED)+0x598)
             fcommon.CheckBoxValue("Mega jump",0x96916C)

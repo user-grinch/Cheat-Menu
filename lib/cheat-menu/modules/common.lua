@@ -182,6 +182,8 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
 
     local image_count   = 1
 
+    -------------------------
+    -- Draws a single image
     draw_image = function(identifier,image_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,search_box_text,model,image)
         local model_name = nil
         if func_get_name ~= nil then
@@ -213,6 +215,7 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
             image_count = image_count + 1
         end
     end
+    -------------------------
 
     -- Draw images in a listed order for list tabs
     if draw_type == fconst.DRAW_TYPE.LIST then
@@ -531,6 +534,14 @@ function module.LoadImages(mainDir,store_image_table,req_ext,dir)
                 end
                 wait(0)
             end
+        end
+    end
+end
+
+function module.ReleaseImages(main_table)
+    for _,image_table in pairs(main_table) do
+        for model,image in pairs(image_table) do
+            imgui.ReleaseTexture(image)
         end
     end
 end
