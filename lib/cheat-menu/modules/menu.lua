@@ -21,7 +21,7 @@ module.tmenu =
 	auto_update_check   = imgui.new.bool(fconfig.Get('tmenu.auto_update_check',true)),
 	auto_reload 		= imgui.new.bool(fconfig.Get('tmenu.auto_reload',true)),
 	crash_text          = "",
-	disable_in_samp		= imgui.new.bool(fconfig.Get('tmenu.disable_in_samp',false)),
+	disable_in_samp		= imgui.new.bool(fconfig.Get('tmenu.disable_in_samp',true)),
 	lock_player   		= imgui.new.bool(fconfig.Get('tmenu.lock_player',false)),
 	overlay             = 
 	{
@@ -35,6 +35,7 @@ module.tmenu =
 		health          = imgui.new.bool(fconfig.Get('tmenu.overlay.health',false)),
 		speed           = imgui.new.bool(fconfig.Get('tmenu.overlay.speed',false)),		
 	},
+	fast_load_images	= imgui.new.bool(fconfig.Get('tmenu.fast_load_images',false)),
 	show_tooltips	    = imgui.new.bool(fconfig.Get('tmenu.show_tooltips',true)),
 	show_crash_message  = imgui.new.bool(fconfig.Get('tmenu.show_crash_message',true)),
 	update_available = false,
@@ -137,9 +138,10 @@ function module.MenuMain()
 			imgui.Columns(2,nil,false)
 			fcommon.CheckBoxVar("Auto check for updates",module.tmenu.auto_update_check)
 			fcommon.CheckBoxVar("Auto reload",module.tmenu.auto_reload,"Reload cheat menu automatically\nin case of a crash")
-			fcommon.CheckBoxVar("Disable in SAMP",module.tmenu.disable_in_samp)
-			imgui.NextColumn()
+			fcommon.CheckBoxVar("Disable in SAMP",module.tmenu.disable_in_samp,"Using cheats online might ruin\nothers gameply and get you banned")
 			fcommon.CheckBoxVar("Lock player",module.tmenu.lock_player,"Lock player controls while the menu is open")
+			imgui.NextColumn()
+			fcommon.CheckBoxVar("Fast load images",module.tmenu.fast_load_images,"Loads images faster\nThe game will freeze during load")
 			fcommon.CheckBoxVar("Show crash message",module.tmenu.show_crash_message)
 			fcommon.CheckBoxVar("Show tooltips",module.tmenu.show_tooltips)
 			imgui.Columns(1)
@@ -196,7 +198,7 @@ function module.MenuMain()
 		if imgui.BeginTabItem("About") then
 			imgui.Spacing()
 			if imgui.Button("Check for updates",imgui.ImVec2(fcommon.GetSize(2))) then
-				module.CheckUpdates()
+				lua_thread.create(module.CheckUpdates)
 			end
 			imgui.SameLine()
 			if imgui.Button("Copy forum link",imgui.ImVec2(fcommon.GetSize(2))) then

@@ -141,7 +141,6 @@ function module.PedMain()
                 fcommon.CheckBoxValue("Everyone is armed",0x969140)
                 fcommon.CheckBoxValue("Gangs control the streets",0x96915B)
                 fcommon.CheckBoxValue("Gang members everywhere",0x96915A)
-                fcommon.CheckBoxValue("Have bounty on head",0x96913F)
                 fcommon.CheckBoxFunc("Gang wars",module.tped.gang.wars,
                 function()
                     setGangWarsActive(module.tped.gang.wars[0])

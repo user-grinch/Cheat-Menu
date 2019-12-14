@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.9-wip")
-script_version_number(20191207) -- YYYYMMDD
+script_version_number(20191215) -- YYYYMMDD
 
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
@@ -226,11 +226,16 @@ function()
             if imgui.MenuItemBool("Bottom Right",nil,fmenu.tmenu.overlay.position_index[0] == 4) then 
                 fmenu.tmenu.overlay.position_index[0] = 4 
             end
-            if  imgui.MenuItemBool("Close") then
-                fgame.tgame.fps.bool[0] = false
-                fvehicle.tvehicle.show.speed[0] = false
-                fvehicle.tvehicle.show.health[0] = false
-                fvisual.tvisuals.show_coordinates[0] = false
+            if imgui.MenuItemBool("Copy coordinates") then 
+                local x,y,z = getCharCoordinates(PLAYER_PED)
+                setClipboardText(string.format( "%d,%d,%d",x,y,z))
+                printHelpString("Coordinates copied")
+            end
+            if imgui.MenuItemBool("Close") then
+                fmenu.tmenu.overlay.fps[0] = false
+                fmenu.tmenu.overlay.speed[0] = false
+                fmenu.tmenu.overlay.health[0] = false
+                fmenu.tmenu.overlay.coordinates[0] = false
             end
             imgui.EndPopup()        
         end
@@ -242,6 +247,7 @@ function main()
     
     --------------------------------------------------
     -- Functions that need to lunch only once on startup
+
 
     -- Gang weapons
     for x=1,10,1 do          
@@ -350,7 +356,37 @@ function main()
     while true do
         --------------------------------------------------
         -- Functions that neeed to run constantly
-        
+
+        --------------------------------------------------
+        --Weapons
+        local pPed = getCharPointer(PLAYER_PED)
+        local CurWeapon = getCurrentCharWeapon(PLAYER_PED)
+        local skill = callMethod(0x5E3B60,pPed,1,0,CurWeapon)
+        local pWeaponInfo = callFunction(0x743C60,2,2,CurWeapon,skill)
+
+        if fweapon.tweapon.huge_damage[0] then
+            writeMemory(pWeaponInfo+0x22,2,1000,false)
+        end
+        if fweapon.tweapon.long_target_range[0] then
+            memory.setfloat(pWeaponInfo+0x04,1000.0)
+        end
+        if fweapon.tweapon.long_weapon_range[0] then
+            memory.setfloat(pWeaponInfo+0x08,1000.0)
+        end
+        if fweapon.tweapon.max_accuracy[0] then
+            memory.setfloat(pWeaponInfo+0x38,1.0)
+        end
+        if fweapon.tweapon.max_ammo_clip[0] then
+            writeMemory(pWeaponInfo+0x20,2,9999,false)
+        end
+        if fweapon.tweapon.max_move_speed[0] then
+            memory.setfloat(pWeaponInfo+0x3C,1.0)
+        end
+        if fweapon.tweapon.max_skills[0] then
+            memory.setfloat(pWeaponInfo+0x30,2.80e-45)
+        end
+        --------------------------------------------------
+
         if fanimation.tanimation.ped[0] == true or fweapon.tweapon.ped[0] == true then
             bool, ped = getCharPlayerIsTargeting(PLAYER_HANDLE)
             if bool == true then

@@ -93,6 +93,7 @@ function module.Write()
                     show            = fmenu.tmenu.overlay.show[0],
                     speed           = fmenu.tmenu.overlay.speed[0],
                 },
+                fast_load_images    = fmenu.tmenu.fast_load_images[0],
                 show_tooltips       = fmenu.tmenu.show_tooltips[0],
                 show_crash_message  = fmenu.tmenu.show_crash_message[0],
             },
@@ -150,9 +151,14 @@ function module.Write()
             },
             tweapon =
             {
-                auto_aim        = fweapon.tweapon.auto_aim[0],
-                fast_reload     = fweapon.tweapon.fast_reload[0],
-                gang_weapons    =
+                auto_aim          = fweapon.tweapon.auto_aim[0],
+                fast_reload       = fweapon.tweapon.fast_reload[0],
+                max_accuracy      = fweapon.tweapon.max_accuracy[0], 
+                max_ammo_clip     = fweapon.tweapon.max_ammo_clip[0], 
+                max_move_speed    = fweapon.tweapon.max_move_speed[0], 
+                max_skills        = fweapon.tweapon.max_skills[0], 
+                huge_damage       = fweapon.tweapon.huge_damage[0],
+                gang_weapons      =
                 {
                     {fweapon.tweapon.gang.used_weapons[1][1],fweapon.tweapon.gang.used_weapons[1][2],fweapon.tweapon.gang.used_weapons[1][3]}, -- Ballas
                     {fweapon.tweapon.gang.used_weapons[2][1],fweapon.tweapon.gang.used_weapons[2][2],fweapon.tweapon.gang.used_weapons[2][3]}, -- Grove
@@ -165,10 +171,11 @@ function module.Write()
                     {fweapon.tweapon.gang.used_weapons[9][1],fweapon.tweapon.gang.used_weapons[9][2],fweapon.tweapon.gang.used_weapons[9][3]}, -- Gang 9 
                     {fweapon.tweapon.gang.used_weapons[10][1],fweapon.tweapon.gang.used_weapons[10][2],fweapon.tweapon.gang.used_weapons[10][3]}, -- Gang 10
                 },
-                long_range      = fweapon.tweapon.long_range[0],
-                no_reload       = fweapon.tweapon.no_reload[0],
-                ped             = fweapon.tweapon.ped[0],
-                quick_spawn     = fweapon.tweapon.quick_spawn[0],
+                long_target_range = fweapon.tweapon.long_target_range[0],
+                long_weapon_range = fweapon.tweapon.long_weapon_range[0],
+                no_reload         = fweapon.tweapon.no_reload[0],
+                ped               = fweapon.tweapon.ped[0],
+                quick_spawn       = fweapon.tweapon.quick_spawn[0],
             }, 
         }
     end

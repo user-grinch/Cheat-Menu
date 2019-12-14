@@ -60,6 +60,8 @@ function module.MissionMain()
 
     if imgui.Button("Fail current mission",imgui.ImVec2(fcommon.GetSize(1))) then
         if isPlayerControlOn(PLAYER_HANDLE) then
+            --test = callFunction(0x5BC520,1,1,1)
+            --callMethod(0x514950,test,1,0)
             failCurrentMission()
             fcommon.CheatActivated()
         end

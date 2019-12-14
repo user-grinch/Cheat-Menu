@@ -18,17 +18,23 @@ local module = {}
 
 module.tweapon =
 {
-    auto_aim    = imgui.new.bool(fconfig.Get('tweapon.auto_aim',false)),
-    fast_reload = imgui.new.bool(fconfig.Get('tweapon.fast_reload',false)),
-    images      = {},
-    long_range  = imgui.new.bool(fconfig.Get('tweapon.long_range',false)),
-    names       = fcommon.LoadJson("weapon"),
-    no_reload   = imgui.new.bool(fconfig.Get('tweapon.no_reload',false)),
-    path        = tcheatmenu.dir .. "weapons",
-    ped         = imgui.new.bool(fconfig.Get('tweapon.ped',false)),
-    quick_spawn = imgui.new.bool(fconfig.Get('tweapon.quick_spawn',false)),
-    search_text = imgui.new.char[20](""),   
-    gang        =
+    auto_aim          = imgui.new.bool(fconfig.Get('tweapon.auto_aim',false)),
+    fast_reload       = imgui.new.bool(fconfig.Get('tweapon.fast_reload',false)),
+    max_accuracy      = imgui.new.bool(fconfig.Get('tweapon.max_accuracy',false)),
+    max_ammo_clip     = imgui.new.bool(fconfig.Get('tweapon.max_ammo_clip',false)),
+    max_move_speed    = imgui.new.bool(fconfig.Get('tweapon.max_move_speed',false)),
+    max_skills        = imgui.new.bool(fconfig.Get('tweapon.max_skills',false)),
+    huge_damage       = imgui.new.bool(fconfig.Get('tweapon.huge_damage',false)),
+    images            = {},
+    long_target_range = imgui.new.bool(fconfig.Get('tweapon.long_target_range',false)),
+    long_weapon_range = imgui.new.bool(fconfig.Get('tweapon.long_weapon_range',false)),
+    names             = fcommon.LoadJson("weapon"),
+    no_reload         = imgui.new.bool(fconfig.Get('tweapon.no_reload',false)),
+    path              = tcheatmenu.dir .. "weapons",
+    ped               = imgui.new.bool(fconfig.Get('tweapon.ped',false)),
+    quick_spawn       = imgui.new.bool(fconfig.Get('tweapon.quick_spawn',false)),
+    search_text       = imgui.new.char[20](""),   
+    gang              =
     {
         weapon_array = {},
         used_weapons = fconfig.Get('tweapon.gang_weapons',fconst.DEFAULT_GANG_WEAPONS),
@@ -161,22 +167,6 @@ end
 
 -- Main function
 function module.WeaponMain()
-
-   
-
-
-    
-    
-    -- local pPed = getCharPointer(PLAYER_PED)
-    -- local CurWeapon = getCurrentCharWeapon(PLAYER_PED)
-
-    -- char __thiscall CPed::GetWeaponSkill(CPed *this, eWeaponType weaponType)
-    -- local skill = callMethod(0x5E3B60,pPed,1,0,CurWeapon)
-
-    -- CWeaponInfo *__cdecl CWeaponInfo::GetWeaponInfo(eWeaponType weaponID, char skill)
-    -- local pWeaponInfo = callFunction(0x743C60,2,2,CurWeapon,skill)
-    -- writeMemory(pWeaponInfo+0x4,4,100000,false)
-    -- writeMemory(pWeaponInfo+0x8,4,100000,false)
     
     imgui.Spacing()
     if imgui.Button("Remove current weapon",imgui.ImVec2(fcommon.GetSize(2))) then
@@ -223,8 +213,72 @@ function module.WeaponMain()
                     fcommon.CheatDeactivated()
                 end
             end)
-            
+            fcommon.CheckBoxFunc("Huge damage",module.tweapon.huge_damage,
+            function()
+                if module.tweapon.huge_damage[0] then
+                    fcommon.CheatActivated()
+                else
+                    callFunction(0x5BE670,0,0)
+                    fcommon.CheatDeactivated()
+                end
+            end,"Increase all weapon damage")
+            fcommon.CheckBoxFunc("Long target range",module.tweapon.long_target_range,
+            function()
+                if module.tweapon.long_target_range[0] then
+                    fcommon.CheatActivated()
+                else
+                    callFunction(0x5BE670,0,0)
+                    fcommon.CheatDeactivated()
+                end
+            end)
+            fcommon.CheckBoxFunc("Long weapon range",module.tweapon.long_weapon_range,
+            function()
+                if module.tweapon.long_weapon_range[0] then
+                    fcommon.CheatActivated()
+                else
+                    callFunction(0x5BE670,0,0)
+                    fcommon.CheatDeactivated()
+                end
+            end)
+        
             imgui.NextColumn()
+            
+            fcommon.CheckBoxFunc("Max accuracy",module.tweapon.max_accuracy,
+            function()
+                if module.tweapon.max_accuracy[0] then
+                    fcommon.CheatActivated()
+                else
+                    callFunction(0x5BE670,0,0)
+                    fcommon.CheatDeactivated()
+                end
+            end)
+            fcommon.CheckBoxFunc("Max ammo clip",module.tweapon.max_ammo_clip,
+            function()
+                if module.tweapon.max_ammo_clip[0] then
+                    fcommon.CheatActivated()
+                else
+                    callFunction(0x5BE670,0,0)
+                    fcommon.CheatDeactivated()
+                end
+            end)
+            fcommon.CheckBoxFunc("Max move speed",module.tweapon.max_move_speed,
+            function()
+                if module.tweapon.max_move_speed[0] then
+                    fcommon.CheatActivated()
+                else
+                    callFunction(0x5BE670,0,0)
+                    fcommon.CheatDeactivated()
+                end
+            end)
+            fcommon.CheckBoxFunc("Max skills",module.tweapon.max_skills,
+            function()
+                if module.tweapon.max_skills[0] then
+                    fcommon.CheatActivated()
+                else
+                    callFunction(0x5BE670,0,0)
+                    fcommon.CheatDeactivated()
+                end
+            end)
             fcommon.CheckBoxFunc("No reload + Inf ammo",module.tweapon.no_reload,
             function()
                 if module.tweapon.no_reload[0] then
@@ -245,26 +299,6 @@ function module.WeaponMain()
                     fcommon.CheatDeactivated()
                 end
             end)
-            -- fcommon.CheckBoxFunc("Long range",module.tweapon.long_range,
-            -- function()
-            --     if module.tweapon.long_range[0] then
-            --         writeMemory( 7600773,1,144,1)
-            --         writeMemory( 7600815,1,144,1)
-            --         writeMemory( 7600816,2,37008,1)
-            --         writeMemory( 7612591,1,144,1)
-            --         writeMemory( 7612646,1,144,1)
-            --         writeMemory( 7612647,2,37008,1)
-            --         fcommon.CheatActivated()
-            --     else
-            --         writeMemory( 7600773,1,72,1)
-            --         writeMemory( 7600815,1,255,1)
-            --         writeMemory( 7600816,2,3150,1)
-            --         writeMemory( 7612591,1,72,1)
-            --         writeMemory( 7612646,1,255,1)
-            --         writeMemory( 7612647,2,3150,1)
-            --         fcommon.CheatDeactivated()
-            --     end
-            -- end)
             imgui.Columns(1)
             imgui.EndTabItem()
         end

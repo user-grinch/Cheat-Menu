@@ -19,7 +19,7 @@ local module = {}
 module.tmemory    =
 {
     address            = imgui.new.char[10](""),
-    offset             = imgui.new.char[10](""),
+    offset             = imgui.new.char[10]("0"),
     is_float           = imgui.new.bool(fconfig.Get('tmemory.is_float',false)),
     list               = fcommon.LoadJson("memory"),
     name               = imgui.new.char[20](""),
@@ -33,7 +33,7 @@ module.tmemory    =
 function MemoryEntry(name,size,address)
     if imgui.MenuItemBool(name)then
         imgui.StrCopy(module.tmemory.address,address)
-        imgui.StrCopy(module.tmemory.offset,"")
+        imgui.StrCopy(module.tmemory.offset,"0")
         if size == "byte" then 
             module.tmemory.size[0] = 1
             module.tmemory.is_float[0] = false
@@ -111,6 +111,7 @@ function module.MemoryMain()
             imgui.InputText("Address", module.tmemory.address,ffi.sizeof(module.tmemory.address))
             fcommon.InformationTooltip("Ctrl + V to paste")
             imgui.InputText("Offset", module.tmemory.offset,ffi.sizeof(module.tmemory.offset))
+
             fcommon.InformationTooltip("Blank = no offset")
             imgui.SliderInt("Size", module.tmemory.size,1,4)
 
@@ -126,17 +127,21 @@ function module.MemoryMain()
             imgui.Checkbox("Virtual protect", module.tmemory.vp)
             imgui.Columns(1)
             imgui.Dummy(imgui.ImVec2(0,10))
-
             if imgui.Button("Read",imgui.ImVec2(fcommon.GetSize(2))) then
+
+                if ffi.string(module.tmemory.offset) == "" then 
+                    imgui.StrCopy(module.tmemory.offset,"0") 
+                end
+
                 if ffi.string(module.tmemory.address) ~= "" then
-                    module.tmemory.value[0] = fcommon.RwMemory(tonumber(ffi.string(module.tmemory.address))+tonumber(ffi.string(module.tmemory.offset)),module.tmemory.size[0],nil,module.tmemory.vp[0],module.tmemory.is_float[0])
+                    module.tmemory.value[0] = fcommon.RwMemory((tonumber(ffi.string(module.tmemory.address))+tonumber(ffi.string(module.tmemory.offset))),module.tmemory.size[0],nil,module.tmemory.vp[0],module.tmemory.is_float[0])
                 end
             end
             imgui.SameLine()
             if imgui.Button("Clear",imgui.ImVec2(fcommon.GetSize(2))) then
                 module.tmemory.value[0] = 0
                 imgui.StrCopy(module.tmemory.address,"")
-                imgui.StrCopy(module.tmemory.offset,"")
+                imgui.StrCopy(module.tmemory.offset,"0")
                 module.tmemory.size[0] = 0
                 module.tmemory.vp[0] = false
                 module.tmemory.is_float[0] = false
@@ -197,6 +202,11 @@ function module.MemoryMain()
             imgui.Dummy(imgui.ImVec2(0,10))
 
             if imgui.Button("Write",imgui.ImVec2(fcommon.GetSize(2))) then
+                
+                if ffi.string(module.tmemory.offset) == "" then 
+                    imgui.StrCopy(module.tmemory.offset,"0") 
+                end
+
                 if ffi.string(module.tmemory.address) ~= "" then
                     fcommon.RwMemory(tonumber(ffi.string(module.tmemory.address))+tonumber(ffi.string(module.tmemory.offset)),module.tmemory.size[0],module.tmemory.value[0],module.tmemory.vp[0],module.tmemory.is_float[0])
                     printHelpString("Value ~g~Updated")
@@ -206,7 +216,7 @@ function module.MemoryMain()
             if imgui.Button("Clear",imgui.ImVec2(fcommon.GetSize(2))) then
                 module.tmemory.value[0] = 0
                 imgui.StrCopy(module.tmemory.address,"")
-                imgui.StrCopy(module.tmemory.offset,"")
+                imgui.StrCopy(module.tmemory.offset,"0")
                 module.tmemory.size[0] = 0
                 module.tmemory.vp[0] = false
                 module.tmemory.is_float[0] = false

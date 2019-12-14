@@ -258,8 +258,6 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
     
 end
 
-
-
 function module.RadioButtonFunc(label,label_table,values,memory)
     module.DropDownMenu(label,function()
         local button = imgui.new.int(module.RwMemory(memory,1))
@@ -532,7 +530,9 @@ function module.LoadImages(mainDir,store_image_table,req_ext,dir)
                         store_image_table[dir][file_name] = imgui.CreateTextureFromFile(file_path)
                     end
                 end
-                wait(0)
+                if not fmenu.tmenu.fast_load_images[0] then
+                    wait(0)
+                end
             end
         end
     end
