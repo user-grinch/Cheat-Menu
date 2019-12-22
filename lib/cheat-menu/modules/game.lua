@@ -54,6 +54,7 @@ module.tgame                =
     },
     solid_water             = imgui.new.bool(fconfig.Get('tgame.solid_water',false)),
     ss_shortcut             = imgui.new.bool(fconfig.Get('tgame.ss_shortcut',false)), 
+    sync_system_time        = imgui.new.bool(fconfig.Get('tgame.sync_system_time',false)), 
     weather                 =
     {    
         names               = 
@@ -213,6 +214,22 @@ function CheatsEntry(func,names)
     end)
 end
 
+function module.SyncSystemTime()
+    while true do
+        -- if module.tgame.sync_system_time[0] then
+        --     os.date("*t")
+        --     local hour = memory.read(0xB70153,1)
+        --     local minute = memory.read(0xB70152,1)
+
+        --     if hour ~= os.hour and minute ~= os.min then
+        --         writeMemory(0xB70153,1,os.hour,false)
+        --         writeMemory(0xB70152,1,os.min,false)
+        --     end
+        -- end
+        wait(0)
+    end
+end
+
 function module.RandomCheats()
     while true do
         if module.tgame.random_cheats[0] then
@@ -222,9 +239,8 @@ function module.RandomCheats()
                 fcommon.CheatActivated()
             end
             wait(10000)
-        else
-            wait(0)
         end
+        wait(0)
     end
 end
 
@@ -522,6 +538,7 @@ function module.GameMain()
             fcommon.CheckBoxVar("Random cheats",module.tgame.random_cheats ,"Activates random cheats every 10 seconds\nSuicide cheat is excluded")
             fcommon.CheckBoxVar('Screenshot shortcut',module.tgame.ss_shortcut,"Take screenshot using (Left Ctrl + S)")
             fcommon.CheckBoxVar('Solid water',module.tgame.solid_water)
+            --fcommon.CheckBoxVar('Sync system time',module.tgame.sync_system_time)
             fcommon.CheckBoxValue('Widescreen',0xB6F065)
             imgui.Columns(1)
 

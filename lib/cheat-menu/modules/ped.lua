@@ -54,6 +54,7 @@ module.tped =
     images      = {},
     names       = fcommon.LoadJson("ped"),
     path        = tcheatmenu.dir .. "peds\\",
+    ped_health_display = imgui.new.bool(fconfig.Get('tped.ped_health_display',false)),
     search_text = imgui.new.char[20](""),  
     selected    = nil,
     special     = fcommon.LoadJson("ped special"),
@@ -127,16 +128,51 @@ function SetGangZoneDensity(title,id)
     if imgui.SliderInt(title,density,0,255) then
         setZoneGangStrength(getNameOfInfoZone(x,y,z),id,density[0])
         clearSpecificZonesToTriggerGangWar()
-        setGangWarsActive(fped.tped.gang.wars[0])
+        setGangWarsActive(true)
+    end
+end
+
+function module.PedHealthDisplay()
+    while true do
+
+        if module.tped.ped_health_display[0] then
+            local result, char = getCharPlayerIsTargeting(PLAYER_HANDLE)
+
+            if result then
+
+                local health = getCharHealth(char)
+                local x,y,z = getCharCoordinates(char)
+                local screenX,screenY = convert3DCoordsToScreen(x,y,z+1.0)
+
+                mad.draw_text(tostring(health),screenX,screenY,1,0.8,0.4,0,false,false,false,255,255,255,255,false)
+
+            end
+        end
+        wait(0)
     end
 end
 
 function module.PedMain()
-
+        imgui.Spacing()
+        if imgui.Button("Defensive gang war",imgui.ImVec2(fcommon.GetSize(2))) then
+            callFunction(0x444300,0,0)
+            setGangWarsActive(true)
+        end
+        imgui.SameLine()
+        if imgui.Button("Offensive gang war",imgui.ImVec2(fcommon.GetSize(2))) then
+            callFunction(0x446050,0,0)
+            setGangWarsActive(true)
+        end
+        if imgui.Button("End gang war",imgui.ImVec2(fcommon.GetSize(1))) then
+            callFunction(0x4464C0,0,0)
+            setGangWarsActive(true)
+        end      
+        imgui.Spacing()
         if imgui.BeginTabBar("Ped") then
             imgui.Spacing()
             if imgui.BeginTabItem("Checkbox") then
                 imgui.Columns(2,nil,false)
+                fcommon.CheckBoxVar("Display target health",module.tped.ped_health_display)
                 fcommon.CheckBoxValue("Elvis everywhere",0x969157)
                 fcommon.CheckBoxValue("Everyone is armed",0x969140)
                 fcommon.CheckBoxValue("Gangs control the streets",0x96915B)
@@ -148,13 +184,13 @@ function module.PedMain()
                 end)
                 
                 imgui.NextColumn()
-                
+
                 fcommon.CheckBoxValue("No road peds",0x8D2538,nil,0,25)
                 fcommon.CheckBoxValue("Peds attack with golfclub",0x96913E)
                 fcommon.CheckBoxValue("Peds attack with rockets",0x969158)
                 fcommon.CheckBoxValue("Peds riot",0x969175)
                 fcommon.CheckBoxValue("Slut magnet",0x96915D)
-
+                
                 imgui.Columns(1)
                 imgui.Spacing()
                 imgui.Separator()

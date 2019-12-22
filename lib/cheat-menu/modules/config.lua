@@ -77,6 +77,7 @@ function module.Write()
                 },
                 solid_water         = fgame.tgame.solid_water[0],
                 ss_shortcut         = fgame.tgame.ss_shortcut[0],
+                sync_system_time    = fgame.tgame.sync_system_time[0],
             },
             tmenu =
             {
@@ -103,6 +104,7 @@ function module.Write()
                 {
                     wars = fped.tped.gang.wars[0],
                 },
+                ped_health_display = fped.tped.ped_health_display[0],
                 type   =
                 {
                     index = fped.tped.type.index[0],
@@ -138,6 +140,7 @@ function module.Write()
                 no_damage        = fvehicle.tvehicle.no_damage[0],
                 no_vehicles      = fvehicle.tvehicle.no_vehicles[0],
                 random_colors    = fvehicle.tvehicle.random_colors[0],
+                random_colors_traffic    = fvehicle.tvehicle.random_colors_traffic[0],
                 spawn_inside     = fvehicle.tvehicle.spawn_inside[0],
                 speed            = fvehicle.tvehicle.speed[0],
                 stay_on_bike     = fvehicle.tvehicle.stay_on_bike[0],

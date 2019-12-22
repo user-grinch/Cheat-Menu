@@ -339,17 +339,19 @@ function main()
         writeMemory(4588800,1,160,false)
     end
 
-         
+    
     lua_thread.create(fplayer.KeepPosition)
+    lua_thread.create(fped.PedHealthDisplay)
     lua_thread.create(fgame.CameraMode)
     lua_thread.create(fgame.FreezeTime)
     lua_thread.create(fgame.SolidWater)
+    --lua_thread.create(fgame.SyncSystemTime)
     lua_thread.create(fvehicle.AircraftCamera)
     lua_thread.create(fvehicle.FirstPersonCamera)
     lua_thread.create(fweapon.AutoAim)
     lua_thread.create(fvehicle.RandomColors)
+    lua_thread.create(fvehicle.RandomTrafficColors)
     lua_thread.create(fvehicle.UnlimitedNitro)
-    --lua_thread.create(fweapon.LongRange)
 
     --------------------------------------------------
     

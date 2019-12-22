@@ -91,6 +91,7 @@ module.tvehicle =
     path = tcheatmenu.dir .. "vehicles\\images",
     quick_spawn  = imgui.new.bool(fconfig.Get('tvehicle.quick_spawn',false)),
     random_colors = imgui.new.bool(fconfig.Get('tvehicle.random_colors',false)),
+    random_colors_traffic = imgui.new.bool(fconfig.Get('tvehicle.random_colors_traffic',false)),
     search_text = imgui.new.char[20](),
     spawn_inside = imgui.new.bool(fconfig.Get('tvehicle.spawn_inside',true)),
     speed = imgui.new.int(fconfig.Get('tvehicle.speed',0)),
@@ -223,7 +224,7 @@ end
 
 function module.RandomColors()
     while true do
-        if isCharInAnyCar(PLAYER_PED) and module.tvehicle.random_colors[0] then
+        if isCharInAnyCar(PLAYER_PED) and module.tvehicle.random_colors[0] and not module.tvehicle.random_colors_traffic[0] then
             local primary_color = math.random(fconst.VEHICLE_COLOR.MIN_VALUE,fconst.VEHICLE_COLOR.MAX_VALUE)
             local secondary_color = math.random(fconst.VEHICLE_COLOR.MIN_VALUE,fconst.VEHICLE_COLOR.MAX_VALUE)
             local car = getCarCharIsUsing(PLAYER_PED)
@@ -231,6 +232,27 @@ function module.RandomColors()
                 changeCarColour(car,primary_color,secondary_color)
             else
                 break
+            end
+            wait(1000)
+        end
+        wait(0)
+    end
+end
+
+function module.RandomTrafficColors()
+    while true do
+        if module.tvehicle.random_colors_traffic[0] then
+            local carX,carY,carZ = getCharCoordinates(PLAYER_PED)
+
+            local result, car = findAllRandomVehiclesInSphere(carX,carY,carZ,100.0,false,true)
+
+            if result then
+                while result do
+                    local primary_color = math.random(fconst.VEHICLE_COLOR.MIN_VALUE,fconst.VEHICLE_COLOR.MAX_VALUE)
+                    local secondary_color = math.random(fconst.VEHICLE_COLOR.MIN_VALUE,fconst.VEHICLE_COLOR.MAX_VALUE)
+                    changeCarColour(car,primary_color,secondary_color)
+                    result, car = findAllRandomVehiclesInSphere(carX,carY,carZ,100.0,true,true)
+                end
             end
             wait(1000)
         end
@@ -457,14 +479,11 @@ function module.VehicleMain()
             fcommon.CheckBoxValue("Cars fly",0x969160)
             fcommon.CheckBoxVar("Car heavy",module.tvehicle.heavy)
             fcommon.CheckBoxValue("Decreased traffic",0x96917A)
-            fcommon.CheckBoxVar("Dont fall off bike",module.tvehicle.stay_on_bike)
+            fcommon.CheckBoxVar("Don't fall off bike",module.tvehicle.stay_on_bike)
             fcommon.CheckBoxValue("Drive on water",0x969152)
             fcommon.CheckBoxVar("First person camera",module.tvehicle.first_person_camera)
             fcommon.CheckBoxValue("Float away when hit",0x969166)
             fcommon.CheckBoxValue("Green traffic lights",0x96914E)
-
-            imgui.NextColumn()
-
             fcommon.CheckBoxFunc("Lights on",module.tvehicle.lights,
             function()
                 if isCharInAnyCar(PLAYER_PED) then
@@ -482,6 +501,9 @@ function module.VehicleMain()
                     printHelpString("Player ~r~not~w~ in car")
                 end
             end)
+
+            imgui.NextColumn()
+
             fcommon.CheckBoxFunc("Lock doors",module.tvehicle.lock_doors,
             function()
                 if isCharInAnyCar(PLAYER_PED) then
@@ -517,7 +539,8 @@ function module.VehicleMain()
             end)
             fcommon.CheckBoxVar("No visual damage",module.tvehicle.visual_damage)
             fcommon.CheckBoxValue("Perfect handling",0x96914C)
-            fcommon.CheckBoxVar("Random colors",module.tvehicle.random_colors,"Paints player's car with random colors every second")
+            fcommon.CheckBoxVar("Random colors",module.tvehicle.random_colors,"Paints players car with random colors every second")
+            fcommon.CheckBoxVar("Random traffic colors",module.tvehicle.random_colors_traffic,"Paints traffic cars with random colors every second")
             fcommon.CheckBoxValue("Tank mode",0x969164) 
             fcommon.CheckBoxValue("Train camera fix",5416239,nil,fconst.TRAIN_CAM_FIX.ON,fconst.TRAIN_CAM_FIX.OFF) 
             fcommon.CheckBoxVar("Unlimited nitro",module.tvehicle.unlimited_nitro,"Enabling this would disable\n\nAll cars have nitro\nAll taxis have nitro")
