@@ -258,16 +258,32 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
     
 end
 
-function module.RadioButtonFunc(label,label_table,values,memory)
+function module.RadioButtonFunc(label,label_table,values,memory,save_func,save_func_parameter_table)
     module.DropDownMenu(label,function()
         local button = imgui.new.int(module.RwMemory(memory,1))
 
+        local btn_in_column = math.floor(#label_table/2)
+        
+        if (#label_table % 2) ~= 0 then -- if odd number
+            btn_in_column = btn_in_column + 1
+        end 
+
+        imgui.Columns(2,nil,false)
         for i = 1, #label_table,1 do
-            if imgui.RadioButtonIntPtr(label_table[i],button,values[i]) then
+
+            if imgui.RadioButtonIntPtr(label_table[i] .. "##" .. label,button,values[i]) then
                 module.RwMemory(memory,1,values[i])
                 button[0] = i
+                if save_func ~= nil then
+                    save_func(save_func_parameter_table,label,values[i])
+                end
+            end
+            if i == btn_in_column then
+                imgui.NextColumn()
             end
         end
+        imgui.Columns(1)
+
     end)
 end
 
@@ -413,7 +429,7 @@ end
 -- Similar UI to the previous function
 -- Provides input options to change game memory values
 function module.UpdateAddress(arg)
-    if arg.cvalue == nil then arg.cvalue = 1 end
+    if arg.cvalue == nil then arg.cvalue = 1.0 end
 
     local buttons = 3
 
@@ -423,6 +439,12 @@ function module.UpdateAddress(arg)
 
     if arg.max == nil then
         buttons = buttons - 1
+    end
+
+    arg.func = function(arg,value)
+        if arg.save_func ~= nil then
+            arg.save_func(arg.save_func_parameter_table,arg.name,value)
+        end
     end
 
     module.DropDownMenu(arg.name,function()
@@ -443,26 +465,31 @@ function module.UpdateAddress(arg)
 
         if imgui.InputFloat("##".. arg.name,value) then
             module.RwMemory(arg.address,arg.size,value[0],nil,arg.is_float,arg.factor)
+            arg.func(arg,value[0])
         end
         imgui.SameLine(0.0,4.0)
         if imgui.Button("-##".. arg.name,imgui.ImVec2(20,20)) then
             module.RwMemory(arg.address,arg.size,(value[0] - arg.cvalue),nil,arg.is_float,arg.factor)
+            arg.func(arg,(value[0] - arg.cvalue))
         end
         imgui.SameLine(0.0,4.0)
         if imgui.Button("+##".. arg.name,imgui.ImVec2(20,20)) then
             module.RwMemory(arg.address,arg.size,(value[0] + arg.cvalue),nil,arg.is_float,arg.factor)
+            arg.func(arg,(value[0] + arg.cvalue))
         end
         imgui.SameLine(0.0,4.0)
         imgui.Text("Set")
         imgui.Spacing()
         if imgui.Button("Minimum##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
             module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float,arg.factor)
+            arg.func(arg,arg.min)
         end
 
         if arg.default ~= nil then
             imgui.SameLine()
             if imgui.Button("Default##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
                 module.RwMemory(arg.address,arg.size,arg.default,nil,arg.is_float,arg.factor)
+                arg.func(arg,arg.default)
             end
         end
 
@@ -470,16 +497,19 @@ function module.UpdateAddress(arg)
             imgui.SameLine()
             if imgui.Button("Maximum##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
                 module.RwMemory(arg.address,arg.size,arg.max,nil,arg.is_float,arg.factor)
+                arg.func(arg,arg.max)
             end
         end
         imgui.SameLine()
         imgui.Spacing()
         if (arg.min ~= nil) and (value[0] < arg.min) then
             module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float,arg.factor)
+            arg.func(arg,arg.min)
         end
 
         if (arg.max ~= nil) and (value[0] > arg.max) then
             module.RwMemory(arg.address,arg.size,arg.max,nil,arg.is_float,arg.factor)
+            arg.func(arg,arg.max)
         end
     end)
 end
@@ -498,7 +528,7 @@ function module.LoadJson(filename)
         file:close()
         return table
     end
-    return {}
+    return nil
 end
 
 function module.SaveJson(filename,table)
@@ -514,7 +544,7 @@ end
 -- Misc
 
 -- Loads images recursively from root directory
-function module.LoadImages(mainDir,store_image_table,req_ext,dir)
+function module.LoadImages(mainDir,store_image_table,req_ext)
     for dir in lfs.dir(mainDir) do
         local dir_path = mainDir .. "\\" .. dir
         if doesDirectoryExist(dir_path) and dir ~= "." and dir ~= ".." then

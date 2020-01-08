@@ -55,33 +55,38 @@ function httpRequest(request, body, handler) -- copas.http
                 wait(0)
             end
             copas.running = false
-        end)
-    end
-    -- do request
-    if handler then
-        return copas.addthread(function(r, b, h)
-            copas.setErrorHandler(function(err) h(nil, err) end)
-            h(http.request(r, b))
-        end, request, body, handler)
-    else
-        local results
-        local thread = copas.addthread(function(r, b)
-            copas.setErrorHandler(function(err) results = {nil, err} end)
-            results = table.pack(http.request(r, b))
-        end, request, body)
-        while coroutine.status(thread) ~= 'dead' do wait(0) end
-        return table.unpack(results)
-    end
+		end)
+		
+		if not (copas.connect(socket.tcp(),"www.github.com",80,1000)) then
+			printHelpString("Unable to connect to GitHub")
+			return
+		end
+	
+		-- do request
+		if handler then
+			return copas.addthread(function(r, b, h)
+				copas.setErrorHandler(function(err) h(nil, err) end)
+				h(http.request(r, b))
+			end, request, body, handler)
+		else
+			local results
+			local thread = copas.addthread(function(r, b)
+				copas.setErrorHandler(function(err) results = {nil, err} end)
+				results = table.pack(http.request(r, b))
+			end, request, body)
+			while coroutine.status(thread) ~= 'dead' do wait(0) end
+			return table.unpack(results)
+		end
+	end
 end
 
 
 function module.CheckUpdates()
-    local https = nil
 	if pcall(function()
 			copas = require 'copas'
-			http = require 'copas.http'
-            end) then
-		
+			http  = require 'copas.http'
+			end) then
+
 		if string.find( script.this.version,"wip") then
 			link = "https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/cheat-menu.lua"
 		else

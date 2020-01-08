@@ -21,6 +21,7 @@ module.tgame                =
     camera                  =
     {
         bool                = imgui.new.bool(false),
+        model_val           = nil,
         speed               = imgui.new.float(fconfig.Get('tgame.camera.speed',0.3)),
         rotation            = 0.0,
     },
@@ -127,11 +128,12 @@ function module.CameraMode()
         if module.tgame.camera.bool[0] then
             freezeCharPositionAndDontLoadCollision(PLAYER_PED,true)
             setCharCollision(PLAYER_PED,false)
+            setEveryoneIgnorePlayer(0,true)
             
             writeMemory(0xBA676C,1,2,false) -- Radar
             writeMemory(0xBA6769,1,0,false) -- Hud
 
-            local model_val = readMemory((getCharPointer(PLAYER_PED)+1140),4,false)
+            module.tgame.camera.model_val = readMemory((getCharPointer(PLAYER_PED)+1140),4,false)
             writeMemory(getCharPointer(PLAYER_PED)+1140,4,2,false)
 
             local total_mouse_x = 0
@@ -181,9 +183,10 @@ function module.CameraMode()
 
                 wait(0)
             end
-            freezeCharPositionAndDontLoadCollision(PLAYER_PED,false)
 
+            freezeCharPositionAndDontLoadCollision(PLAYER_PED,false)
             setCharCollision(PLAYER_PED,true)
+            setEveryoneIgnorePlayer(0,false)
 
             writeMemory(0xBA676C,1,0,false) -- Radar
             writeMemory(0xBA6769,1,1,false) -- Hud
@@ -216,16 +219,13 @@ end
 
 function module.SyncSystemTime()
     while true do
-        -- if module.tgame.sync_system_time[0] then
-        --     os.date("*t")
-        --     local hour = memory.read(0xB70153,1)
-        --     local minute = memory.read(0xB70152,1)
-
-        --     if hour ~= os.hour and minute ~= os.min then
-        --         writeMemory(0xB70153,1,os.hour,false)
-        --         writeMemory(0xB70152,1,os.min,false)
-        --     end
-        -- end
+        if module.tgame.sync_system_time[0] then
+            time = os.date("*t")
+            local hour,minute = getTimeOfDay()
+            if hour ~= time.hour or minute ~= time.min then
+                setTimeOfDay(time.hour,time.min)
+            end
+        end
         wait(0)
     end
 end
@@ -538,7 +538,7 @@ function module.GameMain()
             fcommon.CheckBoxVar("Random cheats",module.tgame.random_cheats ,"Activates random cheats every 10 seconds\nSuicide cheat is excluded")
             fcommon.CheckBoxVar('Screenshot shortcut',module.tgame.ss_shortcut,"Take screenshot using (Left Ctrl + S)")
             fcommon.CheckBoxVar('Solid water',module.tgame.solid_water)
-            --fcommon.CheckBoxVar('Sync system time',module.tgame.sync_system_time)
+            fcommon.CheckBoxVar('Sync system time',module.tgame.sync_system_time)
             fcommon.CheckBoxValue('Widescreen',0xB6F065)
             imgui.Columns(1)
 

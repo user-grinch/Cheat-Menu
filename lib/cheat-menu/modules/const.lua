@@ -37,41 +37,42 @@ module.VEHICLE =
 {
     IMAGE_HEIGHT = 75,
     IMAGE_WIDTH  = 100,
-    IMAGE_EXT    = "jpg"
+    IMAGE_EXT    = "jpg",
 }
 module.COMPONENT =
 {
     IMAGE_HEIGHT = 80,
     IMAGE_WIDTH  = 100,
-    IMAGE_EXT    = "jpg"
+    IMAGE_EXT    = "jpg",
+    TOTAL_SLOTS  = 14,
 }
 
 module.PAINTJOB =
 {
     IMAGE_HEIGHT = 75,
     IMAGE_WIDTH  = 100,
-    IMAGE_EXT    = "png"
+    IMAGE_EXT    = "png",
 }
 
 module.PED =
 {
     IMAGE_HEIGHT = 110,
     IMAGE_WIDTH  = 55,
-    IMAGE_EXT    = "jpg"
+    IMAGE_EXT    = "jpg",
 }
 
 module.WEAPON =
 {
     IMAGE_HEIGHT = 65,
     IMAGE_WIDTH  = 65,
-    IMAGE_EXT    = "jpg"
+    IMAGE_EXT    = "jpg",
 }
 
 module.CLOTH =
 {
     IMAGE_HEIGHT = 100,
     IMAGE_WIDTH  = 80,
-    IMAGE_EXT    = "jpg"
+    IMAGE_EXT    = "jpg",
 }
 
 module.TRAIN_CAM_FIX =
@@ -135,4 +136,5 @@ module.NITRO_STATE =
     EMPTY       = 0,
     FULL        = 1.0,
 }
+
 return module

@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.9-wip")
-script_version_number(20191215) -- YYYYMMDD
+script_version_number(20200108) -- YYYYMMDD
 
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
@@ -87,7 +87,6 @@ end
 resX, resY = getScreenResolution()
 tcheatmenu       =
 {   
-    path_index   = {},
     dir          = tcheatmenu.dir,
     current_menu = fconfig.Get('tcheatmenu.current_menu',1),
     window       =
@@ -98,7 +97,7 @@ tcheatmenu       =
             X    = fconfig.Get('tcheatmenu.window.size.X',resX/4),
             Y    = fconfig.Get('tcheatmenu.window.size.Y',resY/1.2),
         },
-        title    = string.format("%s v%s by %s",script.this.name,script.this.version,script.this.authors[1]),
+        title    = string.format("%s v%s",script.this.name,script.this.version),
     },
 }
 
@@ -339,16 +338,24 @@ function main()
         writeMemory(4588800,1,160,false)
     end
 
+    --Money text
+    ffi.copy(ffi.cast("char(*)", fvisual.tvisual.money.negative_memory), ffi.string(fvisual.tvisual.money.negative))
+    writeMemory(0x58F50A,4,fvisual.tvisual.money.negative_memory,false)
+    ffi.copy(ffi.cast("char(*)", fvisual.tvisual.money.positive_memory), ffi.string(fvisual.tvisual.money.positive))
+    writeMemory(0x58F4C8,4,fvisual.tvisual.money.positive_memory,false)
+
+
     
     lua_thread.create(fplayer.KeepPosition)
     lua_thread.create(fped.PedHealthDisplay)
     lua_thread.create(fgame.CameraMode)
     lua_thread.create(fgame.FreezeTime)
     lua_thread.create(fgame.SolidWater)
-    --lua_thread.create(fgame.SyncSystemTime)
+    lua_thread.create(fgame.SyncSystemTime)
     lua_thread.create(fvehicle.AircraftCamera)
     lua_thread.create(fvehicle.FirstPersonCamera)
     lua_thread.create(fweapon.AutoAim)
+    lua_thread.create(fvehicle.OnEnterVehicle)
     lua_thread.create(fvehicle.RandomColors)
     lua_thread.create(fvehicle.RandomTrafficColors)
     lua_thread.create(fvehicle.UnlimitedNitro)
@@ -360,6 +367,7 @@ function main()
         -- Functions that neeed to run constantly
 
         --------------------------------------------------
+        
         --Weapons
         local pPed = getCharPointer(PLAYER_PED)
         local CurWeapon = getCurrentCharWeapon(PLAYER_PED)
@@ -411,7 +419,9 @@ function main()
         end
         
         -- God mode
-        setCharProofs(PLAYER_PED,fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0])
+        if fplayer.tplayer.god[0] then
+            setCharProofs(PLAYER_PED,true,true,true,true,true)
+        end
 
         if fplayer.tplayer.aimSkinChanger[0] and isKeyDown(tkeys.asc_key) then
             fcommon.KeyWait(tkeys.asc_key,tkeys.asc_key)
@@ -431,6 +441,8 @@ function main()
         -- Vehicle functions
         if isCharInAnyCar(PLAYER_PED) then
             local car = getCarCharIsUsing(PLAYER_PED)
+
+            setCarEngineOn(car,not (fvehicle.tvehicle.disable_car_engine[0]))
 
             -- Reset car colors if player changed color in tune shop
             if fvehicle.tvehicle.color.default ~= -1 then
@@ -495,6 +507,18 @@ function onScriptTerminate(script, quitGame)
                 end
 
             end
+        end
+
+        if fgame.tgame.camera.bool[0] then
+            freezeCharPositionAndDontLoadCollision(PLAYER_PED,false)
+            setCharCollision(PLAYER_PED,true)
+            setEveryoneIgnorePlayer(0,false)
+
+            writeMemory(0xBA676C,1,0,false) -- Radar
+            writeMemory(0xBA6769,1,1,false) -- Hud
+
+            restoreCameraJumpcut()
+            writeMemory((getCharPointer(PLAYER_PED)+1140),4,fgame.tgame.camera.model_val,false)
         end
 
         if fmenu.tmenu.show_crash_message[0] and not fgame.tgame.script_manager.skip_auto_reload then

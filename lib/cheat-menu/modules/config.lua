@@ -18,16 +18,62 @@ local module = {}
 
 module.tconfig =
 {
-    path  = tcheatmenu.dir ..  "json/cheat-menu.json",
-    reset = false,
-    read  = fcommon.LoadJson("cheat-menu"),
-    write = {},
+    handling = {},
+    paint    = {},
+    path     = tcheatmenu.dir ..  "json/config.json",
+    reset    = false,
+    read     = fcommon.LoadJson("config"),
+    temp_texture_name = nil,
+    temp_color_rgb = nil,
+    tune     = {},
 }
 
-function module.Write()
 
+function module.Get(s,default)
+    if module.tconfig.read == nil then return default end
+
+    local t = module.tconfig.read
+    
+    for key in s:gmatch('[^.]+') do
+      if t[key] == nil then return default end
+      t = t[key]
+    end
+
+    if t == nil then
+        return default
+    else
+        return t
+    end
+end
+
+function module.Set(t,path,value)
+
+    local x = 0
+    for key in path:gmatch('[^.]+') do
+        x = x + 1
+    end
+
+    local y = 0
+    for key in path:gmatch('[^.]+') do
+        y = y + 1
+        if x == y then
+            t[key] = value
+        else
+            if t[key] == nil then t[key] = {} end
+            t = t[key]
+        end
+    end
+end
+
+module.tconfig.handling = module.Get("tvehicle.handling",{})
+module.tconfig.paint = module.Get("tvehicle.paint",{})
+module.tconfig.tune = module.Get("tvehicle.tune",{})
+
+
+function module.Write()
+    local write_table = {}
     if module.tconfig.reset == false then
-        module.tconfig.write =
+        write_table =
         {
             tanimation =
             {
@@ -132,18 +178,26 @@ function module.Write()
                     index        = fvehicle.tvehicle.aircraft.index,
                     spawn_in_air = fvehicle.tvehicle.aircraft.spawn_in_air[0],
                 },
+                auto_load_handling  = fvehicle.tvehicle.auto_load_handling[0],
+                auto_load_paint     = fvehicle.tvehicle.auto_load_paint[0],
+                auto_load_tune      = fvehicle.tvehicle.auto_load_tune[0],
+                apply_material_filter = fvehicle.tvehicle.apply_material_filter[0],
+                disable_car_engine  = fvehicle.tvehicle.disable_car_engine[0],
                 first_person_camera = fvehicle.tvehicle.first_person_camera[0],
+                handling         = module.tconfig.handling, -- Generated runtime
                 heavy            = fvehicle.tvehicle.heavy[0],
                 quick_spawn      = fvehicle.tvehicle.quick_spawn[0],
                 lights           = fvehicle.tvehicle.lights[0],
                 lock_speed       = fvehicle.tvehicle.lock_speed[0],
                 no_damage        = fvehicle.tvehicle.no_damage[0],
                 no_vehicles      = fvehicle.tvehicle.no_vehicles[0],
+                paint            = fconfig.tconfig.paint, -- Generated runtime
                 random_colors    = fvehicle.tvehicle.random_colors[0],
                 random_colors_traffic    = fvehicle.tvehicle.random_colors_traffic[0],
                 spawn_inside     = fvehicle.tvehicle.spawn_inside[0],
                 speed            = fvehicle.tvehicle.speed[0],
                 stay_on_bike     = fvehicle.tvehicle.stay_on_bike[0],
+                tune             = fconfig.tconfig.tune, -- Generated runtime
                 visual_damage    = fvehicle.tvehicle.visual_damage[0],
                 unlimited_nitro  = fvehicle.tvehicle.unlimited_nitro[0],
             },
@@ -185,26 +239,8 @@ function module.Write()
 
     local file = io.open(module.tconfig.path,'w')
     if file then
-        file:write(encodeJson(module.tconfig.write))
+        file:write(encodeJson(write_table))
         io.close(file)
-    end
-end
-
--- Get value from loaded config table
-function module.Get(s,default)
-    if module.tconfig.read == nil then return default end
-
-    local t = module.tconfig.read
-    
-    for key in s:gmatch('[^.]+') do
-      if t[key] == nil then return default end
-      t = t[key]
-    end
-
-    if t == nil then
-        return default
-    else
-        return t
     end
 end
 
