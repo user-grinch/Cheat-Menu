@@ -102,6 +102,7 @@ module.tvehicle =
     first_person_camera = imgui.new.bool(fconfig.Get('tvehicle.first_person_camera',false)),
     heavy = imgui.new.bool(fconfig.Get('tvehicle.heavy',false)),
     images = {},
+    invisible_car = imgui.new.bool(fconfig.Get('tvehicle.invisible_car',false)),
     lights = imgui.new.bool(fconfig.Get('tvehicle.lights',false)),
     lock_doors = imgui.new.bool(false),
     lock_speed = imgui.new.bool(fconfig.Get('tvehicle.lock_speed',false)),
@@ -136,6 +137,7 @@ module.tvehicle =
     },
     unlimited_nitro = imgui.new.bool(fconfig.Get('tvehicle.unlimited_nitro',false)), 
     visual_damage   = imgui.new.bool(fconfig.Get('tvehicle.visual_damage',false)),
+    watertight_car = imgui.new.bool(fconfig.Get('tvehicle.watertight_car',false)),
 }
 
 module.tvehicle.components.list  = imgui.new['const char*'][#module.tvehicle.components.ui_names](module.tvehicle.components.ui_names)
@@ -492,6 +494,15 @@ function module.OnEnterVehicle()
                     end
                 end
             end
+            
+            if module.tvehicle.invisible_car[0] then
+                setCarVisible(car,false)
+            end
+            if module.tvehicle.watertight_car[0] then
+                setCarWatertight(car,false)
+            end
+           
+            
 
             while isCharInCar(PLAYER_PED,car) do
                 wait(0)
@@ -682,6 +693,13 @@ function module.VehicleMain()
                 fcommon.CheckBoxVar("First person camera",module.tvehicle.first_person_camera)
                 fcommon.CheckBoxValue("Float away when hit",0x969166)
                 fcommon.CheckBoxValue("Green traffic lights",0x96914E)
+                fcommon.CheckBoxVar("Invisible car",module.tvehicle.invisible_car,nil,
+                function()
+                    if isCharInAnyCar(PLAYER_PED) then
+                        local car = getCarCharIsUsing(PLAYER_PED)
+                        setCarVisible(car,not module.tvehicle.invisible_car[0])
+                    end
+                end)
 
                 imgui.NextColumn()
 
@@ -742,6 +760,13 @@ function module.VehicleMain()
                 fcommon.CheckBoxValue("Tank mode",0x969164) 
                 fcommon.CheckBoxValue("Train camera fix",5416239,nil,fconst.TRAIN_CAM_FIX.ON,fconst.TRAIN_CAM_FIX.OFF) 
                 fcommon.CheckBoxVar("Unlimited nitro",module.tvehicle.unlimited_nitro,"Enabling this would disable\n\nAll cars have nitro\nAll taxis have nitro")
+                fcommon.CheckBoxVar("Watertight car",module.tvehicle.watertight_car,nil,
+                function()
+                    if isCharInAnyCar(PLAYER_PED) then
+                        local car = getCarCharIsUsing(PLAYER_PED)
+                        setCarWatertight(car,module.tvehicle.watertight_car[0])
+                    end
+                end)
                 fcommon.CheckBoxValue("Wheels only",0x96914B)
         
                 imgui.Columns(1)
@@ -880,7 +905,7 @@ function module.VehicleMain()
 
             imgui.Spacing()
             imgui.Columns(2,nil,false)
-            fcommon.CheckBoxVar("Quick vehicle",module.tvehicle.quick_spawn,"Vehicle can be spawned from quick spawner using (Left Ctrl + Q). \n\nControls:\nEnter : Stop reading key press\nDelete : Erase full string\nBackspace : Erase last character")
+            fcommon.CheckBoxVar("Quick vehicle",module.tvehicle.quick_spawn,string.format("Vehicle can be spawned from quick spawner using %s\n\nControls:\nEnter : Stop reading key press\nDelete : Erase full string\nBackspace : Erase last character",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.quick_spawner)))
             fcommon.CheckBoxVar("Spawn inside",module.tvehicle.spawn_inside,"Spawn inside vehicle as driver")
 
             imgui.NextColumn()

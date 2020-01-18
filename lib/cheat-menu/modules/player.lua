@@ -213,7 +213,7 @@ end
 function SkinChangerMenu()
     imgui.Spacing()
     fcommon.CheckBoxVar("Aim skin changer", module.tplayer.aimSkinChanger)
-    fcommon.InformationTooltip("Aim ped with a gun & press enter")
+    fcommon.InformationTooltip("Activate using, Aim ped +".. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.asc_key))
 
     imgui.Spacing()
     if imgui.BeginTabBar("Skins") then

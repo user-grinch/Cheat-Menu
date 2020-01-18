@@ -75,7 +75,7 @@ function module.TeleportMain()
             fcommon.CheckBoxVar("Get Z coordinates",module.tteleport.auto_z,"Get ground Z of your coordinates")
 			fcommon.CheckBoxVar("Insert coordinates",module.tteleport.insert_coords,"Insert current coordinates")
 			imgui.NextColumn()
-			fcommon.CheckBoxVar("Quick teleport",module.tteleport.shortcut,"Teleport to marker using (X + Y)")
+			fcommon.CheckBoxVar("Quick teleport",module.tteleport.shortcut,"Teleport to marker using" ..  fcommon.GetHotKeyNames(tcheatmenu.hot_keys.quick_teleport))
             imgui.Columns(1)
 
             if imgui.InputText("Coordinates",module.tteleport.coords,ffi.sizeof(module.tteleport.coords)) then end

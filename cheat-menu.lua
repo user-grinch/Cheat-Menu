@@ -21,30 +21,10 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.9-wip")
-script_version_number(20200108) -- YYYYMMDD
+script_version_number(20200118) -- YYYYMMDD
 
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
-
---------------------------------------------------
--- All the command keys used throughout the Cheat-Menu
-tkeys =
-{
-    asc_key              = 0x0D, -- RETURN/Enter - used for aim skin changer
-    camera_mode_down     = 0x53, -- S
-    camera_mode_extra    = 0xA0, -- LSHIFT
-    camera_mode_forward  = 0x57, -- W
-    camera_mode_backward = 0x53, -- S
-    camera_mode_up       = 0x57, -- W
-    camera_zoom          = 0x56, -- V
-    control_key          = 0xA2, -- LCONTROL
-    mc_paste             = 0x56, -- V - memory control paste memory address
-    menu_open_key        = 0x4D, -- M
-    quickspawner_key     = 0x51, -- Q
-    screenshot_key       = 0x53, -- S
-    teleport_key1        = 0x58, -- X - key1 for quick teleport
-    teleport_key2        = 0x59, -- Y - key2 for quick teleport
-}
 
 tcheatmenu =
 {   
@@ -60,6 +40,7 @@ lfs           = require 'lfs'
 mad           = require 'MoonAdditions'
 memory        = require 'memory'
 os            = require 'os'
+vkeys         = require 'vkeys'
 
 fcommon       = require 'cheat-menu.modules.common'
 fconfig       = require 'cheat-menu.modules.config'
@@ -89,6 +70,22 @@ tcheatmenu       =
 {   
     dir          = tcheatmenu.dir,
     current_menu = fconfig.Get('tcheatmenu.current_menu',1),
+    hot_keys     =
+    {
+        asc_key              = fconfig.Get('tcheatmenu.hot_keys.asc',{vkeys.VK_RETURN,vkeys.VK_RETURN}),
+        camera_mode_forward  = fconfig.Get('tcheatmenu.hot_keys.camera_mode_forward',{vkeys.VK_W,vkeys.VK_W}),
+        camera_mode_flip     = fconfig.Get('tcheatmenu.hot_keys.camera_mode_flip',{vkeys.VK_LCONTROL,vkeys.VK_LCONTROL}),
+        camera_mode_backward = fconfig.Get('tcheatmenu.hot_keys.camera_mode_backward',{vkeys.VK_S,vkeys.VK_S}),
+        camera_mode_x_axis   = fconfig.Get('tcheatmenu.hot_keys.camera_mode_x_axis',{vkeys.VK_X,vkeys.VK_X}),
+        camera_mode_y_axis   = fconfig.Get('tcheatmenu.hot_keys.camera_mode_y_axis',{vkeys.VK_Y,vkeys.VK_Y}),
+        camera_mode_z_axis   = fconfig.Get('tcheatmenu.hot_keys.camera_mode_z_axis',{vkeys.VK_Z,vkeys.VK_Z}),
+        currently_active     = nil,
+        mc_paste             = fconfig.Get('tcheatmenu.hot_keys.mc_paste',{vkeys.VK_LCONTROL,vkeys.VK_V}),
+        menu_open            = fconfig.Get('tcheatmenu.hot_keys.menu_open',{vkeys.VK_LCONTROL,vkeys.VK_M}),
+        quick_screenshot     = fconfig.Get('tcheatmenu.hot_keys.quick_screenshot',{vkeys.VK_LCONTROL,vkeys.VK_S}),
+        quick_spawner        = fconfig.Get('tcheatmenu.hot_keys.quick_spawner',{vkeys.VK_LCONTROL,vkeys.VK_Q}),
+        quick_teleport       = fconfig.Get('tcheatmenu.hot_keys.quick_teleport',{vkeys.VK_X,vkeys.VK_Y}),
+    },
     window       =
     {
         show     = imgui.new.bool(false),
@@ -345,7 +342,6 @@ function main()
     writeMemory(0x58F4C8,4,fvisual.tvisual.money.positive_memory,false)
 
 
-    
     lua_thread.create(fplayer.KeepPosition)
     lua_thread.create(fped.PedHealthDisplay)
     lua_thread.create(fgame.CameraMode)
@@ -393,7 +389,7 @@ function main()
             memory.setfloat(pWeaponInfo+0x3C,1.0)
         end
         if fweapon.tweapon.max_skills[0] then
-            memory.setfloat(pWeaponInfo+0x30,2.80e-45)
+            callFunction(0x4399D0,1,1)
         end
         --------------------------------------------------
 
@@ -404,39 +400,44 @@ function main()
             end
         end
 
-        if fgame.tgame.ss_shortcut[0]
-        and isKeyDown(tkeys.control_key) and isKeyDown(tkeys.screenshot_key) then
-            takePhoto(true)
-            printHelpString("Screenshot ~g~taken")
-            fcommon.KeyWait(tkeys.control_key,tkeys.screenshot_key)
-        end
 
-        if fteleport.tteleport.shortcut[0]
-        and isKeyDown(tkeys.teleport_key1)
-        and isKeyDown(tkeys.teleport_key2) then
-            fcommon.KeyWait(tkeys.teleport_key1,tkeys.teleport_key2)
-            fteleport.Teleport()
-        end
+        -- Quick screenshot
+        fcommon.OnHotKeyPress(tcheatmenu.hot_keys.quick_screenshot,function()
+            if fgame.tgame.ss_shortcut[0] then
+                takePhoto(true)
+                printHelpString("Screenshot ~g~taken")
+            end
+        end)
+
+        -- Qucik teleport
+        fcommon.OnHotKeyPress(tcheatmenu.hot_keys.quick_teleport,function()
+            if fteleport.tteleport.shortcut[0] then
+                fteleport.Teleport()
+            end
+        end)
         
         -- God mode
         if fplayer.tplayer.god[0] then
             setCharProofs(PLAYER_PED,true,true,true,true,true)
         end
 
-        if fplayer.tplayer.aimSkinChanger[0] and isKeyDown(tkeys.asc_key) then
-            fcommon.KeyWait(tkeys.asc_key,tkeys.asc_key)
-            local bool,char = getCharPlayerIsTargeting(PLAYER_HANDLE)
-            if bool == true then
-                local model = getCharModel(char)
-                fplayer.ChangePlayerModel(model)
+        -- Aim skin changer
+        fcommon.OnHotKeyPress(tcheatmenu.hot_keys.asc_key,function()
+            if fplayer.tplayer.aimSkinChanger[0] then
+                local bool,char = getCharPlayerIsTargeting(PLAYER_HANDLE)
+                if bool == true then
+                    local model = getCharModel(char)
+                    fplayer.ChangePlayerModel(model)
+                end
             end
-        end
+        end)
 
-        if isKeyDown(tkeys.control_key) and isKeyDown(tkeys.quickspawner_key) then
+        -- Quick spawner
+        fcommon.OnHotKeyPress(tcheatmenu.hot_keys.quick_spawner,function()
             if (fvehicle.tvehicle.quick_spawn[0] or fweapon.tweapon.quick_spawn[0]) then
                 fcommon.QuickSpawner()
             end
-        end
+        end)
 
         -- Vehicle functions
         if isCharInAnyCar(PLAYER_PED) then
@@ -480,11 +481,10 @@ function main()
 
         --------------------------------------------------
 
-        -- Menu open close check
-        if isKeyDown(tkeys.control_key) and isKeyDown(tkeys.menu_open_key) then
-            fcommon.KeyWait(tkeys.control_key,tkeys.menu_open_key)
+        -- Menu open close
+        fcommon.OnHotKeyPress(tcheatmenu.hot_keys.menu_open,function()
             tcheatmenu.window.show[0] = not tcheatmenu.window.show[0]
-        end
+        end)
 
         wait(0)
     end
@@ -505,13 +505,19 @@ function onScriptTerminate(script, quitGame)
                     end
                     fmenu.tmenu.crash_text =  fmenu.tmenu.crash_text .. " and reloaded"
                 end
-
             end
         end
 
         if fgame.tgame.camera.bool[0] then
+
+            x,y,z = getCharCoordinates(PLAYER_PED)
+            z = getGroundZFor3dCoord(x,y,z+fgame.tgame.camera.z_offset)
+            
+            setCharCoordinates(PLAYER_PED,x,y,z)
+
             freezeCharPositionAndDontLoadCollision(PLAYER_PED,false)
             setCharCollision(PLAYER_PED,true)
+            setLoadCollisionForCharFlag(PLAYER_PED,true)
             setEveryoneIgnorePlayer(0,false)
 
             writeMemory(0xBA676C,1,0,false) -- Radar
@@ -520,7 +526,8 @@ function onScriptTerminate(script, quitGame)
             restoreCameraJumpcut()
             writeMemory((getCharPointer(PLAYER_PED)+1140),4,fgame.tgame.camera.model_val,false)
         end
-
+        restoreCameraJumpcut()
+        
         if fmenu.tmenu.show_crash_message[0] and not fgame.tgame.script_manager.skip_auto_reload then
             printHelpString(fmenu.tmenu.crash_text)
         end

@@ -91,6 +91,20 @@ function module.Write()
             },
             tcheatmenu =
             {
+                hot_keys = 
+                {
+                    asc_key              = tcheatmenu.hot_keys.asc_key,
+                    camera_mode_forward  = tcheatmenu.hot_keys.camera_mode_forward,
+                    camera_mode_flip     = tcheatmenu.hot_keys.camera_mode_flip,
+                    camera_mode_backward = tcheatmenu.hot_keys.camera_mode_backward,
+                    camera_mode_x_axis   = tcheatmenu.hot_keys.camera_mode_x_axis,
+                    camera_mode_y_axis   = tcheatmenu.hot_keys.camera_mode_y_axis,
+                    camera_mode_z_axis   = tcheatmenu.hot_keys.camera_mode_z_axis,
+                    menu_open            = tcheatmenu.hot_keys.menu_open,
+                    quick_screenshot     = tcheatmenu.hot_keys.quick_screenshot,
+                    quick_spawner        = tcheatmenu.hot_keys.quick_spawner,
+                    quick_teleport       = tcheatmenu.hot_keys.quick_teleport,
+                },
                 window =
                 {
                     size =
@@ -103,10 +117,13 @@ function module.Write()
             },
             tgame =
             {
-                camera                  =
+                camera                    =
                 {
-                    speed               = fgame.tgame.camera.speed[0],
-                    rotation            = 0.0,
+                    speed              = fgame.tgame.camera.speed[0],
+                    rotation           = 0.0,
+                    lock_x_axis = fgame.tgame.camera.lock_x_axis[0],
+                    lock_y_axis = fgame.tgame.camera.lock_y_axis[0],
+                    lock_z_axis = fgame.tgame.camera.lock_z_axis[0],
                 },
                 disable_cheats      = fgame.tgame.disable_cheats[0],
                 disable_help_popups = fgame.tgame.disable_help_popups[0],
@@ -187,6 +204,7 @@ function module.Write()
                 handling         = module.tconfig.handling, -- Generated runtime
                 heavy            = fvehicle.tvehicle.heavy[0],
                 quick_spawn      = fvehicle.tvehicle.quick_spawn[0],
+                invisible_car    = fvehicle.tvehicle.invisible_car[0],
                 lights           = fvehicle.tvehicle.lights[0],
                 lock_speed       = fvehicle.tvehicle.lock_speed[0],
                 no_damage        = fvehicle.tvehicle.no_damage[0],
@@ -200,6 +218,7 @@ function module.Write()
                 tune             = fconfig.tconfig.tune, -- Generated runtime
                 visual_damage    = fvehicle.tvehicle.visual_damage[0],
                 unlimited_nitro  = fvehicle.tvehicle.unlimited_nitro[0],
+                watertight_car   = fvehicle.tvehicle.watertight_car[0],
             },
             tvisual =
             {

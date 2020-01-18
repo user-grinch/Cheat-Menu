@@ -67,10 +67,10 @@ end
 -- Main function
 function module.MemoryMain()
  
-    if isKeyDown(tkeys.control_key)
-    and isKeyDown(tkeys.mc_paste) then
+    fcommon.OnHotKeyPress(tcheatmenu.hot_keys.mc_paste,function()
         imgui.StrCopy(module.tmemory.address, imgui.GetClipboardText(),ffi.sizeof(module.tmemory.address))
-    end
+    end)
+
     if imgui.BeginTabBar("Memory") then
         if imgui.BeginTabItem("Read") then
 
@@ -109,7 +109,7 @@ function module.MemoryMain()
             imgui.Spacing()
 
             imgui.InputText("Address", module.tmemory.address,ffi.sizeof(module.tmemory.address))
-            fcommon.InformationTooltip("Ctrl + V to paste")
+            fcommon.InformationTooltip(fcommon.GetHotKeyNames(tcheatmenu.hot_keys.mc_paste) .. " to paste")
             imgui.InputText("Offset", module.tmemory.offset,ffi.sizeof(module.tmemory.offset))
 
             fcommon.InformationTooltip("Blank = no offset")
@@ -183,7 +183,7 @@ function module.MemoryMain()
             
             imgui.InputInt("Value", module.tmemory.value)
             imgui.InputText("Address", module.tmemory.address,ffi.sizeof(module.tmemory.address))
-            fcommon.InformationTooltip("Ctrl + V to paste")
+            fcommon.InformationTooltip(fcommon.GetHotKeyNames(tcheatmenu.hot_keys.mc_paste) .. " to paste")
             imgui.InputText("Offset", module.tmemory.offset,ffi.sizeof(module.tmemory.offset))
             fcommon.InformationTooltip("Blank = no offset")
             imgui.SliderInt("Size", module.tmemory.size,1,4)

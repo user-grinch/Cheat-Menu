@@ -274,6 +274,7 @@ function module.WeaponMain()
             function()
                 if module.tweapon.max_skills[0] then
                     fcommon.CheatActivated()
+                    callFunction(0x4399D0,1,1)
                 else
                     callFunction(0x5BE670,0,0)
                     fcommon.CheatDeactivated()
@@ -305,7 +306,7 @@ function module.WeaponMain()
         if imgui.BeginTabItem("Spawn") then
             imgui.Spacing()
             imgui.Columns(2,nil,false)
-            fcommon.CheckBoxVar("Quick Weapon",module.tweapon.quick_spawn,"Weapon can be spawned from quick spawner using (Left Ctrl + Q)\n\nControls:\nEnter : Stop reading key press\nDelete : Erase full string\nBackspace : Erase last character")
+            fcommon.CheckBoxVar("Quick Weapon",module.tweapon.quick_spawn,string.format("Weapon can be spawned from quick spawner using %s\n\nControls:\nEnter : Stop reading key press\nDelete : Erase full string\nBackspace : Erase last character",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.quick_spawner)))
             imgui.NextColumn()
             fcommon.CheckBoxVar("Ped",module.tweapon.ped,"Give weapon to ped. Aim with a gun to select")
             imgui.Columns(1)

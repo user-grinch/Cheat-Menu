@@ -154,8 +154,8 @@ function module.MenuMain()
 			imgui.EndTabItem()
 		end
 		if imgui.BeginTabItem("Overlay") then
-			imgui.Columns(2,nil,false)
 			imgui.Spacing()
+			imgui.Columns(2,nil,false)
 			fcommon.CheckBoxVar("Show coordinates",module.tmenu.overlay.coordinates)
 			fcommon.CheckBoxVar("Show FPS",module.tmenu.overlay.fps)	
 			imgui.NextColumn()
@@ -176,6 +176,37 @@ function module.MenuMain()
 			end
 			imgui.EndTabItem()
 		end
+		if imgui.BeginTabItem("Hot keys") then
+			
+			imgui.Spacing()
+			if imgui.BeginChild("Hot keys") then
+				fcommon.HotKey(tcheatmenu.hot_keys.menu_open,"Open or close cheat menu")
+
+				imgui.Dummy(imgui.ImVec2(0,10))
+
+				fcommon.HotKey(tcheatmenu.hot_keys.mc_paste,"Paste memory address")
+				fcommon.HotKey(tcheatmenu.hot_keys.quick_screenshot,"Take quick screenshot")
+				fcommon.HotKey(tcheatmenu.hot_keys.asc_key,"Activate aim skin changer")
+				fcommon.HotKey(tcheatmenu.hot_keys.quick_spawner,"Toggle quick spawner")
+				fcommon.HotKey(tcheatmenu.hot_keys.quick_teleport,"Toggle quick teleport")
+
+				imgui.Dummy(imgui.ImVec2(0,10))
+
+				fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_forward,"Camera mode forward")
+				fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_backward,"Camera mode backward")
+				fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_x_axis,"Camera mode x axis movement")
+				fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_y_axis,"Camera mode y axis movement")
+				fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_z_axis,"Camera mode z axis movement")
+				fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_flip,"Camera mode axis movement flip")
+				imgui.Dummy(imgui.ImVec2(0,10))
+
+				imgui.TextWrapped("You can reset these config to default from 'Reset to default' button under 'Config' tab")
+				imgui.EndChild()
+			end
+
+			imgui.EndTabItem()
+		end
+
 		if imgui.BeginTabItem("Style") then
 			
 			imgui.Spacing()

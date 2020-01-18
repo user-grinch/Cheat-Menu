@@ -21,9 +21,13 @@ module.tgame                =
     camera                  =
     {
         bool                = imgui.new.bool(false),
+        lock_x_axis         = imgui.new.bool(fconfig.Get('tgame.camera.lock_x_axis',false)),
+        lock_y_axis         = imgui.new.bool(fconfig.Get('tgame.camera.lock_y_axis',false)),
+        lock_z_axis         = imgui.new.bool(fconfig.Get('tgame.camera.lock_z_axis',false)),
         model_val           = nil,
         speed               = imgui.new.float(fconfig.Get('tgame.camera.speed',0.3)),
         rotation            = 0.0,
+        z_offset            = 20.0,
     },
     cop = 
     {
@@ -124,10 +128,12 @@ function module.SolidWater()
 end
 
 function module.CameraMode()
+
     while true do
         if module.tgame.camera.bool[0] then
             freezeCharPositionAndDontLoadCollision(PLAYER_PED,true)
             setCharCollision(PLAYER_PED,false)
+            setLoadCollisionForCharFlag(PLAYER_PED,false)
             setEveryoneIgnorePlayer(0,true)
             
             writeMemory(0xBA676C,1,2,false) -- Radar
@@ -139,68 +145,107 @@ function module.CameraMode()
             local total_mouse_x = 0
             local total_mouse_y = 0
 
-            while module.tgame.camera.bool[0] do
-                local x, y, z = getCharCoordinates(PLAYER_PED)
+            local x, y, z = getCharCoordinates(PLAYER_PED)
+            setCharCoordinates(PLAYER_PED,x,y,z-module.tgame.camera.z_offset) 
 
-               
-                if isKeyDown(tkeys.camera_mode_extra) then -- LSHIFT
-                    
-                    if isKeyDown(tkeys.camera_mode_up) then -- W
-                        z = z+module.tgame.camera.speed[0]
-                    end
-                    
-                    if isKeyDown(tkeys.camera_mode_down) then -- S
-                        z = z-module.tgame.camera.speed[0]
-                    end
-
-                else
-                    if isKeyDown(tkeys.camera_mode_forward) then -- W
-                        local angle = getCharHeading(PLAYER_PED) + 90
-
-                        x = x + module.tgame.camera.speed[0] * math.cos(angle * math.pi/180)
-                        y = y + module.tgame.camera.speed[0] * math.sin(angle * math.pi/180)
-                    end
             
-                    if isKeyDown(tkeys.camera_mode_backward) then -- S
-                        local angle = getCharHeading(PLAYER_PED) + 90
-
-                        x = x - module.tgame.camera.speed[0] * math.cos(angle * math.pi/180)
-                        y = y - module.tgame.camera.speed[0] * math.sin(angle * math.pi/180) 
-                    end
-
-                end
-
+            while module.tgame.camera.bool[0] do
+                local x, y, z = getCharCoordinates(PLAYER_PED)  
                 local mouse_x, mouse_y =  getPcMouseMovement()
 
                 total_mouse_x = total_mouse_x + mouse_x
                 total_mouse_y = total_mouse_y + mouse_y
+                
+
+                if isKeyDown(tcheatmenu.hot_keys.camera_mode_flip[1] and tcheatmenu.hot_keys.camera_mode_flip[2]) then
+                    if isKeyDown(tcheatmenu.hot_keys.camera_mode_x_axis[1]) 
+                    and isKeyDown(tcheatmenu.hot_keys.camera_mode_x_axis[2]) then
+                        x = x-module.tgame.camera.speed[0]
+                    end
+                    if isKeyDown(tcheatmenu.hot_keys.camera_mode_y_axis[1]) 
+                    and (tcheatmenu.hot_keys.camera_mode_y_axis[2]) then
+                        y = y-module.tgame.camera.speed[0]
+                    end
+                    if isKeyDown(tcheatmenu.hot_keys.camera_mode_z_axis[1]) 
+                    and isKeyDown(tcheatmenu.hot_keys.camera_mode_z_axis[2]) then
+                        z = z-module.tgame.camera.speed[0]
+                    end
+                else
+                    if isKeyDown(tcheatmenu.hot_keys.camera_mode_x_axis[1]) 
+                    and isKeyDown(tcheatmenu.hot_keys.camera_mode_x_axis[2]) then
+                        x = x+module.tgame.camera.speed[0]
+                    end
+                    if isKeyDown(tcheatmenu.hot_keys.camera_mode_y_axis[1])
+                    and isKeyDown(tcheatmenu.hot_keys.camera_mode_y_axis[2]) then
+                        y = y+module.tgame.camera.speed[0]
+                    end
+                    if isKeyDown(tcheatmenu.hot_keys.camera_mode_z_axis[1]) and isKeyDown(tcheatmenu.hot_keys.camera_mode_z_axis[2]) then
+                        z = z+module.tgame.camera.speed[0]
+                    end
+                end
+
+               
+                if isKeyDown(tcheatmenu.hot_keys.camera_mode_forward[1] and tcheatmenu.hot_keys.camera_mode_forward[2]) then 
+                    local angle = getCharHeading(PLAYER_PED) + 90
+
+                    if not module.tgame.camera.lock_x_axis[0] then
+                        x = x + module.tgame.camera.speed[0] * math.cos(angle * math.pi/180)
+                    end
+                    if not module.tgame.camera.lock_y_axis[0] then
+                        y = y + module.tgame.camera.speed[0] * math.sin(angle * math.pi/180)
+                    end
+                    if not module.tgame.camera.lock_z_axis[0] then
+                        z = z + module.tgame.camera.speed[0] * math.sin(total_mouse_y* math.pi/180)
+                    end
+                end
+        
+                if isKeyDown(tcheatmenu.hot_keys.camera_mode_backward[1] and tcheatmenu.hot_keys.camera_mode_backward[2]) then 
+                    local angle = getCharHeading(PLAYER_PED) + 90
+
+                    if not module.tgame.camera.lock_x_axis[0] then
+                        x = x - module.tgame.camera.speed[0] * math.cos(angle * math.pi/180)
+                    end
+                    if not module.tgame.camera.lock_y_axis[0] then
+                        y = y - module.tgame.camera.speed[0] * math.sin(angle * math.pi/180)
+                    end
+                    if not module.tgame.camera.lock_z_axis[0] then
+                        z = z - module.tgame.camera.speed[0] * math.sin(total_mouse_y* math.pi/180)
+                    end
+                end
+
                 setCharHeading(PLAYER_PED,total_mouse_x*-module.tgame.camera.speed[0])
-                module.tgame.camera.rotation = total_mouse_y
                 module.tgame.camera.rotation = total_mouse_y
 
                 setCharCoordinates(PLAYER_PED,x,y,z-1.0)
-                attachCameraToChar(PLAYER_PED,0.0, 0.0, 0.0, 0.0, 180, module.tgame.camera.rotation, 0.0, 2)
+                attachCameraToChar(PLAYER_PED,0.0, 0.0, module.tgame.camera.z_offset, 0.0, 180, module.tgame.camera.rotation, 0.0, 2)
 
                 wait(0)
             end
 
+            x,y,z = getCharCoordinates(PLAYER_PED)
+            z = getGroundZFor3dCoord(x,y,z+module.tgame.camera.z_offset)
+            
+            setCharCoordinates(PLAYER_PED,x,y,z)
+
             freezeCharPositionAndDontLoadCollision(PLAYER_PED,false)
             setCharCollision(PLAYER_PED,true)
+            setLoadCollisionForCharFlag(PLAYER_PED,true)
             setEveryoneIgnorePlayer(0,false)
 
             writeMemory(0xBA676C,1,0,false) -- Radar
             writeMemory(0xBA6769,1,1,false) -- Hud
 
-            restoreCameraJumpcut()
+            restoreCamera()
             writeMemory((getCharPointer(PLAYER_PED)+1140),4,model_val,false)
         end
         wait(0)
     end
 end
 
-function CheatsEntry(func,names)
-    local sizeX = imgui.GetWindowContentRegionWidth() / 3
-    local sizeY = imgui.GetWindowHeight()/15
+function CheatsEntry(func,status,names)
+    local sizeX = fcommon.GetSize(3)
+    local sizeY = imgui.GetWindowHeight()/10
+
     fcommon.DropDownMenu(names[1],function()
         imgui.Spacing()
 
@@ -208,7 +253,15 @@ function CheatsEntry(func,names)
 
             if imgui.Button(names[i+1],imgui.ImVec2(sizeX,sizeY)) then
                 callFunction(func[i],1,1)
-                fcommon.CheatActivated()
+                if status == nil or status[i] == nil then
+                    fcommon.CheatActivated()
+                else
+                    if readMemory(status[i],1,false) == 0 then
+                        fcommon.CheatDeactivated()
+                    else
+                        fcommon.CheatActivated()
+                    end
+                end
             end
             if i % 3 ~= 0 then
                 imgui.SameLine()
@@ -459,6 +512,26 @@ function ShowLoadedScript(script,search_text,index)
     end)
 end
 
+function FollowPed(ped)
+    local total_mouse_x = 0
+    local total_mouse_y = 0
+    while true do
+        if not doesCharExist(ped) then
+            restoreCamera()
+            break
+        end
+        local x,y,z = getCharCoordinates(ped)
+        local mouseX,mouseY = getPcMouseMovement()
+        total_mouse_x = total_mouse_x + mouseX
+        total_mouse_y = total_mouse_y + mouseY
+        
+        if doesCharExist(ped) then
+            attachCameraToChar(ped,0.0,-2,3.0,0.0,total_mouse_x/20,total_mouse_y/20,0.0,2)
+        end
+        wait(0)
+    end
+end
+
 --------------------------------------------------
 
 
@@ -536,7 +609,7 @@ function module.GameMain()
                 switchDeathPenalties(module.tgame.keep_stuff[0])
             end,"Keep stuff after arrest/death")
             fcommon.CheckBoxVar("Random cheats",module.tgame.random_cheats ,"Activates random cheats every 10 seconds\nSuicide cheat is excluded")
-            fcommon.CheckBoxVar('Screenshot shortcut',module.tgame.ss_shortcut,"Take screenshot using (Left Ctrl + S)")
+            fcommon.CheckBoxVar('Screenshot shortcut',module.tgame.ss_shortcut,"Take screenshot using" .. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.quick_screenshot))
             fcommon.CheckBoxVar('Solid water',module.tgame.solid_water)
             fcommon.CheckBoxVar('Sync system time',module.tgame.sync_system_time)
             fcommon.CheckBoxValue('Widescreen',0xB6F065)
@@ -558,8 +631,29 @@ function module.GameMain()
                 imgui.Spacing()
 
                 fcommon.DropDownMenu('Camera mode',function()
+                    imgui.Columns(2,nil,false)
                     fcommon.CheckBoxVar("Camera mode ##Checkbox",module.tgame.camera.bool,
-                    "Controls:\nForward: W\tBackward: S\nMove up: Left Shift + W\nMove down: Left Shift + S\nRotation: Mouse")
+                    string.format("Keyboard controls:\n\nForward: %s\nBackward: %s\n\nRotation: Mouse\n \
+                    \n%s : X axis up\n%s + %s : X axis down \
+                    \n%s : Y axis up \n%s + %s : Y axis down \
+                    \n%s : Z axis up\n%s + %s : Z axis down",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_forward),
+                    fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_backward),
+                    fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_x_axis),
+                    fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_flip),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_x_axis),
+                    fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_y_axis),
+                    fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_flip),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_y_axis),
+                    fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_z_axis),
+                    fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_flip),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_z_axis)))
+
+                    fcommon.CheckBoxVar("Lock X axis",module.tgame.camera.lock_x_axis,
+                    "Disables auto movement of x axis.\nMovement still possible through input keys")
+                    imgui.NextColumn()
+                    fcommon.CheckBoxVar("Lock Y axis",module.tgame.camera.lock_y_axis,
+                    "Disables auto movement of y axis\nMovement still possible through input keys")
+                    fcommon.CheckBoxVar("Lock Z axis",module.tgame.camera.lock_z_axis,
+                    "Disables auto movement of z axis\nMovement still possible through input keys")
+                    imgui.Columns(1)
+                    imgui.Spacing()
                     imgui.InputFloat("Speed",module.tgame.camera.speed)
                     imgui.Spacing()
                     if imgui.Button("Slow",imgui.ImVec2(fcommon.GetSize(3))) then
@@ -572,6 +666,21 @@ function module.GameMain()
                     imgui.SameLine()
                     if imgui.Button("Fast",imgui.ImVec2(fcommon.GetSize(3))) then
                         module.tgame.camera.speed[0] = 3.0
+                    end
+                end)
+                fcommon.DropDownMenu('Camera options',function()
+                    -- if imgui.Button("Follow nearest ped",imgui.ImVec2(fcommon.GetSize(2))) then
+                    --     local veh, ped = storeClosestEntities(PLAYER_PED)
+                    --     lua_thread.create(FollowPed,ped)
+                        
+                    -- end
+                    -- imgui.SameLine()
+                    -- if imgui.Button("Follow nearest vehicle",imgui.ImVec2(fcommon.GetSize(2))) then
+                        
+                    -- end
+
+                    if imgui.Button("Restore camera",imgui.ImVec2(fcommon.GetSize(1))) then
+                        restoreCamera()
                     end
                 end)
 
@@ -626,26 +735,30 @@ function module.GameMain()
 
         if imgui.BeginTabItem('Cheats') then
             imgui.Spacing()
-            CheatsEntry({0x439110,0x439150,0x439190},{'Body','Fat','Muscle','Skinny'})
-            CheatsEntry({0x438E40,0x438FF0},{'Fight','Health, armour\n200K money','Suicide'})
-            CheatsEntry({0x438F90,0x438FC0},{'Gameplay','Faster','Slower'})
-            CheatsEntry({0x439360,0x4393D0},{'Gangs','Gangs\neverywhere','Gang land'})
-            CheatsEntry({0x4393F0,0x439710,0x439DD0,0x439C70,0x439B20},{'Peds','Slut magnet','Peds riot','Attack with\nrocket','Attack player','Mayhem'})
-            CheatsEntry({0x439930,0x439940,0x4399D0},{'Skills','Stamina','Weapons','Vehicles'})
-            CheatsEntry({0x4395B0,0x439600},{'Spawn','Parachute','Jetpack'})
-            CheatsEntry({0x439230,0x439720,0x439E50},{'Themes','Beach','Fun house','Ninja'})
-            CheatsEntry({0x4390D0,0x4390F0,0x4394B0,0x4394E0},{'Traffic','Pink','Black','Cheap','Fast'})
-            CheatsEntry({0x438F50,0x438F60,0x438F70,0x438F80,0x439570,0x439590},{'Weather','Very sunny','Overcast','Rainy','Foggy','Thunderstorm','Sandstorm'})
-            CheatsEntry({0x439D80,0x4398D0},{'Vehicles','Blow up','Aim while\ndriving'})
-            CheatsEntry({0x439540,0x4391D0,0x439F60,0x4395A0,0x439880},{'Misc','Stop clock','Elvis\neverywhere','Countryside\ninvasion','Predator','Adrenaline'})
-            CheatsEntry({0x438E90,0x438F20,0x4396F0,0x4396C0},{'Wanted level','+2Star','Clear stars','Six star','Never wanted'})
-            CheatsEntry({0x4385B0,0x438890,0x438B30},{'Weapons','Set1','Set2','Set3'})
+            
+            imgui.BeginChild("Cheats")
+            CheatsEntry({0x439110,0x439150,0x439190},nil,{'Body','Fat','Muscle','Skinny'})
+            CheatsEntry({0x438E40,0x438FF0},nil,{'Fight','Health, armour\n200K money','Suicide'})
+            CheatsEntry({0x438F90,0x438FC0},nil,{'Gameplay','Faster','Slower'})
+            CheatsEntry({0x439360,0x4393D0},{0x96915A,0x96915B},{'Gangs','Gangs\neverywhere','Gang land'})
+            CheatsEntry({0x4393F0,0x439710,0x439DD0,0x439C70,0x439B20},{0x96915D,0x969175,0x969158,0x969140,0x96913E},{'Peds','Slut magnet','Peds riot','Attack with\nrocket','Everyone Armed','Mayhem'})
+            CheatsEntry({0x439930,0x439940,0x4399D0},nil,{'Skills','Stamina','Weapons','Vehicles'})
+            CheatsEntry({0x4395B0,0x439600},nil,{'Spawn','Parachute','Jetpack'})
+            CheatsEntry({0x439230,0x439720,0x439E50},{0x969159,0x969176,0x96915C},{'Themes','Beach','Fun house','Ninja'})
+            CheatsEntry({0x4390D0,0x4390F0,0x4394B0,0x4394E0},{0x969150,0x969151,0x96915E,0x96915F},{'Traffic','Pink','Black','Cheap','Fast'})
+            CheatsEntry({0x438F50,0x438F60,0x438F70,0x438F80,0x439570,0x439590},nil,{'Weather','Very sunny','Overcast','Rainy','Foggy','Thunderstorm','Sandstorm'})
+            CheatsEntry({0x439D80,0x4398D0},{nil,0x969179},{'Vehicles','Blow up','Aim while\ndriving'})
+            CheatsEntry({0x439540,0x4391D0,0x439F60,0x4395A0,0x439880},{0x969168,0x969157},{'Misc','Stop clock','Elvis\neverywhere','Countryside\ninvasion','Predator','Adrenaline'})
+            CheatsEntry({0x438E90,0x438F20,0x4396F0,0x4396C0},{nil,nil,nil,0x969171},{'Wanted level','+2Star','Clear stars','Six star','Never wanted'})
+            CheatsEntry({0x4385B0,0x438890,0x438B30},nil,{'Weapons','Set1','Set2','Set3'})
+            imgui.EndChild()
             imgui.EndTabItem()
         end
         if imgui.BeginTabItem('Script Manager') then
             
             imgui.Spacing()
             if imgui.Button("Reload all scripts",imgui.ImVec2(fcommon.GetSize(1))) then
+                fgame.tgame.script_manager.skip_auto_reload = true
                 reloadScripts()
             end
             imgui.Spacing()

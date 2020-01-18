@@ -77,7 +77,7 @@ function module.QuickSpawner()
 end
 
 --------------------------------------------------
--- imgui UI functions
+-- imgui functions
 
 -- Custom imgui.CollapsingHeader
 function module.DropDownMenu(label,func,text_disabled)
@@ -348,13 +348,16 @@ function module.CheckBoxValue(name,address,tooltip,enable_value,disable_value)
 
 end
 
-function module.CheckBoxVar(name,var,tooltip)
+function module.CheckBoxVar(name,var,tooltip,func)
 
     if imgui.Checkbox(name, var) then
         if var[0] then
             fcommon.CheatActivated()
         else
             fcommon.CheatDeactivated()
+        end
+        if func ~= nil then
+            func() -- do other stuff
         end
     end
 
@@ -514,6 +517,80 @@ function module.UpdateAddress(arg)
     end)
 end
 
+function module.GetHotKeyNames(hot_key)
+
+    if hot_key[1] == hot_key[2] then
+        return string.format(" %s",vkeys.id_to_name(hot_key[1]))
+    else
+        return string.format(" %s + %s",vkeys.id_to_name(hot_key[1]),vkeys.id_to_name(hot_key[2]))
+    end
+
+end
+
+function module.OnHotKeyPress(hotkey,func)
+    if isKeyDown(hotkey[1]) and isKeyDown(hotkey[2]) and tcheatmenu.hot_keys.currently_active ~= hotkey then
+        fcommon.KeyWait(hotkey[1],hotkey[2])
+        func()
+    end
+end
+
+function module.HotKey(index,info_text)
+    local active = false
+    local x,y  = fcommon.GetSize(3)
+    
+    if index == tcheatmenu.hot_keys.currently_active then
+        imgui.PushStyleColor(imgui.Col.Button,imgui.GetStyle().Colors[imgui.Col.ButtonActive])
+        active = true
+    end
+
+    if index[1] == index[2] then
+        text = vkeys.id_to_name(index[1])
+    else
+        text = vkeys.id_to_name(index[1]) .. " + " .. vkeys.id_to_name(index[2])
+    end
+
+    if imgui.Button(text,imgui.ImVec2(x,y-y/5)) then
+        if tcheatmenu.hot_keys.currently_active == index then
+            tcheatmenu.hot_keys.currently_active = nil
+        else
+            tcheatmenu.hot_keys.currently_active = index
+        end
+    end
+
+    if active then
+        imgui.PopStyleColor()
+        for i=0,127,1 do
+            if isKeyDown(i) then
+                index[1] = i
+                break
+            end
+        end
+        local x = nil
+        for i=0,127,1 do
+            if isKeyDown(i) then
+                if i == index[1] then
+                    x = i
+                else
+                    index[2] = i
+                    x = nil
+                    break
+                end
+            end
+        end
+        if x ~= nil then
+            index[2] = x
+        end
+    end  
+
+    if not imgui.IsWindowFocused() or not imgui.IsItemVisible() then
+        tcheatmenu.hot_keys.currently_active = nil
+    end
+
+
+    imgui.SameLine()
+
+    imgui.Text(info_text)
+end
 --------------------------------------------------
 
 
