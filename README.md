@@ -50,7 +50,8 @@ Now try it out in-game. If it doesn't work open an issue here or create a post i
 3. <kbd>Right mouse button</kbd> - y axis forward
 3. <kbd>Left Ctrl</kbd> + <kbd>Right mouse button</kbd> - y axis backward
 
-**Note:** There is no way from the menu to change these shortcuts. You must edit 'tkeys' table from '[cheat-menu.lua](https://github.com/user-grinch/Cheat-Menu/blob/master/cheat-menu.lua)' file and change them with your desired keys ([Ascii](http://www.asciitable.com/))
+**Note:**  From version 1.9-wip(20200118) hotkey system is available to change these from the menu. For earlier versions you must edit 'tkeys' table from '[cheat-menu.lua](https://github.com/user-grinch/Cheat-Menu/blob/master/cheat-menu.lua)' file and change them with your desired keys ([Ascii](http://www.asciitable.com/))
+
 
 ## Images
 
