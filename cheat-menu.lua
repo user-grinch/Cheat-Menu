@@ -473,7 +473,6 @@ function main()
             else
                 fvehicle.tvehicle.lock_doors[0] = false
             end
-            markCarAsNoLongerNeeded(car)
         else
             fvehicle.tvehicle.lock_doors[0] = false
             fvehicle.tvehicle.lights[0] = false
