@@ -1,5 +1,5 @@
 -- Cheat Menu -  Cheat menu for Grand Theft Auto SanAndreas
--- Copyright (C) 2019 Grinch_
+-- Copyright (C) 2019-2020 Grinch_
 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@ local module = {}
 
 module.tstat      =
 {    
-    search_text   = imgui.new.char[20](),
+    filter        = imgui.ImGuiTextFilter(),
     names         = fcommon.LoadJson("stat"),
 }     
 
@@ -93,19 +93,18 @@ function module.StatMain()
             imgui.EndTabItem()
         end
         if imgui.BeginTabItem("Search") then
-            imgui.Spacing()
-            imgui.Columns(1)
-            if imgui.InputText("Search",module.tstat.search_text,ffi.sizeof(module.tstat.search_text)) then end
-            imgui.SameLine()
 
             imgui.Spacing()
-            imgui.Text("Stats found :(" .. ffi.string(module.tstat.search_text) .. ")")
+            
+            module.tstat.filter:Draw("Filter")
+            imgui.Spacing()
             imgui.Separator()
             imgui.Spacing()
+
             if imgui.BeginChild("Stat Entries") then
                 for snum, sname in pairs(module.tstat.names) do
                     if snum ~= "" then
-                        if (ffi.string(module.tstat.search_text) == "") or (string.upper(sname):find(string.upper(ffi.string(module.tstat.search_text))) ~= nil) then
+                        if module.tstat.filter:PassFilter(sname) then
                             fcommon.UpdateStat({ name = sname,stat = snum})
                         end
                     end

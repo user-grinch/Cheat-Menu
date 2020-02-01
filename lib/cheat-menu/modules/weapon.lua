@@ -1,5 +1,5 @@
 -- Cheat Menu -  Cheat menu for Grand Theft Auto SanAndreas
--- Copyright (C) 2019 Grinch_
+-- Copyright (C) 2019-2020 Grinch_
 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -32,8 +32,7 @@ module.tweapon =
     no_reload         = imgui.new.bool(fconfig.Get('tweapon.no_reload',false)),
     path              = tcheatmenu.dir .. "weapons",
     ped               = imgui.new.bool(fconfig.Get('tweapon.ped',false)),
-    quick_spawn       = imgui.new.bool(fconfig.Get('tweapon.quick_spawn',false)),
-    search_text       = imgui.new.char[20](""),   
+    quick_spawn       = imgui.new.bool(fconfig.Get('tweapon.quick_spawn',false)),   
     gang              =
     {
         weapon_array = {},
@@ -320,14 +319,7 @@ function module.WeaponMain()
                 end
                 if imgui.BeginTabItem("Search") then
                     imgui.Spacing()
-                    if imgui.InputText("Search",module.tweapon.search_text,ffi.sizeof(module.tweapon.search_text)) then end
-                    imgui.SameLine()
-        
-                    imgui.Spacing()
-                    imgui.Text("Weapons found :(" .. ffi.string(module.tweapon.search_text) .. ")")
-                    imgui.Separator()
-                    imgui.Spacing()
-                    fcommon.DrawImages(fconst.IDENTIFIER.WEAPON,fconst.DRAW_TYPE.SEARCH,module.tweapon.images,fconst.WEAPON.IMAGE_HEIGHT,fconst.WEAPON.IMAGE_WIDTH,module.GiveWeapon,nil,module.GetModelName,ffi.string(module.tweapon.search_text))
+                    fcommon.DrawImages(fconst.IDENTIFIER.WEAPON,fconst.DRAW_TYPE.SEARCH,module.tweapon.images,fconst.WEAPON.IMAGE_HEIGHT,fconst.WEAPON.IMAGE_WIDTH,module.GiveWeapon,nil,module.GetModelName)
                     imgui.EndTabItem()
                 end
                 imgui.EndTabBar()

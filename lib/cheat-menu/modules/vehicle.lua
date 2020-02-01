@@ -1,5 +1,5 @@
 -- Cheat Menu -  Cheat menu for Grand Theft Auto SanAndreas
--- Copyright (C) 2019 Grinch_
+-- Copyright (C) 2019-2020 Grinch_
 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -112,7 +112,6 @@ module.tvehicle =
         cache_images = {},
         current_paintjob = imgui.new.int(-1);
         path   =  tcheatmenu.dir .. "vehicles\\paintjobs",
-        search_text = imgui.new.char[20](),
         images = {},
         texture = nil
     },
@@ -122,7 +121,6 @@ module.tvehicle =
     quick_spawn  = imgui.new.bool(fconfig.Get('tvehicle.quick_spawn',false)),
     random_colors = imgui.new.bool(fconfig.Get('tvehicle.random_colors',false)),
     random_colors_traffic = imgui.new.bool(fconfig.Get('tvehicle.random_colors_traffic',false)),
-    search_text = imgui.new.char[20](),
     spawn_inside = imgui.new.bool(fconfig.Get('tvehicle.spawn_inside',true)),
     speed = imgui.new.int(fconfig.Get('tvehicle.speed',0)),
     stay_on_bike = imgui.new.bool(fconfig.Get('tvehicle.stay_on_bike',false)),
@@ -507,6 +505,7 @@ function module.OnEnterVehicle()
             while isCharInCar(PLAYER_PED,car) do
                 wait(0)
             end
+            module.tvehicle.paintjobs.texture = nil
         else
 
             fconfig.tconfig.temp_texture_name = nil
@@ -723,6 +722,7 @@ function module.VehicleMain()
                 fcommon.CheckBoxFunc("Lock doors",module.tvehicle.lock_doors,
                 function()
                     if isCharInAnyCar(PLAYER_PED) then
+                        local car   = getCarCharIsUsing(PLAYER_PED)
                         if getCarDoorLockStatus(car) == 4 then
                             lockCarDoors(car,1)
                             fcommon.CheatDeactivated()
@@ -736,6 +736,7 @@ function module.VehicleMain()
                 end)
     
                 fcommon.CheckBoxVar("New aircraft camera",module.tvehicle.aircraft.camera)
+                fcommon.CheckBoxValue("New train camera",5416239,nil,fconst.TRAIN_CAM_FIX.ON,fconst.TRAIN_CAM_FIX.OFF) 
                 fcommon.CheckBoxVar("No damage",module.tvehicle.no_damage)
                 fcommon.CheckBoxFunc("No traffic vehicles",module.tvehicle.no_vehicles,
                 function()
@@ -758,7 +759,6 @@ function module.VehicleMain()
                 fcommon.CheckBoxVar("Random colors",module.tvehicle.random_colors,"Paints players car with random colors every second")
                 fcommon.CheckBoxVar("Random traffic colors",module.tvehicle.random_colors_traffic,"Paints traffic cars with random colors every second")
                 fcommon.CheckBoxValue("Tank mode",0x969164) 
-                fcommon.CheckBoxValue("Train camera fix",5416239,nil,fconst.TRAIN_CAM_FIX.ON,fconst.TRAIN_CAM_FIX.OFF) 
                 fcommon.CheckBoxVar("Unlimited nitro",module.tvehicle.unlimited_nitro,"Enabling this would disable\n\nAll cars have nitro\nAll taxis have nitro")
                 fcommon.CheckBoxVar("Watertight car",module.tvehicle.watertight_car,nil,
                 function()
@@ -921,16 +921,7 @@ function module.VehicleMain()
                 end 
                 if imgui.BeginTabItem("Search") then
                     imgui.Spacing()
-                    imgui.Columns(1)
-                    if imgui.InputText("Search",module.tvehicle.search_text,ffi.sizeof(module.tvehicle.search_text)) then end
-                    imgui.SameLine()
-        
-                    imgui.Spacing()
-                    imgui.Text("Vehicles found :(" .. ffi.string(module.tvehicle.search_text) .. ")")
-                    imgui.Separator()
-                    imgui.Spacing()
-
-                    fcommon.DrawImages(fconst.IDENTIFIER.VEHICLE,fconst.DRAW_TYPE.SEARCH,module.tvehicle.images,fconst.VEHICLE.IMAGE_HEIGHT,fconst.VEHICLE.IMAGE_WIDTH,module.GiveVehicleToPlayer,nil,module.GetModelName,ffi.string(module.tvehicle.search_text))
+                    fcommon.DrawImages(fconst.IDENTIFIER.VEHICLE,fconst.DRAW_TYPE.SEARCH,module.tvehicle.images,fconst.VEHICLE.IMAGE_HEIGHT,fconst.VEHICLE.IMAGE_WIDTH,module.GiveVehicleToPlayer,nil,module.GetModelName)
                     imgui.EndTabItem()
                 end
                 imgui.EndTabBar()
@@ -1038,17 +1029,8 @@ function module.VehicleMain()
                         end
                     end
                 end
-
-                imgui.Spacing()
-                if imgui.InputText("Search",module.tvehicle.paintjobs.search_text,ffi.sizeof(module.tvehicle.paintjobs.search_text)) then end
-
-                imgui.Spacing()
-
-                imgui.Text("Custom paintjobs found :(" .. ffi.string(module.tvehicle.paintjobs.search_text) .. ")")
-                imgui.Separator()
-                imgui.Spacing()
     
-                fcommon.DrawImages(fconst.IDENTIFIER.PAINTJOB,fconst.DRAW_TYPE.SEARCH,module.tvehicle.paintjobs.images,fconst.PAINTJOB.IMAGE_HEIGHT,fconst.PAINTJOB.IMAGE_WIDTH,ApplyTexture,nil,module.GetTextureName,ffi.string(module.tvehicle.paintjobs.search_text))
+                fcommon.DrawImages(fconst.IDENTIFIER.PAINTJOB,fconst.DRAW_TYPE.SEARCH,module.tvehicle.paintjobs.images,fconst.PAINTJOB.IMAGE_HEIGHT,fconst.PAINTJOB.IMAGE_WIDTH,ApplyTexture,nil,module.GetTextureName)
                         
                 imgui.EndTabItem()
             end

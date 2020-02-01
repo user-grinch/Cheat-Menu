@@ -1,5 +1,5 @@
 -- Cheat Menu -  Cheat menu for Grand Theft Auto SanAndreas
--- Copyright (C) 2019 Grinch_
+-- Copyright (C) 2019-2020 Grinch_
 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -55,7 +55,6 @@ module.tgame                =
     {
         skip_auto_reload    = false,
         not_loaded          = {},
-        search_text         = imgui.new.char[64](""),
     },
     solid_water             = imgui.new.bool(fconfig.Get('tgame.solid_water',false)),
     ss_shortcut             = imgui.new.bool(fconfig.Get('tgame.ss_shortcut',false)), 
@@ -131,6 +130,13 @@ function module.CameraMode()
 
     while true do
         if module.tgame.camera.bool[0] then
+
+            local x,y,z = getCharCoordinates(PLAYER_PED)
+
+            if isCharInAnyCar(PLAYER_PED) then
+                warpCharFromCarToCoord(PLAYER_PED,x,y,z+5)
+            end
+            
             freezeCharPositionAndDontLoadCollision(PLAYER_PED,true)
             setCharCollision(PLAYER_PED,false)
             setLoadCollisionForCharFlag(PLAYER_PED,false)
@@ -145,7 +151,6 @@ function module.CameraMode()
             local total_mouse_x = 0
             local total_mouse_y = 0
 
-            local x, y, z = getCharCoordinates(PLAYER_PED)
             setCharCoordinates(PLAYER_PED,x,y,z-module.tgame.camera.z_offset) 
 
             
@@ -405,7 +410,7 @@ function module.MonitorScripts()
     end
 end
 
-function ShowNotLoadedScripts(name,path,search_text)
+function ShowNotLoadedScripts(name,path)
     fcommon.DropDownMenu(name .. "##" .. path,function()
 
         imgui.Spacing()
@@ -439,7 +444,7 @@ function ShowNotLoadedScripts(name,path,search_text)
     end,true)
 end
 
-function ShowLoadedScript(script,search_text,index)
+function ShowLoadedScript(script,index)
     fcommon.DropDownMenu(script.name .. "##" .. index,function()
         local authors = ""
         for _,author in ipairs(script.authors) do
@@ -762,34 +767,27 @@ function module.GameMain()
                 reloadScripts()
             end
             imgui.Spacing()
-            
-			if imgui.InputText("Search",module.tgame.script_manager.search_text,ffi.sizeof(module.tgame.script_manager.search_text)) then end
-			fcommon.InformationTooltip("Moonloader scripts manager")
-			imgui.Spacing()
-			imgui.Text("Scripts found :(" .. ffi.string(module.tgame.script_manager.search_text) .. ")")
-			imgui.Separator()
-			imgui.Spacing()
+
             if imgui.BeginChild("Script entries") then
 
                 module.MonitorScripts()
 
+                local filter = imgui.ImGuiTextFilter()
+                filter:Draw("Filter")
+                imgui.Spacing()
+                imgui.Separator()
+                imgui.Spacing()
+                
                 for index, script in ipairs(script.list()) do
-                    if ffi.string(module.tgame.script_manager.search_text) == "" then
-						ShowLoadedScript(script,"",index)
-					else
-						if string.upper(script.name):find(string.upper(ffi.string(module.tgame.script_manager.search_text))) ~= nil  then
-							ShowLoadedScript(script,ffi.string(module.tgame.script_manager.search_text),index)
-						end
-					end
+                    if filter:PassFilter(script.name) then
+                        ShowLoadedScript(script,index)
+                    end
                 end
+
                 for name,path in pairs(module.tgame.script_manager.not_loaded) do
-                    if ffi.string(module.tgame.script_manager.search_text) == "" then
-						ShowNotLoadedScripts(name,path,"",index)
-					else
-						if string.upper(name):find(string.upper(ffi.string(module.tgame.script_manager.search_text))) ~= nil  then
-							ShowNotLoadedScripts(name,path,ffi.string(module.tgame.script_manager.search_text),index)
-						end
-					end
+                    if filter:PassFilter(name) then
+                        ShowNotLoadedScripts(name,path)
+                    end
                 end
 				imgui.EndChild()
 			end

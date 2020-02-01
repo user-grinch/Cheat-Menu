@@ -1,6 +1,6 @@
   
 -- Cheat Menu -  Cheat menu for Grand Theft Auto SanAndreas
--- Copyright (C) 2019 Grinch_
+-- Copyright (C) 2019-2020 Grinch_
 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -25,13 +25,13 @@ module.tanimation =
         names     = {"Default","Boxing","Kung fu","Kick Boxing","Punch Kick"},
         array     = {},
     }, 
+    filter = imgui.ImGuiTextFilter(),
     ifp_name      = imgui.new.char[20](),
     list          = fcommon.LoadJson("animation"),
     loop          = imgui.new.bool(fconfig.Get('tanimation.loop',false)),
     name          = imgui.new.char[20](),
     ped           = imgui.new.bool(fconfig.Get('tanimation.ped',false)),
     secondary     = imgui.new.bool(fconfig.Get('tanimation.secondary',false)),
-    search_text   = imgui.new.char[20](),
     walking       = 
     { 
         selected  = imgui.new.int(fconfig.Get('tanimation.walking.selected',0)),
@@ -152,19 +152,15 @@ function module.AnimationMain()
 
         if imgui.BeginTabItem("Search") then -- Search tab
 
+            module.tanimation.filter:Draw("Filter")
             imgui.Spacing()
-            imgui.Columns(1)
-            if imgui.InputText("Search",module.tanimation.search_text,ffi.sizeof(module.tanimation.search_text)) then end
-            imgui.SameLine()
-            fcommon.InformationTooltip("Right click over any of these entries to remove them")
-            imgui.Spacing()
-            imgui.Text("Animations found :(" .. ffi.string(module.tanimation.search_text) .. ")")
             imgui.Separator()
             imgui.Spacing()
+
             if imgui.BeginChild("Stat Entries") then
                 for key,value in pairs(module.tanimation.list) do
                     file, animation = key:match("([^$]+)$([^$]+)")
-                    if (string.upper(animation):find(string.upper(ffi.string(module.tanimation.search_text)))) then
+                    if module.tanimation.filter:PassFilter(animation) then
                         AnimationEntry(file,animation)
                     end
                 end       

@@ -1,5 +1,5 @@
 -- Cheat Menu -  Cheat menu for Grand Theft Auto SanAndreas
--- Copyright (C) 2019 Grinch_
+-- Copyright (C) 2019-2020 Grinch_
 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.9-wip")
-script_version_number(20200118) -- YYYYMMDD
+script_version_number(20200201) -- YYYYMMDD
 
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
@@ -54,6 +54,7 @@ fmission      = require 'cheat-menu.modules.mission'
 fped          = require 'cheat-menu.modules.ped'
 fplayer       = require 'cheat-menu.modules.player'
 fstat         = require 'cheat-menu.modules.stat'
+fstyle        = require 'cheat-menu.modules.style'
 fteleport     = require 'cheat-menu.modules.teleport'
 fvehicle      = require 'cheat-menu.modules.vehicle'
 fvisual       = require 'cheat-menu.modules.visual'
@@ -99,19 +100,18 @@ tcheatmenu       =
 }
 
 imgui.OnInitialize(function() -- Called once
+
+    if not doesFileExist(tcheatmenu.dir .. "json//styles.json") then fstyle.saveStyles(imgui.GetStyle(), "Default") end
     
-    -- Styles
-    imgui.PushStyleVarFloat(imgui.StyleVar.WindowBorderSize,0)
-    imgui.PushStyleVarFloat(imgui.StyleVar.FramePadding,3)
-    imgui.PushStyleVarFloat(imgui.StyleVar.PopupRounding,3)
-    imgui.PushStyleVarFloat(imgui.StyleVar.PopupBorderSize,0)
-    imgui.PushStyleVarFloat(imgui.StyleVar.ChildBorderSize,0)
-    imgui.PushStyleVarFloat(imgui.StyleVar.WindowRounding,3)
-    imgui.PushStyleVarFloat(imgui.StyleVar.ScrollbarSize,12)
-    imgui.PushStyleVarFloat(imgui.StyleVar.ScrollbarRounding,3)
-    imgui.PushStyleVarFloat(imgui.StyleVar.TabRounding,3)
-    imgui.PushStyleVarVec2(imgui.StyleVar.WindowTitleAlign,imgui.ImVec2(0.5,0.5))
-    imgui.PushStyleColor(imgui.Col.Header, imgui.ImVec4(0,0,0,0))
+    fstyle.tstyle.status = fstyle.loadStyles() 
+
+    if fstyle.tstyle.status then
+        fstyle.tstyle.list = fstyle.getStyles()
+        fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
+        fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])
+    else 
+        print("Can't load styles")
+    end
 
     --Loading images
     lua_thread.create(
@@ -123,6 +123,9 @@ imgui.OnInitialize(function() -- Called once
         fcommon.LoadImages(fped.tped.path,fped.tped.images,fconst.PED.IMAGE_EXT)
         fcommon.LoadImages(fplayer.tplayer.clothes.path,fplayer.tplayer.clothes.images,fconst.CLOTH.IMAGE_EXT)
     end)
+
+    -- Loading fonts
+    fcommon.LoadAndSetFonts()
 end)
 
 -- Menu window
@@ -178,6 +181,10 @@ function()
         flags = flags + imgui.WindowFlags.NoMove
     end
 
+    if pos == 0 then
+        imgui.SetNextWindowPos(imgui.ImVec2(fmenu.tmenu.overlay.pos_x[0], fmenu.tmenu.overlay.pos_y[0]), imgui.Cond.Once , window_pos_pivot)
+    end
+
     imgui.PushStyleVarFloat(imgui.StyleVar.Alpha,0.65)
     imgui.Begin("", nil, flags)
     
@@ -222,20 +229,26 @@ function()
             if imgui.MenuItemBool("Bottom Right",nil,fmenu.tmenu.overlay.position_index[0] == 4) then 
                 fmenu.tmenu.overlay.position_index[0] = 4 
             end
-            if imgui.MenuItemBool("Copy coordinates") then 
-                local x,y,z = getCharCoordinates(PLAYER_PED)
-                setClipboardText(string.format( "%d,%d,%d",x,y,z))
-                printHelpString("Coordinates copied")
-            end
             if imgui.MenuItemBool("Close") then
                 fmenu.tmenu.overlay.fps[0] = false
                 fmenu.tmenu.overlay.speed[0] = false
                 fmenu.tmenu.overlay.health[0] = false
                 fmenu.tmenu.overlay.coordinates[0] = false
             end
+            imgui.Separator()
+            if imgui.MenuItemBool("Copy coordinates") then 
+                local x,y,z = getCharCoordinates(PLAYER_PED)
+                setClipboardText(string.format( "%d,%d,%d",x,y,z))
+                printHelpString("Coordinates copied")
+            end
             imgui.EndPopup()        
         end
+        if pos == 0 then
+            fmenu.tmenu.overlay.pos_x[0] = imgui.GetWindowPos().x
+            fmenu.tmenu.overlay.pos_y[0] = imgui.GetWindowPos().y
+        end
     imgui.End()
+
 end).HideCursor = true
 
 function main()
@@ -301,6 +314,7 @@ function main()
     setGangWarsActive(fped.tped.gang.wars[0])
 
     setPlayerFastReload(PLAYER_HANDLE,fweapon.tweapon.fast_reload[0])
+    
     if fweapon.tweapon.no_reload[0] then
         writeMemory( 7600773,1,144,1)
         writeMemory( 7600815,1,144,1)
@@ -316,8 +330,6 @@ function main()
         writeMemory( 7612646,1,255,1)
         writeMemory( 7612647,2,3150,1)
     end
-
-    lua_thread.create(fgame.RandomCheats)
 
     -- Ghost cop cars
     for key,value in pairs(fgame.tgame.cop) do
@@ -335,16 +347,16 @@ function main()
         writeMemory(4588800,1,160,false)
     end
 
-    --Money text
-    ffi.copy(ffi.cast("char(*)", fvisual.tvisual.money.negative_memory), ffi.string(fvisual.tvisual.money.negative))
-    writeMemory(0x58F50A,4,fvisual.tvisual.money.negative_memory,false)
-    ffi.copy(ffi.cast("char(*)", fvisual.tvisual.money.positive_memory), ffi.string(fvisual.tvisual.money.positive))
-    writeMemory(0x58F4C8,4,fvisual.tvisual.money.positive_memory,false)
+    -- Money text
+    -- ffi.copy(ffi.cast("char(*)", fvisual.tvisual.money.negative_memory), ffi.string(fvisual.tvisual.money.negative))
+    -- writeMemory(0x58F50A,4,fvisual.tvisual.money.negative_memory,false)
+    -- ffi.copy(ffi.cast("char(*)", fvisual.tvisual.money.positive_memory), ffi.string(fvisual.tvisual.money.positive))
+    -- writeMemory(0x58F4C8,4,fvisual.tvisual.money.positive_memory,false)
 
-
+    lua_thread.create(fcommon.ReadKeyPress)
+    lua_thread.create(fgame.CameraMode)
     lua_thread.create(fplayer.KeepPosition)
     lua_thread.create(fped.PedHealthDisplay)
-    lua_thread.create(fgame.CameraMode)
     lua_thread.create(fgame.FreezeTime)
     lua_thread.create(fgame.SolidWater)
     lua_thread.create(fgame.SyncSystemTime)
@@ -353,6 +365,7 @@ function main()
     lua_thread.create(fweapon.AutoAim)
     lua_thread.create(fvehicle.OnEnterVehicle)
     lua_thread.create(fvehicle.RandomColors)
+    lua_thread.create(fgame.RandomCheats)
     lua_thread.create(fvehicle.RandomTrafficColors)
     lua_thread.create(fvehicle.UnlimitedNitro)
 
@@ -364,7 +377,7 @@ function main()
 
         --------------------------------------------------
         
-        --Weapons
+        -- Weapons
         local pPed = getCharPointer(PLAYER_PED)
         local CurWeapon = getCurrentCharWeapon(PLAYER_PED)
         local skill = callMethod(0x5E3B60,pPed,1,0,CurWeapon)
@@ -439,7 +452,7 @@ function main()
             end
         end)
 
-        -- Vehicle functions
+         -- Vehicle functions
         if isCharInAnyCar(PLAYER_PED) then
             local car = getCarCharIsUsing(PLAYER_PED)
 
@@ -491,6 +504,7 @@ end
 
 function onScriptTerminate(script, quitGame)
     if script == thisScript() then
+
         fconfig.Write()
         if fconfig.tconfig.reset == false then
             if fmenu.tmenu.crash_text == "" then
@@ -508,7 +522,6 @@ function onScriptTerminate(script, quitGame)
         end
 
         if fgame.tgame.camera.bool[0] then
-
             x,y,z = getCharCoordinates(PLAYER_PED)
             z = getGroundZFor3dCoord(x,y,z+fgame.tgame.camera.z_offset)
             
@@ -525,7 +538,6 @@ function onScriptTerminate(script, quitGame)
             restoreCameraJumpcut()
             writeMemory((getCharPointer(PLAYER_PED)+1140),4,fgame.tgame.camera.model_val,false)
         end
-        restoreCameraJumpcut()
         
         if fmenu.tmenu.show_crash_message[0] and not fgame.tgame.script_manager.skip_auto_reload then
             printHelpString(fmenu.tmenu.crash_text)
@@ -533,10 +545,7 @@ function onScriptTerminate(script, quitGame)
 
         fmenu.tmenu.crash_text = ""
 
-        freeMemory(fvisual.tvisual.money.negative_memory)
-        freeMemory(fvisual.tvisual.money.positive_memory)
-
-        -- Releasing Images
+        --Releasing Images
         fcommon.ReleaseImages(fvehicle.tvehicle.images)
         fcommon.ReleaseImages(fweapon.tweapon.images)
         fcommon.ReleaseImages(fvehicle.tvehicle.paintjobs.images)

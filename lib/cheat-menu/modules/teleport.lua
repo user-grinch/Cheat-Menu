@@ -1,5 +1,5 @@
 -- Cheat Menu -  Cheat menu for Grand Theft Auto SanAndreas
--- Copyright (C) 2019 Grinch_
+-- Copyright (C) 2019-2020 Grinch_
 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@ module.tteleport =
 	coords                  = imgui.new.char[24](""),
 	coordinates             = fcommon.LoadJson("coordinate"),
 	coord_name              = imgui.new.char[64](""),
+	filter                  = imgui.ImGuiTextFilter(),
     insert_coords           = imgui.new.bool(fconfig.Get('tteleport.insert_coords',false)),
-	search_text             = imgui.new.char[64](""),
 	shortcut                = imgui.new.bool(fconfig.Get('tteleport.shortcut',false)),
 }
 
@@ -100,23 +100,19 @@ function module.TeleportMain()
         end
 		if imgui.BeginTabItem("Search") then -- Search tab
 			imgui.Spacing()
-			if imgui.InputText("Search",module.tteleport.search_text,ffi.sizeof(module.tteleport.search_text)) then end
+
+			module.tteleport.filter:Draw("Filter")
 			fcommon.InformationTooltip("Right click over any of these entries to remove them")
 			imgui.Spacing()
-			imgui.Text("Locations found :(" .. ffi.string(module.tteleport.search_text) .. ")")
 			imgui.Separator()
 			imgui.Spacing()
-			if imgui.BeginChild("Teleport entries") then
 
-				-- Loop through he list and display locations
+			if imgui.BeginChild("Teleport entries") then
 				for name, coord in pairs(module.tteleport.coordinates) do
 					local interior_id, x, y, z = coord:match("([^, ]+), ([^, ]+), ([^, ]+), ([^, ]+)")
-					if ffi.string(module.tteleport.search_text) == "" then
+
+					if module.tteleport.filter:PassFilter(name) then
 						ShowTeleportEntry(name, tonumber(x), tonumber(y), tonumber(z),interior_id)
-					else
-						if string.upper(name):find(string.upper(ffi.string(module.tteleport.search_text))) ~= nil  then
-							ShowTeleportEntry(name, tonumber(x), tonumber(y), tonumber(z),interior_id)
-						end
 					end
 				end
 				imgui.EndChild()

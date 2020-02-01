@@ -1,5 +1,5 @@
 -- Cheat Menu -  Cheat menu for Grand Theft Auto SanAndreas
--- Copyright (C) 2019 Grinch_
+-- Copyright (C) 2019-2020 Grinch_
 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -55,7 +55,6 @@ module.tped =
     names       = fcommon.LoadJson("ped"),
     path        = tcheatmenu.dir .. "peds\\",
     ped_health_display = imgui.new.bool(fconfig.Get('tped.ped_health_display',false)),
-    search_text = imgui.new.char[20](""),  
     selected    = nil,
     special     = fcommon.LoadJson("ped special"),
     type        =
@@ -115,7 +114,7 @@ function module.SpawnPed(model)
             x,y,z = getCharCoordinates(PLAYER_PED)
             ped = createChar(module.tped.type.index[0]+5,290,x,y,z) -- CIVMALE = PLAYER + 5
             markModelAsNoLongerNeeded(module.tped.special[tostring(model)])
-            markCharAsNoLongerNeeded(ped)
+            --markCharAsNoLongerNeeded(ped)
         end
         printHelpString("Ped ~g~Spawned")
     end
@@ -224,15 +223,8 @@ function module.PedMain()
                     end    
                 if imgui.BeginTabItem("Search") then
                     imgui.Spacing()
-                    imgui.Columns(1)
-                    if imgui.InputText("Search",module.tped.search_text,ffi.sizeof(module.tped.search_text)) then end
-                    imgui.SameLine()
-        
-                    imgui.Spacing()
-                    imgui.Text("Peds found :(" .. ffi.string(module.tped.search_text) .. ")")
-                    imgui.Separator()
-                    imgui.Spacing()
-                    fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.SEARCH,module.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.SpawnPed,nil,module.GetModelName,ffi.string(module.tped.search_text))
+
+                    fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.SEARCH,module.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.SpawnPed,nil,module.GetModelName)
 
                     imgui.EndTabItem()
                 end

@@ -1,5 +1,5 @@
 -- Cheat Menu -  Cheat menu for Grand Theft Auto SanAndreas
--- Copyright (C) 2019 Grinch_
+-- Copyright (C) 2019-2020 Grinch_
 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -29,16 +29,18 @@ module.tmenu =
 		fps             = imgui.new.bool(fconfig.Get('tmenu.overlay.fps',false)),
 		show            = imgui.new.bool(true),
 		offset          = imgui.new.int(10),
-    	position        = {"Custom","Top Left","Top Right","Bottom Left","Bottom Right","Close"},
+    	position        = {"Custom","Top Left","Top Right","Bottom Left","Bottom Right"},
     	position_array  = {},
 		position_index  = imgui.new.int(fconfig.Get('tmenu.overlay.position_index',4)),
 		health          = imgui.new.bool(fconfig.Get('tmenu.overlay.health',false)),
+		pos_x           = imgui.new.int(fconfig.Get('tmenu.overlay.pos_x',0)),
+		pos_y           = imgui.new.int(fconfig.Get('tmenu.overlay.pos_y',0)),
 		speed           = imgui.new.bool(fconfig.Get('tmenu.overlay.speed',false)),		
 	},
 	fast_load_images	= imgui.new.bool(fconfig.Get('tmenu.fast_load_images',false)),
 	show_tooltips	    = imgui.new.bool(fconfig.Get('tmenu.show_tooltips',true)),
 	show_crash_message  = imgui.new.bool(fconfig.Get('tmenu.show_crash_message',true)),
-	update_available = false,
+	update_available    = false,
 }
 
 module.tmenu.overlay.position_array = imgui.new['const char*'][#module.tmenu.overlay.position](module.tmenu.overlay.position)
@@ -164,16 +166,8 @@ function module.MenuMain()
 			imgui.Columns(1)	
 			
 			imgui.Spacing()
-			imgui.Separator()
-			imgui.Spacing()
-			if imgui.Combo("Position", module.tmenu.overlay.position_index,module.tmenu.overlay.position_array,#module.tmenu.overlay.position) then
-				if module.tmenu.overlay.position_index == 5 then
-					fgame.tgame.fps.bool[0] = false
-					fvehicles.tvehicles.show.speed[0] = false
-					fvehicles.tvehicles.show.health[0] = false
-					fvisuals.tvisuals.show_coordinates[0] = false
-				end
-			end
+			imgui.Combo("Position", module.tmenu.overlay.position_index,module.tmenu.overlay.position_array,#module.tmenu.overlay.position)
+			fcommon.InformationTooltip("You can also right click over the\noverlay to access these options")
 			imgui.EndTabItem()
 		end
 		if imgui.BeginTabItem("Hot keys") then
@@ -208,10 +202,42 @@ function module.MenuMain()
 		end
 
 		if imgui.BeginTabItem("Style") then
-			
-			imgui.Spacing()
 			if imgui.BeginChild("Style") then
-				imgui.ShowStyleEditor(imgui.GetStyle())
+				imgui.Spacing()
+				
+				if fstyle.tstyle.status then
+					if imgui.Button("Delete style",imgui.ImVec2(fcommon.GetSize(2))) then
+						fstyle.tstyle.styles_table[(fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])] = nil
+						fstyle.tstyle.list = fstyle.getStyles()
+						fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
+						fcommon.SaveJson("styles",fstyle.tstyle.styles_table)
+					end
+					imgui.SameLine()
+					if imgui.Button("Save style",imgui.ImVec2(fcommon.GetSize(2))) then
+						fstyle.saveStyles(imgui.GetStyle(), ffi.string(fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]))
+						fstyle.tstyle.list = fstyle.getStyles()
+						fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
+					end
+				end
+
+				imgui.Spacing()
+
+				imgui.InputText('##styleName', fstyle.tstyle.name, ffi.sizeof(fstyle.tstyle.name) - 1) 
+				imgui.SameLine()
+				if imgui.Button("Add new style") then
+					fstyle.saveStyles(imgui.GetStyle(), ffi.string(fstyle.tstyle.name))
+					fstyle.tstyle.list = fstyle.getStyles()
+					fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
+				end
+
+				if fstyle.tstyle.status then
+					
+					if imgui.Combo('Select style', fstyle.tstyle.selected, fstyle.tstyle.array, #fstyle.tstyle.list) then
+						fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])
+					end
+					
+					fstyle.StyleEditor()
+				end
 				imgui.EndChild()
 			end
 
@@ -227,7 +253,7 @@ function module.MenuMain()
 
 			You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.\n\n\n\z
 
-			Copyright (C) 2019 Grinch_ \n")
+			Copyright (C) 2019-2020 Grinch_ \n")
 
 			imgui.EndTabItem()
 		end
@@ -258,10 +284,15 @@ function module.MenuMain()
 			imgui.TextWrapped("Special thanks to,")
 			imgui.Columns(2,nil,false)
 			imgui.TextWrapped("Junior-Djjr")
-			imgui.TextWrapped("Modding community")
-			imgui.NextColumn()
 			imgui.TextWrapped("Um_Geek")
+			imgui.TextWrapped("randazz0")
+			imgui.TextWrapped("Modding community")
 			imgui.TextWrapped("Rockstar Games")
+			imgui.NextColumn()
+			imgui.TextWrapped("For his help")
+			imgui.TextWrapped("For his help")
+			imgui.TextWrapped("For ImStyleSerializer")
+
 			imgui.Columns(1)
 			
 			imgui.EndTabItem()

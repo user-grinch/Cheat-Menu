@@ -1,5 +1,5 @@
 -- Cheat Menu -  Cheat menu for Grand Theft Auto SanAndreas
--- Copyright (C) 2019 Grinch_
+-- Copyright (C) 2019-2020 Grinch_
 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -15,6 +15,11 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 local module = {}
+
+module.tcommon = 
+{
+    read_key_press = false, 
+}
 
 -- Sorted pairs function
 function module.spairs(t, f)
@@ -34,8 +39,6 @@ end
 -- Key spawner used to spawn vehicles & weapons trigger: Ctrl + Q
 -- Launched in a separate thread
 function module.QuickSpawner()
-
-    fcommon.KeyWait(tkeys.control_key,tkeys.quickspawner_key)
 
     memory.write(0x00969110,0,1)
     local result = ''
@@ -126,10 +129,10 @@ end
 -- Calculates width of element(button) acoording to count
 function module.GetSize(count,no_spacing)
   
-    if x == nil then  x = 20 end
-    if y == nil then  y = 25 end
+    x = x or 20
+    y = y or 25
+    count = count or 1
     if count == 1 then no_spacing = true end
-
 
     if no_spacing == true then 
         x = imgui.GetWindowContentRegionWidth()/count
@@ -148,6 +151,8 @@ function module.CreateMenus(names,funcs)
 
     imgui.PushStyleVarVec2(imgui.StyleVar.ItemSpacing,imgui.ImVec2(0,0.5))
 
+    local button = imgui.ColorConvertFloat4ToU32(imgui.GetStyle()['Colors'][21])
+
     for i=1,#names,1 do
         if tcheatmenu.current_menu == i then
             imgui.GetStyle().Colors[imgui.Col.Button] = imgui.GetStyle().Colors[imgui.Col.ButtonActive]
@@ -156,7 +161,7 @@ function module.CreateMenus(names,funcs)
             tcheatmenu.current_menu = i
         end
         if tcheatmenu.current_menu == i then
-            imgui.GetStyle().Colors[imgui.Col.Button] = imgui.GetStyle().Colors[imgui.Col.TitleBgActive] -- Uses same color as imgui.Col.Button
+            imgui.GetStyle().Colors[imgui.Col.Button] = imgui.ColorConvertU32ToFloat4(button)
         end
        
         if i%4 ~= 0 then
@@ -171,9 +176,9 @@ function module.CreateMenus(names,funcs)
 end
 
 -- Shows loaded images with on_click and on_hover calls
-function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,search_box_text)
-        
-    if search_box_text == nil then search_box_text = "" end
+function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name)
+
+    local filter = imgui.ImGuiTextFilter()
 
     -- Calculate image count in a row
     local images_in_row = math.floor(imgui.GetWindowContentRegionWidth()/const_image_width)
@@ -184,12 +189,13 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
 
     -------------------------
     -- Draws a single image
-    draw_image = function(identifier,image_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,search_box_text,model,image)
+    draw_image = function(identifier,image_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,filter,model,image)
         local model_name = nil
         if func_get_name ~= nil then
             model_name = func_get_name(model)
         end
-        if ((search_box_text == "") or ((string.upper(model_name):find(string.upper(search_box_text))) ~= nil)) then 
+
+        if draw_type == fconst.DRAW_TYPE.LIST or filter:PassFilter(model_name) then
             if imgui.ImageButton(image,imgui.ImVec2(const_image_width,const_image_height),imgui.ImVec2(0,0),imgui.ImVec2(1,1),1,imgui.ImVec4(1,1,1,1),imgui.ImVec4(1,1,1,1)) then
                 func_on_left_click(model)
             end
@@ -232,7 +238,7 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
                     if imgui.CollapsingHeader(table_name) then
                         imgui.Spacing()
                         for model,image in pairs(valid_table) do
-                            draw_image(identifier,valid_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,search_box_text,model,image)
+                            draw_image(identifier,valid_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,filter,model,image)
                         end
                         imgui.Spacing()
                         imgui.Separator()
@@ -246,10 +252,16 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
 
     -- Draw all images one by one for search tabs
     if draw_type == fconst.DRAW_TYPE.SEARCH then 
+
+        filter:Draw("Filter")
+        imgui.Spacing()
+        imgui.Separator()
+        imgui.Spacing()
+
         if imgui.BeginChild("") then 
             for _,image_table in pairs(loaded_images_list) do
                 for model,image in pairs(image_table) do
-                    draw_image(identifier,image_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,search_box_text,model,image)
+                    draw_image(identifier,image_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,filter,model,image)
                 end
             end
             imgui.EndChild()
@@ -551,39 +563,20 @@ function module.HotKey(index,info_text)
 
     if imgui.Button(text,imgui.ImVec2(x,y-y/5)) then
         if tcheatmenu.hot_keys.currently_active == index then
-            tcheatmenu.hot_keys.currently_active = nil
+            module.tcommon.read_key_press = false
+            tcheatmenu.hot_keys.currently_active = {}
         else
             tcheatmenu.hot_keys.currently_active = index
+            module.tcommon.read_key_press = true
         end
     end
 
     if active then
         imgui.PopStyleColor()
-        for i=0,127,1 do
-            if isKeyDown(i) then
-                index[1] = i
-                break
-            end
-        end
-        local x = nil
-        for i=0,127,1 do
-            if isKeyDown(i) then
-                if i == index[1] then
-                    x = i
-                else
-                    index[2] = i
-                    x = nil
-                    break
-                end
-            end
-        end
-        if x ~= nil then
-            index[2] = x
-        end
     end  
 
     if not imgui.IsWindowFocused() or not imgui.IsItemVisible() then
-        tcheatmenu.hot_keys.currently_active = nil
+        tcheatmenu.hot_keys.currently_active = {}
     end
 
 
@@ -591,11 +584,58 @@ function module.HotKey(index,info_text)
 
     imgui.Text(info_text)
 end
+
+
+function module.ReadKeyPress()
+    while true do
+
+        if module.tcommon.read_key_press then
+
+            for i=0,127,1 do
+                if isKeyDown(i) then
+                    tcheatmenu.hot_keys.currently_active[1] = i
+                    break
+                end
+            end
+    
+            for i=127,0,-1 do
+                if isKeyDown(i) then
+                    tcheatmenu.hot_keys.currently_active[2] = i
+                    break
+                end
+            end
+            
+            if tcheatmenu.hot_keys.currently_active[1] ~= tcheatmenu.hot_keys.currently_active[2] then
+                while isKeyDown(tcheatmenu.hot_keys.currently_active[1]) or isKeyDown(tcheatmenu.hot_keys.currently_active[2]) do
+                    wait(0)
+                end
+            end
+
+        end
+        
+        wait(0)
+    end
+end
+
 --------------------------------------------------
 
 
 --------------------------------------------------
--- Functions for loading & saving json files
+-- Functions for loading & saving files
+
+function module.LoadAndSetFonts()
+    local mask = tcheatmenu.dir .. "fonts//*.ttf"
+
+    local handle, name = findFirstFile(mask)
+
+    while handle and name do
+        local font = imgui.GetIO().Fonts:AddFontFromFileTTF(string.format( "%sfonts//%s",tcheatmenu.dir,name), 14)
+        name = findNextFile(handle)
+        --if name == fstyle.tstyle.font then
+        --    imgui.GetIO().FontDefault = font
+        --end
+    end
+end
 
 function module.LoadJson(filename)
     local full_path = tcheatmenu.dir .. "json//" .. filename .. ".json"

@@ -1,5 +1,5 @@
 -- Cheat Menu -  Cheat menu for Grand Theft Auto SanAndreas
--- Copyright (C) 2019 Grinch_
+-- Copyright (C) 2019-2020 Grinch_
 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -154,12 +154,19 @@ function module.Write()
                     fps             = fmenu.tmenu.overlay.fps[0],
                     health          = fmenu.tmenu.overlay.health[0],
                     position_index  = fmenu.tmenu.overlay.position_index[0],
+                    pos_x           = fmenu.tmenu.overlay.pos_x[0],
+                    pos_y           = fmenu.tmenu.overlay.pos_y[0],
                     show            = fmenu.tmenu.overlay.show[0],
                     speed           = fmenu.tmenu.overlay.speed[0],
                 },
                 fast_load_images    = fmenu.tmenu.fast_load_images[0],
                 show_tooltips       = fmenu.tmenu.show_tooltips[0],
                 show_crash_message  = fmenu.tmenu.show_crash_message[0],
+            },
+            tstyle =
+            {
+            --    font            = fstyle.tstyle.font[0],
+                selected        = fstyle.tstyle.selected[0],
             },
             tped  =
             {

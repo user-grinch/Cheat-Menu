@@ -1,5 +1,5 @@
 -- Cheat Menu -  Cheat menu for Grand Theft Auto SanAndreas
--- Copyright (C) 2019 Grinch_
+-- Copyright (C) 2019-2020 Grinch_
 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@ local module = {}
 module.tmission =
 {
     array       = {},
+    filter      = imgui.ImGuiTextFilter(),
     names       = fcommon.LoadJson("mission"),
-    search_text = imgui.new.char[20](),
 }
 
 -- Generating missions list from loaded json file
@@ -31,13 +31,12 @@ for id, name in pairs(module.tmission.names) do
 end
 
 -- Display mission name as entry
-function ShowMissionEntries(title,list,search_text)
-    if search_text == nil then search_text = "" end
+function ShowMissionEntries(title,list,filter)
 
     fcommon.DropDownMenu(title,function()
-        imgui.Spacing()
+
         for _,i in pairs(list) do
-            if (ffi.string(search_text) == "") or ((string.upper(module.tmission.names[tostring(i)])):find(string.upper(ffi.string(search_text))) ~= nil) then
+            if filter == nil or filter:PassFilter(module.tmission.names[tostring(i)]) then
                 if imgui.MenuItemBool(module.tmission.names[tostring(i)]) then
                     if getGameGlobal(glob.ONMISSION) == 0 then
                         clearWantedLevel(PLAYER_HANDLE)
@@ -124,15 +123,14 @@ function module.MissionMain()
             end
             if imgui.BeginTabItem('Search') then
                 imgui.Spacing()
-                imgui.Columns(1)
-                if imgui.InputText('Search ',module.tmission.search_text,ffi.sizeof(module.tmission.search_text)) then 
-                end
+
+                module.tmission.filter:Draw("Filter")
                 imgui.Spacing()
-                imgui.Text("Missions found :(" .. ffi.string(module.tmission.search_text) .. ")")
                 imgui.Separator()
                 imgui.Spacing()
+
                 if imgui.BeginChild("MissionsEntries") then
-                    ShowMissionEntries(nil,module.tmission.array,module.tmission.search_text)
+                    ShowMissionEntries(nil,module.tmission.array,module.tmission.filter)
                     imgui.EndChild()
                 end
                 imgui.EndTabItem()

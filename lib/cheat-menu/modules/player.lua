@@ -1,5 +1,5 @@
 -- Cheat Menu -  Cheat menu for Grand Theft Auto SanAndreas
--- Copyright (C) 2019 Grinch_
+-- Copyright (C) 2019-2020 Grinch_
 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -30,10 +30,6 @@ module.tplayer =
     keep_position       = imgui.new.bool(fconfig.Get('tplayer.keep_stuff',false)),
     model_val           = nil,
     never_wanted        = imgui.new.bool(false),
-    skins =
-    {
-        search_text    = imgui.new.char[20](),
-    },
 }
 
 function module.KeepPosition()
@@ -218,20 +214,12 @@ function SkinChangerMenu()
     imgui.Spacing()
     if imgui.BeginTabBar("Skins") then
         if imgui.BeginTabItem("List") then
-            fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.LIST,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.ChangePlayerModel,nil,fped.GetModelName,ffi.string(module.tplayer.skins.search_text))
+            fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.LIST,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.ChangePlayerModel,nil,fped.GetModelName)
             imgui.EndTabItem()
         end
         if imgui.BeginTabItem("Search") then
             imgui.Spacing()
-            imgui.Columns(1)
-            if imgui.InputText("Search",module.tplayer.skins.search_text,ffi.sizeof(module.tplayer.skins.search_text)) then end
-            imgui.SameLine()
-
-            imgui.Spacing()
-            imgui.Text("Skins found :(" .. ffi.string(module.tplayer.skins.search_text) .. ")")
-            imgui.Separator()
-            imgui.Spacing()
-            fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.SEARCH,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.ChangePlayerModel,nil,fped.GetModelName,ffi.string(module.tplayer.skins.search_text))
+            fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.SEARCH,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.ChangePlayerModel,nil,fped.GetModelName)
             imgui.EndTabItem()
         end
         imgui.EndTabBar()

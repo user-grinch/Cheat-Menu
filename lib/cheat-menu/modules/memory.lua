@@ -1,5 +1,5 @@
 -- Cheat Menu -  Cheat menu for Grand Theft Auto SanAndreas
--- Copyright (C) 2019 Grinch_
+-- Copyright (C) 2019-2020 Grinch_
 
 -- This program is free software: you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -19,12 +19,12 @@ local module = {}
 module.tmemory    =
 {
     address            = imgui.new.char[10](""),
+    filter             = imgui.ImGuiTextFilter(),
     offset             = imgui.new.char[10]("0"),
     is_float           = imgui.new.bool(fconfig.Get('tmemory.is_float',false)),
     list               = fcommon.LoadJson("memory"),
     name               = imgui.new.char[20](""),
     radio_button       = imgui.new.int(fconfig.Get('tmemory.radio_button',0)), 
-    search_text        = imgui.new.char[20](),
     size               = imgui.new.int(fconfig.Get('tmemory.size',1)),
     value              = imgui.new.int(fconfig.Get('tmemory.value',0)),
     vp                 = imgui.new.bool(fconfig.Get('tmemory.vp',false)),
@@ -230,18 +230,16 @@ function module.MemoryMain()
         if imgui.BeginTabItem("Search") then
 
             imgui.Spacing()
-            imgui.Columns(1)
-            if imgui.InputText("Search",module.tmemory.search_text,ffi.sizeof(module.tmemory.search_text)) then end
-            imgui.SameLine()
+            module.tmemory.filter:Draw("Filter")
             fcommon.InformationTooltip("Right click over any of these entries to remove them")
             imgui.Spacing()
-            imgui.Text("Addresses found :(" .. ffi.string(module.tmemory.search_text) .. ")")
             imgui.Separator()
             imgui.Spacing()
+
             if imgui.BeginChild("Stat Entries") then
                 for name_size,address in fcommon.spairs(module.tmemory.list) do
                     size, name = name_size:match("([^$]+)$([^$]+)")
-                    if (string.upper(name):find(string.upper(ffi.string(module.tmemory.search_text)))) then
+                    if module.tmemory.filter:PassFilter(name) then
                         MemoryEntry(name, size, address)
                     end
                 end       
