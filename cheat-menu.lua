@@ -106,8 +106,18 @@ imgui.OnInitialize(function() -- Called once
     fstyle.tstyle.status = fstyle.loadStyles() 
 
     if fstyle.tstyle.status then
-        fstyle.tstyle.list = fstyle.getStyles()
+        fstyle.tstyle.list  = fstyle.getStyles()
         fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
+
+        if fstyle.tstyle.selected[0] == -1 then 
+            for i=1,#fstyle.tstyle.list,1 do
+                if fstyle.tstyle.list[i] == "Default" then
+                    fstyle.tstyle.selected[0] = i - 1
+                end
+            end
+        end
+        print(fstyle.tstyle.selected[0])
+
         fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])
     else 
         print("Can't load styles")

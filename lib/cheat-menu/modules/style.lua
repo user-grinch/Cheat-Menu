@@ -19,7 +19,6 @@
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 local module = {}
-local imgui, ffi, ini = require 'mimgui', require 'ffi', require 'inicfg'
 
 module.tstyle = 
 {
@@ -29,7 +28,7 @@ module.tstyle =
     list           = nil,
     name           = imgui.new.char[256]("Untitled"),
     preparetoapply = false,
-    selected       = imgui.new.int(fconfig.Get('tstyle.selected',0)),
+    selected       = imgui.new.int(fconfig.Get('tstyle.selected',-1)),
     status         = nil,
     styles_table   = {},
 }
@@ -138,7 +137,10 @@ end
 
 function module.getStyles()
     local tmp = {}
-    for k in pairs(module.tstyle.styles_table) do table.insert( tmp, k ); module.tstyle.preparetoapply = true end
+    for k in pairs(module.tstyle.styles_table) do 
+        table.insert( tmp, k ) 
+        module.tstyle.preparetoapply = true 
+    end
     return module.tstyle.preparetoapply and tmp or {"No styles"}
 end
 
