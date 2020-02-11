@@ -25,6 +25,7 @@ module.tplayer =
         images          = {},
         path            = tcheatmenu.dir .. "clothes\\",
     },
+    filter              = imgui.ImGuiTextFilter(),
     god                 = imgui.new.bool(fconfig.Get('tplayer.god',false)),
     invisible           = imgui.new.bool(fconfig.Get('tplayer.invisible',false)),
     keep_position       = imgui.new.bool(fconfig.Get('tplayer.keep_stuff',false)),
@@ -61,14 +62,16 @@ function module.ChangePlayerModel(model)
             loadAllModelsNow()
             setPlayerModel(PLAYER_HANDLE,290)
         end
+        
+        local veh = nil
         if isCharInAnyCar(PLAYER_PED) then
-            car = getCarCharIsUsing(PLAYER_PED)
-            speed = getCarSpeed(car)
+            veh = getCarCharIsUsing(PLAYER_PED)
+            speed = getCarSpeed(veh)
         end
         clearCharTasksImmediately(PLAYER_PED)
-        if car ~= nil then
-            taskWarpCharIntoCarAsDriver(PLAYER_PED,car)
-            setCarForwardSpeed(car,speed)
+        if veh ~= nil then
+            taskWarpCharIntoCarAsDriver(PLAYER_PED,veh)
+            setCarForwardSpeed(veh,speed)
         end
         printHelpString("~g~Skin~w~ changed")
     end
@@ -214,12 +217,12 @@ function SkinChangerMenu()
     imgui.Spacing()
     if imgui.BeginTabBar("Skins") then
         if imgui.BeginTabItem("List") then
-            fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.LIST,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.ChangePlayerModel,nil,fped.GetModelName)
+            fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.LIST,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.ChangePlayerModel,nil,fped.GetModelName,module.tplayer.filter)
             imgui.EndTabItem()
         end
         if imgui.BeginTabItem("Search") then
             imgui.Spacing()
-            fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.SEARCH,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.ChangePlayerModel,nil,fped.GetModelName)
+            fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.SEARCH,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.ChangePlayerModel,nil,fped.GetModelName,module.tplayer.filter)
             imgui.EndTabItem()
         end
         imgui.EndTabBar()

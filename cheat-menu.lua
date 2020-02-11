@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.9-wip")
-script_version_number(20200201) -- YYYYMMDD
+script_version_number(20200211) -- YYYYMMDD
 
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
@@ -321,8 +321,11 @@ function main()
 
     switchArrestPenalties(fgame.tgame.keep_stuff[0])
     switchDeathPenalties(fgame.tgame.keep_stuff[0])
-    setGangWarsActive(fped.tped.gang.wars[0])
 
+    if fped.tped.gang.wars[0] then
+        setGangWarsActive(fped.tped.gang.wars[0])
+    end
+    
     setPlayerFastReload(PLAYER_HANDLE,fweapon.tweapon.fast_reload[0])
     
     if fweapon.tweapon.no_reload[0] then
@@ -477,12 +480,6 @@ function main()
                     end)
                 end
             end
-
-            setCarCanBeDamaged(car,not(fvehicle.tvehicle.no_damage[0]))
-            setCarCanBeVisiblyDamaged(car,not(fvehicle.tvehicle.visual_damage[0]))
-            setCharCanBeKnockedOffBike(PLAYER_PED,fvehicle.tvehicle.stay_on_bike[0])
-            setCarHeavy(car,fvehicle.tvehicle.heavy[0])
-      
 
             if fvehicle.tvehicle.lock_speed[0] then
                 if fvehicle.tvehicle.speed[0] > 500 then

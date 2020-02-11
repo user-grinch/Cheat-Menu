@@ -18,7 +18,7 @@ local module = {}
 
 module.tped =
 {
-
+    filter       = imgui.ImGuiTextFilter(),
     gang =
     {
         array = {},
@@ -218,13 +218,13 @@ function module.PedMain()
                 imgui.Spacing()
                 if imgui.BeginTabBar("Peds list") then   
                     if imgui.BeginTabItem("List") then
-                        fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.LIST,module.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.SpawnPed,nil,module.GetModelName)         
+                        fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.LIST,module.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.SpawnPed,nil,module.GetModelName,module.tped.filter)         
                         imgui.EndTabItem()
                     end    
                 if imgui.BeginTabItem("Search") then
                     imgui.Spacing()
 
-                    fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.SEARCH,module.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.SpawnPed,nil,module.GetModelName)
+                    fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.SEARCH,module.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.SpawnPed,nil,module.GetModelName,module.tped.filter)
 
                     imgui.EndTabItem()
                 end

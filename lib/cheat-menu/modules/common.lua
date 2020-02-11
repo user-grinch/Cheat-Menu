@@ -176,9 +176,7 @@ function module.CreateMenus(names,funcs)
 end
 
 -- Shows loaded images with on_click and on_hover calls
-function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name)
-
-    local filter = imgui.ImGuiTextFilter()
+function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,filter)
 
     -- Calculate image count in a row
     local images_in_row = math.floor(imgui.GetWindowContentRegionWidth()/const_image_width)

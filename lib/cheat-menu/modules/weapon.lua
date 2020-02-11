@@ -20,6 +20,7 @@ module.tweapon =
 {
     auto_aim          = imgui.new.bool(fconfig.Get('tweapon.auto_aim',false)),
     fast_reload       = imgui.new.bool(fconfig.Get('tweapon.fast_reload',false)),
+    filter            = imgui.ImGuiTextFilter(),
     max_accuracy      = imgui.new.bool(fconfig.Get('tweapon.max_accuracy',false)),
     max_ammo_clip     = imgui.new.bool(fconfig.Get('tweapon.max_ammo_clip',false)),
     max_move_speed    = imgui.new.bool(fconfig.Get('tweapon.max_move_speed',false)),
@@ -314,12 +315,12 @@ function module.WeaponMain()
                 
                 if imgui.BeginTabItem("List") then
                     imgui.Spacing()
-                    fcommon.DrawImages(fconst.IDENTIFIER.WEAPON,fconst.DRAW_TYPE.LIST,module.tweapon.images,fconst.WEAPON.IMAGE_HEIGHT,fconst.WEAPON.IMAGE_WIDTH,module.GiveWeapon,nil,module.GetModelName)
+                    fcommon.DrawImages(fconst.IDENTIFIER.WEAPON,fconst.DRAW_TYPE.LIST,module.tweapon.images,fconst.WEAPON.IMAGE_HEIGHT,fconst.WEAPON.IMAGE_WIDTH,module.GiveWeapon,nil,module.GetModelName,module.tweapon.filter)
                     imgui.EndTabItem()
                 end
                 if imgui.BeginTabItem("Search") then
                     imgui.Spacing()
-                    fcommon.DrawImages(fconst.IDENTIFIER.WEAPON,fconst.DRAW_TYPE.SEARCH,module.tweapon.images,fconst.WEAPON.IMAGE_HEIGHT,fconst.WEAPON.IMAGE_WIDTH,module.GiveWeapon,nil,module.GetModelName)
+                    fcommon.DrawImages(fconst.IDENTIFIER.WEAPON,fconst.DRAW_TYPE.SEARCH,module.tweapon.images,fconst.WEAPON.IMAGE_HEIGHT,fconst.WEAPON.IMAGE_WIDTH,module.GiveWeapon,nil,module.GetModelName,module.tweapon.filter)
                     imgui.EndTabItem()
                 end
                 imgui.EndTabBar()

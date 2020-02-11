@@ -100,6 +100,7 @@ module.tvehicle =
     door_menu_button = imgui.new.int(0),
     disable_car_engine = imgui.new.bool(fconfig.Get('tvehicle.disable_car_engine',false)),
     first_person_camera = imgui.new.bool(fconfig.Get('tvehicle.first_person_camera',false)),
+    filter       = imgui.ImGuiTextFilter(),
     heavy = imgui.new.bool(fconfig.Get('tvehicle.heavy',false)),
     images = {},
     invisible_car = imgui.new.bool(fconfig.Get('tvehicle.invisible_car',false)),
@@ -109,11 +110,12 @@ module.tvehicle =
     names = fcommon.LoadJson("vehicle"),
     paintjobs  = 
     {
-        cache_images = {},
+        cache_images     = {},
         current_paintjob = imgui.new.int(-1);
-        path   =  tcheatmenu.dir .. "vehicles\\paintjobs",
-        images = {},
-        texture = nil
+        filter           = imgui.ImGuiTextFilter(),
+        path             =  tcheatmenu.dir .. "vehicles\\paintjobs",
+        images           = {},
+        texture          = nil
     },
     no_vehicles = imgui.new.bool(fconfig.Get('tvehicle.no_vehicles',false)),
     no_damage = imgui.new.bool(fconfig.Get('tvehicle.no_damage',false)),
@@ -227,8 +229,8 @@ end
 
 function DoorMenu(func)
     local vehicle = getCarCharIsUsing(PLAYER_PED)
-    local seats   = getMaximumNumberOfPassengers(vehicle) + 1 -- passenger + driver 
-    
+    local seats   = getMaximumNumberOfPassengers(vehicle) + 1 -- passenger + driver  
+
     if seats == 4 then
         doors = 5
     else
@@ -493,19 +495,27 @@ function module.OnEnterVehicle()
                 end
             end
             
-            if module.tvehicle.invisible_car[0] then
-                setCarVisible(car,false)
-            end
-            if module.tvehicle.watertight_car[0] then
-                setCarWatertight(car,false)
-            end
-           
+            setCarVisible(car,not(module.tvehicle.invisible_car[0]))
+            setCarWatertight(car,module.tvehicle.watertight_car[0])
+            setCarCanBeDamaged(car,not(module.tvehicle.no_damage[0]))
+            setCarCanBeVisiblyDamaged(car,not(module.tvehicle.visual_damage[0]))
+            setCharCanBeKnockedOffBike(PLAYER_PED,module.tvehicle.stay_on_bike[0])
+            setCarHeavy(car,module.tvehicle.heavy[0])
             
 
             while isCharInCar(PLAYER_PED,car) do
                 wait(0)
             end
             module.tvehicle.paintjobs.texture = nil
+            
+            if not isCarDead(car) then
+                setCarVisible(car,true)
+                setCarWatertight(car,false)
+                setCarCanBeDamaged(car,true)
+                setCarCanBeVisiblyDamaged(car,true)
+                setCharCanBeKnockedOffBike(PLAYER_PED,false)
+                setCarHeavy(car,false)
+            end
         else
 
             fconfig.tconfig.temp_texture_name = nil
@@ -801,6 +811,7 @@ function module.VehicleMain()
                             end
                             if imgui.Button("Passenger " .. tostring(i+1),imgui.ImVec2(fcommon.GetSize(2))) then
                                 warpCharIntoCarAsPassenger(PLAYER_PED,vehicle,i)
+                                --taskEnterCarAsPassenger(PLAYER_PED,vehicle,10000,i)
                             end
                         end
                     else
@@ -916,12 +927,12 @@ function module.VehicleMain()
             if imgui.BeginTabBar("Vehicles list") then
                 imgui.Spacing()
                 if imgui.BeginTabItem("List") then
-                    fcommon.DrawImages(fconst.IDENTIFIER.VEHICLE,fconst.DRAW_TYPE.LIST,module.tvehicle.images,fconst.VEHICLE.IMAGE_HEIGHT,fconst.VEHICLE.IMAGE_WIDTH,module.GiveVehicleToPlayer,nil,module.GetModelName)
+                    fcommon.DrawImages(fconst.IDENTIFIER.VEHICLE,fconst.DRAW_TYPE.LIST,module.tvehicle.images,fconst.VEHICLE.IMAGE_HEIGHT,fconst.VEHICLE.IMAGE_WIDTH,module.GiveVehicleToPlayer,nil,module.GetModelName,module.tvehicle.filter)
                     imgui.EndTabItem()
                 end 
                 if imgui.BeginTabItem("Search") then
                     imgui.Spacing()
-                    fcommon.DrawImages(fconst.IDENTIFIER.VEHICLE,fconst.DRAW_TYPE.SEARCH,module.tvehicle.images,fconst.VEHICLE.IMAGE_HEIGHT,fconst.VEHICLE.IMAGE_WIDTH,module.GiveVehicleToPlayer,nil,module.GetModelName)
+                    fcommon.DrawImages(fconst.IDENTIFIER.VEHICLE,fconst.DRAW_TYPE.SEARCH,module.tvehicle.images,fconst.VEHICLE.IMAGE_HEIGHT,fconst.VEHICLE.IMAGE_WIDTH,module.GiveVehicleToPlayer,nil,module.GetModelName,module.tvehicle.filter)
                     imgui.EndTabItem()
                 end
                 imgui.EndTabBar()
@@ -1030,7 +1041,7 @@ function module.VehicleMain()
                     end
                 end
     
-                fcommon.DrawImages(fconst.IDENTIFIER.PAINTJOB,fconst.DRAW_TYPE.SEARCH,module.tvehicle.paintjobs.images,fconst.PAINTJOB.IMAGE_HEIGHT,fconst.PAINTJOB.IMAGE_WIDTH,ApplyTexture,nil,module.GetTextureName)
+                fcommon.DrawImages(fconst.IDENTIFIER.PAINTJOB,fconst.DRAW_TYPE.SEARCH,module.tvehicle.paintjobs.images,fconst.PAINTJOB.IMAGE_HEIGHT,fconst.PAINTJOB.IMAGE_WIDTH,ApplyTexture,nil,module.GetTextureName,module.tvehicle.paintjobs.filter)
                         
                 imgui.EndTabItem()
             end
@@ -1082,7 +1093,7 @@ function module.VehicleMain()
                 imgui.Spacing()
                 if imgui.BeginChild("Tune") then
                     imgui.Spacing()
-                    fcommon.DrawImages(fconst.IDENTIFIER.COMPONENT,fconst.DRAW_TYPE.LIST,module.tvehicle.components.images,fconst.COMPONENT.IMAGE_HEIGHT,fconst.COMPONENT.IMAGE_WIDTH,module.AddComponentToVehicle,module.RemoveComponentFromVehicle)
+                    fcommon.DrawImages(fconst.IDENTIFIER.COMPONENT,fconst.DRAW_TYPE.LIST,module.tvehicle.components.images,fconst.COMPONENT.IMAGE_HEIGHT,fconst.COMPONENT.IMAGE_WIDTH,module.AddComponentToVehicle,module.RemoveComponentFromVehicle,module.tvehicle.filter)
                     imgui.EndChild()
                 end
                 imgui.EndTabItem()
