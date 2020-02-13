@@ -299,8 +299,8 @@ function module.StyleEditor()
                 style.ColorButtonPosition = var[0]
             end
 
-            local string = {"None","Left","Right"}
-            local list   = imgui.new['const char*'][#string](string)
+            string = {"None","Left","Right"}
+            list   = imgui.new['const char*'][#string](string)
             var = imgui.new.int(style.WindowMenuButtonPosition + 1)
 
             if imgui.Combo("Window menu button position", var, list,#string) then

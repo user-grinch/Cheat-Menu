@@ -134,10 +134,6 @@ function module.Write()
                 freeze_mission_timer= fgame.tgame.freeze_mission_timer[0],
                 freeze_time         = fgame.tgame.freeze_time[0], 
                 random_cheats       = fgame.tgame.random_cheats[0], 
-                script_manager      =
-                {
-                    disabled        = encodeJson(fgame.tgame.script_manager.disabled),
-                },
                 solid_water         = fgame.tgame.solid_water[0],
                 ss_shortcut         = fgame.tgame.ss_shortcut[0],
                 sync_system_time    = fgame.tgame.sync_system_time[0],
@@ -208,6 +204,7 @@ function module.Write()
                 apply_material_filter = fvehicle.tvehicle.apply_material_filter[0],
                 disable_car_engine  = fvehicle.tvehicle.disable_car_engine[0],
                 first_person_camera = fvehicle.tvehicle.first_person_camera[0],
+                gxt_name_table   = fvehicle.tvehicle.gxt_name_table,
                 handling         = module.tconfig.handling, -- Generated runtime
                 heavy            = fvehicle.tvehicle.heavy[0],
                 quick_spawn      = fvehicle.tvehicle.quick_spawn[0],

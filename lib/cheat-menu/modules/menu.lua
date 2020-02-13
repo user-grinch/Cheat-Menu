@@ -167,7 +167,7 @@ function module.MenuMain()
 			
 			imgui.Spacing()
 			imgui.Combo("Position", module.tmenu.overlay.position_index,module.tmenu.overlay.position_array,#module.tmenu.overlay.position)
-			fcommon.InformationTooltip("You can also right click over the\noverlay to access these options")
+			fcommon.InformationTooltip("You can also right click on the\noverlay to access these options")
 			imgui.EndTabItem()
 		end
 		if imgui.BeginTabItem("Hot keys") then

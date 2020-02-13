@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.9-wip")
-script_version_number(20200211) -- YYYYMMDD
+script_version_number(20200213) -- YYYYMMDD
 
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
@@ -358,6 +358,11 @@ function main()
         writeMemory(4588800,1,195,false)
     else
         writeMemory(4588800,1,160,false)
+    end
+
+    -- Vehicle gxt names
+    for gxt_name,veh_name in pairs(fvehicle.tvehicle.gxt_name_table) do
+        setGxtEntry(gxt_name,veh_name)
     end
 
     -- Money text

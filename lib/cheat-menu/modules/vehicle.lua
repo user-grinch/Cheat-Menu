@@ -101,6 +101,8 @@ module.tvehicle =
     disable_car_engine = imgui.new.bool(fconfig.Get('tvehicle.disable_car_engine',false)),
     first_person_camera = imgui.new.bool(fconfig.Get('tvehicle.first_person_camera',false)),
     filter       = imgui.ImGuiTextFilter(),
+    gxt_name        = imgui.new.char[32](""),
+    gxt_name_table  = fconfig.Get('tvehicle.gxt_name_table',{}),
     heavy = imgui.new.bool(fconfig.Get('tvehicle.heavy',false)),
     images = {},
     invisible_car = imgui.new.bool(fconfig.Get('tvehicle.invisible_car',false)),
@@ -137,7 +139,7 @@ module.tvehicle =
     },
     unlimited_nitro = imgui.new.bool(fconfig.Get('tvehicle.unlimited_nitro',false)), 
     visual_damage   = imgui.new.bool(fconfig.Get('tvehicle.visual_damage',false)),
-    watertight_car = imgui.new.bool(fconfig.Get('tvehicle.watertight_car',false)),
+    watertight_car  = imgui.new.bool(fconfig.Get('tvehicle.watertight_car',false)),
 }
 
 module.tvehicle.components.list  = imgui.new['const char*'][#module.tvehicle.components.ui_names](module.tvehicle.components.ui_names)
@@ -469,10 +471,12 @@ function module.GetTextureName(name)
 end
 
 function module.OnEnterVehicle()
+
     while true do
         if isCharInAnyCar(PLAYER_PED) then
-            local car = getCarCharIsUsing(PLAYER_PED)
-            local model = getCarModel(car)
+            local car        = getCarCharIsUsing(PLAYER_PED)
+            local model      = getCarModel(car)
+            local model_name = module.tvehicle.gxt_name_table[module.GetModelName(model)] or getGxtText(module.GetModelName(model))
 
             -- Auto load handling data
             if module.tvehicle.auto_load_handling[0] then
@@ -498,10 +502,11 @@ function module.OnEnterVehicle()
             setCarVisible(car,not(module.tvehicle.invisible_car[0]))
             setCarWatertight(car,module.tvehicle.watertight_car[0])
             setCarCanBeDamaged(car,not(module.tvehicle.no_damage[0]))
-            setCarCanBeVisiblyDamaged(car,not(module.tvehicle.visual_damage[0]))
+            setCarCanBeVisiblyDamaged(car,module.tvehicle.visual_damage[0])
             setCharCanBeKnockedOffBike(PLAYER_PED,module.tvehicle.stay_on_bike[0])
             setCarHeavy(car,module.tvehicle.heavy[0])
-            
+
+            imgui.StrCopy(module.tvehicle.gxt_name,model_name)
 
             while isCharInCar(PLAYER_PED,car) do
                 wait(0)
@@ -786,12 +791,13 @@ function module.VehicleMain()
             imgui.EndTabItem()
         end
 
-        if imgui.BeginTabItem("Menus") then
-            if imgui.BeginChild("Menus") then
+        if imgui.BeginTabItem("Menu") then
+            if imgui.BeginChild("Menu") then
 
                 fcommon.DropDownMenu("Enter nearest vehicle as",function()
                     local vehicle,ped = storeClosestEntities(PLAYER_PED)
                     if vehicle ~= -1 then
+
                         local seats = getMaximumNumberOfPassengers(vehicle)
                         imgui.Spacing()
                         imgui.Columns(2,nil,false)
@@ -876,14 +882,33 @@ function module.VehicleMain()
                         end
                         
                     end)
+                    fcommon.DropDownMenu("Vehicle name",function()
+
+                        imgui.Text(string.format( "Model name = %s",module.GetModelName(getCarModel(car))))
+                        imgui.Spacing()
+                        imgui.InputText("Name", module.tvehicle.gxt_name,ffi.sizeof(module.tvehicle.gxt_name))
+
+                        imgui.Spacing()
+                        if imgui.Button("Set",imgui.ImVec2(fcommon.GetSize(3))) then
+                            setGxtEntry(module.GetModelName(getCarModel(car)),ffi.string(module.tvehicle.gxt_name))
+                            fcommon.CheatActivated()
+                        end
+                        imgui.SameLine()
+                        if imgui.Button("Save",imgui.ImVec2(fcommon.GetSize(3))) then
+                            module.tvehicle.gxt_name_table[module.GetModelName(getCarModel(car))] = ffi.string(module.tvehicle.gxt_name)
+                        end
+                        imgui.SameLine()
+                        if imgui.Button("Clear all",imgui.ImVec2(fcommon.GetSize(3))) then
+                            module.tvehicle.gxt_name_table = {}
+                        end
+                    end)
                     fcommon.DropDownMenu("Vehicle speed",function()
                         
-                        imgui.Columns(2,nil,false)
                         fcommon.CheckBoxVar("Lock speed",module.tvehicle.lock_speed)
-                        imgui.NextColumn()
-                        imgui.Columns(1)
-                        if imgui.InputInt("Set",module.tvehicle.speed) then
-                        end
+                        imgui.Spacing()
+                        imgui.InputInt("Set",module.tvehicle.speed)
+                         
+                        imgui.Spacing()
                         if imgui.Button("Set speed",imgui.ImVec2(fcommon.GetSize(2))) then
                             if isCharInAnyCar(PLAYER_PED) then
                                 car = getCarCharIsUsing(PLAYER_PED)
@@ -1093,7 +1118,7 @@ function module.VehicleMain()
                 imgui.Spacing()
                 if imgui.BeginChild("Tune") then
                     imgui.Spacing()
-                    fcommon.DrawImages(fconst.IDENTIFIER.COMPONENT,fconst.DRAW_TYPE.LIST,module.tvehicle.components.images,fconst.COMPONENT.IMAGE_HEIGHT,fconst.COMPONENT.IMAGE_WIDTH,module.AddComponentToVehicle,module.RemoveComponentFromVehicle,module.tvehicle.filter)
+                    fcommon.DrawImages(fconst.IDENTIFIER.COMPONENT,fconst.DRAW_TYPE.LIST,module.tvehicle.components.images,fconst.COMPONENT.IMAGE_HEIGHT,fconst.COMPONENT.IMAGE_WIDTH,module.AddComponentToVehicle,module.RemoveComponentFromVehicle,nil,module.tvehicle.filter)
                     imgui.EndChild()
                 end
                 imgui.EndTabItem()
