@@ -142,6 +142,7 @@ function module.Write()
             {
                 auto_update_check   = fmenu.tmenu.auto_update_check[0],
                 auto_reload         = fmenu.tmenu.auto_reload[0],
+                auto_scale          = fmenu.tmenu.auto_scale[0],
                 disable_in_samp     = fmenu.tmenu.disable_in_samp[0],
                 lock_player         = fmenu.tmenu.lock_player[0],
                 overlay = 

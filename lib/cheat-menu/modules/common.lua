@@ -205,7 +205,7 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
                 if imgui.IsItemHovered() then
                     imgui.BeginTooltip()
                     if identifier ~= fconst.IDENTIFIER.PAINTJOB and identifier ~= fconst.IDENTIFIER.CLOTH then
-                        imgui.SetTooltip(model .. "\n" .. model_name)
+                        imgui.SetTooltip("Model id: " .. model .. "\n" .. model_name)
                     else
                         imgui.SetTooltip(model_name)
                     end

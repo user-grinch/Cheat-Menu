@@ -234,7 +234,7 @@ end
 
 function module.GetClothName(name)
     local body_part, model, texture = name:match("([^$]+)$([^$]+)$([^$]+)")
-    return texture
+    return string.format( "Body part: %s\nModel name: %s\nTexture name: %s",body_part,model,texture)
 end
 
 function module.ChangePlayerCloth(name)

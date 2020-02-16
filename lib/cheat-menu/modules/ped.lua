@@ -92,7 +92,11 @@ module.tped.gang.array = imgui.new['const char*'][#module.tped.gang.list](module
 
 -- Returns ped name
 function module.GetModelName(model)
-    if module.tped.names[model] then return module.tped.names[model] else return "" end
+    if module.tped.names[model] then 
+        return "Model name: " .. module.tped.names[model] 
+    else 
+        return "" 
+    end
 end
 
 function module.SpawnPed(model)  

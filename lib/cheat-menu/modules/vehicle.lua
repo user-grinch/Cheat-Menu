@@ -164,7 +164,13 @@ end
 
 -- Returns name of vehicle
 function module.GetModelName(id)
-    return getNameOfVehicleModel(tonumber(id)) or module.tvehicle.names[id] or ""
+    local name = getNameOfVehicleModel(tonumber(id))
+
+    if name ~= nil then
+        return string.format("Gxt name: %s\nModel name: %s",getGxtText(name),name) 
+    else
+        return ""
+    end
 end
 
 -- Spawns a vehicle for player
@@ -466,7 +472,7 @@ function module.GetTextureName(name)
     if name == nil then
         return ""
     else
-        return name
+        return "Texture: " ..name
     end
 end
 
@@ -476,7 +482,7 @@ function module.OnEnterVehicle()
         if isCharInAnyCar(PLAYER_PED) then
             local car        = getCarCharIsUsing(PLAYER_PED)
             local model      = getCarModel(car)
-            local model_name = module.tvehicle.gxt_name_table[module.GetModelName(model)] or getGxtText(module.GetModelName(model))
+            local model_name = module.tvehicle.gxt_name_table[getNameOfVehicleModel(model)] or getGxtText(getNameOfVehicleModel(model))
 
             -- Auto load handling data
             if module.tvehicle.auto_load_handling[0] then
@@ -499,28 +505,13 @@ function module.OnEnterVehicle()
                 end
             end
             
-            setCarVisible(car,not(module.tvehicle.invisible_car[0]))
-            setCarWatertight(car,module.tvehicle.watertight_car[0])
-            setCarCanBeDamaged(car,not(module.tvehicle.no_damage[0]))
-            setCarCanBeVisiblyDamaged(car,module.tvehicle.visual_damage[0])
-            setCharCanBeKnockedOffBike(PLAYER_PED,module.tvehicle.stay_on_bike[0])
-            setCarHeavy(car,module.tvehicle.heavy[0])
-
             imgui.StrCopy(module.tvehicle.gxt_name,model_name)
 
             while isCharInCar(PLAYER_PED,car) do
                 wait(0)
             end
             module.tvehicle.paintjobs.texture = nil
-            
-            if not isCarDead(car) then
-                setCarVisible(car,true)
-                setCarWatertight(car,false)
-                setCarCanBeDamaged(car,true)
-                setCarCanBeVisiblyDamaged(car,true)
-                setCharCanBeKnockedOffBike(PLAYER_PED,false)
-                setCarHeavy(car,false)
-            end
+
         else
 
             fconfig.tconfig.temp_texture_name = nil
@@ -801,7 +792,7 @@ function module.VehicleMain()
                         local seats = getMaximumNumberOfPassengers(vehicle)
                         imgui.Spacing()
                         imgui.Columns(2,nil,false)
-                        imgui.Text("Vehicle: " .. module.GetModelName(getCarModel(vehicle)))
+                        imgui.Text("Vehicle: " .. getNameOfVehicleModel(getCarModel(vehicle)))
                         imgui.NextColumn()
                         imgui.Text(string.format("Total seats: %d",seats+1))
                         imgui.Columns(1)
@@ -884,18 +875,18 @@ function module.VehicleMain()
                     end)
                     fcommon.DropDownMenu("Vehicle name",function()
 
-                        imgui.Text(string.format( "Model name = %s",module.GetModelName(getCarModel(car))))
+                        imgui.Text(string.format( "Model name = %s",getNameOfVehicleModel(getCarModel(car))))
                         imgui.Spacing()
                         imgui.InputText("Name", module.tvehicle.gxt_name,ffi.sizeof(module.tvehicle.gxt_name))
 
                         imgui.Spacing()
                         if imgui.Button("Set",imgui.ImVec2(fcommon.GetSize(3))) then
-                            setGxtEntry(module.GetModelName(getCarModel(car)),ffi.string(module.tvehicle.gxt_name))
+                            setGxtEntry(getNameOfVehicleModel(getCarModel(car)),ffi.string(module.tvehicle.gxt_name))
                             fcommon.CheatActivated()
                         end
                         imgui.SameLine()
                         if imgui.Button("Save",imgui.ImVec2(fcommon.GetSize(3))) then
-                            module.tvehicle.gxt_name_table[module.GetModelName(getCarModel(car))] = ffi.string(module.tvehicle.gxt_name)
+                            module.tvehicle.gxt_name_table[getNameOfVehicleModel(getCarModel(car))] = ffi.string(module.tvehicle.gxt_name)
                         end
                         imgui.SameLine()
                         if imgui.Button("Clear all",imgui.ImVec2(fcommon.GetSize(3))) then

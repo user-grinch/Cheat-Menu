@@ -20,6 +20,7 @@ module.tmenu =
 {	
 	auto_update_check   = imgui.new.bool(fconfig.Get('tmenu.auto_update_check',true)),
 	auto_reload 		= imgui.new.bool(fconfig.Get('tmenu.auto_reload',true)),
+	auto_scale          = imgui.new.bool(fconfig.Get('tmenu.auto_scale',true)),
 	crash_text          = "",
 	disable_in_samp		= imgui.new.bool(fconfig.Get('tmenu.disable_in_samp',true)),
 	lock_player   		= imgui.new.bool(fconfig.Get('tmenu.lock_player',false)),
@@ -145,9 +146,10 @@ function module.MenuMain()
 			imgui.Columns(2,nil,false)
 			fcommon.CheckBoxVar("Auto check for updates",module.tmenu.auto_update_check)
 			fcommon.CheckBoxVar("Auto reload",module.tmenu.auto_reload,"Reload cheat menu automatically\nin case of a crash")
+			fcommon.CheckBoxVar("Auto scale",module.tmenu.auto_scale,"Automatically scale menu according to size")
 			fcommon.CheckBoxVar("Disable in SAMP",module.tmenu.disable_in_samp,"Using cheats online might ruin\nothers gameply and get you banned")
-			fcommon.CheckBoxVar("Lock player",module.tmenu.lock_player,"Lock player controls while the menu is open")
 			imgui.NextColumn()
+			fcommon.CheckBoxVar("Lock player",module.tmenu.lock_player,"Lock player controls while the menu is open")
 			fcommon.CheckBoxVar("Fast load images",module.tmenu.fast_load_images,"Loads images faster\nThe game will freeze during load")
 			fcommon.CheckBoxVar("Show crash message",module.tmenu.show_crash_message)
 			fcommon.CheckBoxVar("Show tooltips",module.tmenu.show_tooltips)

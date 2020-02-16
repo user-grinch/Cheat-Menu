@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.9-wip")
-script_version_number(20200213) -- YYYYMMDD
+script_version_number(20200216) -- YYYYMMDD
 
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
@@ -147,9 +147,14 @@ function(self) -- render frame
 
     self.LockPlayer = fmenu.tmenu.lock_player[0] 
     imgui.SetNextWindowSize(imgui.ImVec2(tcheatmenu.window.size.X,tcheatmenu.window.size.Y),imgui.Cond.Once)
-    imgui.PushStyleVarVec2(imgui.StyleVar.WindowMinSize,imgui.ImVec2(250,500))
+    imgui.PushStyleVarVec2(imgui.StyleVar.WindowMinSize,imgui.ImVec2(250,350))
+
+    local pop = 1
+    if fmenu.tmenu.auto_scale[0] then
+        imgui.PushStyleVarVec2(imgui.StyleVar.FramePadding,imgui.ImVec2(math.floor(tcheatmenu.window.size.X/85),math.floor(tcheatmenu.window.size.Y/200)))
+        pop = pop +1
+    end
     imgui.Begin(tcheatmenu.window.title, tcheatmenu.window.show,imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoSavedSettings)
-    imgui.PopStyleVar()
 
     if fmenu.tmenu.update_available then
         imgui.Spacing()
@@ -166,6 +171,7 @@ function(self) -- render frame
     tcheatmenu.window.size.X = imgui.GetWindowWidth()
     tcheatmenu.window.size.Y = imgui.GetWindowHeight()
     imgui.End()
+    imgui.PopStyleVar(pop)
 end)
 
 
@@ -498,6 +504,14 @@ function main()
             else
                 fvehicle.tvehicle.lock_doors[0] = false
             end
+
+            setCarVisible(car,not(fvehicle.tvehicle.invisible_car[0]))
+            setCarWatertight(car,fvehicle.tvehicle.watertight_car[0])
+            setCarCanBeDamaged(car,not(fvehicle.tvehicle.no_damage[0]))
+            setCarCanBeVisiblyDamaged(car,not(fvehicle.tvehicle.visual_damage[0]))
+            setCharCanBeKnockedOffBike(PLAYER_PED,fvehicle.tvehicle.stay_on_bike[0])
+            setCarHeavy(car,fvehicle.tvehicle.heavy[0])
+
         else
             fvehicle.tvehicle.lock_doors[0] = false
             fvehicle.tvehicle.lights[0] = false

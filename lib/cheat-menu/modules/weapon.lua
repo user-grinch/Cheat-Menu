@@ -103,7 +103,13 @@ module.tweapon.gang.weapon3[0] = module.tweapon.gang.used_weapons[fped.tped.gang
 
 -- Returns weapon name
 function module.GetModelName(id)
-    return module.tweapon.names[id] or ""
+
+    if module.tweapon.names[id] ~= nil then
+        return "Model name: " .. module.tweapon.names[id]
+    else
+        return ""
+    end
+    
 end
 
 -- Used in quick spawner (fcommon)
