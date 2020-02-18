@@ -53,6 +53,7 @@ module.tgame                =
     random_cheats           = imgui.new.bool(fconfig.Get('tgame.random_cheats',false)),
     script_manager          =
     {
+        scripts             = fconfig.Get('tgame.script_manager.scripts',{}),
         skip_auto_reload    = false,
         not_loaded          = {},
     },
@@ -387,6 +388,30 @@ end
 --------------------------------------------------
 -- Functions of script manager
 
+function module.LoadScriptsOnKeyPress()
+    while true do
+        for name,table in pairs(module.tgame.script_manager.scripts) do
+            fcommon.OnHotKeyPress(table,function()
+                local full_file_path = string.format( "%s\\%s.loadonkeypress",getWorkingDirectory(),name)
+                local is_loaded = false
+                for index, script in ipairs(script.list()) do
+                    if full_file_path == script.path then
+                        is_loaded = true
+                    end
+                end
+                if is_loaded == false then
+                    script.load(full_file_path)
+                    printHelpString("Script loaded")
+                else
+                    printHelpString("Script already loaded")
+                end 
+                module.tgame.script_manager.not_loaded[name .. ".loadonkeypress"] = nil
+            end)
+        end
+        wait(0)
+    end
+end
+
 function module.MonitorScripts()
     local mainDir  = getWorkingDirectory()
     for file in lfs.dir(mainDir) do
@@ -395,7 +420,7 @@ function module.MonitorScripts()
 
             local file_path,file_name,file_ext = string.match(full_file_path, "(.-)([^\\/]-%.?([^%.\\/]*))$") 
 
-            if (file_ext == "lua" or file_ext == "neverload") and module.tgame.script_manager.not_loaded[file_name] == nil  then
+            if (file_ext == "lua" or file_ext == "neverload" or file_ext == "loadonkeypress") and module.tgame.script_manager.not_loaded[file_name] == nil  then
                 local is_loaded = false
                 for index, script in ipairs(script.list()) do
                     if full_file_path == script.path then
@@ -411,12 +436,13 @@ function module.MonitorScripts()
 end
 
 function ShowNotLoadedScripts(name,path)
+
+    local _,file_name,file_ext = string.match(path, "(.-)([^\\/]-%.?([^%.\\/]*))$") 
+
     fcommon.DropDownMenu(name .. "##" .. path,function()
 
         imgui.Spacing()
         imgui.SameLine()
-
-        local _,file_name,file_ext = string.match(path, "(.-)([^\\/]-%.?([^%.\\/]*))$") 
 
         if file_ext ==  "lua" then
             imgui.Text("Status: Not loaded")
@@ -424,20 +450,29 @@ function ShowNotLoadedScripts(name,path)
         if file_ext ==  "neverload" then
             imgui.Text("Status: Never load")
         end
+        if file_ext ==  "loadonkeypress" then
+            imgui.Text("Status: Load on key press")
+        end
+        
         imgui.Spacing()
         imgui.SameLine()
         imgui.TextWrapped("Filepath: " .. path)
         
         if imgui.Button("Load##" .. path,imgui.ImVec2(fcommon.GetSize(1))) then
             if doesFileExist(path) then 
-                
+
                 local load_path = path
                 if file_ext ==  "neverload" then
                     load_path = string.sub(path,1,-11)
                     os.rename(path,load_path)
                 end
-                script.load(load_path)
+                if file_ext ==  "loadonkeypress" then
+                    module.tgame.script_manager.scripts[name:sub(1,-16)] = nil
+                    load_path = string.sub(path,1,-16)
+                    os.rename(path,load_path)
+                end
                 module.tgame.script_manager.not_loaded[name] = nil
+                script.load(load_path)
                 printHelpString("Script loaded")
             end
         end
@@ -446,6 +481,7 @@ end
 
 function ShowLoadedScript(script,index)
     fcommon.DropDownMenu(script.name .. "##" .. index,function()
+        local _,file_name,file_ext = string.match(script.path, "(.-)([^\\/]-%.?([^%.\\/]*))$") 
         local authors = ""
         for _,author in ipairs(script.authors) do
             authors = authors .. author .. ", "
@@ -493,13 +529,39 @@ function ShowLoadedScript(script,index)
             imgui.SameLine(0.0,0.0)
             imgui.TextWrapped(script.description)
         end
-        if imgui.Button("Never load##" .. index,imgui.ImVec2(fcommon.GetSize(3))) then
+        imgui.Spacing()
+
+        if script.path:match(".loadonkeypress") then
+            file_name = file_name:sub(1,-16)
+        end
+
+        tcheatmenu.hot_keys.script_manager_temp = module.tgame.script_manager.scripts[file_name] or  tcheatmenu.hot_keys.script_manager_temp
+
+        fcommon.HotKey(tcheatmenu.hot_keys.script_manager_temp,"Load on keypress hotkey")
+        imgui.Spacing()
+        
+        if imgui.Button("Never load##" .. index,imgui.ImVec2(fcommon.GetSize(2))) then
             printHelpString("Script set to never load")
             os.rename(script.path,script.path.. ".neverload")
             script:unload()
         end
         imgui.SameLine()
-        if imgui.Button("Reload##" .. index,imgui.ImVec2(fcommon.GetSize(3))) then
+
+        if imgui.Button("Load on keypress##" .. index,imgui.ImVec2(fcommon.GetSize(2))) then
+            if script.name == thisScript().name then
+                printHelpString("Can't set for Cheat Menu")
+            else
+                module.tgame.script_manager.scripts[file_name] = {tcheatmenu.hot_keys.script_manager_temp[1],tcheatmenu.hot_keys.script_manager_temp[2]}
+                printHelpString("Key set for the script.")
+
+                if not script.path:match(".loadonkeypress") then
+                    os.rename(script.path,script.path.. ".loadonkeypress")
+                end
+                script:unload()
+            end
+        end
+
+        if imgui.Button("Reload##" .. index,imgui.ImVec2(fcommon.GetSize(2))) then
             if script.name == thisScript().name then
                 module.tgame.script_manager.skip_auto_reload = true
             end  
@@ -507,7 +569,7 @@ function ShowLoadedScript(script,index)
             script:reload()
         end
         imgui.SameLine()
-        if imgui.Button("Unload##" .. index,imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Unload##" .. index,imgui.ImVec2(fcommon.GetSize(2))) then
             if script.name == thisScript().name then
                 module.tgame.script_manager.skip_auto_reload = true
             end

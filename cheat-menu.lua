@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.9-wip")
-script_version_number(20200216) -- YYYYMMDD
+script_version_number(20200218) -- YYYYMMDD
 
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
@@ -86,9 +86,15 @@ tcheatmenu       =
         quick_screenshot     = fconfig.Get('tcheatmenu.hot_keys.quick_screenshot',{vkeys.VK_LCONTROL,vkeys.VK_S}),
         quick_spawner        = fconfig.Get('tcheatmenu.hot_keys.quick_spawner',{vkeys.VK_LCONTROL,vkeys.VK_Q}),
         quick_teleport       = fconfig.Get('tcheatmenu.hot_keys.quick_teleport',{vkeys.VK_X,vkeys.VK_Y}),
+        script_manager_temp  = {vkeys.VK_LCONTROL,vkeys.VK_1}
     },
     window       =
     {
+        coord    = 
+        {
+            X    = fconfig.Get('tcheatmenu.window.coord.X',50),
+            Y    = fconfig.Get('tcheatmenu.window.coord.Y',50),
+        },
         show     = imgui.new.bool(false),
         size     =
         {
@@ -147,6 +153,7 @@ function(self) -- render frame
 
     self.LockPlayer = fmenu.tmenu.lock_player[0] 
     imgui.SetNextWindowSize(imgui.ImVec2(tcheatmenu.window.size.X,tcheatmenu.window.size.Y),imgui.Cond.Once)
+    imgui.SetNextWindowPos(imgui.ImVec2(tcheatmenu.window.coord.X,tcheatmenu.window.coord.Y),imgui.Cond.Once)
     imgui.PushStyleVarVec2(imgui.StyleVar.WindowMinSize,imgui.ImVec2(250,350))
 
     local pop = 1
@@ -168,8 +175,11 @@ function(self) -- render frame
     {fteleport.TeleportMain,fmemory.MemoryMain,fplayer.PlayerMain,fped.PedMain,fanimation.AnimationMain,fvehicle.VehicleMain,
     fweapon.WeaponMain,fmission.MissionMain,fstat.StatMain,fgame.GameMain,fvisual.VisualMain,fmenu.MenuMain})
 
-    tcheatmenu.window.size.X = imgui.GetWindowWidth()
-    tcheatmenu.window.size.Y = imgui.GetWindowHeight()
+    tcheatmenu.window.size.X  = imgui.GetWindowWidth()
+    tcheatmenu.window.size.Y  = imgui.GetWindowHeight()
+    tcheatmenu.window.coord.X = imgui.GetWindowPos().x
+    tcheatmenu.window.coord.Y = imgui.GetWindowPos().y
+    
     imgui.End()
     imgui.PopStyleVar(pop)
 end)
@@ -382,6 +392,7 @@ function main()
     lua_thread.create(fplayer.KeepPosition)
     lua_thread.create(fped.PedHealthDisplay)
     lua_thread.create(fgame.FreezeTime)
+    lua_thread.create(fgame.LoadScriptsOnKeyPress)
     lua_thread.create(fgame.SolidWater)
     lua_thread.create(fgame.SyncSystemTime)
     lua_thread.create(fvehicle.AircraftCamera)

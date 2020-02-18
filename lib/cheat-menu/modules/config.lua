@@ -107,6 +107,11 @@ function module.Write()
                 },
                 window =
                 {
+                    coord =
+                    {
+                        X = tcheatmenu.window.coord.X,
+                        Y = tcheatmenu.window.coord.Y,
+                    },
                     size =
                     {
                         X = tcheatmenu.window.size.X,
@@ -134,6 +139,10 @@ function module.Write()
                 freeze_mission_timer= fgame.tgame.freeze_mission_timer[0],
                 freeze_time         = fgame.tgame.freeze_time[0], 
                 random_cheats       = fgame.tgame.random_cheats[0], 
+                script_manager      = 
+                {
+                    scripts         = fgame.tgame.script_manager.scripts,
+                },
                 solid_water         = fgame.tgame.solid_water[0],
                 ss_shortcut         = fgame.tgame.ss_shortcut[0],
                 sync_system_time    = fgame.tgame.sync_system_time[0],
