@@ -80,28 +80,28 @@ function module.MemoryMain()
             imgui.RadioButtonIntPtr("None", module.tmemory.radio_button, 0)
             imgui.SameLine()
             imgui.RadioButtonIntPtr("Car", module.tmemory.radio_button, 1)
-            fcommon.InformationTooltip("Get inside a car to get pointer")
+            fcommon.InformationTooltip("Get pointer of the nearest car")
             imgui.SameLine()
             imgui.RadioButtonIntPtr("Char", module.tmemory.radio_button, 2)
-            fcommon.InformationTooltip("Aim with a gun to get pointer")
+            fcommon.InformationTooltip("Get pointer of the nearest char")
             imgui.Dummy(imgui.ImVec2(0,10))
 
             imgui.Columns(2,nil,false)
             imgui.Text("Memory value : " .. module.tmemory.value[0])
             imgui.NextColumn()
 
-            if module.tmemory.radio_button[0] == fconst.MEMORY_RB.CAR then
-                if isCharInAnyCar(PLAYER_PED) then
-                    local car = getCarCharIsUsing(PLAYER_PED)
+            local car,ped = storeClosestEntities(PLAYER_PED)
+
+            if module.tmemory.radio_button[0] == fconst.MEMORY_RB.CAR then      
+                if car ~= -1 then
                     local pCar = getCarPointer(car)
                     imgui.StrCopy(module.tmemory.address,string.format("0x%8.8X",pCar))
                 end
             end
             if module.tmemory.radio_button[0] == fconst.MEMORY_RB.CHAR then
-                bool, module.tmemory.char_handle =  getCharPlayerIsTargeting(PLAYER_HANDLE)
                 
-                if bool then
-                    local pChar = getCharPointer(module.tmemory.char_handle)
+                if ped ~= -1 then
+                    local pChar = getCharPointer(ped)
                     imgui.StrCopy(module.tmemory.address,string.format("0x%8.8X",pChar))
                 end
             end
@@ -159,24 +159,24 @@ function module.MemoryMain()
             imgui.RadioButtonIntPtr("None", module.tmemory.radio_button, 0)
             imgui.SameLine()
             imgui.RadioButtonIntPtr("Car", module.tmemory.radio_button, 1)
-            fcommon.InformationTooltip("Get inside a car to get pointer")
+            fcommon.InformationTooltip("Get pointer of the nearest car")
             imgui.SameLine()
             imgui.RadioButtonIntPtr("Char", module.tmemory.radio_button, 2)
-            fcommon.InformationTooltip("Aim with a gun to get pointer")
+            fcommon.InformationTooltip("Get pointer of the nearest char")
             imgui.Dummy(imgui.ImVec2(0,10))
 
-            if module.tmemory.radio_button[0] == fconst.MEMORY_RB.CAR then
-                if isCharInAnyCar(PLAYER_PED) then
-                    local car = getCarCharIsUsing(PLAYER_PED)
+            local car,ped = storeClosestEntities(PLAYER_PED)
+
+            if module.tmemory.radio_button[0] == fconst.MEMORY_RB.CAR then      
+                if car ~= -1 then
                     local pCar = getCarPointer(car)
                     imgui.StrCopy(module.tmemory.address,string.format("0x%8.8X",pCar))
                 end
             end
             if module.tmemory.radio_button[0] == fconst.MEMORY_RB.CHAR then
-                bool, module.tmemory.char_handle =  getCharPlayerIsTargeting(PLAYER_HANDLE)
                 
-                if bool then
-                    local pChar = getCharPointer(module.tmemory.char_handle)
+                if ped ~= -1 then
+                    local pChar = getCharPointer(ped)
                     imgui.StrCopy(module.tmemory.address,string.format("0x%8.8X",pChar))
                 end
             end

@@ -242,7 +242,7 @@ function module.CameraMode()
             writeMemory(0xBA6769,1,1,false) -- Hud
 
             restoreCamera()
-            writeMemory((getCharPointer(PLAYER_PED)+1140),4,model_val,false)
+            writeMemory((getCharPointer(PLAYER_PED)+1140),4,module.tgame.camera.model_val,false)
         end
         wait(0)
     end

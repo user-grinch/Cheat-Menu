@@ -100,9 +100,9 @@ function module.Write()
                     camera_mode_x_axis   = tcheatmenu.hot_keys.camera_mode_x_axis,
                     camera_mode_y_axis   = tcheatmenu.hot_keys.camera_mode_y_axis,
                     camera_mode_z_axis   = tcheatmenu.hot_keys.camera_mode_z_axis,
+                    command_window       = tcheatmenu.hot_keys.command_window,
                     menu_open            = tcheatmenu.hot_keys.menu_open,
                     quick_screenshot     = tcheatmenu.hot_keys.quick_screenshot,
-                    quick_spawner        = tcheatmenu.hot_keys.quick_spawner,
                     quick_teleport       = tcheatmenu.hot_keys.quick_teleport,
                 },
                 window =
@@ -217,9 +217,10 @@ function module.Write()
                 gxt_name_table   = fvehicle.tvehicle.gxt_name_table,
                 handling         = module.tconfig.handling, -- Generated runtime
                 heavy            = fvehicle.tvehicle.heavy[0],
-                quick_spawn      = fvehicle.tvehicle.quick_spawn[0],
                 invisible_car    = fvehicle.tvehicle.invisible_car[0],
                 lights           = fvehicle.tvehicle.lights[0],
+                radio_station_id = fvehicle.tvehicle.radio_station_id,
+                radio_station_lock = fvehicle.tvehicle.radio_station_lock[0],
                 lock_speed       = fvehicle.tvehicle.lock_speed[0],
                 no_damage        = fvehicle.tvehicle.no_damage[0],
                 no_vehicles      = fvehicle.tvehicle.no_vehicles[0],
@@ -265,7 +266,6 @@ function module.Write()
                 long_weapon_range = fweapon.tweapon.long_weapon_range[0],
                 no_reload         = fweapon.tweapon.no_reload[0],
                 ped               = fweapon.tweapon.ped[0],
-                quick_spawn       = fweapon.tweapon.quick_spawn[0],
             }, 
         }
     end

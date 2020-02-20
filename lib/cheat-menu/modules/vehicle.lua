@@ -122,7 +122,8 @@ module.tvehicle =
     no_vehicles = imgui.new.bool(fconfig.Get('tvehicle.no_vehicles',false)),
     no_damage = imgui.new.bool(fconfig.Get('tvehicle.no_damage',false)),
     path = tcheatmenu.dir .. "vehicles\\images",
-    quick_spawn  = imgui.new.bool(fconfig.Get('tvehicle.quick_spawn',false)),
+    radio_station_id   = fconfig.Get('tvehicle.radio_station_id',-1),
+    radio_station_lock = imgui.new.bool(fconfig.Get('tvehicle.radio_station_lock',false)),
     random_colors = imgui.new.bool(fconfig.Get('tvehicle.random_colors',false)),
     random_colors_traffic = imgui.new.bool(fconfig.Get('tvehicle.random_colors_traffic',false)),
     spawn_inside = imgui.new.bool(fconfig.Get('tvehicle.spawn_inside',true)),
@@ -178,14 +179,14 @@ function module.GiveVehicleToPlayer(model)
     model = tonumber(model)
     if isModelAvailable(model) then
         x,y,z = getCharCoordinates(PLAYER_PED)
-        if isCharInAnyCar(PLAYER_PED) and module.tvehicle.spawn_inside[0] then
+        if isCharInAnyCar(PLAYER_PED) and ( module.tvehicle.spawn_inside[0]) then
             vehicle = getCarCharIsUsing(PLAYER_PED)
             speed = getCarSpeed(vehicle)
             warpCharFromCarToCoord(PLAYER_PED,x,y,z)
             deleteCar(vehicle)
         end
 
-        if module.tvehicle.aircraft.spawn_in_air[0] and (isThisModelAHeli(model) or isThisModelAPlane(model)) then
+        if (module.tvehicle.aircraft.spawn_in_air[0]) and (isThisModelAHeli(model) or isThisModelAPlane(model)) then
             z = 400
         end
 
@@ -507,9 +508,16 @@ function module.OnEnterVehicle()
             
             imgui.StrCopy(module.tvehicle.gxt_name,model_name)
 
+            -- if module.tvehicle.radio_station_id ~= -1 and module.tvehicle.radio_station_lock[0] == true then
+            --     setRadioChannel(module.tvehicle.radio_station_id)
+            --     printString("TEST",100)
+            -- end
+
             while isCharInCar(PLAYER_PED,car) do
+                module.tvehicle.radio_station_id = getRadioChannel()
                 wait(0)
             end
+
             module.tvehicle.paintjobs.texture = nil
 
         else
@@ -706,8 +714,6 @@ function module.VehicleMain()
                     end
                 end)
 
-                imgui.NextColumn()
-
                 fcommon.CheckBoxFunc("Lights on",module.tvehicle.lights,
                 function()
                     if isCharInAnyCar(PLAYER_PED) then
@@ -725,6 +731,9 @@ function module.VehicleMain()
                         printHelpString("Player ~r~not~w~ in car")
                     end
                 end)
+
+                imgui.NextColumn()
+
                 fcommon.CheckBoxFunc("Lock doors",module.tvehicle.lock_doors,
                 function()
                     if isCharInAnyCar(PLAYER_PED) then
@@ -740,7 +749,7 @@ function module.VehicleMain()
                         printHelpString("Player ~r~not~w~ in car")
                     end
                 end)
-    
+                fcommon.CheckBoxVar("Lock radio station",module.tvehicle.radio_station_lock,"Switches to your recently played station\nwhen you enter a new vehicle")
                 fcommon.CheckBoxVar("New aircraft camera",module.tvehicle.aircraft.camera)
                 fcommon.CheckBoxValue("New train camera",5416239,nil,fconst.TRAIN_CAM_FIX.ON,fconst.TRAIN_CAM_FIX.OFF) 
                 fcommon.CheckBoxVar("No damage",module.tvehicle.no_damage)
@@ -932,9 +941,10 @@ function module.VehicleMain()
 
             imgui.Spacing()
             imgui.Columns(2,nil,false)
-            fcommon.CheckBoxVar("Quick vehicle",module.tvehicle.quick_spawn,string.format("Vehicle can be spawned from quick spawner using %s\n\nControls:\nEnter : Stop reading key press\nDelete : Erase full string\nBackspace : Erase last character",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.quick_spawner)))
             fcommon.CheckBoxVar("Spawn inside",module.tvehicle.spawn_inside,"Spawn inside vehicle as driver")
-
+            imgui.Text("Quick spawn")
+            fcommon.InformationTooltip(string.format("You can quickly spawn vehicles by\n%s > veh {vehicle name/model}",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.command_window)))
+            
             imgui.NextColumn()
             fcommon.CheckBoxVar("Spawn aircraft in air",module.tvehicle.aircraft.spawn_in_air)
             imgui.Columns(1)

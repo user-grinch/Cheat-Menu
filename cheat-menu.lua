@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.9-wip")
-script_version_number(20200218) -- YYYYMMDD
+script_version_number(20200220) -- YYYYMMDD
 
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
@@ -80,11 +80,11 @@ tcheatmenu       =
         camera_mode_x_axis   = fconfig.Get('tcheatmenu.hot_keys.camera_mode_x_axis',{vkeys.VK_X,vkeys.VK_X}),
         camera_mode_y_axis   = fconfig.Get('tcheatmenu.hot_keys.camera_mode_y_axis',{vkeys.VK_Y,vkeys.VK_Y}),
         camera_mode_z_axis   = fconfig.Get('tcheatmenu.hot_keys.camera_mode_z_axis',{vkeys.VK_Z,vkeys.VK_Z}),
+        command_window       = fconfig.Get('tcheatmenu.hot_keys.command_window',{vkeys.VK_LMENU,vkeys.VK_M}),
         currently_active     = nil,
         mc_paste             = fconfig.Get('tcheatmenu.hot_keys.mc_paste',{vkeys.VK_LCONTROL,vkeys.VK_V}),
         menu_open            = fconfig.Get('tcheatmenu.hot_keys.menu_open',{vkeys.VK_LCONTROL,vkeys.VK_M}),
         quick_screenshot     = fconfig.Get('tcheatmenu.hot_keys.quick_screenshot',{vkeys.VK_LCONTROL,vkeys.VK_S}),
-        quick_spawner        = fconfig.Get('tcheatmenu.hot_keys.quick_spawner',{vkeys.VK_LCONTROL,vkeys.VK_Q}),
         quick_teleport       = fconfig.Get('tcheatmenu.hot_keys.quick_teleport',{vkeys.VK_X,vkeys.VK_Y}),
         script_manager_temp  = {vkeys.VK_LCONTROL,vkeys.VK_1}
     },
@@ -277,6 +277,40 @@ function()
 
 end).HideCursor = true
 
+-- Command window
+imgui.OnFrame(function() 
+    return not isGamePaused() and fmenu.tmenu.command.show[0]
+end,
+function()
+
+
+    imgui.SetNextWindowPos(imgui.ImVec2(0, resY-fmenu.tmenu.command.height), imgui.Cond.Always)
+    imgui.SetNextWindowSize(imgui.ImVec2(resX,fmenu.tmenu.command.height))
+
+    local frame_padding  = {imgui.GetStyle().FramePadding.x,imgui.GetStyle().FramePadding.y}
+    local window_padding = {imgui.GetStyle().WindowPadding.x,imgui.GetStyle().WindowPadding.y}
+    imgui.PushStyleVarVec2(imgui.StyleVar.FramePadding, imgui.ImVec2(frame_padding[1],resY/130))
+    imgui.PushStyleVarVec2(imgui.StyleVar.WindowPadding, imgui.ImVec2(3,3))
+
+    imgui.Begin("Command Window", nil, imgui.WindowFlags.NoDecoration + imgui.WindowFlags.AlwaysAutoResize 
+    + imgui.WindowFlags.NoSavedSettings + imgui.WindowFlags.NoMove)
+    imgui.SetNextItemWidth(resX)
+    imgui.SetKeyboardFocusHere(-1)
+    if imgui.InputText("##TEXTFIELD",fmenu.tmenu.command.input_field,ffi.sizeof(fmenu.tmenu.command.input_field),imgui.InputTextFlags.EnterReturnsTrue 
+    or imgui.InputTextFlags.CallbackCompletion or imgui.InputTextFlags.CallbackHistory) then
+        if imgui.IsKeyPressed(vkeys.VK_RETURN,false) then
+            fmenu.tmenu.command.show[0] = not fmenu.tmenu.command.show[0]
+            fmenu.ExecuteCommand()
+            imgui.StrCopy(fmenu.tmenu.command.input_field, "", 1)
+        end
+    end
+    imgui.End()
+
+    imgui.PushStyleVarVec2(imgui.StyleVar.FramePadding, imgui.ImVec2(frame_padding[1],frame_padding[2]))
+    imgui.PushStyleVarVec2(imgui.StyleVar.WindowPadding, imgui.ImVec2(window_padding[1],window_padding[2]))
+
+end).HideCursor = true
+
 function main()
 
     
@@ -381,6 +415,9 @@ function main()
         setGxtEntry(gxt_name,veh_name)
     end
 
+    -- Command window
+    fmenu.RegisterAllCommands()
+
     -- Money text
     -- ffi.copy(ffi.cast("char(*)", fvisual.tvisual.money.negative_memory), ffi.string(fvisual.tvisual.money.negative))
     -- writeMemory(0x58F50A,4,fvisual.tvisual.money.negative_memory,false)
@@ -480,13 +517,6 @@ function main()
             end
         end)
 
-        -- Quick spawner
-        fcommon.OnHotKeyPress(tcheatmenu.hot_keys.quick_spawner,function()
-            if (fvehicle.tvehicle.quick_spawn[0] or fweapon.tweapon.quick_spawn[0]) then
-                fcommon.QuickSpawner()
-            end
-        end)
-
          -- Vehicle functions
         if isCharInAnyCar(PLAYER_PED) then
             local car = getCarCharIsUsing(PLAYER_PED)
@@ -533,6 +563,9 @@ function main()
         -- Menu open close
         fcommon.OnHotKeyPress(tcheatmenu.hot_keys.menu_open,function()
             tcheatmenu.window.show[0] = not tcheatmenu.window.show[0]
+        end)
+        fcommon.OnHotKeyPress(tcheatmenu.hot_keys.command_window,function()
+            fmenu.tmenu.command.show[0] = not fmenu.tmenu.command.show[0]
         end)
 
         wait(0)

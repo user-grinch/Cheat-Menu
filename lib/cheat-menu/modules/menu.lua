@@ -21,6 +21,14 @@ module.tmenu =
 	auto_update_check   = imgui.new.bool(fconfig.Get('tmenu.auto_update_check',true)),
 	auto_reload 		= imgui.new.bool(fconfig.Get('tmenu.auto_reload',true)),
 	auto_scale          = imgui.new.bool(fconfig.Get('tmenu.auto_scale',true)),
+	command             = 
+	{
+		filter          = imgui.ImGuiTextFilter(),
+		height          = 40,
+		input_field     = imgui.new.char[256](),
+		list            = {},
+		show            = imgui.new.bool(false),
+	},
 	crash_text          = "",
 	disable_in_samp		= imgui.new.bool(fconfig.Get('tmenu.disable_in_samp',true)),
 	lock_player   		= imgui.new.bool(fconfig.Get('tmenu.lock_player',false)),
@@ -125,6 +133,152 @@ function module.CheckUpdates()
     end
 end
 
+--------------------------------------------------
+-- Command window
+
+function module.FindArgument(t,string)
+    for k,v in ipairs(t) do
+        if v == string then
+            return true
+        end
+    end
+    return false
+end
+
+function module.RegisterCommand(string,call_back_func,desc,usage)
+    module.tmenu.command.list[string] = {call_back_func,desc,usage}
+end
+
+function module.ExecuteCommand()
+
+    local string = ffi.string(module.tmenu.command.input_field)
+	local t = {}
+	
+    for w in string:gmatch("%S+") do 
+        table.insert(t,w)
+	end
+	
+	for v,k in pairs(module.tmenu.command.list) do
+        if v == t[1] then
+            k[1](t)
+            return
+        end
+	end
+end
+
+function module.RegisterAllCommands()
+
+	module.RegisterCommand("printstring",function(t)
+		local text = ""
+		
+		for i=2,(#t-1),1 do
+			text = text .. " " .. t[i]
+		end
+		printString(text,tonumber(t[#t]))
+	end,"Prints text","{text} {int time}")
+
+	module.RegisterCommand("printhelpstring",function(t)
+		local text = ""
+
+		for i=2,(#t-1),1 do
+			text = text .. " " .. t[i]
+		end
+		printHelpString(text)
+	end,"Prints text in message box","{text}")
+
+	module.RegisterCommand("reload",function(t)
+		thisScript():reload()
+	end,"Reload cheat menu")
+
+	module.RegisterCommand("reloadall",function(t)
+		reloadScripts()
+	end,"Reload all moonloader scripts")
+
+	module.RegisterCommand("teleport",function(t)
+        if t[4] == nil then t[4] = getGroundZFor3dCoord(x,y,100) end
+		fteleport.Teleport(tonumber(t[2]),tonumber(t[3]),tonumber(t[4]))
+	end,"Teleport to coordinates","{int X} {int Y} {int Z}(optional)")
+	
+	module.RegisterCommand("settime",function(t)
+        setTimeOfDay(t[2],t[3])
+        printHelpString("Time set")
+	end,"Sets in-game time","{int hour} {int minute}")
+	
+	module.RegisterCommand("cheatmenu",function(t)
+        tcheatmenu.window.show[0] = not tcheatmenu.window.show[0]
+    end,"Open or close cheat menu")
+
+    module.RegisterCommand("setplayerhealth",function(t)
+       setCharHealth(PLAYER_PED,tonumber(t[2]))
+       printHelpString("Set health to " .. t[2])
+	end,"Sets player health to value","{int health}")
+	
+    module.RegisterCommand("setplayermaxhealth",function(t)
+        setCharMaxHealth(PLAYER_PED,tonumber(t[2]))
+        printHelpString("Set max health to " .. t[2])
+	end,"Sets player max health to value","{int max_health}")
+
+    module.RegisterCommand("getcoordinates",function(t)
+        local x,y,z = getCharCoordinates(PLAYER_PED)
+        printHelpString(string.format("Current coordinates : %s %s %s",math.floor(x),math.floor(y),math.floor(z)))
+	end,"Prints player coordinates")
+	
+    module.RegisterCommand("copycoordinates",function(t)
+        local x,y,z = getCharCoordinates(PLAYER_PED)
+        setClipboardText(string.format("%s %s %s",math.floor(x),math.floor(y),math.floor(z)))
+        printHelpString("Coordinates copied to clipboard")
+    end,"Copies coordinates to clipboard")
+
+    module.RegisterCommand("setcarspeed",function(t)
+        if isCharInAnyCar(PLAYER_PED) then
+            local car = getCarCharIsUsing(PLAYER_PED)
+            setCarForwardSpeed(car,tonumber(t[2]))
+            printHelpString("Car speed set to " ..t[2])
+        else
+            printHelpString("Player is not in any car")
+        end
+    end,"Sets vehicle speed","{int speed}")
+
+    module.RegisterCommand("restorecam",function(t)
+        restoreCamera()
+	end,"Restores camera to default")
+
+	module.RegisterCommand("cameramode",function(t)
+        fgame.tgame.camera.bool[0] = not fgame.tgame.camera.bool[0]
+	end,"Enable or disable camera mode")
+	
+	module.RegisterCommand("veh",function(t)
+        
+		local model = tonumber(t[2])
+
+        if type(model) == "nil" then
+            model = fvehicle.CBaseModelInfo(string.upper(t[2]))  
+            if model == 0 then  
+                printHelpString("Failed to get model from name")
+                return
+            end
+            t[2] = model
+        end
+        fvehicle.GiveVehicleToPlayer(model)
+	end,"Spawns vehicle")
+
+    module.RegisterCommand("wep",function(t)
+        
+        local model = tonumber(t[2])
+
+        if type(model) == "nil" then
+            model = fweapon.CBaseWeaponInfo(string.upper(t[2]))  
+            if model == 0 then  
+                printHelpString("Failed to get model from name")
+                return
+            end
+            t[2] = model
+        end
+        fweapon.GiveWeapon(t[2])
+    end,"Spawns weapon")
+end
+--------------------------------------------------
+
 -- Main function
 function module.MenuMain()
 
@@ -148,42 +302,61 @@ function module.MenuMain()
 			fcommon.CheckBoxVar("Auto reload",module.tmenu.auto_reload,"Reload cheat menu automatically\nin case of a crash")
 			fcommon.CheckBoxVar("Auto scale",module.tmenu.auto_scale,"Automatically scale menu according to size")
 			fcommon.CheckBoxVar("Disable in SAMP",module.tmenu.disable_in_samp,"Using cheats online might ruin\nothers gameply and get you banned")
-			imgui.NextColumn()
 			fcommon.CheckBoxVar("Lock player",module.tmenu.lock_player,"Lock player controls while the menu is open")
 			fcommon.CheckBoxVar("Fast load images",module.tmenu.fast_load_images,"Loads images faster\nThe game will freeze during load")
-			fcommon.CheckBoxVar("Show crash message",module.tmenu.show_crash_message)
-			fcommon.CheckBoxVar("Show tooltips",module.tmenu.show_tooltips)
-			imgui.Columns(1)
 			
-			imgui.EndTabItem()
-		end
-		if imgui.BeginTabItem("Overlay") then
-			imgui.Spacing()
-			imgui.Columns(2,nil,false)
-			fcommon.CheckBoxVar("Show coordinates",module.tmenu.overlay.coordinates)
-			fcommon.CheckBoxVar("Show FPS",module.tmenu.overlay.fps)	
 			imgui.NextColumn()
+
+			fcommon.CheckBoxVar("Show coordinates",module.tmenu.overlay.coordinates)
+			fcommon.CheckBoxVar("Show crash message",module.tmenu.show_crash_message)
+			fcommon.CheckBoxVar("Show FPS",module.tmenu.overlay.fps)	
+			fcommon.CheckBoxVar("Show tooltips",module.tmenu.show_tooltips)
 			fcommon.CheckBoxVar("Show vehicle health",module.tmenu.overlay.health)
 			fcommon.CheckBoxVar("Show vehicle speed",module.tmenu.overlay.speed)
-			imgui.Columns(1)	
-			
+			imgui.Columns(1)
 			imgui.Spacing()
 			imgui.Combo("Position", module.tmenu.overlay.position_index,module.tmenu.overlay.position_array,#module.tmenu.overlay.position)
 			fcommon.InformationTooltip("You can also right click on the\noverlay to access these options")
 			imgui.EndTabItem()
 		end
-		if imgui.BeginTabItem("Hot keys") then
+		if imgui.BeginTabItem("Commands") then
+			imgui.Spacing()
+			module.tmenu.command.filter:Draw("Filter")
+			fcommon.InformationTooltip(string.format("Open command window using %s\nand close using Enter",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.command_window)))
+			imgui.Spacing()
+			imgui.Separator()
+			imgui.Spacing()
+			if imgui.BeginChild("Command entries") then
+				for v,k in fcommon.spairs(module.tmenu.command.list) do
+					if module.tmenu.command.filter:PassFilter(v) and imgui.CollapsingHeader(v) then
+						imgui.Spacing()
+						if k[2] ~= nil then
+							imgui.TextWrapped("Description: " .. k[2])
+						end
+
+						if k[3] == nil then k[3] = "" end
+						imgui.TextWrapped("Usage: " .. v .. " " .. k[3])
+
+						imgui.Separator()
+					end
+				end
+				imgui.EndChild()
+			end
+		
+			imgui.EndTabItem()
+		end
+		if imgui.BeginTabItem("Hotkeys") then
 			
 			imgui.Spacing()
 			if imgui.BeginChild("Hot keys") then
 				fcommon.HotKey(tcheatmenu.hot_keys.menu_open,"Open or close cheat menu")
+				fcommon.HotKey(tcheatmenu.hot_keys.command_window,"Open command window")
 
 				imgui.Dummy(imgui.ImVec2(0,10))
 
 				fcommon.HotKey(tcheatmenu.hot_keys.mc_paste,"Paste memory address")
 				fcommon.HotKey(tcheatmenu.hot_keys.quick_screenshot,"Take quick screenshot")
 				fcommon.HotKey(tcheatmenu.hot_keys.asc_key,"Activate aim skin changer")
-				fcommon.HotKey(tcheatmenu.hot_keys.quick_spawner,"Toggle quick spawner")
 				fcommon.HotKey(tcheatmenu.hot_keys.quick_teleport,"Toggle quick teleport")
 
 				imgui.Dummy(imgui.ImVec2(0,10))
@@ -265,9 +438,8 @@ function module.MenuMain()
 				lua_thread.create(module.CheckUpdates)
 			end
 			imgui.SameLine()
-			if imgui.Button("Copy forum link",imgui.ImVec2(fcommon.GetSize(2))) then
-				imgui.SetClipboardText(script.this.url)
-				printHelpString("Copied to clipboard")
+			if imgui.Button("Goto GitHub repo",imgui.ImVec2(fcommon.GetSize(2))) then
+				os.execute('explorer "https://github.com/user-grinch/Cheat-Menu"')
 			end
 			imgui.Spacing()
 			imgui.Columns(2,nil,false)

@@ -36,49 +36,6 @@ function module.spairs(t, f)
     return iter
 end
 
--- Key spawner used to spawn vehicles & weapons trigger: Ctrl + Q
--- Launched in a separate thread
-function module.QuickSpawner()
-
-    memory.write(0x00969110,0,1)
-    local result = ''
-    while not wasKeyPressed(0x0D) do
-        if #result > 25 then
-            result = ''
-        end
-        if wasKeyPressed(0x2E) then
-            result = ''
-        elseif wasKeyPressed(0x08) then
-            result = result:sub(1, -2)
-        elseif wasKeyPressed(readMemory(0x00969110,1,false)) then
-            result = string.format('%s%s',result,memory.tostring(0x00969110,1,false));
-        end
-
-        printStringNow(string.format('[%s]',result),1500)
-
-        local text = result
-
-        for i = 0,#result,1 do
-
-            local weapon =  fweapon.CBaseWeaponInfo(text)
-
-            if fweapon.tweapon.quick_spawn[0] == true and weapon ~= 0 then
-                fweapon.GiveWeapon(weapon)
-                return
-            end
-
-            local vehicle = fvehicle.CBaseModelInfo(text)
-
-            if fvehicle.tvehicle.quick_spawn[0] == true and vehicle ~= 0 then
-                fvehicle.GiveVehicleToPlayer(vehicle)
-                return
-            end
-            text = text:sub(2)
-        end
-        wait(0)
-    end
-end
-
 --------------------------------------------------
 -- imgui functions
 

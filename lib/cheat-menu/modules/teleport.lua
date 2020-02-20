@@ -32,7 +32,7 @@ function module.Teleport(x, y, z,interior_id)
 	if x == nil then
 		_, x,y,z = getTargetBlipCoordinates()
 	end
-	if module.tteleport.auto_z[0] then
+	if module.tteleport.auto_z[0] or z == nil then
 		z = getGroundZFor3dCoord(x, y, z)
 	end
 
