@@ -124,8 +124,9 @@ function module.Write()
             {
                 camera                    =
                 {
-                    speed              = fgame.tgame.camera.speed[0],
-                    rotation           = 0.0,
+                    fov         = fgame.tgame.camera.fov[0],       
+                    speed       = fgame.tgame.camera.speed[0],
+                    rotation    = 0.0,
                     lock_x_axis = fgame.tgame.camera.lock_x_axis[0],
                     lock_y_axis = fgame.tgame.camera.lock_y_axis[0],
                     lock_z_axis = fgame.tgame.camera.lock_z_axis[0],
@@ -165,7 +166,6 @@ function module.Write()
                     show            = fmenu.tmenu.overlay.show[0],
                     speed           = fmenu.tmenu.overlay.speed[0],
                 },
-                fast_load_images    = fmenu.tmenu.fast_load_images[0],
                 show_tooltips       = fmenu.tmenu.show_tooltips[0],
                 show_crash_message  = fmenu.tmenu.show_crash_message[0],
             },

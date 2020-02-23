@@ -46,7 +46,6 @@ module.tmenu =
 		pos_y           = imgui.new.int(fconfig.Get('tmenu.overlay.pos_y',0)),
 		speed           = imgui.new.bool(fconfig.Get('tmenu.overlay.speed',false)),		
 	},
-	fast_load_images	= imgui.new.bool(fconfig.Get('tmenu.fast_load_images',false)),
 	show_tooltips	    = imgui.new.bool(fconfig.Get('tmenu.show_tooltips',true)),
 	show_crash_message  = imgui.new.bool(fconfig.Get('tmenu.show_crash_message',true)),
 	update_available    = false,
@@ -303,11 +302,10 @@ function module.MenuMain()
 			fcommon.CheckBoxVar("Auto scale",module.tmenu.auto_scale,"Automatically scale menu according to size")
 			fcommon.CheckBoxVar("Disable in SAMP",module.tmenu.disable_in_samp,"Using cheats online might ruin\nothers gameply and get you banned")
 			fcommon.CheckBoxVar("Lock player",module.tmenu.lock_player,"Lock player controls while the menu is open")
-			fcommon.CheckBoxVar("Fast load images",module.tmenu.fast_load_images,"Loads images faster\nThe game will freeze during load")
+			fcommon.CheckBoxVar("Show coordinates",module.tmenu.overlay.coordinates)
 			
 			imgui.NextColumn()
 
-			fcommon.CheckBoxVar("Show coordinates",module.tmenu.overlay.coordinates)
 			fcommon.CheckBoxVar("Show crash message",module.tmenu.show_crash_message)
 			fcommon.CheckBoxVar("Show FPS",module.tmenu.overlay.fps)	
 			fcommon.CheckBoxVar("Show tooltips",module.tmenu.show_tooltips)

@@ -118,14 +118,14 @@ module.MEMORY_RB =
 
 module.DEFAULT_GANG_WEAPONS =
 {
-    {23,28,0}, -- Ballas
-    {23,0,0}, -- Grove
-    {23,0,0}, -- Vagos
+    {22,28,0}, -- Ballas
+    {22,0,0}, -- Grove
+    {22,0,0}, -- Vagos
     {0,0,0}, -- SF Rifa
-    {23,28,0}, -- Da Nang Boys
+    {22,28,0}, -- Da Nang Boys
     {24,0,0}, -- Mafia
-    {23,30,0}, -- Triads
-    {23,28,0}, -- VLA
+    {22,30,0}, -- Triads
+    {22,28,0}, -- VLA
     {0,0,0}, -- Gang 9 
     {0,0,0}, -- Gang 10
 }

@@ -21,8 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("1.9-wip")
-script_version_number(20200220) -- YYYYMMDD
-
+script_version_number(20200223) -- YYYYMMDD
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -129,16 +128,16 @@ imgui.OnInitialize(function() -- Called once
         print("Can't load styles")
     end
 
-    --Loading images
+    -- Indexing images
     lua_thread.create(
-    function() 
-        fcommon.LoadImages(fvehicle.tvehicle.path,fvehicle.tvehicle.images,fconst.VEHICLE.IMAGE_EXT)
-        fcommon.LoadImages(fweapon.tweapon.path,fweapon.tweapon.images,fconst.WEAPON.IMAGE_EXT)
-        fcommon.LoadImages(fvehicle.tvehicle.paintjobs.path,fvehicle.tvehicle.paintjobs.images,fconst.PAINTJOB.IMAGE_EXT)
-        fcommon.LoadImages(fvehicle.tvehicle.components.path,fvehicle.tvehicle.components.images,fconst.COMPONENT.IMAGE_EXT)
-        fcommon.LoadImages(fped.tped.path,fped.tped.images,fconst.PED.IMAGE_EXT)
-        fcommon.LoadImages(fplayer.tplayer.clothes.path,fplayer.tplayer.clothes.images,fconst.CLOTH.IMAGE_EXT)
-    end)
+        function() 
+            fcommon.IndexImages(fvehicle.tvehicle.path,fvehicle.tvehicle.images,fconst.VEHICLE.IMAGE_EXT)
+            fcommon.IndexImages(fweapon.tweapon.path,fweapon.tweapon.images,fconst.WEAPON.IMAGE_EXT)
+            fcommon.IndexImages(fvehicle.tvehicle.paintjobs.path,fvehicle.tvehicle.paintjobs.images,fconst.PAINTJOB.IMAGE_EXT)
+            fcommon.IndexImages(fvehicle.tvehicle.components.path,fvehicle.tvehicle.components.images,fconst.COMPONENT.IMAGE_EXT)
+            fcommon.IndexImages(fped.tped.path,fped.tped.images,fconst.PED.IMAGE_EXT)
+            fcommon.IndexImages(fplayer.tplayer.clothes.path,fplayer.tplayer.clothes.images,fconst.CLOTH.IMAGE_EXT)
+        end)
 
     -- Loading fonts
     fcommon.LoadAndSetFonts()
@@ -317,7 +316,6 @@ function main()
     --------------------------------------------------
     -- Functions that need to lunch only once on startup
 
-
     -- Gang weapons
     for x=1,10,1 do          
         setGangWeapons(x,fweapon.tweapon.gang.used_weapons[x][1],fweapon.tweapon.gang.used_weapons[x][2],fweapon.tweapon.gang.used_weapons[x][3])
@@ -418,6 +416,10 @@ function main()
     -- Command window
     fmenu.RegisterAllCommands()
 
+    -- Camera fov
+    cameraSetLerpFov(getCameraFov(),fgame.tgame.camera.fov[0],1000,true)
+    cameraPersistFov(true) 
+
     -- Money text
     -- ffi.copy(ffi.cast("char(*)", fvisual.tvisual.money.negative_memory), ffi.string(fvisual.tvisual.money.negative))
     -- writeMemory(0x58F50A,4,fvisual.tvisual.money.negative_memory,false)
@@ -442,13 +444,14 @@ function main()
     lua_thread.create(fvehicle.UnlimitedNitro)
 
     --------------------------------------------------
-    
+   
     while true do
         --------------------------------------------------
         -- Functions that neeed to run constantly
 
         --------------------------------------------------
         
+  
         -- Weapons
         local pPed = getCharPointer(PLAYER_PED)
         local CurWeapon = getCurrentCharWeapon(PLAYER_PED)
@@ -586,7 +589,7 @@ function onScriptTerminate(script, quitGame)
                             script.this:reload()
                         end
                     end
-                    fmenu.tmenu.crash_text =  fmenu.tmenu.crash_text .. " and reloaded"
+                    fmenu.tmenu.crash_text =  fmenu.tmenu.crash_text .. " but reloaded"
                 end
             end
         end

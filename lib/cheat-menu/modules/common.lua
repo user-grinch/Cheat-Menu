@@ -18,7 +18,7 @@ local module = {}
 
 module.tcommon = 
 {
-    read_key_press = false, 
+    read_key_press = false,
 }
 
 -- Sorted pairs function
@@ -129,7 +129,18 @@ function module.CreateMenus(names,funcs)
     imgui.PopStyleVar()
     imgui.Dummy(imgui.ImVec2(0,5))
     funcs[tcheatmenu.current_menu]()
-  
+end
+
+
+function LoadImages(image_table)
+
+    for model,image in pairs(image_table) do
+        if type(image) == "string" then
+            image_table[model] = imgui.CreateTextureFromFile(image)
+        end
+        wait(100)
+    end
+    
 end
 
 -- Shows loaded images with on_click and on_hover calls
@@ -138,7 +149,7 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
     -- Calculate image count in a row
     local images_in_row = math.floor(imgui.GetWindowContentRegionWidth()/const_image_width)
 
-    const_image_width = (imgui.GetWindowContentRegionWidth() - imgui.StyleVar.ItemSpacing*(images_in_row-0.5*images_in_row))/images_in_row
+    const_image_width = (imgui.GetWindowContentRegionWidth() - imgui.StyleVar.ItemSpacing*(images_in_row-0.4*images_in_row))/images_in_row
 
     local image_count   = 1
 
@@ -151,29 +162,31 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
         end
 
         if draw_type == fconst.DRAW_TYPE.LIST or filter:PassFilter(model_name) then
-            if imgui.ImageButton(image,imgui.ImVec2(const_image_width,const_image_height),imgui.ImVec2(0,0),imgui.ImVec2(1,1),1,imgui.ImVec4(1,1,1,1),imgui.ImVec4(1,1,1,1)) then
-                func_on_left_click(model)
-            end
-            if imgui.IsMouseClicked(1) and func_on_right_click ~= nil then
-                func_on_right_click(model)
-            end
-        
-            if model_name ~= nil then
-                if imgui.IsItemHovered() then
-                    imgui.BeginTooltip()
-                    if identifier ~= fconst.IDENTIFIER.PAINTJOB and identifier ~= fconst.IDENTIFIER.CLOTH then
-                        imgui.SetTooltip("Model id: " .. model .. "\n" .. model_name)
-                    else
-                        imgui.SetTooltip(model_name)
-                    end
-                    imgui.EndTooltip()
+            if type(image) ~= "string" and (identifier ~= fconst.IDENTIFIER.COMPONENT or fvehicle.IsValidModForVehicle(tonumber(model),getCarPointer(getCarCharIsUsing(PLAYER_PED)))) then
+                if imgui.ImageButton(image,imgui.ImVec2(const_image_width,const_image_height),imgui.ImVec2(0,0),imgui.ImVec2(1,1),1,imgui.ImVec4(1,1,1,1),imgui.ImVec4(1,1,1,1)) then
+                    func_on_left_click(model)
                 end
-            end
+                if imgui.IsMouseClicked(1) and func_on_right_click ~= nil then
+                    func_on_right_click(model)
+                end
+            
+                if model_name ~= nil then
+                    if imgui.IsItemHovered() then
+                        imgui.BeginTooltip()
+                        if identifier ~= fconst.IDENTIFIER.PAINTJOB and identifier ~= fconst.IDENTIFIER.CLOTH then
+                            imgui.SetTooltip("Model id: " .. model .. "\n" .. model_name)
+                        else
+                            imgui.SetTooltip(model_name)
+                        end
+                        imgui.EndTooltip()
+                    end
+                end
 
-            if image_count % images_in_row ~= 0 then
-                imgui.SameLine(0.0,4.0)
+                if image_count % images_in_row ~= 0 then
+                    imgui.SameLine(0.0,4.0)
+                end
+                image_count = image_count + 1
             end
-            image_count = image_count + 1
         end
     end
     -------------------------
@@ -182,23 +195,15 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
     if draw_type == fconst.DRAW_TYPE.LIST then
         if imgui.BeginChild("") then 
             for table_name,image_table in module.spairs(loaded_images_list) do
-                local valid_table = nil
-                for model,image in module.spairs(image_table) do
-                    if identifier ~= fconst.IDENTIFIER.COMPONENT or fvehicle.IsValidModForVehicle(tonumber(model),getCarPointer(getCarCharIsUsing(PLAYER_PED))) then
-                        if valid_table == nil then valid_table = {} end
-                        valid_table[model] = image
+                if imgui.CollapsingHeader(table_name) then
+                    lua_thread.create(LoadImages,image_table)
+                    imgui.Spacing()
+                    for model,image in pairs(image_table) do
+                        draw_image(identifier,valid_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,filter,model,image)
                     end
-                end
-                if valid_table ~= nil then
-                    if imgui.CollapsingHeader(table_name) then
-                        imgui.Spacing()
-                        for model,image in pairs(valid_table) do
-                            draw_image(identifier,valid_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,filter,model,image)
-                        end
-                        imgui.Spacing()
-                        imgui.Separator()
-                        imgui.Spacing()
-                    end
+                    imgui.Spacing()
+                    imgui.Separator()
+                    imgui.Spacing()
                 end
             end
             imgui.EndChild()
@@ -215,6 +220,7 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
 
         if imgui.BeginChild("") then 
             for _,image_table in pairs(loaded_images_list) do
+                lua_thread.create(LoadImages,image_table)
                 for model,image in pairs(image_table) do
                     draw_image(identifier,image_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,filter,model,image)
                 end
@@ -615,8 +621,9 @@ end
 --------------------------------------------------
 -- Misc
 
--- Loads images recursively from root directory
-function module.LoadImages(mainDir,store_image_table,req_ext)
+-- Indexes image paths recursively from root directory
+
+function module.IndexImages(mainDir,store_image_table,req_ext)
     for dir in lfs.dir(mainDir) do
         local dir_path = mainDir .. "\\" .. dir
         if doesDirectoryExist(dir_path) and dir ~= "." and dir ~= ".." then
@@ -629,13 +636,11 @@ function module.LoadImages(mainDir,store_image_table,req_ext)
                         if store_image_table[dir] == nil then
                             store_image_table[dir] = {}
                         end
-                        store_image_table[dir][file_name] = imgui.CreateTextureFromFile(file_path)
+                        store_image_table[dir][file_name] = file_path
                     end
                 end
-                if not fmenu.tmenu.fast_load_images[0] then
-                    wait(0)
-                end
             end
+            wait(0)
         end
     end
 end
@@ -643,7 +648,9 @@ end
 function module.ReleaseImages(main_table)
     for _,image_table in pairs(main_table) do
         for model,image in pairs(image_table) do
-            imgui.ReleaseTexture(image)
+            if type(image) ~= "string" then
+                imgui.ReleaseTexture(image)
+            end
         end
     end
 end

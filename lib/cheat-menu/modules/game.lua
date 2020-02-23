@@ -21,6 +21,7 @@ module.tgame                =
     camera                  =
     {
         bool                = imgui.new.bool(false),
+        fov                 = imgui.new.int(fconfig.Get('tgame.camera.fov',70)),
         lock_x_axis         = imgui.new.bool(fconfig.Get('tgame.camera.lock_x_axis',false)),
         lock_y_axis         = imgui.new.bool(fconfig.Get('tgame.camera.lock_y_axis',false)),
         lock_z_axis         = imgui.new.bool(fconfig.Get('tgame.camera.lock_z_axis',false)),
@@ -733,6 +734,38 @@ function module.GameMain()
                     imgui.SameLine()
                     if imgui.Button("Fast",imgui.ImVec2(fcommon.GetSize(3))) then
                         module.tgame.camera.speed[0] = 3.0
+                    end
+                end)
+                fcommon.DropDownMenu('Camera fov',function()
+                    if imgui.InputInt("FOV",module.tgame.camera.fov) then
+                        if module.tgame.camera.fov[0] > 150 then 
+                            module.tgame.camera.fov[0] = 150
+                        end
+                        if module.tgame.camera.fov[0] < 50 then 
+                            module.tgame.camera.fov[0] = 50
+                        end
+
+                        cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
+                        cameraPersistFov(true) 
+                    end
+
+                    imgui.Spacing()
+                    if imgui.Button("Minimum##fov",imgui.ImVec2(fcommon.GetSize(3))) then
+                        module.tgame.camera.fov[0] = 50
+                        cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
+                        cameraPersistFov(true) 
+                    end
+                    imgui.SameLine()
+                    if imgui.Button("Default##fov",imgui.ImVec2(fcommon.GetSize(3))) then
+                        module.tgame.camera.fov[0] = 70
+                        cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
+                        cameraPersistFov(true) 
+                    end
+                    imgui.SameLine()
+                    if imgui.Button("Maximum##fov",imgui.ImVec2(fcommon.GetSize(3))) then
+                        module.tgame.camera.fov[0] = 150
+                        cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
+                        cameraPersistFov(true) 
                     end
                 end)
                 fcommon.DropDownMenu('Camera options',function()
