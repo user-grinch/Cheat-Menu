@@ -20,8 +20,8 @@ script_description("Cheat Menu for Grand Theft Auto San Andreas")
 script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-menu")
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
-script_version("1.9-wip")
-script_version_number(20200223) -- YYYYMMDD
+script_version("1.9-beta")
+script_version_number(20200227) -- YYYYMMDD
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -105,8 +105,13 @@ tcheatmenu       =
 }
 
 imgui.OnInitialize(function() -- Called once
+    
+    -- Loading fonts
+   fstyle.LoadFonts()
 
-    if not doesFileExist(tcheatmenu.dir .. "json//styles.json") then fstyle.saveStyles(imgui.GetStyle(), "Default") end
+    if not doesFileExist(tcheatmenu.dir .. "json//styles.json") then 
+        fstyle.saveStyles(imgui.GetStyle(), "Default") 
+    end
     
     fstyle.tstyle.status = fstyle.loadStyles() 
 
@@ -114,14 +119,11 @@ imgui.OnInitialize(function() -- Called once
         fstyle.tstyle.list  = fstyle.getStyles()
         fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
 
-        if fstyle.tstyle.selected[0] == -1 then 
-            for i=1,#fstyle.tstyle.list,1 do
-                if fstyle.tstyle.list[i] == "Default" then
-                    fstyle.tstyle.selected[0] = i - 1
-                end
+        for i=1,#fstyle.tstyle.list,1 do
+            if fstyle.tstyle.list[i] == fstyle.tstyle.selected_name then
+                fstyle.tstyle.selected[0] = i - 1
             end
         end
-        print(fstyle.tstyle.selected[0])
 
         fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])
     else 
@@ -130,17 +132,14 @@ imgui.OnInitialize(function() -- Called once
 
     -- Indexing images
     lua_thread.create(
-        function() 
-            fcommon.IndexImages(fvehicle.tvehicle.path,fvehicle.tvehicle.images,fconst.VEHICLE.IMAGE_EXT)
-            fcommon.IndexImages(fweapon.tweapon.path,fweapon.tweapon.images,fconst.WEAPON.IMAGE_EXT)
-            fcommon.IndexImages(fvehicle.tvehicle.paintjobs.path,fvehicle.tvehicle.paintjobs.images,fconst.PAINTJOB.IMAGE_EXT)
-            fcommon.IndexImages(fvehicle.tvehicle.components.path,fvehicle.tvehicle.components.images,fconst.COMPONENT.IMAGE_EXT)
-            fcommon.IndexImages(fped.tped.path,fped.tped.images,fconst.PED.IMAGE_EXT)
-            fcommon.IndexImages(fplayer.tplayer.clothes.path,fplayer.tplayer.clothes.images,fconst.CLOTH.IMAGE_EXT)
-        end)
-
-    -- Loading fonts
-    fcommon.LoadAndSetFonts()
+    function() 
+        fcommon.IndexImages(fvehicle.tvehicle.path,fvehicle.tvehicle.images,fconst.VEHICLE.IMAGE_EXT)
+        fcommon.IndexImages(fweapon.tweapon.path,fweapon.tweapon.images,fconst.WEAPON.IMAGE_EXT)
+        fcommon.IndexImages(fvehicle.tvehicle.paintjobs.path,fvehicle.tvehicle.paintjobs.images,fconst.PAINTJOB.IMAGE_EXT)
+        fcommon.IndexImages(fvehicle.tvehicle.components.path,fvehicle.tvehicle.components.images,fconst.COMPONENT.IMAGE_EXT)
+        fcommon.IndexImages(fped.tped.path,fped.tped.images,fconst.PED.IMAGE_EXT)
+        fcommon.IndexImages(fplayer.tplayer.clothes.path,fplayer.tplayer.clothes.images,fconst.CLOTH.IMAGE_EXT)
+    end)
 end)
 
 -- Menu window
@@ -158,7 +157,7 @@ function(self) -- render frame
     local pop = 1
     if fmenu.tmenu.auto_scale[0] then
         imgui.PushStyleVarVec2(imgui.StyleVar.FramePadding,imgui.ImVec2(math.floor(tcheatmenu.window.size.X/85),math.floor(tcheatmenu.window.size.Y/200)))
-        pop = pop +1
+        pop = pop + 1
     end
     imgui.Begin(tcheatmenu.window.title, tcheatmenu.window.show,imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoSavedSettings)
 
@@ -211,7 +210,8 @@ function()
     end
 
     imgui.PushStyleVarFloat(imgui.StyleVar.Alpha,0.65)
-    imgui.Begin("", nil, flags)
+    imgui.PushStyleVarVec2(imgui.StyleVar.WindowMinSize,imgui.ImVec2(0,0))
+    imgui.Begin("Overlay", nil, flags)
     
         if fmenu.tmenu.overlay.fps[0] then
             imgui.Text("Frames :" .. tostring(math.floor(imgui.GetIO().Framerate)))
@@ -273,6 +273,7 @@ function()
             fmenu.tmenu.overlay.pos_y[0] = imgui.GetWindowPos().y
         end
     imgui.End()
+    imgui.PopStyleVar()
 
 end).HideCursor = true
 
@@ -318,7 +319,7 @@ function main()
 
     -- Gang weapons
     for x=1,10,1 do          
-        setGangWeapons(x,fweapon.tweapon.gang.used_weapons[x][1],fweapon.tweapon.gang.used_weapons[x][2],fweapon.tweapon.gang.used_weapons[x][3])
+        setGangWeapons(x-1,fweapon.tweapon.gang.used_weapons[x][1],fweapon.tweapon.gang.used_weapons[x][2],fweapon.tweapon.gang.used_weapons[x][3])
     end
 
     -- Invisible player

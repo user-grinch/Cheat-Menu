@@ -172,7 +172,7 @@ function module.Write()
             tstyle =
             {
             --    font            = fstyle.tstyle.font[0],
-                selected        = fstyle.tstyle.selected[0],
+                selected_name   = fstyle.tstyle.selected_name,
             },
             tped  =
             {
@@ -218,6 +218,7 @@ function module.Write()
                 handling         = module.tconfig.handling, -- Generated runtime
                 heavy            = fvehicle.tvehicle.heavy[0],
                 invisible_car    = fvehicle.tvehicle.invisible_car[0],
+                license_plate_text = ffi.string(fvehicle.tvehicle.license_plate_text),
                 lights           = fvehicle.tvehicle.lights[0],
                 radio_station_id = fvehicle.tvehicle.radio_station_id,
                 radio_station_lock = fvehicle.tvehicle.radio_station_lock[0],

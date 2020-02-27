@@ -36,6 +36,7 @@ module.tvehicle =
     },
     components =
     {
+        filter = imgui.ImGuiTextFilter(),
         images = {},
         list   = {},
         names  =
@@ -106,6 +107,7 @@ module.tvehicle =
     heavy = imgui.new.bool(fconfig.Get('tvehicle.heavy',false)),
     images = {},
     invisible_car = imgui.new.bool(fconfig.Get('tvehicle.invisible_car',false)),
+    license_plate_text = imgui.new.char[9](fconfig.Get('tvehicle.license_plate_text',"GTA__SAN")),
     lights = imgui.new.bool(fconfig.Get('tvehicle.lights',false)),
     lock_doors = imgui.new.bool(false),
     lock_speed = imgui.new.bool(fconfig.Get('tvehicle.lock_speed',false)),
@@ -165,7 +167,7 @@ end
 
 -- Returns name of vehicle
 function module.GetModelName(id)
-    local name = getNameOfVehicleModel(tonumber(id))
+    local name = getNameOfVehicleModel(tonumber(id)) or module.tvehicle.names[id]
 
     if name ~= nil then
         return string.format("Gxt name: %s\nModel name: %s",getGxtText(name),name) 
@@ -219,7 +221,7 @@ function module.GiveVehicleToPlayer(model)
         else
             requestModel(model)
             loadAllModelsNow()
-
+            customPlateForNextCar(model,ffi.string(module.tvehicle.license_plate_text))
             if not module.tvehicle.spawn_inside[0] then
                 vehicle = spawnVehicleByCheating(model)
             else
@@ -665,7 +667,7 @@ end
 -- Main function
 function module.VehicleMain()
     imgui.Spacing()
-
+    
     if imgui.Button("Repair vehicle",imgui.ImVec2(fcommon.GetSize(2))) then
         if isCharInAnyCar(PLAYER_PED) then
             local car = getCarCharIsUsing(PLAYER_PED)
@@ -823,6 +825,10 @@ function module.VehicleMain()
                     else
                         imgui.Text("No near by vehicles")
                     end
+                end)
+                fcommon.DropDownMenu("License plate text",function()
+                    imgui.InputText("Text", module.tvehicle.license_plate_text,ffi.sizeof(module.tvehicle.license_plate_text))
+fcommon.InformationTooltip("The text of vehicle license plate\nwhich you spawn using cheat-menu")
                 end)
 
                 fcommon.DropDownMenu("Traffic options",function()
@@ -1119,7 +1125,7 @@ function module.VehicleMain()
                 imgui.Spacing()
                 if imgui.BeginChild("Tune") then
                     imgui.Spacing()
-                    fcommon.DrawImages(fconst.IDENTIFIER.COMPONENT,fconst.DRAW_TYPE.LIST,module.tvehicle.components.images,fconst.COMPONENT.IMAGE_HEIGHT,fconst.COMPONENT.IMAGE_WIDTH,module.AddComponentToVehicle,module.RemoveComponentFromVehicle,nil,module.tvehicle.filter)
+                    fcommon.DrawImages(fconst.IDENTIFIER.COMPONENT,fconst.DRAW_TYPE.LIST,module.tvehicle.components.images,fconst.COMPONENT.IMAGE_HEIGHT,fconst.COMPONENT.IMAGE_WIDTH,module.AddComponentToVehicle,module.RemoveComponentFromVehicle,nil,module.tvehicle.components.filter)
                     imgui.EndChild()
                 end
                 imgui.EndTabItem()

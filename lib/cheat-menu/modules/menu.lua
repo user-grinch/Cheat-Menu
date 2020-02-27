@@ -97,7 +97,7 @@ function module.CheckUpdates()
 			http  = require 'copas.http'
 			end) then
 
-		if string.find( script.this.version,"wip") then
+		if string.find( script.this.version,"beta") then
 			link = "https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/cheat-menu.lua"
 		else
 			link = "https://api.github.com/repos/user-grinch/Cheat-Menu/tags"
@@ -106,7 +106,7 @@ function module.CheckUpdates()
 		httpRequest(link, nil, function(body, code, headers, status)
 			if body then
 				print(link, 'OK', status)
-				if string.find( script.this.version,"wip") then
+				if string.find( script.this.version,"beta") then
 					repo_version = body:match("script_version_number%((%d+)%)")
 					this_version = script.this.version_num
 				else
@@ -167,24 +167,6 @@ end
 
 function module.RegisterAllCommands()
 
-	module.RegisterCommand("printstring",function(t)
-		local text = ""
-		
-		for i=2,(#t-1),1 do
-			text = text .. " " .. t[i]
-		end
-		printString(text,tonumber(t[#t]))
-	end,"Prints text","{text} {int time}")
-
-	module.RegisterCommand("printhelpstring",function(t)
-		local text = ""
-
-		for i=2,(#t-1),1 do
-			text = text .. " " .. t[i]
-		end
-		printHelpString(text)
-	end,"Prints text in message box","{text}")
-
 	module.RegisterCommand("reload",function(t)
 		thisScript():reload()
 	end,"Reload cheat menu")
@@ -193,7 +175,7 @@ function module.RegisterAllCommands()
 		reloadScripts()
 	end,"Reload all moonloader scripts")
 
-	module.RegisterCommand("teleport",function(t)
+	module.RegisterCommand("tp",function(t)
         if t[4] == nil then t[4] = getGroundZFor3dCoord(x,y,100) end
 		fteleport.Teleport(tonumber(t[2]),tonumber(t[3]),tonumber(t[4]))
 	end,"Teleport to coordinates","{int X} {int Y} {int Z}(optional)")
@@ -207,20 +189,15 @@ function module.RegisterAllCommands()
         tcheatmenu.window.show[0] = not tcheatmenu.window.show[0]
     end,"Open or close cheat menu")
 
-    module.RegisterCommand("setplayerhealth",function(t)
+    module.RegisterCommand("sethealth",function(t)
        setCharHealth(PLAYER_PED,tonumber(t[2]))
        printHelpString("Set health to " .. t[2])
 	end,"Sets player health to value","{int health}")
 	
-    module.RegisterCommand("setplayermaxhealth",function(t)
+    module.RegisterCommand("setmaxhealth",function(t)
         setCharMaxHealth(PLAYER_PED,tonumber(t[2]))
         printHelpString("Set max health to " .. t[2])
 	end,"Sets player max health to value","{int max_health}")
-
-    module.RegisterCommand("getcoordinates",function(t)
-        local x,y,z = getCharCoordinates(PLAYER_PED)
-        printHelpString(string.format("Current coordinates : %s %s %s",math.floor(x),math.floor(y),math.floor(z)))
-	end,"Prints player coordinates")
 	
     module.RegisterCommand("copycoordinates",function(t)
         local x,y,z = getCharCoordinates(PLAYER_PED)
@@ -247,7 +224,11 @@ function module.RegisterAllCommands()
 	end,"Enable or disable camera mode")
 	
 	module.RegisterCommand("veh",function(t)
-        
+		if t[2] == nil then 
+			printHelpString("No vehicle name/model provided") 
+			return 
+		end
+
 		local model = tonumber(t[2])
 
         if type(model) == "nil" then
@@ -256,13 +237,24 @@ function module.RegisterAllCommands()
                 printHelpString("Failed to get model from name")
                 return
             end
-            t[2] = model
-        end
-        fvehicle.GiveVehicleToPlayer(model)
-	end,"Spawns vehicle")
+		end
+		
+		if isThisModelABoat(model) 
+		or isThisModelACar(model)
+		or isThisModelAHeli(model)
+		or isThisModelAPlane(model) then
+			fvehicle.GiveVehicleToPlayer(model)
+		else
+			printHelpString("This is not a vehicle model")
+		end
+	end,"Spawns vehicle","{vehicle name/model}")
 
     module.RegisterCommand("wep",function(t)
-        
+		if t[2] == nil then 
+			printHelpString("No weapon name/id provided") 
+			return 
+		end
+
         local model = tonumber(t[2])
 
         if type(model) == "nil" then
@@ -274,7 +266,7 @@ function module.RegisterAllCommands()
             t[2] = model
         end
         fweapon.GiveWeapon(t[2])
-    end,"Spawns weapon")
+    end,"Spawns weapon","{vehicle name/id}")
 end
 --------------------------------------------------
 
@@ -388,8 +380,9 @@ function module.MenuMain()
 					imgui.SameLine()
 					if imgui.Button("Save style",imgui.ImVec2(fcommon.GetSize(2))) then
 						fstyle.saveStyles(imgui.GetStyle(), ffi.string(fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]))
-						fstyle.tstyle.list = fstyle.getStyles()
+						fstyle.tstyle.list  = fstyle.getStyles()
 						fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
+						
 					end
 				end
 
@@ -407,6 +400,7 @@ function module.MenuMain()
 					
 					if imgui.Combo('Select style', fstyle.tstyle.selected, fstyle.tstyle.array, #fstyle.tstyle.list) then
 						fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])
+						fstyle.tstyle.selected_name = fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]
 					end
 					
 					fstyle.StyleEditor()

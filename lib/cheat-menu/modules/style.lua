@@ -24,11 +24,12 @@ module.tstyle =
 {
     array          = nil,
     alpha_flags    = imgui.new.int(0),
---    font           = imgui.new.char[256]("verdana"),
+    fonts          = {},
     list           = nil,
     name           = imgui.new.char[256]("Untitled"),
     preparetoapply = false,
-    selected       = imgui.new.int(fconfig.Get('tstyle.selected',-1)),
+    selected       = imgui.new.int(0),
+    selected_name  = fconfig.Get('tstyle.selected_name',"Default"),
     status         = nil,
     styles_table   = {},
 }
@@ -69,8 +70,7 @@ local _ImGuiStyle =
     'AntiAliasedLines',           -- Enable anti-aliasing on lines/borders. Disable if you are really tight on CPU/GPU.
     'AntiAliasedFill',            -- Enable anti-aliasing on filled shapes (rounded rectangles, circles, etc.)
     'CurveTessellationTol',       -- Tessellation tolerance when using PathBezierCurveTo() without a specific number of segments. Decrease for highly tessellated curves (higher quality, more polygons), increase to reduce quality.
-    'Colors'
-
+    'Colors',
 };
 
 local _ImGuiCol =
@@ -154,6 +154,9 @@ function module.applyStyle(style, stylename)
                 end
                 break
             end
+            if v == 'Font' then
+                break
+            end
             if tostring(module.tstyle.styles_table[stylename][v]):find("(%d+) (%d+)") then
                 local n = split(module.tstyle.styles_table[stylename][v], " ")
                 style[v] = imgui.ImVec2(tonumber(n[1]), tonumber(n[2]))
@@ -161,6 +164,9 @@ function module.applyStyle(style, stylename)
                 style[v] = tonumber(module.tstyle.styles_table[stylename][v])
             end
         end
+
+        imgui.GetIO().FontDefault = fstyle.tstyle.fonts[module.tstyle.styles_table[stylename]["Font"]]
+
         return true
     end
     return false
@@ -175,6 +181,17 @@ function module.loadStyles()
     end
 
     return module.tstyle.preparetoapply
+end
+
+function module.LoadFonts()
+    local mask = tcheatmenu.dir .. "fonts//*.ttf"
+
+    local handle, name = findFirstFile(mask)
+
+    while handle and name do
+        fstyle.tstyle.fonts[name] = imgui.GetIO().Fonts:AddFontFromFileTTF(string.format( "%sfonts//%s",tcheatmenu.dir,name), 14)
+        name = findNextFile(handle)
+    end
 end
 
 function module.StyleEditor()
@@ -192,29 +209,29 @@ function module.StyleEditor()
             imgui.Spacing()
 
             imgui.Columns(2,nil,false)
-            var = imgui.new.bool((style.ChildBorderSize > 0.0) and true or false)
+            var = imgui.new.bool((style.ChildBorderSize > 0.0) or false)
             if imgui.Checkbox("Child border", var) then 
                 style.ChildBorderSize = var[0] and 1.0 or 0.0
             end
         
-            var = imgui.new.bool((style.FrameBorderSize > 0.0) and true or false)
+            var = imgui.new.bool((style.FrameBorderSize > 0.0) or false)
             if imgui.Checkbox("Frame border", var) then 
                 style.FrameBorderSize = var[0] and 1.0 or 0.0
             end
         
-            var = imgui.new.bool((style.PopupBorderSize > 0.0) and true or false)
+            var = imgui.new.bool((style.PopupBorderSize > 0.0) or false)
             if imgui.Checkbox("Popup border", var) then 
                 style.PopupBorderSize = var[0] and 1.0 or 0.0
             end
         
             imgui.NextColumn()
         
-            var = imgui.new.bool((style.TabBorderSize > 0.0) and true or false)
+            var = imgui.new.bool((style.TabBorderSize > 0.0) or false)
             if imgui.Checkbox("Tab border", var) then 
                 style.TabBorderSize = var[0] and 1.0 or 0.0
             end
         
-            var = imgui.new.bool((style.WindowBorderSize > 0.0) and true or false)
+            var = imgui.new.bool((style.WindowBorderSize > 0.0) or false)
             if imgui.Checkbox("Window border", var) then
                 style.WindowBorderSize = var[0] and 1.0 or 0.0
             end
@@ -224,6 +241,7 @@ function module.StyleEditor()
             imgui.EndTabItem();
         end
         if imgui.BeginTabItem("Colors") then
+           
 
             local int output_dest = 0;
             local bool output_only_modified = true;
@@ -430,6 +448,8 @@ function module.saveStyles( style, stylename )
         end
         module.tstyle.styles_table[stylename][v] = type(style[v]) == 'cdata' and (style[v].x.." "..style[v].y) or style[v]
     end
+
+    module.tstyle.styles_table[stylename]["Font"] = memory.tostring(imgui.GetFont():GetDebugName()):sub(1,-7)
     
     return fcommon.SaveJson("styles",module.tstyle.styles_table) and true or false
 end

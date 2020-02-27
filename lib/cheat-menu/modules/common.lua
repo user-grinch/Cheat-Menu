@@ -162,30 +162,32 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
         end
 
         if draw_type == fconst.DRAW_TYPE.LIST or filter:PassFilter(model_name) then
-            if type(image) ~= "string" and (identifier ~= fconst.IDENTIFIER.COMPONENT or fvehicle.IsValidModForVehicle(tonumber(model),getCarPointer(getCarCharIsUsing(PLAYER_PED)))) then
-                if imgui.ImageButton(image,imgui.ImVec2(const_image_width,const_image_height),imgui.ImVec2(0,0),imgui.ImVec2(1,1),1,imgui.ImVec4(1,1,1,1),imgui.ImVec4(1,1,1,1)) then
-                    func_on_left_click(model)
-                end
-                if imgui.IsMouseClicked(1) and func_on_right_click ~= nil then
-                    func_on_right_click(model)
-                end
-            
-                if model_name ~= nil then
-                    if imgui.IsItemHovered() then
-                        imgui.BeginTooltip()
-                        if identifier ~= fconst.IDENTIFIER.PAINTJOB and identifier ~= fconst.IDENTIFIER.CLOTH then
-                            imgui.SetTooltip("Model id: " .. model .. "\n" .. model_name)
-                        else
-                            imgui.SetTooltip(model_name)
-                        end
-                        imgui.EndTooltip()
+            if type(image) ~= "string" then
+                if identifier ~= fconst.IDENTIFIER.COMPONENT or fvehicle.IsValidModForVehicle(tonumber(model),getCarPointer(getCarCharIsUsing(PLAYER_PED))) then
+                    if imgui.ImageButton(image,imgui.ImVec2(const_image_width,const_image_height),imgui.ImVec2(0,0),imgui.ImVec2(1,1),1,imgui.ImVec4(1,1,1,1),imgui.ImVec4(1,1,1,1)) then
+                        func_on_left_click(model)
                     end
-                end
+                    if imgui.IsMouseClicked(1) and func_on_right_click ~= nil then
+                        func_on_right_click(model)
+                    end
+                
+                    if model_name ~= nil then
+                        if imgui.IsItemHovered() then
+                            imgui.BeginTooltip()
+                            if identifier ~= fconst.IDENTIFIER.PAINTJOB and identifier ~= fconst.IDENTIFIER.CLOTH then
+                                imgui.SetTooltip("Model id: " .. model .. "\n" .. model_name)
+                            else
+                                imgui.SetTooltip(model_name)
+                            end
+                            imgui.EndTooltip()
+                        end
+                    end
 
-                if image_count % images_in_row ~= 0 then
-                    imgui.SameLine(0.0,4.0)
+                    if image_count % images_in_row ~= 0 then
+                        imgui.SameLine(0.0,4.0)
+                    end
+                    image_count = image_count + 1
                 end
-                image_count = image_count + 1
             end
         end
     end
@@ -195,7 +197,16 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
     if draw_type == fconst.DRAW_TYPE.LIST then
         if imgui.BeginChild("") then 
             for table_name,image_table in module.spairs(loaded_images_list) do
-                if imgui.CollapsingHeader(table_name) then
+                local show = true
+                if identifier == fconst.IDENTIFIER.COMPONENT then
+                    show = false
+                    for model,image in pairs(image_table) do
+                        if fvehicle.IsValidModForVehicle(tonumber(model),getCarPointer(getCarCharIsUsing(PLAYER_PED))) then
+                            show = true
+                        end
+                    end
+                end
+                if show and imgui.CollapsingHeader(table_name) then
                     lua_thread.create(LoadImages,image_table)
                     imgui.Spacing()
                     for model,image in pairs(image_table) do
@@ -583,20 +594,6 @@ end
 
 --------------------------------------------------
 -- Functions for loading & saving files
-
-function module.LoadAndSetFonts()
-    local mask = tcheatmenu.dir .. "fonts//*.ttf"
-
-    local handle, name = findFirstFile(mask)
-
-    while handle and name do
-        local font = imgui.GetIO().Fonts:AddFontFromFileTTF(string.format( "%sfonts//%s",tcheatmenu.dir,name), 14)
-        name = findNextFile(handle)
-        --if name == fstyle.tstyle.font then
-        --    imgui.GetIO().FontDefault = font
-        --end
-    end
-end
 
 function module.LoadJson(filename)
     local full_path = tcheatmenu.dir .. "json//" .. filename .. ".json"
