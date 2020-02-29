@@ -28,7 +28,7 @@ module.tplayer =
     filter              = imgui.ImGuiTextFilter(),
     god                 = imgui.new.bool(fconfig.Get('tplayer.god',false)),
     invisible           = imgui.new.bool(fconfig.Get('tplayer.invisible',false)),
-    keep_position       = imgui.new.bool(fconfig.Get('tplayer.keep_stuff',false)),
+    keep_position       = imgui.new.bool(fconfig.Get('tplayer.keep_position',false)),
     model_val           = nil,
     never_wanted        = imgui.new.bool(false),
 }
