@@ -34,11 +34,11 @@ Now try it out in-game. If it doesn't work open an issue here or create a post i
 
 ## Keyboard shortcuts
 
-1. <kbd>Left Ctrl</kbd> + <kbd>M</kbd> - open the menu in-game (must be enabled)
-2. <kbd>Left Ctrl</kbd> + <kbd>Q</kbd> - start quick vehicle/weapon spawner (must be enabled)
-3. <kbd>Left Ctrl</kbd> + <kbd>S</kbd> - take quick screenshot (must be enabled)
-4. <kbd>X</kbd> + <kbd>Y</kbd> - quick teleport (must be enabled)
-5. Aim a ped + <kbd>Enter/Return</kbd> - aim skin changer (must be enabled)
+1. <kbd>Left Ctrl</kbd> + <kbd>M</kbd> - open the menu in-game 
+2. <kbd>Left Ctrl</kbd> + <kbd>Q</kbd> - start quick vehicle/weapon spawner 
+3. <kbd>Left Ctrl</kbd> + <kbd>S</kbd> - take quick screenshot 
+4. <kbd>X</kbd> + <kbd>Y</kbd> - quick teleport 
+5. Aim a ped + <kbd>Enter/Return</kbd> - aim skin changer 
 
 ### Camera mode shortcuts
 1. <kbd>W</kbd> - go forward
@@ -55,10 +55,14 @@ Now try it out in-game. If it doesn't work open an issue here or create a post i
 
 ## Images
 
-![Image](https://i.imgur.com/4H0xAff.jpg)
-![Image](https://i.imgur.com/wVUqbYC.jpg)
-![Image](https://i.imgur.com/0C0FQU3.jpg)
-![Image](https://i.imgur.com/Fjqd2hi.jpg)
+![Cheat Menu logo](https://i.imgur.com/fZ71SbF.png)
+![Image](https://i.imgur.com/Y7iYbUo.jpg)
+![Image](https://i.imgur.com/RwaSaSg.jpg)
+![Image](https://i.imgur.com/7EYPtDn.jpg)
+![Image](https://i.imgur.com/dYiIxo7.jpg)
+![Image](https://i.imgur.com/Uf24JGR.jpg)
+![Image](https://i.imgur.com/s7V6FOv.jpg)
+![Image](https://i.imgur.com/1SgP0KV.jpg)
 
 
 ## Video
@@ -66,7 +70,7 @@ Now try it out in-game. If it doesn't work open an issue here or create a post i
 [![Youtue Video](https://img.youtube.com/vi/XF1bhn74s2M/0.jpg)](https://www.youtube.com/watch?v=XF1bhn74s2M)
 
 
-## Docs
+## Docs 
 
 ### Adding custom peds/skins images
 - Required version 1.8-wip and above
