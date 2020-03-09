@@ -209,26 +209,6 @@ function WantedLevelMenu()
     end)
 end
 
-function SkinChangerMenu()
-    imgui.Spacing()
-    fcommon.CheckBoxVar("Aim skin changer", module.tplayer.aimSkinChanger)
-    fcommon.InformationTooltip("Activate using, Aim ped +".. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.asc_key))
-
-    imgui.Spacing()
-    if imgui.BeginTabBar("Skins") then
-        if imgui.BeginTabItem("List") then
-            fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.LIST,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.ChangePlayerModel,nil,fped.GetModelName,module.tplayer.filter)
-            imgui.EndTabItem()
-        end
-        if imgui.BeginTabItem("Search") then
-            imgui.Spacing()
-            fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.SEARCH,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.ChangePlayerModel,nil,fped.GetModelName,module.tplayer.filter)
-            imgui.EndTabItem()
-        end
-        imgui.EndTabBar()
-    end
-end
-
 --------------------------------------------------
 -- Cloth functions
 
@@ -256,10 +236,8 @@ function module.PlayerMain()
     end
     imgui.Spacing()
 
-    if imgui.BeginTabBar('Player') then
-
-        if imgui.BeginTabItem("Checkbox") then
-            imgui.Spacing()
+    fcommon.Tabs("Player",{"Checkboxes","Menus","Skins","Clothes"},{
+        function()
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxValue("Aim while driving",0x969179)
             fcommon.CheckBoxVar("God mode",module.tplayer.god)
@@ -300,30 +278,24 @@ function module.PlayerMain()
             end)
            
             imgui.Columns(1)
-
-            imgui.Spacing()
-            imgui.Separator()
-            imgui.Spacing()
-            imgui.Text("Body")
-            if imgui.RadioButtonIntPtr("Fat",module.tplayer.cjBody,1) then
-                callFunction(0x439110,1,1,false)
-                fcommon.CheatActivated()
-            end
-            if imgui.RadioButtonIntPtr("Muscle",module.tplayer.cjBody,2) then
-                -- body not changing to muscular after changing to fat fix
-                callFunction(0x439190,1,1,false)
-                callFunction(0x439150,1,1,false)
-                fcommon.CheatActivated()
-            end
-            if imgui.RadioButtonIntPtr("Skinny",module.tplayer.cjBody,3) then
-                callFunction(0x439190,1,1,false)
-                fcommon.CheatActivated()
-            end
-            imgui.EndTabItem()
-        end
-        if imgui.BeginTabItem("Menu") then
-            imgui.Spacing()
-            
+        end,
+        function()
+            fcommon.DropDownMenu("Body",function()
+                if imgui.RadioButtonIntPtr("Fat",module.tplayer.cjBody,1) then
+                    callFunction(0x439110,1,1,false)
+                    fcommon.CheatActivated()
+                end
+                if imgui.RadioButtonIntPtr("Muscle",module.tplayer.cjBody,2) then
+                    -- body not changing to muscular after changing to fat fix
+                    callFunction(0x439190,1,1,false)
+                    callFunction(0x439150,1,1,false)
+                    fcommon.CheatActivated()
+                end
+                if imgui.RadioButtonIntPtr("Skinny",module.tplayer.cjBody,3) then
+                    callFunction(0x439190,1,1,false)
+                    fcommon.CheatActivated()
+                end
+            end)
             fcommon.UpdateStat({ name = "Energy",stat = 165})
             fcommon.UpdateStat({ name = "Fat",stat = 21})
             HealthArmour()
@@ -333,35 +305,31 @@ function module.PlayerMain()
             fcommon.UpdateStat({ name = "Respect",stat = 68,max = 2450}) 
             fcommon.UpdateStat({ name = "Stamina",stat = 22})
             WantedLevelMenu()
+        end,
+        function()
+            fcommon.CheckBoxVar("Aim skin changer", module.tplayer.aimSkinChanger)
+            fcommon.InformationTooltip("Activate using, Aim ped +".. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.asc_key))
 
-            imgui.EndTabItem()
-        end
-        if imgui.BeginTabItem("Skin") then
-            SkinChangerMenu()
-            imgui.EndTabItem()
-        end
-        if imgui.BeginTabItem("Clothes") then
             imgui.Spacing()
+            fcommon.Tabs("Skins",{"List","Search"},{
+                function()
+                    fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.LIST,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.ChangePlayerModel,nil,fped.GetModelName,module.tplayer.filter)
+                end,
+                function()
+                    fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.SEARCH,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.ChangePlayerModel,nil,fped.GetModelName,module.tplayer.filter)
+                end
+            })
+        end,
+        function()
             if imgui.Button("Remove clothes",imgui.ImVec2(fcommon.GetSize(1))) then
                 for i=0, 17 do givePlayerClothes(PLAYER_HANDLE,0,0,i) end
                 buildPlayerModel(PLAYER_HANDLE)
                 printHelpString("Clothes ~r~removed")
             end
-            imgui.Spacing()
-
-            if imgui.BeginTabBar("Clothes") then
-                imgui.Spacing()
-                
-                if imgui.BeginTabItem("List") then
-                    fcommon.DrawImages(fconst.IDENTIFIER.CLOTH,fconst.DRAW_TYPE.LIST,module.tplayer.clothes.images,fconst.CLOTH.IMAGE_HEIGHT,fconst.CLOTH.IMAGE_WIDTH,module.ChangePlayerCloth,nil,module.GetClothName)
-                    imgui.EndTabItem()
-                end 
-                imgui.EndTabBar()
-            end
-            imgui.EndTabItem()
+            imgui.Spacing()          
+            fcommon.DrawImages(fconst.IDENTIFIER.CLOTH,fconst.DRAW_TYPE.LIST,module.tplayer.clothes.images,fconst.CLOTH.IMAGE_HEIGHT,fconst.CLOTH.IMAGE_WIDTH,module.ChangePlayerCloth,nil,module.GetClothName)
         end
-        imgui.EndTabBar()
-    end
+    })
 end
 
 return module

@@ -618,11 +618,9 @@ function module.GameMain()
         setClipboardText(string.format( "%d,%d,%d",x,y,z))
         printHelpString("Coordinates copied")
     end
-    imgui.Spacing()
-    if imgui.BeginTabBar("Game") then
-
-        if imgui.BeginTabItem("Checkbox") then
-            imgui.Spacing()
+    
+    fcommon.Tabs("Game",{"Checkboxes","Menus","Cheats","Script manager"},{
+        function()
             imgui.Columns(2,nil,false)
 
             fcommon.CheckBoxFunc("Disable cheats",module.tgame.disable_cheats,
@@ -684,159 +682,144 @@ function module.GameMain()
             imgui.Columns(1)
 
             imgui.Spacing()
-            imgui.Separator()
-            imgui.Spacing()
 
             SetCurrentWeekday()
             SetWeather()
             imgui.Spacing()
             fcommon.RadioButton('Game themes',{'Beach','Country','Fun house','Ninja'},{0x969159,0x96917D,0x969176,0x96915C})
-            imgui.EndTabItem()
-        end
+        end,
+        function()
+            fcommon.DropDownMenu('Camera mode',function()
+                imgui.Columns(2,nil,false)
+                fcommon.CheckBoxVar("Camera mode ##Checkbox",module.tgame.camera.bool,
+                string.format("Keyboard controls:\n\nForward: %s\nBackward: %s\n\nRotation: Mouse\n \
+                \n%s : X axis up\n%s + %s : X axis down \
+                \n%s : Y axis up \n%s + %s : Y axis down \
+                \n%s : Z axis up\n%s + %s : Z axis down",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_forward),
+                fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_backward),
+                fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_x_axis),
+                fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_flip),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_x_axis),
+                fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_y_axis),
+                fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_flip),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_y_axis),
+                fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_z_axis),
+                fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_flip),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_z_axis)))
 
-        if imgui.BeginTabItem('Menu') then
-            if imgui.BeginChild("Game") then
+                fcommon.CheckBoxVar("Lock X axis",module.tgame.camera.lock_x_axis,
+                "Disables auto movement of x axis.\nMovement still possible through input keys")
+                imgui.NextColumn()
+                fcommon.CheckBoxVar("Lock Y axis",module.tgame.camera.lock_y_axis,
+                "Disables auto movement of y axis\nMovement still possible through input keys")
+                fcommon.CheckBoxVar("Lock Z axis",module.tgame.camera.lock_z_axis,
+                "Disables auto movement of z axis\nMovement still possible through input keys")
+                imgui.Columns(1)
                 imgui.Spacing()
-
-                fcommon.DropDownMenu('Camera mode',function()
-                    imgui.Columns(2,nil,false)
-                    fcommon.CheckBoxVar("Camera mode ##Checkbox",module.tgame.camera.bool,
-                    string.format("Keyboard controls:\n\nForward: %s\nBackward: %s\n\nRotation: Mouse\n \
-                    \n%s : X axis up\n%s + %s : X axis down \
-                    \n%s : Y axis up \n%s + %s : Y axis down \
-                    \n%s : Z axis up\n%s + %s : Z axis down",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_forward),
-                    fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_backward),
-                    fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_x_axis),
-                    fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_flip),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_x_axis),
-                    fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_y_axis),
-                    fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_flip),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_y_axis),
-                    fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_z_axis),
-                    fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_flip),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_z_axis)))
-
-                    fcommon.CheckBoxVar("Lock X axis",module.tgame.camera.lock_x_axis,
-                    "Disables auto movement of x axis.\nMovement still possible through input keys")
-                    imgui.NextColumn()
-                    fcommon.CheckBoxVar("Lock Y axis",module.tgame.camera.lock_y_axis,
-                    "Disables auto movement of y axis\nMovement still possible through input keys")
-                    fcommon.CheckBoxVar("Lock Z axis",module.tgame.camera.lock_z_axis,
-                    "Disables auto movement of z axis\nMovement still possible through input keys")
-                    imgui.Columns(1)
-                    imgui.Spacing()
-                    imgui.InputFloat("Speed",module.tgame.camera.speed)
-                    imgui.Spacing()
-                    if imgui.Button("Slow",imgui.ImVec2(fcommon.GetSize(3))) then
-                        module.tgame.camera.speed[0] = 0.03
-                    end
-                    imgui.SameLine()
-                    if imgui.Button("Normal",imgui.ImVec2(fcommon.GetSize(3))) then
-                        module.tgame.camera.speed[0] = 0.3
-                    end
-                    imgui.SameLine()
-                    if imgui.Button("Fast",imgui.ImVec2(fcommon.GetSize(3))) then
-                        module.tgame.camera.speed[0] = 3.0
-                    end
-                end)
-                fcommon.DropDownMenu('Camera fov',function()
-                    if imgui.InputInt("FOV",module.tgame.camera.fov) then
-                        if module.tgame.camera.fov[0] > 150 then 
-                            module.tgame.camera.fov[0] = 150
-                        end
-                        if module.tgame.camera.fov[0] < 50 then 
-                            module.tgame.camera.fov[0] = 50
-                        end
-
-                        cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
-                        cameraPersistFov(true) 
-                    end
-
-                    imgui.Spacing()
-                    if imgui.Button("Minimum##fov",imgui.ImVec2(fcommon.GetSize(3))) then
-                        module.tgame.camera.fov[0] = 50
-                        cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
-                        cameraPersistFov(true) 
-                    end
-                    imgui.SameLine()
-                    if imgui.Button("Default##fov",imgui.ImVec2(fcommon.GetSize(3))) then
-                        module.tgame.camera.fov[0] = 70
-                        cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
-                        cameraPersistFov(true) 
-                    end
-                    imgui.SameLine()
-                    if imgui.Button("Maximum##fov",imgui.ImVec2(fcommon.GetSize(3))) then
+                imgui.InputFloat("Speed",module.tgame.camera.speed)
+                imgui.Spacing()
+                if imgui.Button("Slow",imgui.ImVec2(fcommon.GetSize(3))) then
+                    module.tgame.camera.speed[0] = 0.03
+                end
+                imgui.SameLine()
+                if imgui.Button("Normal",imgui.ImVec2(fcommon.GetSize(3))) then
+                    module.tgame.camera.speed[0] = 0.3
+                end
+                imgui.SameLine()
+                if imgui.Button("Fast",imgui.ImVec2(fcommon.GetSize(3))) then
+                    module.tgame.camera.speed[0] = 3.0
+                end
+            end)
+            fcommon.DropDownMenu('Camera fov',function()
+                if imgui.InputInt("FOV",module.tgame.camera.fov) then
+                    if module.tgame.camera.fov[0] > 150 then 
                         module.tgame.camera.fov[0] = 150
-                        cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
-                        cameraPersistFov(true) 
                     end
-                end)
-                fcommon.DropDownMenu('Camera options',function()
-                    -- if imgui.Button("Follow nearest ped",imgui.ImVec2(fcommon.GetSize(2))) then
-                    --     local veh, ped = storeClosestEntities(PLAYER_PED)
-                    --     lua_thread.create(FollowPed,ped)
-                        
-                    -- end
-                    -- imgui.SameLine()
-                    -- if imgui.Button("Follow nearest vehicle",imgui.ImVec2(fcommon.GetSize(2))) then
-                        
-                    -- end
-
-                    if imgui.Button("Restore camera",imgui.ImVec2(fcommon.GetSize(1))) then
-                        restoreCamera()
+                    if module.tgame.camera.fov[0] < 50 then 
+                        module.tgame.camera.fov[0] = 50
                     end
-                end)
 
-                fcommon.UpdateAddress({name = 'Days passed',address = 0xB79038 ,size = 4,min = 0,max = 9999})
+                    cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
+                    cameraPersistFov(true) 
+                end
 
-                fcommon.DropDownMenu('FPS',function()
-
-                    imgui.Columns(2,nil,false)
-                    imgui.Text("Minimum" .. " = 1")
+                imgui.Spacing()
+                if imgui.Button("Minimum##fov",imgui.ImVec2(fcommon.GetSize(3))) then
+                    module.tgame.camera.fov[0] = 50
+                    cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
+                    cameraPersistFov(true) 
+                end
+                imgui.SameLine()
+                if imgui.Button("Default##fov",imgui.ImVec2(fcommon.GetSize(3))) then
+                    module.tgame.camera.fov[0] = 70
+                    cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
+                    cameraPersistFov(true) 
+                end
+                imgui.SameLine()
+                if imgui.Button("Maximum##fov",imgui.ImVec2(fcommon.GetSize(3))) then
+                    module.tgame.camera.fov[0] = 150
+                    cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
+                    cameraPersistFov(true) 
+                end
+            end)
+            fcommon.DropDownMenu('Camera options',function()
+                -- if imgui.Button("Follow nearest ped",imgui.ImVec2(fcommon.GetSize(2))) then
+                --     local veh, ped = storeClosestEntities(PLAYER_PED)
+                --     lua_thread.create(FollowPed,ped)
                     
-                    imgui.NextColumn()
-                    imgui.Text("Maximum" .. " = 999")
-                    imgui.Columns(1)
+                -- end
+                -- imgui.SameLine()
+                -- if imgui.Button("Follow nearest vehicle",imgui.ImVec2(fcommon.GetSize(2))) then
+                    
+                -- end
 
-                    imgui.PushItemWidth(imgui.GetWindowWidth()-50)
-                    if imgui.InputInt('Set',module.tgame.fps_limit) then
-                        memory.write(0xC1704C,(module.tgame.fps_limit[0]+1),1)
-                        memory.write(0xBA6794,1,1)
-                    end
-                    if module.tgame.fps_limit[0] < 1 then
-                        module.tgame.fps_limit[0] = 1
-                    end
+                if imgui.Button("Restore camera",imgui.ImVec2(fcommon.GetSize(1))) then
+                    restoreCamera()
+                end
+            end)
 
-                    imgui.PopItemWidth()
+            fcommon.UpdateAddress({name = 'Days passed',address = 0xB79038 ,size = 4,min = 0,max = 9999})
 
-                    imgui.Spacing()
-                    if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(3))) then
-                        memory.write(0xC1704C,1,1)
-                        memory.write(0xBA6794,1,1)
-                        module.tgame.fps_limit[0] = 1
-                    end
-                    imgui.SameLine()
-                    if imgui.Button("Default",imgui.ImVec2(fcommon.GetSize(3))) then
-                        memory.write(0xC1704C,30,1)
-                        memory.write(0xBA6794,1,1)
-                        module.tgame.fps_limit[0] = 30
-                    end
-                    imgui.SameLine()
-                    if imgui.Button("Maximum",imgui.ImVec2(fcommon.GetSize(3))) then
-                        memory.write(0xBA6794,0,1)
-                        module.tgame.fps_limit[0] = 999
-                    end
-                end)
-                fcommon.UpdateAddress({name = 'Game speed',address = 0xB7CB64,size = 4,max = 10,min = 0, is_float =true, default = 1})
-                fcommon.UpdateAddress({name = 'Gravity',address = 0x863984,size = 4,max = 1,min = -1, default = 0.008,cvalue = 0.001 ,is_float = true})
-                SetTime()
+            fcommon.DropDownMenu('FPS',function()
+
+                imgui.Columns(2,nil,false)
+                imgui.Text("Minimum" .. " = 1")
                 
-                imgui.EndChild()
-            end
-            imgui.EndTabItem()
-        end
+                imgui.NextColumn()
+                imgui.Text("Maximum" .. " = 999")
+                imgui.Columns(1)
 
-        if imgui.BeginTabItem('Cheats') then
-            imgui.Spacing()
-            
-            imgui.BeginChild("Cheats")
+                imgui.PushItemWidth(imgui.GetWindowWidth()-50)
+                if imgui.InputInt('Set',module.tgame.fps_limit) then
+                    memory.write(0xC1704C,(module.tgame.fps_limit[0]+1),1)
+                    memory.write(0xBA6794,1,1)
+                end
+                if module.tgame.fps_limit[0] < 1 then
+                    module.tgame.fps_limit[0] = 1
+                end
+
+                imgui.PopItemWidth()
+
+                imgui.Spacing()
+                if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(3))) then
+                    memory.write(0xC1704C,1,1)
+                    memory.write(0xBA6794,1,1)
+                    module.tgame.fps_limit[0] = 1
+                end
+                imgui.SameLine()
+                if imgui.Button("Default",imgui.ImVec2(fcommon.GetSize(3))) then
+                    memory.write(0xC1704C,30,1)
+                    memory.write(0xBA6794,1,1)
+                    module.tgame.fps_limit[0] = 30
+                end
+                imgui.SameLine()
+                if imgui.Button("Maximum",imgui.ImVec2(fcommon.GetSize(3))) then
+                    memory.write(0xBA6794,0,1)
+                    module.tgame.fps_limit[0] = 999
+                end
+            end)
+            fcommon.UpdateAddress({name = 'Game speed',address = 0xB7CB64,size = 4,max = 10,min = 0, is_float =true, default = 1})
+            fcommon.UpdateAddress({name = 'Gravity',address = 0x863984,size = 4,max = 1,min = -1, default = 0.008,cvalue = 0.001 ,is_float = true})
+            SetTime()
+        end,
+        function()
             CheatsEntry({0x439110,0x439150,0x439190},nil,{'Body','Fat','Muscle','Skinny'})
             CheatsEntry({0x438E40,0x438FF0},nil,{'Fight','Health, armour\n200K money','Suicide'})
             CheatsEntry({0x438F90,0x438FC0},nil,{'Gameplay','Faster','Slower'})
@@ -851,12 +834,8 @@ function module.GameMain()
             CheatsEntry({0x439540,0x4391D0,0x439F60,0x4395A0,0x439880},{0x969168,0x969157},{'Misc','Stop clock','Elvis\neverywhere','Countryside\ninvasion','Predator','Adrenaline'})
             CheatsEntry({0x438E90,0x438F20,0x4396F0,0x4396C0},{nil,nil,nil,0x969171},{'Wanted level','+2Star','Clear stars','Six star','Never wanted'})
             CheatsEntry({0x4385B0,0x438890,0x438B30},nil,{'Weapons','Set1','Set2','Set3'})
-            imgui.EndChild()
-            imgui.EndTabItem()
-        end
-        if imgui.BeginTabItem('Script Manager') then
-            
-            imgui.Spacing()
+        end,
+        function()
             if imgui.Button("Reload all scripts",imgui.ImVec2(fcommon.GetSize(1))) then
                 fgame.tgame.script_manager.skip_auto_reload = true
                 reloadScripts()
@@ -869,8 +848,6 @@ function module.GameMain()
 
                 local filter = imgui.ImGuiTextFilter()
                 filter:Draw("Filter")
-                imgui.Spacing()
-                imgui.Separator()
                 imgui.Spacing()
                 
                 for index, script in ipairs(script.list()) do
@@ -886,10 +863,8 @@ function module.GameMain()
                 end
 				imgui.EndChild()
 			end
-            imgui.EndTabItem()
         end
-        imgui.EndTabBar()
-    end
+    })
 end
 
 return module

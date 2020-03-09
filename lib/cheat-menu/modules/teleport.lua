@@ -33,10 +33,11 @@ function module.Teleport(x, y, z,interior_id)
 		_, x,y,z = getTargetBlipCoordinates()
 	end
 	if module.tteleport.auto_z[0] or z == nil then
+		z = 100
 		z = getGroundZFor3dCoord(x, y, z)
 	end
 
-	if interior_id == nil then
+	if interior_id == nil or interior_id == 0 then
 		interior_id = 0
 		z = z+3 -- +3.0 to prevent player from teleporting under map
 	end
@@ -67,16 +68,14 @@ end
 -- Main function
 function module.TeleportMain()
 
-	if imgui.BeginTabBar("Teleport") then
-
-        if imgui.BeginTabItem("Teleport") then	-- Teleport tab
-            imgui.Spacing()
-            imgui.Columns(2,nil,false)
+	fcommon.Tabs("Teleport",{"Teleport","Search","Custom"},{
+		function()
+			imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Get Z coordinates",module.tteleport.auto_z,"Get ground Z of your coordinates")
 			fcommon.CheckBoxVar("Insert coordinates",module.tteleport.insert_coords,"Insert current coordinates")
 			imgui.NextColumn()
 			fcommon.CheckBoxVar("Quick teleport",module.tteleport.shortcut,"Teleport to marker using" ..  fcommon.GetHotKeyNames(tcheatmenu.hot_keys.quick_teleport))
-            imgui.Columns(1)
+			imgui.Columns(1)
 
             if imgui.InputText("Coordinates",module.tteleport.coords,ffi.sizeof(module.tteleport.coords)) then end
 
@@ -96,15 +95,10 @@ function module.TeleportMain()
             if imgui.Button("Teleport to marker",imgui.ImVec2(fcommon.GetSize(2))) then
                 module.Teleport()
             end
-            imgui.EndTabItem()
-        end
-		if imgui.BeginTabItem("Search") then -- Search tab
-			imgui.Spacing()
-
+		end,
+		function()
 			module.tteleport.filter:Draw("Filter")
 			fcommon.InformationTooltip("Right click over any of these entries to remove them")
-			imgui.Spacing()
-			imgui.Separator()
 			imgui.Spacing()
 
 			if imgui.BeginChild("Teleport entries") then
@@ -117,11 +111,8 @@ function module.TeleportMain()
 				end
 				imgui.EndChild()
 			end
-            imgui.EndTabItem()
-		end
-
-		if imgui.BeginTabItem("Custom") then -- Add  custom locations tab
-			imgui.Spacing()
+		end,
+		function()
 			imgui.Columns(1)
 			if imgui.InputText("Location name",module.tteleport.coord_name,ffi.sizeof(module.tteleport.coords)) then end
 			if imgui.InputText("Coordinates",module.tteleport.coords,ffi.sizeof(module.tteleport.coords)) then end
@@ -141,10 +132,8 @@ function module.TeleportMain()
 				module.tteleport.coordinates = fcommon.LoadJson("coordinate")
 				printHelpString("Entry ~g~added")
             end
-            imgui.EndTabItem()
 		end
-        imgui.EndTabBar()
-    end
+	})
 end
 
 return module

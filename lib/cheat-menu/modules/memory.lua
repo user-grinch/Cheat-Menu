@@ -71,10 +71,8 @@ function module.MemoryMain()
         imgui.StrCopy(module.tmemory.address, imgui.GetClipboardText(),ffi.sizeof(module.tmemory.address))
     end)
 
-    if imgui.BeginTabBar("Memory") then
-        if imgui.BeginTabItem("Read") then
-
-            imgui.Spacing()
+    fcommon.Tabs("Memory",{"Read","Write","Search","Custom"},{
+        function()
             imgui.Text("Pointer")
             imgui.SameLine()
             imgui.RadioButtonIntPtr("None", module.tmemory.radio_button, 0)
@@ -148,12 +146,8 @@ function module.MemoryMain()
                 module.tmemory.radio_button[0] = 0
                 printHelpString("Entries cleared")
             end
-
-            imgui.EndTabItem()
-        end
-
-        if imgui.BeginTabItem("Write") then
-            imgui.Spacing()
+        end,
+        function()
             imgui.Text("Pointer")
             imgui.SameLine()
             imgui.RadioButtonIntPtr("None", module.tmemory.radio_button, 0)
@@ -223,17 +217,10 @@ function module.MemoryMain()
                 module.tmemory.radio_button[0] = 0
                 printHelpString("Entries cleared")
             end
-            
-
-            imgui.EndTabItem()
-        end
-        if imgui.BeginTabItem("Search") then
-
-            imgui.Spacing()
+        end,
+        function()
             module.tmemory.filter:Draw("Filter")
             fcommon.InformationTooltip("Right click over any of these entries to remove them")
-            imgui.Spacing()
-            imgui.Separator()
             imgui.Spacing()
 
             if imgui.BeginChild("Stat Entries") then
@@ -246,11 +233,8 @@ function module.MemoryMain()
                 imgui.Spacing()
                 imgui.EndChild()
             end
-
-            imgui.EndTabItem()
-        end
-        if imgui.BeginTabItem("Custom") then    -- Add custom memory tab
-            imgui.Spacing()
+        end,
+        function()
             if imgui.InputText("Name",module.tmemory.name,ffi.sizeof(module.tmemory.name)) then end
             if imgui.InputText("Address",module.tmemory.address,ffi.sizeof(module.tmemory.address)) then end
             imgui.SliderInt("Size", module.tmemory.size,1,4)
@@ -277,11 +261,9 @@ function module.MemoryMain()
                 fcommon.SaveJson("memory",module.tmemory.list)
                 module.tmemory.list = fcommon.LoadJson("memory")
                 printHelpString("Address ~g~added")
-            end
-            imgui.EndTabItem()
         end
-        imgui.EndTabBar()
-    end
+    end})
+
 end
 
 return module

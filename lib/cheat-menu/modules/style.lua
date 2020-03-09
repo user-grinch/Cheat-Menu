@@ -202,12 +202,8 @@ function module.StyleEditor()
     imgui.ShowFontSelector("Fonts##Selector")
     imgui.Spacing()
 
-    if imgui.BeginTabBar("##tabs") then
-
-        if imgui.BeginTabItem("Borders") then
-
-            imgui.Spacing()
-
+    fcommon.Tabs("Style",{"Borders","Colors","Sizes"},{
+        function()
             imgui.Columns(2,nil,false)
             var = imgui.new.bool((style.ChildBorderSize > 0.0) or false)
             if imgui.Checkbox("Child border", var) then 
@@ -219,17 +215,17 @@ function module.StyleEditor()
                 style.FrameBorderSize = var[0] and 1.0 or 0.0
             end
         
+            imgui.NextColumn()
+
             var = imgui.new.bool((style.PopupBorderSize > 0.0) or false)
             if imgui.Checkbox("Popup border", var) then 
                 style.PopupBorderSize = var[0] and 1.0 or 0.0
             end
         
-            imgui.NextColumn()
-        
-            var = imgui.new.bool((style.TabBorderSize > 0.0) or false)
-            if imgui.Checkbox("Tab border", var) then 
-                style.TabBorderSize = var[0] and 1.0 or 0.0
-            end
+            -- var = imgui.new.bool((style.TabBorderSize > 0.0) or false)
+            -- if imgui.Checkbox("Tab border", var) then 
+            --     style.TabBorderSize = var[0] and 1.0 or 0.0
+            -- end
         
             var = imgui.new.bool((style.WindowBorderSize > 0.0) or false)
             if imgui.Checkbox("Window border", var) then
@@ -237,12 +233,8 @@ function module.StyleEditor()
             end
 
             imgui.Columns(1)
-
-            imgui.EndTabItem();
-        end
-        if imgui.BeginTabItem("Colors") then
-           
-
+        end,
+        function()
             local int output_dest = 0;
             local bool output_only_modified = true;
 
@@ -299,11 +291,8 @@ function module.StyleEditor()
             end
             imgui.PopItemWidth();
             imgui.EndChild();
-
-            imgui.EndTabItem();
-        end
-        if imgui.BeginTabItem("Sizes") then
-
+        end,
+        function()
             imgui.BeginChild("##sizes");
             imgui.PushItemWidth(imgui.GetWindowWidth() * 0.50);
 
@@ -400,10 +389,10 @@ function module.StyleEditor()
                 style.ScrollbarRounding = var[0]
             end
 
-            var = imgui.new.float(style.TabRounding)
-            if imgui.SliderFloat("Tab rounding", var, 0.0, 12.0, "%.0f") then
-                style.TabRounding = var[0]
-            end
+            -- var = imgui.new.float(style.TabRounding)
+            -- if imgui.SliderFloat("Tab rounding", var, 0.0, 12.0, "%.0f") then
+            --     style.TabRounding = var[0]
+            -- end
 
             var = imgui.new.float(style.WindowRounding)
             if imgui.SliderFloat("Window rounding", var, 0.0, 12.0, "%.0f") then
@@ -429,10 +418,8 @@ function module.StyleEditor()
 
             imgui.PopItemWidth()
             imgui.EndChild()
-            imgui.EndTabItem();
         end
-        imgui.EndTabBar();
-    end
+    })
 end
 
 
@@ -448,7 +435,6 @@ function module.saveStyles( style, stylename )
         end
         module.tstyle.styles_table[stylename][v] = type(style[v]) == 'cdata' and (style[v].x.." "..style[v].y) or style[v]
     end
-
     module.tstyle.styles_table[stylename]["Font"] = memory.tostring(imgui.GetFont():GetDebugName()):sub(1,-7)
     
     return fcommon.SaveJson("styles",module.tstyle.styles_table) and true or false

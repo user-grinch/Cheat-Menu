@@ -20,8 +20,8 @@ script_description("Cheat Menu for Grand Theft Auto San Andreas")
 script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-menu")
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
-script_version("1.9")
-script_version_number(20200229) -- YYYYMMDD
+script_version("2.0-beta")
+script_version_number(20200309) -- YYYYMMDD
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -41,9 +41,19 @@ memory        = require 'memory'
 os            = require 'os'
 vkeys         = require 'vkeys'
 
+-- External scripts
+gsx           = import 'gsx-data.lua'
+
+-- Menu modules
 fcommon       = require 'cheat-menu.modules.common'
 fconfig       = require 'cheat-menu.modules.config'
 fconst        = require 'cheat-menu.modules.const'
+
+if not fconfig.Get("tmenu.debug.read_config",true) then
+    local debug = fconfig.Get("tmenu.debug",{})
+    fconfig.tconfig.read = {}
+    fconfig.Set(fconfig.tconfig.read,"tmenu.debug",debug)
+end
 
 fanimation    = require 'cheat-menu.modules.animation'
 fgame         = require 'cheat-menu.modules.game'
@@ -69,7 +79,7 @@ resX, resY = getScreenResolution()
 tcheatmenu       =
 {   
     dir          = tcheatmenu.dir,
-    current_menu = fconfig.Get('tcheatmenu.current_menu',1),
+    current_menu = fconfig.Get('tcheatmenu.current_menu',0),
     hot_keys     =
     {
         asc_key              = fconfig.Get('tcheatmenu.hot_keys.asc',{vkeys.VK_RETURN,vkeys.VK_RETURN}),
@@ -87,6 +97,8 @@ tcheatmenu       =
         quick_teleport       = fconfig.Get('tcheatmenu.hot_keys.quick_teleport',{vkeys.VK_X,vkeys.VK_Y}),
         script_manager_temp  = {vkeys.VK_LCONTROL,vkeys.VK_1}
     },
+    read_key_press = false,
+    tab_data     = {},
     window       =
     {
         coord    = 
@@ -142,7 +154,6 @@ imgui.OnInitialize(function() -- Called once
     end)
 end)
 
--- Menu window
 imgui.OnFrame(
 function() -- condition
     return tcheatmenu.window.show[0] and not isGamePaused() 
@@ -156,22 +167,58 @@ function(self) -- render frame
 
     local pop = 1
     if fmenu.tmenu.auto_scale[0] then
-        imgui.PushStyleVarVec2(imgui.StyleVar.FramePadding,imgui.ImVec2(math.floor(tcheatmenu.window.size.X/85),math.floor(tcheatmenu.window.size.Y/200)))
-        pop = pop + 1
+       imgui.PushStyleVarVec2(imgui.StyleVar.FramePadding,imgui.ImVec2(math.floor(tcheatmenu.window.size.X/85),math.floor(tcheatmenu.window.size.Y/200)))
+       pop = pop + 1
     end
-    imgui.Begin(tcheatmenu.window.title, tcheatmenu.window.show,imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoSavedSettings)
+    imgui.Begin(tcheatmenu.window.title, tcheatmenu.window.show,imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoSavedSettings )
 
-    if fmenu.tmenu.update_available then
-        imgui.Spacing()
-        if imgui.Button(string.format( "New version available | Click to hide"), imgui.ImVec2(fcommon.GetSize(1))) then
-            fmenu.tmenu.update_available = false
-        end
-        imgui.Spacing()            
-    end
 
     fcommon.CreateMenus({"Teleport","Memory","Player","Ped","Animation","Vehicle","Weapon","Mission","Stat","Game","Visual","Menu"},
     {fteleport.TeleportMain,fmemory.MemoryMain,fplayer.PlayerMain,fped.PedMain,fanimation.AnimationMain,fvehicle.VehicleMain,
     fweapon.WeaponMain,fmission.MissionMain,fstat.StatMain,fgame.GameMain,fvisual.VisualMain,fmenu.MenuMain})
+    
+    -- Welcome page
+    if tcheatmenu.current_menu == 0 then
+
+        if imgui.BeginChild("Welcome") then
+            imgui.Dummy(imgui.ImVec2(0,10))
+            imgui.TextWrapped("Welcome to " .. tcheatmenu.window.title)
+            imgui.Dummy(imgui.ImVec2(0,10))
+            imgui.TextWrapped("Please configure the settings below,\n(Recommanded settings are already applied)")
+            imgui.Dummy(imgui.ImVec2(0,20))
+
+            if fstyle.tstyle.status then	
+                if imgui.Combo('Select style', fstyle.tstyle.selected, fstyle.tstyle.array, #fstyle.tstyle.list) then
+                    fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])
+                    fstyle.tstyle.selected_name = fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]
+                end
+            end
+            imgui.Spacing()
+            fcommon.HotKey(tcheatmenu.hot_keys.menu_open,"Cheat Menu open/close hotkey")
+
+            imgui.Dummy(imgui.ImVec2(0,10))
+
+            imgui.Columns(2,nil,false)
+            fcommon.CheckBoxVar("Auto reload",fmenu.tmenu.auto_reload,"Reload cheat menu automatically\nin case of a crash.\n\nMight cause crash loop sometimes.")
+            fcommon.CheckBoxVar("Check for updates",fmenu.tmenu.auto_update_check)
+            fcommon.InformationTooltip("Cheat Menu will automatically check for updates\nonline. This requires an internet connection and\
+will download files from github repository.\n\nRequires Moonloader version 0.27 or above.")
+            imgui.NextColumn()
+            fcommon.CheckBoxVar("Fast load images",fmenu.tmenu.fast_load_images,"Loads vehicles, weapons, peds etc. images\nat menu startup.\n \
+This may increase game startup time or\nfreeze it for few seconds.")
+            fcommon.CheckBoxVar("Show tooltips",fmenu.tmenu.show_tooltips)
+            fcommon.InformationTooltip("Shows usage tips beside options.")
+            imgui.Columns(1)
+            imgui.Spacing()
+            imgui.TextWrapped("You can configure everything here anytime from the 'Menu' section.")
+            if getMoonloaderVersion() < 27 then
+                imgui.Dummy(imgui.ImVec2(0,20))
+                imgui.TextWrapped("You're using an older version of moonloader. Some features may not work properly. Please update to the lastet version if possible.")
+            end
+            imgui.EndChild()
+        end
+    end
+
 
     tcheatmenu.window.size.X  = imgui.GetWindowWidth()
     tcheatmenu.window.size.Y  = imgui.GetWindowHeight()
@@ -181,7 +228,6 @@ function(self) -- render frame
     imgui.End()
     imgui.PopStyleVar(pop)
 end)
-
 
 -- Overlay window
 imgui.OnFrame(function() 
@@ -368,8 +414,8 @@ function main()
         writeMemory(0x004384D5 ,4,0x90909090 ,false)
     end
 
-    switchArrestPenalties(fgame.tgame.keep_stuff[0])
-    switchDeathPenalties(fgame.tgame.keep_stuff[0])
+    switchArrestPenalties(not(fgame.tgame.keep_stuff[0]))
+    switchDeathPenalties(not(fgame.tgame.keep_stuff[0]))
 
     if fped.tped.gang.wars[0] then
         setGangWarsActive(fped.tped.gang.wars[0])

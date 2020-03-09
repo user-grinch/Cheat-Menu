@@ -203,10 +203,8 @@ function module.WeaponMain()
             fcommon.CheatActivated()
         end
     end
-    imgui.Spacing()
-    if imgui.BeginTabBar("Weapon") then
-        if imgui.BeginTabItem("Checkbox") then
-            imgui.Spacing()
+    fcommon.Tabs("Weapons",{"Checkboxes","Spawn","Gang weapon editor"},{
+        function()
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Auto aim",module.tweapon.auto_aim,"Enables joypad auto aim feature\n\nControls:\n Q = left\n E = right")
             fcommon.CheckBoxFunc("Fast reload",module.tweapon.fast_reload,
@@ -306,10 +304,8 @@ function module.WeaponMain()
                 end
             end)
             imgui.Columns(1)
-            imgui.EndTabItem()
-        end
-        if imgui.BeginTabItem("Spawn") then
-            imgui.Spacing()
+        end,
+        function()
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Ped",module.tweapon.ped,"Give weapon to ped. Aim with a gun to select")
             imgui.NextColumn()
@@ -317,25 +313,16 @@ function module.WeaponMain()
             fcommon.InformationTooltip(string.format("You can quickly spawn weapons by\n%s > wep {weapon name/id}",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.command_window)))
             imgui.Columns(1)
             imgui.Spacing()
-            if imgui.BeginTabBar("Spawn") then
-                
-                if imgui.BeginTabItem("List") then
-                    imgui.Spacing()
+            fcommon.Tabs("Spawn",{"List","Search"},{
+                function()
                     fcommon.DrawImages(fconst.IDENTIFIER.WEAPON,fconst.DRAW_TYPE.LIST,module.tweapon.images,fconst.WEAPON.IMAGE_HEIGHT,fconst.WEAPON.IMAGE_WIDTH,module.GiveWeapon,nil,module.GetModelName,module.tweapon.filter)
-                    imgui.EndTabItem()
-                end
-                if imgui.BeginTabItem("Search") then
-                    imgui.Spacing()
+                end,
+                function()
                     fcommon.DrawImages(fconst.IDENTIFIER.WEAPON,fconst.DRAW_TYPE.SEARCH,module.tweapon.images,fconst.WEAPON.IMAGE_HEIGHT,fconst.WEAPON.IMAGE_WIDTH,module.GiveWeapon,nil,module.GetModelName,module.tweapon.filter)
-                    imgui.EndTabItem()
                 end
-                imgui.EndTabBar()
-            end
-            imgui.EndTabItem()
-        end
-        if imgui.BeginTabItem("Gang weapon editor") then
-            imgui.Spacing()
-
+            })
+        end,
+        function()
             if imgui.Combo("Gang", fped.tped.gang.index,fped.tped.gang.array,#fped.tped.gang.list) then
                 module.tweapon.gang.weapon1[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][1]
                 module.tweapon.gang.weapon2[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][2]
@@ -369,9 +356,7 @@ function module.WeaponMain()
                 module.tweapon.gang.weapon3[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][3]
                 printHelpString("Gang weapons reset")
             end
-            imgui.EndTabItem()
         end
-        imgui.EndTabBar()
-    end
+    })  
 end
 return module

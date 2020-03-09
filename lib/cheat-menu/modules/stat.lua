@@ -39,66 +39,46 @@ function module.StatMain()
         end
         fcommon.CheatActivated()
     end
-    imgui.Spacing()
-    if imgui.BeginTabBar("Stats") then
-        imgui.Spacing()
-
-        if imgui.BeginTabItem("Vehicle") then
-            if imgui.BeginChild("Vehicle") then
-                fcommon.UpdateStat({ name = "Bike",stat = 229})
-                fcommon.UpdateStat({ name = "Cycling",stat = 230})
-                fcommon.UpdateStat({ name = "Driving",stat = 160})
-                fcommon.UpdateStat({ name = "Flying",stat = 223})        
-                imgui.EndChild()
-            end
-            imgui.EndTabItem()
-        end
-        if imgui.BeginTabItem("Weapon") then
-            if imgui.BeginChild("Weapon") then
-                fcommon.UpdateStat({ name = "AK47",stat = 77})
-                fcommon.UpdateStat({ name = "Combat shotgun",stat = 74})
-                fcommon.UpdateStat({ name = "Desert eagle",stat = 71})
-                
-                fcommon.UpdateStat({ name = "Machine pistol",stat = 75})
-                fcommon.UpdateStat({ name = "M4",stat = 78})
-                fcommon.UpdateStat({ name = "Pistol",stat = 69})
-                fcommon.UpdateStat({ name = "Sawn off shotgun",stat = 73})
-                fcommon.UpdateStat({ name = "Shotgun",stat = 72})
-                fcommon.UpdateStat({ name = "Silenced pistol",stat = 70})
-                fcommon.UpdateStat({ name = "SMG",stat = 76})
-                fcommon.UpdateStat({ name = "Rifle",stat = 79})
-                imgui.EndChild()
-            end
-            imgui.EndTabItem()
-        end
-        if imgui.BeginTabItem("GF") then
-            if imgui.BeginChild("GF") then
-                imgui.Spacing()
-                if imgui.Button("Max GF progress",imgui.ImVec2(fcommon.GetSize(1))) then
-                    for i=252,257,1 do
-                        setFloatStat(i,100)
-                    end
-                    clearHelp()
-                    fcommon.CheatActivated()
-                end
-                imgui.Spacing()
-                fcommon.UpdateStat({ name = "Barbara",stat = 255,max = 100})
-                fcommon.UpdateStat({ name = "Denise",stat = 252,max = 100})
-                fcommon.UpdateStat({ name = "Helena",stat = 254,max = 100})
-                fcommon.UpdateStat({ name = "Katie",stat = 256,max = 100})
-                fcommon.UpdateStat({ name = "Michelle",stat = 253,max = 100})
-                fcommon.UpdateStat({ name = "Millie",stat = 257,max = 100})
-                imgui.EndChild()
-            end
-            imgui.EndTabItem()
-        end
-        if imgui.BeginTabItem("Search") then
-
-            imgui.Spacing()
+    
+    fcommon.Tabs("Stats",{"Vehicle","Weapon","Girlfriend","Search"},{
+        function()
+            fcommon.UpdateStat({ name = "Bike",stat = 229})
+            fcommon.UpdateStat({ name = "Cycling",stat = 230})
+            fcommon.UpdateStat({ name = "Driving",stat = 160})
+            fcommon.UpdateStat({ name = "Flying",stat = 223})  
+        end,
+        function()
+            fcommon.UpdateStat({ name = "AK47",stat = 77})
+            fcommon.UpdateStat({ name = "Combat shotgun",stat = 74})
+            fcommon.UpdateStat({ name = "Desert eagle",stat = 71})
             
-            module.tstat.filter:Draw("Filter")
+            fcommon.UpdateStat({ name = "Machine pistol",stat = 75})
+            fcommon.UpdateStat({ name = "M4",stat = 78})
+            fcommon.UpdateStat({ name = "Pistol",stat = 69})
+            fcommon.UpdateStat({ name = "Sawn off shotgun",stat = 73})
+            fcommon.UpdateStat({ name = "Shotgun",stat = 72})
+            fcommon.UpdateStat({ name = "Silenced pistol",stat = 70})
+            fcommon.UpdateStat({ name = "SMG",stat = 76})
+            fcommon.UpdateStat({ name = "Rifle",stat = 79})
+        end,
+        function()
+            if imgui.Button("Max GF progress",imgui.ImVec2(fcommon.GetSize(1))) then
+                for i=252,257,1 do
+                    setFloatStat(i,100)
+                end
+                clearHelp()
+                fcommon.CheatActivated()
+            end
             imgui.Spacing()
-            imgui.Separator()
+            fcommon.UpdateStat({ name = "Barbara",stat = 255,max = 100})
+            fcommon.UpdateStat({ name = "Denise",stat = 252,max = 100})
+            fcommon.UpdateStat({ name = "Helena",stat = 254,max = 100})
+            fcommon.UpdateStat({ name = "Katie",stat = 256,max = 100})
+            fcommon.UpdateStat({ name = "Michelle",stat = 253,max = 100})
+            fcommon.UpdateStat({ name = "Millie",stat = 257,max = 100})
+        end,
+        function()
+            module.tstat.filter:Draw("Filter")
             imgui.Spacing()
 
             if imgui.BeginChild("Stat Entries") then
@@ -112,10 +92,8 @@ function module.StatMain()
                 imgui.Spacing()
                 imgui.EndChild()
             end
-            imgui.EndTabItem()
         end
-        imgui.EndTabBar()
-    end
+    })
 end
 
 return module

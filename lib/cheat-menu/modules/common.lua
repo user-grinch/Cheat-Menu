@@ -16,11 +16,6 @@
 
 local module = {}
 
-module.tcommon = 
-{
-    read_key_press = false,
-}
-
 -- Sorted pairs function
 function module.spairs(t, f)
     local a = {}
@@ -103,6 +98,61 @@ function module.GetSize(count,no_spacing)
     return x,y
 end
 
+function module.WriteDebug(text)
+    if fmenu.tmenu.debug.write_info[0] then
+        print("[DEBUG] " .. text)
+    end
+end
+
+function module.Tabs(label,names,func)
+
+    if tcheatmenu.tab_data[label] == nil then
+        tcheatmenu.tab_data[label] = 1
+    end
+
+    local button = imgui.ColorConvertFloat4ToU32(imgui.GetStyle()['Colors'][21])
+    local buttonhovered = imgui.ColorConvertFloat4ToU32(imgui.GetStyle()['Colors'][22])
+    local buttonactive = imgui.ColorConvertFloat4ToU32(imgui.GetStyle()['Colors'][23])
+    
+    imgui.Spacing()
+    if imgui.BeginChild(label,imgui.ImVec2(tcheatmenu.window.size.X-imgui.GetStyle().WindowPadding.x*2,imgui.CalcTextSize(names[i]).y+10)) then
+        imgui.PushStyleVarVec2(imgui.StyleVar.ItemSpacing, imgui.ImVec2(4,0))
+
+        imgui.GetStyle().Colors[imgui.Col.Button] = imgui.GetStyle().Colors[imgui.Col.Tab]
+        imgui.GetStyle().Colors[imgui.Col.ButtonHovered] = imgui.GetStyle().Colors[imgui.Col.TabHovered]
+        imgui.GetStyle().Colors[imgui.Col.ButtonActive] = imgui.GetStyle().Colors[imgui.Col.TabActive]
+
+        for i=1,#names,1 do
+            if tcheatmenu.tab_data[label] == i then
+                imgui.GetStyle().Colors[imgui.Col.Button] = imgui.GetStyle().Colors[imgui.Col.TabActive]
+            else
+                imgui.GetStyle().Colors[imgui.Col.Button] = imgui.GetStyle().Colors[imgui.Col.Tab]
+            end
+
+            if imgui.Button(names[i],imgui.ImVec2(imgui.CalcTextSize(names[i]).x+10,imgui.CalcTextSize(names[i]).y+5)) then
+                tcheatmenu.tab_data[label] = i
+            end
+
+            imgui.SameLine()
+        end
+        fcommon.InformationTooltip("If your window width is small you\ncan scroll by Shift + Mouse wheel")
+        imgui.GetStyle().Colors[imgui.Col.Button] = imgui.ColorConvertU32ToFloat4(button)
+        imgui.GetStyle().Colors[imgui.Col.ButtonHovered] = imgui.ColorConvertU32ToFloat4(buttonhovered)
+        imgui.GetStyle().Colors[imgui.Col.ButtonActive] = imgui.ColorConvertU32ToFloat4(buttonactive)
+
+        imgui.Separator()
+        imgui.EndChild()
+        imgui.PopStyleVar(1)
+    end
+    if func[tcheatmenu.tab_data[label]] ~= nil then
+        imgui.Spacing()
+        if imgui.BeginChild("") then
+            func[tcheatmenu.tab_data[label]]()
+            imgui.EndChild()
+        end
+    end
+end
+
 -- Creates top level menus
 function module.CreateMenus(names,funcs)
 
@@ -128,7 +178,9 @@ function module.CreateMenus(names,funcs)
 
     imgui.PopStyleVar()
     imgui.Dummy(imgui.ImVec2(0,5))
-    funcs[tcheatmenu.current_menu]()
+    if tcheatmenu.current_menu ~= 0 then
+        funcs[tcheatmenu.current_menu]()
+    end
 end
 
 
@@ -138,7 +190,7 @@ function LoadImages(image_table)
         if type(image) == "string" then
             image_table[model] = imgui.CreateTextureFromFile(image)
         end
-        wait(100)
+        wait(0)
     end
     
 end
@@ -213,8 +265,6 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
                         draw_image(identifier,valid_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,filter,model,image)
                     end
                     imgui.Spacing()
-                    imgui.Separator()
-                    imgui.Spacing()
                 end
             end
             imgui.EndChild()
@@ -225,8 +275,6 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
     if draw_type == fconst.DRAW_TYPE.SEARCH then 
 
         filter:Draw("Filter")
-        imgui.Spacing()
-        imgui.Separator()
         imgui.Spacing()
 
         if imgui.BeginChild("") then 
@@ -535,11 +583,11 @@ function module.HotKey(index,info_text)
 
     if imgui.Button(text,imgui.ImVec2(x,y-y/5)) then
         if tcheatmenu.hot_keys.currently_active == index then
-            module.tcommon.read_key_press = false
+            tcheatmenu.read_key_press = false
             tcheatmenu.hot_keys.currently_active = {}
         else
             tcheatmenu.hot_keys.currently_active = index
-            module.tcommon.read_key_press = true
+            tcheatmenu.read_key_press = true
         end
     end
 
@@ -561,7 +609,7 @@ end
 function module.ReadKeyPress()
     while true do
 
-        if module.tcommon.read_key_press then
+        if tcheatmenu.read_key_press then
 
             for i=0,127,1 do
                 if isKeyDown(i) then
@@ -633,7 +681,11 @@ function module.IndexImages(mainDir,store_image_table,req_ext)
                         if store_image_table[dir] == nil then
                             store_image_table[dir] = {}
                         end
-                        store_image_table[dir][file_name] = file_path
+                        if fmenu.tmenu.fast_load_images[0] then
+                            store_image_table[dir][file_name] = imgui.CreateTextureFromFile(file_path)
+                        else
+                            store_image_table[dir][file_name] = file_path
+                        end
                     end
                 end
             end

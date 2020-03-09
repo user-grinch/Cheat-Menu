@@ -113,48 +113,34 @@ function module.AnimationMain()
     imgui.Columns(1)
 
     imgui.Spacing() 
-    if imgui.BeginTabBar("Animation") then
-        imgui.Spacing() 
-
-        imgui.Spacing()
-        if imgui.BeginTabItem("List") then  -- List tab
-            if imgui.BeginChild("Stat Entries") then
-
-                local menus_shown = {}
-
-                for key,value in fcommon.spairs(module.tanimation.list) do
-                    local temp,_ = key:match("([^$]+)$([^$]+)")
-                    
-                    local show_menu = true
-                    for i=1,#menus_shown,1 do
-                        if menus_shown[i] == temp then
-                            show_menu = false
-                        end
+    fcommon.Tabs("Animation",{"List","Search","Misc","Custom"},{
+        function()
+            local menus_shown = {}
+            for key,value in fcommon.spairs(module.tanimation.list) do
+                local temp,_ = key:match("([^$]+)$([^$]+)")
+                
+                local show_menu = true
+                for i=1,#menus_shown,1 do
+                    if menus_shown[i] == temp then
+                        show_menu = false
                     end
+                end
 
-                    if show_menu then
-                        fcommon.DropDownMenu(temp,function()
-                            for key,value in fcommon.spairs(module.tanimation.list) do
-                                local file,animation = key:match("([^$]+)$([^$]+)")
-                                if temp == file then
-                                    AnimationEntry(file,animation)
-                                end
+                if show_menu then
+                    fcommon.DropDownMenu(temp,function()
+                        for key,value in fcommon.spairs(module.tanimation.list) do
+                            local file,animation = key:match("([^$]+)$([^$]+)")
+                            if temp == file then
+                                AnimationEntry(file,animation)
                             end
-                        end)
-                        table.insert(menus_shown,temp)
-                    end
-                end   
-                                
-                imgui.EndChild()
-            end
-            imgui.EndTabItem()
-        end
-
-        if imgui.BeginTabItem("Search") then -- Search tab
-
+                        end
+                    end)
+                    table.insert(menus_shown,temp)
+                end
+            end   
+        end,
+        function()
             module.tanimation.filter:Draw("Filter")
-            imgui.Spacing()
-            imgui.Separator()
             imgui.Spacing()
 
             if imgui.BeginChild("Stat Entries") then
@@ -167,12 +153,8 @@ function module.AnimationMain()
                 imgui.Spacing()
                 imgui.EndChild()
             end
-            
-            imgui.EndTabItem()
-        end
-
-
-        if imgui.BeginTabItem("Misc") then
+        end,
+        function()
             if imgui.Combo("Fighting", module.tanimation.fighting.selected,module.tanimation.fighting.array,#module.tanimation.fighting.names) then
                 giveMeleeAttackToChar(PLAYER_PED,module.tanimation.fighting.selected[0]+4,6)
                 fcommon.CheatActivated()
@@ -186,10 +168,8 @@ function module.AnimationMain()
                 removeAnimation(module.tanimation.walking.names[module.tanimation.walking.selected[0]+1])
                 fcommon.CheatActivated()
             end
-            imgui.EndTabItem()
-        end
-
-        if imgui.BeginTabItem("Custom") then    -- Add custom animation tab
+        end,
+        function()
             if imgui.InputText("IFP name",module.tanimation.ifp_name,ffi.sizeof(module.tanimation.ifp_name)) then end
             if imgui.InputText("Animation name",module.tanimation.name,ffi.sizeof(module.tanimation.name)) then end
             imgui.Spacing()
@@ -199,11 +179,8 @@ function module.AnimationMain()
                 module.tanimation.list = fcommon.LoadJson("animation")
                 printHelpString("Animation ~g~added")
             end
-            imgui.EndTabItem()
         end
-            
-        imgui.EndTabBar()
-    end
+    })
 end
 
 return module

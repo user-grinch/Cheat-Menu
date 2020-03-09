@@ -30,7 +30,14 @@ module.tmenu =
 		show            = imgui.new.bool(false),
 	},
 	crash_text          = "",
+	debug               =
+	{
+		read_config     = imgui.new.bool(fconfig.Get('tmenu.debug.read_config',true)),
+		write_config    = imgui.new.bool(fconfig.Get('tmenu.debug.write_config',true)),
+		write_info      = imgui.new.bool(fconfig.Get('tmenu.debug.write_info',false)),
+	},
 	disable_in_samp		= imgui.new.bool(fconfig.Get('tmenu.disable_in_samp',true)),
+	fast_load_images    = imgui.new.bool(fconfig.Get('tmenu.fast_load_images',false)),
 	lock_player   		= imgui.new.bool(fconfig.Get('tmenu.lock_player',false)),
 	overlay             = 
 	{
@@ -232,22 +239,24 @@ function module.RegisterAllCommands()
 		local model = tonumber(t[2])
 
         if type(model) == "nil" then
-            model = fvehicle.CBaseModelInfo(string.upper(t[2]))  
-            if model == 0 then  
-                printHelpString("Failed to get model from name")
-                return
-            end
+			model = fvehicle.GetModelInfo(string.upper(t[2])) 
+
+			if model ~= 0 and isModelAvailable(model) then  
+				if isThisModelABoat(model) 
+				or isThisModelACar(model)
+				or isThisModelAHeli(model)
+				or isThisModelAPlane(model) then
+					fvehicle.GiveVehicleToPlayer(model)
+				else
+					printHelpString("This is not a vehicle model")
+				end
+			else
+				printHelpString("Failed to get model from name")
+			end
 		end
 		
-		if isThisModelABoat(model) 
-		or isThisModelACar(model)
-		or isThisModelAHeli(model)
-		or isThisModelAPlane(model) then
-			fvehicle.GiveVehicleToPlayer(model)
-		else
-			printHelpString("This is not a vehicle model")
-		end
-	end,"Spawns vehicle","{vehicle name/model}")
+
+	end,"Spawns vehicle","{vehicle name}")
 
     module.RegisterCommand("wep",function(t)
 		if t[2] == nil then 
@@ -263,20 +272,18 @@ function module.RegisterAllCommands()
                 printHelpString("Failed to get model from name")
                 return
             end
-            t[2] = model
+			t[2] = model
+			fweapon.GiveWeapon(t[2])
         end
-        fweapon.GiveWeapon(t[2])
-    end,"Spawns weapon","{vehicle name/id}")
+    end,"Spawns weapon","{vehicle name}")
 end
 --------------------------------------------------
 
 -- Main function
 function module.MenuMain()
 
-	if imgui.BeginTabBar("MenuTab") then
-		if imgui.BeginTabItem("Config") then
-			
-			imgui.Spacing()
+	fcommon.Tabs("Menu",{"Config","Overlay","Commands","Hoykeys","Styles","License","About"},{
+		function()
 			if imgui.Button("Reset to default",imgui.ImVec2(fcommon.GetSize(2))) then
 				module.tmenu.crash_text = "Default configuration ~g~restored"
 				fconfig.tconfig.reset = true
@@ -289,33 +296,53 @@ function module.MenuMain()
 			end
 			imgui.Dummy(imgui.ImVec2(0,5))
 			imgui.Columns(2,nil,false)
-			fcommon.CheckBoxVar("Auto check for updates",module.tmenu.auto_update_check)
-			fcommon.CheckBoxVar("Auto reload",module.tmenu.auto_reload,"Reload cheat menu automatically\nin case of a crash")
+			fcommon.CheckBoxVar("Check for updates",module.tmenu.auto_update_check)
+			fcommon.InformationTooltip("Cheat Menu will automatically check for updates\nonline. This requires an internet connection and\
+will download files from github repository.\n\nRequires Moonloader version 0.27 or above.")
+			fcommon.CheckBoxVar("Auto reload",module.tmenu.auto_reload,"Reload cheat menu automatically\nin case of a crash.\n\nMight cause crash loop sometimes.")
 			fcommon.CheckBoxVar("Auto scale",module.tmenu.auto_scale,"Automatically scale menu according to size")
-			fcommon.CheckBoxVar("Disable in SAMP",module.tmenu.disable_in_samp,"Using cheats online might ruin\nothers gameply and get you banned")
-			fcommon.CheckBoxVar("Lock player",module.tmenu.lock_player,"Lock player controls while the menu is open")
-			fcommon.CheckBoxVar("Show coordinates",module.tmenu.overlay.coordinates)
+			fcommon.CheckBoxVar("Disable in SAMP",module.tmenu.disable_in_samp,"Using cheats online might ruin\nothers gameply and get you banned")	
 			
 			imgui.NextColumn()
-
+			fcommon.CheckBoxVar("Fast load images",module.tmenu.fast_load_images,"Loads vehicles, weapons, peds etc. images\nat menu startup.\n \
+This may increase game startup time or\nfreeze it for few seconds.")
+			fcommon.CheckBoxVar("Lock player",module.tmenu.lock_player,"Lock player controls while the menu is open")
 			fcommon.CheckBoxVar("Show crash message",module.tmenu.show_crash_message)
-			fcommon.CheckBoxVar("Show FPS",module.tmenu.overlay.fps)	
 			fcommon.CheckBoxVar("Show tooltips",module.tmenu.show_tooltips)
+			fcommon.InformationTooltip("Shows usage tips beside options.")
+			imgui.Columns(1)
+			
+			if string.find( script.this.version,"beta") then
+				imgui.Dummy(imgui.ImVec2(0,10))
+				imgui.Columns(2,nil,false)
+				fcommon.CheckBoxVar("Read config file",module.tmenu.debug.read_config)
+				fcommon.CheckBoxVar("Write config file",module.tmenu.debug.write_config)
+				imgui.NextColumn()
+				fcommon.CheckBoxVar("Write debug info",module.tmenu.debug.write_info,"Write extra debug info in log")
+				imgui.Columns(1)
+			end
+			
+		end,
+		function()
+			imgui.Columns(2,nil,false)
+			fcommon.CheckBoxVar("Show coordinates",module.tmenu.overlay.coordinates)
+			fcommon.CheckBoxVar("Show FPS",module.tmenu.overlay.fps)	
+
+			imgui.NextColumn()
+
 			fcommon.CheckBoxVar("Show vehicle health",module.tmenu.overlay.health)
 			fcommon.CheckBoxVar("Show vehicle speed",module.tmenu.overlay.speed)
 			imgui.Columns(1)
+
 			imgui.Spacing()
 			imgui.Combo("Position", module.tmenu.overlay.position_index,module.tmenu.overlay.position_array,#module.tmenu.overlay.position)
 			fcommon.InformationTooltip("You can also right click on the\noverlay to access these options")
-			imgui.EndTabItem()
-		end
-		if imgui.BeginTabItem("Commands") then
-			imgui.Spacing()
+		end,
+		function()
 			module.tmenu.command.filter:Draw("Filter")
 			fcommon.InformationTooltip(string.format("Open command window using %s\nand close using Enter",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.command_window)))
 			imgui.Spacing()
-			imgui.Separator()
-			imgui.Spacing()
+
 			if imgui.BeginChild("Command entries") then
 				for v,k in fcommon.spairs(module.tmenu.command.list) do
 					if module.tmenu.command.filter:PassFilter(v) and imgui.CollapsingHeader(v) then
@@ -332,85 +359,68 @@ function module.MenuMain()
 				end
 				imgui.EndChild()
 			end
-		
-			imgui.EndTabItem()
-		end
-		if imgui.BeginTabItem("Hotkeys") then
-			
-			imgui.Spacing()
-			if imgui.BeginChild("Hot keys") then
-				fcommon.HotKey(tcheatmenu.hot_keys.menu_open,"Open or close cheat menu")
-				fcommon.HotKey(tcheatmenu.hot_keys.command_window,"Open command window")
+		end,
+		function()
+			fcommon.HotKey(tcheatmenu.hot_keys.menu_open,"Open or close cheat menu")
+			fcommon.HotKey(tcheatmenu.hot_keys.command_window,"Open command window")
 
-				imgui.Dummy(imgui.ImVec2(0,10))
+			imgui.Dummy(imgui.ImVec2(0,10))
 
-				fcommon.HotKey(tcheatmenu.hot_keys.mc_paste,"Paste memory address")
-				fcommon.HotKey(tcheatmenu.hot_keys.quick_screenshot,"Take quick screenshot")
-				fcommon.HotKey(tcheatmenu.hot_keys.asc_key,"Activate aim skin changer")
-				fcommon.HotKey(tcheatmenu.hot_keys.quick_teleport,"Toggle quick teleport")
+			fcommon.HotKey(tcheatmenu.hot_keys.mc_paste,"Paste memory address")
+			fcommon.HotKey(tcheatmenu.hot_keys.quick_screenshot,"Take quick screenshot")
+			fcommon.HotKey(tcheatmenu.hot_keys.asc_key,"Activate aim skin changer")
+			fcommon.HotKey(tcheatmenu.hot_keys.quick_teleport,"Toggle quick teleport")
 
-				imgui.Dummy(imgui.ImVec2(0,10))
+			imgui.Dummy(imgui.ImVec2(0,10))
 
-				fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_forward,"Camera mode forward")
-				fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_backward,"Camera mode backward")
-				fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_x_axis,"Camera mode x axis movement")
-				fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_y_axis,"Camera mode y axis movement")
-				fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_z_axis,"Camera mode z axis movement")
-				fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_flip,"Camera mode axis movement flip")
-				imgui.Dummy(imgui.ImVec2(0,10))
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_forward,"Camera mode forward")
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_backward,"Camera mode backward")
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_x_axis,"Camera mode x axis movement")
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_y_axis,"Camera mode y axis movement")
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_z_axis,"Camera mode z axis movement")
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_flip,"Camera mode axis movement flip")
+			imgui.Dummy(imgui.ImVec2(0,10))
 
-				imgui.TextWrapped("You can reset these config to default from 'Reset to default' button under 'Config' tab")
-				imgui.EndChild()
-			end
-
-			imgui.EndTabItem()
-		end
-
-		if imgui.BeginTabItem("Style") then
-			if imgui.BeginChild("Style") then
-				imgui.Spacing()
-				
-				if fstyle.tstyle.status then
-					if imgui.Button("Delete style",imgui.ImVec2(fcommon.GetSize(2))) then
-						fstyle.tstyle.styles_table[(fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])] = nil
-						fstyle.tstyle.list = fstyle.getStyles()
-						fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
-						fcommon.SaveJson("styles",fstyle.tstyle.styles_table)
-					end
-					imgui.SameLine()
-					if imgui.Button("Save style",imgui.ImVec2(fcommon.GetSize(2))) then
-						fstyle.saveStyles(imgui.GetStyle(), ffi.string(fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]))
-						fstyle.tstyle.list  = fstyle.getStyles()
-						fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
-						
-					end
-				end
-
-				imgui.Spacing()
-
-				imgui.InputText('##styleName', fstyle.tstyle.name, ffi.sizeof(fstyle.tstyle.name) - 1) 
-				imgui.SameLine()
-				if imgui.Button("Add new style") then
-					fstyle.saveStyles(imgui.GetStyle(), ffi.string(fstyle.tstyle.name))
+			imgui.TextWrapped("You can reset these config to default from 'Reset to default' button under 'Config' tab")
+		end,
+		function()
+			if fstyle.tstyle.status then
+				if imgui.Button("Delete style",imgui.ImVec2(fcommon.GetSize(2))) then
+					fstyle.tstyle.styles_table[(fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])] = nil
 					fstyle.tstyle.list = fstyle.getStyles()
 					fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
+					fcommon.SaveJson("styles",fstyle.tstyle.styles_table)
 				end
-
-				if fstyle.tstyle.status then
+				imgui.SameLine()
+				if imgui.Button("Save style",imgui.ImVec2(fcommon.GetSize(2))) then
+					fstyle.saveStyles(imgui.GetStyle(), ffi.string(fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]))
+					fstyle.tstyle.list  = fstyle.getStyles()
+					fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
 					
-					if imgui.Combo('Select style', fstyle.tstyle.selected, fstyle.tstyle.array, #fstyle.tstyle.list) then
-						fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])
-						fstyle.tstyle.selected_name = fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]
-					end
-					
-					fstyle.StyleEditor()
 				end
-				imgui.EndChild()
 			end
 
-			imgui.EndTabItem()
-		end
-		if imgui.BeginTabItem("License") then
+			imgui.Spacing()
+
+			imgui.InputText('##styleName', fstyle.tstyle.name, ffi.sizeof(fstyle.tstyle.name) - 1) 
+			imgui.SameLine()
+			if imgui.Button("Add new style") then
+				fstyle.saveStyles(imgui.GetStyle(), ffi.string(fstyle.tstyle.name))
+				fstyle.tstyle.list = fstyle.getStyles()
+				fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
+			end
+
+			if fstyle.tstyle.status then
+				
+				if imgui.Combo('Select style', fstyle.tstyle.selected, fstyle.tstyle.array, #fstyle.tstyle.list) then
+					fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])
+					fstyle.tstyle.selected_name = fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]
+				end
+				
+				fstyle.StyleEditor()
+			end
+		end,
+		function()
 			imgui.TextWrapped("This program is free software: you can redistribute it and/or modify it under the terms of the \z
 			GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or \z
 			(at your option) any later version. \n\n\z
@@ -421,11 +431,8 @@ function module.MenuMain()
 			You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.\n\n\n\z
 
 			Copyright (C) 2019-2020 Grinch_ \n")
-
-			imgui.EndTabItem()
-		end
-		if imgui.BeginTabItem("About") then
-			imgui.Spacing()
+		end,
+		function()
 			if imgui.Button("Check for updates",imgui.ImVec2(fcommon.GetSize(2))) then
 				lua_thread.create(module.CheckUpdates)
 			end
@@ -452,20 +459,17 @@ function module.MenuMain()
 			imgui.TextWrapped("Junior-Djjr")
 			imgui.TextWrapped("Um_Geek")
 			imgui.TextWrapped("randazz0")
+			imgui.TextWrapped("Fabio")
 			imgui.TextWrapped("Modding community")
 			imgui.TextWrapped("Rockstar Games")
 			imgui.NextColumn()
 			imgui.TextWrapped("For his help")
 			imgui.TextWrapped("For his help")
 			imgui.TextWrapped("For ImStyleSerializer")
-
+			imgui.TextWrapped("For Garage Save Extender")
 			imgui.Columns(1)
-			
-			imgui.EndTabItem()
 		end
-		imgui.EndTabBar()
-	end
-
+	})
 end
 
 return module

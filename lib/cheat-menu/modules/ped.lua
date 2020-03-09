@@ -171,9 +171,8 @@ function module.PedMain()
             setGangWarsActive(true)
         end      
         imgui.Spacing()
-        if imgui.BeginTabBar("Ped") then
-            imgui.Spacing()
-            if imgui.BeginTabItem("Checkbox") then
+        fcommon.Tabs("Ped",{"Checkboxes","Menus","Spawn"},{
+            function()
                 imgui.Columns(2,nil,false)
                 fcommon.CheckBoxVar("Display target health",module.tped.ped_health_display)
                 fcommon.CheckBoxValue("Elvis everywhere",0x969157)
@@ -196,13 +195,9 @@ function module.PedMain()
                 
                 imgui.Columns(1)
                 imgui.Spacing()
-                imgui.Separator()
-                imgui.Spacing()
                 fcommon.RadioButton("Recruit anyone",{"9mm","AK47","Rockets"},{0x96917C,0x96917D,0x96917E})
-
-                imgui.EndTabItem()
-            end
-            if imgui.BeginTabItem("Menu") then
+            end,
+            function()
                 fcommon.UpdateAddress({name = 'Pedestrian density multiplier',address = 0x8D2530,size = 4,min = 0,max = 10, default = 1,is_float = true})
                 fcommon.DropDownMenu("Gang zone density",function()
                     imgui.PushItemWidth(imgui.GetWindowWidth() - 200)
@@ -214,27 +209,19 @@ function module.PedMain()
                     imgui.Spacing()
                     imgui.Text("You'll need ExGangWars plugin to display some turf colors")
                 end)
-                imgui.EndTabItem()
-            end
-            if imgui.BeginTabItem("Spawn") then
-                imgui.Spacing()
+            end,
+            function()
                 if imgui.Combo("Ped type", module.tped.type.index,module.tped.type.array,#module.tped.type.names) then end
                 imgui.Spacing()
-                if imgui.BeginTabBar("Peds list") then   
-                    if imgui.BeginTabItem("List") then
+                fcommon.Tabs("Ped List",{"List","Search"},{
+                    function()
                         fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.LIST,module.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.SpawnPed,nil,module.GetModelName,module.tped.filter)         
-                        imgui.EndTabItem()
-                    end    
-                if imgui.BeginTabItem("Search") then
-                    imgui.Spacing()
-
-                    fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.SEARCH,module.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.SpawnPed,nil,module.GetModelName,module.tped.filter)
-
-                    imgui.EndTabItem()
-                end
-                imgui.EndTabBar()
+                    end,
+                    function()
+                        fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.SEARCH,module.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.SpawnPed,nil,module.GetModelName,module.tped.filter)
+                    end
+                })
             end
-        end
-    end
+        })
 end
 return module
