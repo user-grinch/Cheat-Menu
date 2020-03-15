@@ -699,7 +699,7 @@ function module.MoveFiles(main_dir,dest_dir)
         local main_file = main_dir .. "/" .. f
 
         if doesDirectoryExist(main_file) and f ~= "." and f ~= ".." then
-            lua_thread.create(module.MoveFiles,main_file,dest_dir .. "/" .. f)
+            module.MoveFiles(main_file,dest_dir .. "/" .. f)
         end
 
         if doesFileExist(main_file) then
@@ -716,7 +716,6 @@ function module.MoveFiles(main_dir,dest_dir)
                 print("[UPDATE] Unable to delete file " .. dest_file)
             else
                 os.rename(main_file,dest_file)
-                print("Moved " .. main_file .. " to " .. dest_file )
             end
             
         end

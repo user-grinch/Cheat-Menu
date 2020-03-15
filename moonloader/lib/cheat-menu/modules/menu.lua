@@ -56,7 +56,7 @@ module.tmenu =
 	repo_version        = nil,
 	show_tooltips	    = imgui.new.bool(fconfig.Get('tmenu.show_tooltips',true)),
 	show_crash_message  = imgui.new.bool(fconfig.Get('tmenu.show_crash_message',true)),
-	update_status       = fconst.UPDATE_STATUS.INSTALL,
+	update_status       = fconst.UPDATE_STATUS.HIDE_MSG,
 }
 
 module.tmenu.overlay.position_array = imgui.new['const char*'][#module.tmenu.overlay.position](module.tmenu.overlay.position)
@@ -236,7 +236,7 @@ end
 function module.CheckUpdates()
 
 	if string.find( script.this.version,"beta") then
-		link = "https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/cheat-menu.lua"
+		link = "https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/moonloader/cheat-menu.lua"
 	else
 		link = "https://api.github.com/repos/user-grinch/Cheat-Menu/tags"
 	end
@@ -268,11 +268,15 @@ function module.CheckUpdates()
 	end)
 end
 
-function module.DownloadCompleteCallback()
-	if fmenu.tmenu.update_status == fconst.UPDATE_STATUS.DOWNLOADING then
-		fmenu.tmenu.update_status = fconst.UPDATE_STATUS.INSTALL
-		printHelpString("Download complete. Click the 'Install update' button to finish.")
-	end
+function module.DownloadCompleteCallback(test)
+	lua_thread.create(
+	function()
+		if fmenu.tmenu.update_status == fconst.UPDATE_STATUS.DOWNLOADING then
+			wait(10000)
+			fmenu.tmenu.update_status = fconst.UPDATE_STATUS.INSTALL
+			printHelpString("Download complete. Click the 'Install update' button to finish.")
+		end
+	end)
 end
 
 function module.InstallUpdate()
@@ -300,7 +304,7 @@ function module.MenuMain()
 			fcommon.CheckBoxVar("Auto scale",module.tmenu.auto_scale,"Automatically scale menu according to size")
 			fcommon.CheckBoxVar("Check for updates",module.tmenu.auto_update_check)
 			fcommon.InformationTooltip("Cheat Menu will automatically check for updates\nonline. This requires an internet connection and\
-will download files from github repository.\n\nRequires Moonloader version 0.27 or above.")
+will download files from github repository.")
 			fcommon.CheckBoxVar("Disable in SAMP",module.tmenu.disable_in_samp,"Cheat Menu doesn't endorse using cheats\
 on multiplayer and is created for offline\nusage only.\n\nUsing cheats online might ruin others\ngameplay and get yourself banned.")	
 			

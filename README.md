@@ -27,7 +27,7 @@ It's based on [Moonloader](https://gtaforums.com/topic/890987-moonloader/) and u
 2. If your game version isn't v1.0 then you'll need to [downgrade](https://gtaforums.com/topic/927016-san-andreas-downgrader/).
 3. Download [Moonloader 0.27](https://gtaforums.com/topic/890987-moonloader/) from [here](https://blast.hk/moonloader/files/moonloader-027.0-preview3.zip).Then extract all these files to your game folder (replace if necessary).
 4. Download [Cheat Menu](https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu) from [here](https://github.com/inanahammad/Cheat-Menu/releases).
-5. Open up that achieve file and extract 'lib' folder & 'cheat-menu.lua' into moonloader folder (replace if necessary).
+5. Open up that achieve file and extract everything in game directory (replace if necessary).
 
 Now try it out in-game. If it doesn't work open an issue here or create a post in one of the topics above with 'moonloader.log'.
 

@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.0-beta")
-script_version_number(20200315) -- YYYYMMDD
+script_version_number(20200316) -- YYYYMMDD
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -230,10 +230,10 @@ function(self) -- render frame
                 fcommon.MoveFiles(getWorkingDirectory() .. "\\lib\\cheat-menu\\Cheat-Menu-" .. fmenu.tmenu.repo_version .. "\\",getGameDirectory())
             end
             
-            --os.remove(tcheatmenu.dir .. "update.zip")
+            os.remove(tcheatmenu.dir .. "update.zip")
             printHelpString("Update ~g~Installed")
             print("Update installed. Reloading script.")
-          --  thisScript():reload()
+            thisScript():reload()
         end
         imgui.Spacing()
     end
@@ -267,7 +267,7 @@ function(self) -- render frame
             fcommon.CheckBoxVar("Auto reload",fmenu.tmenu.auto_reload,"Reload cheat menu automatically\nin case of a crash.\n\nMight cause crash loop sometimes.")
             fcommon.CheckBoxVar("Check for updates",fmenu.tmenu.auto_update_check)
             fcommon.InformationTooltip("Cheat Menu will automatically check for updates\nonline. This requires an internet connection and\
-will download files from github repository.\n\nRequires Moonloader version 0.27 or above.")
+will download files from github repository.")
             imgui.NextColumn()
             fcommon.CheckBoxVar("Fast load images",fmenu.tmenu.fast_load_images,"Loads vehicles, weapons, peds etc. images\nat menu startup.\n \
 This may increase game startup time or\nfreeze it for few seconds.")
@@ -462,7 +462,7 @@ function main()
     math.randomseed(getGameTimer())
 
     if fmenu.tmenu.auto_update_check[0] then
-       --fmenu.CheckUpdates()
+        fmenu.CheckUpdates()
     end
 
     if fgame.tgame.disable_help_popups[0] == true then
