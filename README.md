@@ -8,6 +8,7 @@ It's based on [Moonloader](https://gtaforums.com/topic/890987-moonloader/) and u
 
 ## Official Topics
 
+- [Discord](https://discord.gg/ZzW7kmf)
 - [Mixmods](https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu)
 - [GTA Forums](https://gtaforums.com/topic/930023-mooncheat-menu/)
 
