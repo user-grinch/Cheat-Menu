@@ -18,10 +18,14 @@ local module = {}
 
 module.tconfig =
 {
-    path     = tcheatmenu.dir ..  "json/config.json",
-    reset    = false,
-    read     = fcommon.LoadJson("config"),
+    memory_data = {},
+    misc_data   = {},
+    path        = tcheatmenu.dir ..  "json/config.json",
+    reset       = false,
+    read        = fcommon.LoadJson("config"),
+    stat_data   = {},
 }
+
 
 function module.Get(s,default)
     if module.tconfig.read == nil then return default end
@@ -59,10 +63,61 @@ function module.Set(t,path,value)
     end
 end
 
-module.tconfig.handling = module.Get("tvehicle.handling",{})
-module.tconfig.paint = module.Get("tvehicle.paint",{})
-module.tconfig.tune = module.Get("tvehicle.tune",{})
+module.tconfig.memory_data = module.Get('tmemory_data',{})
+module.tconfig.misc_data = module.Get('tmisc_data',{})
+module.tconfig.stat_data = module.Get('tstat_data',{})
 
+function module.SetConfigData()
+    for k,v in pairs(module.tconfig.memory_data) do
+        fcommon.RwMemory(tonumber(k),v[1],v[2],nil,v[3],v[4])
+    end
+
+    for k,v in pairs(module.tconfig.stat_data) do
+        setFloatStat(tonumber(k),v)
+    end
+    setFloatStat(24,module.Get("tstat_data.24",569.0))
+    setCharHealth(PLAYER_PED,module.Get("tmisc_data.Health",100))
+    
+    if getCharArmour(PLAYER_PED) < module.Get("tmisc_data.Armour",0) then
+        addArmourToChar(PLAYER_PED,module.Get("tmisc_data.Armour",0)-getCharArmour(PLAYER_PED))
+    else
+        damageChar(PLAYER_PED,getCharArmour(PLAYER_PED)-module.Get("tmisc_data.Armour",0),true)
+    end
+
+    -- Never Wanted
+    if readMemory(0x969171,1,false) == 0 and  module.Get("tmisc_data.Never Wanted",0) == true then
+        callFunction(0x4396C0,1,0,false)
+    end
+
+    -- Body
+    local body = module.Get("tmisc_data.Body",nil)
+    if body == 1 then
+        callFunction(0x439110,1,1,false)
+    end
+    if body == 2 then
+        callFunction(0x439190,1,1,false)
+        callFunction(0x439150,1,1,false)
+    end
+    if body == 3 then
+        callFunction(0x439190,1,1,false)
+    end
+
+    -- Car & zone names
+    local car_name = module.Get("tmisc_data.Display Car Names",nil)
+
+    if car_name ~= nil then
+        displayCarNames(car_name)
+        fvisual.tvisual.car_names[0] = car_name
+    end
+
+    local zone_name = module.Get("tmisc_data.Display Zone Names",nil)
+
+    if zone_name ~= nil then
+        displayZoneNames(zone_name)
+        fvisual.tvisual.zone_names[0] = zone_name
+    end
+    
+end
 
 function module.Write()
     local write_table = {}
@@ -143,6 +198,9 @@ function module.Write()
                     ss_shortcut         = fgame.tgame.ss_shortcut[0],
                     sync_system_time    = fgame.tgame.sync_system_time[0],
                 },
+                tmemory_data = module.tconfig.memory_data,
+                tmisc_data   = module.tconfig.misc_data,
+                tstat_data   = module.tconfig.stat_data,
                 tmenu =
                 {
                     auto_update_check   = fmenu.tmenu.auto_update_check[0],

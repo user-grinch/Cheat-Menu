@@ -261,9 +261,12 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
                 if show and imgui.CollapsingHeader(table_name) then
                     lua_thread.create(LoadImages,image_table)
                     imgui.Spacing()
+                    image_count = 1
                     for model,image in pairs(image_table) do
                         draw_image(identifier,valid_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,filter,model,image)
                     end
+                    imgui.NewLine()
+                    imgui.Separator()
                     imgui.Spacing()
                 end
             end
@@ -290,7 +293,7 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
     
 end
 
-function module.RadioButtonFunc(label,label_table,values,memory,save_func,save_func_parameter_table)
+function module.RadioButtonFunc(label,label_table,values,memory)
     module.DropDownMenu(label,function()
         local button = imgui.new.int(module.RwMemory(memory,1))
 
@@ -305,10 +308,8 @@ function module.RadioButtonFunc(label,label_table,values,memory,save_func,save_f
 
             if imgui.RadioButtonIntPtr(label_table[i] .. "##" .. label,button,values[i]) then
                 module.RwMemory(memory,1,values[i])
+                fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",memory),{1,values[i]})
                 button[0] = i
-                if save_func ~= nil then
-                    save_func(save_func_parameter_table,label,values[i])
-                end
             end
             if i == btn_in_column then
                 imgui.NextColumn()
@@ -334,9 +335,11 @@ function module.RadioButton(label,rb_table,addr_table,default)
         if imgui.RadioButtonIntPtr(rb_table[i],button,i) then
             for j = 1,#addr_table,1 do
                 writeMemory(addr_table[j],1,0,false)
+                fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",addr_table[j]),{1,0})
             end
             button[0] = i
             writeMemory(addr_table[i],1,1,false)
+            fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",addr_table[i]),{1,1})
             module.CheatActivated()
         end
     end
@@ -369,9 +372,11 @@ function module.CheckBoxValue(name,address,tooltip,enable_value,disable_value)
     if imgui.Checkbox(name, var) then
         if var[0] then
             fcommon.RwMemory(address,1,enable_value)
+            fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",address),{1,enable_value})
             fcommon.CheatActivated()
         else
             fcommon.RwMemory(address,1,disable_value)
+            fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",address),{1,disable_value})
             fcommon.CheatDeactivated()
         end
     end
@@ -437,26 +442,32 @@ function module.UpdateStat(arg)
         imgui.PushItemWidth(imgui.GetWindowWidth()-70)
         if imgui.InputInt("Set##".. arg.name,value) then
             setFloatStat(arg.stat,value[0])
+            fconfig.Set(fconfig.tconfig.stat_data,tostring(arg.stat),value[0])
         end
         imgui.PopItemWidth()
 
         imgui.Spacing()
         if imgui.Button("Minimum##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(arg.stat,arg.min)
+            fconfig.Set(fconfig.tconfig.stat_data,tostring(arg.stat),arg.min)
         end
         imgui.SameLine()
         if imgui.Button("Default##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(arg.stat,arg.default)
+            fconfig.Set(fconfig.tconfig.stat_data,tostring(arg.stat),arg.default)
         end
         imgui.SameLine()
         if imgui.Button("Maximum##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(arg.stat,arg.max)
+            fconfig.Set(fconfig.tconfig.stat_data,tostring(arg.stat),arg.max)
         end
         if value[0] < arg.min then
             setFloatStat(arg.stat,arg.min)
+            fconfig.Set(fconfig.tconfig.stat_data,tostring(arg.stat),arg.min)
         end
         if value[0] > arg.max then
             setFloatStat(arg.stat,arg.max)
+            fconfig.Set(fconfig.tconfig.stat_data,tostring(arg.stat),arg.max)
         end
     end)
 end
@@ -500,16 +511,19 @@ function module.UpdateAddress(arg)
 
         if imgui.InputFloat("##".. arg.name,value) then
             module.RwMemory(arg.address,arg.size,value[0],nil,arg.is_float,arg.factor)
+            fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",arg.address),{arg.size,value[0],arg.is_float,arg.factor})
             arg.func(arg,value[0])
         end
         imgui.SameLine(0.0,4.0)
         if imgui.Button("-##".. arg.name,imgui.ImVec2(20,20)) then
             module.RwMemory(arg.address,arg.size,(value[0] - arg.cvalue),nil,arg.is_float,arg.factor)
+            fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",arg.address),{arg.size,(value[0] - arg.cvalue),arg.is_float,arg.factor})
             arg.func(arg,(value[0] - arg.cvalue))
         end
         imgui.SameLine(0.0,4.0)
         if imgui.Button("+##".. arg.name,imgui.ImVec2(20,20)) then
             module.RwMemory(arg.address,arg.size,(value[0] + arg.cvalue),nil,arg.is_float,arg.factor)
+            fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",arg.address),{arg.size,(value[0] + arg.cvalue),arg.is_float,arg.factor})
             arg.func(arg,(value[0] + arg.cvalue))
         end
         imgui.SameLine(0.0,4.0)
@@ -517,6 +531,7 @@ function module.UpdateAddress(arg)
         imgui.Spacing()
         if imgui.Button("Minimum##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
             module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float,arg.factor)
+            fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",arg.address),{arg.size,arg.min,arg.is_float,arg.factor})
             arg.func(arg,arg.min)
         end
 
@@ -524,6 +539,7 @@ function module.UpdateAddress(arg)
             imgui.SameLine()
             if imgui.Button("Default##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
                 module.RwMemory(arg.address,arg.size,arg.default,nil,arg.is_float,arg.factor)
+                fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",arg.address),{arg.size,arg.default,arg.is_float,arg.factor})
                 arg.func(arg,arg.default)
             end
         end
@@ -532,6 +548,7 @@ function module.UpdateAddress(arg)
             imgui.SameLine()
             if imgui.Button("Maximum##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
                 module.RwMemory(arg.address,arg.size,arg.max,nil,arg.is_float,arg.factor)
+                fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",arg.address),{arg.size,arg.max,arg.is_float,arg.factor})
                 arg.func(arg,arg.max)
             end
         end
@@ -539,11 +556,13 @@ function module.UpdateAddress(arg)
         imgui.Spacing()
         if (arg.min ~= nil) and (value[0] < arg.min) then
             module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float,arg.factor)
+            fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",arg.address),{arg.size,arg.min,arg.is_float,arg.factor})
             arg.func(arg,arg.min)
         end
 
         if (arg.max ~= nil) and (value[0] > arg.max) then
             module.RwMemory(arg.address,arg.size,arg.max,nil,arg.is_float,arg.factor)
+            fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",arg.address),{arg.size,arg.max,arg.is_float,arg.factor})
             arg.func(arg,arg.max)
         end
     end)

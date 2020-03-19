@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.0-beta")
-script_version_number(20200316) -- YYYYMMDD
+script_version_number(20200320) -- YYYYMMDD
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -528,6 +528,9 @@ function main()
     -- Command window
     fmenu.RegisterAllCommands()
 
+    -- Set saved values of addresses
+    fconfig.SetConfigData()
+
     -- Camera fov
     cameraSetLerpFov(getCameraFov(),fgame.tgame.camera.fov[0],1000,true)
     cameraPersistFov(true) 
@@ -617,9 +620,7 @@ function main()
         end)
         
         -- God mode
-        if fplayer.tplayer.god[0] then
-            setCharProofs(PLAYER_PED,true,true,true,true,true)
-        end
+        setCharProofs(PLAYER_PED,fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0])
 
         -- Aim skin changer
         fcommon.OnHotKeyPress(tcheatmenu.hot_keys.asc_key,function()

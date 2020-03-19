@@ -368,24 +368,6 @@ function SetTime()
     end)
 end
 
-function SetCurrentWeekday()
-    imgui.Spacing()
-    local current_day = imgui.new.int(readMemory(0xB7014E,1,false)-1)
-    if imgui.Combo("Day", current_day,module.tgame.day.array,#module.tgame.day.names) then
-        writeMemory(0xB7014E,1,current_day[0]+1,false)
-        fcommon.CheatActivated()
-    end
-end
-
-function SetWeather()
-    imgui.Spacing()
-    local current_weather = imgui.new.int(readMemory(0xC81320,2,false))
-    if imgui.Combo("Weather", current_weather,module.tgame.weather.array,#module.tgame.weather.names) then
-        writeMemory(0xC81320,2,current_weather[0],false)
-        fcommon.CheatActivated()
-    end
-end
-
 --------------------------------------------------
 -- Functions of script manager
 
@@ -621,6 +603,21 @@ function module.GameMain()
     
     fcommon.Tabs("Game",{"Checkboxes","Menus","Cheats","Script manager"},{
         function()
+            
+            local current_day = imgui.new.int(readMemory(0xB7014E,1,false)-1)
+            imgui.SetNextItemWidth(imgui.GetWindowContentRegionWidth()/1.7)
+            if imgui.Combo("Day", current_day,module.tgame.day.array,#module.tgame.day.names) then
+                writeMemory(0xB7014E,1,current_day[0]+1,false)
+                fcommon.CheatActivated()
+            end
+            local current_weather = imgui.new.int(readMemory(0xC81320,2,false))
+            imgui.SetNextItemWidth(imgui.GetWindowContentRegionWidth()/1.7)
+            if imgui.Combo("Weather", current_weather,module.tgame.weather.array,#module.tgame.weather.names) then
+                writeMemory(0xC81320,2,current_weather[0],false)
+                fcommon.CheatActivated()
+            end
+            
+            imgui.Dummy(imgui.ImVec2(0,10))
             imgui.Columns(2,nil,false)
 
             fcommon.CheckBoxFunc("Disable cheats",module.tgame.disable_cheats,
@@ -680,13 +677,7 @@ function module.GameMain()
             fcommon.CheckBoxVar('Sync system time',module.tgame.sync_system_time)
             fcommon.CheckBoxValue('Widescreen',0xB6F065)
             imgui.Columns(1)
-
-            imgui.Spacing()
-
-            SetCurrentWeekday()
-            SetWeather()
-            imgui.Spacing()
-            fcommon.RadioButton('Game themes',{'Beach','Country','Fun house','Ninja'},{0x969159,0x96917D,0x969176,0x96915C})
+        
         end,
         function()
             fcommon.DropDownMenu('Camera mode',function()
@@ -776,7 +767,6 @@ function module.GameMain()
             end)
 
             fcommon.UpdateAddress({name = 'Days passed',address = 0xB79038 ,size = 4,min = 0,max = 9999})
-
             fcommon.DropDownMenu('FPS',function()
 
                 imgui.Columns(2,nil,false)
@@ -790,6 +780,8 @@ function module.GameMain()
                 if imgui.InputInt('Set',module.tgame.fps_limit) then
                     memory.write(0xC1704C,(module.tgame.fps_limit[0]+1),1)
                     memory.write(0xBA6794,1,1)
+                    fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xC1704C),{1,module.tgame.fps_limit[0]+1})
+                    fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xBA6794),{1,1})
                 end
                 if module.tgame.fps_limit[0] < 1 then
                     module.tgame.fps_limit[0] = 1
@@ -802,22 +794,32 @@ function module.GameMain()
                     memory.write(0xC1704C,1,1)
                     memory.write(0xBA6794,1,1)
                     module.tgame.fps_limit[0] = 1
+                    fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xC1704C),{1,1})
+                    fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xBA6794),{1,1})
                 end
                 imgui.SameLine()
                 if imgui.Button("Default",imgui.ImVec2(fcommon.GetSize(3))) then
                     memory.write(0xC1704C,30,1)
                     memory.write(0xBA6794,1,1)
                     module.tgame.fps_limit[0] = 30
+                    fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xC1704C),{1,30})
+                    fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xBA6794),{1,1})
                 end
                 imgui.SameLine()
                 if imgui.Button("Maximum",imgui.ImVec2(fcommon.GetSize(3))) then
                     memory.write(0xBA6794,0,1)
+                    memory.write(0xBA6794,1,1)
                     module.tgame.fps_limit[0] = 999
+                    fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xC1704C),{1,999})
+                    fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xBA6794),{1,1})
                 end
             end)
             fcommon.UpdateAddress({name = 'Game speed',address = 0xB7CB64,size = 4,max = 10,min = 0, is_float =true, default = 1})
             fcommon.UpdateAddress({name = 'Gravity',address = 0x863984,size = 4,max = 1,min = -1, default = 0.008,cvalue = 0.001 ,is_float = true})
             SetTime()
+            fcommon.DropDownMenu('Themes',function()
+                fcommon.RadioButton('Select theme',{'Beach','Country','Fun house','Ninja'},{0x969159,0x96917D,0x969176,0x96915C})
+            end)
         end,
         function()
             CheatsEntry({0x439110,0x439150,0x439190},nil,{'Body','Fat','Muscle','Skinny'})

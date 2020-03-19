@@ -34,27 +34,27 @@ function module.VisualMain()
     fcommon.Tabs("Visual",{"Checkboxes","Menus"},{
         function()
             imgui.Columns(2,nil,false)
-            fcommon.CheckBoxValue('Body armour border',0x589123)
-            fcommon.CheckBoxValue('Body armour percentage',0x589125)
-            fcommon.CheckBoxValue('Breath meter border',0x589207)
-            fcommon.CheckBoxValue('Breath meter percentage',0x589209)
-            fcommon.CheckBoxFunc('Display zone names',module.tvisual.zone_names,
-            function()     
-                if module.tvisual.zone_names[0] then 
-                    displayZoneNames(true)
+            fcommon.CheckBoxValue('Armour border',0x589123)
+            fcommon.CheckBoxValue('Armour percentage',0x589125)
+            fcommon.CheckBoxValue('Breath border',0x589207)
+            fcommon.CheckBoxValue('Breath percentage',0x589209)
+            fcommon.CheckBoxFunc('Display car names',module.tvisual.car_names,
+            function()    
+                displayCarNames(module.tvisual.car_names[0]) 
+                fconfig.Set(fconfig.tconfig.misc_data,"Display Car Names",module.tvisual.car_names[0])
+                if module.tvisual.car_names[0] then 
                     fcommon.CheatActivated() 
                 else 
-                    displayZoneNames(false)
                     fcommon.CheatDeactivated() 
                 end
             end)
-            fcommon.CheckBoxFunc('Display car names',module.tvisual.car_names,
+            fcommon.CheckBoxFunc('Display zone names',module.tvisual.zone_names,
             function()     
-                if module.tvisual.car_names[0] then 
-                    displayCarNames(true)
+                displayZoneNames(module.tvisual.zone_names[0])
+                fconfig.Set(fconfig.tconfig.misc_data,"Display Zone Names",module.tvisual.zone_names[0])
+                if module.tvisual.zone_names[0] then 
                     fcommon.CheatActivated() 
                 else 
-                    displayCarNames(false)
                     fcommon.CheatDeactivated() 
                 end
             end)
@@ -64,13 +64,12 @@ function module.VisualMain()
             fcommon.CheckBoxValue('Enable hud',0xBA6769)
             fcommon.CheckBoxValue('Enable radar',0xBA676C,nil,0,2)
             fcommon.CheckBoxValue('Gray radar',0xA444A4)
-            fcommon.CheckBoxValue('Health meter border',0x589353)
-            fcommon.CheckBoxValue('Health bar percentage',0x589355)
+            fcommon.CheckBoxValue('Health border',0x589353)
+            fcommon.CheckBoxValue('Health percentage',0x589355)
             fcommon.CheckBoxValue('Hide wanted level',0x58DD1B,nil,0x90)
             imgui.Columns(1)
         end,
         function()
-            fcommon.UpdateAddress({ name = 'Active wanted star posY',address = 0x858CCC,size = 4,is_float = true,min=-500,default = 12,max = 500})
             fcommon.RadioButtonFunc("Debt color",{"Red (Default)","Green","Purple","Light purple","White","Black","Yellow","Pink","Gray","Dark red"},{0,1,2,3,4,5,6,7,8,9},0x58F4D4)
             fcommon.RadioButtonFunc("Money color",{"Red","Green (Default)","Purple","Light purple","White","Black","Yellow","Pink","Gray","Dark red"},{0,1,2,3,4,5,6,7,8,9},0x58F492)
             fcommon.RadioButtonFunc("Money font outline",{"No outline","Thin outline","Default outline"},{0,1,2},0x58F58D)
@@ -105,6 +104,8 @@ function module.VisualMain()
             fcommon.UpdateAddress({ name = 'Radar Y position',address = 0x866B70,size = 4,min=-999,default = 104,max = 999,is_float = true,help_text = "Changes radar horizantal position"})
             fcommon.RadioButtonFunc("Wanted star border",{"No border","Default","Bold border"},{0,1,2},0x58DD41)
             fcommon.RadioButtonFunc("Wanted star color",{"Red","Green","Purple","Light purple","White","Black","Yellow (Default)","Pink","Gray","Dark red"},{0,1,2,3,4,5,6,7,8,9},0x58DDC9)
+            fcommon.UpdateAddress({ name = 'Wanted star Y position',address = 0x858CCC,size = 4,is_float = true,min=-500,default = 12,max = 500})
+            
         end
     })
 end

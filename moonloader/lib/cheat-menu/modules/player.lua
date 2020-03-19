@@ -91,9 +91,10 @@ function HealthArmour()
         if imgui.InputInt("Set ##Health",health) then
             if health[0] > 100 then
                 setFloatStat(24,health[0]*5.686)
-                
+                fconfig.Set(fconfig.tconfig.stat_data,tostring(24),health[0]*5.686)
             else
                 setFloatStat(24,569.0)
+                fconfig.Set(fconfig.tconfig.stat_data,tostring(24),569.0)
             end
 
             setCharHealth(PLAYER_PED,health[0])
@@ -103,25 +104,33 @@ function HealthArmour()
         imgui.Spacing()
         if imgui.Button("Minimum ##Health",imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(24,569.0)
-            setCharHealth(PLAYER_PED,0)
+            fconfig.Set(fconfig.tconfig.stat_data,tostring(24),569.0)
+            setCharHealth(PLAYER_PED,1)
+            fconfig.Set(fconfig.tconfig.misc_data,tostring("Health"),1)
         end
         imgui.SameLine()
         if imgui.Button("Default ##Health",imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(24,569.0)
+            fconfig.Set(fconfig.tconfig.stat_data,tostring(24),569.0)
             setCharHealth(PLAYER_PED,100)
+            fconfig.Set(fconfig.tconfig.misc_data,tostring("Health"),100)
         end
         imgui.SameLine()
         if imgui.Button("Maximum ##Health",imgui.ImVec2(fcommon.GetSize(3))) then
             setFloatStat(24,1450.0)
+            fconfig.Set(fconfig.tconfig.stat_data,tostring(24),1450.0)
             setCharHealth(PLAYER_PED,255)
+            fconfig.Set(fconfig.tconfig.misc_data,tostring("Health"),255)
         end
 
-        if health[0] < 0 then
-            setCharHealth(PLAYER_PED,0)
+        if health[0] < 1 then
+            setCharHealth(PLAYER_PED,1)
+            fconfig.Set(fconfig.tconfig.misc_data,tostring("Health"),1)
         end
 
         if health[0] >  255 then
             setCharHealth(PLAYER_PED, 255)
+            fconfig.Set(fconfig.tconfig.misc_data,tostring("Health"),255)
         end
     end)
 
@@ -147,23 +156,28 @@ function HealthArmour()
             end
             if getCharArmour(PLAYER_PED) < armour[0] then
                 addArmourToChar(PLAYER_PED,(armour[0]-getCharArmour(PLAYER_PED)))
+                fconfig.Set(fconfig.tconfig.misc_data,tostring("Armour"),getCharArmour(PLAYER_PED))
             end
             if getCharArmour(PLAYER_PED) > armour[0] then
                 damageChar(PLAYER_PED,getCharArmour(PLAYER_PED)-armour[0],true)
+                fconfig.Set(fconfig.tconfig.misc_data,tostring("Armour"),getCharArmour(PLAYER_PED))
             end
         end
         imgui.PopItemWidth()
         imgui.Spacing()
         if imgui.Button("Minimum ##Armour",imgui.ImVec2(fcommon.GetSize(3))) then
             damageChar(PLAYER_PED,  getCharArmour(PLAYER_PED),true)
+            fconfig.Set(fconfig.tconfig.misc_data,tostring("Armour"),getCharArmour(PLAYER_PED))
         end
         imgui.SameLine()
         if imgui.Button("Default ##Armour",imgui.ImVec2(fcommon.GetSize(3))) then
             damageChar(PLAYER_PED,  getCharArmour(PLAYER_PED),true)
+            fconfig.Set(fconfig.tconfig.misc_data,tostring("Armour"),getCharArmour(PLAYER_PED))
         end
         imgui.SameLine()
         if imgui.Button("Maximum ##Armour",imgui.ImVec2(fcommon.GetSize(3))) then
             addArmourToChar(PLAYER_PED, max_armour)
+            fconfig.Set(fconfig.tconfig.misc_data,tostring("Armour"),getCharArmour(PLAYER_PED))
         end
     end)
 end
@@ -275,6 +289,7 @@ function module.PlayerMain()
                 else
                     fcommon.CheatDeactivated()
                 end
+                fconfig.Set(fconfig.tconfig.misc_data,"Never Wanted",module.tplayer.never_wanted[0])
             end)
            
             imgui.Columns(1)
@@ -283,16 +298,19 @@ function module.PlayerMain()
             fcommon.DropDownMenu("Body",function()
                 if imgui.RadioButtonIntPtr("Fat",module.tplayer.cjBody,1) then
                     callFunction(0x439110,1,1,false)
+                    fconfig.Set(fconfig.tconfig.misc_data,"Body",1)
                     fcommon.CheatActivated()
                 end
                 if imgui.RadioButtonIntPtr("Muscle",module.tplayer.cjBody,2) then
                     -- body not changing to muscular after changing to fat fix
                     callFunction(0x439190,1,1,false)
                     callFunction(0x439150,1,1,false)
+                    fconfig.Set(fconfig.tconfig.misc_data,"Body",2)
                     fcommon.CheatActivated()
                 end
                 if imgui.RadioButtonIntPtr("Skinny",module.tplayer.cjBody,3) then
                     callFunction(0x439190,1,1,false)
+                    fconfig.Set(fconfig.tconfig.misc_data,"Body",3)
                     fcommon.CheatActivated()
                 end
             end)
