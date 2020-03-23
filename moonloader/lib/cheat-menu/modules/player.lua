@@ -241,6 +241,12 @@ function module.ChangePlayerCloth(name)
     printHelpString("Clothes changed")
     clearCharTasksImmediately(PLAYER_PED)
 end
+
+function module.RemoveThisCloth(name)
+    local body_part, model, texture = name:match("([^$]+)$([^$]+)$([^$]+)")
+    givePlayerClothes(PLAYER_HANDLE,0,0,body_part)
+    buildPlayerModel(PLAYER_HANDLE)
+end
 --------------------------------------------------
 
 -- Main function
@@ -344,8 +350,10 @@ function module.PlayerMain()
                 buildPlayerModel(PLAYER_HANDLE)
                 printHelpString("Clothes ~r~removed")
             end
+            imgui.Text("Info")
+            fcommon.InformationTooltip("Right click to add clothes\nLeft click to remove clothes")
             imgui.Spacing()          
-            fcommon.DrawImages(fconst.IDENTIFIER.CLOTH,fconst.DRAW_TYPE.LIST,module.tplayer.clothes.images,fconst.CLOTH.IMAGE_HEIGHT,fconst.CLOTH.IMAGE_WIDTH,module.ChangePlayerCloth,nil,module.GetClothName)
+            fcommon.DrawImages(fconst.IDENTIFIER.CLOTH,fconst.DRAW_TYPE.LIST,module.tplayer.clothes.images,fconst.CLOTH.IMAGE_HEIGHT,fconst.CLOTH.IMAGE_WIDTH,module.ChangePlayerCloth,module.RemoveThisCloth,module.GetClothName)
         end
     })
 end

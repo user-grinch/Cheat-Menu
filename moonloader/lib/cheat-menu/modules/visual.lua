@@ -100,12 +100,15 @@ function module.VisualMain()
             end)
 
             --fcommon.UpdateAddress({ name = 'Radio station text color',address = 0xBAB24C ,size = 4,min=-999,default = 40,max = 999})
+            fcommon.UpdateAddress({ name = 'Radar Height',address = 0x866B74,size = 4,min=0,default = 76,max = 999,is_float = true})
+            fcommon.UpdateAddress({ name = 'Radar Width',address = 0x866B78,size = 4,min=0,default = 94,max = 999,is_float = true})
             fcommon.UpdateAddress({ name = 'Radar X position',address = 0x858A10,size = 4,min=-999,default = 40,max = 999,is_float = true,help_text = "Changes radar vertical position"})
             fcommon.UpdateAddress({ name = 'Radar Y position',address = 0x866B70,size = 4,min=-999,default = 104,max = 999,is_float = true,help_text = "Changes radar horizantal position"})
+            fcommon.UpdateAddress({ name = 'Radar zoom',address = 0xA444A3,size = 1,min=0,default = 0,max = 170})
             fcommon.RadioButtonFunc("Wanted star border",{"No border","Default","Bold border"},{0,1,2},0x58DD41)
             fcommon.RadioButtonFunc("Wanted star color",{"Red","Green","Purple","Light purple","White","Black","Yellow (Default)","Pink","Gray","Dark red"},{0,1,2,3,4,5,6,7,8,9},0x58DDC9)
             fcommon.UpdateAddress({ name = 'Wanted star Y position',address = 0x858CCC,size = 4,is_float = true,min=-500,default = 12,max = 500})
-            
+            callFunction(0x71D730,1,1,200.0)
         end
     })
 end

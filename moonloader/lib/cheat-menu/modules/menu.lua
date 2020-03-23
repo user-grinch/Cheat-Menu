@@ -268,19 +268,12 @@ function module.CheckUpdates()
 	end)
 end
 
-function module.DownloadCompleteCallback(test)
-	lua_thread.create(
-	function()
-		if fmenu.tmenu.update_status == fconst.UPDATE_STATUS.DOWNLOADING then
-			wait(10000)
-			fmenu.tmenu.update_status = fconst.UPDATE_STATUS.INSTALL
-			printHelpString("Download complete. Click the 'Install update' button to finish.")
-		end
-	end)
-end
-
-function module.InstallUpdate()
-
+function module.DownloadHandler(id, status, p1, p2)
+	print("Update status: " .. status)
+	if status == fconst.UPDATE_STATUS.INSTALL then
+		fmenu.tmenu.update_status = fconst.UPDATE_STATUS.INSTALL
+		printHelpString("Download complete. Click the 'Install update' button to finish.")
+	end
 end
 
 -- Main function

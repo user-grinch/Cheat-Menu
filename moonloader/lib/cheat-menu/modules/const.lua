@@ -139,10 +139,10 @@ module.NITRO_STATE =
 
 module.UPDATE_STATUS =
 {
-    DOWNLOADING = 1,
-    HIDE_MSG    = 2,
-    INSTALL     = 3,
-    NEW_UPDATE  = 4,
+    DOWNLOADING   = 5,
+    INSTALL       = 6,
+    HIDE_MSG      = 7,
+    NEW_UPDATE    = 9,
 }
 
 return module

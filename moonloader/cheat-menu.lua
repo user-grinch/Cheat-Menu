@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.0-beta")
-script_version_number(20200320) -- YYYYMMDD
+script_version_number(20200324) -- YYYYMMDD
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -192,13 +192,13 @@ function(self) -- render frame
             if string.find( script.this.version,"beta") then
                 fmenu.httpRequest("https://github.com/user-grinch/Cheat-Menu/archive/master.zip", nil, function(body, code, headers, status)  
                     print(link, 'OK', status)
-                    downloadUrlToFile("https://github.com/user-grinch/Cheat-Menu/archive/master.zip",string.format("%supdate.zip",tcheatmenu.dir),fmenu.DownloadCompleteCallback)
+                    downloadUrlToFile("https://github.com/user-grinch/Cheat-Menu/archive/master.zip",string.format("%supdate.zip",tcheatmenu.dir),fmenu.DownloadHandler)
                 end)
             else
                 fmenu.httpRequest("https://api.github.com/repos/user-grinch/Cheat-Menu/tags", nil, function(body, code, headers, status)  
                     print(link, 'OK', status)
                     fmenu.tmenu.repo_version = tostring(decodeJson(body)[1].name)
-                    downloadUrlToFile("https://github.com/user-grinch/Cheat-Menu/archive/".. fmenu.tmenu.repo_version .. ".zip",string.format("%supdate.zip",tcheatmenu.dir),fmenu.DownloadCompleteCallback)
+                    downloadUrlToFile("https://github.com/user-grinch/Cheat-Menu/archive/".. fmenu.tmenu.repo_version .. ".zip",string.format("%supdate.zip",tcheatmenu.dir),fmenu.DownloadHandler)
                 end)
             end
             
