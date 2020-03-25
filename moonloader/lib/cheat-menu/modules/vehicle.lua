@@ -403,7 +403,6 @@ function module.ForEachCarComponent(func,skip)
             end
             ::_skip::
         end
-        markCarAsNoLongerNeeded(car)
     else
         printHelpString("Player ~r~not ~w~in car")
     end
