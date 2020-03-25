@@ -36,50 +36,7 @@ module.tvehicle =
         filter = imgui.ImGuiTextFilter(),
         images = {},
         list   = {},
-        names  =
-        {
-            "Default",
-            "wheel_rf_dummy",
-            "wheel_lb_dummy",
-            "wheel_lf_dummy",
-            "wheel_rb_dummy",
-            "chassis_dummy",
-            "chassis_vlo",
-            "exhaust_ok",
-            "chassis",
-            "ug_nitro",
-            "door_lr_dummy",
-            "bump_rear_dummy",
-            "bonnet_dummy",
-            "bump_front_dummy",
-            "door_lf_dummy",
-            "door_rf_dummy",
-            "door_rr_dummy",
-            "windscreen_dummy",
-            "boot_dummy"
-        },
-        ui_names =
-        {
-            "Default",
-            "Front right wheel",
-            "Back left wheel",
-            "Front left wheel",
-            "Back right wheel",
-            "Chassis ok",
-            "Chassis lod",
-            "Exhaust",
-            "Chassis",
-            "Nitro",
-            "Back left door",
-            "Rear bumper",
-            "Boonet",
-            "Front bumper",
-            "Front left door",
-            "Front right door",
-            "Back right door",
-            "Windscreen",
-            "Boot"
-        },
+        names  = {},
         path   =  tcheatmenu.dir .. "vehicles\\components\\",
         saved = false,
         selected = imgui.new.int(0),
@@ -102,6 +59,7 @@ module.tvehicle =
     gxt_name        = imgui.new.char[32](""),
     gxt_name_table  = fconfig.Get('tvehicle.gxt_name_table',{}),
     heavy = imgui.new.bool(fconfig.Get('tvehicle.heavy',false)),
+    hidden_objects = {},
     images = {},
     invisible_car = imgui.new.bool(fconfig.Get('tvehicle.invisible_car',false)),
     license_plate_text = imgui.new.char[9](fconfig.Get('tvehicle.license_plate_text',"GTA__SAN")),
@@ -117,6 +75,13 @@ module.tvehicle =
         path             =  tcheatmenu.dir .. "vehicles\\paintjobs",
         images           = {},
         texture          = nil
+    },
+    neon   = 
+    {
+        checkbox = imgui.new.bool(fconfig.Get('tvehicle.neon.checkbox',false)),
+        data     = fcommon.LoadJson("neon data"),
+        pulsing  = imgui.new.bool(false),
+        rb_value = imgui.new.int(-1),
     },
     no_vehicles = imgui.new.bool(fconfig.Get('tvehicle.no_vehicles',false)),
     no_damage = imgui.new.bool(fconfig.Get('tvehicle.no_damage',false)),
@@ -142,11 +107,29 @@ module.tvehicle =
     watertight_car  = imgui.new.bool(fconfig.Get('tvehicle.watertight_car',false)),
 }
 
-module.tvehicle.components.list  = imgui.new['const char*'][#module.tvehicle.components.ui_names](module.tvehicle.components.ui_names)
-
 module.IsValidModForVehicle = ffi.cast('bool(*)(int model, int cvehicle)',0x49B010)
 
 IsThisModelATrain = ffi.cast('bool(*)(int model)',0x4C5AD0)
+
+-- load neon library
+result, handle = loadDynamicLibrary("neon_api.asi")
+module.tvehicle.neon["Handle"] = handle
+
+result, proc = getDynamicLibraryProcedure("SetFlag",module.tvehicle.neon["Handle"])
+module.tvehicle.neon["SetFlag"] = proc
+
+result, proc = getDynamicLibraryProcedure("GetFlag",module.tvehicle.neon["Handle"])
+module.tvehicle.neon["GetFlag"] = proc
+
+result, proc = getDynamicLibraryProcedure("SetX",module.tvehicle.neon["Handle"])
+module.tvehicle.neon["SetX"] = proc
+
+result, proc = getDynamicLibraryProcedure("SetY",module.tvehicle.neon["Handle"])
+module.tvehicle.neon["SetY"] = proc
+
+result, proc = getDynamicLibraryProcedure("InstallNeon",module.tvehicle.neon["Handle"])
+module.tvehicle.neon["InstallNeon"] = proc
+
 
 function module.GetModelInfo(name)
     local pInfo = allocateMemory(16)
@@ -437,15 +420,30 @@ end
 function module.OnEnterVehicle()
 
     while true do
+        
         if isCharInAnyCar(PLAYER_PED) then
             local car        = getCarCharIsUsing(PLAYER_PED)
+            local pCar       = getCarPointer(car)
             local model      = getCarModel(car)
             local model_name = module.tvehicle.gxt_name_table[module.GetModelName(model)] or getGxtText(module.GetModelName(model))
 
+            -- Get vehicle components
+            module.tvehicle.hidden_objects = {}
+            module.tvehicle.components.names = {"default"}
+
+            for _, comp in ipairs(mad.get_all_vehicle_components(car)) do
+                table.insert(module.tvehicle.components.names,comp.name) 
+            end
+            module.tvehicle.components.list  = imgui.new['const char*'][#module.tvehicle.components.names](module.tvehicle.components.names)
 
             --Load gsx data
-            ApplyTexture(nil,true)
-            ApplyColor(true)
+            if script.find('gsx-data') then
+                ApplyTexture(nil,true)
+                ApplyColor(true)
+                module.tvehicle.neon.rb_value[0] = gsx.get(car,"cm_neon_color") or -1
+                module.tvehicle.neon.pulsing[0]  = gsx.get(car,"cm_neon_pulsing") or false
+                InstallNeon(pCar)
+            end
             
             imgui.StrCopy(module.tvehicle.gxt_name,model_name)
 
@@ -581,6 +579,62 @@ function module.RemoveComponentFromVehicle(component,car,hide_msg)
     end
 end
 
+function module.TrafficNeons()
+    while true do
+        if module.tvehicle.neon.checkbox[0] then
+            local x,y,z = getCharCoordinates(PLAYER_PED)
+
+            local result, car = findAllRandomVehiclesInSphere(x,y,z,100.0,false,true)
+            
+            if result then
+                while result do
+                    local temp = 0
+                    local pCar = getCarPointer(car)
+
+                    if getVehicleClass(car) == fconst.VEHICLE_CLASS.NORMAL then
+                        temp = math.random(1,20) -- 5%
+                    end
+                    if getVehicleClass(car) == fconst.VEHICLE_CLASS.RICH_FAMILY then
+                        temp = math.random(1,5) -- 20%
+                    end
+                    if getVehicleClass(car) == fconst.VEHICLE_CLASS.EXECUTIVE then
+                        temp = math.random(1,3) -- 30%
+                    end
+                    if temp == 1 and callFunction(module.tvehicle.neon["GetFlag"],1,1,pCar) ~= 0x10 then
+                        if getCarCharIsUsing(PLAYER_PED) ~= car then
+                            InstallNeon(pCar,math.random(0,6),math.random(0,1))
+                        end
+                    end
+                    callFunction(module.tvehicle.neon["SetFlag"],2,2,pCar,0x10)
+                    result, car = findAllRandomVehiclesInSphere(x,y,z,100.0,true,true)
+                end
+            end
+        end
+
+        wait(0)
+    end
+end
+
+function InstallNeon(pCar,color,pulsing)
+    color = color or module.tvehicle.neon.rb_value[0]
+    pulsing = pulsing or module.tvehicle.neon.pulsing[0]
+
+    if module.tvehicle.neon["Handle"] then
+        if module.tvehicle.neon["InstallNeon"] and module.tvehicle.neon["SetX"] and module.tvehicle.neon["SetY"] then
+            callFunction(module.tvehicle.neon["InstallNeon"],3,3,pCar,color,pulsing)
+            
+            local data = module.tvehicle.neon.data[module.tvehicle.names[tostring(model)]] or { X = 0.0, Y = 0.0}
+  
+            callFunction(module.tvehicle.neon["SetX"],2,2,pCar,data.X)
+            callFunction(module.tvehicle.neon["SetY"],2,2,pCar,data.Y)
+            if script.find('gsx-data') then
+                gsx.set(car,"cm_neon_color",color)
+                gsx.set(car,"cm_neon_pulsing",pulsing)
+            end
+        end
+    end
+end
+
 --------------------------------------------------
 
 
@@ -691,6 +745,7 @@ function module.VehicleMain()
             fcommon.CheckBoxVar("Random colors",module.tvehicle.random_colors,"Paints players car with random colors every second")
             fcommon.CheckBoxVar("Random traffic colors",module.tvehicle.random_colors_traffic,"Paints traffic cars with random colors every second")
             fcommon.CheckBoxValue("Tank mode",0x969164) 
+            fcommon.CheckBoxVar("Traffic neons",module.tvehicle.neon.checkbox,"Adds neon lights to traffic vehicles.\nOnly some vehicles will have them.")
             fcommon.CheckBoxVar("Unlimited nitro",module.tvehicle.unlimited_nitro,"Enabling this would disable\n\nAll cars have nitro\nAll taxis have nitro")
             fcommon.CheckBoxVar("Watertight car",module.tvehicle.watertight_car,nil,
             function()
@@ -747,21 +802,22 @@ function module.VehicleMain()
 
             if isCharInAnyCar(PLAYER_PED) then
                 local car = getCarCharIsUsing(PLAYER_PED)
-                fcommon.UpdateAddress({name = 'Vehicle dirt level',address = getCarPointer(car) + 1200 ,size = 4,min = 0,max = 15, default = 7.5,is_float = true})
-                fcommon.UpdateAddress({name = 'Vehicle nitro count',address = getCarPointer(car) + 0x48A ,size = 1,min = 0,max = 15, default = 7.5,is_float = false})
+                local pCar = getCarPointer(car)
+                local model = getCarModel(car)
 
-                fcommon.DropDownMenu("Vehicle doors",function()
+                fcommon.UpdateAddress({name = 'Density multiplier',address = 0x8A5B20,size = 4,min = 0,max = 10, default = 1,is_float = true})
+                fcommon.UpdateAddress({name = 'Dirt level',address = pCar + 1200 ,size = 4,min = 0,max = 15, default = 7.5,is_float = true})
+                fcommon.DropDownMenu("Doors",function()
                     if isCharInAnyCar(PLAYER_PED) and not (isCharOnAnyBike(PLAYER_PED) or isCharInAnyBoat(PLAYER_PED) 
                     or isCharInAnyHeli(PLAYER_PED) or isCharInAnyPlane(PLAYER_PED)) then    
-                        if imgui.RadioButtonIntPtr("Damage", module.tvehicle.door_menu_button,0) then end
-                        imgui.SameLine()
-                        if imgui.RadioButtonIntPtr("Fix", module.tvehicle.door_menu_button,1) then end
-                        imgui.SameLine()
-                        if imgui.RadioButtonIntPtr("Open", module.tvehicle.door_menu_button,2) then end
-                        imgui.SameLine()
-                        if imgui.RadioButtonIntPtr("Pop", module.tvehicle.door_menu_button,3) then end
-                        imgui.Spacing()
-                        imgui.Separator()
+                        imgui.Columns(2,nil,false)
+                        imgui.RadioButtonIntPtr("Damage", module.tvehicle.door_menu_button,0) 
+                        imgui.RadioButtonIntPtr("Fix", module.tvehicle.door_menu_button,1) 
+                        imgui.NextColumn()
+                        imgui.RadioButtonIntPtr("Open", module.tvehicle.door_menu_button,2) 
+                        imgui.RadioButtonIntPtr("Pop", module.tvehicle.door_menu_button,3)
+                        imgui.Columns(1)
+
                         imgui.Spacing()
 
                         if module.tvehicle.door_menu_button[0] == 0 then
@@ -793,7 +849,55 @@ function module.VehicleMain()
                     end
                     
                 end)
-                fcommon.DropDownMenu("Vehicle name",function()
+                fcommon.DropDownMenu("Hide components",function()
+                    if isCharInAnyCar(PLAYER_PED) then
+                        local count = 1
+
+                        imgui.Columns(2,nil,false)
+
+                        for _, comp in ipairs(mad.get_all_vehicle_components(car)) do
+
+                            if module.tvehicle.hidden_objects[comp.name] == nil then
+                                module.tvehicle.hidden_objects[comp.name] = imgui.new.bool(false)
+                            end
+                            imgui.Checkbox(comp.name, module.tvehicle.hidden_objects[comp.name])
+                            for _, obj in ipairs(comp:get_objects()) do
+                                obj:hide(module.tvehicle.hidden_objects[comp.name][0])
+                            end
+                            count = count + 1 
+                            if count == math.floor((#module.tvehicle.components.names/2)+1) then
+                                imgui.NextColumn()
+                            end
+
+                        end
+                        imgui.Columns(1)
+                    end
+                end)
+                fcommon.DropDownMenu("Neons",function()
+                    imgui.Columns(3,nil,false)
+                    imgui.RadioButtonIntPtr("Blue", module.tvehicle.neon.rb_value,2) 
+                    imgui.RadioButtonIntPtr("Cyan", module.tvehicle.neon.rb_value,5)
+                    imgui.RadioButtonIntPtr("Green", module.tvehicle.neon.rb_value,1) 
+                    imgui.NextColumn()
+                    imgui.RadioButtonIntPtr("None", module.tvehicle.neon.rb_value,-1)
+                    imgui.RadioButtonIntPtr("Purple", module.tvehicle.neon.rb_value,6)
+                    imgui.RadioButtonIntPtr("Red", module.tvehicle.neon.rb_value,0) 
+                    imgui.NextColumn()
+                    imgui.RadioButtonIntPtr("White", module.tvehicle.neon.rb_value,3)
+                    imgui.RadioButtonIntPtr("Yellow", module.tvehicle.neon.rb_value,4)
+                    imgui.Columns(1)
+
+                    imgui.Dummy(imgui.ImVec2(0,20))
+                    imgui.Checkbox("Pulsing",module.tvehicle.neon.pulsing)
+                    fcommon.InformationTooltip("Neons will blink continuously")
+                    imgui.Spacing()
+
+                    if imgui.Button("Install Neon",imgui.ImVec2(fcommon.GetSize(1))) then
+                        InstallNeon(pCar)
+                    end
+                end)
+                fcommon.UpdateAddress({name = 'Nitro count',address = pCar + 0x48A ,size = 1,min = 0,max = 15, default = 7.5,is_float = false})
+                fcommon.DropDownMenu("Set name",function()
 
                     imgui.Text(string.format( "Model name = %s",module.GetModelName(getCarModel(car))))
                     imgui.Spacing()
@@ -813,7 +917,7 @@ function module.VehicleMain()
                         module.tvehicle.gxt_name_table = {}
                     end
                 end)
-                fcommon.DropDownMenu("Vehicle speed",function()
+                fcommon.DropDownMenu("Set speed",function()
                     
                     fcommon.CheckBoxVar("Lock speed",module.tvehicle.lock_speed)
                     imgui.Spacing()
@@ -840,9 +944,7 @@ function module.VehicleMain()
                         module.tvehicle.speed[0] = 0
                     end
                 end)
-            end
-            
-            fcommon.UpdateAddress({name = 'Vehicle density multiplier',address = 0x8A5B20,size = 4,min = 0,max = 10, default = 1,is_float = true})
+            end            
         end,
         function()
             imgui.Columns(2,nil,false)
@@ -897,7 +999,8 @@ function module.VehicleMain()
 
                 imgui.Spacing()
                 imgui.Columns(2,nil,false)
-                fcommon.CheckBoxVar("Apply material filter",module.tvehicle.apply_material_filter)
+                fcommon.CheckBoxVar("Material filter",module.tvehicle.apply_material_filter)
+                fcommon.InformationTooltip("Filters material while applying color/ texture\nDisable if something doesn't work properly")
                 imgui.NextColumn()
                 imgui.Columns(1)
                 imgui.Spacing()

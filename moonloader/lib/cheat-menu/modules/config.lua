@@ -278,6 +278,10 @@ function module.Write()
                     radio_station_id = fvehicle.tvehicle.radio_station_id,
                     radio_station_lock = fvehicle.tvehicle.radio_station_lock[0],
                     lock_speed       = fvehicle.tvehicle.lock_speed[0],
+                    neon             = 
+                    {
+                        checkbox     = fvehicle.tvehicle.neon.checkbox[0],
+                    },
                     no_damage        = fvehicle.tvehicle.no_damage[0],
                     no_vehicles      = fvehicle.tvehicle.no_vehicles[0],
                     random_colors    = fvehicle.tvehicle.random_colors[0],

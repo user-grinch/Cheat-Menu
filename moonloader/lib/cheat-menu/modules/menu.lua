@@ -459,6 +459,7 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 			imgui.TextWrapped("randazz0")
 			imgui.TextWrapped("Fabio")
 			imgui.TextWrapped("kuba--")
+			imgui.TextWrapped("Israel")
 			imgui.TextWrapped("Modding community")
 			imgui.TextWrapped("Rockstar Games")
 			imgui.NextColumn()
@@ -467,6 +468,7 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 			imgui.TextWrapped("For ImStyleSerializer")
 			imgui.TextWrapped("For Garage Save Extender")
 			imgui.TextWrapped("For C zip library")
+			imgui.TextWrapped("For Neon api")
 			imgui.Columns(1)
 		end
 	})

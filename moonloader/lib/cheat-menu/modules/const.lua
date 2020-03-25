@@ -145,4 +145,21 @@ module.UPDATE_STATUS =
     NEW_UPDATE    = 9,
 }
 
+module.VEHICLE_CLASS =
+{
+    IGNORE         = - 1,
+    NORMAL         = 0,
+    POOR_FAMILY    = 1,
+    RICH_FAMILY    = 2,
+    EXECUTIVE      = 3,
+    WORKER         = 4,
+    BIG            = 5,
+    TAXI           = 6,
+    MOPED          = 7,
+    MOTOR_BIKE     = 8,
+    LEISURE_BOAT   = 9,
+    WORKER_BOAT    = 10,
+    BICYCLE        = 11,
+}
+
 return module

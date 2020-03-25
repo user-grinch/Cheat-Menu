@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.0-beta")
-script_version_number(20200324) -- YYYYMMDD
+script_version_number(20200325) -- YYYYMMDD
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -276,6 +276,8 @@ This may increase game startup time or\nfreeze it for few seconds.")
             imgui.Columns(1)
             imgui.Spacing()
             imgui.TextWrapped("You can configure everything here anytime from the 'Menu' section.")
+            imgui.Spacing()
+            imgui.TextWrapped("This modification is licensed under the terms of GPLv3. For more details see <http://www.gnu.org/licenses/>")
             if getMoonloaderVersion() < 27 then
                 imgui.Dummy(imgui.ImVec2(0,20))
                 imgui.TextWrapped("You're using an older version of moonloader. Some features may not work properly. Please update to the lastet version if possible.")
@@ -542,21 +544,22 @@ function main()
     -- writeMemory(0x58F4C8,4,fvisual.tvisual.money.positive_memory,false)
 
     lua_thread.create(fcommon.ReadKeyPress)
-    lua_thread.create(fgame.CameraMode)
     lua_thread.create(fplayer.KeepPosition)
     lua_thread.create(fped.PedHealthDisplay)
+    lua_thread.create(fgame.CameraMode)
     lua_thread.create(fgame.FreezeTime)
     lua_thread.create(fgame.LoadScriptsOnKeyPress)
+    lua_thread.create(fgame.RandomCheats)
     lua_thread.create(fgame.SolidWater)
     lua_thread.create(fgame.SyncSystemTime)
     lua_thread.create(fvehicle.AircraftCamera)
     lua_thread.create(fvehicle.FirstPersonCamera)
-    lua_thread.create(fweapon.AutoAim)
     lua_thread.create(fvehicle.OnEnterVehicle)
     lua_thread.create(fvehicle.RandomColors)
-    lua_thread.create(fgame.RandomCheats)
     lua_thread.create(fvehicle.RandomTrafficColors)
+    lua_thread.create(fvehicle.TrafficNeons)
     lua_thread.create(fvehicle.UnlimitedNitro)
+    lua_thread.create(fweapon.AutoAim)
 
     --------------------------------------------------
    

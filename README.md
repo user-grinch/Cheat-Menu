@@ -42,7 +42,7 @@ Now try it out in-game. If it doesn't work open an issue here or create a post i
 ## Keyboard shortcuts
 
 1. <kbd>Left Ctrl</kbd> + <kbd>M</kbd> - open the menu in-game 
-2. <kbd>Left Ctrl</kbd> + <kbd>Q</kbd> - start quick vehicle/weapon spawner 
+2. <kbd>Left Alt</kbd> + <kbd>Q</kbd> - open command window
 3. <kbd>Left Ctrl</kbd> + <kbd>S</kbd> - take quick screenshot 
 4. <kbd>X</kbd> + <kbd>Y</kbd> - quick teleport 
 5. Aim a ped + <kbd>Enter/Return</kbd> - aim skin changer 
@@ -59,6 +59,9 @@ Now try it out in-game. If it doesn't work open an issue here or create a post i
 
 **Note:**  From version 1.9-wip(20200118) hotkey system is available to change these from the menu. For earlier versions you must edit 'tkeys' table from '[cheat-menu.lua](https://github.com/user-grinch/Cheat-Menu/blob/master/cheat-menu.lua)' file and change them with your desired keys ([Ascii](http://www.asciitable.com/))
 
+## Youtubers
+
+A kind request to all those YouTubers out there who are making videos about this mod, use ad sites or whatever( you'll probably do it even if I ask not to ), link to this GitHub repository & don't reupload this mod simply cause you can. It'll help me to get notified about the issues people are having & fix them. It'd be great if you also keep my name in your video description & don't pretend to be the author of it. Your help will be highly appreciated.
 
 ## Images
 
