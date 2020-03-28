@@ -26,7 +26,8 @@ module.tgame                =
         lock_y_axis         = imgui.new.bool(fconfig.Get('tgame.camera.lock_y_axis',false)),
         lock_z_axis         = imgui.new.bool(fconfig.Get('tgame.camera.lock_z_axis',false)),
         model_val           = nil,
-        speed               = imgui.new.float(fconfig.Get('tgame.camera.speed',0.3)),
+        movement_speed      = imgui.new.float(fconfig.Get('tgame.camera.movement_speed',0.3)),
+        rotation_speed      = imgui.new.float(fconfig.Get('tgame.camera.rotation_speed',0.2)),
         rotation            = 0.0,
         z_offset            = 20.0,
     },
@@ -176,27 +177,27 @@ function module.CameraMode()
                 if isKeyDown(tcheatmenu.hot_keys.camera_mode_flip[1] and tcheatmenu.hot_keys.camera_mode_flip[2]) then
                     if isKeyDown(tcheatmenu.hot_keys.camera_mode_x_axis[1]) 
                     and isKeyDown(tcheatmenu.hot_keys.camera_mode_x_axis[2]) then
-                        x = x-module.tgame.camera.speed[0]
+                        x = x-module.tgame.camera.movement_speed[0]
                     end
                     if isKeyDown(tcheatmenu.hot_keys.camera_mode_y_axis[1]) 
                     and (tcheatmenu.hot_keys.camera_mode_y_axis[2]) then
-                        y = y-module.tgame.camera.speed[0]
+                        y = y-module.tgame.camera.movement_speed[0]
                     end
                     if isKeyDown(tcheatmenu.hot_keys.camera_mode_z_axis[1]) 
                     and isKeyDown(tcheatmenu.hot_keys.camera_mode_z_axis[2]) then
-                        z = z-module.tgame.camera.speed[0]
+                        z = z-module.tgame.camera.movement_speed[0]
                     end
                 else
                     if isKeyDown(tcheatmenu.hot_keys.camera_mode_x_axis[1]) 
                     and isKeyDown(tcheatmenu.hot_keys.camera_mode_x_axis[2]) then
-                        x = x+module.tgame.camera.speed[0]
+                        x = x+module.tgame.camera.movement_speed[0]
                     end
                     if isKeyDown(tcheatmenu.hot_keys.camera_mode_y_axis[1])
                     and isKeyDown(tcheatmenu.hot_keys.camera_mode_y_axis[2]) then
-                        y = y+module.tgame.camera.speed[0]
+                        y = y+module.tgame.camera.movement_speed[0]
                     end
                     if isKeyDown(tcheatmenu.hot_keys.camera_mode_z_axis[1]) and isKeyDown(tcheatmenu.hot_keys.camera_mode_z_axis[2]) then
-                        z = z+module.tgame.camera.speed[0]
+                        z = z+module.tgame.camera.movement_speed[0]
                     end
                 end
 
@@ -205,13 +206,13 @@ function module.CameraMode()
                     local angle = getCharHeading(PLAYER_PED) + 90
 
                     if not module.tgame.camera.lock_x_axis[0] then
-                        x = x + module.tgame.camera.speed[0] * math.cos(angle * math.pi/180)
+                        x = x + module.tgame.camera.movement_speed[0] * math.cos(angle * math.pi/180)
                     end
                     if not module.tgame.camera.lock_y_axis[0] then
-                        y = y + module.tgame.camera.speed[0] * math.sin(angle * math.pi/180)
+                        y = y + module.tgame.camera.movement_speed[0] * math.sin(angle * math.pi/180)
                     end
                     if not module.tgame.camera.lock_z_axis[0] then
-                        z = z + module.tgame.camera.speed[0] * math.sin(total_mouse_y* math.pi/180)
+                        z = z + module.tgame.camera.rotation_speed * math.sin(total_mouse_y* math.pi/180)
                     end
                 end
         
@@ -219,17 +220,17 @@ function module.CameraMode()
                     local angle = getCharHeading(PLAYER_PED) + 90
 
                     if not module.tgame.camera.lock_x_axis[0] then
-                        x = x - module.tgame.camera.speed[0] * math.cos(angle * math.pi/180)
+                        x = x - module.tgame.camera.movement_speed[0] * math.cos(angle * math.pi/180)
                     end
                     if not module.tgame.camera.lock_y_axis[0] then
-                        y = y - module.tgame.camera.speed[0] * math.sin(angle * math.pi/180)
+                        y = y - module.tgame.camera.movement_speed[0] * math.sin(angle * math.pi/180)
                     end
                     if not module.tgame.camera.lock_z_axis[0] then
-                        z = z - module.tgame.camera.speed[0] * math.sin(total_mouse_y* math.pi/180)
+                        z = z - module.tgame.camera.rotation_speed * math.sin(total_mouse_y* math.pi/180)
                     end
                 end
 
-                setCharHeading(PLAYER_PED,total_mouse_x*-module.tgame.camera.speed[0])
+                setCharHeading(PLAYER_PED,total_mouse_x*-module.tgame.camera.rotation_speed)
                 module.tgame.camera.rotation = total_mouse_y
 
                 setCharCoordinates(PLAYER_PED,x,y,z-1.0)
@@ -302,12 +303,12 @@ end
 function module.RandomCheatsActivate()
     while true do
         if module.tgame.random_cheats.checkbox[0] then
-            cheatid = math.random(0,91)
-            if module.tgame.random_cheats.disabled_cheats[i] then  -- Suicide cheat
-                callFunction(0x00438370,1,1,cheatid)
+            wait(module.tgame.random_cheats.cheat_activate_timer[0]*1000)
+            if module.tgame.random_cheats.checkbox[0] then
+                cheatid = math.random(0,91)
+                callFunction(0x438370,1,1,cheatid)
                 table.insert(module.tgame.random_cheats.activated_cheats,cheatid)
-                fcommon.CheatActivated()
-                wait(module.tgame.random_cheats.cheat_activate_timer[0]*1000)
+                printHelpString("~g~" .. module.tgame.random_cheats.cheat_id[tostring(cheatid)])
             end
         end
         wait(0)
@@ -316,11 +317,14 @@ end
 
 function module.RandomCheatsDeactivate()
     while true do
-        if module.tgame.random_cheats.disable_cheat_checkbox[0] and module.tgame.random_cheats.activated_cheats[1] then
-            callFunction(0x00438370,1,1,module.tgame.random_cheats.activated_cheats[1])
-            module.tgame.random_cheats.activated_cheats[1] = nil
-            fcommon.CheatDeactivated() 
-            wait(module.tgame.random_cheats.cheat_deactivate_timer[0]*1000)
+        if module.tgame.random_cheats.disable_cheat_checkbox[0] and module.tgame.random_cheats.activated_cheats then
+            for _,x in ipairs(module.tgame.random_cheats.activated_cheats) do
+                wait(module.tgame.random_cheats.cheat_deactivate_timer[0]*1000)
+                if module.tgame.random_cheats.disable_cheat_checkbox[0] then
+                    callFunction(0x438370,1,1,module.tgame.random_cheats.activated_cheats[x])
+                    printHelpString("~r~" .. module.tgame.random_cheats.cheat_id[tostring(x)])
+                end
+            end
         end
         wait(0)
     end
@@ -344,16 +348,13 @@ function module.FreezeTime()
 end
 
 function SetTime()
-    fcommon.DropDownMenu("Time",function()
+    fcommon.DropDownMenu("Set time",function()
         imgui.Spacing()
 
         local days_passed = imgui.new.int(memory.read(0xB79038 ,4))
         local hour = imgui.new.int(memory.read(0xB70153,1))
         local minute = imgui.new.int(memory.read(0xB70152,1))
 
-        fcommon.CheckBoxValue("Faster clock",0x96913B)
-        imgui.SameLine()
-        fcommon.CheckBoxVar("Freeze time",module.tgame.freeze_time)
         if imgui.InputInt("Current hour",hour) then
             memory.write(0xB70153 ,hour[0],1)
         end
@@ -641,7 +642,32 @@ function module.GameMain()
             
             imgui.Dummy(imgui.ImVec2(0,10))
             imgui.Columns(2,nil,false)
-
+            fcommon.CheckBoxVar("Camera mode",module.tgame.camera.bool,string.format("Keyboard controls:\n\nForward: %s\nBackward: %s\n\nRotation: Mouse\n \
+            \n%s : X axis up\n%s + %s : X axis down \
+            \n%s : Y axis up \n%s + %s : Y axis down \
+            \n%s : Z axis up\n%s + %s : Z axis down",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_forward),
+            fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_backward),
+            fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_x_axis),
+            fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_flip),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_x_axis),
+            fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_y_axis),
+            fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_flip),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_y_axis),
+            fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_z_axis),
+            fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_flip),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_z_axis)),nil,
+            function()
+                imgui.Columns(2,nil,false)
+                fcommon.CheckBoxVar("Lock X axis",module.tgame.camera.lock_x_axis,
+                "Disables auto movement of x axis.\nMovement still possible through input keys")
+                fcommon.CheckBoxVar("Lock Y axis",module.tgame.camera.lock_y_axis,
+                "Disables auto movement of y axis\nMovement still possible through input keys")
+                imgui.NextColumn()
+                fcommon.CheckBoxVar("Lock Z axis",module.tgame.camera.lock_z_axis,
+                "Disables auto movement of z axis\nMovement still possible through input keys")
+                imgui.Columns(1)
+                imgui.Spacing()
+                imgui.SliderFloat("Movement Speed",module.tgame.camera.movement_speed, 0.0, 5.0)
+                imgui.SliderFloat("Rotation Speed",module.tgame.camera.rotation_speed, 0.0, 1.0)
+              
+            end)
             fcommon.CheckBoxFunc("Disable cheats",module.tgame.disable_cheats,
             function()
                 if module.tgame.disable_cheats[0] then
@@ -676,6 +702,11 @@ function module.GameMain()
                     fcommon.CheatDeactivated()
                 end
             end)
+            fcommon.CheckBoxValue("Faster clock",0x96913B)            
+            fcommon.CheckBoxVar("Freeze time",module.tgame.freeze_time)
+            
+            imgui.NextColumn()
+
             fcommon.CheckBoxFunc("Ghost cop vehicles",module.tgame.ghost_cop_cars,function()        
                 for key,value in pairs(module.tgame.cop) do
                     if  module.tgame.ghost_cop_cars[0] then
@@ -685,9 +716,6 @@ function module.GameMain()
                     end
                 end
             end)
-            
-            imgui.NextColumn()
-
             fcommon.CheckBoxFunc("Keep stuff",module.tgame.keep_stuff,
             function()
                 switchArrestPenalties(module.tgame.keep_stuff[0])
@@ -728,44 +756,6 @@ function module.GameMain()
         
         end,
         function()
-            fcommon.DropDownMenu('Camera mode',function()
-                imgui.Columns(2,nil,false)
-                fcommon.CheckBoxVar("Camera mode ##Checkbox",module.tgame.camera.bool,
-                string.format("Keyboard controls:\n\nForward: %s\nBackward: %s\n\nRotation: Mouse\n \
-                \n%s : X axis up\n%s + %s : X axis down \
-                \n%s : Y axis up \n%s + %s : Y axis down \
-                \n%s : Z axis up\n%s + %s : Z axis down",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_forward),
-                fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_backward),
-                fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_x_axis),
-                fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_flip),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_x_axis),
-                fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_y_axis),
-                fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_flip),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_y_axis),
-                fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_z_axis),
-                fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_flip),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_z_axis)))
-
-                fcommon.CheckBoxVar("Lock X axis",module.tgame.camera.lock_x_axis,
-                "Disables auto movement of x axis.\nMovement still possible through input keys")
-                imgui.NextColumn()
-                fcommon.CheckBoxVar("Lock Y axis",module.tgame.camera.lock_y_axis,
-                "Disables auto movement of y axis\nMovement still possible through input keys")
-                fcommon.CheckBoxVar("Lock Z axis",module.tgame.camera.lock_z_axis,
-                "Disables auto movement of z axis\nMovement still possible through input keys")
-                imgui.Columns(1)
-                imgui.Spacing()
-                imgui.InputFloat("Speed",module.tgame.camera.speed)
-                imgui.Spacing()
-                if imgui.Button("Slow",imgui.ImVec2(fcommon.GetSize(3))) then
-                    module.tgame.camera.speed[0] = 0.03
-                end
-                imgui.SameLine()
-                if imgui.Button("Normal",imgui.ImVec2(fcommon.GetSize(3))) then
-                    module.tgame.camera.speed[0] = 0.3
-                end
-                imgui.SameLine()
-                if imgui.Button("Fast",imgui.ImVec2(fcommon.GetSize(3))) then
-                    module.tgame.camera.speed[0] = 3.0
-                end
-            end)
             fcommon.DropDownMenu('Camera fov',function()
                 if imgui.InputInt("FOV",module.tgame.camera.fov) then
                     if module.tgame.camera.fov[0] > 150 then 
