@@ -189,7 +189,14 @@ function module.Write()
                     keep_stuff          = fgame.tgame.keep_stuff[0],
                     freeze_mission_timer= fgame.tgame.freeze_mission_timer[0],
                     freeze_time         = fgame.tgame.freeze_time[0], 
-                    random_cheats       = fgame.tgame.random_cheats[0], 
+                    random_cheats       = 
+                    {
+                        cheat_activate_timer   = fgame.tgame.random_cheats.cheat_activate_timer[0], 
+                        cheat_deactivate_timer = fgame.tgame.random_cheats.cheat_deactivate_timer[0], 
+                        checkbox               = fgame.tgame.random_cheats.checkbox[0], 
+                        disabled_cheats        = fgame.tgame.random_cheats.disabled_cheats, 
+                        disable_cheat_checkbox = fgame.tgame.random_cheats.disable_cheat_checkbox[0], 
+                    },
                     script_manager      = 
                     {
                         scripts         = fgame.tgame.script_manager.scripts,

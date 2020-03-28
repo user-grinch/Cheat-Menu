@@ -309,8 +309,6 @@ function module.WeaponMain()
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Ped",module.tweapon.ped,"Give weapon to ped. Aim with a gun to select")
             imgui.NextColumn()
-            imgui.Text("Quick spawn")
-            fcommon.InformationTooltip(string.format("You can quickly spawn weapons by\n%s > wep {weapon name/id}",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.command_window)))
             imgui.Columns(1)
             imgui.Spacing()
             fcommon.Tabs("Spawn",{"List","Search"},{

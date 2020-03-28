@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.0-beta")
-script_version_number(20200325) -- YYYYMMDD
+script_version_number(20200328) -- YYYYMMDD
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -119,6 +119,7 @@ tcheatmenu       =
             X    = fconfig.Get('tcheatmenu.window.coord.X',50),
             Y    = fconfig.Get('tcheatmenu.window.coord.Y',50),
         },
+        panel_func = nil,
         show     = imgui.new.bool(false),
         size     =
         {
@@ -549,7 +550,8 @@ function main()
     lua_thread.create(fgame.CameraMode)
     lua_thread.create(fgame.FreezeTime)
     lua_thread.create(fgame.LoadScriptsOnKeyPress)
-    lua_thread.create(fgame.RandomCheats)
+    lua_thread.create(fgame.RandomCheatsActivate)
+    lua_thread.create(fgame.RandomCheatsDeactivate)
     lua_thread.create(fgame.SolidWater)
     lua_thread.create(fgame.SyncSystemTime)
     lua_thread.create(fvehicle.AircraftCamera)
@@ -644,8 +646,7 @@ function main()
 
             -- Reset car colors if player changed color in tune shop
             if fvehicle.tvehicle.color.default ~= -1 then
-                local color_id = getCarColours(car)
-                if fvehicle.tvehicle.color.default ~= color_id then
+                if fvehicle.tvehicle.color.default ~= getCarColours(car) then
                     fvehicle.ForEachCarComponent(function(mat)
                         mat:reset_color()
                     end)

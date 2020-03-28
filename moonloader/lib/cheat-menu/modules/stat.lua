@@ -35,7 +35,7 @@ function module.StatMain()
     imgui.SameLine()
     if imgui.Button("Max weapon stats",imgui.ImVec2(fcommon.GetSize(2))) then
         for i=69,79,1 do
-            setFloatStat(i)
+            setFloatStat(i,1000)
         end
         fcommon.CheatActivated()
     end

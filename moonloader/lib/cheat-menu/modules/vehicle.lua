@@ -403,7 +403,6 @@ function module.ForEachCarComponent(func,skip)
             end
             ::_skip::
         end
-        markCarAsNoLongerNeeded(car)
     else
         printHelpString("Player ~r~not ~w~in car")
     end
@@ -461,7 +460,6 @@ function ApplyColor(load_saved_color)
     module.ForEachCarComponent(function(mat,comp,car)
 
         local r, g, b, old_a = mat:get_color()
-        local model = getCarModel(car)
 
         -- -1.0 used as nil
         if load_saved_color and script.find('gsx-data') then
@@ -740,9 +738,10 @@ function module.VehicleMain()
                     fcommon.CheatDeactivated()
                 end
             end)
+            
             fcommon.CheckBoxVar("No visual damage",module.tvehicle.visual_damage)
             fcommon.CheckBoxValue("Perfect handling",0x96914C)
-            fcommon.CheckBoxVar("Random colors",module.tvehicle.random_colors,"Paints players car with random colors every second")
+            fcommon.CheckBoxVar("Random colors",module.tvehicle.random_colors,"Paints players car with random\ncolors every second")
             fcommon.CheckBoxVar("Random traffic colors",module.tvehicle.random_colors_traffic,"Paints traffic cars with random colors every second")
             fcommon.CheckBoxValue("Tank mode",0x969164) 
             fcommon.CheckBoxVar("Traffic neons",module.tvehicle.neon.checkbox,"Adds neon lights to traffic vehicles.\nOnly some vehicles will have them.")
@@ -849,30 +848,30 @@ function module.VehicleMain()
                     end
                     
                 end)
-                fcommon.DropDownMenu("Hide components",function()
-                    if isCharInAnyCar(PLAYER_PED) then
-                        local count = 1
+                -- fcommon.DropDownMenu("Hide components",function()
+                --     if isCharInAnyCar(PLAYER_PED) then
+                --         local count = 1
 
-                        imgui.Columns(2,nil,false)
+                --         imgui.Columns(2,nil,false)
 
-                        for _, comp in ipairs(mad.get_all_vehicle_components(car)) do
+                --         for _, comp in ipairs(mad.get_all_vehicle_components(car)) do
 
-                            if module.tvehicle.hidden_objects[comp.name] == nil then
-                                module.tvehicle.hidden_objects[comp.name] = imgui.new.bool(false)
-                            end
-                            imgui.Checkbox(comp.name, module.tvehicle.hidden_objects[comp.name])
-                            for _, obj in ipairs(comp:get_objects()) do
-                                obj:hide(module.tvehicle.hidden_objects[comp.name][0])
-                            end
-                            count = count + 1 
-                            if count == math.floor((#module.tvehicle.components.names/2)+1) then
-                                imgui.NextColumn()
-                            end
+                --             if module.tvehicle.hidden_objects[comp.name] == nil then
+                --                 module.tvehicle.hidden_objects[comp.name] = imgui.new.bool(false)
+                --             end
+                --             imgui.Checkbox(comp.name, module.tvehicle.hidden_objects[comp.name])
+                --             for _, obj in ipairs(comp:get_objects()) do
+                --                 obj:hide(module.tvehicle.hidden_objects[comp.name][0])
+                --             end
+                --             count = count + 1 
+                --             if count == math.floor((#module.tvehicle.components.names/2)+1) then
+                --                 imgui.NextColumn()
+                --             end
 
-                        end
-                        imgui.Columns(1)
-                    end
-                end)
+                --         end
+                --         imgui.Columns(1)
+                --     end
+                -- end)
                 fcommon.DropDownMenu("Neons",function()
                     imgui.Columns(3,nil,false)
                     imgui.RadioButtonIntPtr("Blue", module.tvehicle.neon.rb_value,2) 
@@ -949,9 +948,7 @@ function module.VehicleMain()
         function()
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Spawn inside",module.tvehicle.spawn_inside,"Spawn inside vehicle as driver")
-            imgui.Text("Quick spawn")
-            fcommon.InformationTooltip(string.format("You can quickly spawn vehicles by\n%s > veh {vehicle name/model}",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.command_window)))
-            
+
             imgui.NextColumn()
             fcommon.CheckBoxVar("Spawn aircraft in air",module.tvehicle.aircraft.spawn_in_air)
             imgui.Columns(1)

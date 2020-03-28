@@ -51,7 +51,16 @@ module.tgame                =
     freeze_time             = imgui.new.bool(fconfig.Get('tgame.freeze_time',false)), 
     ghost_cop_cars          = imgui.new.bool(fconfig.Get('tgame.ghost_cop_cars',false)),
     keep_stuff              = imgui.new.bool(fconfig.Get('tgame.keep_stuff',false)),
-    random_cheats           = imgui.new.bool(fconfig.Get('tgame.random_cheats',false)),
+    random_cheats           = 
+    {
+        cheat_activate_timer   = imgui.new.int(fconfig.Get('tgame.random_cheats.cheat_activate_timer',10)),
+        cheat_deactivate_timer = imgui.new.int(fconfig.Get('tgame.random_cheats.cheat_deactivate_timer',10)),
+        cheat_id               = fcommon.LoadJson("cheat id"),
+        checkbox               = imgui.new.bool(fconfig.Get('tgame.random_cheats.checkbox',false)),
+        activated_cheats       = {},
+        disable_cheat_checkbox = imgui.new.bool(fconfig.Get('tgame.random_cheats.disable_cheat_checkbox',false)),
+        disabled_cheats        = fconfig.Get('tgame.random_cheats.disabled_cheats',{}),
+    },
     script_manager          =
     {
         scripts             = fconfig.Get('tgame.script_manager.scripts',{}),
@@ -290,15 +299,28 @@ function module.SyncSystemTime()
     end
 end
 
-function module.RandomCheats()
+function module.RandomCheatsActivate()
     while true do
-        if module.tgame.random_cheats[0] then
-            cheatid = math.random(1,92)
-            if cheatid ~= 29 then  -- Suicide cheat
+        if module.tgame.random_cheats.checkbox[0] then
+            cheatid = math.random(0,91)
+            if module.tgame.random_cheats.disabled_cheats[i] then  -- Suicide cheat
                 callFunction(0x00438370,1,1,cheatid)
+                table.insert(module.tgame.random_cheats.activated_cheats,cheatid)
                 fcommon.CheatActivated()
+                wait(module.tgame.random_cheats.cheat_activate_timer[0]*1000)
             end
-            wait(10000)
+        end
+        wait(0)
+    end
+end
+
+function module.RandomCheatsDeactivate()
+    while true do
+        if module.tgame.random_cheats.disable_cheat_checkbox[0] and module.tgame.random_cheats.activated_cheats[1] then
+            callFunction(0x00438370,1,1,module.tgame.random_cheats.activated_cheats[1])
+            module.tgame.random_cheats.activated_cheats[1] = nil
+            fcommon.CheatDeactivated() 
+            wait(module.tgame.random_cheats.cheat_deactivate_timer[0]*1000)
         end
         wait(0)
     end
@@ -671,7 +693,33 @@ function module.GameMain()
                 switchArrestPenalties(module.tgame.keep_stuff[0])
                 switchDeathPenalties(module.tgame.keep_stuff[0])
             end,"Keep stuff after arrest/death")
-            fcommon.CheckBoxVar("Random cheats",module.tgame.random_cheats ,"Activates random cheats every 10 seconds\nSuicide cheat is excluded")
+            fcommon.CheckBoxVar("Random cheats",module.tgame.random_cheats.checkbox,"Activates random cheats after certain time",nil,
+            function()
+                fcommon.CheckBoxVar('Disable cheats',module.tgame.random_cheats.disable_cheat_checkbox,"Disable activated cheats after certain time")
+                imgui.Spacing()
+                imgui.SetNextItemWidth(imgui.GetWindowWidth()/2)
+                imgui.SliderInt("Activate cheat timer", module.tgame.random_cheats.cheat_activate_timer, 10, 100)
+                imgui.SetNextItemWidth(imgui.GetWindowWidth()/2)
+                imgui.SliderInt("Deactivate cheat timer", module.tgame.random_cheats.cheat_deactivate_timer, 10, 100)
+                imgui.Spacing()
+
+                imgui.TextWrapped("Enabled cheats")
+                imgui.Separator()
+                if imgui.BeginChild("Cheats list") then  
+                    for i=0,91,1 do   
+                        if module.tgame.random_cheats.disabled_cheats[tostring(i)] then
+                            selected = false
+                        else
+                            selected = true
+                        end
+
+                        if imgui.MenuItemBool(tostring(module.tgame.random_cheats.cheat_id[tostring(i)]),nil,selected) then
+                            module.tgame.random_cheats.disabled_cheats[tostring(i)] = selected
+                        end
+                    end
+                    imgui.EndChild()
+                end
+            end)
             fcommon.CheckBoxVar('Screenshot shortcut',module.tgame.ss_shortcut,"Take screenshot using" .. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.quick_screenshot))
             fcommon.CheckBoxVar('Solid water',module.tgame.solid_water)
             fcommon.CheckBoxVar('Sync system time',module.tgame.sync_system_time)

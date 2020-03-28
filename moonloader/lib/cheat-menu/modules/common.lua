@@ -69,11 +69,34 @@ end
 function module.InformationTooltip(text)
     if fmenu.tmenu.show_tooltips[0] and text ~= nil then
         imgui.SameLine()
-        imgui.TextColored(imgui.ImVec4(128,128,128,0.3),'(?)')
+        imgui.TextColored(imgui.ImVec4(128,128,128,0.3),'?')
+        
         if imgui.IsItemHovered() then
             imgui.BeginTooltip()
             imgui.SetTooltip(text)
             imgui.EndTooltip()
+        end
+    end
+end
+
+-- Config panel
+function module.ConfigPanel(func_arg_table,func)
+    if func ~= nil then
+        imgui.SameLine()
+        imgui.TextColored(imgui.ImVec4(128,128,128,0.3),'c')
+        
+        if imgui.IsItemClicked(0) then
+            tcheatmenu.window.panel_func = function()
+                imgui.TextWrapped(string.format("%s configuraion",func_arg_table[2]))
+                imgui.Separator()
+                if imgui.Button("Hide",imgui.ImVec2(fcommon.GetSize(1))) then
+                    tcheatmenu.window.panel_func = nil
+                end
+                imgui.Dummy(imgui.ImVec2(0,10))
+                func_arg_table[1](func_arg_table[2],func_arg_table[3],func_arg_table[4])
+                imgui.Dummy(imgui.ImVec2(0,10))
+                func()
+            end
         end
     end
 end
@@ -146,8 +169,13 @@ function module.Tabs(label,names,func)
     end
     if func[tcheatmenu.tab_data[label]] ~= nil then
         imgui.Spacing()
+           
         if imgui.BeginChild("") then
-            func[tcheatmenu.tab_data[label]]()
+            if tcheatmenu.window.panel_func == nil then
+                func[tcheatmenu.tab_data[label]]()
+            else
+                tcheatmenu.window.panel_func()
+            end
             imgui.EndChild()
         end
     end
@@ -385,7 +413,7 @@ function module.CheckBoxValue(name,address,tooltip,enable_value,disable_value)
 
 end
 
-function module.CheckBoxVar(name,var,tooltip,func)
+function module.CheckBoxVar(name,var,tooltip,func,panel_func)
 
     if imgui.Checkbox(name, var) then
         if var[0] then
@@ -394,11 +422,13 @@ function module.CheckBoxVar(name,var,tooltip,func)
             fcommon.CheatDeactivated()
         end
         if func ~= nil then
-            func() -- do other stuff
+            func()
         end
     end
 
     module.InformationTooltip(tooltip)
+
+    module.ConfigPanel({module.CheckBoxVar,name,var,tooltip},panel_func)
     
 end
 
