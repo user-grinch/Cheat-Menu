@@ -143,17 +143,17 @@ function module.Write()
                 {
                     hot_keys = 
                     {
-                        asc_key              = tcheatmenu.hot_keys.asc_key,
-                        camera_mode_forward  = tcheatmenu.hot_keys.camera_mode_forward,
-                        camera_mode_flip     = tcheatmenu.hot_keys.camera_mode_flip,
-                        camera_mode_backward = tcheatmenu.hot_keys.camera_mode_backward,
-                        camera_mode_x_axis   = tcheatmenu.hot_keys.camera_mode_x_axis,
-                        camera_mode_y_axis   = tcheatmenu.hot_keys.camera_mode_y_axis,
-                        camera_mode_z_axis   = tcheatmenu.hot_keys.camera_mode_z_axis,
-                        command_window       = tcheatmenu.hot_keys.command_window,
-                        menu_open            = tcheatmenu.hot_keys.menu_open,
-                        quick_screenshot     = tcheatmenu.hot_keys.quick_screenshot,
-                        quick_teleport       = tcheatmenu.hot_keys.quick_teleport,
+                        asc_key                = tcheatmenu.hot_keys.asc_key,
+                        camera_mode_forward    = tcheatmenu.hot_keys.camera_mode_forward,
+                        camera_mode_flip       = tcheatmenu.hot_keys.camera_mode_flip,
+                        camera_mode_backward   = tcheatmenu.hot_keys.camera_mode_backward,
+                        camera_mode_x_axis     = tcheatmenu.hot_keys.camera_mode_x_axis,
+                        camera_mode_y_axis     = tcheatmenu.hot_keys.camera_mode_y_axis,
+                        camera_mode_z_axis     = tcheatmenu.hot_keys.camera_mode_z_axis,
+                        command_window         = tcheatmenu.hot_keys.command_window,
+                        menu_open              = tcheatmenu.hot_keys.menu_open,
+                        quick_screenshot       = tcheatmenu.hot_keys.quick_screenshot,
+                        quick_teleport         = tcheatmenu.hot_keys.quick_teleport,
                     },
                     window =
                     {
@@ -172,14 +172,12 @@ function module.Write()
                 },
                 tgame =
                 {
-                    camera                    =
-                    {
-                        fov         = fgame.tgame.camera.fov[0],       
-                        speed       = fgame.tgame.camera.speed[0],
-                        rotation    = 0.0,
-                        lock_x_axis = fgame.tgame.camera.lock_x_axis[0],
-                        lock_y_axis = fgame.tgame.camera.lock_y_axis[0],
-                        lock_z_axis = fgame.tgame.camera.lock_z_axis[0],
+                    camera            =
+                    {    
+                        fov             = fgame.tgame.camera.fov[0],   
+                        fov_cm          = fgame.tgame.camera.fov_cm[0], 
+                        load_map        = fgame.tgame.camera.load_map[0],
+                        movement_speed  = fgame.tgame.camera.movement_speed[0],
                     },
                     disable_cheats      = fgame.tgame.disable_cheats[0],
                     disable_help_popups = fgame.tgame.disable_help_popups[0],

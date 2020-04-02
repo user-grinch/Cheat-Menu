@@ -373,10 +373,12 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 
 			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_forward,"Camera mode forward")
 			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_backward,"Camera mode backward")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_x_axis,"Camera mode x axis movement")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_y_axis,"Camera mode y axis movement")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_z_axis,"Camera mode z axis movement")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_flip,"Camera mode axis movement flip")
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_left,"Camera mode left")
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_right,"Camera mode right")
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_slow,"Camera mode slower movement")
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_fast,"Camera mode faster movement")
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_up,"Camera mode up (lock on player)")
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_down,"Camera mode down (lock on player)")
 			imgui.Dummy(imgui.ImVec2(0,10))
 
 			imgui.TextWrapped("You can reset these config to default from 'Reset to default' button under 'Config' tab")

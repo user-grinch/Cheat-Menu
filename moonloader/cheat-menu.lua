@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.0-beta")
-script_version_number(20200328) -- YYYYMMDD
+script_version_number(20200402) -- YYYYMMDD
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -95,20 +95,22 @@ tcheatmenu       =
     current_menu = fconfig.Get('tcheatmenu.current_menu',0),
     hot_keys     =
     {
-        asc_key              = fconfig.Get('tcheatmenu.hot_keys.asc',{vkeys.VK_RETURN,vkeys.VK_RETURN}),
-        camera_mode_forward  = fconfig.Get('tcheatmenu.hot_keys.camera_mode_forward',{vkeys.VK_W,vkeys.VK_W}),
-        camera_mode_flip     = fconfig.Get('tcheatmenu.hot_keys.camera_mode_flip',{vkeys.VK_LCONTROL,vkeys.VK_LCONTROL}),
-        camera_mode_backward = fconfig.Get('tcheatmenu.hot_keys.camera_mode_backward',{vkeys.VK_S,vkeys.VK_S}),
-        camera_mode_x_axis   = fconfig.Get('tcheatmenu.hot_keys.camera_mode_x_axis',{vkeys.VK_X,vkeys.VK_X}),
-        camera_mode_y_axis   = fconfig.Get('tcheatmenu.hot_keys.camera_mode_y_axis',{vkeys.VK_Y,vkeys.VK_Y}),
-        camera_mode_z_axis   = fconfig.Get('tcheatmenu.hot_keys.camera_mode_z_axis',{vkeys.VK_Z,vkeys.VK_Z}),
-        command_window       = fconfig.Get('tcheatmenu.hot_keys.command_window',{vkeys.VK_LMENU,vkeys.VK_M}),
-        currently_active     = nil,
-        mc_paste             = fconfig.Get('tcheatmenu.hot_keys.mc_paste',{vkeys.VK_LCONTROL,vkeys.VK_V}),
-        menu_open            = fconfig.Get('tcheatmenu.hot_keys.menu_open',{vkeys.VK_LCONTROL,vkeys.VK_M}),
-        quick_screenshot     = fconfig.Get('tcheatmenu.hot_keys.quick_screenshot',{vkeys.VK_LCONTROL,vkeys.VK_S}),
-        quick_teleport       = fconfig.Get('tcheatmenu.hot_keys.quick_teleport',{vkeys.VK_X,vkeys.VK_Y}),
-        script_manager_temp  = {vkeys.VK_LCONTROL,vkeys.VK_1}
+        asc_key               = fconfig.Get('tcheatmenu.hot_keys.asc',{vkeys.VK_RETURN,vkeys.VK_RETURN}),
+        camera_mode_forward   = fconfig.Get('tcheatmenu.hot_keys.camera_mode_forward',{vkeys.VK_I,vkeys.VK_I}),
+        camera_mode_backward  = fconfig.Get('tcheatmenu.hot_keys.camera_mode_backward',{vkeys.VK_K,vkeys.VK_K}),
+        camera_mode_left      = fconfig.Get('tcheatmenu.hot_keys.camera_mode_left',{vkeys.VK_J,vkeys.VK_J}),
+        camera_mode_right     = fconfig.Get('tcheatmenu.hot_keys.camera_mode_right',{vkeys.VK_L,vkeys.VK_L}),
+        camera_mode_slow      = fconfig.Get('tcheatmenu.hot_keys.camera_mode_slow',{vkeys.VK_RCONTROL,vkeys.VK_RCONTROL}),
+        camera_mode_fast      = fconfig.Get('tcheatmenu.hot_keys.camera_mode_fast',{vkeys.VK_RSHIFT,vkeys.VK_RSHIFT}),
+        camera_mode_up        = fconfig.Get('tcheatmenu.hot_keys.camera_mode_up',{vkeys.VK_O,vkeys.VK_O}),
+        camera_mode_down      = fconfig.Get('tcheatmenu.hot_keys.camera_mode_down',{vkeys.VK_P,vkeys.VK_P}),
+        command_window        = fconfig.Get('tcheatmenu.hot_keys.command_window',{vkeys.VK_LMENU,vkeys.VK_M}),
+        currently_active      = nil,
+        mc_paste              = fconfig.Get('tcheatmenu.hot_keys.mc_paste',{vkeys.VK_LCONTROL,vkeys.VK_V}),
+        menu_open             = fconfig.Get('tcheatmenu.hot_keys.menu_open',{vkeys.VK_LCONTROL,vkeys.VK_M}),
+        quick_screenshot      = fconfig.Get('tcheatmenu.hot_keys.quick_screenshot',{vkeys.VK_LCONTROL,vkeys.VK_S}),
+        quick_teleport        = fconfig.Get('tcheatmenu.hot_keys.quick_teleport',{vkeys.VK_X,vkeys.VK_Y}),
+        script_manager_temp   = {vkeys.VK_LCONTROL,vkeys.VK_1}
     },
     read_key_press = false,
     tab_data     = {},
@@ -571,7 +573,6 @@ function main()
 
         --------------------------------------------------
         
-  
         -- Weapons
         local pPed = getCharPointer(PLAYER_PED)
         local CurWeapon = getCurrentCharWeapon(PLAYER_PED)
@@ -712,21 +713,9 @@ function onScriptTerminate(script, quitGame)
         end
 
         if fgame.tgame.camera.bool[0] then
-            x,y,z = getCharCoordinates(PLAYER_PED)
-            z = getGroundZFor3dCoord(x,y,z+fgame.tgame.camera.z_offset)
-            
-            setCharCoordinates(PLAYER_PED,x,y,z)
-
-            freezeCharPositionAndDontLoadCollision(PLAYER_PED,false)
-            setCharCollision(PLAYER_PED,true)
-            setLoadCollisionForCharFlag(PLAYER_PED,true)
-            setEveryoneIgnorePlayer(0,false)
-
-            writeMemory(0xBA676C,1,0,false) -- Radar
-            writeMemory(0xBA6769,1,1,false) -- Hud
-
+            displayRadar(true)
+            displayHud(true)
             restoreCameraJumpcut()
-            writeMemory((getCharPointer(PLAYER_PED)+1140),4,fgame.tgame.camera.model_val,false)
         end
         
         if fmenu.tmenu.show_crash_message[0] and not fgame.tgame.script_manager.skip_auto_reload then

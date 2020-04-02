@@ -218,7 +218,7 @@ function LoadImages(image_table)
         if type(image) == "string" then
             image_table[model] = imgui.CreateTextureFromFile(image)
         end
-        wait(100)
+        wait(0)
     end
     
 end
@@ -330,8 +330,10 @@ function module.RadioButtonFunc(label,label_table,values,memory)
         if (#label_table % 2) ~= 0 then -- if odd number
             btn_in_column = btn_in_column + 1
         end 
-
-        imgui.Columns(2,nil,false)
+        
+        if #label_table > 1 then
+            imgui.Columns(2,nil,false)
+        end
         for i = 1, #label_table,1 do
 
             if imgui.RadioButtonIntPtr(label_table[i] .. "##" .. label,button,values[i]) then
@@ -353,9 +355,10 @@ function module.RadioButton(label,rb_table,addr_table,default)
     if default == nil then default = true end
 
     local button = imgui.new.int(#addr_table + 1)
+    local btn_in_column = math.floor(#addr_table/2+1)
 
     imgui.Text(label)
-
+    imgui.Columns(2,nil,false)
     for i = 1, #addr_table,1 do
         if readMemory(addr_table[i],1,false) == 1 then
             button[0] = i
@@ -370,6 +373,9 @@ function module.RadioButton(label,rb_table,addr_table,default)
             fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",addr_table[i]),{1,1})
             module.CheatActivated()
         end
+        if i == btn_in_column then
+            imgui.NextColumn()
+        end
     end
 
     if default == true then --  unused in handling section
@@ -380,6 +386,7 @@ function module.RadioButton(label,rb_table,addr_table,default)
             module.CheatActivated()
         end
     end
+    imgui.Columns(1)
 end
 
 
