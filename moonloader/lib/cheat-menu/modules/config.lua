@@ -176,7 +176,6 @@ function module.Write()
                     {    
                         fov             = fgame.tgame.camera.fov[0],   
                         fov_cm          = fgame.tgame.camera.fov_cm[0], 
-                        load_map        = fgame.tgame.camera.load_map[0],
                         movement_speed  = fgame.tgame.camera.movement_speed[0],
                     },
                     disable_cheats      = fgame.tgame.disable_cheats[0],

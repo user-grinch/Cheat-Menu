@@ -24,7 +24,6 @@ module.tgame                =
         fov                 = imgui.new.int(fconfig.Get('tgame.camera.fov',70)),
         fov_cm              = imgui.new.int(fconfig.Get('tgame.camera.fov_cm',70)),
         lock_on_player      = imgui.new.bool(false),
-        load_map            = imgui.new.bool(fconfig.Get('tgame.camera.load_map',false)),
         movement_speed      = imgui.new.float(fconfig.Get('tgame.camera.movement_speed',0.2)),
         shake               = imgui.new.float(0.0),
     },
@@ -176,10 +175,10 @@ function module.CameraMode()
                 
 
                 if isKeyDown(tcheatmenu.hot_keys.camera_mode_slow[1] and tcheatmenu.hot_keys.camera_mode_slow[2]) then 
-                    factor = 0.5
+                    factor = factor*0.5
                 end
                 if isKeyDown(tcheatmenu.hot_keys.camera_mode_fast[1] and tcheatmenu.hot_keys.camera_mode_fast[2]) then 
-                    factor = 2
+                    factor = factor*2
                 end
 
 
@@ -229,10 +228,10 @@ function module.CameraMode()
                         factor = 1
 
                         if isKeyDown(tcheatmenu.hot_keys.camera_mode_slow[1] and tcheatmenu.hot_keys.camera_mode_slow[2]) then 
-                            factor = 0.5
+                            factor = factor*0.5
                         end
                         if isKeyDown(tcheatmenu.hot_keys.camera_mode_fast[1] and tcheatmenu.hot_keys.camera_mode_fast[2]) then 
-                            factor = 2
+                            factor = factor*2
                         end
 
                         if isKeyDown(tcheatmenu.hot_keys.camera_mode_forward[1] and tcheatmenu.hot_keys.camera_mode_forward[2]) then 
@@ -281,8 +280,6 @@ function module.CameraMode()
                     attachCameraToChar(ped,0.0, 0.0, 20.0, 0.0, 180, total_mouse_y, 0.0, 2)
                     setCharCoordinates(ped,x,y,z-1.0)
                 end
-                
-                wait(0)
 
                 if total_mouse_delta + getMousewheelDelta() ~= total_mouse_delta then
                     total_mouse_delta = total_mouse_delta + getMousewheelDelta()
@@ -296,9 +293,7 @@ function module.CameraMode()
                     cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov_cm[0],100,true)
                     cameraPersistFov(true) 
                 end
-                if module.tgame.camera.load_map[0] then
-                    loadScene(x,y,z)
-                end
+                wait(0)
             end
            
            
@@ -710,12 +705,8 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",
             fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_up),
             fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_down)),nil,
             function()
-                imgui.Columns(2,nil,false)
                 fcommon.CheckBoxVar("Lock on player",module.tgame.camera.lock_on_player,"Locks camera on player")
-                imgui.NextColumn()
-                fcommon.CheckBoxVar("Load map",module.tgame.camera.load_map,"Keeps loading map as the camera moves.\
-Disabling this might show LODs.")
-                imgui.Columns(1)
+
                 imgui.Spacing()
                 if imgui.SliderInt("FOV", module.tgame.camera.fov_cm, 5,120) then
                     if module.tgame.camera.bool[0] then
