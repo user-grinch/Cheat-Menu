@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.0-beta")
-script_version_number(20200402) -- YYYYMMDD
+script_version_number(20200409) -- YYYYMMDD
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -559,20 +559,21 @@ function main()
     lua_thread.create(fvehicle.AircraftCamera)
     lua_thread.create(fvehicle.FirstPersonCamera)
     lua_thread.create(fvehicle.OnEnterVehicle)
+    lua_thread.create(fvehicle.ParseCarcols)
     lua_thread.create(fvehicle.RandomColors)
     lua_thread.create(fvehicle.RandomTrafficColors)
     lua_thread.create(fvehicle.TrafficNeons)
     lua_thread.create(fvehicle.UnlimitedNitro)
+    lua_thread.create(fvisual.LockWeather)
     lua_thread.create(fweapon.AutoAim)
 
     --------------------------------------------------
-   
+
     while true do
         --------------------------------------------------
         -- Functions that neeed to run constantly
 
         --------------------------------------------------
-        
         -- Weapons
         local pPed = getCharPointer(PLAYER_PED)
         local CurWeapon = getCurrentCharWeapon(PLAYER_PED)
@@ -648,8 +649,13 @@ function main()
             -- Reset car colors if player changed color in tune shop
             if fvehicle.tvehicle.color.default ~= -1 then
                 if fvehicle.tvehicle.color.default ~= getCarColours(car) then
-                    fvehicle.ForEachCarComponent(function(mat)
+                    fvehicle.ForEachCarComponent(function(mat,comp,car)
                         mat:reset_color()
+                        if script.find('gsx-data') then
+                            gsx.set(car,"cm_color_red_" .. comp.name,fvehicle.tvehicle.color.rgb[0])
+                            gsx.set(car,"cm_color_green_" .. comp.name,fvehicle.tvehicle.color.rgb[1])
+                            gsx.set(car,"cm_color_blue_" .. comp.name,fvehicle.tvehicle.color.rgb[2])
+                        end
                     end)
                 end
             end
@@ -716,6 +722,10 @@ function onScriptTerminate(script, quitGame)
             displayRadar(true)
             displayHud(true)
             restoreCameraJumpcut()
+        end
+
+        if doesObjectExist(fgame.tgame.solid_water_object) then
+            deleteObject(fgame.tgame.solid_water_object)
         end
         
         if fmenu.tmenu.show_crash_message[0] and not fgame.tgame.script_manager.skip_auto_reload then

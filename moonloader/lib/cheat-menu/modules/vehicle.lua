@@ -28,8 +28,13 @@ module.tvehicle =
     apply_material_filter = imgui.new.bool(fconfig.Get('tvehicle.apply_material_filter',true)),
     color =
     {
+        car_data_table = {},
+        col_data_table = {},
         default = -1,
-        rgb     = imgui.new.float[3](0.0,0.0,0.0),
+        parse_done = false,
+        radio_btn = imgui.new.int(1),
+        rgb      = imgui.new.float[3](0.0,0.0,0.0),
+        show_all = imgui.new.bool(fconfig.Get('tvehicle.color.show_all',false))
     },
     components =
     {
@@ -110,6 +115,7 @@ module.tvehicle =
 module.IsValidModForVehicle = ffi.cast('bool(*)(int model, int cvehicle)',0x49B010)
 
 IsThisModelATrain = ffi.cast('bool(*)(int model)',0x4C5AD0)
+CVehicleModelInfo = ffi.cast("uintptr_t*", 0x00A9B0C8)
 
 -- load neon library
 result, handle = loadDynamicLibrary("neon_api.asi")
@@ -130,6 +136,9 @@ module.tvehicle.neon["SetY"] = proc
 result, proc = getDynamicLibraryProcedure("InstallNeon",module.tvehicle.neon["Handle"])
 module.tvehicle.neon["InstallNeon"] = proc
 
+function module.GetNameOfVehicleModel(model)
+    return ffi.string(ffi.cast("char*", CVehicleModelInfo[tonumber(model)] + 0x32)) or ""
+end
 
 function module.GetModelInfo(name)
     local pInfo = allocateMemory(16)
@@ -138,27 +147,10 @@ function module.GetModelInfo(name)
     local model = readMemory(pInfo,4,false)
     freeMemory(pInfo)
     
-    if fvehicle.GetModelName(model) ~= "" then
+    if module.GetNameOfVehicleModel(model) ~= "" then
         return model
     else
         return 0
-    end
-end
-
--- Returns name of vehicle
-function module.GetModelName(id)
-    local name = module.tvehicle.names[tostring(id)]
-
-    local gxt_name = getGxtText(name)
-    if name ~= nil then
-        if gxt_name ~= "" then
-            return string.format("Gxt name: %s\nModel name: %s",gxt_name,name) 
-        else
-            return string.format("Model name: %s",name) 
-        end
-       
-    else
-        return ""
     end
 end
 
@@ -338,8 +330,8 @@ function module.AircraftCamera()
                 local roll = getCarRoll(vehicle)
 
                 attachCameraToVehicle(vehicle,0.0,module.tvehicle.aircraft.zoom[module.tvehicle.aircraft.index],2.5,0.0,0.0,0.0,(roll*-1),2)
-                if isKeyDown(tkeys.camera_zoom) then
-                    while isKeyDown(tkeys.camera_zoom) do
+                if isKeyDown(0x56) then
+                    while isKeyDown(0x56) do
                         wait(0)
                     end
                     module.tvehicle.aircraft.index = module.tvehicle.aircraft.index + 1
@@ -412,7 +404,55 @@ function module.GetTextureName(name)
     if name == nil then
         return ""
     else
-        return "Texture: " ..name
+        return name
+    end
+end
+
+function module.ParseCarcols()
+    local file_path = string.format("%s/data/carcols.dat",getGameDirectory())
+    local col_data = false
+    local car_data = false
+
+    if doesFileExist(file_path) then
+  
+        for line in io.lines(file_path) do
+          --  print(line)
+            if line == "col" then
+                col_data = true
+                goto continue
+            end
+            if line == "car" or line == "car4" then
+                car_data = true
+                goto continue
+            end 
+            if line == "end" then
+                if col_data then col_data = false end
+                if car_data then car_data = false end
+                goto continue
+            end
+            if col_data then
+                local r, g, b = string.match(line,"(%d+).(%d+).(%d+)")
+
+                if r and g and b then
+                    table.insert(module.tvehicle.color.col_data_table,string.format("%d %d %d",r,g,b))
+                end
+            end
+            if car_data then
+                local name = nil
+                for x in string.gmatch(line,"[^,]+") do
+                    if type(tonumber(x)) == "nil" then
+                        name = string.upper(x)
+                        module.tvehicle.color.car_data_table[name] = {}
+                    end
+                    if type(tonumber(x)) == "number" then
+                        table.insert(module.tvehicle.color.car_data_table[name],tonumber(x))
+                    end
+                end
+            end
+            ::continue::
+            wait(0)
+        end
+        module.tvehicle.color.parse_done = true
     end
 end
 
@@ -424,15 +464,15 @@ function module.OnEnterVehicle()
             local car        = getCarCharIsUsing(PLAYER_PED)
             local pCar       = getCarPointer(car)
             local model      = getCarModel(car)
-            local model_name = module.tvehicle.gxt_name_table[module.GetModelName(model)] or getGxtText(module.GetModelName(model))
+            local model_name = module.tvehicle.gxt_name_table[module.GetNameOfVehicleModel(model)] or getGxtText(module.GetNameOfVehicleModel(model))
 
             -- Get vehicle components
             module.tvehicle.hidden_objects = {}
             module.tvehicle.components.names = {"default"}
 
-            for _, comp in ipairs(mad.get_all_vehicle_components(car)) do
-                table.insert(module.tvehicle.components.names,comp.name) 
-            end
+            module.ForEachCarComponent(function(mat,comp,car)
+                table.insert(module.tvehicle.components.names,comp.name)
+            end,true)
             module.tvehicle.components.list  = imgui.new['const char*'][#module.tvehicle.components.names](module.tvehicle.components.names)
 
             --Load gsx data
@@ -614,6 +654,7 @@ function module.TrafficNeons()
 end
 
 function InstallNeon(pCar,color,pulsing)
+    local car = getVehiclePointerHandle(pCar)
     color = color or module.tvehicle.neon.rb_value[0]
     pulsing = pulsing or module.tvehicle.neon.pulsing[0]
 
@@ -621,7 +662,7 @@ function InstallNeon(pCar,color,pulsing)
         if module.tvehicle.neon["InstallNeon"] and module.tvehicle.neon["SetX"] and module.tvehicle.neon["SetY"] then
             callFunction(module.tvehicle.neon["InstallNeon"],3,3,pCar,color,pulsing)
             
-            local data = module.tvehicle.neon.data[module.tvehicle.names[tostring(model)]] or { X = 0.0, Y = 0.0}
+            local data = module.tvehicle.neon.data[module.GetNameOfVehicleModel(getCarModel(car))] or { X = 0.0, Y = 0.0}
   
             callFunction(module.tvehicle.neon["SetX"],2,2,pCar,data.X)
             callFunction(module.tvehicle.neon["SetY"],2,2,pCar,data.Y)
@@ -764,7 +805,7 @@ function module.VehicleMain()
                     local seats = getMaximumNumberOfPassengers(vehicle)
                     imgui.Spacing()
                     imgui.Columns(2,nil,false)
-                    imgui.Text(module.GetModelName(getCarModel(vehicle)))
+                    imgui.Text(module.GetNameOfVehicleModel(getCarModel(vehicle)))
                     imgui.NextColumn()
                     imgui.Text(string.format("Total seats: %d",seats+1))
                     imgui.Columns(1)
@@ -895,18 +936,18 @@ function module.VehicleMain()
                 fcommon.UpdateAddress({name = 'Nitro count',address = pCar + 0x48A ,size = 1,min = 0,max = 15, default = 7.5,is_float = false})
                 fcommon.DropDownMenu("Set name",function()
 
-                    imgui.Text(string.format( "Model name = %s",module.GetModelName(getCarModel(car))))
+                    imgui.Text(string.format( "Model name = %s",module.GetNameOfVehicleModel(getCarModel(car))))
                     imgui.Spacing()
                     imgui.InputText("Name", module.tvehicle.gxt_name,ffi.sizeof(module.tvehicle.gxt_name))
 
                     imgui.Spacing()
                     if imgui.Button("Set",imgui.ImVec2(fcommon.GetSize(3))) then
-                        setGxtEntry(module.GetModelName(getCarModel(car)),ffi.string(module.tvehicle.gxt_name))
+                        setGxtEntry(module.GetNameOfVehicleModel(getCarModel(car)),ffi.string(module.tvehicle.gxt_name))
                         fcommon.CheatActivated()
                     end
                     imgui.SameLine()
                     if imgui.Button("Save",imgui.ImVec2(fcommon.GetSize(3))) then
-                        module.tvehicle.gxt_name_table[module.GetModelName(getCarModel(car))] = ffi.string(module.tvehicle.gxt_name)
+                        module.tvehicle.gxt_name_table[module.GetNameOfVehicleModel(getCarModel(car))] = ffi.string(module.tvehicle.gxt_name)
                     end
                     imgui.SameLine()
                     if imgui.Button("Clear all",imgui.ImVec2(fcommon.GetSize(3))) then
@@ -940,6 +981,9 @@ function module.VehicleMain()
                         module.tvehicle.speed[0] = 0
                     end
                 end)
+                fcommon.UpdateAddress({name = 'Wheel scale',address = pCar+0x458,size = 4,min = 0,max = 10, default = 1,is_float = true})
+                --fcommon.UpdateAddress({name = 'ZZZZZ',address = pCar+0x489,size = 4,min = -10,max = 10, default = 1,is_float = false})
+
             end            
         end,
         function()
@@ -953,10 +997,10 @@ function module.VehicleMain()
             imgui.Spacing()
             fcommon.Tabs("Vehicles list",{"List","Search"},{
                 function()
-                    fcommon.DrawImages(fconst.IDENTIFIER.VEHICLE,fconst.DRAW_TYPE.LIST,module.tvehicle.images,fconst.VEHICLE.IMAGE_HEIGHT,fconst.VEHICLE.IMAGE_WIDTH,module.GiveVehicleToPlayer,nil,module.GetModelName,module.tvehicle.filter)
+                    fcommon.DrawImages(fconst.IDENTIFIER.VEHICLE,fconst.DRAW_TYPE.LIST,module.tvehicle.images,fconst.VEHICLE.IMAGE_HEIGHT,fconst.VEHICLE.IMAGE_WIDTH,module.GiveVehicleToPlayer,nil,module.GetNameOfVehicleModel,module.tvehicle.filter)
                 end,
                 function()
-                    fcommon.DrawImages(fconst.IDENTIFIER.VEHICLE,fconst.DRAW_TYPE.SEARCH,module.tvehicle.images,fconst.VEHICLE.IMAGE_HEIGHT,fconst.VEHICLE.IMAGE_WIDTH,module.GiveVehicleToPlayer,nil,module.GetModelName,module.tvehicle.filter)
+                    fcommon.DrawImages(fconst.IDENTIFIER.VEHICLE,fconst.DRAW_TYPE.SEARCH,module.tvehicle.images,fconst.VEHICLE.IMAGE_HEIGHT,fconst.VEHICLE.IMAGE_WIDTH,module.GiveVehicleToPlayer,nil,module.GetNameOfVehicleModel,module.tvehicle.filter)
                 end
             })
         end,
@@ -1002,6 +1046,81 @@ function module.VehicleMain()
                 if imgui.ColorEdit3("Color",module.tvehicle.color.rgb) then
                     ApplyColor()
                 end
+                fcommon.ConfigPanel({nil,"Color"},function()
+                    if module.tvehicle.color.parse_done then
+                        fcommon.CheckBoxVar("Show all", module.tvehicle.color.show_all,"Show all carcol colors")
+                        imgui.Spacing()
+                        local name = module.GetNameOfVehicleModel(getCarModel(car))
+                        
+                        if module.tvehicle.color.car_data_table[name] ~= nil then
+                            local shown_colors = {}
+                            imgui.Text("Color:")
+                            imgui.Spacing()
+                            imgui.Columns(2,nil,false)
+                            imgui.RadioButtonIntPtr("Color 1", module.tvehicle.color.radio_btn, 1)
+                            imgui.RadioButtonIntPtr("Color 2", module.tvehicle.color.radio_btn, 2)
+                            imgui.NextColumn()
+                            imgui.RadioButtonIntPtr("Color 3", module.tvehicle.color.radio_btn, 3)
+                            imgui.RadioButtonIntPtr("Color 4", module.tvehicle.color.radio_btn, 4)
+                            imgui.Spacing()
+                            imgui.Columns(1)
+                            imgui.Text("Select color preset:")
+                            imgui.Spacing()
+
+                            if imgui.BeginChild("Colors") then
+                                local x,y = fcommon.GetSize(1)
+                                local btns_in_row = math.floor(imgui.GetWindowContentRegionWidth()/(y*2))
+                                local btn_size = (imgui.GetWindowContentRegionWidth() - imgui.StyleVar.ItemSpacing*(btns_in_row-0.75*btns_in_row))/btns_in_row
+                                local btn_count = 1
+
+                                func = function(v)
+                                    if not shown_colors[v] then
+                                        local t = {}
+                                        local k =  1
+                                     
+                                        for i in string.gmatch(module.tvehicle.color.col_data_table[v+1],"%w+") do 
+                                            table.insert( t,tonumber(i))
+                                        end
+
+                                        if imgui.ColorButton("Color " .. tostring(v),imgui.ImVec4(t[1]/255,t[2]/255,t[3]/255,255),0,imgui.ImVec2(btn_size,btn_size)) then
+                                            writeMemory(getCarPointer(car) + 1075 + module.tvehicle.color.radio_btn[0],1,tonumber(v),false)
+                                            module.ForEachCarComponent(function(mat,comp,car)
+                                                mat:reset_color()
+                                                if script.find('gsx-data') then
+                                                    gsx.set(car,"cm_color_red_" .. comp.name,module.tvehicle.color.rgb[0])
+                                                    gsx.set(car,"cm_color_green_" .. comp.name,module.tvehicle.color.rgb[1])
+                                                    gsx.set(car,"cm_color_blue_" .. comp.name,module.tvehicle.color.rgb[2])
+                                                end
+                                            end)
+                                        end
+                                        if imgui.IsItemHovered() then
+                                            local drawlist = imgui.GetWindowDrawList()
+                                            drawlist:AddRectFilled(imgui.GetItemRectMin(), imgui.GetItemRectMax(), imgui.GetColorU32(imgui.Col.ModalWindowDimBg))
+                                        end
+                                        shown_colors[v] = true
+                                        if btn_count % btns_in_row ~= 0 then
+                                            imgui.SameLine(0.0,4.0)
+                                        end
+                                        btn_count = btn_count + 1
+                                    end
+                                end
+
+                                if module.tvehicle.color.show_all[0] then       
+                                    for v=0,(#module.tvehicle.color.col_data_table-1),1 do
+                                        func(v)
+                                    end
+                                else
+                                    for k,v in ipairs(module.tvehicle.color.car_data_table[name]) do
+                                        func(v)
+                                    end
+                                end
+                                imgui.EndChild()
+                            end
+                        end
+                    else
+                        imgui.Text("Parsing 'carcols.dat'")
+                    end
+                end)
                 imgui.Combo("Component",module.tvehicle.components.selected,module.tvehicle.components.list,#module.tvehicle.components.names)
                 
                 local paintjobs_count =  getNumAvailablePaintjobs(car)

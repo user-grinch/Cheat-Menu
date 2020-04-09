@@ -25,6 +25,7 @@ module.IDENTIFIER =
     PAINTJOB  = 2,
     COMPONENT = 3,
     PED       = 4,
+    CLOTHES   = 5,
 }
 
 module.DRAW_TYPE =
@@ -57,7 +58,7 @@ module.PAINTJOB =
 module.PED =
 {
     IMAGE_HEIGHT = 110,
-    IMAGE_WIDTH  = 55,
+    IMAGE_WIDTH  = 65,
     IMAGE_EXT    = "jpg",
 }
 

@@ -37,6 +37,7 @@ module.tmenu =
 		write_info      = imgui.new.bool(fconfig.Get('tmenu.debug.write_info',false)),
 	},
 	disable_in_samp		= imgui.new.bool(fconfig.Get('tmenu.disable_in_samp',true)),
+	draw_text_only      = imgui.new.bool(fconfig.Get('tmenu.draw_text_only',false)),
 	fast_load_images    = imgui.new.bool(fconfig.Get('tmenu.fast_load_images',false)),
 	lock_player   		= imgui.new.bool(fconfig.Get('tmenu.lock_player',false)),
 	overlay             = 
@@ -300,6 +301,8 @@ function module.MenuMain()
 will download files from github repository.")
 			fcommon.CheckBoxVar("Disable in SAMP",module.tmenu.disable_in_samp,"Cheat Menu doesn't endorse using cheats\
 on multiplayer and is created for offline\nusage only.\n\nUsing cheats online might ruin others\ngameplay and get yourself banned.")	
+			fcommon.CheckBoxVar("Draw text only",module.tmenu.draw_text_only,"Replace the menu images with text names\
+This might improve the menu performance")	
 			
 			imgui.NextColumn()
 			fcommon.CheckBoxVar("Fast load images",module.tmenu.fast_load_images,"Loads vehicles, weapons, peds etc. images\nat menu startup.\n \
@@ -462,6 +465,7 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 			imgui.TextWrapped("Fabio")
 			imgui.TextWrapped("kuba--")
 			imgui.TextWrapped("Israel")
+			imgui.TextWrapped("guru guru")
 			imgui.TextWrapped("Modding community")
 			imgui.TextWrapped("Rockstar Games")
 			imgui.NextColumn()
@@ -471,6 +475,7 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 			imgui.TextWrapped("For Garage Save Extender")
 			imgui.TextWrapped("For C zip library")
 			imgui.TextWrapped("For Neon api")
+			imgui.TextWrapped("For Timecyc stuff")
 			imgui.Columns(1)
 		end
 	})

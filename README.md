@@ -39,26 +39,6 @@ Now try it out in-game. If it doesn't work open an issue here or create a post i
 2. Download [Moonloader 0.27](https://gtaforums.com/topic/890987-moonloader/) and goto its libstd folder.
 3. Copy everything from that folder and paste them into your installed Moonloader 0.26, lib folder.
 
-## Keyboard shortcuts
-
-1. <kbd>Left Ctrl</kbd> + <kbd>M</kbd> - open the menu in-game 
-2. <kbd>Left Alt</kbd> + <kbd>Q</kbd> - open command window
-3. <kbd>Left Ctrl</kbd> + <kbd>S</kbd> - take quick screenshot 
-4. <kbd>X</kbd> + <kbd>Y</kbd> - quick teleport 
-5. Aim a ped + <kbd>Enter/Return</kbd> - aim skin changer 
-
-### Camera mode shortcuts
-1. <kbd>W</kbd> - go forward
-2. <kbd>S</kbd> - go backward
-3. <kbd>X</kbd> - x axis forward
-3. <kbd>Left Ctrl</kbd> + <kbd>X</kbd> - x axis backward
-3. <kbd>Z</kbd> - z axis forward
-3. <kbd>Left Ctrl</kbd> + <kbd>Z</kbd> - z axis backward
-3. <kbd>Y</kbd> - y axis forward
-3. <kbd>Left Ctrl</kbd> + <kbd>Y</kbd> - y axis backward
-
-**Note:**  From version 1.9-wip(20200118) hotkey system is available to change these from the menu. For earlier versions you must edit 'tkeys' table from '[cheat-menu.lua](https://github.com/user-grinch/Cheat-Menu/blob/master/cheat-menu.lua)' file and change them with your desired keys ([Ascii](http://www.asciitable.com/))
-
 ## Youtubers
 
 A kind request to all those YouTubers out there who are making videos about this mod, use ad sites or whatever( you'll probably do it even if I ask not to ), link to this GitHub repository & don't reupload this mod simply cause you can. It'll help me to get notified about the issues people are having & fix them. It'd be great if you also keep my name in your video description & don't pretend to be the author of it. Your help will be highly appreciated.
@@ -90,7 +70,7 @@ Ped/skin images (only jpg) are loaded from '\moonloader\lib\cheat-menu\peds\' di
 ### Adding custom vehicle images 
 - Required version 1.8-wip and above
 
-Vehicle images (only jpg) are loaded from '\moonloader\lib\cheat-menu\vehicles\images\' directory. There are more folders inside that directory. Those folders are menus that appear on the lists tab. Images under those directories will appear both on the 'search' tab and on the 'list' tab. The image name should contain the vehicle model id. Names for custom vehicles have to be added inside '\moonloader\lib\cheat-menu\json\vehicle.json' file.
+Vehicle images (only jpg) are loaded from '\moonloader\lib\cheat-menu\vehicles\images\' directory. There are more folders inside that directory. Those folders are menus that appear on the lists tab. Images under those directories will appear both on the 'search' tab and on the 'list' tab. The image name should contain the vehicle model id.
 
 ### Adding custom vehicle component images 
 - Required version 1.8-wip and above

@@ -65,46 +65,16 @@ module.tgame                =
         not_loaded          = {},
     },
     solid_water             = imgui.new.bool(fconfig.Get('tgame.solid_water',false)),
+    solid_water_object      = nil,
     ss_shortcut             = imgui.new.bool(fconfig.Get('tgame.ss_shortcut',false)), 
     sync_system_time        = imgui.new.bool(fconfig.Get('tgame.sync_system_time',false)), 
-    weather                 =
-    {    
-        names               = 
-        {
-            "EXTRASUNNY LA",
-            "SUNNY LA",
-            "EXTRASUNNY SMOG LA",
-            "SUNNY SMOG LA",
-            "CLOUDY LA",
-            "SUNNY SF",
-            "EXTRASUNNY SF",
-            "CLOUDY SF",
-            "RAINY SF",
-            "FOGGY SF",
-            "SUNNY VEGAS",
-            "EXTRASUNNY VEGAS",
-            "CLOUDY VEGAS",
-            "EXTRASUNNY COUNTRYSIDE",
-            "SUNNY COUNTRYSIDE",
-            "CLOUDY COUNTRYSIDE",
-            "RAINY COUNTRYSIDE",
-            "EXTRASUNNY DESERT",
-            "SUNNY DESERT",
-            "SANDSTORM DESERT",
-            "UNDERWATER",
-            "EXTRACOLOURS 1",
-            "EXTRACOLOURS 2",
-        },
-        array               = {},
-    },
 }
 
 module.tgame.day.array      = imgui.new['const char*'][#module.tgame.day.names](module.tgame.day.names)
-module.tgame.weather.array  = imgui.new['const char*'][#module.tgame.weather.names](module.tgame.weather.names)
 
 
 function module.SolidWater()
-    local object = nil
+   
     while true do
         if module.tgame.solid_water[0] then
             while module.tgame.solid_water[0] do
@@ -112,21 +82,18 @@ function module.SolidWater()
                 local x,y,z = getCharCoordinates(PLAYER_PED)
                 local water_height =  getWaterHeightAtCoords(x,y,false)
 
-                if doesObjectExist(object) then
-                    deleteObject(object)
-                    removeObjectElegantly(object)
+                if doesObjectExist(module.tgame.solid_water_object) then
+                    deleteObject(module.tgame.solid_water_object)
                 end
 
                 if z > water_height and water_height ~= -1000 and not isCharInAnyBoat(PLAYER_PED) then     -- Don't create the object if player is under water/diving
-                    object = createObject(3095,x,y,water_height)
-                    
+                    module.tgame.solid_water_object = createObject(3095,x,y,water_height)
                     setObjectVisible(object,false)
                 end
             end
 
-            if doesObjectExist(object) then
-                deleteObject(object)
-                removeObjectElegantly(object)
+            if doesObjectExist(module.tgame.solid_water_object) then
+                deleteObject(module.tgame.solid_water_object)
             end
             
         end
@@ -685,12 +652,6 @@ function module.GameMain()
             imgui.SetNextItemWidth(imgui.GetWindowContentRegionWidth()/1.7)
             if imgui.Combo("Day", current_day,module.tgame.day.array,#module.tgame.day.names) then
                 writeMemory(0xB7014E,1,current_day[0]+1,false)
-                fcommon.CheatActivated()
-            end
-            local current_weather = imgui.new.int(readMemory(0xC81320,2,false))
-            imgui.SetNextItemWidth(imgui.GetWindowContentRegionWidth()/1.7)
-            if imgui.Combo("Weather", current_weather,module.tgame.weather.array,#module.tgame.weather.names) then
-                writeMemory(0xC81320,2,current_weather[0],false)
                 fcommon.CheatActivated()
             end
             

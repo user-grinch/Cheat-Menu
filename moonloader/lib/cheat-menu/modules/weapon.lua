@@ -104,7 +104,7 @@ module.tweapon.gang.weapon3[0] = module.tweapon.gang.used_weapons[fped.tped.gang
 function module.GetModelName(id)
 
     if module.tweapon.names[id] ~= nil then
-        return "Model name: " .. module.tweapon.names[id]
+        return module.tweapon.names[id]
     else
         return ""
     end

@@ -92,8 +92,10 @@ function module.ConfigPanel(func_arg_table,func)
                 if imgui.Button("Hide",imgui.ImVec2(fcommon.GetSize(1))) then
                     tcheatmenu.window.panel_func = nil
                 end
-                imgui.Dummy(imgui.ImVec2(0,10))
-                func_arg_table[1](func_arg_table[2],func_arg_table[3],func_arg_table[4])
+                if func_arg_table[1] ~= nil then
+                    imgui.Dummy(imgui.ImVec2(0,10))
+                    func_arg_table[1](func_arg_table[2],func_arg_table[3],func_arg_table[4])
+                end
                 imgui.Dummy(imgui.ImVec2(0,10))
                 func()
             end
@@ -253,13 +255,36 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
                 
                     if model_name ~= nil then
                         if imgui.IsItemHovered() then
-                            imgui.BeginTooltip()
-                            if identifier ~= fconst.IDENTIFIER.PAINTJOB and identifier ~= fconst.IDENTIFIER.CLOTH then
-                                imgui.SetTooltip("Model id: " .. model .. "\n" .. model_name)
-                            else
-                                imgui.SetTooltip(model_name)
+                            local drawlist = imgui.GetWindowDrawList()
+                            drawlist:AddRectFilled(imgui.GetItemRectMin(), imgui.GetItemRectMax(), imgui.GetColorU32(imgui.Col.ModalWindowDimBg))
+
+                            if identifier == fconst.IDENTIFIER.CLOTH and func_get_name ~= nil then
+                                model, model_name = func_get_name(model,true)
                             end
-                            imgui.EndTooltip()
+
+                            if imgui.CalcTextSize(model_name).x > const_image_width then
+                                model_name = model_name:gsub(" ","\n")
+                            end
+
+                            if identifier ~= fconst.IDENTIFIER.PAINTJOB then
+                                local offset_x = (imgui.GetItemRectSize().x - imgui.CalcTextSize(model).x)/2
+                                local offset_y = 5
+
+                                drawlist:AddText(imgui.ImVec2(imgui.GetItemRectMin().x+offset_x,imgui.GetItemRectMin().y+offset_y), imgui.GetColorU32(imgui.Col.Text),model)
+                                
+                                local offset_x = (imgui.GetItemRectSize().x - imgui.CalcTextSize(model_name).x)/2
+                                local offset_y = imgui.CalcTextSize(model).y+5
+                                drawlist:AddText(imgui.ImVec2(imgui.GetItemRectMin().x+offset_x,imgui.GetItemRectMin().y+offset_y), imgui.GetColorU32(imgui.Col.Text),model_name)
+                                
+                            else
+                                local text = string.format("%s",model)
+
+                                local offset_x = (imgui.GetItemRectSize().x - imgui.CalcTextSize(model).x)/2
+                                local offset_y = 5
+
+                                drawlist:AddText(imgui.ImVec2(imgui.GetItemRectMin().x+offset_x,imgui.GetItemRectMin().y+offset_y), imgui.GetColorU32(imgui.Col.Text),model)
+                                
+                            end
                         end
                     end
 
@@ -267,6 +292,37 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
                         imgui.SameLine(0.0,4.0)
                     end
                     image_count = image_count + 1
+                end
+            end
+        end
+    end
+
+    draw_text = function(identifier,func_on_left_click,func_on_right_click,func_get_name,filter,model)
+        local model_name = ""
+        local label = ""
+
+        if func_get_name ~= nil then
+            model_name = func_get_name(model)
+        end
+        
+        if identifier == fconst.IDENTIFIER.PAINTJOB or identifier == fconst.IDENTIFIER.COMPONENT or identifier == fconst.IDENTIFIER.CLOTHES then
+            if identifier == fconst.IDENTIFIER.CLOTHES then
+                local body_part, model_name , texture_name = fplayer.GetClothName(model,true)
+                label = string.format( "%s - %s - %s",body_part, model_name , texture_name)
+            else
+                label = model:gsub("$"," ")
+            end
+        else
+            label = string.format( "%s - %s",model_name,model)
+        end
+
+        if draw_type == fconst.DRAW_TYPE.LIST or filter:PassFilter(model_name) then
+            if identifier ~= fconst.IDENTIFIER.COMPONENT or fvehicle.IsValidModForVehicle(tonumber(model),getCarPointer(getCarCharIsUsing(PLAYER_PED))) then
+                if imgui.MenuItemBool(label) and func_on_left_click ~= nil then
+                    func_on_left_click(model)
+                end 
+                if imgui.IsMouseClicked(1) and func_on_right_click ~= nil then
+                    func_on_right_click(model)
                 end
             end
         end
@@ -291,11 +347,14 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
                     imgui.Spacing()
                     image_count = 1
                     for model,image in pairs(image_table) do
-                        draw_image(identifier,valid_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,filter,model,image)
+                        if fmenu.tmenu.draw_text_only[0] then
+                            draw_text(identifier,func_on_left_click,func_on_right_click,func_get_name,filter,model)
+                        else
+                            draw_image(identifier,valid_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,filter,model,image)
+                        end
                     end
-                    imgui.NewLine()
-                    imgui.Separator()
                     imgui.Spacing()
+                    imgui.Separator()
                 end
             end
             imgui.EndChild()
@@ -312,7 +371,11 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
             for _,image_table in pairs(loaded_images_list) do
                 lua_thread.create(LoadImages,image_table)
                 for model,image in pairs(image_table) do
-                    draw_image(identifier,image_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,filter,model,image)
+                    if fmenu.tmenu.draw_text_only[0] then
+                        draw_text(identifier,func_on_left_click,func_on_right_click,func_get_name,filter,model)
+                    else
+                        draw_image(identifier,valid_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,filter,model,image)
+                    end
                 end
             end
             imgui.EndChild()
@@ -439,13 +502,15 @@ function module.CheckBoxVar(name,var,tooltip,func,panel_func)
     
 end
 
-function module.CheckBoxFunc(name,var,func,tooltip)
+function module.CheckBoxFunc(name,var,func,tooltip,panel_func)
 
     if imgui.Checkbox(name, var) then
         func()
     end
 
     module.InformationTooltip(tooltip)
+
+    module.ConfigPanel({module.CheckBoxVar,name,var,tooltip},panel_func)
 end
 
 --------------------------------------------------
@@ -637,7 +702,7 @@ function module.HotKey(index,info_text)
         text = vkeys.id_to_name(index[1]) .. " + " .. vkeys.id_to_name(index[2])
     end
 
-    if imgui.Button(text,imgui.ImVec2(x,y-y/5)) then
+    if imgui.Button(text,imgui.ImVec2(x,y/1.2)) then
         if tcheatmenu.hot_keys.currently_active == index then
             tcheatmenu.read_key_press = false
             tcheatmenu.hot_keys.currently_active = {}

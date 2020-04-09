@@ -93,7 +93,7 @@ module.tped.gang.array = imgui.new['const char*'][#module.tped.gang.list](module
 -- Returns ped name
 function module.GetModelName(model)
     if module.tped.names[model] then 
-        return "Model name: " .. module.tped.names[model] 
+        return module.tped.names[model] 
     else 
         return "" 
     end
@@ -121,17 +121,6 @@ function module.SpawnPed(model)
             --markCharAsNoLongerNeeded(ped)
         end
         printHelpString("Ped ~g~Spawned")
-    end
-end
-
-function SetGangZoneDensity(title,id)
-    local x,y,z = getCharCoordinates(PLAYER_PED)
-        
-    local density = imgui.new.int(getZoneGangStrength(getNameOfInfoZone(x,y,z),id))
-    if imgui.SliderInt(title,density,0,255) then
-        setZoneGangStrength(getNameOfInfoZone(x,y,z),id,density[0])
-        clearSpecificZonesToTriggerGangWar()
-        setGangWarsActive(true)
     end
 end
 
@@ -183,6 +172,23 @@ function module.PedMain()
                 function()
                     setGangWarsActive(module.tped.gang.wars[0])
                     if module.tped.gang.wars[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
+                end,nil,
+                function()
+                    imgui.TextWrapped("Gang zone density:")
+                    imgui.Spacing()
+                    for title,id in pairs(module.tped.gang.names) do
+
+                        local x,y,z = getCharCoordinates(PLAYER_PED)
+        
+                        local density = imgui.new.int(getZoneGangStrength(getNameOfInfoZone(x,y,z),id))
+                        imgui.PushItemWidth(imgui.GetWindowWidth()/2)
+                        if imgui.SliderInt(title,density,0,255) then
+                            setZoneGangStrength(getNameOfInfoZone(x,y,z),id,density[0])
+                        end
+                    end
+                    imgui.PopItemWidth()
+                    imgui.Spacing()
+                    imgui.TextWrapped("You'll need ExGangWars plugin to display some turf colors")
                 end)
                 
                 imgui.NextColumn()
@@ -195,19 +201,11 @@ function module.PedMain()
                 
                 imgui.Columns(1)
                 imgui.Spacing()
-                fcommon.RadioButton("Recruit anyone",{"9mm","AK47","Rockets"},{0x96917C,0x96917D,0x96917E})
             end,
             function()
                 fcommon.UpdateAddress({name = 'Pedestrian density multiplier',address = 0x8D2530,size = 4,min = 0,max = 10, default = 1,is_float = true})
-                fcommon.DropDownMenu("Gang zone density",function()
-                    imgui.PushItemWidth(imgui.GetWindowWidth() - 200)
-
-                    for k,v in pairs(module.tped.gang.names) do
-                        SetGangZoneDensity(k,v)
-                    end
-                    imgui.PopItemWidth()
-                    imgui.Spacing()
-                    imgui.Text("You'll need ExGangWars plugin to display some turf colors")
+                fcommon.DropDownMenu("Recruit anyone",function()
+                    fcommon.RadioButton("Select Weapon",{"9mm","AK47","Rockets"},{0x96917C,0x96917D,0x96917E})
                 end)
             end,
             function()

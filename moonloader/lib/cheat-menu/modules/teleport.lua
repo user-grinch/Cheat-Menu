@@ -19,7 +19,7 @@ local module = {}
 module.tteleport =
 {
 	auto_z                  = imgui.new.bool(fconfig.Get('tteleport.auto_z',false)),
-	coords                  = imgui.new.char[24](""),
+	coords                  = imgui.new.char[64](""),
 	coordinates             = fcommon.LoadJson("coordinate"),
 	coord_name              = imgui.new.char[64](""),
 	filter                  = imgui.ImGuiTextFilter(),
@@ -82,14 +82,19 @@ function module.TeleportMain()
             if module.tteleport.insert_coords[0] then
                 local x,y,z = getCharCoordinates(PLAYER_PED)
                 imgui.StrCopy(module.tteleport.coords,string.format("%d, %d, %d", math.floor(x) , math.floor(y) , math.floor(z)))
-            end
+			end
+			
+			if (isKeyDown(vkeys.VK_LCONTROL) or isKeyDown(vkeys.VK_RCONTROL)) and isKeyDown(vkeys.VK_V) then
+				imgui.StrCopy(module.tteleport.coords,getClipboardText())
+			end
 
             fcommon.InformationTooltip("Enter XYZ coordinates.\nFormat : X,Y,Z")
             imgui.Dummy(imgui.ImVec2(0,10))
 
             if imgui.Button("Teleport to coord",imgui.ImVec2(fcommon.GetSize(2))) then
-                local x,y,z = (ffi.string(module.tteleport.coords)):match("([^,]+),([^,]+),([^,]+)")
-                module.Teleport(x, y, z,0)
+				local x,y,z = (ffi.string(module.tteleport.coords)):match("([^,]+),([^,]+),([^,]+)")
+				
+				module.Teleport(x, y, z,0)
             end
             imgui.SameLine()
             if imgui.Button("Teleport to marker",imgui.ImVec2(fcommon.GetSize(2))) then
@@ -114,8 +119,8 @@ function module.TeleportMain()
 		end,
 		function()
 			imgui.Columns(1)
-			if imgui.InputText("Location name",module.tteleport.coord_name,ffi.sizeof(module.tteleport.coords)) then end
-			if imgui.InputText("Coordinates",module.tteleport.coords,ffi.sizeof(module.tteleport.coords)) then end
+			imgui.InputText("Location name",module.tteleport.coord_name,ffi.sizeof(module.tteleport.coords))
+			imgui.InputText("Coordinates",module.tteleport.coords,ffi.sizeof(module.tteleport.coords))
 			fcommon.InformationTooltip("Enter XYZ coordinates.\nFormat : X,Y,Z")
 			if module.tteleport.insert_coords[0] then
 				local x,y,z = getCharCoordinates(PLAYER_PED)
