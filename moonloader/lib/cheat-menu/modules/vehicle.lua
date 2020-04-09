@@ -1047,9 +1047,13 @@ function module.VehicleMain()
                     ApplyColor()
                 end
                 fcommon.ConfigPanel({nil,"Color"},function()
+                    if not isCharInAnyCar(PLAYER_PED) then
+                        tcheatmenu.window.panel_func = nil
+                    end
                     if module.tvehicle.color.parse_done then
                         fcommon.CheckBoxVar("Show all", module.tvehicle.color.show_all,"Show all carcol colors")
                         imgui.Spacing()
+                        
                         local name = module.GetNameOfVehicleModel(getCarModel(car))
                         
                         if module.tvehicle.color.car_data_table[name] ~= nil then
