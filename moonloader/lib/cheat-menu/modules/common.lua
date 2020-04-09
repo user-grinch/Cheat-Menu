@@ -732,14 +732,14 @@ function module.ReadKeyPress()
 
         if tcheatmenu.read_key_press then
 
-            for i=0,127,1 do
+            for i=32,255,1 do
                 if isKeyDown(i) then
                     tcheatmenu.hot_keys.currently_active[1] = i
                     break
                 end
             end
     
-            for i=127,0,-1 do
+            for i=255,32,-1 do
                 if isKeyDown(i) then
                     tcheatmenu.hot_keys.currently_active[2] = i
                     break

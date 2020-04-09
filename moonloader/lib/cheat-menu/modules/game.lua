@@ -88,7 +88,7 @@ function module.SolidWater()
 
                 if z > water_height and water_height ~= -1000 and not isCharInAnyBoat(PLAYER_PED) then     -- Don't create the object if player is under water/diving
                     module.tgame.solid_water_object = createObject(3095,x,y,water_height)
-                    setObjectVisible(object,false)
+                    setObjectVisible(module.tgame.solid_water_object,false)
                 end
             end
 
