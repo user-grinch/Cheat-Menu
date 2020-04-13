@@ -277,6 +277,24 @@ function module.DownloadHandler(id, status, p1, p2)
 	end
 end
 
+function DownloadUpdate()
+	if string.find( script.this.version,"beta") then
+		module.httpRequest("https://github.com/user-grinch/Cheat-Menu/archive/master.zip", nil, function(body, code, headers, status)  
+			print(link, 'OK', status)
+			downloadUrlToFile("https://github.com/user-grinch/Cheat-Menu/archive/master.zip",string.format("%supdate.zip",tcheatmenu.dir),module.DownloadHandler)
+		end)
+	else
+		module.httpRequest("https://api.github.com/repos/user-grinch/Cheat-Menu/tags", nil, function(body, code, headers, status)  
+			print(link, 'OK', status)
+			module.tmenu.repo_version = tostring(decodeJson(body)[1].name)
+			downloadUrlToFile("https://github.com/user-grinch/Cheat-Menu/archive/".. module.tmenu.repo_version .. ".zip",string.format("%supdate.zip",tcheatmenu.dir),module.DownloadHandler)
+		end)
+	end
+	
+	printHelpString("Download has started. You'll get notified when the download completes.")
+	module.tmenu.update_status = fconst.UPDATE_STATUS.DOWNLOADING
+end
+
 -- Main function
 function module.MenuMain()
 

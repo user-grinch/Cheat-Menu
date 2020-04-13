@@ -21,13 +21,17 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.0-beta")
-script_version_number(20200409) -- YYYYMMDD
+script_version_number(20200413) -- YYYYMMDD
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
 tcheatmenu =
 {   
-    dir = string.format( "%s%s",getWorkingDirectory(),"/lib/cheat-menu/"),
+    dir                    = string.format( "%s%s",getWorkingDirectory(),"/lib/cheat-menu/"),
+    window                 = 
+    {
+        missing_components = false,
+    }
 }
 
 --------------------------------------------------
@@ -43,9 +47,6 @@ memory        = require 'memory'
 os            = require 'os'
 vkeys         = require 'vkeys'
 ziplib        = ffi.load(string.format( "%s/lib/ziplib.dll",getWorkingDirectory()))
-
--- External scripts
-gsx           = import 'gsx-data.lua'
 
 -- Menu modules
 fcommon       = require 'cheat-menu.modules.common'
@@ -121,6 +122,7 @@ tcheatmenu       =
             X    = fconfig.Get('tcheatmenu.window.coord.X',50),
             Y    = fconfig.Get('tcheatmenu.window.coord.Y',50),
         },
+        missing_components = tcheatmenu.window.missing_components,
         panel_func = nil,
         show     = imgui.new.bool(false),
         size     =
@@ -188,25 +190,22 @@ function(self) -- render frame
     end
     imgui.Begin(tcheatmenu.window.title, tcheatmenu.window.show,imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoSavedSettings )
 
+    if tcheatmenu.window.missing_components then
+        imgui.Button("Some components of Cheat Menu are missing!",imgui.ImVec2(fcommon.GetSize(1)))
+        if imgui.Button("Reinstall latest",imgui.ImVec2(fcommon.GetSize(2))) then
+            DownloadUpdate()
+            tcheatmenu.window.missing_components = false
+        end
+        imgui.SameLine()
+        if imgui.Button("Hide message",imgui.ImVec2(fcommon.GetSize(2))) then
+            tcheatmenu.window.missing_components = false
+        end
+        imgui.Spacing()
+    end
     if fmenu.tmenu.update_status == fconst.UPDATE_STATUS.NEW_UPDATE then
         imgui.Button("A new update is available",imgui.ImVec2(fcommon.GetSize(1)))
         if imgui.Button("Download now",imgui.ImVec2(fcommon.GetSize(2))) then
-
-            if string.find( script.this.version,"beta") then
-                fmenu.httpRequest("https://github.com/user-grinch/Cheat-Menu/archive/master.zip", nil, function(body, code, headers, status)  
-                    print(link, 'OK', status)
-                    downloadUrlToFile("https://github.com/user-grinch/Cheat-Menu/archive/master.zip",string.format("%supdate.zip",tcheatmenu.dir),fmenu.DownloadHandler)
-                end)
-            else
-                fmenu.httpRequest("https://api.github.com/repos/user-grinch/Cheat-Menu/tags", nil, function(body, code, headers, status)  
-                    print(link, 'OK', status)
-                    fmenu.tmenu.repo_version = tostring(decodeJson(body)[1].name)
-                    downloadUrlToFile("https://github.com/user-grinch/Cheat-Menu/archive/".. fmenu.tmenu.repo_version .. ".zip",string.format("%supdate.zip",tcheatmenu.dir),fmenu.DownloadHandler)
-                end)
-            end
-            
-            printHelpString("Download has started. You'll get notified when the download completes.")
-            fmenu.tmenu.update_status = fconst.UPDATE_STATUS.DOWNLOADING
+            DownloadUpdate()
         end
         imgui.SameLine()
         if imgui.Button("Hide message",imgui.ImVec2(fcommon.GetSize(2))) then
@@ -250,7 +249,7 @@ function(self) -- render frame
 
         if imgui.BeginChild("Welcome") then
             imgui.Dummy(imgui.ImVec2(0,10))
-            imgui.TextWrapped("Welcome to " .. tcheatmenu.window.title)
+            imgui.TextWrapped("Welcome to " .. tcheatmenu.window.title .. " by Grinch_")
             imgui.Dummy(imgui.ImVec2(0,10))
             imgui.TextWrapped("Please configure the settings below,\n(Recommanded settings are already applied)")
             imgui.Dummy(imgui.ImVec2(0,20))
@@ -560,6 +559,7 @@ function main()
     lua_thread.create(fvehicle.FirstPersonCamera)
     lua_thread.create(fvehicle.OnEnterVehicle)
     lua_thread.create(fvehicle.ParseCarcols)
+    lua_thread.create(fvehicle.GSXProcessVehicles)
     lua_thread.create(fvehicle.RandomColors)
     lua_thread.create(fvehicle.RandomTrafficColors)
     lua_thread.create(fvehicle.TrafficNeons)
@@ -570,6 +570,7 @@ function main()
     --------------------------------------------------
 
     while true do
+
         --------------------------------------------------
         -- Functions that neeed to run constantly
 
@@ -597,9 +598,6 @@ function main()
         end
         if fweapon.tweapon.max_move_speed[0] then
             memory.setfloat(pWeaponInfo+0x3C,1.0)
-        end
-        if fweapon.tweapon.max_skills[0] then
-            callFunction(0x4399D0,1,1)
         end
         --------------------------------------------------
 
@@ -651,10 +649,10 @@ function main()
                 if fvehicle.tvehicle.color.default ~= getCarColours(car) then
                     fvehicle.ForEachCarComponent(function(mat,comp,car)
                         mat:reset_color()
-                        if script.find('gsx-data') then
-                            gsx.set(car,"cm_color_red_" .. comp.name,fvehicle.tvehicle.color.rgb[0])
-                            gsx.set(car,"cm_color_green_" .. comp.name,fvehicle.tvehicle.color.rgb[1])
-                            gsx.set(car,"cm_color_blue_" .. comp.name,fvehicle.tvehicle.color.rgb[2])
+                        if fvehicle.tvehicle.gsx.handle ~= 0  then
+                            fvehicle.GSXSet(car,"cm_color_red_" .. comp.name,fvehicle.tvehicle.color.rgb[0])
+                            fvehicle.GSXSet(car,"cm_color_green_" .. comp.name,fvehicle.tvehicle.color.rgb[1])
+                            fvehicle.GSXSet(car,"cm_color_blue_" .. comp.name,fvehicle.tvehicle.color.rgb[2])
                         end
                     end)
                 end
@@ -686,11 +684,11 @@ function main()
         end
 
         --------------------------------------------------
-
         -- Menu open close
         fcommon.OnHotKeyPress(tcheatmenu.hot_keys.menu_open,function()
             tcheatmenu.window.show[0] = not tcheatmenu.window.show[0]
         end)
+
         fcommon.OnHotKeyPress(tcheatmenu.hot_keys.command_window,function()
             fmenu.tmenu.command.show[0] = not fmenu.tmenu.command.show[0]
         end)
@@ -723,16 +721,20 @@ function onScriptTerminate(script, quitGame)
             displayHud(true)
             restoreCameraJumpcut()
         end
-
-        if doesObjectExist(fgame.tgame.solid_water_object) then
-            deleteObject(fgame.tgame.solid_water_object)
-        end
         
         if fmenu.tmenu.show_crash_message[0] and not fgame.tgame.script_manager.skip_auto_reload then
             printHelpString(fmenu.tmenu.crash_text)
         end
 
         fmenu.tmenu.crash_text = ""
+
+        if fvehicle.tvehicle.gsx.handle ~= 0 then
+            fvehicle.RemoveNotifyCallback(fvehicle.GSXpNotifyCallback)
+        end
+
+        if doesObjectExist(fgame.tgame.solid_water_object) then
+            deleteObject(fgame.tgame.solid_water_object)
+        end
 
         --Releasing Images
         fcommon.ReleaseImages(fvehicle.tvehicle.images)

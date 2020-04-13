@@ -29,26 +29,31 @@ module.tteleport =
 
 -- Teleports player to a specified coordinates
 function module.Teleport(x, y, z,interior_id)
-	if x == nil then
-		_, x,y,z = getTargetBlipCoordinates()
+
+	if x == nil and y == nil and z == nil then
+		result, x,y,z = getTargetBlipCoordinates()
+
+		if not result then
+			printHelpString("No marker found")
+			return
+		end
 	end
+
 	if module.tteleport.auto_z[0] or z == nil then
-		z = 100
 		z = getGroundZFor3dCoord(x, y, z)
 	end
 
-	if interior_id == nil or interior_id == 0 then
+	if interior_id == nil then
 		interior_id = 0
-		z = z+3 -- +3.0 to prevent player from teleporting under map
 	end
 
 	setCharInterior(PLAYER_PED,interior_id)
 	setInteriorVisible(interior_id)
 	clearExtraColours(true)
+	loadScene(x,y,z)
 	requestCollision(x,y)
 	activateInteriorPeds(true)
 	setCharCoordinates(PLAYER_PED, x, y, z) 
-	loadScene(x,y,z)
 
 end
 
@@ -93,8 +98,11 @@ function module.TeleportMain()
 
             if imgui.Button("Teleport to coord",imgui.ImVec2(fcommon.GetSize(2))) then
 				local x,y,z = (ffi.string(module.tteleport.coords)):match("([^,]+),([^,]+),([^,]+)")
-				
-				module.Teleport(x, y, z,0)
+				if x ~= nil and y ~= nil and z ~= nil then
+					module.Teleport(x, y, z,0)
+				else
+					printHelpString("No coordinate found")
+				end
             end
             imgui.SameLine()
             if imgui.Button("Teleport to marker",imgui.ImVec2(fcommon.GetSize(2))) then

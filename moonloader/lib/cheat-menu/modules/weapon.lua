@@ -24,7 +24,6 @@ module.tweapon =
     max_accuracy      = imgui.new.bool(fconfig.Get('tweapon.max_accuracy',false)),
     max_ammo_clip     = imgui.new.bool(fconfig.Get('tweapon.max_ammo_clip',false)),
     max_move_speed    = imgui.new.bool(fconfig.Get('tweapon.max_move_speed',false)),
-    max_skills        = imgui.new.bool(fconfig.Get('tweapon.max_skills',false)),
     huge_damage       = imgui.new.bool(fconfig.Get('tweapon.huge_damage',false)),
     images            = {},
     long_target_range = imgui.new.bool(fconfig.Get('tweapon.long_target_range',false)),
@@ -268,16 +267,6 @@ function module.WeaponMain()
             function()
                 if module.tweapon.max_move_speed[0] then
                     fcommon.CheatActivated()
-                else
-                    callFunction(0x5BE670,0,0)
-                    fcommon.CheatDeactivated()
-                end
-            end)
-            fcommon.CheckBoxFunc("Max skills",module.tweapon.max_skills,
-            function()
-                if module.tweapon.max_skills[0] then
-                    fcommon.CheatActivated()
-                    callFunction(0x4399D0,1,1)
                 else
                     callFunction(0x5BE670,0,0)
                     fcommon.CheatDeactivated()

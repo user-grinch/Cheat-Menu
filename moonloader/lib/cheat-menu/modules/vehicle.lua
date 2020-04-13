@@ -36,16 +36,16 @@ module.tvehicle =
         rgb      = imgui.new.float[3](0.0,0.0,0.0),
         show_all = imgui.new.bool(fconfig.Get('tvehicle.color.show_all',false))
     },
-    components =
+    components   =
     {
-        filter = imgui.ImGuiTextFilter(),
-        images = {},
-        list   = {},
-        names  = {},
-        path   =  tcheatmenu.dir .. "vehicles\\components\\",
-        saved = false,
+        filter   = imgui.ImGuiTextFilter(),
+        images   = {},
+        list     = {},
+        names    = {},
+        path     =  tcheatmenu.dir .. "vehicles\\components\\",
+        saved    = false,
         selected = imgui.new.int(0),
-        value  = imgui.new.int(0),
+        value    = imgui.new.int(0),
     },
     doors = 
     {
@@ -60,7 +60,13 @@ module.tvehicle =
     door_menu_button = imgui.new.int(0),
     disable_car_engine = imgui.new.bool(fconfig.Get('tvehicle.disable_car_engine',false)),
     first_person_camera = imgui.new.bool(fconfig.Get('tvehicle.first_person_camera',false)),
-    filter       = imgui.ImGuiTextFilter(),
+    filter          = imgui.ImGuiTextFilter(),
+    gsx             =
+    {
+        handle      = getModuleHandle("gsx.asi"),
+        p_table     = {},
+        veh_data    = {},
+    },
     gxt_name        = imgui.new.char[32](""),
     gxt_name_table  = fconfig.Get('tvehicle.gxt_name_table',{}),
     heavy = imgui.new.bool(fconfig.Get('tvehicle.heavy',false)),
@@ -113,28 +119,229 @@ module.tvehicle =
 }
 
 module.IsValidModForVehicle = ffi.cast('bool(*)(int model, int cvehicle)',0x49B010)
-
 IsThisModelATrain = ffi.cast('bool(*)(int model)',0x4C5AD0)
 CVehicleModelInfo = ffi.cast("uintptr_t*", 0x00A9B0C8)
 
--- load neon library
+--------------------------------------------------
+-- Neon
+
 result, handle = loadDynamicLibrary("neon_api.asi")
 module.tvehicle.neon["Handle"] = handle
 
-result, proc = getDynamicLibraryProcedure("SetFlag",module.tvehicle.neon["Handle"])
-module.tvehicle.neon["SetFlag"] = proc
+if module.tvehicle.neon["Handle"] == 0 then
+    tcheatmenu.window.missing_components = true
+else
+    result, proc = getDynamicLibraryProcedure("SetFlag",module.tvehicle.neon["Handle"])
+    module.tvehicle.neon["SetFlag"] = proc
 
-result, proc = getDynamicLibraryProcedure("GetFlag",module.tvehicle.neon["Handle"])
-module.tvehicle.neon["GetFlag"] = proc
+    result, proc = getDynamicLibraryProcedure("GetFlag",module.tvehicle.neon["Handle"])
+    module.tvehicle.neon["GetFlag"] = proc
 
-result, proc = getDynamicLibraryProcedure("SetX",module.tvehicle.neon["Handle"])
-module.tvehicle.neon["SetX"] = proc
+    result, proc = getDynamicLibraryProcedure("SetX",module.tvehicle.neon["Handle"])
+    module.tvehicle.neon["SetX"] = proc
 
-result, proc = getDynamicLibraryProcedure("SetY",module.tvehicle.neon["Handle"])
-module.tvehicle.neon["SetY"] = proc
+    result, proc = getDynamicLibraryProcedure("SetY",module.tvehicle.neon["Handle"])
+    module.tvehicle.neon["SetY"] = proc
 
-result, proc = getDynamicLibraryProcedure("InstallNeon",module.tvehicle.neon["Handle"])
-module.tvehicle.neon["InstallNeon"] = proc
+    result, proc = getDynamicLibraryProcedure("InstallNeon",module.tvehicle.neon["Handle"])
+    module.tvehicle.neon["InstallNeon"] = proc
+end
+
+function InstallNeon(pCar,color,pulsing)
+    local car = getVehiclePointerHandle(pCar)
+    color = color or module.tvehicle.neon.rb_value[0]
+    pulsing = pulsing or module.tvehicle.neon.pulsing[0]
+    if module.tvehicle.neon["Handle"] ~= 0 then
+        if module.tvehicle.neon["InstallNeon"] and module.tvehicle.neon["SetX"] and module.tvehicle.neon["SetY"] then
+            callFunction(module.tvehicle.neon["InstallNeon"],3,3,pCar,color,pulsing)
+            
+            local data = module.tvehicle.neon.data[module.GetNameOfVehicleModel(getCarModel(car))] or { X = 0.0, Y = 0.0}
+  
+            callFunction(module.tvehicle.neon["SetX"],2,2,pCar,data.X)
+            callFunction(module.tvehicle.neon["SetY"],2,2,pCar,data.Y)
+            if module.tvehicle.gsx.handle ~= 0  then
+                module.GSXSet(car,"cm_neon_color",color)
+                module.GSXSet(car,"cm_neon_pulsing",pulsing)
+            end
+        end
+    end
+end
+
+function module.TrafficNeons()
+    
+    while true do
+        if module.tvehicle.neon.checkbox[0] and module.tvehicle.neon["Handle"] ~= 0 then
+            local x,y,z = getCharCoordinates(PLAYER_PED)
+
+            local result, car = findAllRandomVehiclesInSphere(x,y,z,100.0,false,true)
+            
+            if result then
+                while result do
+                    local temp = 0
+                    local pCar = getCarPointer(car)
+
+                    if getVehicleClass(car) == fconst.VEHICLE_CLASS.NORMAL then
+                        temp = math.random(1,20) -- 5%
+                    end
+                    if getVehicleClass(car) == fconst.VEHICLE_CLASS.RICH_FAMILY then
+                        temp = math.random(1,5) -- 20%
+                    end
+                    if getVehicleClass(car) == fconst.VEHICLE_CLASS.EXECUTIVE then
+                        temp = math.random(1,3) -- 30%
+                    end
+                    if temp == 1 and callFunction(module.tvehicle.neon["GetFlag"],1,1,pCar) ~= 0x10 then
+                        if getCarCharIsUsing(PLAYER_PED) ~= car then
+                            InstallNeon(pCar,math.random(0,6),math.random(0,1))
+                        end
+                    end
+                    callFunction(module.tvehicle.neon["SetFlag"],2,2,pCar,0x10)
+                    result, car = findAllRandomVehiclesInSphere(x,y,z,100.0,true,true)
+                end
+            end
+        end
+        wait(0)
+    end
+end
+
+--------------------------------------------------
+-- Garage Save Extender (GSX) https://gtaforums.com/topic/925563-garage-save-extender/
+-- gsx-data https://forum.mixmods.com.br/f16-utilidades/t2954-gsx-data-usar-gsx-em-scripts-lua-facilmente
+
+if module.tvehicle.gsx.handle == 0 then
+    tcheatmenu.window.missing_components = true
+else
+    ffi.cdef[[
+    typedef uint32_t GSXCVehicle;
+    typedef struct { float x, y, z; } CVector;
+    typedef struct __attribute__((packed, aligned(1))) {
+        CVector pos;
+        uint32_t handling_flags;
+        uint8_t flags;
+        uint8_t field_11;
+        uint16_t model;
+        uint16_t carmods[15];
+        uint8_t colour[4];
+        uint8_t radio_station;
+        uint8_t extra1;
+        uint8_t extra2;
+        uint8_t bomb_type;
+        uint8_t paintjob;
+        uint8_t nitro_count;
+        uint8_t angleX;
+        uint8_t angleY;
+        uint8_t angleZ;
+        uint8_t field_3F;
+    } CStoredCar;
+    typedef struct __attribute__((packed, aligned(1))) { GSXCVehicle veh; int32_t status; size_t when; } journalNews;
+    typedef struct __attribute__((packed, aligned(1))) { GSXCVehicle veh; int32_t status; } apiCarNotify;
+    typedef struct __attribute__((packed, aligned(1))) { GSXCVehicle veh; int32_t status; CStoredCar *gameStoredData; } externalCallbackStructure;
+    typedef void(__cdecl externalCbFun_t)(const externalCallbackStructure*);
+    int __cdecl addNotifyCallback(externalCbFun_t fun);
+    int __cdecl addNotifyTempCallback(externalCbFun_t fun);
+    void __cdecl removeNotifyCallback(int cbRef);
+    void __cdecl removeNotifyTempCallback(int cbRef);
+    int __cdecl getNewCarGrgForeach(size_t *i, apiCarNotify *out);
+    void __cdecl setDataToSaveLaterVehPtr(GSXCVehicle veh, const char *name, int size, void *ptr, bool forceCopyNow);
+    void __cdecl pushDirectlyToSavedData(GSXCVehicle veh, const char *name, int size, void *ptr);
+    int __cdecl dataToSaveLaterExists(GSXCVehicle veh, const char *name);
+    void __cdecl removeToLoadDataVehPtr(GSXCVehicle veh, const char *name);
+    void __cdecl removeToSaveLaterVehPtr(GSXCVehicle veh, const char *name);
+    int __cdecl dataToLoadExists(GSXCVehicle veh, const char *name);
+    void*  __cdecl getLoadDataByVehPtr(GSXCVehicle veh, const char *name);
+    const char*  __cdecl GSX_getCompileTime();
+    const char*  __cdecl GSX_getVersionString();
+    float __cdecl GSX_getVersionNum();
+    int __cdecl getDataToLoadSize(GSXCVehicle veh, const char *name);
+    int __cdecl getDataToSaveSize(GSXCVehicle veh, const char *name);
+    ]]
+
+    local gsx = ffi.load("gsx.asi")
+
+    module.DataToLoadExists = ffi.cast("int (*)(int,const char*)",gsx.dataToLoadExists)
+    module.GetDataToLoadSize = ffi.cast("int (*)(int,const char*)",gsx.getDataToLoadSize)
+    module.GetLoadDataByVehPtr = ffi.cast("int (*)(int,const char*)",gsx.getLoadDataByVehPtr)
+    module.PushDirectlyToSavedData = ffi.cast("int (*)(int,const char*,int,int)",gsx.pushDirectlyToSavedData)
+    module.RemoveNotifyCallback = ffi.cast("void (*)(int)",gsx.removeNotifyCallback)
+
+    module.GSXpNotifyCallback = gsx.addNotifyCallback(function(data)
+        local t = module.tvehicle.gsx.veh_data
+        if data.status == 1 then -- save vehicle
+            local wdata = encodeJson(t[data.veh])
+            if wdata ~= nil then
+                module.PushDirectlyToSavedData(data.veh,"CM_DATA",#wdata,memory.strptr(wdata));
+            end
+        else -- load vehicle
+            if module.DataToLoadExists(data.veh,"CM_DATA") == 1 then
+                local pdata = module.GetLoadDataByVehPtr(data.veh,"CM_DATA")
+                local size = module.GetDataToLoadSize(data.veh,"CM_DATA") 
+                t[data.veh] = decodeJson(memory.tostring(pdata,size,false))
+            end
+        end
+    end)
+
+end
+
+function module.GSXProcessVehicles()
+
+    if module.tvehicle.gsx.handle == 0 then
+        return
+    end
+
+    local t = module.tvehicle.gsx.veh_data
+    local s = module.tvehicle.gsx.p_table
+
+    while true do 
+        
+        for i, car in ipairs(getAllVehicles()) do
+            local pveh = getCarPointer(car)
+            if t[pveh] == nil then 
+                if module.DataToLoadExists(pveh,"CM_DATA") == 1 then
+                    local pdata = module.GetLoadDataByVehPtr(pveh,"CM_DATA")
+                    local size  = module.GetDataToLoadSize(pveh,"CM_DATA") 
+                    t[pveh]     = decodeJson(memory.tostring(pdata,size,false))
+                    s[car]      = pveh
+                end
+            end
+        end
+
+        for car, pveh in pairs(s) do
+            if not doesVehicleExist(car) then 
+                t[pveh] = nil
+                s[car] = nil
+                print("REMOVED")
+            end
+        end
+        
+        wait(10)
+    end
+end
+
+function module.GSXSet(car,str,val)
+    local t = module.tvehicle.gsx.veh_data
+
+    if doesVehicleExist(car) then 
+        local pveh = getCarPointer(car)
+        if  t[pveh] == nil then 
+            t[pveh] = {}
+        end
+        t[pveh][str] = val
+    end
+end
+
+function module.GSXGet(car,str)
+    local t = module.tvehicle.gsx.veh_data
+
+    if doesVehicleExist(car) then 
+        local pveh = getCarPointer(car)
+        if t[pveh] then
+            return t[pveh][str]
+        end
+    end
+    return nil
+end
+
+--------------------------------------------------
+-- Model/ info
 
 function module.GetNameOfVehicleModel(model)
     return ffi.string(ffi.cast("char*", CVehicleModelInfo[tonumber(model)] + 0x32)) or ""
@@ -216,101 +423,6 @@ function module.GiveVehicleToPlayer(model)
     end
 end
 
-function DoorMenu(func)
-    local vehicle = getCarCharIsUsing(PLAYER_PED)
-    local seats   = getMaximumNumberOfPassengers(vehicle) + 1 -- passenger + driver  
-
-    if seats == 4 then
-        doors = 5
-    else
-        doors = 3
-    end
-    if imgui.Button(module.tvehicle.doors[7],imgui.ImVec2(fcommon.GetSize(1))) then
-        for i=0,doors,1 do
-            func(vehicle,i)
-        end
-    end
-    for i=0,doors,1 do
-        if imgui.Button(module.tvehicle.doors[i+1],imgui.ImVec2(fcommon.GetSize(2))) then
-            func(vehicle,i)
-        end
-        if i%2 ~= 1 then
-            imgui.SameLine()
-        end
-    end
-
-end   
-
-
-function module.RandomColors()
-    while true do
-        if isCharInAnyCar(PLAYER_PED) and module.tvehicle.random_colors[0] and not module.tvehicle.random_colors_traffic[0] then
-            local primary_color = math.random(fconst.VEHICLE_COLOR.MIN_VALUE,fconst.VEHICLE_COLOR.MAX_VALUE)
-            local secondary_color = math.random(fconst.VEHICLE_COLOR.MIN_VALUE,fconst.VEHICLE_COLOR.MAX_VALUE)
-            local car = getCarCharIsUsing(PLAYER_PED)
-            if isCharInAnyCar(PLAYER_PED) and module.tvehicle.random_colors[0] then
-                changeCarColour(car,primary_color,secondary_color)
-            else
-                break
-            end
-            wait(1000)
-        end
-        wait(0)
-    end
-end
-
-function module.RandomTrafficColors()
-    while true do
-        if module.tvehicle.random_colors_traffic[0] then
-            local carX,carY,carZ = getCharCoordinates(PLAYER_PED)
-
-            local result, car = findAllRandomVehiclesInSphere(carX,carY,carZ,100.0,false,true)
-
-            if result then
-                while result do
-                    local primary_color = math.random(fconst.VEHICLE_COLOR.MIN_VALUE,fconst.VEHICLE_COLOR.MAX_VALUE)
-                    local secondary_color = math.random(fconst.VEHICLE_COLOR.MIN_VALUE,fconst.VEHICLE_COLOR.MAX_VALUE)
-                    changeCarColour(car,primary_color,secondary_color)
-                    result, car = findAllRandomVehiclesInSphere(carX,carY,carZ,100.0,true,true)
-                end
-            end
-            wait(1000)
-        end
-        wait(0)
-    end
-end
-
-function module.UnlimitedNitro()
-    while true do
-        if isCharInAnyCar(PLAYER_PED) and module.tvehicle.unlimited_nitro[0] then
-            local car = getCarCharIsUsing(PLAYER_PED)
-            local pCar = getCarPointer(car)
-            if isThisModelACar(getCarModel(car)) then
-                module.AddComponentToVehicle(1010,car,true)
-                
-                while module.tvehicle.unlimited_nitro[0] do
-
-                    writeMemory(0x969165,1,0,false) -- ALl cars have nitro
-                    writeMemory(0x96918B,1,0,false) -- All taxis have nitro
-
-                    if getCarCharIsUsing(PLAYER_PED) ~= car then
-                        break
-                    end
-
-                    local nitro_state = fcommon.RwMemory(pCar+0x8A4,4,nil,false,true)
-                    
-                    if nitro_state == fconst.NITRO_STATE.FULL or nitro_state == fconst.NITRO_STATE.EMPTY or nitro_state == fconst.NITRO_STATE.DISCHANGRED then
-                        giveNonPlayerCarNitro(car)
-                    end
-
-                    wait(0)
-                end
-            end
-        end
-        wait(0)
-    end
-end
-
 --------------------------------------------------
 -- Camera
 
@@ -377,13 +489,12 @@ function module.FirstPersonCamera()
 end
 
 --------------------------------------------------
+-- Color/ paintjob
 
---------------------------------------------------
--- Vehicle Paintjobs
+function module.ForEachCarComponent(func,skip,car)
+    car = car or getCarCharIsUsing(PLAYER_PED)
+    if car ~= nil then
 
-function module.ForEachCarComponent(func,skip)
-    if isCharInAnyCar(PLAYER_PED) then
-        car = getCarCharIsUsing(PLAYER_PED)
         for _, comp in ipairs(mad.get_all_vehicle_components(car)) do
             for _, obj in ipairs(comp:get_objects()) do
                 for _, mat in ipairs(obj:get_materials()) do
@@ -456,56 +567,17 @@ function module.ParseCarcols()
     end
 end
 
-function module.OnEnterVehicle()
-
-    while true do
-        
-        if isCharInAnyCar(PLAYER_PED) then
-            local car        = getCarCharIsUsing(PLAYER_PED)
-            local pCar       = getCarPointer(car)
-            local model      = getCarModel(car)
-            local model_name = module.tvehicle.gxt_name_table[module.GetNameOfVehicleModel(model)] or getGxtText(module.GetNameOfVehicleModel(model))
-
-            -- Get vehicle components
-            module.tvehicle.hidden_objects = {}
-            module.tvehicle.components.names = {"default"}
-
-            module.ForEachCarComponent(function(mat,comp,car)
-                table.insert(module.tvehicle.components.names,comp.name)
-            end,true)
-            module.tvehicle.components.list  = imgui.new['const char*'][#module.tvehicle.components.names](module.tvehicle.components.names)
-
-            --Load gsx data
-            if script.find('gsx-data') then
-                ApplyTexture(nil,true)
-                ApplyColor(true)
-                module.tvehicle.neon.rb_value[0] = gsx.get(car,"cm_neon_color") or -1
-                module.tvehicle.neon.pulsing[0]  = gsx.get(car,"cm_neon_pulsing") or false
-                InstallNeon(pCar)
-            end
-            
-            imgui.StrCopy(module.tvehicle.gxt_name,model_name)
-
-            while isCharInCar(PLAYER_PED,car) do
-                module.tvehicle.radio_station_id = getRadioChannel()
-                wait(0)
-            end
-        end
-        wait(0)
-    end
-end
-
-function ApplyColor(load_saved_color)
+function ApplyColor(load_saved_color,car)
 
     module.ForEachCarComponent(function(mat,comp,car)
 
         local r, g, b, old_a = mat:get_color()
 
         -- -1.0 used as nil
-        if load_saved_color and script.find('gsx-data') then
-            module.tvehicle.color.rgb[0] = gsx.get(car,"cm_color_red_" .. comp.name) or -1
-            module.tvehicle.color.rgb[1] = gsx.get(car,"cm_color_green_" .. comp.name) or -1
-            module.tvehicle.color.rgb[2] = gsx.get(car,"cm_color_blue_" .. comp.name) or -1
+        if load_saved_color and module.tvehicle.gsx.handle ~= 0  then
+            module.tvehicle.color.rgb[0] = module.GSXGet(car,"cm_color_red_" .. comp.name) or -1
+            module.tvehicle.color.rgb[1] = module.GSXGet(car,"cm_color_green_" .. comp.name) or -1
+            module.tvehicle.color.rgb[2] = module.GSXGet(car,"cm_color_blue_" .. comp.name) or -1
         end
 
         if (module.tvehicle.color.rgb[0] ~= -1.0 and module.tvehicle.color.rgb[0] ~= -1.0 and module.tvehicle.color.rgb[0] ~= -1.0)
@@ -514,37 +586,37 @@ function ApplyColor(load_saved_color)
             if module.tvehicle.components.selected[0] == 0 and not load_saved_texture then   
                 mat:set_color(module.tvehicle.color.rgb[0]*255, module.tvehicle.color.rgb[1]*255, module.tvehicle.color.rgb[2]*255, 255.0)
                 
-                if script.find('gsx-data') then
-                    gsx.set(car,"cm_color_red_" .. comp.name,module.tvehicle.color.rgb[0])
-                    gsx.set(car,"cm_color_green_" .. comp.name,module.tvehicle.color.rgb[1])
-                    gsx.set(car,"cm_color_blue_" .. comp.name,module.tvehicle.color.rgb[2])
+                if module.tvehicle.gsx.handle ~= 0  then
+                    module.GSXSet(car,"cm_color_red_" .. comp.name,module.tvehicle.color.rgb[0])
+                    module.GSXSet(car,"cm_color_green_" .. comp.name,module.tvehicle.color.rgb[1])
+                    module.GSXSet(car,"cm_color_blue_" .. comp.name,module.tvehicle.color.rgb[2])
                 end
             end
 
             if comp.name == module.tvehicle.components.names[module.tvehicle.components.selected[0]+1] or load_saved_color then     
                 mat:set_color(module.tvehicle.color.rgb[0]*255, module.tvehicle.color.rgb[1]*255, module.tvehicle.color.rgb[2]*255, 255.0)
                 
-                if script.find('gsx-data') then
-                    gsx.set(car,"cm_color_red_" .. comp.name,module.tvehicle.color.rgb[0])
-                    gsx.set(car,"cm_color_green_" .. comp.name,module.tvehicle.color.rgb[1])
-                    gsx.set(car,"cm_color_blue_" .. comp.name,module.tvehicle.color.rgb[2])
+                if module.tvehicle.gsx.handle ~= 0  then
+                    module.GSXSet(car,"cm_color_red_" .. comp.name,module.tvehicle.color.rgb[0])
+                    module.GSXSet(car,"cm_color_green_" .. comp.name,module.tvehicle.color.rgb[1])
+                    module.GSXSet(car,"cm_color_blue_" .. comp.name,module.tvehicle.color.rgb[2])
                 end
             end
 
         end
         module.tvehicle.color.default = getCarColours(car)
-    end)  
+    end,false,car)  
 end
 
-function ApplyTexture(filename,load_saved_texture)
+function ApplyTexture(filename,load_saved_texture,car)
 
     module.ForEachCarComponent(function(mat,comp,car)
         local r, g, b, old_a = mat:get_color()
 
         local model = getCarModel(car)
 
-        if load_saved_texture and script.find('gsx-data') then
-            filename = gsx.get(car,"cm_texture_" .. comp.name)
+        if load_saved_texture and module.tvehicle.gsx.handle ~= 0  then
+            filename = module.GSXGet(car,"cm_texture_" .. comp.name)
         end
 
         if filename ~= nil then
@@ -562,29 +634,63 @@ function ApplyTexture(filename,load_saved_texture)
                 if not module.tvehicle.apply_material_filter[0] or (r == 0x3C and g == 0xFF and b == 0x00) or (r == 0xFF and g == 0x00 and b == 0xAF) then
                     if module.tvehicle.components.selected[0] == 0 and not load_saved_texture then
                         mat:set_texture(module.tvehicle.paintjobs.texture)
-                        if script.find('gsx-data') then 
-                            gsx.set(car,"cm_texture_" .. comp.name,filename)
+                        if module.tvehicle.gsx.handle ~= 0  then 
+                            module.GSXSet(car,"cm_texture_" .. comp.name,filename)
                         end 
                     end
                     if comp.name == module.tvehicle.components.names[module.tvehicle.components.selected[0]+1] or load_saved_texture then
                         mat:set_texture(module.tvehicle.paintjobs.texture)
-                        if script.find('gsx-data') then 
-                            gsx.set(car,"cm_texture_" .. comp.name,filename)
+                        if module.tvehicle.gsx.handle ~= 0  then 
+                            module.GSXSet(car,"cm_texture_" .. comp.name,filename)
                         end 
                     end
                 end
             end
         end
         module.tvehicle.color.default = getCarColours(car)
-    end)
-    
+    end,false,car)
+end
+
+function module.RandomColors()
+    while true do
+        if isCharInAnyCar(PLAYER_PED) and module.tvehicle.random_colors[0] and not module.tvehicle.random_colors_traffic[0] then
+            local primary_color = math.random(fconst.VEHICLE_COLOR.MIN_VALUE,fconst.VEHICLE_COLOR.MAX_VALUE)
+            local secondary_color = math.random(fconst.VEHICLE_COLOR.MIN_VALUE,fconst.VEHICLE_COLOR.MAX_VALUE)
+            local car = getCarCharIsUsing(PLAYER_PED)
+            if isCharInAnyCar(PLAYER_PED) and module.tvehicle.random_colors[0] then
+                changeCarColour(car,primary_color,secondary_color)
+            else
+                break
+            end
+            wait(1000)
+        end
+        wait(0)
+    end
+end
+
+function module.RandomTrafficColors()
+    while true do
+        if module.tvehicle.random_colors_traffic[0] then
+            local carX,carY,carZ = getCharCoordinates(PLAYER_PED)
+
+            local result, car = findAllRandomVehiclesInSphere(carX,carY,carZ,100.0,false,true)
+
+            if result then
+                while result do
+                    local primary_color = math.random(fconst.VEHICLE_COLOR.MIN_VALUE,fconst.VEHICLE_COLOR.MAX_VALUE)
+                    local secondary_color = math.random(fconst.VEHICLE_COLOR.MIN_VALUE,fconst.VEHICLE_COLOR.MAX_VALUE)
+                    changeCarColour(car,primary_color,secondary_color)
+                    result, car = findAllRandomVehiclesInSphere(carX,carY,carZ,100.0,true,true)
+                end
+            end
+            wait(1000)
+        end
+        wait(0)
+    end
 end
 
 --------------------------------------------------
-
-
---------------------------------------------------
--- Add car component - tune
+-- Component/ tune
 
 function module.AddComponentToVehicle(component,car,hide_msg)
     component = tonumber(component)
@@ -617,67 +723,107 @@ function module.RemoveComponentFromVehicle(component,car,hide_msg)
     end
 end
 
-function module.TrafficNeons()
+--------------------------------------------------
+-- Misc
+
+function module.OnEnterVehicle()
+
     while true do
-        if module.tvehicle.neon.checkbox[0] then
-            local x,y,z = getCharCoordinates(PLAYER_PED)
+        
+        if isCharInAnyCar(PLAYER_PED) then
+            local car        = getCarCharIsUsing(PLAYER_PED)
+            local pCar       = getCarPointer(car)
+            local model      = getCarModel(car)
+            local model_name = module.tvehicle.gxt_name_table[module.GetNameOfVehicleModel(model)] or getGxtText(module.GetNameOfVehicleModel(model))
 
-            local result, car = findAllRandomVehiclesInSphere(x,y,z,100.0,false,true)
+            -- Get vehicle components
+            module.tvehicle.hidden_objects = {}
+            module.tvehicle.components.names = {"default"}
+
+            module.ForEachCarComponent(function(mat,comp,car)
+                table.insert(module.tvehicle.components.names,comp.name)
+            end,true)
+            module.tvehicle.components.list  = imgui.new['const char*'][#module.tvehicle.components.names](module.tvehicle.components.names)
+
+            --Load gsx data
+            if module.tvehicle.gsx.handle ~= 0  then
+                ApplyTexture(nil,true)
+                ApplyColor(true)
+                module.tvehicle.neon.rb_value[0] = module.GSXGet(car,"cm_neon_color") or -1
+                module.tvehicle.neon.pulsing[0]  = module.GSXGet(car,"cm_neon_pulsing") or false
+                InstallNeon(pCar)
+            end
             
-            if result then
-                while result do
-                    local temp = 0
-                    local pCar = getCarPointer(car)
+            imgui.StrCopy(module.tvehicle.gxt_name,model_name)
 
-                    if getVehicleClass(car) == fconst.VEHICLE_CLASS.NORMAL then
-                        temp = math.random(1,20) -- 5%
-                    end
-                    if getVehicleClass(car) == fconst.VEHICLE_CLASS.RICH_FAMILY then
-                        temp = math.random(1,5) -- 20%
-                    end
-                    if getVehicleClass(car) == fconst.VEHICLE_CLASS.EXECUTIVE then
-                        temp = math.random(1,3) -- 30%
-                    end
-                    if temp == 1 and callFunction(module.tvehicle.neon["GetFlag"],1,1,pCar) ~= 0x10 then
-                        if getCarCharIsUsing(PLAYER_PED) ~= car then
-                            InstallNeon(pCar,math.random(0,6),math.random(0,1))
-                        end
-                    end
-                    callFunction(module.tvehicle.neon["SetFlag"],2,2,pCar,0x10)
-                    result, car = findAllRandomVehiclesInSphere(x,y,z,100.0,true,true)
-                end
+            while isCharInCar(PLAYER_PED,car) do
+                module.tvehicle.radio_station_id = getRadioChannel()
+                wait(0)
             end
         end
-
         wait(0)
     end
 end
 
-function InstallNeon(pCar,color,pulsing)
-    local car = getVehiclePointerHandle(pCar)
-    color = color or module.tvehicle.neon.rb_value[0]
-    pulsing = pulsing or module.tvehicle.neon.pulsing[0]
+function DoorMenu(func)
+    local vehicle = getCarCharIsUsing(PLAYER_PED)
+    local seats   = getMaximumNumberOfPassengers(vehicle) + 1 -- passenger + driver  
 
-    if module.tvehicle.neon["Handle"] then
-        if module.tvehicle.neon["InstallNeon"] and module.tvehicle.neon["SetX"] and module.tvehicle.neon["SetY"] then
-            callFunction(module.tvehicle.neon["InstallNeon"],3,3,pCar,color,pulsing)
-            
-            local data = module.tvehicle.neon.data[module.GetNameOfVehicleModel(getCarModel(car))] or { X = 0.0, Y = 0.0}
-  
-            callFunction(module.tvehicle.neon["SetX"],2,2,pCar,data.X)
-            callFunction(module.tvehicle.neon["SetY"],2,2,pCar,data.Y)
-            if script.find('gsx-data') then
-                gsx.set(car,"cm_neon_color",color)
-                gsx.set(car,"cm_neon_pulsing",pulsing)
+    if seats == 4 then
+        doors = 5
+    else
+        doors = 3
+    end
+    if imgui.Button(module.tvehicle.doors[7],imgui.ImVec2(fcommon.GetSize(1))) then
+        for i=0,doors,1 do
+            func(vehicle,i)
+        end
+    end
+    for i=0,doors,1 do
+        if imgui.Button(module.tvehicle.doors[i+1],imgui.ImVec2(fcommon.GetSize(2))) then
+            func(vehicle,i)
+        end
+        if i%2 ~= 1 then
+            imgui.SameLine()
+        end
+    end
+
+end   
+
+function module.UnlimitedNitro()
+    while true do
+        if isCharInAnyCar(PLAYER_PED) and module.tvehicle.unlimited_nitro[0] then
+            local car = getCarCharIsUsing(PLAYER_PED)
+            local pCar = getCarPointer(car)
+            if isThisModelACar(getCarModel(car)) then
+                module.AddComponentToVehicle(1010,car,true)
+                
+                while module.tvehicle.unlimited_nitro[0] do
+
+                    writeMemory(0x969165,1,0,false) -- ALl cars have nitro
+                    writeMemory(0x96918B,1,0,false) -- All taxis have nitro
+
+                    if getCarCharIsUsing(PLAYER_PED) ~= car then
+                        break
+                    end
+
+                    local nitro_state = fcommon.RwMemory(pCar+0x8A4,4,nil,false,true)
+                    
+                    if nitro_state == fconst.NITRO_STATE.FULL or nitro_state == fconst.NITRO_STATE.EMPTY or nitro_state == fconst.NITRO_STATE.DISCHANGRED then
+                        giveNonPlayerCarNitro(car)
+                    end
+
+                    wait(0)
+                end
             end
         end
+        wait(0)
     end
 end
 
 --------------------------------------------------
+-- Main
 
-
--- Main function
 function module.VehicleMain()
     imgui.Spacing()
     
@@ -911,26 +1057,30 @@ function module.VehicleMain()
                 --     end
                 -- end)
                 fcommon.DropDownMenu("Neons",function()
-                    imgui.Columns(3,nil,false)
-                    imgui.RadioButtonIntPtr("Blue", module.tvehicle.neon.rb_value,2) 
-                    imgui.RadioButtonIntPtr("Cyan", module.tvehicle.neon.rb_value,5)
-                    imgui.RadioButtonIntPtr("Green", module.tvehicle.neon.rb_value,1) 
-                    imgui.NextColumn()
-                    imgui.RadioButtonIntPtr("None", module.tvehicle.neon.rb_value,-1)
-                    imgui.RadioButtonIntPtr("Purple", module.tvehicle.neon.rb_value,6)
-                    imgui.RadioButtonIntPtr("Red", module.tvehicle.neon.rb_value,0) 
-                    imgui.NextColumn()
-                    imgui.RadioButtonIntPtr("White", module.tvehicle.neon.rb_value,3)
-                    imgui.RadioButtonIntPtr("Yellow", module.tvehicle.neon.rb_value,4)
-                    imgui.Columns(1)
+                    if module.tvehicle.neon["Handle"] ~= 0 then
+                        imgui.Columns(3,nil,false)
+                        imgui.RadioButtonIntPtr("Blue", module.tvehicle.neon.rb_value,2) 
+                        imgui.RadioButtonIntPtr("Cyan", module.tvehicle.neon.rb_value,5)
+                        imgui.RadioButtonIntPtr("Green", module.tvehicle.neon.rb_value,1) 
+                        imgui.NextColumn()
+                        imgui.RadioButtonIntPtr("None", module.tvehicle.neon.rb_value,-1)
+                        imgui.RadioButtonIntPtr("Purple", module.tvehicle.neon.rb_value,6)
+                        imgui.RadioButtonIntPtr("Red", module.tvehicle.neon.rb_value,0) 
+                        imgui.NextColumn()
+                        imgui.RadioButtonIntPtr("White", module.tvehicle.neon.rb_value,3)
+                        imgui.RadioButtonIntPtr("Yellow", module.tvehicle.neon.rb_value,4)
+                        imgui.Columns(1)
 
-                    imgui.Dummy(imgui.ImVec2(0,20))
-                    imgui.Checkbox("Pulsing",module.tvehicle.neon.pulsing)
-                    fcommon.InformationTooltip("Neons will blink continuously")
-                    imgui.Spacing()
+                        imgui.Dummy(imgui.ImVec2(0,20))
+                        imgui.Checkbox("Pulsing",module.tvehicle.neon.pulsing)
+                        fcommon.InformationTooltip("Neons will blink continuously")
+                        imgui.Spacing()
 
-                    if imgui.Button("Install Neon",imgui.ImVec2(fcommon.GetSize(1))) then
-                        InstallNeon(pCar)
+                        if imgui.Button("Install Neon",imgui.ImVec2(fcommon.GetSize(1))) then
+                            InstallNeon(pCar)
+                        end
+                    else
+                        imgui.TextWrapped("Unable to find 'neon_api.asi'. Please reinstall Cheat Menu.")
                     end
                 end)
                 fcommon.UpdateAddress({name = 'Nitro count',address = pCar + 0x48A ,size = 1,min = 0,max = 15, default = 7.5,is_float = false})
@@ -1013,10 +1163,10 @@ function module.VehicleMain()
 
                     module.ForEachCarComponent(function(mat,comp,car)
                         mat:reset_color()
-                        if script.find('gsx-data') then
-                            gsx.set(car,"cm_color_red_" .. comp.name,module.tvehicle.color.rgb[0])
-                            gsx.set(car,"cm_color_green_" .. comp.name,module.tvehicle.color.rgb[1])
-                            gsx.set(car,"cm_color_blue_" .. comp.name,module.tvehicle.color.rgb[2])
+                        if module.tvehicle.gsx.handle ~= 0  then
+                            module.GSXSet(car,"cm_color_red_" .. comp.name,module.tvehicle.color.rgb[0])
+                            module.GSXSet(car,"cm_color_green_" .. comp.name,module.tvehicle.color.rgb[1])
+                            module.GSXSet(car,"cm_color_blue_" .. comp.name,module.tvehicle.color.rgb[2])
                         end
                     end)
                     module.tvehicle.color.default = -1
@@ -1027,8 +1177,8 @@ function module.VehicleMain()
                     fconfig.tconfig.temp_texture_name = nil
                     module.ForEachCarComponent(function(mat,comp,car)
                         mat:reset_texture()
-                        if script.find('gsx-data') then 
-                            gsx.set(car,"cm_texture_" .. comp.name,filename)
+                        if module.tvehicle.gsx.handle ~= 0  then 
+                            module.GSXSet(car,"cm_texture_" .. comp.name,filename)
                         end 
                     end)
                     module.tvehicle.paintjobs.texture = nil
@@ -1090,10 +1240,10 @@ function module.VehicleMain()
                                             writeMemory(getCarPointer(car) + 1075 + module.tvehicle.color.radio_btn[0],1,tonumber(v),false)
                                             module.ForEachCarComponent(function(mat,comp,car)
                                                 mat:reset_color()
-                                                if script.find('gsx-data') then
-                                                    gsx.set(car,"cm_color_red_" .. comp.name,module.tvehicle.color.rgb[0])
-                                                    gsx.set(car,"cm_color_green_" .. comp.name,module.tvehicle.color.rgb[1])
-                                                    gsx.set(car,"cm_color_blue_" .. comp.name,module.tvehicle.color.rgb[2])
+                                                if module.tvehicle.gsx.handle ~= 0  then
+                                                    module.GSXSet(car,"cm_color_red_" .. comp.name,module.tvehicle.color.rgb[0])
+                                                    module.GSXSet(car,"cm_color_green_" .. comp.name,module.tvehicle.color.rgb[1])
+                                                    module.GSXSet(car,"cm_color_blue_" .. comp.name,module.tvehicle.color.rgb[2])
                                                 end
                                             end)
                                         end

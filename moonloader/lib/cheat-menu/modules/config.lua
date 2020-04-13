@@ -315,7 +315,6 @@ function module.Write()
                     max_accuracy      = fweapon.tweapon.max_accuracy[0], 
                     max_ammo_clip     = fweapon.tweapon.max_ammo_clip[0], 
                     max_move_speed    = fweapon.tweapon.max_move_speed[0], 
-                    max_skills        = fweapon.tweapon.max_skills[0], 
                     huge_damage       = fweapon.tweapon.huge_damage[0],
                     gang_weapons      =
                     {

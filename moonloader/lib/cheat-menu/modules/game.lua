@@ -355,13 +355,13 @@ function module.FreezeTime()
     while true do
         if module.tgame.freeze_time[0] then
 
-            local weather = readMemory(0xC81320,2,false) -- Weather
+            local status = fvisual.tvisual.lock_weather[0]
             memory.write(0x969168,1,1)  -- Freeze time
-
             while module.tgame.freeze_time[0] do
-                writeMemory(0xC81320,2,weather,false) -- Weather
+                fvisual.tvisual.lock_weather[0] = true
                 wait(0)
             end
+            fvisual.tvisual.lock_weather[0] = status
             memory.write(0x969168,0,1)  -- Freeze time
         end
         wait(0)
