@@ -107,7 +107,7 @@ function module.RegisterAllCommands()
 
 	module.RegisterCommand("tp",function(t)
         if t[4] == nil then t[4] = getGroundZFor3dCoord(x,y,100) end
-		fteleport.Teleport(tonumber(t[2]),tonumber(t[3]),tonumber(t[4]))
+		lua_thread.create(fteleport.Teleport,tonumber(t[2]),tonumber(t[3]),tonumber(t[4]))
 	end,"Teleport to coordinates","{int X} {int Y} {int Z}(optional)")
 	
 	module.RegisterCommand("settime",function(t)

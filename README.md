@@ -4,7 +4,6 @@
 </p>
 
 #
-[![GitHub All Releases](https://img.shields.io/github/downloads/user-grinch/Cheat-Menu/total?style=for-the-badge)](https://github.com/user-grinch/Cheat-Menu)
 ![GitHub repo size](https://img.shields.io/github/repo-size/user-grinch/Cheat-Menu?label=Size&style=for-the-badge)
 [![License](https://img.shields.io/github/license/user-grinch/Cheat-Menu?style=for-the-badge)](https://github.com/user-grinch/Cheat-Menu/blob/master/LICENSE)
 [![Discord](https://img.shields.io/discord/689515979847237649?label=Discord&style=for-the-badge)](https://discord.gg/ZzW7kmf)
@@ -26,22 +25,15 @@ It's based on [Moonloader](https://gtaforums.com/topic/890987-moonloader/) and u
 [Master branch](https://github.com/inanahammad/Cheat-Menu) contains all the recent work done to the menu. While this can be the best way to live on the edge & try the latest features out, it could come with a fair number of bugs.
 
 
-## Installation (Moonloader 0.27)
+## Installation
 
 1. Install [DirectX](https://www.microsoft.com/en-us/download/details.aspx?id=35) &  [Visual C++ Redistributable 2017](https://aka.ms/vs/16/release/vc_redist.x86.exe) if not already installed.
 2. If your game version isn't v1.0 then you'll need to [downgrade](https://gtaforums.com/topic/927016-san-andreas-downgrader/).
-3. Download [Moonloader 0.27](https://gtaforums.com/topic/890987-moonloader/) from [here](https://blast.hk/moonloader/files/moonloader-027.0-preview3.zip).Then extract all these files to your game folder (replace if necessary).
+3. Download [Moonloader](https://gtaforums.com/topic/890987-moonloader/) from [here](https://blast.hk/moonloader/files/moonloader-026.zip).Then extract all these files to your game folder (replace if necessary).
 4. Download [Cheat Menu](https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu) from [here](https://github.com/inanahammad/Cheat-Menu/releases).
 5. Open up that achieve file and extract everything in game directory (replace if necessary).
 
 Now try it out in-game. If it doesn't work open an issue here or create a post in one of the topics above with 'moonloader.log'.
-
-### Install on Moonloader 0.26
-(Follow these steps if cheat-menu doesn't work on Moonloader 0.26)
-
-1. Install [Moonloader 0.26](https://blast.hk/moonloader/files/moonloader-026.zip) & [Cheat Menu](https://github.com/inanahammad/Cheat-Menu/releases) following the installation steps for [Moonloader 0.27](https://gtaforums.com/topic/890987-moonloader/)
-2. Download [Moonloader 0.27](https://gtaforums.com/topic/890987-moonloader/) and goto its libstd folder.
-3. Copy everything from that folder and paste them into your installed Moonloader 0.26, lib folder.
 
 ## Youtubers
 
@@ -59,7 +51,7 @@ If you're making videos about this mod link to this GitHub repository, don't reu
 
 ## Video
 
-[![Youtue Video](https://img.youtube.com/vi/XF1bhn74s2M/0.jpg)](https://www.youtube.com/watch?v=XF1bhn74s2M)
+[![Youtube Video](https://img.youtube.com/vi/XF1bhn74s2M/0.jpg)](https://www.youtube.com/watch?v=XF1bhn74s2M)
 
 
 ## Docs 

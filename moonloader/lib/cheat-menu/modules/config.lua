@@ -175,7 +175,6 @@ function module.Write()
                     camera            =
                     {    
                         fov             = fgame.tgame.camera.fov[0],   
-                        fov_cm          = fgame.tgame.camera.fov_cm[0], 
                         movement_speed  = fgame.tgame.camera.movement_speed[0],
                     },
                     disable_cheats      = fgame.tgame.disable_cheats[0],
@@ -260,7 +259,6 @@ function module.Write()
                 },
                 tteleport =
                 {
-                    auto_z         = fteleport.tteleport.auto_z[0],
                     insert_coords  = fteleport.tteleport.insert_coords[0],
                     shortcut       = fteleport.tteleport.shortcut[0],
                 },
@@ -284,8 +282,6 @@ function module.Write()
                     invisible_car    = fvehicle.tvehicle.invisible_car[0],
                     license_plate_text = ffi.string(fvehicle.tvehicle.license_plate_text),
                     lights           = fvehicle.tvehicle.lights[0],
-                    radio_station_id = fvehicle.tvehicle.radio_station_id,
-                    radio_station_lock = fvehicle.tvehicle.radio_station_lock[0],
                     lock_speed       = fvehicle.tvehicle.lock_speed[0],
                     neon             = 
                     {

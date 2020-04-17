@@ -79,6 +79,24 @@ function module.InformationTooltip(text)
     end
 end
 
+function module.ComboBox(label,selected,table,func)
+    text = selected
+    
+    imgui.SetNextItemWidth(imgui.GetWindowContentRegionWidth()/2- imgui.StyleVar.ItemSpacing) 
+    if imgui.BeginCombo("##" .. label,imgui.new.char[64](text)) then
+        for k,v in ipairs(table) do
+            imgui.Selectable(v) 
+            if imgui.IsItemClicked(0) then
+                selected = v
+                if func ~= nil then
+                    func(k,v)
+                end
+            end
+        end
+        imgui.EndCombo()
+    end
+end
+
 -- Config panel
 function module.ConfigPanel(func_arg_table,func)
     if func ~= nil then
@@ -343,7 +361,9 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
                     end
                 end
                 if show and imgui.CollapsingHeader(table_name) then
-                    lua_thread.create(LoadImages,image_table)
+                    if not fmenu.tmenu.draw_text_only[0] then
+                        lua_thread.create(LoadImages,image_table)
+                    end
                     imgui.Spacing()
                     image_count = 1
                     for model,image in pairs(image_table) do
@@ -369,7 +389,9 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
 
         if imgui.BeginChild("") then 
             for _,image_table in pairs(loaded_images_list) do
-                lua_thread.create(LoadImages,image_table)
+                if not fmenu.tmenu.draw_text_only[0] then
+                    lua_thread.create(LoadImages,image_table)
+                end
                 for model,image in pairs(image_table) do
                     if fmenu.tmenu.draw_text_only[0] then
                         draw_text(identifier,func_on_left_click,func_on_right_click,func_get_name,filter,model)
@@ -768,11 +790,16 @@ function module.LoadJson(filename)
     local full_path = tcheatmenu.dir .. "json//" .. filename .. ".json"
     if doesFileExist(full_path) then
         local file = io.open(full_path, "r")
-        local table = decodeJson(file:read("*a"))
+        local status, table = pcall(decodeJson,file:read("*a"))
         file:close()
-        return table
+        if status and table then
+            return table
+        else
+            tcheatmenu.window.fail_loading_json = true
+            print("Failed to load json file, " .. filename)
+        end
     end
-    return nil
+    return {}
 end
 
 function module.SaveJson(filename,table)

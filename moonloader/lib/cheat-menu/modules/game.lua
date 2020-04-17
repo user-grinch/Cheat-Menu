@@ -22,7 +22,6 @@ module.tgame                =
     {
         bool                = imgui.new.bool(false),
         fov                 = imgui.new.int(fconfig.Get('tgame.camera.fov',70)),
-        fov_cm              = imgui.new.int(fconfig.Get('tgame.camera.fov_cm',70)),
         lock_on_player      = imgui.new.bool(false),
         movement_speed      = imgui.new.float(fconfig.Get('tgame.camera.movement_speed',0.2)),
         shake               = imgui.new.float(0.0),
@@ -126,7 +125,7 @@ function module.CameraMode()
 
             setCharCoordinates(ped,x,y,z-20) 
 
-            cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov_cm[0],1000,true)
+            cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
             cameraPersistFov(true) 
 
             while module.tgame.camera.bool[0] do
@@ -229,14 +228,14 @@ function module.CameraMode()
 
                         if total_mouse_delta + getMousewheelDelta() ~= total_mouse_delta then
                             total_mouse_delta = total_mouse_delta + getMousewheelDelta()
-                            module.tgame.camera.fov_cm[0] = module.tgame.camera.fov_cm[0] - getMousewheelDelta()
-                            if module.tgame.camera.fov_cm[0] > 120 then
-                                module.tgame.camera.fov_cm[0] = 120
+                            module.tgame.camera.fov[0] = module.tgame.camera.fov[0] - getMousewheelDelta()
+                            if module.tgame.camera.fov[0] > 120 then
+                                module.tgame.camera.fov[0] = 120
                             end
-                            if module.tgame.camera.fov_cm[0] < 5 then
-                                module.tgame.camera.fov_cm[0] = 5
+                            if module.tgame.camera.fov[0] < 5 then
+                                module.tgame.camera.fov[0] = 5
                             end
-                            cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov_cm[0],100,true)
+                            cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],100,true)
                             cameraPersistFov(true) 
                         end
                         
@@ -250,22 +249,20 @@ function module.CameraMode()
 
                 if total_mouse_delta + getMousewheelDelta() ~= total_mouse_delta then
                     total_mouse_delta = total_mouse_delta + getMousewheelDelta()
-                    module.tgame.camera.fov_cm[0] = module.tgame.camera.fov_cm[0] - getMousewheelDelta()
-                    if module.tgame.camera.fov_cm[0] > 120 then
-                        module.tgame.camera.fov_cm[0] = 120
+                    module.tgame.camera.fov[0] = module.tgame.camera.fov[0] - getMousewheelDelta()
+                    if module.tgame.camera.fov[0] > 120 then
+                        module.tgame.camera.fov[0] = 120
                     end
-                    if module.tgame.camera.fov_cm[0] < 5 then
-                        module.tgame.camera.fov_cm[0] = 5
+                    if module.tgame.camera.fov[0] < 5 then
+                        module.tgame.camera.fov[0] = 5
                     end
-                    cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov_cm[0],100,true)
+                    cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],100,true)
                     cameraPersistFov(true) 
                 end
                 wait(0)
             end
-           
-           
-            cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
-            cameraPersistFov(true) 
+        
+            cameraPersistFov(false) 
 
             displayRadar(true)
             displayHud(true)
@@ -669,9 +666,9 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",
                 fcommon.CheckBoxVar("Lock on player",module.tgame.camera.lock_on_player,"Locks camera on player")
 
                 imgui.Spacing()
-                if imgui.SliderInt("FOV", module.tgame.camera.fov_cm, 5,120) then
+                if imgui.SliderInt("FOV", module.tgame.camera.fov, 5,120) then
                     if module.tgame.camera.bool[0] then
-                        cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov_cm[0],1000,true)
+                        cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
                         cameraPersistFov(true) 
                     end
                 end
@@ -685,11 +682,12 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",
                 imgui.Spacing()
                 if imgui.Button("Restore Camera",imgui.ImVec2(fcommon.GetSize(2))) then
                     restoreCamera()
-                    module.tgame.camera.fov_cm[0] = module.tgame.camera.fov[0]
-                    cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov_cm[0],1000,true)
+                    module.tgame.camera.fov[0] = module.tgame.camera.fov[0]
+                    cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
                     cameraPersistFov(true) 
                     module.tgame.camera.shake[0] = 0.0
                     cameraSetShakeSimulationSimple(1,1,0.0)
+                    module.tgame.camera.movement_speed[0] = 0.2
                 end
                 imgui.SameLine()
                 if imgui.Button("Warp player",imgui.ImVec2(fcommon.GetSize(2))) then
@@ -787,39 +785,6 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",
         
         end,
         function()
-            fcommon.DropDownMenu('Camera fov',function()
-
-                if imgui.InputInt("FOV",module.tgame.camera.fov) then
-                    if module.tgame.camera.fov[0] > 120 then 
-                        module.tgame.camera.fov[0] = 120
-                    end
-                    if module.tgame.camera.fov[0] < 5 then 
-                        module.tgame.camera.fov[0] = 5
-                    end
-
-                    cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
-                    cameraPersistFov(true) 
-                end
-
-                imgui.Spacing()
-                if imgui.Button("Minimum##fov",imgui.ImVec2(fcommon.GetSize(3))) then
-                    module.tgame.camera.fov[0] = 5
-                    cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
-                    cameraPersistFov(true) 
-                end
-                imgui.SameLine()
-                if imgui.Button("Default##fov",imgui.ImVec2(fcommon.GetSize(3))) then
-                    module.tgame.camera.fov[0] = 70
-                    cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
-                    cameraPersistFov(true) 
-                end
-                imgui.SameLine()
-                if imgui.Button("Maximum##fov",imgui.ImVec2(fcommon.GetSize(3))) then
-                    module.tgame.camera.fov[0] = 120
-                    cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
-                    cameraPersistFov(true) 
-                end
-            end)
 
             fcommon.UpdateAddress({name = 'Days passed',address = 0xB79038 ,size = 4,min = 0,max = 9999})
             fcommon.DropDownMenu('FPS',function()

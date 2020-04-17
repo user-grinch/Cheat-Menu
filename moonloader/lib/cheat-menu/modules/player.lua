@@ -77,111 +77,6 @@ function module.ChangePlayerModel(model)
     end
 end
 
-function HealthArmour()
-    fcommon.DropDownMenu("Health",function()
-        local health = imgui.new.int(getCharHealth(PLAYER_PED))
-
-        imgui.Columns(2,nil,false)
-        imgui.Text("Minimum" .. " = " .. tostring(0))
-        imgui.NextColumn()
-        imgui.Text("Maximum" .. " = " .. tostring(255))
-        imgui.Columns(1)
-
-        imgui.PushItemWidth(imgui.GetWindowWidth()-70)
-        if imgui.InputInt("Set ##Health",health) then
-            if health[0] > 100 then
-                setFloatStat(24,health[0]*5.686)
-                fconfig.Set(fconfig.tconfig.stat_data,tostring(24),health[0]*5.686)
-            else
-                setFloatStat(24,569.0)
-                fconfig.Set(fconfig.tconfig.stat_data,tostring(24),569.0)
-            end
-
-            setCharHealth(PLAYER_PED,health[0])
-        end
-        imgui.PopItemWidth()
-
-        imgui.Spacing()
-        if imgui.Button("Minimum ##Health",imgui.ImVec2(fcommon.GetSize(3))) then
-            setFloatStat(24,569.0)
-            fconfig.Set(fconfig.tconfig.stat_data,tostring(24),569.0)
-            setCharHealth(PLAYER_PED,1)
-            fconfig.Set(fconfig.tconfig.misc_data,tostring("Health"),1)
-        end
-        imgui.SameLine()
-        if imgui.Button("Default ##Health",imgui.ImVec2(fcommon.GetSize(3))) then
-            setFloatStat(24,569.0)
-            fconfig.Set(fconfig.tconfig.stat_data,tostring(24),569.0)
-            setCharHealth(PLAYER_PED,100)
-            fconfig.Set(fconfig.tconfig.misc_data,tostring("Health"),100)
-        end
-        imgui.SameLine()
-        if imgui.Button("Maximum ##Health",imgui.ImVec2(fcommon.GetSize(3))) then
-            setFloatStat(24,1450.0)
-            fconfig.Set(fconfig.tconfig.stat_data,tostring(24),1450.0)
-            setCharHealth(PLAYER_PED,255)
-            fconfig.Set(fconfig.tconfig.misc_data,tostring("Health"),255)
-        end
-
-        if health[0] < 1 then
-            setCharHealth(PLAYER_PED,1)
-            fconfig.Set(fconfig.tconfig.misc_data,tostring("Health"),1)
-        end
-
-        if health[0] >  255 then
-            setCharHealth(PLAYER_PED, 255)
-            fconfig.Set(fconfig.tconfig.misc_data,tostring("Health"),255)
-        end
-    end)
-
-    fcommon.DropDownMenu("Armour",function()
-        local armour = imgui.new.int()
-        local max_armour = 100
-        local min_armour = 0
-        armour[0] = getCharArmour(PLAYER_PED)
-
-        imgui.Columns(2,nil,false)
-        imgui.Text("Minimum" .. " = " .. min_armour)
-        imgui.NextColumn()
-        imgui.Text("Maximum" .. " = " .. max_armour)
-        imgui.Columns(1)
-
-        imgui.Spacing()
-
-        imgui.PushItemWidth(imgui.GetWindowWidth()-70)
-        if imgui.InputInt("Set ##Armour",armour) then
-
-            if armour[0] < 0 then
-                armour[0] = 0
-            end
-            if getCharArmour(PLAYER_PED) < armour[0] then
-                addArmourToChar(PLAYER_PED,(armour[0]-getCharArmour(PLAYER_PED)))
-                fconfig.Set(fconfig.tconfig.misc_data,tostring("Armour"),getCharArmour(PLAYER_PED))
-            end
-            if getCharArmour(PLAYER_PED) > armour[0] then
-                damageChar(PLAYER_PED,getCharArmour(PLAYER_PED)-armour[0],true)
-                fconfig.Set(fconfig.tconfig.misc_data,tostring("Armour"),getCharArmour(PLAYER_PED))
-            end
-        end
-        imgui.PopItemWidth()
-        imgui.Spacing()
-        if imgui.Button("Minimum ##Armour",imgui.ImVec2(fcommon.GetSize(3))) then
-            damageChar(PLAYER_PED,  getCharArmour(PLAYER_PED),true)
-            fconfig.Set(fconfig.tconfig.misc_data,tostring("Armour"),getCharArmour(PLAYER_PED))
-        end
-        imgui.SameLine()
-        if imgui.Button("Default ##Armour",imgui.ImVec2(fcommon.GetSize(3))) then
-            damageChar(PLAYER_PED,  getCharArmour(PLAYER_PED),true)
-            fconfig.Set(fconfig.tconfig.misc_data,tostring("Armour"),getCharArmour(PLAYER_PED))
-        end
-        imgui.SameLine()
-        if imgui.Button("Maximum ##Armour",imgui.ImVec2(fcommon.GetSize(3))) then
-            addArmourToChar(PLAYER_PED, max_armour)
-            fconfig.Set(fconfig.tconfig.misc_data,tostring("Armour"),getCharArmour(PLAYER_PED))
-        end
-    end)
-end
-
 function WantedLevelMenu()
     
     fcommon.DropDownMenu("Wanted level",function()
@@ -274,7 +169,7 @@ function module.PlayerMain()
             fcommon.CheckBoxValue("Infinite run",0xB7CEE4)
         
             imgui.NextColumn()
-            
+
             fcommon.CheckBoxFunc("Invisible player",module.tplayer.invisible,
             function()
                 if module.tplayer.invisible[0] then
@@ -307,6 +202,7 @@ function module.PlayerMain()
             imgui.Columns(1)
         end,
         function()
+            fcommon.UpdateAddress({name = "Armour",address = getCharPointer(PLAYER_PED)+0x548,size = 4,min = 0,default =0,max = 100, is_float = true})
             fcommon.DropDownMenu("Body",function()
                 if imgui.RadioButtonIntPtr("Fat",module.tplayer.cjBody,1) then
                     callFunction(0x439110,1,1,false)
@@ -328,12 +224,14 @@ function module.PlayerMain()
             end)
             fcommon.UpdateStat({ name = "Energy",stat = 165})
             fcommon.UpdateStat({ name = "Fat",stat = 21})
-            HealthArmour()
+            fcommon.UpdateAddress({name = "Health",address = getCharPointer(PLAYER_PED)+0x540,size = 4,min = 0,default =100,max = 255, is_float = true})
             fcommon.UpdateStat({ name = "Lung capacity",stat = 225})
+            fcommon.UpdateStat({ name = "Max health",stat = 24,min = 0,default = 569,max = 1450})
             fcommon.UpdateAddress({name = "Money",address = 0xB7CE50,size = 4,min = -9999999,max = 9999999})
             fcommon.UpdateStat({ name = "Muscle",stat = 23})
             fcommon.UpdateStat({ name = "Respect",stat = 68,max = 2450}) 
             fcommon.UpdateStat({ name = "Stamina",stat = 22})
+            
             WantedLevelMenu()
         end,
         function()

@@ -18,7 +18,6 @@ local module = {}
 
 module.tteleport =
 {
-	auto_z                  = imgui.new.bool(fconfig.Get('tteleport.auto_z',false)),
 	coords                  = imgui.new.char[64](""),
 	coordinates             = fcommon.LoadJson("coordinate"),
 	coord_name              = imgui.new.char[64](""),
@@ -30,22 +29,24 @@ module.tteleport =
 -- Teleports player to a specified coordinates
 function module.Teleport(x, y, z,interior_id)
 
-	if x == nil and y == nil and z == nil then
-		result, x,y,z = getTargetBlipCoordinates()
+	local target = false
 
-		if not result then
+	if x == nil and y == nil then
+		target, x,y,z = getTargetBlipCoordinates()
+
+		if not target then
 			printHelpString("No marker found")
 			return
 		end
 	end
 
-	if module.tteleport.auto_z[0] or z == nil then
-		z = getGroundZFor3dCoord(x, y, z)
-	end
-
 	if interior_id == nil then
 		interior_id = 0
 	end
+
+	lockPlayerControl(true)
+	doFade(false,300)
+	wait(300)
 
 	setCharInterior(PLAYER_PED,interior_id)
 	setInteriorVisible(interior_id)
@@ -53,14 +54,28 @@ function module.Teleport(x, y, z,interior_id)
 	loadScene(x,y,z)
 	requestCollision(x,y)
 	activateInteriorPeds(true)
-	setCharCoordinates(PLAYER_PED, x, y, z) 
 
+	setCharCoordinates(PLAYER_PED, x, y, z)
+
+	wait(300)
+	if target or z == nil then
+		while true do
+			local px,py = getCharCoordinates(PLAYER_PED)
+			setCharCoordinates(PLAYER_PED, x, y, -100.0)
+			if px == x and py == y then
+				break
+			end
+			wait(0)
+		end
+	end
+	doFade(true,300)
+	lockPlayerControl(false)
 end
 
 -- Displays the teleport location name
 function ShowTeleportEntry(label, x, y, z,interior_id)
 	if imgui.MenuItemBool(label) then
-		module.Teleport(x, y, z,interior_id)
+		lua_thread.create(module.Teleport,x, y, z,interior_id)
 	end
 	if imgui.IsItemClicked(1) then
 		module.tteleport.coordinates[label] = nil
@@ -76,37 +91,37 @@ function module.TeleportMain()
 	fcommon.Tabs("Teleport",{"Teleport","Search","Custom"},{
 		function()
 			imgui.Columns(2,nil,false)
-            fcommon.CheckBoxVar("Get Z coordinates",module.tteleport.auto_z,"Get ground Z of your coordinates")
 			fcommon.CheckBoxVar("Insert coordinates",module.tteleport.insert_coords,"Insert current coordinates")
 			imgui.NextColumn()
 			fcommon.CheckBoxVar("Quick teleport",module.tteleport.shortcut,"Teleport to marker using" ..  fcommon.GetHotKeyNames(tcheatmenu.hot_keys.quick_teleport))
 			imgui.Columns(1)
+			
+			imgui.Spacing()
 
-            if imgui.InputText("Coordinates",module.tteleport.coords,ffi.sizeof(module.tteleport.coords)) then end
+            imgui.InputText("Coordinates",module.tteleport.coords,ffi.sizeof(module.tteleport.coords))
 
             if module.tteleport.insert_coords[0] then
                 local x,y,z = getCharCoordinates(PLAYER_PED)
                 imgui.StrCopy(module.tteleport.coords,string.format("%d, %d, %d", math.floor(x) , math.floor(y) , math.floor(z)))
 			end
-			
+
 			if (isKeyDown(vkeys.VK_LCONTROL) or isKeyDown(vkeys.VK_RCONTROL)) and isKeyDown(vkeys.VK_V) then
 				imgui.StrCopy(module.tteleport.coords,getClipboardText())
 			end
-
             fcommon.InformationTooltip("Enter XYZ coordinates.\nFormat : X,Y,Z")
             imgui.Dummy(imgui.ImVec2(0,10))
 
             if imgui.Button("Teleport to coord",imgui.ImVec2(fcommon.GetSize(2))) then
 				local x,y,z = (ffi.string(module.tteleport.coords)):match("([^,]+),([^,]+),([^,]+)")
 				if x ~= nil and y ~= nil and z ~= nil then
-					module.Teleport(x, y, z,0)
+					lua_thread.create(module.Teleport,x, y, z,0)
 				else
 					printHelpString("No coordinate found")
 				end
             end
             imgui.SameLine()
             if imgui.Button("Teleport to marker",imgui.ImVec2(fcommon.GetSize(2))) then
-                module.Teleport()
+                lua_thread.create(module.Teleport)
             end
 		end,
 		function()
@@ -132,15 +147,15 @@ function module.TeleportMain()
 			fcommon.InformationTooltip("Enter XYZ coordinates.\nFormat : X,Y,Z")
 			if module.tteleport.insert_coords[0] then
 				local x,y,z = getCharCoordinates(PLAYER_PED)
-				
+
                 imgui.StrCopy(module.tteleport.coords,string.format("%d, %d, %d", math.floor(x) , math.floor(y) , math.floor(z)))
 			end
 			imgui.Spacing()
 			if imgui.Button("Save location",imgui.ImVec2(fcommon.GetSize(1))) then
-				if ffi.string(module.tteleport.coord_name) == "" then 
+				if ffi.string(module.tteleport.coord_name) == "" then
 					imgui.StrCopy(module.tteleport.coord_name,"Untitled")
 				end
-				module.tteleport.coordinates[ffi.string(module.tteleport.coord_name)] = string.format("%d, %s",getActiveInterior(), ffi.string(module.tteleport.coords))   
+				module.tteleport.coordinates[ffi.string(module.tteleport.coord_name)] = string.format("%d, %s",getActiveInterior(), ffi.string(module.tteleport.coords))
 				fcommon.SaveJson("coordinate",module.tteleport.coordinates)
 				module.tteleport.coordinates = fcommon.LoadJson("coordinate")
 				printHelpString("Entry ~g~added")

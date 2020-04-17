@@ -97,8 +97,6 @@ module.tvehicle =
     no_vehicles = imgui.new.bool(fconfig.Get('tvehicle.no_vehicles',false)),
     no_damage = imgui.new.bool(fconfig.Get('tvehicle.no_damage',false)),
     path = tcheatmenu.dir .. "vehicles\\images",
-    radio_station_id   = fconfig.Get('tvehicle.radio_station_id',-1),
-    radio_station_lock = imgui.new.bool(fconfig.Get('tvehicle.radio_station_lock',false)),
     random_colors = imgui.new.bool(fconfig.Get('tvehicle.random_colors',false)),
     random_colors_traffic = imgui.new.bool(fconfig.Get('tvehicle.random_colors_traffic',false)),
     spawn_inside = imgui.new.bool(fconfig.Get('tvehicle.spawn_inside',true)),
@@ -757,7 +755,6 @@ function module.OnEnterVehicle()
             imgui.StrCopy(module.tvehicle.gxt_name,model_name)
 
             while isCharInCar(PLAYER_PED,car) do
-                module.tvehicle.radio_station_id = getRadioChannel()
                 wait(0)
             end
         end
@@ -905,7 +902,6 @@ function module.VehicleMain()
                     printHelpString("Player ~r~not~w~ in car")
                 end
             end)
-            fcommon.CheckBoxVar("Lock radio station",module.tvehicle.radio_station_lock,"Switches to your recently played station\nwhen you enter a new vehicle")
             fcommon.CheckBoxVar("New aircraft camera",module.tvehicle.aircraft.camera)
             fcommon.CheckBoxValue("New train camera",5416239,nil,fconst.TRAIN_CAM_FIX.ON,fconst.TRAIN_CAM_FIX.OFF) 
             fcommon.CheckBoxVar("No damage",module.tvehicle.no_damage)

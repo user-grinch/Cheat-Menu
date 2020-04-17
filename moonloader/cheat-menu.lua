@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.0-beta")
-script_version_number(20200413) -- YYYYMMDD
+script_version_number(20200417) -- YYYYMMDD
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -30,6 +30,7 @@ tcheatmenu =
     dir                    = string.format( "%s%s",getWorkingDirectory(),"/lib/cheat-menu/"),
     window                 = 
     {
+        fail_loading_json  = false,
         missing_components = false,
     }
 }
@@ -122,6 +123,7 @@ tcheatmenu       =
             X    = fconfig.Get('tcheatmenu.window.coord.X',50),
             Y    = fconfig.Get('tcheatmenu.window.coord.Y',50),
         },
+        fail_loading_json = tcheatmenu.window.fail_loading_json,
         missing_components = tcheatmenu.window.missing_components,
         panel_func = nil,
         show     = imgui.new.bool(false),
@@ -189,6 +191,13 @@ function(self) -- render frame
        pop = pop + 1
     end
     imgui.Begin(tcheatmenu.window.title, tcheatmenu.window.show,imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoSavedSettings )
+
+    if tcheatmenu.window.fail_loading_json then
+        if imgui.Button("Failed to load some json files! Click to hide",imgui.ImVec2(fcommon.GetSize(1))) then
+            tcheatmenu.window.fail_loading_json = false
+        end
+        imgui.Spacing()
+    end
 
     if tcheatmenu.window.missing_components then
         imgui.Button("Some components of Cheat Menu are missing!",imgui.ImVec2(fcommon.GetSize(1)))
@@ -534,10 +543,6 @@ function main()
 
     -- Set saved values of addresses
     fconfig.SetConfigData()
-
-    -- Camera fov
-    cameraSetLerpFov(getCameraFov(),fgame.tgame.camera.fov[0],1000,true)
-    cameraPersistFov(true) 
 
     -- Money text
     -- ffi.copy(ffi.cast("char(*)", fvisual.tvisual.money.negative_memory), ffi.string(fvisual.tvisual.money.negative))

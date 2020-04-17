@@ -118,7 +118,6 @@ function module.SpawnPed(model)
             x,y,z = getCharCoordinates(PLAYER_PED)
             ped = createChar(module.tped.type.index[0]+5,290,x,y,z) -- CIVMALE = PLAYER + 5
             markModelAsNoLongerNeeded(module.tped.special[tostring(model)])
-            --markCharAsNoLongerNeeded(ped)
         end
         printHelpString("Ped ~g~Spawned")
     end
