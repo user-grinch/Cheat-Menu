@@ -435,7 +435,7 @@ function module.saveStyles( style, stylename )
         end
         module.tstyle.styles_table[stylename][v] = type(style[v]) == 'cdata' and (style[v].x.." "..style[v].y) or style[v]
     end
-    module.tstyle.styles_table[stylename]["Font"] = memory.tostring(imgui.GetFont():GetDebugName()):sub(1,-7)
+    module.tstyle.styles_table[stylename]["Font"] = (memory.tostring(imgui.GetFont():GetDebugName()):sub(1,-7))
     
     return fcommon.SaveJson("styles",module.tstyle.styles_table) and true or false
 end

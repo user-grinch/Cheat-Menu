@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.0-beta")
-script_version_number(20200417) -- YYYYMMDD
+script_version_number(20200421) -- YYYYMMDD
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -44,7 +44,7 @@ http          = require 'copas.http'
 imgui         = require 'mimgui'
 lfs           = require 'lfs'
 mad           = require 'MoonAdditions'
-memory        = require 'memory'
+memory        = require 'cheat-menu.libraries.memory'
 os            = require 'os'
 vkeys         = require 'vkeys'
 ziplib        = ffi.load(string.format( "%s/lib/ziplib.dll",getWorkingDirectory()))
@@ -575,7 +575,9 @@ function main()
     --------------------------------------------------
 
     while true do
-
+        
+        -- local x,y,z = getCharCoordinates(PLAYER_PED)
+        -- printString(getNameOfZone(x,y,z),100)
         --------------------------------------------------
         -- Functions that neeed to run constantly
 

@@ -411,13 +411,29 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 					fstyle.tstyle.list = fstyle.getStyles()
 					fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
 					fcommon.SaveJson("styles",fstyle.tstyle.styles_table)
+
+					for k,v in ipairs(fstyle.tstyle.list) do
+						if v == "Default" then
+							fstyle.tstyle.selected[0] = k-1
+						end
+					end
+
+					if fstyle.tstyle.list[fstyle.tstyle.selected[0]+1] == nil then
+						fstyle.tstyle.selected[0] = fstyle.tstyle.selected[0] - 1
+					end
+					fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0]+1])
+					fstyle.tstyle.selected_name = fstyle.tstyle.list[fstyle.tstyle.selected[0]+1]
+
+					printHelpString("Style deleted")
 				end
 				imgui.SameLine()
 				if imgui.Button("Save style",imgui.ImVec2(fcommon.GetSize(2))) then
 					fstyle.saveStyles(imgui.GetStyle(), ffi.string(fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]))
 					fstyle.tstyle.list  = fstyle.getStyles()
 					fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
-					
+					fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])
+					fstyle.tstyle.selected_name = fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]
+					printHelpString("Style saved")
 				end
 			end
 
@@ -425,10 +441,19 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 
 			imgui.InputText('##styleName', fstyle.tstyle.name, ffi.sizeof(fstyle.tstyle.name) - 1) 
 			imgui.SameLine()
-			if imgui.Button("Add new style") then
+			local vec_size = imgui.GetItemRectSize()
+			vec_size.x = fcommon.GetSize(3)
+			if imgui.Button("Add new style",vec_size) then
 				fstyle.saveStyles(imgui.GetStyle(), ffi.string(fstyle.tstyle.name))
 				fstyle.tstyle.list = fstyle.getStyles()
 				fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
+				for k,v in ipairs(fstyle.tstyle.list) do
+					if v == ffi.string(fstyle.tstyle.name) then
+						fstyle.tstyle.selected[0] = k-1
+					end
+				end
+				fstyle.tstyle.selected_name = fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]
+				printHelpString("Style added")
 			end
 
 			if fstyle.tstyle.status then

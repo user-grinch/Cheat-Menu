@@ -69,6 +69,7 @@ module.tvehicle =
     },
     gxt_name        = imgui.new.char[32](""),
     gxt_name_table  = fconfig.Get('tvehicle.gxt_name_table',{}),
+    handling_flags = fcommon.LoadJson("handling flags"),
     heavy = imgui.new.bool(fconfig.Get('tvehicle.heavy',false)),
     hidden_objects = {},
     images = {},
@@ -77,6 +78,7 @@ module.tvehicle =
     lights = imgui.new.bool(fconfig.Get('tvehicle.lights',false)),
     lock_doors = imgui.new.bool(false),
     lock_speed = imgui.new.bool(fconfig.Get('tvehicle.lock_speed',false)),
+    model_flags = fcommon.LoadJson("model flags"),
     names = fcommon.LoadJson("vehicle"),
     paintjobs  = 
     {
@@ -1322,9 +1324,9 @@ function module.VehicleMain()
             if isCharInAnyCar(PLAYER_PED) then
                 local car = getCarCharIsUsing(PLAYER_PED)
                 local model = getCarModel(car)
+
                 -------------------------------------------------------
-                local address = callFunction(0x00403DA0,1,1,model)
-                local phandling = readMemory((address + 0x4A),2,false)
+                local phandling = readMemory((CVehicleModelInfo[model] + 0x4A),2,false) --m_nHandlingId
                 phandling = phandling * 0xE0
                 phandling = phandling + 0xC2B9DC
 
@@ -1339,43 +1341,45 @@ function module.VehicleMain()
                     callMethod(0x5BD830,cHandlingDataMgr,0,0)
                     printHelpString("Handling reset")
                 end
-    
+                local val = readMemory(phandling + 0xCC,4,false)     
+
                 imgui.Spacing()
                 if imgui.BeginChild("Handling") then
-
-                    fcommon.RadioButtonFunc("ABS",{"On","Off"},{1.0,0.0},phandling + 0x9C)
-                    fcommon.UpdateAddress({name = 'Brake bias',address = phandling + 0x98 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01})
-                    fcommon.UpdateAddress({name = 'Brake deceleration',address = phandling + 0x94 ,size = 4,min = 0.1,max = 10,is_float = true,factor = 3.9999999e-4,cvalue = 0.1})
-                    fcommon.UpdateAddress({name = 'Centre of mass X',address = phandling + 0x14 ,size = 1,min = -10.0,max = 10.0,is_float = true,cvalue = 0.05})
-                    fcommon.UpdateAddress({name = 'Centre of mass Y',address = phandling + 0x18 ,size = 1,min = -10.0,max = 10.0,is_float = true,cvalue = 0.05})
-                    fcommon.UpdateAddress({name = 'Centre of mass Z',address = phandling + 0x1C ,size = 1,min = -10.0,max = 10.0,is_float = true,cvalue = 0.05})
-                    fcommon.UpdateAddress({name = 'Collision damage multiplier',address = phandling + 0xC8 ,size = 4,min = 0.2,max = 5.0,is_float = true,cvalue = 0.05})                    
-                    fcommon.UpdateAddress({name = 'Damage multiplier',address = phandling + CDM ,size = 4,min = 0.0,max = 5.0,is_float = true})
-                    fcommon.UpdateAddress({name = 'Damping level',address = phandling + 0xB0 ,size = 4,is_float = true,cvalue = 0.01})
-                    fcommon.UpdateAddress({name = 'Drag mult',address = phandling + 0x10 ,size = 4,min = 1,max = 20.0,is_float = true})
-                    fcommon.RadioButtonFunc("Drive type",{"Front wheel drive","Rear wheel drive","Four wheel drive"},{fconst.DRIVE_TYPE.FWD,fconst.DRIVE_TYPE.RWD,fconst.DRIVE_TYPE.AWD},phandling + 0x74)
-                    fcommon.UpdateAddress({name = 'Engine acceleration',address = phandling + 0x7C ,size = 4,min = 1,max = 10,is_float = true,factor = 3.9999999e-4})
-                    fcommon.UpdateAddress({name = 'Engine inertia',address = phandling + 0x80 ,size = 4,min = 0,max = 50,is_float = true})
-                    fcommon.RadioButtonFunc("Engine type",{"Petrol","Diseal","Electric"},{fconst.ENGINE_TYPE.PETROL,fconst.ENGINE_TYPE.DISEAL,fconst.ENGINE_TYPE.ELECTRIC},phandling + 0x75)
-                    fcommon.RadioButtonFunc("Front lights",{"Long","Small","Big","Tall"},{fconst.LIGHTS.LONG,fconst.LIGHTS.SMALL,fconst.LIGHTS.BIG,fconst.LIGHTS.TALL},phandling + 0xDC)
-                    fcommon.UpdateAddress({name = 'Force level',address = phandling + 0xAC ,size = 4,is_float = true,cvalue = 0.1})
-                    fcommon.UpdateAddress({name = 'High speed damping',address = phandling + 0xB4 ,size = 4,is_float = true,cvalue = 0.1})
-                    fcommon.UpdateAddress({name = 'Lower limit',address = phandling + 0xBC ,size = 4,is_float = true,cvalue = 0.05})
-                    fcommon.UpdateAddress({name = 'Mass',address = phandling + 0x4 ,size = 4,min = 1,max = 50000,is_float = true})
-                    fcommon.UpdateAddress({name = 'Max velocity',address = phandling + 0x84 ,size = 4,min = 1,max = 150,is_float = true,factor = 5.5555599e-3})
-                    fcommon.UpdateAddress({name = 'Monetary value',address = phandling + 0xD8 ,size = 4,min = 1,max = 100000})
-                    fcommon.UpdateAddress({name = 'Number of gears',address = phandling + 0x76 ,size = 1,min = 1,max = 10})
-                    fcommon.UpdateAddress({name = 'Percent submerged',address = phandling + 0x20 ,size = 1,min = 10,max = 120})
-                    fcommon.RadioButtonFunc("Rear lights",{"Long","Small","Big","Tall"},{fconst.LIGHTS.LONG,fconst.LIGHTS.SMALL,fconst.LIGHTS.BIG,fconst.LIGHTS.TALL},phandling + 0xDD)
-                    fcommon.UpdateAddress({name = 'Seat offset distance',address = phandling + 0xD4 ,size = 4,is_float = true,cvalue = 0.05})
-                    fcommon.UpdateAddress({name = 'Steering lock',address = phandling + 0xA0 ,size = 4,min = 10,max = 40,is_float = true})
-                    fcommon.UpdateAddress({name = 'Suspension bias',address = phandling + 0xC0 ,size = 4,is_float = true,cvalue = 0.05})
-                    fcommon.UpdateAddress({name = 'Traction bias',address = phandling + 0xA8 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01})
-                    fcommon.UpdateAddress({name = 'Traction loss',address = phandling + 0xA4 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01})
-                    fcommon.UpdateAddress({name = 'Turn mass',address = phandling + 0xC ,size = 4,min = 0,max = 20,is_float = true})
-                    fcommon.UpdateAddress({name = 'Traction multiplier',address = phandling + 0x28 ,size = 4,min = 0.2,max = 2,is_float = true,cvalue = 0.05})
-                    fcommon.UpdateAddress({name = 'Upper limit',address = phandling + 0xB8 ,size = 4,is_float = true,cvalue = 0.05})
-                    fcommon.UpdateAddress({name = 'Vehicle anim group',address = phandling + 0xDE ,size = 1})
+                    fcommon.RadioButtonFunc("ABS",{"On","Off"},{1.0,0.0},phandling + 0x9C,false)
+                    fcommon.UpdateAddress({name = 'Brake bias',address = phandling + 0x98 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
+                    fcommon.UpdateAddress({name = 'Brake deceleration',address = phandling + 0x94 ,size = 4,min = 0.1,max = 10,is_float = true,factor = 3.9999999e-4,cvalue = 0.1, save = false})
+                    fcommon.UpdateAddress({name = 'Centre of mass X',address = phandling + 0x14 ,size = 1,min = -10.0,max = 10.0,is_float = true,cvalue = 0.05, save = false})
+                    fcommon.UpdateAddress({name = 'Centre of mass Y',address = phandling + 0x18 ,size = 1,min = -10.0,max = 10.0,is_float = true,cvalue = 0.05, save = false})
+                    fcommon.UpdateAddress({name = 'Centre of mass Z',address = phandling + 0x1C ,size = 1,min = -10.0,max = 10.0,is_float = true,cvalue = 0.05, save = false})
+                    fcommon.UpdateAddress({name = 'Collision damage multiplier',address = phandling + 0xC8 ,size = 4,min = 0.2,max = 5.0,is_float = true,cvalue = 0.05, save = false})                    
+                    fcommon.UpdateAddress({name = 'Damage multiplier',address = phandling + CDM ,size = 4,min = 0.0,max = 5.0,is_float = true, save = false})
+                    fcommon.UpdateAddress({name = 'Damping level',address = phandling + 0xB0 ,size = 4,is_float = true,cvalue = 0.01, save = false})
+                    fcommon.UpdateAddress({name = 'Drag mult',address = phandling + 0x10 ,size = 4,min = 1,max = 20.0,is_float = true, save = false})
+                    fcommon.RadioButtonFunc("Drive type",{"Front wheel drive","Rear wheel drive","Four wheel drive"},{fconst.DRIVE_TYPE.FWD,fconst.DRIVE_TYPE.RWD,fconst.DRIVE_TYPE.AWD},phandling + 0x74,false)
+                    fcommon.UpdateAddress({name = 'Engine acceleration',address = phandling + 0x7C ,size = 4,min = 1,max = 10,is_float = true,factor = 3.9999999e-4, save = false})
+                    fcommon.UpdateAddress({name = 'Engine inertia',address = phandling + 0x80 ,size = 4,min = 0,max = 50,is_float = true, save = false})
+                    fcommon.RadioButtonFunc("Engine type",{"Petrol","Diseal","Electric"},{fconst.ENGINE_TYPE.PETROL,fconst.ENGINE_TYPE.DISEAL,fconst.ENGINE_TYPE.ELECTRIC},phandling + 0x75,false)
+                    fcommon.RadioButtonFunc("Front lights",{"Long","Small","Big","Tall"},{fconst.LIGHTS.LONG,fconst.LIGHTS.SMALL,fconst.LIGHTS.BIG,fconst.LIGHTS.TALL},phandling + 0xDC,false)
+                    fcommon.UpdateAddress({name = 'Force level',address = phandling + 0xAC ,size = 4,is_float = true,cvalue = 0.1, save = false})
+                    fcommon.UpdateBits("Handling flags",module.tvehicle.handling_flags,phandling + 0xD0,4)
+                    fcommon.UpdateAddress({name = 'High speed damping',address = phandling + 0xB4 ,size = 4,is_float = true,cvalue = 0.1, save = false})
+                    fcommon.UpdateAddress({name = 'Lower limit',address = phandling + 0xBC ,size = 4,is_float = true,cvalue = 0.05, save = false})
+                    fcommon.UpdateAddress({name = 'Mass',address = phandling + 0x4 ,size = 4,min = 1,max = 50000,is_float = true, save = false})
+                    fcommon.UpdateAddress({name = 'Max velocity',address = phandling + 0x84 ,size = 4,min = 1,max = 150,is_float = true,factor = 5.5555599e-3, save = false})
+                    fcommon.UpdateBits("Model flags",module.tvehicle.model_flags,phandling + 0xCC,4)
+                    fcommon.UpdateAddress({name = 'Monetary value',address = phandling + 0xD8 ,size = 4,min = 1,max = 100000, save = false})
+                    fcommon.UpdateAddress({name = 'Number of gears',address = phandling + 0x76 ,size = 1,min = 1,max = 10, save = false})
+                    fcommon.UpdateAddress({name = 'Percent submerged',address = phandling + 0x20 ,size = 1,min = 10,max = 120, save = false})
+                    fcommon.RadioButtonFunc("Rear lights",{"Long","Small","Big","Tall"},{fconst.LIGHTS.LONG,fconst.LIGHTS.SMALL,fconst.LIGHTS.BIG,fconst.LIGHTS.TALL},phandling + 0xDD,false)
+                    fcommon.UpdateAddress({name = 'Seat offset distance',address = phandling + 0xD4 ,size = 4,is_float = true,cvalue = 0.05, save = false})
+                    fcommon.UpdateAddress({name = 'Steering lock',address = phandling + 0xA0 ,size = 4,min = 10,max = 40,is_float = true, save = false})
+                    fcommon.UpdateAddress({name = 'Suspension bias',address = phandling + 0xC0 ,size = 4,is_float = true,cvalue = 0.05, save = false})
+                    fcommon.UpdateAddress({name = 'Traction bias',address = phandling + 0xA8 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
+                    fcommon.UpdateAddress({name = 'Traction loss',address = phandling + 0xA4 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
+                    fcommon.UpdateAddress({name = 'Turn mass',address = phandling + 0xC ,size = 4,min = 0,max = 20,is_float = true, save = false})
+                    fcommon.UpdateAddress({name = 'Traction multiplier',address = phandling + 0x28 ,size = 4,min = 0.2,max = 2,is_float = true,cvalue = 0.05, save = false})
+                    fcommon.UpdateAddress({name = 'Upper limit',address = phandling + 0xB8 ,size = 4,is_float = true,cvalue = 0.05, save = false})
+                    fcommon.UpdateAddress({name = 'Vehicle anim group',address = phandling + 0xDE ,size = 1, save = false})
                     imgui.EndChild()
                 end
             else
