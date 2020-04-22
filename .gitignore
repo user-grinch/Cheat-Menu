@@ -26,7 +26,6 @@ luac.out
 *.exp
 
 # Shared objects (inc. Windows DLLs)
-*.dll
 *.so
 *.so.*
 *.dylib
@@ -39,7 +38,4 @@ luac.out
 *.x86_64
 *.hex
 
-lib/cheat-menu/json/cheat-menu.json
-
-lib/cheat-menu/json/config.json
 moonloader/lib/cheat-menu/json/config.json
