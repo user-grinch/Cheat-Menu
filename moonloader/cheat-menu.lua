@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.0-beta")
-script_version_number(20200421) -- YYYYMMDD
+script_version_number(20200429) -- YYYYMMDD
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -98,6 +98,7 @@ tcheatmenu       =
     hot_keys     =
     {
         asc_key               = fconfig.Get('tcheatmenu.hot_keys.asc',{vkeys.VK_RETURN,vkeys.VK_RETURN}),
+        camera_mode           = fconfig.Get('tcheatmenu.hot_keys.camera_mode',{vkeys.VK_LMENU,vkeys.VK_C}),
         camera_mode_forward   = fconfig.Get('tcheatmenu.hot_keys.camera_mode_forward',{vkeys.VK_I,vkeys.VK_I}),
         camera_mode_backward  = fconfig.Get('tcheatmenu.hot_keys.camera_mode_backward',{vkeys.VK_K,vkeys.VK_K}),
         camera_mode_left      = fconfig.Get('tcheatmenu.hot_keys.camera_mode_left',{vkeys.VK_J,vkeys.VK_J}),
@@ -615,6 +616,15 @@ function main()
             end
         end
 
+        -- Camera mode
+        fcommon.OnHotKeyPress(tcheatmenu.hot_keys.camera_mode,function()
+            fgame.tgame.camera.bool[0] = not fgame.tgame.camera.bool[0]
+            if fgame.tgame.camera.bool[0] then
+                printHelpString("Camera mode enabled")
+            else
+                printHelpString("Camera mode disabled")
+            end
+        end)
 
         -- Quick screenshot
         fcommon.OnHotKeyPress(tcheatmenu.hot_keys.quick_screenshot,function()
@@ -742,7 +752,7 @@ function onScriptTerminate(script, quitGame)
         if doesObjectExist(fgame.tgame.solid_water_object) then
             deleteObject(fgame.tgame.solid_water_object)
         end
-
+        fgame.RemoveAllObjects()
         --Releasing Images
         fcommon.ReleaseImages(fvehicle.tvehicle.images)
         fcommon.ReleaseImages(fweapon.tweapon.images)
@@ -751,4 +761,8 @@ function onScriptTerminate(script, quitGame)
         fcommon.ReleaseImages(fped.tped.images)
         fcommon.ReleaseImages(fplayer.tplayer.clothes.images)
     end
+end
+
+function onSaveGame()
+    fgame.RemoveAllObjects()
 end

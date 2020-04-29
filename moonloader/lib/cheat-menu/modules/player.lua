@@ -140,7 +140,17 @@ function module.ChangePlayerCloth(name)
     givePlayerClothesOutsideShop(PLAYER_HANDLE,texture,model,body_part)
     buildPlayerModel(PLAYER_HANDLE)
     printHelpString("Clothes changed")
+    local veh = nil
+    local speed = 0
+    if isCharInAnyCar(PLAYER_PED) then
+        veh = getCarCharIsUsing(PLAYER_PED)
+        speed = getCarSpeed(veh)
+    end
     clearCharTasksImmediately(PLAYER_PED)
+    if veh ~= nil then
+        taskWarpCharIntoCarAsDriver(PLAYER_PED,veh)
+        setCarForwardSpeed(veh,speed)
+    end
 end
 
 function module.RemoveThisCloth(name)

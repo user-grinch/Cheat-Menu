@@ -380,7 +380,7 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 			end
 		end,
 		function()
-			fcommon.HotKey(tcheatmenu.hot_keys.menu_open,"Open or close cheat menu")
+			fcommon.HotKey(tcheatmenu.hot_keys.menu_open,"Open/ close cheat menu")
 			fcommon.HotKey(tcheatmenu.hot_keys.command_window,"Open command window")
 
 			imgui.Dummy(imgui.ImVec2(0,10))
@@ -391,7 +391,8 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 			fcommon.HotKey(tcheatmenu.hot_keys.quick_teleport,"Toggle quick teleport")
 
 			imgui.Dummy(imgui.ImVec2(0,10))
-
+			
+			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode,"Enable/ disable camera mode")
 			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_forward,"Camera mode forward")
 			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_backward,"Camera mode backward")
 			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_left,"Camera mode left")
@@ -502,23 +503,25 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 			
 			imgui.TextWrapped("Special thanks to,")
 			imgui.Columns(2,nil,false)
-			imgui.TextWrapped("Junior-Djjr")
-			imgui.TextWrapped("Um_Geek")
-			imgui.TextWrapped("randazz0")
+			
 			imgui.TextWrapped("Fabio")
-			imgui.TextWrapped("kuba--")
-			imgui.TextWrapped("Israel")
 			imgui.TextWrapped("guru guru")
+			imgui.TextWrapped("Israel")
+			imgui.TextWrapped("Junior-Djjr")
+			imgui.TextWrapped("kuba--")
+			imgui.TextWrapped("randazz0")
+			imgui.TextWrapped("Um_Geek")
 			imgui.TextWrapped("Modding community")
 			imgui.TextWrapped("Rockstar Games")
 			imgui.NextColumn()
-			imgui.TextWrapped("For his help")
-			imgui.TextWrapped("For his help")
-			imgui.TextWrapped("For ImStyleSerializer")
-			imgui.TextWrapped("For Garage Save Extender")
-			imgui.TextWrapped("For C zip library")
-			imgui.TextWrapped("For Neon api")
+			imgui.TextWrapped("For GSX")
 			imgui.TextWrapped("For Timecyc stuff")
+			imgui.TextWrapped("For Neon api")
+			imgui.TextWrapped("For his help")
+			imgui.TextWrapped("For C zip library")
+			imgui.TextWrapped("For ImStyleSerializer")
+			imgui.TextWrapped("For his help")
+			
 			imgui.Columns(1)
 		end
 	})

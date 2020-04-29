@@ -47,6 +47,18 @@ module.tgame                =
     freeze_time             = imgui.new.bool(fconfig.Get('tgame.freeze_time',false)), 
     ghost_cop_cars          = imgui.new.bool(fconfig.Get('tgame.ghost_cop_cars',false)),
     keep_stuff              = imgui.new.bool(fconfig.Get('tgame.keep_stuff',false)),
+    object_spawner          = 
+    {
+        coord               = 
+        {
+            x               = imgui.new.float(0),
+            y               = imgui.new.float(0),
+            z               = imgui.new.float(0),
+        },
+        filter              = imgui.ImGuiTextFilter(),
+        model               = imgui.new.int(1427),
+        placed              = {},
+    },  
     random_cheats           = 
     {
         activated_cheats       = {},
@@ -59,6 +71,7 @@ module.tgame                =
     },
     script_manager          =
     {
+        filter              = imgui.ImGuiTextFilter(),
         scripts             = fconfig.Get('tgame.script_manager.scripts',{}),
         skip_auto_reload    = false,
         not_loaded          = {},
@@ -189,6 +202,8 @@ function module.CameraMode()
 
                         total_mouse_x = total_mouse_x - mouse_x/6
                         total_mouse_y = total_mouse_y + mouse_y/6
+                        if total_mouse_x > 300 then total_mouse_x = 300 end
+                        if total_mouse_x < -300 then total_mouse_x = -300 end
                         if total_mouse_y > 170 then total_mouse_y = 170 end
                         if total_mouse_y < -170 then total_mouse_y = -170 end
                         factor = 1
@@ -201,30 +216,29 @@ function module.CameraMode()
                         end
 
                         if isKeyDown(tcheatmenu.hot_keys.camera_mode_forward[1] and tcheatmenu.hot_keys.camera_mode_forward[2]) then 
-                            front = front + 0.1 * factor
+                            front = front + factor * module.tgame.camera.movement_speed[0]
                         end
         
                         if isKeyDown(tcheatmenu.hot_keys.camera_mode_backward[1] and tcheatmenu.hot_keys.camera_mode_backward[2]) then 
-                            front = front - 0.1* factor
+                            front = front - factor * module.tgame.camera.movement_speed[0]
                         end
 
                         if isKeyDown(tcheatmenu.hot_keys.camera_mode_left[1] and tcheatmenu.hot_keys.camera_mode_left[2]) then 
-                            right = right - 0.1* factor
+                            right = right - factor * module.tgame.camera.movement_speed[0]
                         end
         
                         if isKeyDown(tcheatmenu.hot_keys.camera_mode_right[1] and tcheatmenu.hot_keys.camera_mode_right[2]) then 
-                            right = right + 0.1* factor
+                            right = right + factor * module.tgame.camera.movement_speed[0]
                         end
 
                         if isKeyDown(tcheatmenu.hot_keys.camera_mode_up[1] and tcheatmenu.hot_keys.camera_mode_up[2]) then 
-                            up = up - 0.1* factor
+                            up = up - factor * module.tgame.camera.movement_speed[0]
                         end
         
                         if isKeyDown(tcheatmenu.hot_keys.camera_mode_down[1] and tcheatmenu.hot_keys.camera_mode_down[2]) then 
-                            up = up + 0.1* factor
+                            up = up + factor * module.tgame.camera.movement_speed[0]
                         end
-
-                        attachCameraToChar(PLAYER_PED,right, front, up, 0.0, 180.0, total_mouse_y, 0.0, 2)
+                        attachCameraToChar(PLAYER_PED,right, front, up, total_mouse_x*-1, 180.0, total_mouse_y, 0.0, 2)
 
                         if total_mouse_delta + getMousewheelDelta() ~= total_mouse_delta then
                             total_mouse_delta = total_mouse_delta + getMousewheelDelta()
@@ -274,7 +288,6 @@ function module.CameraMode()
         wait(0)
     end
 end
-
 function CheatsEntry(func,status,names)
     local sizeX = fcommon.GetSize(3)
     local sizeY = imgui.GetWindowHeight()/10
@@ -418,16 +431,19 @@ function module.LoadScriptsOnKeyPress()
             fcommon.OnHotKeyPress(table,function()
                 local full_file_path = string.format( "%s\\%s.loadonkeypress",getWorkingDirectory(),name)
                 local is_loaded = false
+                local sc_handle = nil
                 for index, script in ipairs(script.list()) do
                     if full_file_path == script.path then
                         is_loaded = true
+                        sc_handle = script
                     end
                 end
                 if is_loaded == false then
                     script.load(full_file_path)
                     printHelpString("Script loaded")
                 else
-                    printHelpString("Script already loaded")
+                    sc_handle:unload()
+                    printHelpString("Script unloaded")
                 end 
                 module.tgame.script_manager.not_loaded[name .. ".loadonkeypress"] = nil
             end)
@@ -623,6 +639,60 @@ function FollowPed(ped)
     end
 end
 
+function SpawnObject(model,x,y,z)
+    if model < 700 then
+        printHelpString("Can't spawn object")
+        return
+    end
+    requestModel(model)
+    while not hasModelLoaded(model) do
+        wait(0)
+    end
+
+    if isModelAvailable(model) then
+        local obj = createObject(model,x,y,z)
+        setObjectRotation(obj,0,0,0)
+        setObjectCollision(obj,false)
+        markModelAsNoLongerNeeded(model)
+        printHelpString("Model Spawned")
+        module.tgame.object_spawner.placed[string.format("%d##%d",model,obj)] = 
+        {
+            collision = imgui.new.bool(false),
+            rotx = imgui.new.float(0),
+            roty = imgui.new.float(0),
+            rotz = imgui.new.float(0),
+        }
+    end
+end
+
+function GenerateIPL()
+    local file = io.open("generated.ipl","w")
+    local write_string = "inst\n"
+
+    for key,value in pairs(module.tgame.object_spawner.placed) do
+        local model, handle = string.match(key,"(%w+)##(%w+)")
+        local _,posx,posy,posz = getObjectCoordinates(handle)
+        local rotx,roty,rotz,rotw = getObjectQuaternion(handle)
+        local interior =  getActiveInterior()
+
+        local inst_line = string.format("%d, dummy, %d, %f, %f, %f, %f, %f, %f, %f, -1\n",model,interior,posx,posy,posz,rotx,roty,rotz,rotw)
+        write_string = write_string .. inst_line
+    end
+    write_string = write_string .. "end"
+    file:write(write_string)
+    file:close()
+    printHelpString("IPL generated")
+end
+
+function module.RemoveAllObjects()
+    for key,value in pairs(module.tgame.object_spawner.placed) do
+        local model, handle = string.match(key,"(%w+)##(%w+)")
+        deleteObject(tonumber(handle))
+        module.tgame.object_spawner.placed[key] = nil
+    end
+    printHelpString("Objects removed")
+end
+
 --------------------------------------------------
 
 
@@ -642,7 +712,7 @@ function module.GameMain()
         printHelpString("Coordinates copied")
     end
     
-    fcommon.Tabs("Game",{"Checkboxes","Menus","Cheats","Script manager"},{
+    fcommon.Tabs("Game",{"Checkboxes","Menus","Cheats","Script manager","Object spawner"},{
         function()
             
             local current_day = imgui.new.int(readMemory(0xB7014E,1,false)-1)
@@ -654,9 +724,9 @@ function module.GameMain()
             
             imgui.Dummy(imgui.ImVec2(0,10))
             imgui.Columns(2,nil,false)
-            fcommon.CheckBoxVar("Camera mode",module.tgame.camera.bool,string.format("Forward: %s\tBackward: %s\
+            fcommon.CheckBoxVar("Camera mode",module.tgame.camera.bool,string.format("Toggle: %s\n\nForward: %s\tBackward: %s\
 Left: %s\t\t  Right: %s\n\nSlow movement: %s\nFast movement: %s\n\nRotation: Mouse\nZoom in/out : Mouse wheel \n\
-Up : %s (Lock on player)\nDown: %s (Lock on player)",
+Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode),
             fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_forward),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_backward),
             fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_left),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_right),
             fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_slow),fcommon.GetHotKeyNames(tcheatmenu.hot_keys.camera_mode_fast),
@@ -682,7 +752,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",
                 imgui.Spacing()
                 if imgui.Button("Restore Camera",imgui.ImVec2(fcommon.GetSize(2))) then
                     restoreCamera()
-                    module.tgame.camera.fov[0] = module.tgame.camera.fov[0]
+                    module.tgame.camera.fov[0] = 70
                     cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
                     cameraPersistFov(true) 
                     module.tgame.camera.shake[0] = 0.0
@@ -868,7 +938,8 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",
 
                 module.MonitorScripts()
 
-                local filter = imgui.ImGuiTextFilter()
+                local filter = module.tgame.script_manager.filter
+
                 filter:Draw("Filter")
                 imgui.Spacing()
                 
@@ -885,6 +956,69 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",
                 end
 				imgui.EndChild()
 			end
+        end,
+        function()
+            if imgui.Button("Remove all objects",imgui.ImVec2(fcommon.GetSize(2))) then
+                module.RemoveAllObjects()
+            end
+            imgui.SameLine()
+            if imgui.Button("Generate IPL",imgui.ImVec2(fcommon.GetSize(2))) then
+                GenerateIPL()
+            end
+            fcommon.Tabs("Object Spawner Tabs",{"Spawn","Placed"},{
+            function()
+                imgui.InputInt("Model",module.tgame.object_spawner.model)
+                imgui.Spacing()
+                imgui.InputFloat("Coord X",module.tgame.object_spawner.coord.x,1.0, 1.0, "%.5f")
+                imgui.InputFloat("Coord Y",module.tgame.object_spawner.coord.y,1.0, 1.0, "%.5f")
+                imgui.InputFloat("Coord Z",module.tgame.object_spawner.coord.z,1.0, 1.0, "%.5f")
+                imgui.Dummy(imgui.ImVec2(0,10))
+                if imgui.Button("Set player coord",imgui.ImVec2(fcommon.GetSize(2))) then
+                    module.tgame.object_spawner.coord.x[0],module.tgame.object_spawner.coord.y[0],module.tgame.object_spawner.coord.z[0] = getCharCoordinates(PLAYER_PED)
+                end
+                imgui.SameLine()
+                if imgui.Button("Spawn object",imgui.ImVec2(fcommon.GetSize(2))) then
+                    lua_thread.create(SpawnObject,module.tgame.object_spawner.model[0],module.tgame.object_spawner.coord.x[0],module.tgame.object_spawner.coord.y[0],module.tgame.object_spawner.coord.z[0])
+                end
+            end,
+            function()
+                local filter = module.tgame.object_spawner.filter
+
+                filter:Draw("Filter")
+                fcommon.InformationTooltip("All objects will be removed if\nCheat Menu gets terminated")
+                imgui.Spacing()
+
+                if imgui.BeginChild("") then 
+                    for key,value in pairs(module.tgame.object_spawner.placed) do
+                        local model, handle = string.match(key,"(%w+)##(%w+)")
+                        handle = tonumber(handle)
+                        fcommon.DropDownMenu(key,function()
+                            local _,x,y,z = getObjectCoordinates(handle)
+                            
+                            module.tgame.object_spawner.coord.x[0] = x
+                            module.tgame.object_spawner.coord.y[0] = y
+                            module.tgame.object_spawner.coord.z[0] = z
+
+                            if imgui.Checkbox("Collision",value.collision) then
+                                setObjectCollision(handle,value.collision[0])
+                            end
+                            imgui.InputFloat("Coord X",module.tgame.object_spawner.coord.x,1.0, 1.0, "%.5f")
+                            imgui.InputFloat("Coord Y",module.tgame.object_spawner.coord.y,1.0, 1.0, "%.5f")
+                            imgui.InputFloat("Coord Z",module.tgame.object_spawner.coord.z,1.0, 1.0, "%.5f")
+                            setObjectCoordinates(handle,module.tgame.object_spawner.coord.x[0],module.tgame.object_spawner.coord.y[0],module.tgame.object_spawner.coord.z[0])
+                            
+                            imgui.Spacing()
+                            
+                            imgui.SliderFloat("Rotation X",value.rotx,0,360, "%.5f")
+                            imgui.SliderFloat("Rotation Y",value.roty,0,360, "%.5f")
+                            imgui.SliderFloat("Rotation Z",value.rotz,0,360, "%.5f")
+                            setObjectRotation(handle,value.rotx[0],value.roty[0],value.rotz[0])
+                        end)
+                    end
+                    imgui.EndChild()
+                end
+            end
+            })
         end
     })
 end

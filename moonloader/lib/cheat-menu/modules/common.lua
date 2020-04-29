@@ -470,6 +470,7 @@ function module.RadioButton(label,rb_table,addr_table,default)
         if imgui.RadioButtonIntPtr("Default ##" ..label,button,#addr_table + 1) then
             for j = 1,#addr_table,1 do
                 writeMemory(addr_table[j],1,0,false)
+                fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",addr_table[j]),{1,0})
             end
             module.CheatActivated()
         end

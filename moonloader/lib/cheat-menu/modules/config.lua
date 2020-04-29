@@ -144,6 +144,7 @@ function module.Write()
                     hot_keys = 
                     {
                         asc_key                = tcheatmenu.hot_keys.asc_key,
+                        camera_mode            = tcheatmenu.hot_keys.camera_mode,
                         camera_mode_forward    = tcheatmenu.hot_keys.camera_mode_forward,
                         camera_mode_flip       = tcheatmenu.hot_keys.camera_mode_flip,
                         camera_mode_backward   = tcheatmenu.hot_keys.camera_mode_backward,
