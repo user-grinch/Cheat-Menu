@@ -24,6 +24,7 @@ It's based on [Moonloader](https://gtaforums.com/topic/890987-moonloader/) and u
 ### Master Branch
 [Master branch](https://github.com/inanahammad/Cheat-Menu) contains all the recent work done to the menu. While this can be the best way to live on the edge & try the latest features out, it could come with a fair number of bugs.
 
+A portuguese translation of the menu is [here](https://github.com/Dowglass/Cheat-Menu)
 
 ## Installation
 
