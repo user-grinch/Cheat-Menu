@@ -210,12 +210,12 @@ function module.WeaponMain()
             function()
                 setPlayerFastReload(PLAYER_HANDLE,module.tweapon.fast_reload[0])
             end)
-            fcommon.CheckBoxVar("Huge damage",module.tweapon.huge_damage,nil,
+            fcommon.CheckBoxVar("Huge damage",module.tweapon.huge_damage,"Increase all weapon damage",
             function()
                 if not module.tweapon.huge_damage[0] then
                     callFunction(0x5BE670,0,0)
                 end
-            end,"Increase all weapon damage")
+            end)
             fcommon.CheckBoxVar("Long target range",module.tweapon.long_target_range,nil,
             function()
                 if not module.tweapon.long_target_range[0] then
