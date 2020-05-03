@@ -390,24 +390,28 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 		function()
 			if fstyle.tstyle.status then
 				if imgui.Button("Delete style",imgui.ImVec2(fcommon.GetSize(2))) then
-					fstyle.tstyle.styles_table[(fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])] = nil
-					fstyle.tstyle.list = fstyle.getStyles()
-					fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
-					fcommon.SaveJson("styles",fstyle.tstyle.styles_table)
+					if fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1] == nil then
+						printHelpString("No style selected")
+					else
+						fstyle.tstyle.styles_table[(fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])] = nil
+						fstyle.tstyle.list = fstyle.getStyles()
+						fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
+						fcommon.SaveJson("styles",fstyle.tstyle.styles_table)
 
-					for k,v in ipairs(fstyle.tstyle.list) do
-						if v == "Default" then
-							fstyle.tstyle.selected[0] = k-1
+						for k,v in ipairs(fstyle.tstyle.list) do
+							if v == "Default" then
+								fstyle.tstyle.selected[0] = k-1
+							end
 						end
-					end
 
-					if fstyle.tstyle.list[fstyle.tstyle.selected[0]+1] == nil then
-						fstyle.tstyle.selected[0] = fstyle.tstyle.selected[0] - 1
-					end
-					fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0]+1])
-					fstyle.tstyle.selected_name = fstyle.tstyle.list[fstyle.tstyle.selected[0]+1]
+						if fstyle.tstyle.list[fstyle.tstyle.selected[0]+1] == nil then
+							fstyle.tstyle.selected[0] = fstyle.tstyle.selected[0] - 1
+						end
+						fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0]+1])
+						fstyle.tstyle.selected_name = fstyle.tstyle.list[fstyle.tstyle.selected[0]+1]
 
-					printHelpString("Style deleted")
+						printHelpString("Style deleted")
+					end
 				end
 				imgui.SameLine()
 				if imgui.Button("Save style",imgui.ImVec2(fcommon.GetSize(2))) then
