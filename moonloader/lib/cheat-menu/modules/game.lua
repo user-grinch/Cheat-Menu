@@ -767,7 +767,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                     printHelpString("Player warped")
                 end
             end)
-            fcommon.CheckBoxFunc("Disable cheats",module.tgame.disable_cheats,
+            fcommon.CheckBoxVar("Disable cheats",module.tgame.disable_cheats,nil,
             function()
                 if module.tgame.disable_cheats[0] then
                     writeMemory(0x004384D0 ,1,0xE9 ,false)
@@ -783,7 +783,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
             end)
             fcommon.CheckBoxVar("Disable help popups",module.tgame.disable_help_popups,"Disables wasted & arrested popups that\nappear in a new game.Requires restart")
             fcommon.CheckBoxValue('Free PNS',0x96C009)
-            fcommon.CheckBoxFunc("Freeze misson timer",module.tgame.freeze_mission_timer,function()
+            fcommon.CheckBoxVar("Freeze misson timer",module.tgame.freeze_mission_timer,nil,function()
                 if module.tgame.freeze_mission_timer[0] then
                     freezeOnscreenTimer(true)
                     fcommon.CheatActivated()
@@ -792,7 +792,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                     fcommon.CheatDeactivated()
                 end
             end)
-            fcommon.CheckBoxFunc("Disable F1 & F3 replay",module.tgame.disable_replay,function()
+            fcommon.CheckBoxVar("Disable F1 & F3 replay",module.tgame.disable_replay,nil,function()
                 if module.tgame.disable_replay[0] then
                     writeMemory(4588800,1,195,false)
                     fcommon.CheatActivated()
@@ -806,7 +806,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
             
             imgui.NextColumn()
 
-            fcommon.CheckBoxFunc("Ghost cop vehicles",module.tgame.ghost_cop_cars,function()        
+            fcommon.CheckBoxVar("Ghost cop vehicles",module.tgame.ghost_cop_cars,nil,function()        
                 for key,value in pairs(module.tgame.cop) do
                     if  module.tgame.ghost_cop_cars[0] then
                         writeMemory(tonumber(key),4,math.random(400,611),false)
@@ -815,11 +815,11 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                     end
                 end
             end)
-            fcommon.CheckBoxFunc("Keep stuff",module.tgame.keep_stuff,
+            fcommon.CheckBoxVar("Keep stuff",module.tgame.keep_stuff,"Keep stuff after arrest/death",
             function()
                 switchArrestPenalties(module.tgame.keep_stuff[0])
                 switchDeathPenalties(module.tgame.keep_stuff[0])
-            end,"Keep stuff after arrest/death")
+            end)
             fcommon.CheckBoxVar("Random cheats",module.tgame.random_cheats.checkbox,"Activates random cheats after certain time",nil,
             function()
                 fcommon.CheckBoxVar('Disable cheats',module.tgame.random_cheats.disable_cheat_checkbox,"Disable activated cheats after certain time")

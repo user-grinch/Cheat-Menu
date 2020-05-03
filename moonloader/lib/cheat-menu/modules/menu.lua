@@ -30,12 +30,6 @@ module.tmenu =
 		show            = imgui.new.bool(false),
 	},
 	crash_text          = "",
-	debug               =
-	{
-		read_config     = imgui.new.bool(fconfig.Get('tmenu.debug.read_config',true)),
-		write_config    = imgui.new.bool(fconfig.Get('tmenu.debug.write_config',true)),
-		write_info      = imgui.new.bool(fconfig.Get('tmenu.debug.write_info',false)),
-	},
 	disable_in_samp		= imgui.new.bool(fconfig.Get('tmenu.disable_in_samp',true)),
 	draw_text_only      = imgui.new.bool(fconfig.Get('tmenu.draw_text_only',false)),
 	fast_load_images    = imgui.new.bool(fconfig.Get('tmenu.fast_load_images',false)),
@@ -155,7 +149,7 @@ function module.RegisterAllCommands()
 	
 	module.RegisterCommand("veh",function(t)
 		if t[2] == nil then 
-			printHelpString("No vehicle name/model provided") 
+			printHelpString("No vehicle name provided") 
 			return 
 		end
 
@@ -174,7 +168,7 @@ function module.RegisterAllCommands()
 					printHelpString("This is not a vehicle model")
 				end
 			else
-				printHelpString("Failed to get model from name")
+				printHelpString("Invalid vehicle name")
 			end
 		end
 		
@@ -183,7 +177,7 @@ function module.RegisterAllCommands()
 
     module.RegisterCommand("wep",function(t)
 		if t[2] == nil then 
-			printHelpString("No weapon name/id provided") 
+			printHelpString("No weapon name provided") 
 			return 
 		end
 
@@ -192,13 +186,13 @@ function module.RegisterAllCommands()
         if type(model) == "nil" then
             model = fweapon.CBaseWeaponInfo(string.upper(t[2]))  
             if model == 0 then  
-                printHelpString("Failed to get model from name")
+                printHelpString("Invalid weapon name")
                 return
             end
 			t[2] = model
 			fweapon.GiveWeapon(t[2])
         end
-    end,"Spawns weapon","{vehicle name}")
+    end,"Spawns weapon","{weapon name}")
 end
 --------------------------------------------------
 
@@ -314,8 +308,7 @@ function module.MenuMain()
 			imgui.Columns(2,nil,false)
 			fcommon.CheckBoxVar("Auto reload",module.tmenu.auto_reload,"Reload cheat menu automatically\nin case of a crash.\n\nMight cause crash loop sometimes.")
 			fcommon.CheckBoxVar("Auto scale",module.tmenu.auto_scale,"Automatically scale menu according to size")
-			fcommon.CheckBoxVar("Check for updates",module.tmenu.auto_update_check)
-			fcommon.InformationTooltip("Cheat Menu will automatically check for updates\nonline. This requires an internet connection and\
+			fcommon.CheckBoxVar("Check for updates",module.tmenu.auto_update_check,"Cheat Menu will automatically check for updates\nonline. This requires an internet connection and\
 will download files from github repository.")
 			fcommon.CheckBoxVar("Disable in SAMP",module.tmenu.disable_in_samp,"Cheat Menu doesn't endorse using cheats\
 on multiplayer and is created for offline\nusage only.\n\nUsing cheats online might ruin others\ngameplay and get yourself banned.")	
@@ -327,19 +320,8 @@ This might improve the menu performance")
 This may increase game startup time or\nfreeze it for few seconds but improve\nmenu performance.")
 			fcommon.CheckBoxVar("Lock player",module.tmenu.lock_player,"Lock player controls while the menu is open")
 			fcommon.CheckBoxVar("Show crash message",module.tmenu.show_crash_message)
-			fcommon.CheckBoxVar("Show tooltips",module.tmenu.show_tooltips)
-			fcommon.InformationTooltip("Shows usage tips beside options.")
+			fcommon.CheckBoxVar("Show tooltips",module.tmenu.show_tooltips,"Shows usage tips beside options.")
 			imgui.Columns(1)
-			
-			if string.find( script.this.version,"beta") then
-				imgui.Dummy(imgui.ImVec2(0,10))
-				imgui.Columns(2,nil,false)
-				fcommon.CheckBoxVar("Read config file",module.tmenu.debug.read_config)
-				fcommon.CheckBoxVar("Write config file",module.tmenu.debug.write_config)
-				imgui.NextColumn()
-				fcommon.CheckBoxVar("Write debug info",module.tmenu.debug.write_info,"Write extra debug info in log")
-				imgui.Columns(1)
-			end
 			
 		end,
 		function()
@@ -385,9 +367,9 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 
 			imgui.Dummy(imgui.ImVec2(0,10))
 
+			fcommon.HotKey(tcheatmenu.hot_keys.asc_key,"Activate aim skin changer")
 			fcommon.HotKey(tcheatmenu.hot_keys.mc_paste,"Paste memory address")
 			fcommon.HotKey(tcheatmenu.hot_keys.quick_screenshot,"Take quick screenshot")
-			fcommon.HotKey(tcheatmenu.hot_keys.asc_key,"Activate aim skin changer")
 			fcommon.HotKey(tcheatmenu.hot_keys.quick_teleport,"Toggle quick teleport")
 
 			imgui.Dummy(imgui.ImVec2(0,10))

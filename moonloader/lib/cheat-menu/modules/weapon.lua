@@ -206,73 +206,50 @@ function module.WeaponMain()
         function()
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Auto aim",module.tweapon.auto_aim,"Enables joypad auto aim feature\n\nControls:\n Q = left\n E = right")
-            fcommon.CheckBoxFunc("Fast reload",module.tweapon.fast_reload,
+            fcommon.CheckBoxVar("Fast reload",module.tweapon.fast_reload,nil,
             function()
                 setPlayerFastReload(PLAYER_HANDLE,module.tweapon.fast_reload[0])
-                if module.tweapon.fast_reload[0] then                  
-                    fcommon.CheatActivated()
-                else
-                    fcommon.CheatDeactivated()
-                end
             end)
-            fcommon.CheckBoxFunc("Huge damage",module.tweapon.huge_damage,
+            fcommon.CheckBoxVar("Huge damage",module.tweapon.huge_damage,nil,
             function()
-                if module.tweapon.huge_damage[0] then
-                    fcommon.CheatActivated()
-                else
+                if not module.tweapon.huge_damage[0] then
                     callFunction(0x5BE670,0,0)
-                    fcommon.CheatDeactivated()
                 end
             end,"Increase all weapon damage")
-            fcommon.CheckBoxFunc("Long target range",module.tweapon.long_target_range,
+            fcommon.CheckBoxVar("Long target range",module.tweapon.long_target_range,nil,
             function()
-                if module.tweapon.long_target_range[0] then
-                    fcommon.CheatActivated()
-                else
+                if not module.tweapon.long_target_range[0] then
                     callFunction(0x5BE670,0,0)
-                    fcommon.CheatDeactivated()
                 end
             end)
-            fcommon.CheckBoxFunc("Long weapon range",module.tweapon.long_weapon_range,
+            fcommon.CheckBoxVar("Long weapon range",module.tweapon.long_weapon_range,nil,
             function()
-                if module.tweapon.long_weapon_range[0] then
-                    fcommon.CheatActivated()
-                else
+                if not module.tweapon.long_weapon_range[0] then
                     callFunction(0x5BE670,0,0)
-                    fcommon.CheatDeactivated()
                 end
             end)
         
             imgui.NextColumn()
             
-            fcommon.CheckBoxFunc("Max accuracy",module.tweapon.max_accuracy,
+            fcommon.CheckBoxVar("Max accuracy",module.tweapon.max_accuracy,nil,
             function()
-                if module.tweapon.max_accuracy[0] then
-                    fcommon.CheatActivated()
-                else
+                if not module.tweapon.max_accuracy[0] then
                     callFunction(0x5BE670,0,0)
-                    fcommon.CheatDeactivated()
                 end
             end)
-            fcommon.CheckBoxFunc("Max ammo clip",module.tweapon.max_ammo_clip,
+            fcommon.CheckBoxVar("Max ammo clip",module.tweapon.max_ammo_clip,nil,
             function()
-                if module.tweapon.max_ammo_clip[0] then
-                    fcommon.CheatActivated()
-                else
+                if not module.tweapon.max_ammo_clip[0] then
                     callFunction(0x5BE670,0,0)
-                    fcommon.CheatDeactivated()
                 end
             end)
-            fcommon.CheckBoxFunc("Max move speed",module.tweapon.max_move_speed,
+            fcommon.CheckBoxVar("Max move speed",module.tweapon.max_move_speed,nil,
             function()
-                if module.tweapon.max_move_speed[0] then
-                    fcommon.CheatActivated()
-                else
+                if not module.tweapon.max_move_speed[0] then
                     callFunction(0x5BE670,0,0)
-                    fcommon.CheatDeactivated()
                 end
             end)
-            fcommon.CheckBoxFunc("No reload + Inf ammo",module.tweapon.no_reload,
+            fcommon.CheckBoxVar("No reload + Inf ammo",module.tweapon.no_reload,nil,
             function()
                 if module.tweapon.no_reload[0] then
                     writeMemory( 7600773,1,144,1)
@@ -281,7 +258,6 @@ function module.WeaponMain()
                     writeMemory( 7612591,1,144,1)
                     writeMemory( 7612646,1,144,1)
                     writeMemory( 7612647,2,37008,1)
-                    fcommon.CheatActivated()
                 else
                     writeMemory( 7600773,1,72,1)
                     writeMemory( 7600815,1,255,1)
@@ -289,7 +265,6 @@ function module.WeaponMain()
                     writeMemory( 7612591,1,72,1)
                     writeMemory( 7612646,1,255,1)
                     writeMemory( 7612647,2,3150,1)
-                    fcommon.CheatDeactivated()
                 end
             end)
             imgui.Columns(1)

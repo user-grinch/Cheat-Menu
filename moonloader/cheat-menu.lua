@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.0-beta")
-script_version_number(20200429) -- YYYYMMDD
+script_version_number(20200503) -- YYYYMMDD
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -49,16 +49,11 @@ os            = require 'os'
 vkeys         = require 'vkeys'
 ziplib        = ffi.load(string.format( "%s/lib/ziplib.dll",getWorkingDirectory()))
 
+--------------------------------------------------
 -- Menu modules
 fcommon       = require 'cheat-menu.modules.common'
 fconfig       = require 'cheat-menu.modules.config'
 fconst        = require 'cheat-menu.modules.const'
-
-if not fconfig.Get("tmenu.debug.read_config",true) then
-    local debug = fconfig.Get("tmenu.debug",{})
-    fconfig.tconfig.read = {}
-    fconfig.Set(fconfig.tconfig.read,"tmenu.debug",debug)
-end
 
 fanimation    = require 'cheat-menu.modules.animation'
 fgame         = require 'cheat-menu.modules.game'
@@ -194,7 +189,13 @@ function(self) -- render frame
     imgui.Begin(tcheatmenu.window.title, tcheatmenu.window.show,imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoSavedSettings )
 
     if tcheatmenu.window.fail_loading_json then
-        if imgui.Button("Failed to load some json files! Click to hide",imgui.ImVec2(fcommon.GetSize(1))) then
+        imgui.Button("Failed to load some json files!",imgui.ImVec2(fcommon.GetSize(1)))
+        if imgui.Button("Reinstall latest",imgui.ImVec2(fcommon.GetSize(2))) then
+            DownloadUpdate()
+            tcheatmenu.window.fail_loading_json = false
+        end
+        imgui.SameLine()
+        if imgui.Button("Hide message",imgui.ImVec2(fcommon.GetSize(2))) then
             tcheatmenu.window.fail_loading_json = false
         end
         imgui.Spacing()
@@ -277,23 +278,17 @@ function(self) -- render frame
 
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Auto reload",fmenu.tmenu.auto_reload,"Reload cheat menu automatically\nin case of a crash.\n\nMight cause crash loop sometimes.")
-            fcommon.CheckBoxVar("Check for updates",fmenu.tmenu.auto_update_check)
-            fcommon.InformationTooltip("Cheat Menu will automatically check for updates\nonline. This requires an internet connection and\
+            fcommon.CheckBoxVar("Check for updates",fmenu.tmenu.auto_update_check,"Cheat Menu will automatically check for updates\nonline. This requires an internet connection and\
 will download files from github repository.")
             imgui.NextColumn()
             fcommon.CheckBoxVar("Fast load images",fmenu.tmenu.fast_load_images,"Loads vehicles, weapons, peds etc. images\nat menu startup.\n \
 This may increase game startup time or\nfreeze it for few seconds.")
-            fcommon.CheckBoxVar("Show tooltips",fmenu.tmenu.show_tooltips)
-            fcommon.InformationTooltip("Shows usage tips beside options.")
+            fcommon.CheckBoxVar("Show tooltips",fmenu.tmenu.show_tooltips,"Shows usage tips beside options.")
             imgui.Columns(1)
             imgui.Spacing()
             imgui.TextWrapped("You can configure everything here anytime from the 'Menu' section.")
             imgui.Spacing()
             imgui.TextWrapped("This modification is licensed under the terms of GPLv3. For more details see <http://www.gnu.org/licenses/>")
-            if getMoonloaderVersion() < 27 then
-                imgui.Dummy(imgui.ImVec2(0,20))
-                imgui.TextWrapped("You're using an older version of moonloader. Some features may not work properly. Please update to the lastet version if possible.")
-            end
             imgui.EndChild()
         end
     end
@@ -545,12 +540,6 @@ function main()
     -- Set saved values of addresses
     fconfig.SetConfigData()
 
-    -- Money text
-    -- ffi.copy(ffi.cast("char(*)", fvisual.tvisual.money.negative_memory), ffi.string(fvisual.tvisual.money.negative))
-    -- writeMemory(0x58F50A,4,fvisual.tvisual.money.negative_memory,false)
-    -- ffi.copy(ffi.cast("char(*)", fvisual.tvisual.money.positive_memory), ffi.string(fvisual.tvisual.money.positive))
-    -- writeMemory(0x58F4C8,4,fvisual.tvisual.money.positive_memory,false)
-
     lua_thread.create(fcommon.ReadKeyPress)
     lua_thread.create(fplayer.KeepPosition)
     lua_thread.create(fped.PedHealthDisplay)
@@ -577,8 +566,6 @@ function main()
 
     while true do
         
-        -- local x,y,z = getCharCoordinates(PLAYER_PED)
-        -- printString(getNameOfZone(x,y,z),100)
         --------------------------------------------------
         -- Functions that neeed to run constantly
 
@@ -655,7 +642,7 @@ function main()
             end
         end)
 
-         -- Vehicle functions
+        --  Vehicle functions
         if isCharInAnyCar(PLAYER_PED) then
             local car = getCarCharIsUsing(PLAYER_PED)
 
@@ -700,7 +687,7 @@ function main()
             fvehicle.tvehicle.lights[0] = false
         end
 
-        --------------------------------------------------
+        ------------------------------------------------
         -- Menu open close
         fcommon.OnHotKeyPress(tcheatmenu.hot_keys.menu_open,function()
             tcheatmenu.window.show[0] = not tcheatmenu.window.show[0]

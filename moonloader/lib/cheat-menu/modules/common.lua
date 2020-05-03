@@ -98,7 +98,7 @@ function module.ComboBox(label,selected,table,func)
 end
 
 -- Config panel
-function module.ConfigPanel(func_arg_table,func)
+function module.ConfigPanel(func_arg_table,func,func_arg_table_func)
     if func ~= nil then
         imgui.SameLine()
         imgui.TextColored(imgui.ImVec4(128,128,128,0.3),'c')
@@ -112,7 +112,11 @@ function module.ConfigPanel(func_arg_table,func)
                 end
                 if func_arg_table[1] ~= nil then
                     imgui.Dummy(imgui.ImVec2(0,10))
-                    func_arg_table[1](func_arg_table[2],func_arg_table[3],func_arg_table[4])
+                    if func_arg_table[1](func_arg_table[2],func_arg_table[3],func_arg_table[4],func_arg_table[5]) then
+                        if func_arg_table_func ~= nil then
+                            func_arg_table_func()
+                        end
+                    end
                 end
                 imgui.Dummy(imgui.ImVec2(0,10))
                 func()
@@ -509,13 +513,17 @@ function module.CheckBoxValue(name,address,tooltip,enable_value,disable_value)
 
 end
 
-function module.CheckBoxVar(name,var,tooltip,func,panel_func)
+function module.CheckBoxVar(name,var,tooltip,func,panel_func,show_help_msg)
+    show_help_msg = show_help_msg or true
 
     if imgui.Checkbox(name, var) then
-        if var[0] then
-            fcommon.CheatActivated()
-        else
-            fcommon.CheatDeactivated()
+
+        if show_help_msg then
+            if var[0] then
+                fcommon.CheatActivated()
+            else
+                fcommon.CheatDeactivated()
+            end
         end
         if func ~= nil then
             func()
@@ -523,9 +531,7 @@ function module.CheckBoxVar(name,var,tooltip,func,panel_func)
     end
 
     module.InformationTooltip(tooltip)
-
-    module.ConfigPanel({module.CheckBoxVar,name,var,tooltip},panel_func)
-    
+    module.ConfigPanel({module.CheckBoxVar,name,var,tooltip,func},panel_func)
 end
 
 function module.CheckBoxFunc(name,var,func,tooltip,panel_func)
@@ -536,7 +542,7 @@ function module.CheckBoxFunc(name,var,func,tooltip,panel_func)
 
     module.InformationTooltip(tooltip)
 
-    module.ConfigPanel({module.CheckBoxVar,name,var,tooltip},panel_func)
+    
 end
 
 --------------------------------------------------

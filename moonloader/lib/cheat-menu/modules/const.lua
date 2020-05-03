@@ -82,12 +82,6 @@ module.TRAIN_CAM_FIX =
     OFF = 6,
 }
 
-module.VEHICLE_COLOR =
-{
-    MAX_VALUE  = 139,
-    MIN_VALUE  = 0,
-}
-
 module.DRIVE_TYPE =
 {
     FWD = 82,
@@ -129,13 +123,6 @@ module.DEFAULT_GANG_WEAPONS =
     {22,28,0}, -- VLA
     {0,0,0}, -- Gang 9 
     {0,0,0}, -- Gang 10
-}
-
-module.NITRO_STATE =
-{
-    DISCHANGRED = -1.0,
-    EMPTY       = 0,
-    FULL        = 1.0,
 }
 
 module.UPDATE_STATUS =

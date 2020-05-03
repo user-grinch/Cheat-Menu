@@ -134,7 +134,6 @@ function module.PedHealthDisplay()
                 local health = getCharHealth(char)
                 local x,y,z = getCharCoordinates(char)
                 local screenX,screenY = convert3DCoordsToScreen(x,y,z+1.0)
-
                 mad.draw_text(tostring(health),screenX,screenY,1,0.8,0.4,0,false,false,false,255,255,255,255,false)
 
             end
@@ -167,11 +166,11 @@ function module.PedMain()
                 fcommon.CheckBoxValue("Everyone is armed",0x969140)
                 fcommon.CheckBoxValue("Gangs control the streets",0x96915B)
                 fcommon.CheckBoxValue("Gangs everywhere",0x96915A)
-                fcommon.CheckBoxFunc("Gang wars",module.tped.gang.wars,
+                fcommon.CheckBoxVar("Gang wars",module.tped.gang.wars,nil,
                 function()
                     setGangWarsActive(module.tped.gang.wars[0])
                     if module.tped.gang.wars[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
-                end,nil,
+                end,
                 function()
                     imgui.TextWrapped("Gang zone density:")
                     imgui.Spacing()
@@ -183,6 +182,7 @@ function module.PedMain()
                         imgui.PushItemWidth(imgui.GetWindowWidth()/2)
                         if imgui.SliderInt(title,density,0,255) then
                             setZoneGangStrength(getNameOfInfoZone(x,y,z),id,density[0])
+                            clearSpecificZonesToTriggerGangWar()
                         end
                     end
                     imgui.PopItemWidth()
@@ -208,7 +208,7 @@ function module.PedMain()
                 end)
             end,
             function()
-                if imgui.Combo("Ped type", module.tped.type.index,module.tped.type.array,#module.tped.type.names) then end
+                imgui.Combo("Ped type", module.tped.type.index,module.tped.type.array,#module.tped.type.names)
                 imgui.Spacing()
                 fcommon.Tabs("Ped List",{"List","Search"},{
                     function()

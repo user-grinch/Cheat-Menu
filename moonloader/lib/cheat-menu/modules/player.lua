@@ -180,7 +180,7 @@ function module.PlayerMain()
         
             imgui.NextColumn()
 
-            fcommon.CheckBoxFunc("Invisible player",module.tplayer.invisible,
+            fcommon.CheckBoxVar("Invisible player",module.tplayer.invisible,"Player can't enter/exit vehicle",
             function()
                 if module.tplayer.invisible[0] then
                     module.tplayer.model_val = readMemory((getCharPointer(PLAYER_PED)+1140),4,false)
@@ -190,7 +190,7 @@ function module.PlayerMain()
                     writeMemory((getCharPointer(PLAYER_PED)+1140),4,fplayer.tplayer.model_val,false)
                     fcommon.CheatDeactivated()
                 end
-            end,"Player can't enter/exit vehicle")
+            end)
             fcommon.CheckBoxVar("Keep position",module.tplayer.keep_position,"Auto teleport to the position you died from")
             fcommon.CheckBoxValue("Lock player control",getCharPointer(PLAYER_PED)+0x598)
             fcommon.CheckBoxValue("Mega jump",0x96916C)
@@ -198,7 +198,7 @@ function module.PlayerMain()
             fcommon.CheckBoxValue("Never get hungry",0x969174)
 
             module.tplayer.never_wanted[0] = readMemory(0x969171 ,1,false)
-            fcommon.CheckBoxFunc("Never wanted",module.tplayer.never_wanted,
+            fcommon.CheckBoxVar("Never wanted",module.tplayer.never_wanted,
             function()
                 callFunction(0x4396C0,1,0,false)
                 if module.tplayer.never_wanted[0] then
@@ -245,8 +245,7 @@ function module.PlayerMain()
             WantedLevelMenu()
         end,
         function()
-            fcommon.CheckBoxVar("Aim skin changer", module.tplayer.aimSkinChanger)
-            fcommon.InformationTooltip("Activate using, Aim ped +".. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.asc_key))
+            fcommon.CheckBoxVar("Aim skin changer", module.tplayer.aimSkinChanger,"Activate using, Aim ped +".. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.asc_key))
 
             imgui.Spacing()
             fcommon.Tabs("Skins",{"List","Search"},{

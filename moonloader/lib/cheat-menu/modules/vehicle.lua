@@ -353,8 +353,7 @@ function module.GetModelInfo(name)
     callFunction(0x4C5940,2,2,name,pInfo)
     local model = readMemory(pInfo,4,false)
     freeMemory(pInfo)
-    
-    if module.GetNameOfVehicleModel(model) ~= "" then
+    if model > 0 and model < 1000000 and module.GetNameOfVehicleModel(model) ~= "" then
         return model
     else
         return 0
@@ -580,7 +579,7 @@ function ApplyColor(load_saved_color,car)
             module.tvehicle.color.rgb[2] = module.GSXGet(car,"cm_color_blue_" .. comp.name) or -1
         end
 
-        if (module.tvehicle.color.rgb[0] ~= -1.0 and module.tvehicle.color.rgb[0] ~= -1.0 and module.tvehicle.color.rgb[0] ~= -1.0)
+        if (module.tvehicle.color.rgb[0] ~= -1.0 and module.tvehicle.color.rgb[1] ~= -1.0 and module.tvehicle.color.rgb[2] ~= -1.0)
         and (not module.tvehicle.apply_material_filter[0] or (r == 0x3C and g == 0xFF and b == 0x00) or (r == 0xFF and g == 0x00 and b == 0xAF)) then
             
             if module.tvehicle.components.selected[0] == 0 and not load_saved_texture then   
@@ -654,8 +653,8 @@ end
 function module.RandomColors()
     while true do
         if isCharInAnyCar(PLAYER_PED) and module.tvehicle.random_colors[0] and not module.tvehicle.random_colors_traffic[0] then
-            local primary_color = math.random(fconst.VEHICLE_COLOR.MIN_VALUE,fconst.VEHICLE_COLOR.MAX_VALUE)
-            local secondary_color = math.random(fconst.VEHICLE_COLOR.MIN_VALUE,fconst.VEHICLE_COLOR.MAX_VALUE)
+            local primary_color = math.random(0,#module.tvehicle.color.col_data_table)
+            local secondary_color = math.random(0,#module.tvehicle.color.col_data_table)
             local car = getCarCharIsUsing(PLAYER_PED)
             if isCharInAnyCar(PLAYER_PED) and module.tvehicle.random_colors[0] then
                 changeCarColour(car,primary_color,secondary_color)
@@ -672,13 +671,13 @@ function module.RandomTrafficColors()
     while true do
         if module.tvehicle.random_colors_traffic[0] then
             local carX,carY,carZ = getCharCoordinates(PLAYER_PED)
-
+        
             local result, car = findAllRandomVehiclesInSphere(carX,carY,carZ,100.0,false,true)
 
             if result then
                 while result do
-                    local primary_color = math.random(fconst.VEHICLE_COLOR.MIN_VALUE,fconst.VEHICLE_COLOR.MAX_VALUE)
-                    local secondary_color = math.random(fconst.VEHICLE_COLOR.MIN_VALUE,fconst.VEHICLE_COLOR.MAX_VALUE)
+                    local primary_color = math.random(0,#module.tvehicle.color.col_data_table)
+                    local secondary_color = math.random(0,#module.tvehicle.color.col_data_table)
                     changeCarColour(car,primary_color,secondary_color)
                     result, car = findAllRandomVehiclesInSphere(carX,carY,carZ,100.0,true,true)
                 end
@@ -793,23 +792,22 @@ function module.UnlimitedNitro()
     while true do
         if isCharInAnyCar(PLAYER_PED) and module.tvehicle.unlimited_nitro[0] then
             local car = getCarCharIsUsing(PLAYER_PED)
-            local pCar = getCarPointer(car)
-            if isThisModelACar(getCarModel(car)) then
-                module.AddComponentToVehicle(1010,car,true)
-                
+            
+            if isThisModelACar(getCarModel(car)) then  
+                writeMemory(0x969165,1,0,false) -- ALl cars have nitro
+                writeMemory(0x96918B,1,0,false) -- All taxis have nitro
                 while module.tvehicle.unlimited_nitro[0] do
-
-                    writeMemory(0x969165,1,0,false) -- ALl cars have nitro
-                    writeMemory(0x96918B,1,0,false) -- All taxis have nitro
 
                     if getCarCharIsUsing(PLAYER_PED) ~= car then
                         break
                     end
-
-                    local nitro_state = fcommon.RwMemory(pCar+0x8A4,4,nil,false,true)
                     
-                    if nitro_state == fconst.NITRO_STATE.FULL or nitro_state == fconst.NITRO_STATE.EMPTY or nitro_state == fconst.NITRO_STATE.DISCHANGRED then
-                        giveNonPlayerCarNitro(car)
+                    if isKeyDown(vkeys.VK_LBUTTON) then
+                        module.AddComponentToVehicle(1010,car,true)
+                        while isKeyDown(vkeys.VK_LBUTTON) do
+                            wait(0)
+                        end
+                        module.RemoveComponentFromVehicle(1010,car,true)
                     end
 
                     wait(0)
@@ -869,7 +867,7 @@ function module.VehicleMain()
                 end
             end)
 
-            fcommon.CheckBoxFunc("Lights on",module.tvehicle.lights,
+            fcommon.CheckBoxVar("Lights on",module.tvehicle.lights,nil,
             function()
                 if isCharInAnyCar(PLAYER_PED) then
                     car = getCarCharIsUsing(PLAYER_PED)
@@ -885,11 +883,11 @@ function module.VehicleMain()
                 else
                     printHelpString("Player ~r~not~w~ in car")
                 end
-            end)
+            end,nil,false)
 
             imgui.NextColumn()
 
-            fcommon.CheckBoxFunc("Lock doors",module.tvehicle.lock_doors,
+            fcommon.CheckBoxVar("Lock doors",module.tvehicle.lock_doors,nil,
             function()
                 if isCharInAnyCar(PLAYER_PED) then
                     local car   = getCarCharIsUsing(PLAYER_PED)
@@ -903,11 +901,11 @@ function module.VehicleMain()
                 else
                     printHelpString("Player ~r~not~w~ in car")
                 end
-            end)
+            end,nil,false)
             fcommon.CheckBoxVar("New aircraft camera",module.tvehicle.aircraft.camera)
             fcommon.CheckBoxValue("New train camera",5416239,nil,fconst.TRAIN_CAM_FIX.ON,fconst.TRAIN_CAM_FIX.OFF) 
             fcommon.CheckBoxVar("No damage",module.tvehicle.no_damage)
-            fcommon.CheckBoxFunc("No traffic vehicles",module.tvehicle.no_vehicles,
+            fcommon.CheckBoxVar("No traffic vehicles",module.tvehicle.no_vehicles,nil,
             function()
                 if module.tvehicle.no_vehicles[0] then
                     writeMemory(0x434237,1,0x73,false) -- change condition to unsigned (0-255)
@@ -922,7 +920,7 @@ function module.VehicleMain()
                     writeMemory(0x484D17,1,1988955949,false)
                     fcommon.CheatDeactivated()
                 end
-            end)
+            end,nil,false)
             
             fcommon.CheckBoxVar("No visual damage",module.tvehicle.visual_damage)
             fcommon.CheckBoxValue("Perfect handling",0x96914C)
@@ -930,7 +928,7 @@ function module.VehicleMain()
             fcommon.CheckBoxVar("Random traffic colors",module.tvehicle.random_colors_traffic,"Paints traffic cars with random colors every second")
             fcommon.CheckBoxValue("Tank mode",0x969164) 
             fcommon.CheckBoxVar("Traffic neons",module.tvehicle.neon.checkbox,"Adds neon lights to traffic vehicles.\nOnly some vehicles will have them.")
-            fcommon.CheckBoxVar("Unlimited nitro",module.tvehicle.unlimited_nitro,"Enabling this would disable\n\nAll cars have nitro\nAll taxis have nitro")
+            fcommon.CheckBoxVar("Unlimited nitro",module.tvehicle.unlimited_nitro,"Nitro will activate when left clicked\n\nEnabling this would disable\nAll cars have nitro\nAll taxis have nitro")
             fcommon.CheckBoxVar("Watertight car",module.tvehicle.watertight_car,nil,
             function()
                 if isCharInAnyCar(PLAYER_PED) then
@@ -1070,8 +1068,7 @@ function module.VehicleMain()
                         imgui.Columns(1)
 
                         imgui.Dummy(imgui.ImVec2(0,20))
-                        imgui.Checkbox("Pulsing",module.tvehicle.neon.pulsing)
-                        fcommon.InformationTooltip("Neons will blink continuously")
+                        fcommon.CheckBoxVar("Pulsing",module.tvehicle.neon.pulsing,"Neons will blink continuously")
                         imgui.Spacing()
 
                         if imgui.Button("Install Neon",imgui.ImVec2(fcommon.GetSize(1))) then
@@ -1185,8 +1182,7 @@ function module.VehicleMain()
 
                 imgui.Spacing()
                 imgui.Columns(2,nil,false)
-                fcommon.CheckBoxVar("Material filter",module.tvehicle.apply_material_filter)
-                fcommon.InformationTooltip("Filters material while applying color/ texture\nDisable if something doesn't work properly")
+                fcommon.CheckBoxVar("Material filter",module.tvehicle.apply_material_filter,"Filters material while applying color/ texture\nDisable if something doesn't work properly")
                 imgui.NextColumn()
                 imgui.Columns(1)
                 imgui.Spacing()
