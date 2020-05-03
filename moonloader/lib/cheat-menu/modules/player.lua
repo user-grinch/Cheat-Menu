@@ -198,7 +198,7 @@ function module.PlayerMain()
             fcommon.CheckBoxValue("Never get hungry",0x969174)
 
             module.tplayer.never_wanted[0] = readMemory(0x969171 ,1,false)
-            fcommon.CheckBoxVar("Never wanted",module.tplayer.never_wanted,
+            fcommon.CheckBoxVar("Never wanted",module.tplayer.never_wanted,nil,
             function()
                 callFunction(0x4396C0,1,0,false)
                 if module.tplayer.never_wanted[0] then
