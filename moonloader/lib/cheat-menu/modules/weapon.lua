@@ -18,21 +18,22 @@ local module = {}
 
 module.tweapon =
 {
-    auto_aim          = imgui.new.bool(fconfig.Get('tweapon.auto_aim',false)),
-    fast_reload       = imgui.new.bool(fconfig.Get('tweapon.fast_reload',false)),
-    filter            = imgui.ImGuiTextFilter(),
-    max_accuracy      = imgui.new.bool(fconfig.Get('tweapon.max_accuracy',false)),
-    max_ammo_clip     = imgui.new.bool(fconfig.Get('tweapon.max_ammo_clip',false)),
-    max_move_speed    = imgui.new.bool(fconfig.Get('tweapon.max_move_speed',false)),
-    huge_damage       = imgui.new.bool(fconfig.Get('tweapon.huge_damage',false)),
-    images            = {},
-    long_target_range = imgui.new.bool(fconfig.Get('tweapon.long_target_range',false)),
-    long_weapon_range = imgui.new.bool(fconfig.Get('tweapon.long_weapon_range',false)),
-    names             = fcommon.LoadJson("weapon"),
-    no_reload         = imgui.new.bool(fconfig.Get('tweapon.no_reload',false)),
-    path              = tcheatmenu.dir .. "weapons",
-    ped               = imgui.new.bool(fconfig.Get('tweapon.ped',false)),
-    gang              =
+    auto_aim            = imgui.new.bool(fconfig.Get('tweapon.auto_aim',false)),
+    ammo_count          = imgui.new.int(fconfig.Get('tweapon.ammo_count',99999)),
+    fast_reload         = imgui.new.bool(fconfig.Get('tweapon.fast_reload',false)),
+    filter              = imgui.ImGuiTextFilter(),
+    max_accuracy        = imgui.new.bool(fconfig.Get('tweapon.max_accuracy',false)),
+    max_ammo_clip       = imgui.new.bool(fconfig.Get('tweapon.max_ammo_clip',false)),
+    max_move_speed      = imgui.new.bool(fconfig.Get('tweapon.max_move_speed',false)),
+    huge_damage         = imgui.new.bool(fconfig.Get('tweapon.huge_damage',false)),
+    images              = {},
+    long_target_range   = imgui.new.bool(fconfig.Get('tweapon.long_target_range',false)),
+    long_weapon_range   = imgui.new.bool(fconfig.Get('tweapon.long_weapon_range',false)),
+    names               = fcommon.LoadJson("weapon"),
+    no_reload           = imgui.new.bool(fconfig.Get('tweapon.no_reload',false)),
+    path                = tcheatmenu.dir .. "weapons",
+    ped                 = imgui.new.bool(fconfig.Get('tweapon.ped',false)),
+    gang                =
     {
         weapon_array = {},
         used_weapons = fconfig.Get('tweapon.gang_weapons',fconst.DEFAULT_GANG_WEAPONS),
@@ -130,13 +131,13 @@ function module.GiveWeapon(weapon)
 
         if module.tweapon.ped[0] == true then
             if fped.tped.selected ~=  nil then
-                giveWeaponToChar(fped.tped.selected,weapon,99999)
+                giveWeaponToChar(fped.tped.selected,weapon,module.tweapon.ammo_count[0])
                 fcommon.CheatActivated()
             else
                 printHelpString("~r~No~w~ ped selected")
             end
         else
-            giveWeaponToChar(PLAYER_PED,weapon,99999)
+            giveWeaponToChar(PLAYER_PED,weapon,module.tweapon.ammo_count[0])
             fcommon.CheatActivated()
         end          
         markModelAsNoLongerNeeded(model)
@@ -274,6 +275,11 @@ function module.WeaponMain()
             fcommon.CheckBoxVar("Ped",module.tweapon.ped,"Give weapon to ped. Aim with a gun to select")
             imgui.NextColumn()
             imgui.Columns(1)
+            imgui.Spacing()
+            if imgui.InputInt('Ammo', module.tweapon.ammo_count) then
+              module.tweapon.ammo_count[0]  =  (module.tweapon.ammo_count[0] < 0) and 0 or  module.tweapon.ammo_count[0]
+              module.tweapon.ammo_count[0]  =  (module.tweapon.ammo_count[0] > 99999) and 99999 or  module.tweapon.ammo_count[0]
+            end
             imgui.Spacing()
             fcommon.Tabs("Spawn",{"List","Search"},{
                 function()

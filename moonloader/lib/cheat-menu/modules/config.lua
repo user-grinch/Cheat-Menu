@@ -307,6 +307,7 @@ function module.Write()
             tweapon =
             {
                 auto_aim          = fweapon.tweapon.auto_aim[0],
+                ammo_count         = fweapon.tweapon.ammo_count[0],
                 fast_reload       = fweapon.tweapon.fast_reload[0],
                 max_accuracy      = fweapon.tweapon.max_accuracy[0], 
                 max_ammo_clip     = fweapon.tweapon.max_ammo_clip[0], 
