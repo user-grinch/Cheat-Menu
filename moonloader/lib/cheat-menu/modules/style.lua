@@ -270,12 +270,13 @@ function module.StyleEditor()
                     style.Colors[i].z = float[2]
                     style.Colors[i].w = float[3]
                 end
+
+                imgui.SameLine(0.0, style.ItemInnerSpacing.x)
+                imgui.TextUnformatted(name)
                
-                if module.tstyle.styles_table[fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]][ffi.string(name)] ~= nil then
+                if fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1] ~= nil
+                and module.tstyle.styles_table[fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]][ffi.string(name)] ~= nil then
                     local s = imgui.ColorConvertU32ToFloat4(tonumber(bit.tohex(module.tstyle.styles_table[fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]][ffi.string(name)]), 16))
-                    
-                    imgui.SameLine(0.0, style.ItemInnerSpacing.x)
-                    imgui.TextUnformatted(name)
 
                     if float[0] ~= s.x or float[1] ~= s.y or float[2] ~= s.z or float[3] ~= s.w then
                         imgui.SameLine(0.0, style.ItemInnerSpacing.x)
