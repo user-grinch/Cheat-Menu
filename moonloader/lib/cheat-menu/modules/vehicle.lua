@@ -1369,9 +1369,10 @@ function module.VehicleMain()
                     local fTractionLoss = memory.getfloat(phandling + 0xA4)
                     local TractionBias  = memory.getfloat(phandling + 0xA8)                     
                     local nNumberOfGears= memory.read(phandling + 0x76,4)    
-                    local fMaxVelocity = memory.getfloat(phandling + 0x58)*581
-                    local fEngineAcceleration = memory.getfloat(phandling + 0x50)*85.04
-                    local fEngineInertia = memory.getfloat(phandling + 0x54)*9.3838	
+                    local fMaxVelocity = memory.getfloat(phandling + 0x84)
+                    fMaxVelocity = fMaxVelocity*206 + (fMaxVelocity-0.918668)*1501
+                    local fEngineAcceleration = memory.getfloat(phandling + 0x7C)*12500
+                    local fEngineInertia = memory.getfloat(phandling + 0x80)	
                     local nDriveType = memory.tostring(phandling + 0x74,1)	
                     local nEngineType = memory.tostring(phandling + 0x75,1)			
                     local BrakeDeceleration = memory.getfloat(phandling + 0x94)*2500
@@ -1419,7 +1420,7 @@ function module.VehicleMain()
                     fcommon.UpdateAddress({name = 'Damping level',address = phandling + 0xB0 ,size = 4,is_float = true,cvalue = 0.01, save = false})
                     fcommon.UpdateAddress({name = 'Drag mult',address = phandling + 0x10 ,size = 4,min = 1,max = 20.0,is_float = true, save = false})
                     fcommon.RadioButtonFunc("Drive type",{"Front wheel drive","Rear wheel drive","Four wheel drive"},{fconst.DRIVE_TYPE.FWD,fconst.DRIVE_TYPE.RWD,fconst.DRIVE_TYPE.AWD},phandling + 0x74,false)
-                    fcommon.UpdateAddress({name = 'Engine acceleration',address = phandling + 0x7C ,size = 4,min = 0,max = 50,is_float = true,mul = 85.04, save = false})
+                    fcommon.UpdateAddress({name = 'Engine acceleration',address = phandling + 0x7C ,size = 4,min = 0,max = 49,is_float = true,mul = 12500, save = false})
                     fcommon.UpdateAddress({name = 'Engine inertia',address = phandling + 0x80 ,size = 4,min = 0,max = 200,is_float = true, save = false})
                     fcommon.RadioButtonFunc("Engine type",{"Petrol","Diseal","Electric"},{fconst.ENGINE_TYPE.PETROL,fconst.ENGINE_TYPE.DISEAL,fconst.ENGINE_TYPE.ELECTRIC},phandling + 0x75,false)
                     fcommon.RadioButtonFunc("Front lights",{"Long","Small","Big","Tall"},{fconst.LIGHTS.LONG,fconst.LIGHTS.SMALL,fconst.LIGHTS.BIG,fconst.LIGHTS.TALL},phandling + 0xDC,false)
@@ -1428,7 +1429,57 @@ function module.VehicleMain()
                     fcommon.UpdateAddress({name = 'High speed damping',address = phandling + 0xB4 ,size = 4,is_float = true,cvalue = 0.1, save = false})
                     fcommon.UpdateAddress({name = 'Lower limit',address = phandling + 0xBC ,size = 4,min = -1,max = 1,is_float = true,cvalue = 0.01, save = false})
                     fcommon.UpdateAddress({name = 'Mass',address = phandling + 0x4 ,size = 4,min = 1,max = 50000,is_float = true, save = false})
-                    fcommon.UpdateAddress({name = 'Max velocity',address = phandling + 0x84 ,size = 4,min = 1,max = 300,is_float = true,mul = 581, save = false})
+                    
+                    -- This will need some updates
+                    -- Had to do custom as it was giving too much headaches
+                    fcommon.DropDownMenu("Max velocity",function()
+                        local fMaxVelocity = memory.getfloat(phandling + 0x84)
+                        local min = 7.0
+                        local max = 325
+                        local velocity = fMaxVelocity*206 + (fMaxVelocity-0.918668)*1501
+                        multiplier = velocity/fMaxVelocity
+
+                        local value = imgui.new.float(velocity)
+                        
+                        imgui.Columns(2,nil,false)
+                        imgui.Text("Minimum = " .. min)
+                        imgui.NextColumn()
+                        imgui.Text("Maximum = " .. max)
+                        imgui.Columns(1)
+                
+                        imgui.Spacing()
+                
+                        if imgui.InputFloat("##Max velocity",value) then
+                            if value[0] < min then value[0] = 0.812 end
+                            if value[0] > max then value[0] = 0.998 end
+                            memory.setfloat(phandling + 0x84,value[0]/multiplier)
+                        end
+                        imgui.SameLine(0.0,4.0)
+                        if imgui.Button("-##Max velocity",imgui.ImVec2(20,20)) then
+                            local val = value[0] - 0.001
+                            if val > min then
+                                memory.setfloat(phandling + 0x84,val/multiplier)
+                            end
+                        end
+                        imgui.SameLine(0.0,4.0)
+                        if imgui.Button("+##Max velocity",imgui.ImVec2(20,20)) then
+                            local val = value[0] + 0.001
+                            if val < max then
+                                memory.setfloat(phandling + 0x84,val/multiplier)
+                            end
+                        end
+                        imgui.SameLine(0.0,4.0)
+                        imgui.Text("Set")
+                        imgui.Spacing()
+                        if imgui.Button("Minimum##Max velocity",imgui.ImVec2(fcommon.GetSize(2))) then
+                            memory.setfloat(phandling + 0x84,0.812)
+                        end
+                        imgui.SameLine()
+                        if imgui.Button("Maximum##Max velocity",imgui.ImVec2(fcommon.GetSize(2))) then
+                            memory.setfloat(phandling + 0x84,0.998)
+                        end
+                    end)
+                    -- fcommon.UpdateAddress({name = 'Max velocity',address = phandling + 0x84 ,size = 4,min = 100.0,max = 500,is_float = true,mul = multiplier, save = false})
                     fcommon.UpdateBits("Model flags",module.tvehicle.model_flags,phandling + 0xCC,4)
                     fcommon.UpdateAddress({name = 'Monetary value',address = phandling + 0xD8 ,size = 4,min = 1,max = 150000, save = false})
                     fcommon.UpdateAddress({name = 'Number of gears',address = phandling + 0x76 ,size = 1,min = 1,max = 10, save = false})

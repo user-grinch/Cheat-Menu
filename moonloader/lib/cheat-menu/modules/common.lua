@@ -612,6 +612,7 @@ function module.UpdateAddress(arg)
 
     if arg.cvalue == nil then arg.cvalue = 1.0  end
     if arg.save == nil then arg.save = true end
+    if arg.mul == nil then arg.mul = 1.0  end
 
     local buttons = 3
 
@@ -630,7 +631,7 @@ function module.UpdateAddress(arg)
     module.DropDownMenu(arg.name,function()
 
         local value = imgui.new.float(module.RwMemory(arg.address,arg.size,nil,nil,arg.is_float,arg.mul))
-
+        
         imgui.Columns(2,nil,false)
         if arg.min ~= nil then
             imgui.Text("Minimum = " .. arg.min)
