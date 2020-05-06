@@ -690,7 +690,6 @@ function module.RemoveAllObjects()
         deleteObject(tonumber(handle))
         module.tgame.object_spawner.placed[key] = nil
     end
-    printHelpString("Objects removed")
 end
 
 --------------------------------------------------
@@ -960,6 +959,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
         function()
             if imgui.Button("Remove all objects",imgui.ImVec2(fcommon.GetSize(2))) then
                 module.RemoveAllObjects()
+                printHelpString("Objects removed")
             end
             imgui.SameLine()
             if imgui.Button("Generate IPL",imgui.ImVec2(fcommon.GetSize(2))) then

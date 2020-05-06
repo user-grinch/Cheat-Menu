@@ -63,7 +63,7 @@ end
 
 function PlayAnimation(file,animation)
     if module.tanimation.ped[0] == true then
-        if fped.tped.selected ~=  nil then
+        if doesCharExist(fped.tped.selected) then
             char = fped.tped.selected
         else
             printHelpString("~r~No~w~ ped selected")

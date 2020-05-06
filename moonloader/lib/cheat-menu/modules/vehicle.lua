@@ -31,7 +31,6 @@ module.tvehicle =
         car_data_table = {},
         col_data_table = {},
         default = -1,
-        parse_done = false,
         radio_btn = imgui.new.int(1),
         rgb      = imgui.new.float[3](0.0,0.0,0.0),
         show_all = imgui.new.bool(fconfig.Get('tvehicle.color.show_all',false))
@@ -70,6 +69,7 @@ module.tvehicle =
     gxt_name        = imgui.new.char[32](""),
     gxt_name_table  = fconfig.Get('tvehicle.gxt_name_table',{}),
     handling_flags = fcommon.LoadJson("handling flags"),
+    handling_name = {},
     heavy = imgui.new.bool(fconfig.Get('tvehicle.heavy',false)),
     hidden_objects = {},
     images = {},
@@ -526,7 +526,6 @@ function module.ParseCarcols()
     if doesFileExist(file_path) then
   
         for line in io.lines(file_path) do
-          --  print(line)
             if line == "col" then
                 col_data = true
                 goto continue
@@ -560,9 +559,38 @@ function module.ParseCarcols()
                 end
             end
             ::continue::
-            wait(0)
         end
-        module.tvehicle.color.parse_done = true
+    end
+end
+
+function module.ParseVehiclesIDE()
+    local file_path = string.format("%s/data/vehicles.ide",getGameDirectory())
+    local cars_data = false
+    local tt = module.tvehicle.handling_name
+    if doesFileExist(file_path) then
+  
+        for line in io.lines(file_path) do
+            if line == "cars" then
+                cars_data = true
+            end 
+            if line == "end" then
+                if cars_data then cars_data = false end
+                goto continue
+            end
+            if cars_data then
+                local name = nil
+                local t = {}
+                for x in string.gmatch(line,"[^,]+") do             
+                    x = x:gsub(".",{["\t"] ="",[","] = "",[" "] = ""})
+                    table.insert(t,x)
+                end
+                t[1] = tonumber(t[1])
+                if t[1] ~= nil then
+                    tt[t[1]] = t[5]
+                end
+            end
+        end
+        ::continue::
     end
 end
 
@@ -1194,79 +1222,75 @@ function module.VehicleMain()
                     if not isCharInAnyCar(PLAYER_PED) then
                         tcheatmenu.window.panel_func = nil
                     end
-                    if module.tvehicle.color.parse_done then
-                        fcommon.CheckBoxVar("Show all", module.tvehicle.color.show_all,"Show all carcol colors")
+                    fcommon.CheckBoxVar("Show all", module.tvehicle.color.show_all,"Show all carcol colors")
+                    imgui.Spacing()
+                    
+                    local name = module.GetNameOfVehicleModel(getCarModel(car))
+                    
+                    if module.tvehicle.color.car_data_table[name] ~= nil then
+                        local shown_colors = {}
+                        imgui.Text("Color:")
                         imgui.Spacing()
-                        
-                        local name = module.GetNameOfVehicleModel(getCarModel(car))
-                        
-                        if module.tvehicle.color.car_data_table[name] ~= nil then
-                            local shown_colors = {}
-                            imgui.Text("Color:")
-                            imgui.Spacing()
-                            imgui.Columns(2,nil,false)
-                            imgui.RadioButtonIntPtr("Color 1", module.tvehicle.color.radio_btn, 1)
-                            imgui.RadioButtonIntPtr("Color 2", module.tvehicle.color.radio_btn, 2)
-                            imgui.NextColumn()
-                            imgui.RadioButtonIntPtr("Color 3", module.tvehicle.color.radio_btn, 3)
-                            imgui.RadioButtonIntPtr("Color 4", module.tvehicle.color.radio_btn, 4)
-                            imgui.Spacing()
-                            imgui.Columns(1)
-                            imgui.Text("Select color preset:")
-                            imgui.Spacing()
+                        imgui.Columns(2,nil,false)
+                        imgui.RadioButtonIntPtr("Color 1", module.tvehicle.color.radio_btn, 1)
+                        imgui.RadioButtonIntPtr("Color 2", module.tvehicle.color.radio_btn, 2)
+                        imgui.NextColumn()
+                        imgui.RadioButtonIntPtr("Color 3", module.tvehicle.color.radio_btn, 3)
+                        imgui.RadioButtonIntPtr("Color 4", module.tvehicle.color.radio_btn, 4)
+                        imgui.Spacing()
+                        imgui.Columns(1)
+                        imgui.Text("Select color preset:")
+                        imgui.Spacing()
 
-                            if imgui.BeginChild("Colors") then
-                                local x,y = fcommon.GetSize(1)
-                                local btns_in_row = math.floor(imgui.GetWindowContentRegionWidth()/(y*2))
-                                local btn_size = (imgui.GetWindowContentRegionWidth() - imgui.StyleVar.ItemSpacing*(btns_in_row-0.75*btns_in_row))/btns_in_row
-                                local btn_count = 1
+                        if imgui.BeginChild("Colors") then
+                            local x,y = fcommon.GetSize(1)
+                            local btns_in_row = math.floor(imgui.GetWindowContentRegionWidth()/(y*2))
+                            local btn_size = (imgui.GetWindowContentRegionWidth() - imgui.StyleVar.ItemSpacing*(btns_in_row-0.75*btns_in_row))/btns_in_row
+                            local btn_count = 1
 
-                                func = function(v)
-                                    if not shown_colors[v] then
-                                        local t = {}
-                                        local k =  1
-                                     
-                                        for i in string.gmatch(module.tvehicle.color.col_data_table[v+1],"%w+") do 
-                                            table.insert( t,tonumber(i))
-                                        end
-
-                                        if imgui.ColorButton("Color " .. tostring(v),imgui.ImVec4(t[1]/255,t[2]/255,t[3]/255,255),0,imgui.ImVec2(btn_size,btn_size)) then
-                                            writeMemory(getCarPointer(car) + 1075 + module.tvehicle.color.radio_btn[0],1,tonumber(v),false)
-                                            module.ForEachCarComponent(function(mat,comp,car)
-                                                mat:reset_color()
-                                                if module.tvehicle.gsx.handle ~= 0  then
-                                                    module.GSXSet(car,"cm_color_red_" .. comp.name,module.tvehicle.color.rgb[0])
-                                                    module.GSXSet(car,"cm_color_green_" .. comp.name,module.tvehicle.color.rgb[1])
-                                                    module.GSXSet(car,"cm_color_blue_" .. comp.name,module.tvehicle.color.rgb[2])
-                                                end
-                                            end)
-                                        end
-                                        if imgui.IsItemHovered() then
-                                            local drawlist = imgui.GetWindowDrawList()
-                                            drawlist:AddRectFilled(imgui.GetItemRectMin(), imgui.GetItemRectMax(), imgui.GetColorU32(imgui.Col.ModalWindowDimBg))
-                                        end
-                                        shown_colors[v] = true
-                                        if btn_count % btns_in_row ~= 0 then
-                                            imgui.SameLine(0.0,4.0)
-                                        end
-                                        btn_count = btn_count + 1
+                            func = function(v)
+                                if not shown_colors[v] then
+                                    local t = {}
+                                    local k =  1
+                                    
+                                    for i in string.gmatch(module.tvehicle.color.col_data_table[v+1],"%w+") do 
+                                        table.insert( t,tonumber(i))
                                     end
+
+                                    if imgui.ColorButton("Color " .. tostring(v),imgui.ImVec4(t[1]/255,t[2]/255,t[3]/255,255),0,imgui.ImVec2(btn_size,btn_size)) then
+                                        writeMemory(getCarPointer(car) + 1075 + module.tvehicle.color.radio_btn[0],1,tonumber(v),false)
+                                        module.ForEachCarComponent(function(mat,comp,car)
+                                            mat:reset_color()
+                                            if module.tvehicle.gsx.handle ~= 0  then
+                                                module.GSXSet(car,"cm_color_red_" .. comp.name,module.tvehicle.color.rgb[0])
+                                                module.GSXSet(car,"cm_color_green_" .. comp.name,module.tvehicle.color.rgb[1])
+                                                module.GSXSet(car,"cm_color_blue_" .. comp.name,module.tvehicle.color.rgb[2])
+                                            end
+                                        end)
+                                    end
+                                    if imgui.IsItemHovered() then
+                                        local drawlist = imgui.GetWindowDrawList()
+                                        drawlist:AddRectFilled(imgui.GetItemRectMin(), imgui.GetItemRectMax(), imgui.GetColorU32(imgui.Col.ModalWindowDimBg))
+                                    end
+                                    shown_colors[v] = true
+                                    if btn_count % btns_in_row ~= 0 then
+                                        imgui.SameLine(0.0,4.0)
+                                    end
+                                    btn_count = btn_count + 1
                                 end
-
-                                if module.tvehicle.color.show_all[0] then       
-                                    for v=0,(#module.tvehicle.color.col_data_table-1),1 do
-                                        func(v)
-                                    end
-                                else
-                                    for k,v in ipairs(module.tvehicle.color.car_data_table[name]) do
-                                        func(v)
-                                    end
-                                end
-                                imgui.EndChild()
                             end
+
+                            if module.tvehicle.color.show_all[0] then       
+                                for v=0,(#module.tvehicle.color.col_data_table-1),1 do
+                                    func(v)
+                                end
+                            else
+                                for k,v in ipairs(module.tvehicle.color.car_data_table[name]) do
+                                    func(v)
+                                end
+                            end
+                            imgui.EndChild()
                         end
-                    else
-                        imgui.Text("Parsing 'carcols.dat'")
                     end
                 end)
                 imgui.Combo("Component",module.tvehicle.components.selected,module.tvehicle.components.list,#module.tvehicle.components.names)
@@ -1326,55 +1350,98 @@ function module.VehicleMain()
                 phandling = phandling * 0xE0
                 phandling = phandling + 0xC2B9DC
 
-                local CDM = readMemory((phandling + 0xC8),4,false)
-                local fMass_in = readMemory((phandling + 0x8),4,false)
-                CDM = CDM/2000.0
-                CDM = CDM/fMass_in
-                -------------------------------------------------------
-
-                if imgui.Button("Reset game handling",imgui.ImVec2(fcommon.GetSize(1))) then
+                if imgui.Button("Reset game handling",imgui.ImVec2(fcommon.GetSize(2))) then
                     local cHandlingDataMgr = readMemory(0x05BFA96,4,false)
                     callMethod(0x5BD830,cHandlingDataMgr,0,0)
                     printHelpString("Handling reset")
                 end
-                local val = readMemory(phandling + 0xCC,4,false)     
+                imgui.SameLine()
+                if imgui.Button("Save data to file",imgui.ImVec2(fcommon.GetSize(2))) then
+                    local name = module.tvehicle.handling_name[model]
+                    local fMass =  memory.getfloat(phandling + 0x4)
+                    local fTurnMass = memory.getfloat(phandling + 0xC)
+                    local fDragMult = memory.getfloat(phandling + 0x10)
+                    local CentreOfMassX = memory.getfloat(phandling + 0x14)
+                    local CentreOfMassY = memory.getfloat(phandling + 0x18)
+                    local CentreOfMassZ = memory.getfloat(phandling + 0x1C)
+                    local nPercentSubmerged = memory.read(phandling + 0x20,4)
+                    local fTractionMultiplier = memory.getfloat(phandling + 0x28)
+                    local fTractionLoss = memory.getfloat(phandling + 0xA4)
+                    local TractionBias  = memory.getfloat(phandling + 0xA8)                     
+                    local nNumberOfGears= memory.read(phandling + 0x76,4)    
+                    local fMaxVelocity = memory.getfloat(phandling + 0x58)*581
+                    local fEngineAcceleration = memory.getfloat(phandling + 0x50)*85.04
+                    local fEngineInertia = memory.getfloat(phandling + 0x54)*9.3838	
+                    local nDriveType = memory.tostring(phandling + 0x74,1)	
+                    local nEngineType = memory.tostring(phandling + 0x75,1)			
+                    local BrakeDeceleration = memory.getfloat(phandling + 0x94)*2500
+                    local BrakeBias	= memory.getfloat(phandling + 0x98)	
+                    local ABS = memory.read(phandling + 0x9C,1)    			
+                    local SteeringLock = memory.getfloat(phandling + 0xA0)			
+                    local SuspensionForceLevel = memory.getfloat(phandling + 0xAC)	
+                    local SuspensionDampingLevel = memory.getfloat(phandling + 0xB0)		
+                    local SuspensionHighSpdComDamp	= memory.getfloat(phandling + 0xB4)			
+                    local Suspension_upper_limit = memory.getfloat(phandling + 0xB8)	
+                    local Suspension_lower_limit = memory.getfloat(phandling + 0xBC)	
+                    local Suspension_bias = memory.getfloat(phandling + 0xC0)	
+                    local Suspension_anti_dive_multiplier = memory.getfloat(phandling + 0xC4)	
+                    local fSeatOffsetDistance = memory.getfloat(phandling + 0xD4)		
+                    local fCollisionDamageMultiplier = memory.getfloat(phandling + 0xC8)*0.25
+                    local nMonetaryValue = memory.read(phandling + 0xD8,4)
+                    local modelFlags = string.format('%x',memory.read(phandling + 0xCC,4))   	
+                    local handlingFlags = string.format('%x',memory.read(phandling + 0xD0,4))   	
+                    local front_lights = memory.read(phandling + 0xDC,1)   
+                    local rear_lights = memory.read(phandling + 0xDD,1)   
+                    local vehicle_anim_group = memory.read(phandling + 0xDE,1)    	
+
+                    local file = io.open(getGameDirectory() .. "/handling.txt","a+")
+                    
+                    local data = string.format("\n%s\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%f\t%f\t%f\t%s\t%s\t%f\t%f\t%d\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%f\t%d\t%d\t%d\t%d\t%d\t%d",
+                    name,fMass,fTurnMass,fDragMult,CentreOfMassX,CentreOfMassY,CentreOfMassZ,nPercentSubmerged,fTractionMultiplier,fTractionLoss,TractionBias,nNumberOfGears,
+                    fMaxVelocity,fEngineAcceleration,fEngineInertia,tostring(nDriveType),nEngineType,BrakeDeceleration,BrakeBias,ABS,SteeringLock,SuspensionForceLevel,SuspensionDampingLevel,
+                    SuspensionHighSpdComDamp,Suspension_upper_limit,Suspension_lower_limit,Suspension_bias,Suspension_anti_dive_multiplier,fSeatOffsetDistance,
+                    fCollisionDamageMultiplier,nMonetaryValue,modelFlags,handlingFlags,front_lights,rear_lights,vehicle_anim_group)
+                    file:write(data)
+                    file:close()
+                    printHelpString("Data saved")
+                end
 
                 imgui.Spacing()
                 if imgui.BeginChild("Handling") then
                     fcommon.RadioButtonFunc("ABS",{"On","Off"},{1.0,0.0},phandling + 0x9C,false)
+                    fcommon.UpdateAddress({name = 'Anti dive multiplier',address = phandling + 0xC4 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
                     fcommon.UpdateAddress({name = 'Brake bias',address = phandling + 0x98 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
-                    fcommon.UpdateAddress({name = 'Brake deceleration',address = phandling + 0x94 ,size = 4,min = 0.1,max = 10,is_float = true,factor = 3.9999999e-4,cvalue = 0.1, save = false})
+                    fcommon.UpdateAddress({name = 'Brake deceleration',address = phandling + 0x94 ,size = 4,min = 0.1,max = 20,is_float = true,mul = 2500,cvalue = 0.1, save = false})
                     fcommon.UpdateAddress({name = 'Centre of mass X',address = phandling + 0x14 ,size = 1,min = -10.0,max = 10.0,is_float = true,cvalue = 0.05, save = false})
                     fcommon.UpdateAddress({name = 'Centre of mass Y',address = phandling + 0x18 ,size = 1,min = -10.0,max = 10.0,is_float = true,cvalue = 0.05, save = false})
                     fcommon.UpdateAddress({name = 'Centre of mass Z',address = phandling + 0x1C ,size = 1,min = -10.0,max = 10.0,is_float = true,cvalue = 0.05, save = false})
-                    fcommon.UpdateAddress({name = 'Collision damage multiplier',address = phandling + 0xC8 ,size = 4,min = 0.2,max = 5.0,is_float = true,cvalue = 0.05, save = false})                    
-                    fcommon.UpdateAddress({name = 'Damage multiplier',address = phandling + CDM ,size = 4,min = 0.0,max = 5.0,is_float = true, save = false})
+                    fcommon.UpdateAddress({name = 'Collision damage multiplier',address = phandling + 0xC8,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01,mul = 0.25, save = false})                    
                     fcommon.UpdateAddress({name = 'Damping level',address = phandling + 0xB0 ,size = 4,is_float = true,cvalue = 0.01, save = false})
                     fcommon.UpdateAddress({name = 'Drag mult',address = phandling + 0x10 ,size = 4,min = 1,max = 20.0,is_float = true, save = false})
                     fcommon.RadioButtonFunc("Drive type",{"Front wheel drive","Rear wheel drive","Four wheel drive"},{fconst.DRIVE_TYPE.FWD,fconst.DRIVE_TYPE.RWD,fconst.DRIVE_TYPE.AWD},phandling + 0x74,false)
-                    fcommon.UpdateAddress({name = 'Engine acceleration',address = phandling + 0x7C ,size = 4,min = 1,max = 10,is_float = true,factor = 3.9999999e-4, save = false})
-                    fcommon.UpdateAddress({name = 'Engine inertia',address = phandling + 0x80 ,size = 4,min = 0,max = 50,is_float = true, save = false})
+                    fcommon.UpdateAddress({name = 'Engine acceleration',address = phandling + 0x7C ,size = 4,min = 0,max = 50,is_float = true,mul = 85.04, save = false})
+                    fcommon.UpdateAddress({name = 'Engine inertia',address = phandling + 0x80 ,size = 4,min = 0,max = 200,is_float = true, save = false})
                     fcommon.RadioButtonFunc("Engine type",{"Petrol","Diseal","Electric"},{fconst.ENGINE_TYPE.PETROL,fconst.ENGINE_TYPE.DISEAL,fconst.ENGINE_TYPE.ELECTRIC},phandling + 0x75,false)
                     fcommon.RadioButtonFunc("Front lights",{"Long","Small","Big","Tall"},{fconst.LIGHTS.LONG,fconst.LIGHTS.SMALL,fconst.LIGHTS.BIG,fconst.LIGHTS.TALL},phandling + 0xDC,false)
                     fcommon.UpdateAddress({name = 'Force level',address = phandling + 0xAC ,size = 4,is_float = true,cvalue = 0.1, save = false})
                     fcommon.UpdateBits("Handling flags",module.tvehicle.handling_flags,phandling + 0xD0,4)
                     fcommon.UpdateAddress({name = 'High speed damping',address = phandling + 0xB4 ,size = 4,is_float = true,cvalue = 0.1, save = false})
-                    fcommon.UpdateAddress({name = 'Lower limit',address = phandling + 0xBC ,size = 4,is_float = true,cvalue = 0.05, save = false})
+                    fcommon.UpdateAddress({name = 'Lower limit',address = phandling + 0xBC ,size = 4,min = -1,max = 1,is_float = true,cvalue = 0.01, save = false})
                     fcommon.UpdateAddress({name = 'Mass',address = phandling + 0x4 ,size = 4,min = 1,max = 50000,is_float = true, save = false})
-                    fcommon.UpdateAddress({name = 'Max velocity',address = phandling + 0x84 ,size = 4,min = 1,max = 150,is_float = true,factor = 5.5555599e-3, save = false})
+                    fcommon.UpdateAddress({name = 'Max velocity',address = phandling + 0x84 ,size = 4,min = 1,max = 300,is_float = true,mul = 581, save = false})
                     fcommon.UpdateBits("Model flags",module.tvehicle.model_flags,phandling + 0xCC,4)
-                    fcommon.UpdateAddress({name = 'Monetary value',address = phandling + 0xD8 ,size = 4,min = 1,max = 100000, save = false})
+                    fcommon.UpdateAddress({name = 'Monetary value',address = phandling + 0xD8 ,size = 4,min = 1,max = 150000, save = false})
                     fcommon.UpdateAddress({name = 'Number of gears',address = phandling + 0x76 ,size = 1,min = 1,max = 10, save = false})
                     fcommon.UpdateAddress({name = 'Percent submerged',address = phandling + 0x20 ,size = 1,min = 10,max = 120, save = false})
                     fcommon.RadioButtonFunc("Rear lights",{"Long","Small","Big","Tall"},{fconst.LIGHTS.LONG,fconst.LIGHTS.SMALL,fconst.LIGHTS.BIG,fconst.LIGHTS.TALL},phandling + 0xDD,false)
-                    fcommon.UpdateAddress({name = 'Seat offset distance',address = phandling + 0xD4 ,size = 4,is_float = true,cvalue = 0.05, save = false})
-                    fcommon.UpdateAddress({name = 'Steering lock',address = phandling + 0xA0 ,size = 4,min = 10,max = 40,is_float = true, save = false})
-                    fcommon.UpdateAddress({name = 'Suspension bias',address = phandling + 0xC0 ,size = 4,is_float = true,cvalue = 0.05, save = false})
+                    fcommon.UpdateAddress({name = 'Seat offset distance',address = phandling + 0xD4 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
+                    fcommon.UpdateAddress({name = 'Steering lock',address = phandling + 0xA0 ,size = 4,min = 10,max = 50,is_float = true, save = false})
+                    fcommon.UpdateAddress({name = 'Suspension bias',address = phandling + 0xC0 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
                     fcommon.UpdateAddress({name = 'Traction bias',address = phandling + 0xA8 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
                     fcommon.UpdateAddress({name = 'Traction loss',address = phandling + 0xA4 ,size = 4,min = 0,max = 1,is_float = true,cvalue = 0.01, save = false})
-                    fcommon.UpdateAddress({name = 'Turn mass',address = phandling + 0xC ,size = 4,min = 0,max = 20,is_float = true, save = false})
-                    fcommon.UpdateAddress({name = 'Traction multiplier',address = phandling + 0x28 ,size = 4,min = 0.2,max = 2,is_float = true,cvalue = 0.05, save = false})
-                    fcommon.UpdateAddress({name = 'Upper limit',address = phandling + 0xB8 ,size = 4,is_float = true,cvalue = 0.05, save = false})
+                    fcommon.UpdateAddress({name = 'Traction multiplier',address = phandling + 0x28 ,size = 4,min = 0.5,max = 2,is_float = true,cvalue = 0.05, save = false})
+                    fcommon.UpdateAddress({name = 'Turn mass',address = phandling + 0xC ,size = 4,is_float = true, save = false})
+                    fcommon.UpdateAddress({name = 'Upper limit',address = phandling + 0xB8 ,size = 4,min = -1,max = 1,is_float = true,cvalue = 0.01, save = false})
                     fcommon.UpdateAddress({name = 'Vehicle anim group',address = phandling + 0xDE ,size = 1, save = false})
                     imgui.EndChild()
                 end

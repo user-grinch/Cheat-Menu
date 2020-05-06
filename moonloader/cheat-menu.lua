@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.0-beta")
-script_version_number(2020050402) -- YYYYMMDDNN
+script_version_number(2020050601) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -80,6 +80,7 @@ ffi.cdef[[
 if isSampLoaded() then
     print("SAMP is loaded.")
     if fmenu.tmenu.disable_in_samp[0] then
+        fgame.tgame.script_manager.skip_auto_reload = true
         print("Disable in samp enabled, unloading script.")
         thisScript():unload()
     end
@@ -540,6 +541,10 @@ function main()
     -- Set saved values of addresses
     fconfig.SetConfigData()
 
+    -- Parse files
+    fvehicle.ParseCarcols()
+    fvehicle.ParseVehiclesIDE()
+
     lua_thread.create(fcommon.ReadKeyPress)
     lua_thread.create(fplayer.KeepPosition)
     lua_thread.create(fped.PedHealthDisplay)
@@ -553,7 +558,6 @@ function main()
     lua_thread.create(fvehicle.AircraftCamera)
     lua_thread.create(fvehicle.FirstPersonCamera)
     lua_thread.create(fvehicle.OnEnterVehicle)
-    lua_thread.create(fvehicle.ParseCarcols)
     lua_thread.create(fvehicle.GSXProcessVehicles)
     lua_thread.create(fvehicle.RandomColors)
     lua_thread.create(fvehicle.RandomTrafficColors)
@@ -713,6 +717,7 @@ function onScriptTerminate(script, quitGame)
                     for index, script in ipairs(script.list()) do
                         if script.name ~= thisScript().name then
                             script.this:reload()
+                            print("Reloading script")
                         end
                     end
                     fmenu.tmenu.crash_text =  fmenu.tmenu.crash_text .. " but reloaded"

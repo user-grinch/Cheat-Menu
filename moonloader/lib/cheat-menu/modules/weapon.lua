@@ -130,7 +130,7 @@ function module.GiveWeapon(weapon)
         loadAllModelsNow()
 
         if module.tweapon.ped[0] == true then
-            if fped.tped.selected ~=  nil then
+            if doesCharExist(fped.tped.selected) then
                 giveWeaponToChar(fped.tped.selected,weapon,module.tweapon.ammo_count[0])
                 fcommon.CheatActivated()
             else
