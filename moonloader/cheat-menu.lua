@@ -701,55 +701,55 @@ function main()
     end
 end
 
--- function onScriptTerminate(script, quitGame)
---     if script == thisScript() then
+function onScriptTerminate(script, quitGame)
+    if script == thisScript() then
 
---         fconfig.Write()
---         if fconfig.tconfig.reset == false then
---             if fmenu.tmenu.crash_text == "" then
---                 fmenu.tmenu.crash_text = "Cheat menu crashed unexpectedly"
+        fconfig.Write()
+        if fconfig.tconfig.reset == false then
+            if fmenu.tmenu.crash_text == "" then
+                fmenu.tmenu.crash_text = "Cheat menu crashed unexpectedly"
 
---                 if fmenu.tmenu.auto_reload[0] and not fgame.tgame.script_manager.skip_auto_reload then
---                     for index, script in ipairs(script.list()) do
---                         if script.name ~= thisScript().name then
---                             script.this:reload()
---                             print("Reloading script")
---                         end
---                     end
---                     fmenu.tmenu.crash_text =  fmenu.tmenu.crash_text .. " but reloaded"
---                 end
---             end
---         end
+                if fmenu.tmenu.auto_reload[0] and not fgame.tgame.script_manager.skip_auto_reload then
+                    for index, script in ipairs(script.list()) do
+                        if script.name ~= thisScript().name then
+                            script.this:reload()
+                            print("Reloading script")
+                        end
+                    end
+                    fmenu.tmenu.crash_text =  fmenu.tmenu.crash_text .. " but reloaded"
+                end
+            end
+        end
 
---         if fgame.tgame.camera.bool[0] then
---             displayRadar(true)
---             displayHud(true)
---             restoreCameraJumpcut()
---         end
+        if fgame.tgame.camera.bool[0] then
+            displayRadar(true)
+            displayHud(true)
+            restoreCameraJumpcut()
+        end
         
---         if fmenu.tmenu.show_crash_message[0] and not fgame.tgame.script_manager.skip_auto_reload then
---             printHelpString(fmenu.tmenu.crash_text)
---         end
+        if fmenu.tmenu.show_crash_message[0] and not fgame.tgame.script_manager.skip_auto_reload then
+            printHelpString(fmenu.tmenu.crash_text)
+        end
 
---         fmenu.tmenu.crash_text = ""
+        fmenu.tmenu.crash_text = ""
 
---         if fvehicle.tvehicle.gsx.handle ~= 0 then
---             fvehicle.RemoveNotifyCallback(fvehicle.GSXpNotifyCallback)
---         end
+        if fvehicle.tvehicle.gsx.handle ~= 0 then
+            fvehicle.RemoveNotifyCallback(fvehicle.GSXpNotifyCallback)
+        end
 
---         if doesObjectExist(fgame.tgame.solid_water_object) then
---             deleteObject(fgame.tgame.solid_water_object)
---         end
---         fgame.RemoveAllObjects()
---         --Releasing Images
---         fcommon.ReleaseImages(fvehicle.tvehicle.images)
---         fcommon.ReleaseImages(fweapon.tweapon.images)
---         fcommon.ReleaseImages(fvehicle.tvehicle.paintjobs.images)
---         fcommon.ReleaseImages(fvehicle.tvehicle.components.images)
---         fcommon.ReleaseImages(fped.tped.images)
---         fcommon.ReleaseImages(fplayer.tplayer.clothes.images)
---     end
--- end
+        if doesObjectExist(fgame.tgame.solid_water_object) then
+            deleteObject(fgame.tgame.solid_water_object)
+        end
+        fgame.RemoveAllObjects()
+        --Releasing Images
+        fcommon.ReleaseImages(fvehicle.tvehicle.images)
+        fcommon.ReleaseImages(fweapon.tweapon.images)
+        fcommon.ReleaseImages(fvehicle.tvehicle.paintjobs.images)
+        fcommon.ReleaseImages(fvehicle.tvehicle.components.images)
+        fcommon.ReleaseImages(fped.tped.images)
+        fcommon.ReleaseImages(fplayer.tplayer.clothes.images)
+    end
+end
 
 function onSaveGame()
     fgame.RemoveAllObjects()
