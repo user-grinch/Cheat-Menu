@@ -1406,6 +1406,9 @@ function module.VehicleMain()
                     file:close()
                     printHelpString("Data saved")
                 end
+                if imgui.Button("Read more about handling",imgui.ImVec2(fcommon.GetSize(1))) then
+                    os.execute('explorer "https://projectcerbera.com/gta/sa/tutorials/handling"')
+                end
 
                 imgui.Spacing()
                 if imgui.BeginChild("Handling") then
