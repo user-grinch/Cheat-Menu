@@ -323,7 +323,7 @@ function module.SyncSystemTime()
             local hour,minute = getTimeOfDay()
             if hour ~= time.hour or minute ~= time.min then
                 setTimeOfDay(time.hour,time.min)
-            end
+            end 
         end
         wait(0)
     end

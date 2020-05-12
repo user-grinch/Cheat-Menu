@@ -78,6 +78,7 @@ module.tvehicle =
     lights = imgui.new.bool(fconfig.Get('tvehicle.lights',false)),
     lock_doors = imgui.new.bool(false),
     lock_speed = imgui.new.bool(fconfig.Get('tvehicle.lock_speed',false)),
+    max_velocity_temp = imgui.new.int(-1),
     model_flags = fcommon.LoadJson("model flags"),
     names = fcommon.LoadJson("vehicle"),
     paintjobs  = 
@@ -786,6 +787,7 @@ function module.OnEnterVehicle()
             while isCharInCar(PLAYER_PED,car) do
                 wait(0)
             end
+            module.tvehicle.max_velocity_temp[0] = -1
         end
         wait(0)
     end
@@ -1369,7 +1371,7 @@ function module.VehicleMain()
                     local fTractionLoss = memory.getfloat(phandling + 0xA4)
                     local TractionBias  = memory.getfloat(phandling + 0xA8)                     
                     local nNumberOfGears= memory.read(phandling + 0x76,4)    
-                    local fMaxVelocity = memory.getfloat(phandling + 0x84)
+                    local fMaxVelocity = module.tvehicle.max_velocity_temp[0] --memory.getfloat(phandling + 0x84)
                     fMaxVelocity = fMaxVelocity*206 + (fMaxVelocity-0.918668)*1501
                     local fEngineAcceleration = memory.getfloat(phandling + 0x7C)*12500
                     local fEngineInertia = memory.getfloat(phandling + 0x80)	
@@ -1432,7 +1434,52 @@ function module.VehicleMain()
                     fcommon.UpdateAddress({name = 'High speed damping',address = phandling + 0xB4 ,size = 4,is_float = true,cvalue = 0.1, save = false})
                     fcommon.UpdateAddress({name = 'Lower limit',address = phandling + 0xBC ,size = 4,min = -1,max = 1,is_float = true,cvalue = 0.01, save = false})
                     fcommon.UpdateAddress({name = 'Mass',address = phandling + 0x4 ,size = 4,min = 1,max = 50000,is_float = true, save = false})
-                    fcommon.UpdateAddress({name = 'Max velocity',address = phandling + 0x84 ,size = 4,min = 0,max = 2,is_float = true,cvalue = 0.01 , save = false})
+                    
+                    -- fcommon.UpdateAddress({name = 'Max velocity',address = phandling + 0x84 ,size = 4,min = 0,max = 2,is_float = true,cvalue = 0.01 , save = false})
+                    fcommon.DropDownMenu("Max velocity",function()
+                        imgui.Text("Info")
+                        fcommon.InformationTooltip("Due to an issue, any changes made here won't\nbe applied in game. You can still generate your\
+data file with these values changed here")
+                        imgui.Columns(2,nil,false)
+                        imgui.Text("Minimum = 0")
+                        imgui.NextColumn()
+                        imgui.Text("Maximum = 500")
+                        imgui.Columns(1)
+                        imgui.Spacing()
+                
+                        imgui.InputInt("Set##MaxVelocity",module.tvehicle.max_velocity_temp)
+
+                        if imgui.Button("Minimum##MaxVelocity",imgui.ImVec2(fcommon.GetSize(3))) then
+                            module.tvehicle.max_velocity_temp[0] = 0
+                        end
+            
+                        imgui.SameLine()
+                        if imgui.Button("Default##MaxVelocity",imgui.ImVec2(fcommon.GetSize(3))) then
+                            local fMaxVelocity = memory.getfloat(phandling + 0x84)
+                            fMaxVelocity = fMaxVelocity*206 + (fMaxVelocity-0.918668)*1501
+                            module.tvehicle.max_velocity_temp[0] = math.floor(fMaxVelocity)
+                        end
+            
+                        imgui.SameLine()
+                        if imgui.Button("Maximum##MaxVelocity",imgui.ImVec2(fcommon.GetSize(3))) then
+                            module.tvehicle.max_velocity_temp[0] = 500
+                        end
+
+                        if module.tvehicle.max_velocity_temp[0] > 500 then
+                            module.tvehicle.max_velocity_temp[0] = 500
+                        end
+
+                        if module.tvehicle.max_velocity_temp[0] == -1 then
+                            local fMaxVelocity = memory.getfloat(phandling + 0x84)
+                            fMaxVelocity = fMaxVelocity*206 + (fMaxVelocity-0.918668)*1501
+                            module.tvehicle.max_velocity_temp[0] = math.floor(fMaxVelocity)
+                        end
+
+                        if module.tvehicle.max_velocity_temp[0] < 0 then
+                            module.tvehicle.max_velocity_temp[0] = 0
+                        end
+                    end)
+
                     fcommon.UpdateBits("Model flags",module.tvehicle.model_flags,phandling + 0xCC,4)
                     fcommon.UpdateAddress({name = 'Monetary value',address = phandling + 0xD8 ,size = 4, save = false})
                     fcommon.UpdateAddress({name = 'Number of gears',address = phandling + 0x76 ,size = 1,min = 1,max = 10, save = false})
