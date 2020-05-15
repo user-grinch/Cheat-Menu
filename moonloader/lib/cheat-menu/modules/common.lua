@@ -142,7 +142,7 @@ end
 function module.GetSize(count,no_spacing)
   
     x = x or 20
-    y = y or 25
+    y = y or 20
     count = count or 1
     if count == 1 then no_spacing = true end
 
@@ -152,7 +152,7 @@ function module.GetSize(count,no_spacing)
         x = imgui.GetWindowContentRegionWidth()/count - imgui.StyleVar.ItemSpacing/(count+1)
     end
 
-    y = (imgui.GetWindowHeight()/25)
+    y = (tcheatmenu.window.size.Y/25)
     if y < 25 then y = 25 end
 
     return x,y
@@ -175,7 +175,8 @@ function module.Tabs(label,names,func)
     local buttonactive = imgui.ColorConvertFloat4ToU32(imgui.GetStyle()['Colors'][23])
     
     imgui.Spacing()
-    if imgui.BeginChild(label,imgui.ImVec2(tcheatmenu.window.size.X-imgui.GetStyle().WindowPadding.x*2,imgui.CalcTextSize(names[i]).y+10)) then
+    x,y = module.GetSize(1)
+    if imgui.BeginChild(label,imgui.ImVec2(tcheatmenu.window.size.X-imgui.GetStyle().WindowPadding.x*2,y*0.9)) then
         imgui.PushStyleVarVec2(imgui.StyleVar.ItemSpacing, imgui.ImVec2(4,0))
 
         imgui.GetStyle().Colors[imgui.Col.Button] = imgui.GetStyle().Colors[imgui.Col.Tab]
@@ -188,8 +189,8 @@ function module.Tabs(label,names,func)
             else
                 imgui.GetStyle().Colors[imgui.Col.Button] = imgui.GetStyle().Colors[imgui.Col.Tab]
             end
-
-            if imgui.Button(names[i],imgui.ImVec2(imgui.CalcTextSize(names[i]).x+10,imgui.CalcTextSize(names[i]).y+5)) then
+      
+            if imgui.Button(names[i],imgui.ImVec2(imgui.CalcTextSize(names[i]).x+10,y*0.75)) then
                 tcheatmenu.tab_data[label] = i
             end
 

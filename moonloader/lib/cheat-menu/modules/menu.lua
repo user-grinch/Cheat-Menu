@@ -30,7 +30,6 @@ module.tmenu =
 		show            = imgui.new.bool(false),
 	},
 	crash_text          = "",
-	disable_in_samp		= imgui.new.bool(fconfig.Get('tmenu.disable_in_samp',true)),
 	draw_text_only      = imgui.new.bool(fconfig.Get('tmenu.draw_text_only',false)),
 	fast_load_images    = imgui.new.bool(fconfig.Get('tmenu.fast_load_images',false)),
 	lock_player   		= imgui.new.bool(fconfig.Get('tmenu.lock_player',false)),
@@ -39,6 +38,7 @@ module.tmenu =
 		coordinates     = imgui.new.bool(fconfig.Get('tmenu.overlay.coordinates',false)),
 		fps             = imgui.new.bool(fconfig.Get('tmenu.overlay.fps',false)),
 		show            = imgui.new.bool(true),
+		location    	= imgui.new.bool(fconfig.Get('tmenu.overlay.location',false)),
 		offset          = imgui.new.int(10),
     	position        = {"Custom","Top Left","Top Right","Bottom Left","Bottom Right"},
     	position_array  = {},
@@ -227,9 +227,37 @@ function module.httpRequest(request, body, handler) -- copas.http
     end
 end
 
+function module.GetPlayerLocation()
+	local interior = getActiveInterior() 
+
+	local town_name = "San Andreas"
+	local city =  getCityPlayerIsIn(PLAYER_PED)
+
+	if city == 0 then
+		town_name = "CS"
+	end
+	if city == 1 then
+		town_name = "LS"
+	end
+	if city == 2 then
+		town_name = "SF"
+	end
+	if city == 3 then
+		town_name = "LV"
+	end
+
+	if interior == 0 then
+
+		local x,y,z = getCharCoordinates(PLAYER_PED)
+		local zone_name = getGxtText(getNameOfZone(x,y,z))
+
+		return string.format("Location: %s, %s",zone_name,town_name)
+	else
+		return string.format("Location: Interior %d, %s",getCharActiveInterior(PLAYER_PED),town_name)
+	end
+end
 
 function module.CheckUpdates()
-
 	if string.find( script.this.version,"beta") then
 		link = "https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/moonloader/cheat-menu.lua"
 	else
@@ -310,8 +338,6 @@ function module.MenuMain()
 			fcommon.CheckBoxVar("Auto scale",module.tmenu.auto_scale,"Automatically scale menu according to size")
 			fcommon.CheckBoxVar("Check for updates",module.tmenu.auto_update_check,"Cheat Menu will automatically check for updates\nonline. This requires an internet connection and\
 will download files from github repository.")
-			fcommon.CheckBoxVar("Disable in SAMP",module.tmenu.disable_in_samp,"Cheat Menu doesn't endorse using cheats\
-on multiplayer and is created for offline\nusage only.\n\nUsing cheats online might ruin others\ngameplay and get yourself banned.")	
 			fcommon.CheckBoxVar("Draw text only",module.tmenu.draw_text_only,"Replace the menu images with text names\
 This might improve the menu performance")	
 			
@@ -328,7 +354,7 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 			imgui.Columns(2,nil,false)
 			fcommon.CheckBoxVar("Show coordinates",module.tmenu.overlay.coordinates)
 			fcommon.CheckBoxVar("Show FPS",module.tmenu.overlay.fps)	
-
+			fcommon.CheckBoxVar("Show location",module.tmenu.overlay.location)
 			imgui.NextColumn()
 
 			fcommon.CheckBoxVar("Show vehicle health",module.tmenu.overlay.health)
@@ -393,24 +419,27 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 					if fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1] == nil then
 						printHelpString("No style selected")
 					else
-						fstyle.tstyle.styles_table[(fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])] = nil
-						fstyle.tstyle.list = fstyle.getStyles()
-						fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
-						fcommon.SaveJson("styles",fstyle.tstyle.styles_table)
+						if fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1] == "Default" then
+							printHelpString("Can't delete default style")
+						else
+							fstyle.tstyle.styles_table[(fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])] = nil
+							fstyle.tstyle.list = fstyle.getStyles()
+							fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
+							fcommon.SaveJson("styles",fstyle.tstyle.styles_table)
 
-						for k,v in ipairs(fstyle.tstyle.list) do
-							if v == "Default" then
-								fstyle.tstyle.selected[0] = k-1
+							for k,v in ipairs(fstyle.tstyle.list) do
+								if v == "Default" then
+									fstyle.tstyle.selected[0] = k-1
+								end
 							end
-						end
 
-						if fstyle.tstyle.list[fstyle.tstyle.selected[0]+1] == nil then
-							fstyle.tstyle.selected[0] = fstyle.tstyle.selected[0] - 1
+							if fstyle.tstyle.list[fstyle.tstyle.selected[0]+1] == nil then
+								fstyle.tstyle.selected[0] = fstyle.tstyle.selected[0] - 1
+							end
+							fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0]+1])
+							fstyle.tstyle.selected_name = fstyle.tstyle.list[fstyle.tstyle.selected[0]+1]
+							printHelpString("Style deleted")
 						end
-						fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0]+1])
-						fstyle.tstyle.selected_name = fstyle.tstyle.list[fstyle.tstyle.selected[0]+1]
-
-						printHelpString("Style deleted")
 					end
 				end
 				imgui.SameLine()
@@ -474,40 +503,50 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 				os.execute('explorer "https://github.com/user-grinch/Cheat-Menu"')
 			end
 			imgui.Spacing()
-			imgui.Columns(2,nil,false)
-			imgui.Text(string.format("%s v%s",script.this.name,script.this.version))
-			imgui.Text(string.format("Build: %d",script.this.version_num))
 
-			imgui.NextColumn()
-			imgui.Text(string.format("Author: %s",script.this.authors[1]))
-			imgui.Text(string.format("Imgui:   v%s",imgui._VERSION))
-			imgui.Columns(1)
-			imgui.Dummy(imgui.ImVec2(0,10))
-			imgui.TextWrapped("Need help/ facing issues/ have suggestions?\nContact me on discord, Grinch_#3311 or on forum.")
-			imgui.TextWrapped("\nPlease provide 'moonloader.log' in case of debugging.")
-			imgui.Dummy(imgui.ImVec2(0,10))
-			
-			imgui.TextWrapped("Special thanks to,")
-			imgui.Columns(2,nil,false)
-			
-			imgui.TextWrapped("Fabio")
-			imgui.TextWrapped("guru guru")
-			imgui.TextWrapped("Israel")
-			imgui.TextWrapped("Junior-Djjr")
-			imgui.TextWrapped("kuba--")
-			imgui.TextWrapped("randazz0")
-			imgui.TextWrapped("Um_Geek")
-			imgui.TextWrapped("Modding community")
-			imgui.TextWrapped("Rockstar Games")
-			imgui.NextColumn()
-			imgui.TextWrapped("For GSX")
-			imgui.TextWrapped("For Timecyc stuff")
-			imgui.TextWrapped("For Neon api")
-			imgui.TextWrapped("For his help")
-			imgui.TextWrapped("For C zip library")
-			imgui.TextWrapped("For ImStyleSerializer")
-			imgui.TextWrapped("For his help")
-			
+			if imgui.BeginChild("About2") then
+
+				imgui.Columns(2,nil,false)
+				imgui.Text(string.format("%s v%s",script.this.name,script.this.version))
+				imgui.Text(string.format("Build: %d",script.this.version_num))
+	
+				imgui.NextColumn()
+				imgui.Text(string.format("Author: %s",script.this.authors[1]))
+				imgui.Text(string.format("Imgui:   v%s",imgui._VERSION))
+				imgui.Columns(1)
+
+				imgui.Dummy(imgui.ImVec2(0,10))
+				imgui.TextWrapped("Need help/ facing issues/ have suggestions?\nContact me on discord, Grinch_#3311 or on forum.")
+				imgui.TextWrapped("\nPlease provide 'moonloader.log' in case of debugging.")
+				imgui.Dummy(imgui.ImVec2(0,10))
+				imgui.TextWrapped("Minimum resolution: 1024x768")
+				imgui.TextWrapped(string.format("Your resolution: %dx%d",resX,resY))
+				imgui.TextWrapped("Maximum resolution: 1920x1080")
+				imgui.Spacing()
+				imgui.TextWrapped("The menu will work properly on other resolutions but the gui & fonts might have issues.")
+				imgui.Dummy(imgui.ImVec2(0,10))
+				imgui.TextWrapped("Special thanks to,")
+				imgui.Columns(2,nil,false)
+				
+				imgui.TextWrapped("Fabio")
+				imgui.TextWrapped("guru guru")
+				imgui.TextWrapped("Israel")
+				imgui.TextWrapped("Junior-Djjr")
+				imgui.TextWrapped("kuba--")
+				imgui.TextWrapped("randazz0")
+				imgui.TextWrapped("Um_Geek")
+				imgui.TextWrapped("Modding community")
+				imgui.TextWrapped("Rockstar Games")
+				imgui.NextColumn()
+				imgui.TextWrapped("For GSX")
+				imgui.TextWrapped("For Timecyc stuff")
+				imgui.TextWrapped("For Neon api")
+				imgui.TextWrapped("For his help")
+				imgui.TextWrapped("For C zip library")
+				imgui.TextWrapped("For ImStyleSerializer")
+				imgui.TextWrapped("For his help")
+				imgui.EndChild()
+			end
 			imgui.Columns(1)
 		end
 	})

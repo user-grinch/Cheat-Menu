@@ -121,17 +121,6 @@ end
 --------------------------------------------------
 -- Cloth functions
 
-function module.GetClothName(name,separated)
-    local body_part, model, texture = name:match("([^$]+)$([^$]+)$([^$]+)")
-
-    if separated == nil then
-        return string.format( "%s\n%s\n%s",body_part,model,texture)
-    else
-        return body_part,model,texture
-    end
-
-end
-
 function module.ChangePlayerCloth(name)
     local body_part, model, texture = name:match("([^$]+)$([^$]+)$([^$]+)")
     
@@ -266,7 +255,7 @@ function module.PlayerMain()
             imgui.Text("Info")
             fcommon.InformationTooltip("Right click to add clothes\nLeft click to remove clothes")
             imgui.Spacing()          
-            fcommon.DrawImages(fconst.IDENTIFIER.CLOTHES,fconst.DRAW_TYPE.LIST,module.tplayer.clothes.images,fconst.CLOTH.IMAGE_HEIGHT,fconst.CLOTH.IMAGE_WIDTH,module.ChangePlayerCloth,module.RemoveThisCloth,module.GetClothName)
+            fcommon.DrawImages(fconst.IDENTIFIER.CLOTHES,fconst.DRAW_TYPE.LIST,module.tplayer.clothes.images,fconst.CLOTH.IMAGE_HEIGHT,fconst.CLOTH.IMAGE_WIDTH,module.ChangePlayerCloth,module.RemoveThisCloth)
         end
     })
 end

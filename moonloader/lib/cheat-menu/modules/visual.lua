@@ -18,6 +18,7 @@ local module = {}
 module.tvisual =
 {
     car_names                   = imgui.new.bool(true),
+    disable_motion_blur         = imgui.new.bool(fconfig.Get('tvisual.disable_motion_blur',false)),   
     lock_weather                = imgui.new.bool(fconfig.Get('tvisual.lock_weather',false)),   
     timecyc                     =
     {   timecyc_24_plugin       = getModuleHandle("timecycle24"),
@@ -354,15 +355,23 @@ function module.VisualMain()
                 displayCarNames(module.tvisual.car_names[0]) 
                 fconfig.Set(fconfig.tconfig.misc_data,"Display Car Names",module.tvisual.car_names[0])
             end)
+            fcommon.CheckBoxVar('Disable motion blur',module.tvisual.disable_motion_blur,nil,
+            function()    
+                if module.tvisual.disable_motion_blur[0] then
+                    writeMemory(0x7030A0,4,0xC3,false)
+                else
+                    writeMemory(0x7030A0,4,0xF3CEC83,false)
+                end
+            end)
             fcommon.CheckBoxVar('Display zone names',module.tvisual.zone_names,nil,
             function()     
                 displayZoneNames(module.tvisual.zone_names[0])
                 fconfig.Set(fconfig.tconfig.misc_data,"Display Zone Names",module.tvisual.zone_names[0])
             end)
-            fcommon.CheckBoxValue('Enable hud',0xBA6769)
 
             imgui.NextColumn()
 
+            fcommon.CheckBoxValue('Enable hud',0xBA6769)
             fcommon.CheckBoxValue('Enable radar',0xBA676C,nil,0,2)
             fcommon.CheckBoxValue('Gray radar',0xA444A4)
             fcommon.CheckBoxValue('Health border',0x589353)

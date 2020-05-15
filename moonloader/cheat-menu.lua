@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.0-beta")
-script_version_number(2020051201) -- YYYYMMDDNN
+script_version_number(2020051501) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -120,6 +120,7 @@ tcheatmenu       =
             Y    = fconfig.Get('tcheatmenu.window.size.Y',resY/1.2),
         },
         title    = string.format("%s v%s",script.this.name,script.this.version),
+        show_unsupported_resolution_msg = imgui.new.bool(fconfig.Get('tcheatmenu.window.show_unsupported_resolution_msg',true)),
     },
 }
 
@@ -178,6 +179,19 @@ function(self) -- render frame
        pop = pop + 1
     end
     imgui.Begin(tcheatmenu.window.title, tcheatmenu.window.show,imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoSavedSettings )
+
+    if tcheatmenu.window.show_unsupported_resolution_msg[0] and ((resX < 1024 and resY < 720) or (resX > 1920 and resY > 1080)) then
+        imgui.Button("Unsupported resolution",imgui.ImVec2(fcommon.GetSize(1)))
+        if imgui.Button("Read more",imgui.ImVec2(fcommon.GetSize(2))) then
+            tcheatmenu.current_menu = 12
+            tcheatmenu.tab_data["Menu"] = 7
+        end
+        imgui.SameLine()
+        if imgui.Button("Don't show again",imgui.ImVec2(fcommon.GetSize(2))) then
+            tcheatmenu.window.show_unsupported_resolution_msg[0] = false
+        end
+        imgui.Spacing()
+    end
 
     if tcheatmenu.window.fail_loading_json then
         imgui.Button("Failed to load some json files!",imgui.ImVec2(fcommon.GetSize(1)))
@@ -289,14 +303,13 @@ This may increase game startup time or\nfreeze it for few seconds.")
     tcheatmenu.window.size.Y  = imgui.GetWindowHeight()
     tcheatmenu.window.coord.X = imgui.GetWindowPos().x
     tcheatmenu.window.coord.Y = imgui.GetWindowPos().y
-    
     imgui.End()
     imgui.PopStyleVar(pop)
 end)
 
 -- Overlay window
 imgui.OnFrame(function() 
-    return not isGamePaused() and fmenu.tmenu.overlay.show[0] and (fmenu.tmenu.overlay.fps[0] or fmenu.tmenu.overlay.coordinates[0]
+    return not isGamePaused() and fmenu.tmenu.overlay.show[0] and (fmenu.tmenu.overlay.fps[0] or fmenu.tmenu.overlay.coordinates[0] or fmenu.tmenu.overlay.location[0]
     or ((fmenu.tmenu.overlay.speed[0] or fmenu.tmenu.overlay.health[0]) and isCharInAnyCar(PLAYER_PED)))
 end,
 function()
@@ -325,7 +338,7 @@ function()
     imgui.Begin("Overlay", nil, flags)
     
         if fmenu.tmenu.overlay.fps[0] then
-            imgui.Text("Frames :" .. tostring(math.floor(imgui.GetIO().Framerate)))
+            imgui.Text("Frames: " .. tostring(math.floor(imgui.GetIO().Framerate)))
         end
         if isCharInAnyCar(PLAYER_PED) then
             car = getCarCharIsUsing(PLAYER_PED)
@@ -333,18 +346,23 @@ function()
                 speed = getCarSpeed(car)
                 total_gears = getCarNumberOfGears(car)
                 current_gear = getCarCurrentGear(car)
-                imgui.Text(string.format("Speed   :%d %d/%d",math.floor(speed),current_gear,total_gears))
+                imgui.Text(string.format("Speed: %d %d/%d",math.floor(speed),current_gear,total_gears))
             end
 
             if fmenu.tmenu.overlay.health[0] then
-                imgui.Text(string.format("Health  :%.0f%%",getCarHealth(car)/10))
+                imgui.Text(string.format("Health: %.0f%%",getCarHealth(car)/10))
             end
+        end
+
+        if fmenu.tmenu.overlay.location[0] then
+            imgui.Text(fmenu.GetPlayerLocation())
         end
 
         if fmenu.tmenu.overlay.coordinates[0] then
             x,y,z = getCharCoordinates(PLAYER_PED)
-            imgui.Text(string.format("Coordinates :%d %d %d", math.floor(x) , math.floor(y) , math.floor(z)),1000)
+            imgui.Text(string.format("Coordinates: %d %d %d", math.floor(x) , math.floor(y) , math.floor(z)),1000)
         end
+
         imgui.PopStyleVar()
         if imgui.BeginPopupContextWindow() then
             imgui.Text("Position")
@@ -424,13 +442,12 @@ end).HideCursor = true
 
 function main()
 
-    
     --------------------------------------------------
     -- Functions that need to lunch only once on startup
 
-    if isSampLoaded() and fmenu.tmenu.disable_in_samp[0] then
+    if isSampLoaded() then
         fgame.tgame.script_manager.skip_auto_reload = true
-        print("Disable in samp enabled, unloading script.")
+        print("SAMP detected, unloading script.")
         thisScript():unload()
     end
 
@@ -448,8 +465,6 @@ function main()
     -- Mission timer
     if fgame.tgame.freeze_mission_timer[0] then
         freezeOnscreenTimer(true)
-    else
-        freezeOnscreenTimer(false)
     end
 
     -- No traffic vehicles 
@@ -458,11 +473,6 @@ function main()
         writeMemory(0x434224,1,0,false)
         writeMemory(0x484D19,1,0x83,false) -- change condition to unsigned (0-255)
         writeMemory(0x484D17,1,0,false)
-    else
-        writeMemory(0x434237,1,-1063242627,false) -- change condition to unsigned (0-255)
-        writeMemory(0x434224,1,940431405,false)
-        writeMemory(0x484D19,1,292493,false) -- change condition to unsigned (0-255)
-        writeMemory(0x484D17,1,1988955949,false)
     end
 
     math.randomseed(getGameTimer())
@@ -480,9 +490,9 @@ function main()
     end
 
     if fgame.tgame.disable_cheats[0] == true then
-        writeMemory(0x004384D0 ,1,0xE9 ,false)
-        writeMemory(0x004384D1 ,4,0x000000D0 ,false)
-        writeMemory(0x004384D5 ,4,0x90909090 ,false)
+        writeMemory(0x4384D0,1,0xE9,false)
+        writeMemory(0x4384D1,4,0xD0,false)
+        writeMemory(0x4384D5,4,0x90909090,false)
     end
 
     switchArrestPenalties(not(fgame.tgame.keep_stuff[0]))
@@ -495,35 +505,24 @@ function main()
     setPlayerFastReload(PLAYER_HANDLE,fweapon.tweapon.fast_reload[0])
     
     if fweapon.tweapon.no_reload[0] then
-        writeMemory( 7600773,1,144,1)
-        writeMemory( 7600815,1,144,1)
-        writeMemory( 7600816,2,37008,1)
-        writeMemory( 7612591,1,144,1)
-        writeMemory( 7612646,1,144,1)
-        writeMemory( 7612647,2,37008,1)
-    else
-        writeMemory( 7600773,1,72,1)
-        writeMemory( 7600815,1,255,1)
-        writeMemory( 7600816,2,3150,1)
-        writeMemory( 7612591,1,72,1)
-        writeMemory( 7612646,1,255,1)
-        writeMemory( 7612647,2,3150,1)
+        writeMemory( 0x73FA85,1,0x90,1)
+        writeMemory( 0x73FAAF,1,0x90,1)
+        writeMemory( 0x73FAB0,2,0x9090,1)
+        writeMemory( 0x7428AF,1,0x90,1)
+        writeMemory( 0x7428E6,1,0x90,1)
+        writeMemory( 0x7428E7,2,0x9090,1)
     end
 
-    -- Ghost cop cars
-    for key,value in pairs(fgame.tgame.cop) do
-        if  fgame.tgame.ghost_cop_cars[0] then
+    -- Ghost cop cars 
+    if  fgame.tgame.ghost_cop_cars[0] then
+        for key,value in pairs(fgame.tgame.cop) do
             writeMemory(tonumber(key),4,math.random(400,611),false)
-        else
-            writeMemory(tonumber(key),4,value,false)
         end
     end
 
     -- Disable Replay
     if fgame.tgame.disable_replay[0] then
-        writeMemory(4588800,1,195,false)
-    else
-        writeMemory(4588800,1,160,false)
+        writeMemory(0x460500,4,0xC3,false)
     end
 
     -- Vehicle gxt names
@@ -536,6 +535,11 @@ function main()
 
     -- Set saved values of addresses
     fconfig.SetConfigData()
+
+    -- Motion blur
+    if fvisual.tvisual.disable_motion_blur[0] then
+        writeMemory(0x7030A0,4,0xC3,false)
+    end
 
     -- Parse files
     fvehicle.ParseCarcols()
@@ -563,9 +567,7 @@ function main()
     lua_thread.create(fweapon.AutoAim)
 
     --------------------------------------------------
-
     while true do
-        
         --------------------------------------------------
         -- Functions that neeed to run constantly
 

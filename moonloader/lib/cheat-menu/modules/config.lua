@@ -175,6 +175,7 @@ function module.Write()
                         X = tcheatmenu.window.size.X,
                         Y = tcheatmenu.window.size.Y,
                     },
+                    show_unsupported_resolution_msg = tcheatmenu.window.show_unsupported_resolution_msg[0],
                 },
                 current_menu = tcheatmenu.current_menu,
             },
@@ -193,6 +194,10 @@ function module.Write()
                 keep_stuff          = fgame.tgame.keep_stuff[0],
                 freeze_mission_timer= fgame.tgame.freeze_mission_timer[0],
                 freeze_time         = fgame.tgame.freeze_time[0], 
+                object_spawner      = 
+                {
+                    set_player_coord= fgame.tgame.object_spawner.set_player_coord[0],
+                },
                 random_cheats       = 
                 {
                     cheat_activate_timer   = fgame.tgame.random_cheats.cheat_activate_timer[0], 
@@ -217,7 +222,6 @@ function module.Write()
                 auto_update_check   = fmenu.tmenu.auto_update_check[0],
                 auto_reload         = fmenu.tmenu.auto_reload[0],
                 auto_scale          = fmenu.tmenu.auto_scale[0],
-                disable_in_samp     = fmenu.tmenu.disable_in_samp[0],
                 draw_text_only      = fmenu.tmenu.draw_text_only[0], 
                 fast_load_images    = fmenu.tmenu.fast_load_images[0],
                 lock_player         = fmenu.tmenu.lock_player[0],
@@ -226,6 +230,7 @@ function module.Write()
                     coordinates     = fmenu.tmenu.overlay.coordinates[0],
                     fps             = fmenu.tmenu.overlay.fps[0],
                     health          = fmenu.tmenu.overlay.health[0],
+                    location        = fmenu.tmenu.overlay.location[0],
                     position_index  = fmenu.tmenu.overlay.position_index[0],
                     pos_x           = fmenu.tmenu.overlay.pos_x[0],
                     pos_y           = fmenu.tmenu.overlay.pos_y[0],
@@ -303,6 +308,7 @@ function module.Write()
             tvisual =
             {
                 lock_weather     = fvisual.tvisual.lock_weather[0],
+                disable_motion_blur = fvisual.tvisual.disable_motion_blur[0],
             },
             tweapon =
             {

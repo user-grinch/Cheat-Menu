@@ -24,6 +24,7 @@ module.tstyle =
 {
     array          = nil,
     alpha_flags    = imgui.new.int(0),
+    current_font   = "",
     fonts          = {},
     list           = nil,
     name           = imgui.new.char[256]("Untitled"),
@@ -164,9 +165,8 @@ function module.applyStyle(style, stylename)
                 style[v] = tonumber(module.tstyle.styles_table[stylename][v])
             end
         end
-
-        imgui.GetIO().FontDefault = fstyle.tstyle.fonts[module.tstyle.styles_table[stylename]["Font"]]
-
+        imgui.GetIO().FontDefault = fstyle.tstyle.fonts[module.tstyle.styles_table[stylename]["Font"]] or fstyle.tstyle.fonts["trebucbd.ttf"]
+        fstyle.tstyle.current_font = module.tstyle.styles_table[stylename]["Font"]
         return true
     end
     return false
@@ -187,10 +187,25 @@ function module.LoadFonts()
     local mask = tcheatmenu.dir .. "fonts//*.ttf"
 
     local handle, name = findFirstFile(mask)
-
+    
     while handle and name do
         fstyle.tstyle.fonts[name] = imgui.GetIO().Fonts:AddFontFromFileTTF(string.format( "%sfonts//%s",tcheatmenu.dir,name), 14)
         name = findNextFile(handle)
+    end
+end
+
+function FontSelector()
+    if imgui.BeginCombo("Select Font", fstyle.tstyle.current_font) then
+
+        for name,font in pairs(fstyle.tstyle.fonts) do
+            if name ~= fstyle.tstyle.current_font then
+                if imgui.MenuItemBool(name) then
+                    imgui.GetIO().FontDefault = font
+                    fstyle.tstyle.current_font = name
+                end
+            end
+        end
+        imgui.EndCombo()
     end
 end
 
@@ -199,7 +214,7 @@ function module.StyleEditor()
     local style = imgui.GetStyle();
     local var = nil
 
-    imgui.ShowFontSelector("Fonts##Selector")
+    FontSelector()
     imgui.Spacing()
 
     fcommon.Tabs("Style",{"Borders","Colors","Sizes"},{

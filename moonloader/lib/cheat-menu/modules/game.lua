@@ -58,6 +58,7 @@ module.tgame                =
         filter              = imgui.ImGuiTextFilter(),
         model               = imgui.new.int(1427),
         placed              = {},
+        set_player_coord    = imgui.new.bool(fconfig.Get('tgame.object_spawner.set_player_coord',false)),
     },  
     random_cheats           = 
     {
@@ -770,13 +771,13 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
             function()
                 if module.tgame.disable_cheats[0] then
                     writeMemory(0x004384D0 ,1,0xE9 ,false)
-                    writeMemory(0x004384D1 ,4,0x000000D0 ,false)
+                    writeMemory(0x004384D1 ,4,0xD0 ,false)
                     writeMemory(0x004384D5 ,4,0x90909090 ,false)
                     fcommon.CheatActivated()
                 else
-                    writeMemory(0x004384D0 ,1,0x83,false)
-                    writeMemory(0x004384D1 ,4,-0x7DF0F908,false)
-                    writeMemory(0x004384D5 ,4,0xCC,false)
+                    writeMemory(0x4384D0 ,1,0x83,false)
+                    writeMemory(0x4384D1 ,4,-0x7DF0F908,false)
+                    writeMemory(0x4384D5 ,4,0xCC,false)
                     fcommon.CheatDeactivated()
                 end
             end)
@@ -793,10 +794,10 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
             end)
             fcommon.CheckBoxVar("Disable F1 & F3 replay",module.tgame.disable_replay,nil,function()
                 if module.tgame.disable_replay[0] then
-                    writeMemory(4588800,1,195,false)
+                    writeMemory(0x460500,4,0xC3,false)
                     fcommon.CheatActivated()
                 else
-                    writeMemory(4588800,1,160,false)
+                    writeMemory(0x460500,4,0xBD844BB,false)
                     fcommon.CheatDeactivated()
                 end
             end)
@@ -967,17 +968,19 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
             end
             fcommon.Tabs("Object Spawner Tabs",{"Spawn","Placed"},{
             function()
+                fcommon.CheckBoxVar('Insert player coord',module.tgame.object_spawner.set_player_coord)
+
+                if module.tgame.object_spawner.set_player_coord[0] then
+                    module.tgame.object_spawner.coord.x[0],module.tgame.object_spawner.coord.y[0],module.tgame.object_spawner.coord.z[0] = getCharCoordinates(PLAYER_PED)
+                end
+                imgui.Spacing()
                 imgui.InputInt("Model",module.tgame.object_spawner.model)
                 imgui.Spacing()
                 imgui.InputFloat("Coord X",module.tgame.object_spawner.coord.x,1.0, 1.0, "%.5f")
                 imgui.InputFloat("Coord Y",module.tgame.object_spawner.coord.y,1.0, 1.0, "%.5f")
                 imgui.InputFloat("Coord Z",module.tgame.object_spawner.coord.z,1.0, 1.0, "%.5f")
                 imgui.Dummy(imgui.ImVec2(0,10))
-                if imgui.Button("Set player coord",imgui.ImVec2(fcommon.GetSize(2))) then
-                    module.tgame.object_spawner.coord.x[0],module.tgame.object_spawner.coord.y[0],module.tgame.object_spawner.coord.z[0] = getCharCoordinates(PLAYER_PED)
-                end
-                imgui.SameLine()
-                if imgui.Button("Spawn object",imgui.ImVec2(fcommon.GetSize(2))) then
+                if imgui.Button("Spawn object",imgui.ImVec2(fcommon.GetSize(1))) then
                     lua_thread.create(SpawnObject,module.tgame.object_spawner.model[0],module.tgame.object_spawner.coord.x[0],module.tgame.object_spawner.coord.y[0],module.tgame.object_spawner.coord.z[0])
                 end
             end,
