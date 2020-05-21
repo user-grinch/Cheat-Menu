@@ -61,6 +61,10 @@ If you're making videos about this mod link to this GitHub repository, don't reu
 
 Ped/skin images are loaded from '\moonloader\lib\cheat-menu\peds\' directory. The image name should contain the ped model id. Names for custom peds have to be added inside '\moonloader\lib\cheat-menu\json\ped.json' file.
 
+### Add custom player skins #2
+
+You can also add player skins by using a different method. Place your skin txd & dff files inside 'modloader\Custom Skins\' folder. Note, [Modloader](https://gtaforums.com/topic/669520-mod-loader/) is required & names can't exceed 8 characters. 
+
 ### Adding custom vehicle images - jpg
 
 Vehicle images are loaded from '\moonloader\lib\cheat-menu\vehicles\images\' directory. The image name should contain the vehicle model id. You don't need to add custom vehicle names in v2.0-beta & above.
@@ -71,7 +75,7 @@ Vehicle component images are loaded from '\moonloader\lib\cheat-menu\vehicles\c
 
 ### Adding custom vehicle paint jobs images - png
 
-Paintjob images are loaded from '\moonloader\lib\cheat-menu\vehicles\paintjobs\images\' directory. Image names can be any string and their name will show up on the menu.
+Paintjob images are loaded from '\moonloader\lib\cheat-menu\vehicles\paintjobs\' directory. Image names can be any string and their name will show up on the menu.
 
 ### Adding custom weapons images - jpg
 
