@@ -35,7 +35,7 @@ module.tanimation =
     walking       = 
     { 
         selected  = imgui.new.int(fconfig.Get('tanimation.walking.selected',0)),
-        names     = {"man","shuffle","oldman","gang1","gang2","oldfatman","fatman","jogger","drunkman","blindman","swat","woman","shopping","busywoman","sexywoman","pro","oldwoman","fatwoman","jogwoman","oldfatwoman","skate"},
+        names     = {"default","man","shuffle","oldman","gang1","gang2","oldfatman","fatman","jogger","drunkman","blindman","swat","woman","shopping","busywoman","sexywoman","pro","oldwoman","fatwoman","jogwoman","oldfatwoman","skate"},
         array     = {},
     },
 }
@@ -46,7 +46,6 @@ module.tanimation.walking.array  = imgui.new['const char*'][#module.tanimation.w
 
 function AnimationEntry(file,animation)
     if imgui.MenuItemBool(animation)then
-        local char = nil
         if file ~= "PED" then   -- don't request if animation is from ped.ifp
             requestAnimation(file)
             loadAllModelsNow()
@@ -159,19 +158,27 @@ function module.AnimationMain()
                 giveMeleeAttackToChar(PLAYER_PED,module.tanimation.fighting.selected[0]+4,6)
                 fcommon.CheatActivated()
             end
+
             if imgui.Combo("Walking", module.tanimation.walking.selected,module.tanimation.walking.array,#module.tanimation.walking.names) then
-                writeMemory(0x609A4E,4,-1869574000,true)
-                writeMemory(0x609A52,2,37008,true)
-                requestAnimation(module.tanimation.walking.names[module.tanimation.walking.selected[0]+1])
-                loadAllModelsNow()
-                setAnimGroupForChar(PLAYER_PED,module.tanimation.walking.names[module.tanimation.walking.selected[0]+1])
-                removeAnimation(module.tanimation.walking.names[module.tanimation.walking.selected[0]+1])
+              
+                if module.tanimation.walking.names[module.tanimation.walking.selected[0]+1] == "default" then
+                    writeMemory(0x609A4E,4,0x4D48689,false)
+                    writeMemory(0x609A52,2,0,false)
+                else
+                    writeMemory(0x609A4E,4,-0x6F6F6F70,false)
+                    writeMemory(0x609A52,2,0x9090,false)
+                    
+                    requestAnimation(module.tanimation.walking.names[module.tanimation.walking.selected[0]+1])
+                    loadAllModelsNow()
+                    setAnimGroupForChar(PLAYER_PED,module.tanimation.walking.names[module.tanimation.walking.selected[0]+1])
+                    removeAnimation(module.tanimation.walking.names[module.tanimation.walking.selected[0]+1])
+                end
                 fcommon.CheatActivated()
             end
         end,
         function()
-            if imgui.InputText("IFP name",module.tanimation.ifp_name,ffi.sizeof(module.tanimation.ifp_name)) then end
-            if imgui.InputText("Animation name",module.tanimation.name,ffi.sizeof(module.tanimation.name)) then end
+            imgui.InputText("IFP name",module.tanimation.ifp_name,ffi.sizeof(module.tanimation.ifp_name))
+            imgui.InputText("Animation name",module.tanimation.name,ffi.sizeof(module.tanimation.name))
             imgui.Spacing()
             if imgui.Button("Add animation",imgui.ImVec2(fcommon.GetSize(1))) then
                 module.tanimation.list[ffi.string(module.tanimation.ifp_name) .. "$" .. ffi.string(module.tanimation.name)] = "Animation"

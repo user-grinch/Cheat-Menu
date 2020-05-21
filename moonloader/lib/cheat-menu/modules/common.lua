@@ -883,29 +883,37 @@ end
 -- Misc
 
 -- Indexes image paths recursively from root directory
+function module.IndexFiles(mainDir,store_table,req_ext,load_images)
+    load_images = load_images or false
 
-function module.IndexImages(mainDir,store_image_table,req_ext)
-    for dir in lfs.dir(mainDir) do
-        local dir_path = mainDir .. "\\" .. dir
-        if doesDirectoryExist(dir_path) and dir ~= "." and dir ~= ".." then
-            for file in lfs.dir(dir_path) do
-                local file_path = dir_path .. "\\" .. file
-                if doesFileExist(file_path) then
-                    local _,file_name,file_ext = string.match(file_path, "(.-)([^\\/]-%.?([^%.\\/]*))$") 
-                    file_name = string.sub(file_name,1,-5)
-                    if req_ext == file_ext then
-                        if store_image_table[dir] == nil then
-                            store_image_table[dir] = {}
-                        end
-                        if fmenu.tmenu.fast_load_images[0] then
-                            store_image_table[dir][file_name] = imgui.CreateTextureFromFile(file_path)
-                        else
-                            store_image_table[dir][file_name] = file_path
-                        end
-                    end
+    process_file = function(file_path,element)
+        if doesFileExist(file_path) then
+            local _,file_name,file_ext = string.match(file_path, "(.-)([^\\/]-%.?([^%.\\/]*))$") 
+            file_name = string.sub(file_name,1,-5)
+            if req_ext == file_ext then
+                if store_table[element] == nil then
+                    store_table[element] = {}
+                end
+                if fmenu.tmenu.fast_load_images[0] and load_images then
+                    store_table[element][file_name] = imgui.CreateTextureFromFile(file_path)
+                else
+                    store_table[element][file_name] = file_path
                 end
             end
+        end
+    end
+
+    for element in lfs.dir(mainDir) do
+        local ele_path = mainDir .. "\\" .. element
+        if doesDirectoryExist(ele_path) and element ~= "." and element ~= ".." then
+            for file in lfs.dir(ele_path) do
+                local file_path = ele_path .. "\\" .. file
+                process_file(file_path,element)
+            end
             wait(0)
+        end
+        if doesFileExist(ele_path) then
+            process_file(ele_path,element)
         end
     end
 end

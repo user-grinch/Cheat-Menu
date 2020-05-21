@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.0-beta")
-script_version_number(2020051501) -- YYYYMMDDNN
+script_version_number(2020052101) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -153,12 +153,12 @@ imgui.OnInitialize(function() -- Called once
     -- Indexing images
     lua_thread.create(
     function() 
-        fcommon.IndexImages(fvehicle.tvehicle.path,fvehicle.tvehicle.images,fconst.VEHICLE.IMAGE_EXT)
-        fcommon.IndexImages(fweapon.tweapon.path,fweapon.tweapon.images,fconst.WEAPON.IMAGE_EXT)
-        fcommon.IndexImages(fvehicle.tvehicle.paintjobs.path,fvehicle.tvehicle.paintjobs.images,fconst.PAINTJOB.IMAGE_EXT)
-        fcommon.IndexImages(fvehicle.tvehicle.components.path,fvehicle.tvehicle.components.images,fconst.COMPONENT.IMAGE_EXT)
-        fcommon.IndexImages(fped.tped.path,fped.tped.images,fconst.PED.IMAGE_EXT)
-        fcommon.IndexImages(fplayer.tplayer.clothes.path,fplayer.tplayer.clothes.images,fconst.CLOTH.IMAGE_EXT)
+        fcommon.IndexFiles(fvehicle.tvehicle.path,fvehicle.tvehicle.images,fconst.VEHICLE.IMAGE_EXT,true)
+        fcommon.IndexFiles(fweapon.tweapon.path,fweapon.tweapon.images,fconst.WEAPON.IMAGE_EXT,true)
+        fcommon.IndexFiles(fvehicle.tvehicle.paintjobs.path,fvehicle.tvehicle.paintjobs.images,fconst.PAINTJOB.IMAGE_EXT,true)
+        fcommon.IndexFiles(fvehicle.tvehicle.components.path,fvehicle.tvehicle.components.images,fconst.COMPONENT.IMAGE_EXT,true)
+        fcommon.IndexFiles(fped.tped.path,fped.tped.images,fconst.PED.IMAGE_EXT,true)
+        fcommon.IndexFiles(fplayer.tplayer.clothes.path,fplayer.tplayer.clothes.images,fconst.CLOTH.IMAGE_EXT,true)
     end)
 end)
 
@@ -451,6 +451,9 @@ function main()
         thisScript():unload()
     end
 
+    -- Custom Skins
+    fplayer.CustomSkinsSetup()
+
     -- Gang weapons
     for x=1,10,1 do          
         setGangWeapons(x-1,fweapon.tweapon.gang.used_weapons[x][1],fweapon.tweapon.gang.used_weapons[x][2],fweapon.tweapon.gang.used_weapons[x][3])
@@ -742,7 +745,10 @@ function onScriptTerminate(script, quitGame)
         if doesObjectExist(fgame.tgame.solid_water_object) then
             deleteObject(fgame.tgame.solid_water_object)
         end
+
         fgame.RemoveAllObjects()
+        fweapon.RemoveAllWeaponDrops()
+        
         --Releasing Images
         fcommon.ReleaseImages(fvehicle.tvehicle.images)
         fcommon.ReleaseImages(fweapon.tweapon.images)
@@ -755,4 +761,5 @@ end
 
 function onSaveGame()
     fgame.RemoveAllObjects()
+    fweapon.RemoveAllWeaponDrops()
 end

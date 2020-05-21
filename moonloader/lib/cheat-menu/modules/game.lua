@@ -958,9 +958,8 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
 			end
         end,
         function()
-            if imgui.Button("Remove all objects",imgui.ImVec2(fcommon.GetSize(2))) then
-                module.RemoveAllObjects()
-                printHelpString("Objects removed")
+            if imgui.Button("Browse images",imgui.ImVec2(fcommon.GetSize(2))) then
+                os.execute('explorer "https://dev.prineside.com/en/gtasa_samp_model_id"')
             end
             imgui.SameLine()
             if imgui.Button("Generate IPL",imgui.ImVec2(fcommon.GetSize(2))) then
@@ -985,6 +984,11 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                 end
             end,
             function()
+                if imgui.Button("Remove all objects",imgui.ImVec2(fcommon.GetSize(1))) then
+                    module.RemoveAllObjects()
+                    printHelpString("Objects removed")
+                end
+                imgui.Spacing()
                 local filter = module.tgame.object_spawner.filter
 
                 filter:Draw("Filter")

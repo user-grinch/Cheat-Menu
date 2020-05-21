@@ -25,6 +25,13 @@ module.tplayer =
         images          = {},
         path            = tcheatmenu.dir .. "clothes\\",
     },
+    custom_skins        =
+    {
+        filter          = imgui.ImGuiTextFilter(),
+        is_modloader_installed = false,
+        names           = {},
+        path            = string.format("%s\\modloader\\Custom Skins",getGameDirectory())
+    },
     filter              = imgui.ImGuiTextFilter(),
     god                 = imgui.new.bool(fconfig.Get('tplayer.god',false)),
     invisible           = imgui.new.bool(fconfig.Get('tplayer.invisible',false)),
@@ -32,6 +39,22 @@ module.tplayer =
     model_val           = nil,
     never_wanted        = imgui.new.bool(false),
 }
+
+function module.CustomSkinsSetup()
+    local hmodloader = getModuleHandle("modloader.asi")
+    if hmodloader ~= 0 then
+        local dir = fplayer.tplayer.custom_skins.path
+
+        module.tplayer.custom_skins.is_modloader_installed = true
+
+        if not doesDirectoryExist(dir) then
+            createDirectory(dir)
+        end
+
+        fcommon.IndexFiles(dir,fplayer.tplayer.custom_skins.names,"dff")
+
+    end
+end
 
 function module.KeepPosition()
     while true do
@@ -45,9 +68,12 @@ function module.KeepPosition()
 end
 
 function module.ChangePlayerModel(model)
-    model = tonumber(model)
-    if fped.tped.names[tostring(model)] ~= nil then
-        if fped.tped.special[tostring(model)] == nil then
+
+    local modeldff = (model .. ".dff")
+
+    if fped.tped.names[model] ~= nil or fplayer.tplayer.custom_skins.names[modeldff] ~= nil then
+        if fped.tped.special[model] == nil and fplayer.tplayer.custom_skins.names[modeldff] == nil then
+            model = tonumber(model)
             if isModelAvailable(model) then
                 requestModel(model)
                 loadAllModelsNow()
@@ -55,23 +81,25 @@ function module.ChangePlayerModel(model)
                 markModelAsNoLongerNeeded(model)
             end
         else
-            if not hasSpecialCharacterLoaded(290) then
-                unloadSpecialCharacter(model)
+            if fped.tped.special[model] ~= nil then
+                model = fped.tped.special[model]
             end
-            loadSpecialCharacter(fped.tped.special[tostring(model)],1)
+
+            loadSpecialCharacter(model,1)
             loadAllModelsNow()
             setPlayerModel(PLAYER_HANDLE,290)
+            unloadSpecialCharacter(290)
         end
         
-        local veh = nil
+        local hveh = nil
         if isCharInAnyCar(PLAYER_PED) then
-            veh = getCarCharIsUsing(PLAYER_PED)
-            speed = getCarSpeed(veh)
+            hveh = getCarCharIsUsing(PLAYER_PED)
+            speed = getCarSpeed(hveh)
         end
         clearCharTasksImmediately(PLAYER_PED)
-        if veh ~= nil then
-            taskWarpCharIntoCarAsDriver(PLAYER_PED,veh)
-            setCarForwardSpeed(veh,speed)
+        if hveh ~= nil then
+            taskWarpCharIntoCarAsDriver(PLAYER_PED,hveh)
+            setCarForwardSpeed(hveh,speed)
         end
         printHelpString("~g~Skin~w~ changed")
     end
@@ -237,12 +265,38 @@ function module.PlayerMain()
             fcommon.CheckBoxVar("Aim skin changer", module.tplayer.aimSkinChanger,"Activate using, Aim ped +".. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.asc_key))
 
             imgui.Spacing()
-            fcommon.Tabs("Skins",{"List","Search"},{
+            fcommon.Tabs("Skins",{"List","Search","Custom"},{
                 function()
                     fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.LIST,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.ChangePlayerModel,nil,fped.GetModelName,module.tplayer.filter)
                 end,
                 function()
                     fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.SEARCH,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.ChangePlayerModel,nil,fped.GetModelName,module.tplayer.filter)
+                end,
+                function()
+                    if module.tplayer.custom_skins.is_modloader_installed then
+                        module.tplayer.custom_skins.filter:Draw("Filter")
+                        fcommon.InformationTooltip(string.format("Place your dff & txd files inside,\n'%s'\n\
+Note:\nFile names can't exceed 8 characters.\nDon't change names while the game is running",fplayer.tplayer.custom_skins.path))
+                        imgui.Spacing()
+
+                        if imgui.BeginChild("Custom skins") then
+                            for model_name,_ in pairs(fplayer.tplayer.custom_skins.names) do
+                                if module.tplayer.custom_skins.filter:PassFilter(key) then
+                                    model_name = string.sub(model_name,1,-5)
+                                    if #model_name < 9 and imgui.MenuItemBool(model_name) then
+                                        fplayer.ChangePlayerModel(model_name)
+                                    end
+                                end
+                            end
+                            imgui.EndChild()
+                        end
+                    else
+                        if imgui.Button("Download Modloader",imgui.ImVec2(fcommon.GetSize(1))) then
+                            os.execute('explorer "https://gtaforums.com/topic/669520-mod-loader/"')
+                        end
+                        imgui.Spacing()
+                        imgui.TextWrapped("Modloader is not installed. Please install modloader.")
+                    end
                 end
             })
         end,

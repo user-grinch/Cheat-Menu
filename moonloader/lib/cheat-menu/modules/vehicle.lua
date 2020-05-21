@@ -107,12 +107,9 @@ module.tvehicle =
     stay_on_bike = imgui.new.bool(fconfig.Get('tvehicle.stay_on_bike',false)),
     trains =
     {
-        ["449"]     = 9,
-        ["400"]     = 9,
-        ["537"]     = 10,
-        ["569"]     = 10,
-        ["538"]     = 11,
-        ["570"]     = 11,
+        ["449"]     = {8,9},
+        ["537"]     = {0,3,6,10,12,13},
+        ["538"]     = {1,5,15},
     },
     unlimited_nitro = imgui.new.bool(fconfig.Get('tvehicle.unlimited_nitro',false)), 
     visual_damage   = imgui.new.bool(fconfig.Get('tvehicle.visual_damage',false)),
@@ -361,52 +358,76 @@ function module.GetModelInfo(name)
     end
 end
 
--- Spawns a vehicle for player
 function module.GiveVehicleToPlayer(model)
     model = tonumber(model)
+
     if isModelAvailable(model) then
-        x,y,z = getCharCoordinates(PLAYER_PED)
-        if isCharInAnyCar(PLAYER_PED) and ( module.tvehicle.spawn_inside[0]) then
-            vehicle = getCarCharIsUsing(PLAYER_PED)
-            speed = getCarSpeed(vehicle)
+
+        local x,y,z = getCharCoordinates(PLAYER_PED)
+        local speed = 0
+        
+        if isCharInAnyCar(PLAYER_PED) and module.tvehicle.spawn_inside[0] then
+
+            local hveh = getCarCharIsUsing(PLAYER_PED)
+            local previous_model = getCarModel(hveh)
+            speed = getCarSpeed(hveh)
+
             warpCharFromCarToCoord(PLAYER_PED,x,y,z)
-            deleteCar(vehicle)
+
+            if IsThisModelATrain(previous_model) then
+                deleteMissionTrain(hveh)
+            else
+                deleteCar(hveh)
+            end
         end
 
         if (module.tvehicle.aircraft.spawn_in_air[0]) and (isThisModelAHeli(model) or isThisModelAPlane(model)) then
             z = 400
         end
 
-        if IsThisModelATrain(model) == true then
+        if IsThisModelATrain(model) then
 
-            id = module.tvehicle.trains[tostring(model)]
+            local train_id_table = module.tvehicle.trains[tostring(model)]
+            local train_id = train_id_table[math.random(1,#train_id_table)]
 
-            for key,value in pairs(module.tvehicle.trains) do
-                if value == id and key ~= tostring(model) then
-                    model2 = tonumber(key)
-                    break
-                end
-            end
+            -- Loading all train related models
+            requestModel(590)	
+            requestModel(538)	
+            requestModel(570)	
+            requestModel(569)
+            requestModel(537)	
+            requestModel(449)
 
-            deleteAllTrains()
-            requestModel(model)
-            requestModel(model2)
             loadAllModelsNow()
+
             if math.random(0,1) == 0 then
-                vehicle = createMissionTrain(id,x,y,z)
+                vehicle = createMissionTrain(train_id,x,y,z)
             else
-                vehicle = createMissionTrain(id,x,y,z,true)
+                vehicle = createMissionTrain(train_id,x,y,z,true)
             end
-            removeCharElegantly(getDriverOfCar(vehicle))
+            
+            deleteChar(getDriverOfCar(vehicle))
+
             if module.tvehicle.spawn_inside[0] then
                 warpCharIntoCar(PLAYER_PED,vehicle)
+                setTrainCruiseSpeed(vehicle,speed)
             end
+
             markMissionTrainAsNoLongerNeeded(vehicle)
-            markModelAsNoLongerNeeded(model2)
+            markModelAsNoLongerNeeded(590)	
+            markModelAsNoLongerNeeded(538)	
+            markModelAsNoLongerNeeded(570)	
+            markModelAsNoLongerNeeded(569)
+            markModelAsNoLongerNeeded(537)	
+            markModelAsNoLongerNeeded(449)
+
         else
+
             requestModel(model)
             loadAllModelsNow()
+
             customPlateForNextCar(model,ffi.string(module.tvehicle.license_plate_text))
+            
             if not module.tvehicle.spawn_inside[0] then
                 vehicle = spawnVehicleByCheating(model)
             else
@@ -417,8 +438,9 @@ function module.GiveVehicleToPlayer(model)
             end
 
             markCarAsNoLongerNeeded(vehicle)
+            markModelAsNoLongerNeeded(model)
         end
-        markModelAsNoLongerNeeded(model)
+        
         fcommon.CheatActivated()
     end
 end
@@ -1352,6 +1374,12 @@ function module.VehicleMain()
                 phandling = phandling * 0xE0
                 phandling = phandling + 0xC2B9DC
 
+                if module.tvehicle.max_velocity_temp[0] == -1 then
+                    local velocity = memory.getfloat(phandling + 0x84)
+                    velocity = velocity*206 + (velocity-0.918668)*1501
+                    module.tvehicle.max_velocity_temp[0] = velocity
+                end
+
                 if imgui.Button("Reset game handling",imgui.ImVec2(fcommon.GetSize(2))) then
                     local cHandlingDataMgr = readMemory(0x05BFA96,4,false)
                     callMethod(0x5BD830,cHandlingDataMgr,0,0)
@@ -1372,7 +1400,7 @@ function module.VehicleMain()
                     local TractionBias  = memory.getfloat(phandling + 0xA8)                     
                     local nNumberOfGears= memory.read(phandling + 0x76,4)    
                     local fMaxVelocity = module.tvehicle.max_velocity_temp[0] --memory.getfloat(phandling + 0x84)
-                    fMaxVelocity = fMaxVelocity*206 + (fMaxVelocity-0.918668)*1501
+                    --fMaxVelocity = fMaxVelocity*206 + (fMaxVelocity-0.918668)*1501
                     local fEngineAcceleration = memory.getfloat(phandling + 0x7C)*12500
                     local fEngineInertia = memory.getfloat(phandling + 0x80)	
                     local nDriveType = memory.tostring(phandling + 0x74,1)	
@@ -1399,7 +1427,7 @@ function module.VehicleMain()
  	
 
                     local file = io.open(getGameDirectory() .. "/handling.txt","a+")
-                    local data = string.format("\n%s\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%d\t%.5g\t%.5g\t%.5g\t%s\t%s\t%.5g\t%.5g\t%d\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%d\t%s\t%s\t%d\t%d\t%d",
+                    local data = string.format("\n%s\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%d\t%d\t%.5g\t%.5g\t%s\t%s\t%.5g\t%.5g\t%d\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%d\t%s\t%s\t%d\t%d\t%d",
                     name,fMass,fTurnMass,fDragMult,CentreOfMassX,CentreOfMassY,CentreOfMassZ,nPercentSubmerged,fTractionMultiplier,fTractionLoss,TractionBias,nNumberOfGears,
                     fMaxVelocity,fEngineAcceleration,fEngineInertia,tostring(nDriveType),nEngineType,BrakeDeceleration,BrakeBias,ABS,SteeringLock,SuspensionForceLevel,SuspensionDampingLevel,
                     SuspensionHighSpdComDamp,Suspension_upper_limit,Suspension_lower_limit,Suspension_bias,Suspension_anti_dive_multiplier,fSeatOffsetDistance,
@@ -1467,12 +1495,6 @@ data file with these values changed here")
 
                         if module.tvehicle.max_velocity_temp[0] > 500 then
                             module.tvehicle.max_velocity_temp[0] = 500
-                        end
-
-                        if module.tvehicle.max_velocity_temp[0] == -1 then
-                            local fMaxVelocity = memory.getfloat(phandling + 0x84)
-                            fMaxVelocity = fMaxVelocity*206 + (fMaxVelocity-0.918668)*1501
-                            module.tvehicle.max_velocity_temp[0] = math.floor(fMaxVelocity)
                         end
 
                         if module.tvehicle.max_velocity_temp[0] < 0 then

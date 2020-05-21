@@ -92,6 +92,7 @@ module.tweapon =
         weapon2 = imgui.new.int(0),
         weapon3 = imgui.new.int(0),
     },
+    weapon_drops = {},
 }
 
 
@@ -144,6 +145,13 @@ function module.GiveWeapon(weapon)
     end
 end
 
+function module.RemoveAllWeaponDrops()
+    for _, pickup in ipairs(module.tweapon.weapon_drops) do
+        if doesPickupExist(pickup) then
+            removePickup(pickup)
+        end
+    end
+end
 
 function module.AutoAim()
     while true do
@@ -179,13 +187,13 @@ function module.WeaponMain()
         if module.tweapon.ped[0] == true then
             if fped.tped.selected ~=  nil then
                 removeWeaponFromChar(fped.tped.selected,getCurrentCharWeapon(fped.tped.selected))
-                fcommon.CheatActivated()
+                printHelpString("Current weapon removed")
             else
                 printHelpString("~r~No~w~ ped selected")
             end
         else
             removeWeaponFromChar(PLAYER_PED,getCurrentCharWeapon(PLAYER_PED))
-            fcommon.CheatActivated()
+            printHelpString("Current weapon removed")
         end
     end
 
@@ -194,13 +202,39 @@ function module.WeaponMain()
         if module.tweapon.ped[0] == true then
             if fped.tped.selected ~=  nil then
                 removeAllCharWeapons(fped.tped.selected)
-                fcommon.CheatActivated()
+                printHelpString("All weapons removed")
             else
                 printHelpString("~r~No~w~ ped selected")
             end
         else
             removeAllCharWeapons(PLAYER_PED)
-            fcommon.CheatActivated()
+            printHelpString("All weapons removed")
+        end
+    end
+    if imgui.Button("Drop weapon",imgui.ImVec2(fcommon.GetSize(1))) then   
+        local ped = PLAYER_PED
+
+        if module.tweapon.ped[0] == true then
+            if fped.tped.selected ==  nil then
+                ped = nil
+                printHelpString("~r~No~w~ ped selected")
+            end
+        end     
+
+        if ped ~= nil then
+            local x,y,z = getOffsetFromCharInWorldCoords(ped,0.0,3.0,0.0)
+            local weapon_type = getCurrentCharWeapon(ped)
+            if weapon_type == 0 then
+                printHelpString("No weapon to drop")
+            else
+                local weapon_model = getWeapontypeModel(weapon_type)
+                local weapon_ammo = getAmmoInCharWeapon(ped,weapon_type)
+
+                local pickup = createPickupWithAmmo(weapon_model,3,weapon_ammo,x,y,z)
+                table.insert(module.tweapon.weapon_drops,pickup)
+                removeWeaponFromChar(PLAYER_PED,weapon_type)
+                printHelpString("Weapon dropped")
+            end
         end
     end
     fcommon.Tabs("Weapons",{"Checkboxes","Spawn","Gang weapon editor"},{
