@@ -20,6 +20,7 @@ module.tvisual =
     car_names                   = imgui.new.bool(true),
     disable_motion_blur         = imgui.new.bool(fconfig.Get('tvisual.disable_motion_blur',false)),   
     lock_weather                = imgui.new.bool(fconfig.Get('tvisual.lock_weather',false)),   
+    radio_channel_names         = imgui.new.bool(fconfig.Get('tvisual.radio_channel_names',true)),   
     timecyc                     =
     {   timecyc_24_plugin       = getModuleHandle("timecycle24"),
         ambient                 = imgui.new.float[3](),
@@ -368,16 +369,24 @@ function module.VisualMain()
                 displayZoneNames(module.tvisual.zone_names[0])
                 fconfig.Set(fconfig.tconfig.misc_data,"Display Zone Names",module.tvisual.zone_names[0])
             end)
+            fcommon.CheckBoxValue('Enable hud',0xBA6769)
 
             imgui.NextColumn()
-
-            fcommon.CheckBoxValue('Enable hud',0xBA6769)
+            
             fcommon.CheckBoxValue('Enable radar',0xBA676C,nil,0,2)
             fcommon.CheckBoxValue('Gray radar',0xA444A4)
             fcommon.CheckBoxValue('Health border',0x589353)
             fcommon.CheckBoxValue('Health percentage',0x589355)
             fcommon.CheckBoxValue('Hide wanted level',0x58DD1B,nil,0x90)
             fcommon.CheckBoxVar('Lock weather',module.tvisual.lock_weather)
+            fcommon.CheckBoxVar('Radio channel names',module.tvisual.radio_channel_names,nil,
+            function()     
+                if module.tvisual.radio_channel_names[0] then
+                    writeMemory(0x507035,5,-30533911,false)
+                else
+                    writeMemory(0x507035,4,0x90,false)
+                end
+            end)
             imgui.Columns(1)
         end,
         function()

@@ -31,19 +31,6 @@ function module.spairs(t, f)
     return iter
 end
 
-function RemoveTrailingZeros(number)
-    local str = tostring(number)
-
-    for i = 1, #str do
-        local c = str:sub(i,i)
-        if c ~= "0" then
-            return tonumber(str:sub(i,#str))
-        end
-    end
-    return number
-end
-
-print(RemoveTrailingZeros(4500.00))
 --------------------------------------------------
 -- imgui functions
 

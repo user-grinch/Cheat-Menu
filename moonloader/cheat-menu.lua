@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.0-beta")
-script_version_number(2020052101) -- YYYYMMDDNN
+script_version_number(2020052501) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -544,6 +544,11 @@ function main()
         writeMemory(0x7030A0,4,0xC3,false)
     end
 
+    -- Radio channel
+    if not fvisual.tvisual.radio_channel_names[0] then
+       writeMemory(0x507035,4,0x90,false)
+    end
+
     -- Parse files
     fvehicle.ParseCarcols()
     fvehicle.ParseVehiclesIDE()
@@ -605,6 +610,12 @@ function main()
             bool, ped = getCharPlayerIsTargeting(PLAYER_HANDLE)
             if bool == true then
                 fped.tped.selected = ped
+            end
+        end
+
+        if fped.tped.selected ~= nil then
+            if not doesCharExist(fped.tped.selected) or isCharDead(fped.tped.selected) then
+                fped.tped.selected = nil
             end
         end
 

@@ -281,7 +281,7 @@ Note:\nFile names can't exceed 8 characters.\nDon't change names while the game 
 
                         if imgui.BeginChild("Custom skins") then
                             for model_name,_ in pairs(fplayer.tplayer.custom_skins.names) do
-                                if module.tplayer.custom_skins.filter:PassFilter(key) then
+                                if module.tplayer.custom_skins.filter:PassFilter(model_name) then
                                     model_name = string.sub(model_name,1,-5)
                                     if #model_name < 9 and imgui.MenuItemBool(model_name) then
                                         fplayer.ChangePlayerModel(model_name)

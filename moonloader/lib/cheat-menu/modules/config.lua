@@ -309,6 +309,7 @@ function module.Write()
             {
                 lock_weather     = fvisual.tvisual.lock_weather[0],
                 disable_motion_blur = fvisual.tvisual.disable_motion_blur[0],
+                radio_channel_names = fvisual.tvisual.radio_channel_names[0],
             },
             tweapon =
             {

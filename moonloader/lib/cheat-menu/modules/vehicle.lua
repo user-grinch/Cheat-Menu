@@ -670,7 +670,7 @@ function ApplyTexture(filename,load_saved_texture,car)
         end
 
         if filename ~= nil then
-            local fullpath = module.tvehicle.paintjobs.path .. "\\images\\" .. filename .. ".png"
+            local fullpath = module.tvehicle.paintjobs.path .. "\\" .. filename .. ".png"
 
             if doesFileExist(fullpath) then
                 

@@ -113,7 +113,7 @@ function module.TeleportMain()
 
             if imgui.Button("Teleport to coord",imgui.ImVec2(fcommon.GetSize(2))) then
 				local x,y,z = (ffi.string(module.tteleport.coords)):match("([^,]+),([^,]+),([^,]+)")
-				if x ~= nil and y ~= nil and z ~= nil then
+				if tonumber(x) ~= nil and tonumber(y) ~= nil and tonumber(z) ~= nil then
 					lua_thread.create(module.Teleport,x, y, z,0)
 				else
 					printHelpString("No coordinate found")
@@ -155,7 +155,8 @@ function module.TeleportMain()
 				if ffi.string(module.tteleport.coord_name) == "" then
 					imgui.StrCopy(module.tteleport.coord_name,"Untitled")
 				end
-				module.tteleport.coordinates[ffi.string(module.tteleport.coord_name)] = string.format("%d, %s",getActiveInterior(), ffi.string(module.tteleport.coords))
+
+				module.tteleport.coordinates[ffi.string(module.tteleport.coord_name)] = string.format("%d, %s",getCharActiveInterior(PLAYER_PED), ffi.string(module.tteleport.coords))
 				fcommon.SaveJson("coordinate",module.tteleport.coordinates)
 				module.tteleport.coordinates = fcommon.LoadJson("coordinate")
 				printHelpString("Entry ~g~added")
