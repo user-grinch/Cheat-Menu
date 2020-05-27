@@ -41,14 +41,16 @@ Now try it out in-game. If it doesn't work open an issue here or create a post i
 If you're making videos about this mod link to this GitHub repository, don't reupload this mod simply cause you can. It'll help me to provide better support & in development. Also it'd be great if you keep my name in your video description. Thanks.
 
 ## Images
-![Image](https://i.imgur.com/Y7iYbUo.jpg)
-![Image](https://i.imgur.com/RwaSaSg.jpg)
-![Image](https://i.imgur.com/7EYPtDn.jpg)
-![Image](https://i.imgur.com/dYiIxo7.jpg)
-![Image](https://i.imgur.com/Uf24JGR.jpg)
-![Image](https://i.imgur.com/s7V6FOv.jpg)
-![Image](https://i.imgur.com/1SgP0KV.jpg)
-
+![Image](https://i.imgur.com/XPbm13b.jpg)
+![Image](https://i.imgur.com/GabImU1.jpg)
+![Image](https://i.imgur.com/pCpsX2v.jpg)
+![Image](https://i.imgur.com/fu7nzjc.jpg)
+![Image](https://i.imgur.com/I9pxh9d.jpg)
+![Image](https://i.imgur.com/iGSOZzR.jpg)
+![Image](https://i.imgur.com/c1Nnuqn.jpg)
+![Image](https://i.imgur.com/2Feogff.jpg)
+![Image](https://i.imgur.com/DnsXweQ.jpg)
+![Image](https://i.imgur.com/MwmZqjM.jpg)
 
 ## Video
 
