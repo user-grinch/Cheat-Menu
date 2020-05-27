@@ -197,7 +197,8 @@ function module.CameraMode()
                     local right = 0
                     local front = 0
                     local up = 0
-                    
+                    total_mouse_x = 0
+                    total_mouse_y = 0
                     while module.tgame.camera.lock_on_player[0] and module.tgame.camera.bool[0] do
                         local mouse_x, mouse_y =  getPcMouseMovement()
 
@@ -208,7 +209,7 @@ function module.CameraMode()
                         if total_mouse_y > 170 then total_mouse_y = 170 end
                         if total_mouse_y < -170 then total_mouse_y = -170 end
                         factor = 1
-
+                        
                         if isKeyDown(tcheatmenu.hot_keys.camera_mode_slow[1] and tcheatmenu.hot_keys.camera_mode_slow[2]) then 
                             factor = factor*0.5
                         end
@@ -239,7 +240,7 @@ function module.CameraMode()
                         if isKeyDown(tcheatmenu.hot_keys.camera_mode_down[1] and tcheatmenu.hot_keys.camera_mode_down[2]) then 
                             up = up + factor * module.tgame.camera.movement_speed[0]
                         end
-                        attachCameraToChar(PLAYER_PED,right, front, up, total_mouse_x*-1, 180.0, total_mouse_y, 0.0, 2)
+                        attachCameraToChar(PLAYER_PED,right, front, up, total_mouse_x*-1, 90.0, total_mouse_y, 0.0, 2)
 
                         if total_mouse_delta + getMousewheelDelta() ~= total_mouse_delta then
                             total_mouse_delta = total_mouse_delta + getMousewheelDelta()

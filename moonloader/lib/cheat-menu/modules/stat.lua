@@ -26,28 +26,28 @@ module.tstat      =
 
 -- Main function
 function module.StatMain()
-
-    if imgui.Button("Max vehicle stats",imgui.ImVec2(fcommon.GetSize(2))) then
-        callFunction(0x4399D0,1,1,false)
-        displayNonMinigameHelpMessages(false)
-        fcommon.CheatActivated()
-    end
-    imgui.SameLine()
-    if imgui.Button("Max weapon stats",imgui.ImVec2(fcommon.GetSize(2))) then
-        for i=69,79,1 do
-            setFloatStat(i,1000)
-        end
-        fcommon.CheatActivated()
-    end
     
     fcommon.Tabs("Stats",{"Vehicle","Weapon","Girlfriend","Search"},{
         function()
+            if imgui.Button("Max vehicle stats",imgui.ImVec2(fcommon.GetSize(1))) then
+                callFunction(0x4399D0,1,1,false)
+                displayNonMinigameHelpMessages(false)
+                fcommon.CheatActivated()
+            end
+            imgui.Spacing()
             fcommon.UpdateStat({ name = "Bike",stat = 229})
             fcommon.UpdateStat({ name = "Cycling",stat = 230})
             fcommon.UpdateStat({ name = "Driving",stat = 160})
             fcommon.UpdateStat({ name = "Flying",stat = 223})  
         end,
         function()
+            if imgui.Button("Max weapon stats",imgui.ImVec2(fcommon.GetSize(1))) then
+                for i=69,79,1 do
+                    setFloatStat(i,1000)
+                end
+                fcommon.CheatActivated()
+            end
+            imgui.Spacing()
             fcommon.UpdateStat({ name = "AK47",stat = 77})
             fcommon.UpdateStat({ name = "Combat shotgun",stat = 74})
             fcommon.UpdateStat({ name = "Desert eagle",stat = 71})
@@ -62,7 +62,7 @@ function module.StatMain()
             fcommon.UpdateStat({ name = "Rifle",stat = 79})
         end,
         function()
-            if imgui.Button("Max GF progress",imgui.ImVec2(fcommon.GetSize(1))) then
+            if imgui.Button("Max girlfriend stats",imgui.ImVec2(fcommon.GetSize(1))) then
                 for i=252,257,1 do
                     setFloatStat(i,100)
                 end
