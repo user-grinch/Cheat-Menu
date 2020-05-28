@@ -45,8 +45,8 @@ function module.Teleport(x, y, z,interior_id)
 	end
 
 	lockPlayerControl(true)
-	doFade(false,300)
-	wait(300)
+	doFade(false,200)
+	wait(200)
 
 	setCharInterior(PLAYER_PED,interior_id)
 	setInteriorVisible(interior_id)
@@ -55,20 +55,38 @@ function module.Teleport(x, y, z,interior_id)
 	requestCollision(x,y)
 	activateInteriorPeds(true)
 
-	setCharCoordinates(PLAYER_PED, x, y, z)
+	if isCharInAnyCar(PLAYER_PED) then
+		local car = getCarCharIsUsing(PLAYER_PED)
+		setCarCoordinates(car,x,y,z)
+	else
+		setCharCoordinates(PLAYER_PED, x, y, z)
+	end
 
-	wait(300)
+	local timer = getGameTimer()
+	
 	if target or z == nil then
 		while true do
+			wait(0)
 			local px,py = getCharCoordinates(PLAYER_PED)
-			setCharCoordinates(PLAYER_PED, x, y, -100.0)
+
+			if isCharInAnyCar(PLAYER_PED) then
+				local car = getCarCharIsUsing(PLAYER_PED)
+				setCarCoordinates(car,x,y,-100)
+			else
+				setCharCoordinates(PLAYER_PED, x, y, -100)
+			end
+
 			if px == x and py == y then
 				break
 			end
-			wait(0)
+
+			if getGameTimer() - timer > 500 then
+				break
+			end
+
 		end
 	end
-	doFade(true,300)
+	doFade(true,200)
 	lockPlayerControl(false)
 end
 
