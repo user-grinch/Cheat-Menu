@@ -20,8 +20,8 @@ script_description("Cheat Menu for Grand Theft Auto San Andreas")
 script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-menu")
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
-script_version("2.0")
-script_version_number(2020052901) -- YYYYMMDDNN
+script_version("2.1-beta")
+script_version_number(2020060301) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -174,11 +174,11 @@ function(self) -- render frame
     imgui.PushStyleVarVec2(imgui.StyleVar.WindowMinSize,imgui.ImVec2(250,350))
 
     local pop = 1
-    if fmenu.tmenu.auto_scale[0] then
-       imgui.PushStyleVarVec2(imgui.StyleVar.FramePadding,imgui.ImVec2(math.floor(tcheatmenu.window.size.X/85),math.floor(tcheatmenu.window.size.Y/200)))
-       pop = pop + 1
-    end
+    imgui.PushStyleVarVec2(imgui.StyleVar.FramePadding,imgui.ImVec2(math.floor(tcheatmenu.window.size.X/85),math.floor(tcheatmenu.window.size.Y/200)))
+    pop = pop + 1
+    
     imgui.Begin(tcheatmenu.window.title, tcheatmenu.window.show,imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoSavedSettings )
+
 
     if tcheatmenu.window.show_unsupported_resolution_msg[0] and ((resX < 1024 and resY < 720) or (resX > 1920 and resY > 1080)) then
         imgui.Button("Unsupported resolution",imgui.ImVec2(fcommon.GetSize(1)))
@@ -721,6 +721,16 @@ function onScriptTerminate(script, quitGame)
     if script == thisScript() then
 
         fconfig.Write()
+
+        -- first person camera
+        if isCharInAnyCar(PLAYER_PED) then
+            local model = getCarModel(getCarCharIsUsing(PLAYER_PED))
+            fvehicle.tvehicle.first_person_camera.offsets[tostring(model)].x = fvehicle.tvehicle.first_person_camera.offset_x_var[0]
+            fvehicle.tvehicle.first_person_camera.offsets[tostring(model)].y = fvehicle.tvehicle.first_person_camera.offset_y_var[0] 
+            fvehicle.tvehicle.first_person_camera.offsets[tostring(model)].z = fvehicle.tvehicle.first_person_camera.offset_z_var[0] 
+            fcommon.SaveJson("first person camera offsets",fvehicle.tvehicle.first_person_camera.offsets)
+        end
+
         if fconfig.tconfig.reset == false then
             if fmenu.tmenu.crash_text == "" then
                 fmenu.tmenu.crash_text = "Cheat menu crashed unexpectedly"
@@ -740,8 +750,9 @@ function onScriptTerminate(script, quitGame)
         if fgame.tgame.camera.bool[0] then
             displayRadar(true)
             displayHud(true)
-            restoreCameraJumpcut()
         end
+
+        restoreCameraJumpcut()
         
         if fmenu.tmenu.show_crash_message[0] and not fgame.tgame.script_manager.skip_auto_reload then
             printHelpString(fmenu.tmenu.crash_text)

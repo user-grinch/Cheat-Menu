@@ -58,7 +58,14 @@ module.tvehicle =
     },
     door_menu_button = imgui.new.int(0),
     disable_car_engine = imgui.new.bool(fconfig.Get('tvehicle.disable_car_engine',false)),
-    first_person_camera = imgui.new.bool(fconfig.Get('tvehicle.first_person_camera',false)),
+    first_person_camera = 
+    {
+        bool            = imgui.new.bool(fconfig.Get('tvehicle.first_person_camera.bool',false)),
+        offsets         = fcommon.LoadJson("first person camera offsets"),
+        offset_x_var    = imgui.new.float(0),
+        offset_y_var    = imgui.new.float(0),
+        offset_z_var    = imgui.new.float(0),
+    },
     filter          = imgui.ImGuiTextFilter(),
     gsx             =
     {
@@ -458,7 +465,7 @@ function module.AircraftCamera()
             or isCharInAnyPlane(PLAYER_PED) do
                 
                 -- FirstPersonCamera controls the camera if its enabled
-                if module.tvehicle.aircraft.camera[0] == false or module.tvehicle.first_person_camera[0] then break end 
+                if module.tvehicle.aircraft.camera[0] == false or module.tvehicle.first_person_camera.bool[0] then break end 
 
                 local vehicle = getCarCharIsUsing(PLAYER_PED)
                 local roll = getCarRoll(vehicle)
@@ -485,12 +492,17 @@ function module.FirstPersonCamera()
     while true do
         local total_x = 0
         local total_y = 0
-        if module.tvehicle.first_person_camera[0] and not isCharOnFoot(PLAYER_PED) then
-            while module.tvehicle.first_person_camera[0] do
+        if module.tvehicle.first_person_camera.bool[0] and not isCharOnFoot(PLAYER_PED) then
 
-                if isCharOnFoot(PLAYER_PED) then
+            local model = getCarModel(getCarCharIsUsing(PLAYER_PED))
+            while module.tvehicle.first_person_camera.bool[0] do
+
+                local hveh = getCarCharIsUsing(PLAYER_PED)
+
+                if isCharOnFoot(PLAYER_PED) or getCarModel(hveh) ~= model then
                     break 
                 end
+            
                 
                 x,y = getPcMouseMovement()
                 total_x = total_x + x
@@ -498,10 +510,10 @@ function module.FirstPersonCamera()
 
                 local roll = 0.0
                 if module.tvehicle.aircraft.camera[0] == true then -- check if new aircraft camera is enabled
-                    local vehicle = getCarCharIsUsing(PLAYER_PED)
-                    roll = getCarRoll(vehicle)
+                    roll = getCarRoll(hveh)
                 end
-                attachCameraToChar(PLAYER_PED,0.0, 0.1, 0.6, total_x, 180, total_y, (roll*-1), 2)
+
+                attachCameraToChar(PLAYER_PED,module.tvehicle.first_person_camera.offset_x_var[0], module.tvehicle.first_person_camera.offset_y_var[0], module.tvehicle.first_person_camera.offset_z_var[0], total_x, 180, total_y, (roll*-1), 2)
                 wait(0)
             end
             restoreCameraJumpcut()  
@@ -806,9 +818,26 @@ function module.OnEnterVehicle()
             
             imgui.StrCopy(module.tvehicle.gxt_name,model_name)
 
+            if module.tvehicle.first_person_camera.offsets[tostring(model)] == nil then
+                module.tvehicle.first_person_camera.offsets[tostring(model)] = 
+                {
+                    ["x"] = 0,
+                    ["y"] = 0.1,
+                    ["z"] = 0.6,
+                }
+            end
+
+            module.tvehicle.first_person_camera.offset_x_var[0] = module.tvehicle.first_person_camera.offsets[tostring(model)]["x"]
+            module.tvehicle.first_person_camera.offset_y_var[0] = module.tvehicle.first_person_camera.offsets[tostring(model)]["y"]
+            module.tvehicle.first_person_camera.offset_z_var[0] = module.tvehicle.first_person_camera.offsets[tostring(model)]["z"]
+
             while isCharInCar(PLAYER_PED,car) do
                 wait(0)
             end
+
+            module.tvehicle.first_person_camera.offsets[tostring(model)].x = module.tvehicle.first_person_camera.offset_x_var[0]
+            module.tvehicle.first_person_camera.offsets[tostring(model)].y = module.tvehicle.first_person_camera.offset_y_var[0] 
+            module.tvehicle.first_person_camera.offsets[tostring(model)].z = module.tvehicle.first_person_camera.offset_z_var[0] 
             module.tvehicle.max_velocity_temp[0] = -1
         end
         wait(0)
@@ -908,7 +937,13 @@ function module.VehicleMain()
             fcommon.CheckBoxVar("Don't fall off bike",module.tvehicle.stay_on_bike)
             fcommon.CheckBoxValue("Drive on water",0x969152)
             fcommon.CheckBoxVar("Disable car engine",module.tvehicle.disable_car_engine)
-            fcommon.CheckBoxVar("First person camera",module.tvehicle.first_person_camera)
+            fcommon.CheckBoxVar("First person camera",module.tvehicle.first_person_camera.bool,nil,nil,
+            function()
+                fcommon.InputFloat("Offset X", module.tvehicle.first_person_camera.offset_x_var,nil,-5,5,0.02)
+                fcommon.InputFloat("Offset Y", module.tvehicle.first_person_camera.offset_y_var,nil,-5,5,0.02)
+                fcommon.InputFloat("Offset Z", module.tvehicle.first_person_camera.offset_z_var,nil,-5,5,0.02)
+            end)
+
             fcommon.CheckBoxValue("Float away when hit",0x969166)
             fcommon.CheckBoxValue("Green traffic lights",0x96914E)
             fcommon.CheckBoxVar("Invisible car",module.tvehicle.invisible_car,nil,

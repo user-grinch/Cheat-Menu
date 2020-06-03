@@ -221,7 +221,6 @@ function module.Write()
             {
                 auto_update_check   = fmenu.tmenu.auto_update_check[0],
                 auto_reload         = fmenu.tmenu.auto_reload[0],
-                auto_scale          = fmenu.tmenu.auto_scale[0],
                 draw_text_only      = fmenu.tmenu.draw_text_only[0], 
                 fast_load_images    = fmenu.tmenu.fast_load_images[0],
                 lock_player         = fmenu.tmenu.lock_player[0],
@@ -283,7 +282,10 @@ function module.Write()
                 },
                 apply_material_filter = fvehicle.tvehicle.apply_material_filter[0],
                 disable_car_engine  = fvehicle.tvehicle.disable_car_engine[0],
-                first_person_camera = fvehicle.tvehicle.first_person_camera[0],
+                first_person_camera = 
+                {
+                    bool            = fvehicle.tvehicle.first_person_camera.bool[0],
+                },
                 gxt_name_table   = fvehicle.tvehicle.gxt_name_table,
                 heavy            = fvehicle.tvehicle.heavy[0],
                 invisible_car    = fvehicle.tvehicle.invisible_car[0],

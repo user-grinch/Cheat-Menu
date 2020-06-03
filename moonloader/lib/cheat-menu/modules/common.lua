@@ -145,12 +145,6 @@ function module.GetSize(count,no_spacing)
     return x,y
 end
 
-function module.WriteDebug(text)
-    if fmenu.tmenu.debug.write_info[0] then
-        print("[DEBUG] " .. text)
-    end
-end
-
 function module.Tabs(label,names,func)
 
     if tcheatmenu.tab_data[label] == nil then
@@ -548,7 +542,42 @@ end
 
 --------------------------------------------------
 
--- Provides input options to change game stats
+function module.InputFloat(label,var,func,min,max,cval)
+
+    cval = cval or 1
+
+    if imgui.InputFloat("##".. label,var,0.0,0.0,"%.5f") then
+        if func ~= nil then
+            func()
+        end
+    end
+
+    local size = imgui.GetItemRectSize().y
+    imgui.SameLine(0.0,4.0)
+
+    if imgui.Button("-##".. label,imgui.ImVec2(size,size)) then
+        var[0] = var[0] - cval
+    end
+
+    imgui.SameLine(0.0,4.0)
+    
+    if imgui.Button("+##".. label,imgui.ImVec2(size,size)) then
+        var[0] = var[0] + cval
+    end
+
+    imgui.SameLine(0.0,4.0)
+
+    imgui.Text(label)
+
+    if min ~= nil and var[0] < min then
+        var[0] = min
+    end
+
+    if max ~= nil and var[0] > max then
+        var[0] = max
+    end
+end
+
 function module.UpdateStat(arg)
     if arg.min == nil then arg.min = 0 end
     if arg.default == nil then arg.default = 0 end
@@ -607,8 +636,6 @@ function module.UpdateStat(arg)
     end)
 end
 
--- Similar UI to the previous function
--- Provides input options to change game memory values
 function module.UpdateAddress(arg)
 
     if arg.cvalue == nil then arg.cvalue = 1.0  end

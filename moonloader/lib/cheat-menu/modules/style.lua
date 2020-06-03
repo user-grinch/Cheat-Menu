@@ -209,10 +209,39 @@ function FontSelector()
     end
 end
 
+function StylerCheckbox(label,style)
+
+    local var = imgui.new.bool((style > 0.0) and true or false)
+    if imgui.Checkbox(label, var) then 
+        style = var[0] and 1.0 or 0.0
+    end
+
+    return style
+end
+
+function StylerSliderFloat(label,style,min,max)
+
+    local var = imgui.new.float(style)
+    if imgui.SliderFloat(label, var, min, max, "%.0f") then
+        style = var[0]
+    end
+
+    return style
+end
+
+function StylerSliderFloat2(label,style,min,max)
+
+    local var = imgui.new.float[2](style.x,style.y)
+    if imgui.SliderFloat2(label, var, min, max, "%.0f") then
+        style = imgui.ImVec2(var[0],var[1])
+    end
+
+    return style
+end
+
 function module.StyleEditor()
 
     local style = imgui.GetStyle();
-    local var = nil
 
     FontSelector()
     imgui.Spacing()
@@ -220,38 +249,18 @@ function module.StyleEditor()
     fcommon.Tabs("Style",{"Borders","Colors","Sizes"},{
         function()
             imgui.Columns(2,nil,false)
-            var = imgui.new.bool((style.ChildBorderSize > 0.0) or false)
-            if imgui.Checkbox("Child border", var) then 
-                style.ChildBorderSize = var[0] and 1.0 or 0.0
-            end
-        
-            var = imgui.new.bool((style.FrameBorderSize > 0.0) or false)
-            if imgui.Checkbox("Frame border", var) then 
-                style.FrameBorderSize = var[0] and 1.0 or 0.0
-            end
+
+            style.ChildBorderSize = StylerCheckbox("Child border",style.ChildBorderSize)
+            style.FrameBorderSize = StylerCheckbox("Frame border",style.FrameBorderSize)
         
             imgui.NextColumn()
 
-            var = imgui.new.bool((style.PopupBorderSize > 0.0) or false)
-            if imgui.Checkbox("Popup border", var) then 
-                style.PopupBorderSize = var[0] and 1.0 or 0.0
-            end
-        
-            -- var = imgui.new.bool((style.TabBorderSize > 0.0) or false)
-            -- if imgui.Checkbox("Tab border", var) then 
-            --     style.TabBorderSize = var[0] and 1.0 or 0.0
-            -- end
-        
-            var = imgui.new.bool((style.WindowBorderSize > 0.0) or false)
-            if imgui.Checkbox("Window border", var) then
-                style.WindowBorderSize = var[0] and 1.0 or 0.0
-            end
+            style.PopupBorderSize = StylerCheckbox("Popup border",style.PopupBorderSize)
+            style.WindowBorderSize = StylerCheckbox("Window border",style.WindowBorderSize)
 
             imgui.Columns(1)
         end,
         function()
-            local int output_dest = 0;
-            local bool output_only_modified = true;
 
             if imgui.RadioButtonIntPtr("Opaque", module.tstyle.alpha_flags,0) then                                    
                 module.tstyle.alpha_flags[0] = 0
@@ -332,105 +341,29 @@ function module.StyleEditor()
 
             imgui.Dummy(imgui.ImVec2(0,10))
 
-            var = imgui.new.float[2](style.DisplaySafeAreaPadding.x,style.DisplaySafeAreaPadding.y)
-            if imgui.SliderFloat2("Display safe area padding", var, 0.0, 30.0, "%.0f") then
-                style.DisplaySafeAreaPadding = imgui.ImVec2(var[0],var[1])
-            end
-            fcommon.InformationTooltip("Adjust if you cannot see the edges of your screen (e.g. on a TV where scaling has not been configured).")
-
-            var = imgui.new.float[2](style.FramePadding.x,style.FramePadding.y)
-            if imgui.SliderFloat2("Frame padding", var, 0.0, 20.0, "%.0f") then
-                style.FramePadding = imgui.ImVec2(var[0],var[1])
-            end
-
-            var = imgui.new.float(style.GrabMinSize)
-            if imgui.SliderFloat("Grab min size", var, 1.0, 20.0, "%.0f") then
-                style.GrabMinSize = var[0]
-            end
-
-            var = imgui.new.float(style.IndentSpacing)
-            if imgui.SliderFloat("Indent spacing", var, 0.0, 30.0, "%.0f") then
-                style.IndentSpacing = var[0]
-            end
-
-            var = imgui.new.float[2](style.ItemInnerSpacing.x,style.ItemInnerSpacing.y)
-            if imgui.SliderFloat2("Item inner spacing", var, 0.0, 20.0, "%.0f") then
-                style.ItemInnerSpacing = imgui.ImVec2(var[0],var[1])
-            end
-
-            var = imgui.new.float[2](style.ItemSpacing.x,style.ItemSpacing.y)
-            if imgui.SliderFloat2("Item spacing", var, 0.0, 20.0, "%.0f") then
-                style.ItemSpacing = imgui.ImVec2(var[0],var[1])
-            end
-
-            var = imgui.new.float(style.ScrollbarSize)
-            if imgui.SliderFloat("Scrollbar size", var, 1.0, 20.0, "%.0f") then
-                style.ScrollbarSize = var[0]
-            end
-
-            var = imgui.new.float[2](style.TouchExtraPadding.x,style.TouchExtraPadding.y)
-            if imgui.SliderFloat2("Touch extra padding", var, 0.0, 10.0, "%.0f") then
-                style.TouchExtraPadding = imgui.ImVec2(var[0],var[1])
-            end
-
-            var = imgui.new.float[2](style.WindowPadding.x,style.WindowPadding.y)
-            if imgui.SliderFloat2("Window padding", var, 0.0, 20.0, "%.0f") then
-                style.WindowPadding = imgui.ImVec2(var[0],var[1])
-            end
+            style.DisplaySafeAreaPadding = StylerSliderFloat2("Display safe area padding",style.DisplaySafeAreaPadding,0.0,30.0)
+            style.GrabMinSize = StylerSliderFloat("Grab min size",style.GrabMinSize,0.0,20.0)
+            style.IndentSpacing = StylerSliderFloat("Indent spacing",style.IndentSpacing,0.0,30.0)
+            style.ItemInnerSpacing = StylerSliderFloat2("Item inner spacing",style.ItemInnerSpacing,0.0,20.0)
+            style.ItemSpacing = StylerSliderFloat2("Item spacing",style.ItemSpacing,0.0,20.0)
+            style.ScrollbarSize = StylerSliderFloat("Scrollbar size",style.ScrollbarSize,1.0,20.0)
+            style.TouchExtraPadding = StylerSliderFloat2("Touch extra padding",style.TouchExtraPadding,0.0,10.0)
+            style.WindowPadding = StylerSliderFloat2("Window padding",style.WindowPadding,0.0,20.0)
             
             imgui.Dummy(imgui.ImVec2(0,10))
 
-            var = imgui.new.float(style.ChildRounding)
-            if imgui.SliderFloat("Child rounding", var, 0.0, 12.0, "%.0f") then
-                style.ChildRounding = var[0]
-            end
-
-            var = imgui.new.float(style.FrameRounding)
-            if imgui.SliderFloat("Frame rounding", var, 0.0, 12.0, "%.0f") then
-                style.FrameRounding = var[0]
-            end
-
-            var = imgui.new.float(style.GrabRounding)
-            if imgui.SliderFloat("Grab rounding", var, 0.0, 12.0, "%.0f") then
-                style.GrabRounding = var[0]
-            end
-
-            var = imgui.new.float(style.PopupRounding)
-            if imgui.SliderFloat("Popup rounding", var, 0.0, 12.0, "%.0f") then
-                style.PopupRounding = var[0]
-            end
-
-            var = imgui.new.float(style.ScrollbarRounding)
-            if imgui.SliderFloat("Scrollbar rounding", var, 0.0, 12.0, "%.0f") then
-                style.ScrollbarRounding = var[0]
-            end
-
-            -- var = imgui.new.float(style.TabRounding)
-            -- if imgui.SliderFloat("Tab rounding", var, 0.0, 12.0, "%.0f") then
-            --     style.TabRounding = var[0]
-            -- end
-
-            var = imgui.new.float(style.WindowRounding)
-            if imgui.SliderFloat("Window rounding", var, 0.0, 12.0, "%.0f") then
-                style.WindowRounding = var[0]
-            end
+            style.ChildRounding = StylerSliderFloat("Child rounding",style.ChildRounding,0.0,12.0)
+            style.FrameRounding = StylerSliderFloat("Frame rounding",style.FrameRounding,0.0,12.0)
+            style.GrabRounding = StylerSliderFloat("Grab rounding",style.GrabRounding,0.0,12.0)
+            style.PopupRounding = StylerSliderFloat("Popup rounding",style.PopupRounding,0.0,12.0)
+            style.ScrollbarRounding = StylerSliderFloat("Scrollbar rounding",style.ScrollbarRounding,0.0,12.0)
+            style.WindowRounding = StylerSliderFloat("Window rounding",style.WindowRounding,0.0,12.0)
 
             imgui.Dummy(imgui.ImVec2(0,10))
 
-            var = imgui.new.float[2](style.ButtonTextAlign.x,style.ButtonTextAlign.y)
-            if imgui.SliderFloat2("Button text align", var, 0.0, 1.0, "%.2f") then
-                style.ButtonTextAlign = imgui.ImVec2(var[0],var[1])
-            end
-
-            var = imgui.new.float[2](style.SelectableTextAlign.x,style.SelectableTextAlign.y)
-            if imgui.SliderFloat2("Selectable text align", var, 0.0, 1.0, "%.2f") then
-                style.SelectableTextAlign = imgui.ImVec2(var[0],var[1])
-            end
-
-            var = imgui.new.float[2](style.WindowTitleAlign.x,style.WindowTitleAlign.y)
-            if imgui.SliderFloat2("Window title align", var, 0.0, 1.0, "%.2f") then
-                style.WindowTitleAlign = imgui.ImVec2(var[0],var[1])
-            end
+            style.ButtonTextAlign = StylerSliderFloat2("Button text align",style.ButtonTextAlign,0.0,20.0)
+            style.SelectableTextAlign = StylerSliderFloat2("Selectable text align",style.SelectableTextAlign,0.0,20.0)
+            style.WindowTitleAlign = StylerSliderFloat2("Window title align",style.WindowTitleAlign,0.0,20.0)
 
             imgui.PopItemWidth()
             imgui.EndChild()
