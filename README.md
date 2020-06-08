@@ -16,6 +16,8 @@ Cheat menu for Grand Theft Auto SanAndreas which allows a large set of modificat
 
 It's based on [Moonloader](https://gtaforums.com/topic/890987-moonloader/) and uses [mimgui](https://github.com/THE-FYP/mimgui) for its interface.
 
+Press Ctrl+M to open the menu.
+
 ## Versions
 
 ### Releases
