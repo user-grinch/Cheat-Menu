@@ -1286,71 +1286,72 @@ function module.VehicleMain()
                     
                     local name = module.GetNameOfVehicleModel(getCarModel(car))
                     
-                    if module.tvehicle.color.car_data_table[name] ~= nil then
-                        local shown_colors = {}
-                        imgui.Text("Color:")
-                        imgui.Spacing()
-                        imgui.Columns(2,nil,false)
-                        imgui.RadioButtonIntPtr("Color 1", module.tvehicle.color.radio_btn, 1)
-                        imgui.RadioButtonIntPtr("Color 2", module.tvehicle.color.radio_btn, 2)
-                        imgui.NextColumn()
-                        imgui.RadioButtonIntPtr("Color 3", module.tvehicle.color.radio_btn, 3)
-                        imgui.RadioButtonIntPtr("Color 4", module.tvehicle.color.radio_btn, 4)
-                        imgui.Spacing()
-                        imgui.Columns(1)
-                        imgui.Text("Select color preset:")
-                        imgui.Spacing()
+                    local shown_colors = {}
+                    imgui.Text("Color:")
+                    imgui.Spacing()
+                    imgui.Columns(2,nil,false)
+                    imgui.RadioButtonIntPtr("Color 1", module.tvehicle.color.radio_btn, 1)
+                    imgui.RadioButtonIntPtr("Color 2", module.tvehicle.color.radio_btn, 2)
+                    imgui.NextColumn()
+                    imgui.RadioButtonIntPtr("Color 3", module.tvehicle.color.radio_btn, 3)
+                    imgui.RadioButtonIntPtr("Color 4", module.tvehicle.color.radio_btn, 4)
+                    imgui.Spacing()
+                    imgui.Columns(1)
+                    imgui.Text("Select color preset:")
+                    imgui.Spacing()
 
-                        if imgui.BeginChild("Colors") then
-                            local x,y = fcommon.GetSize(1)
-                            local btns_in_row = math.floor(imgui.GetWindowContentRegionWidth()/(y*2))
-                            local btn_size = (imgui.GetWindowContentRegionWidth() - imgui.StyleVar.ItemSpacing*(btns_in_row-0.75*btns_in_row))/btns_in_row
-                            local btn_count = 1
+                    if imgui.BeginChild("Colors") then
+                        local x,y = fcommon.GetSize(1)
+                        local btns_in_row = math.floor(imgui.GetWindowContentRegionWidth()/(y*2))
+                        local btn_size = (imgui.GetWindowContentRegionWidth() - imgui.StyleVar.ItemSpacing*(btns_in_row-0.75*btns_in_row))/btns_in_row
+                        local btn_count = 1
 
-                            func = function(v)
-                                if not shown_colors[v] then
-                                    local t = {}
-                                    local k =  1
-                                    
-                                    for i in string.gmatch(module.tvehicle.color.col_data_table[v+1],"%w+") do 
-                                        table.insert( t,tonumber(i))
-                                    end
-
-                                    if imgui.ColorButton("Color " .. tostring(v),imgui.ImVec4(t[1]/255,t[2]/255,t[3]/255,255),0,imgui.ImVec2(btn_size,btn_size)) then
-                                        writeMemory(getCarPointer(car) + 1075 + module.tvehicle.color.radio_btn[0],1,tonumber(v),false)
-                                        module.ForEachCarComponent(function(mat,comp,car)
-                                            mat:reset_color()
-                                            if module.tvehicle.gsx.handle ~= 0  then
-                                                module.GSXSet(car,"cm_color_red_" .. comp.name,module.tvehicle.color.rgb[0])
-                                                module.GSXSet(car,"cm_color_green_" .. comp.name,module.tvehicle.color.rgb[1])
-                                                module.GSXSet(car,"cm_color_blue_" .. comp.name,module.tvehicle.color.rgb[2])
-                                            end
-                                        end)
-                                    end
-                                    if imgui.IsItemHovered() then
-                                        local drawlist = imgui.GetWindowDrawList()
-                                        drawlist:AddRectFilled(imgui.GetItemRectMin(), imgui.GetItemRectMax(), imgui.GetColorU32(imgui.Col.ModalWindowDimBg))
-                                    end
-                                    shown_colors[v] = true
-                                    if btn_count % btns_in_row ~= 0 then
-                                        imgui.SameLine(0.0,4.0)
-                                    end
-                                    btn_count = btn_count + 1
+                        func = function(v)
+                            if not shown_colors[v] then
+                                local t = {}
+                                local k =  1
+                                
+                                for i in string.gmatch(module.tvehicle.color.col_data_table[v+1],"%w+") do 
+                                    table.insert( t,tonumber(i))
                                 end
+
+                                if imgui.ColorButton("Color " .. tostring(v),imgui.ImVec4(t[1]/255,t[2]/255,t[3]/255,255),0,imgui.ImVec2(btn_size,btn_size)) then
+                                    writeMemory(getCarPointer(car) + 1075 + module.tvehicle.color.radio_btn[0],1,tonumber(v),false)
+                                    module.ForEachCarComponent(function(mat,comp,car)
+                                        mat:reset_color()
+                                        if module.tvehicle.gsx.handle ~= 0  then
+                                            module.GSXSet(car,"cm_color_red_" .. comp.name,module.tvehicle.color.rgb[0])
+                                            module.GSXSet(car,"cm_color_green_" .. comp.name,module.tvehicle.color.rgb[1])
+                                            module.GSXSet(car,"cm_color_blue_" .. comp.name,module.tvehicle.color.rgb[2])
+                                        end
+                                    end)
+                                end
+                                if imgui.IsItemHovered() then
+                                    local drawlist = imgui.GetWindowDrawList()
+                                    drawlist:AddRectFilled(imgui.GetItemRectMin(), imgui.GetItemRectMax(), imgui.GetColorU32(imgui.Col.ModalWindowDimBg))
+                                end
+                                shown_colors[v] = true
+                                if btn_count % btns_in_row ~= 0 then
+                                    imgui.SameLine(0.0,4.0)
+                                end
+                                btn_count = btn_count + 1
                             end
+                        end
 
-                            if module.tvehicle.color.show_all[0] then       
-                                for v=0,(#module.tvehicle.color.col_data_table-1),1 do
-                                    func(v)
-                                end
-                            else
+                        if module.tvehicle.color.show_all[0] then       
+                            for v=0,(#module.tvehicle.color.col_data_table-1),1 do
+                                func(v)
+                            end
+                        else
+                            if module.tvehicle.color.car_data_table[name] ~= nil then
                                 for k,v in ipairs(module.tvehicle.color.car_data_table[name]) do
                                     func(v)
                                 end
                             end
-                            imgui.EndChild()
                         end
+                        imgui.EndChild()
                     end
+                    
                 end)
                 imgui.Combo("Component",module.tvehicle.components.selected,module.tvehicle.components.list,#module.tvehicle.components.names)
                 
