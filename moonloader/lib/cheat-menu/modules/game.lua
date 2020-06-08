@@ -46,6 +46,7 @@ module.tgame                =
     freeze_mission_timer    = imgui.new.bool(fconfig.Get('tgame.freeze_mission_timer',false)), 
     freeze_time             = imgui.new.bool(fconfig.Get('tgame.freeze_time',false)), 
     ghost_cop_cars          = imgui.new.bool(fconfig.Get('tgame.ghost_cop_cars',false)),
+    gxt_save_name           = imgui.new.char[22]("Untitled Save"),
     keep_stuff              = imgui.new.bool(fconfig.Get('tgame.keep_stuff',false)),
     object_spawner          = 
     {
@@ -856,7 +857,18 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
         
         end,
         function()
-
+            fcommon.DropDownMenu('Custom save game name',function()
+                imgui.InputText("Name", module.tgame.gxt_save_name,ffi.sizeof(module.tgame.gxt_save_name))
+                imgui.Spacing()
+                if imgui.Button("Save game with this name",imgui.ImVec2(fcommon.GetSize(1))) then
+                    if isCharOnFoot(PLAYER_PED) then
+                        registerMissionPassed(setFreeGxtEntry(ffi.string(module.tgame.gxt_save_name)))
+                        activateSaveMenu()
+                    else
+                        printHelpString("Player is ~r~not~w~ on foot")
+                    end
+                end
+            end)
             fcommon.UpdateAddress({name = 'Days passed',address = 0xB79038 ,size = 4,min = 0,max = 9999})
             fcommon.DropDownMenu('FPS',function()
 
@@ -1027,7 +1039,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                 end
             end
             })
-        end
+        end,
     })
 end
 
