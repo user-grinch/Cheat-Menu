@@ -492,7 +492,7 @@ function module.FirstPersonCamera()
     while true do
         local total_x = 0
         local total_y = 0
-        if module.tvehicle.first_person_camera.bool[0] and not isCharOnFoot(PLAYER_PED) then
+        if module.tvehicle.first_person_camera.bool[0] and not isCharOnFoot(PLAYER_PED) and not fgame.tgame.camera.bool[0] then
 
             local model = getCarModel(getCarCharIsUsing(PLAYER_PED))
             while module.tvehicle.first_person_camera.bool[0] do
@@ -513,6 +513,9 @@ function module.FirstPersonCamera()
                     roll = getCarRoll(hveh)
                 end
 
+                if fgame.tgame.camera.bool[0] then
+                    break
+                end
                 attachCameraToChar(PLAYER_PED,module.tvehicle.first_person_camera.offset_x_var[0], module.tvehicle.first_person_camera.offset_y_var[0], module.tvehicle.first_person_camera.offset_z_var[0], total_x, 180, total_y, (roll*-1), 2)
                 wait(0)
             end
