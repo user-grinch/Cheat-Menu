@@ -678,14 +678,16 @@ function GenerateIPL()
     local file = io.open("generated.ipl","w")
     local write_string = "inst\n"
 
-    for key,value in pairs(module.tgame.object_spawner.placed) do
-        local model, handle = string.match(key,"(%w+)##(%w+)")
-        local _,posx,posy,posz = getObjectCoordinates(handle)
-        local rotx,roty,rotz,rotw = getObjectQuaternion(handle)
-        local interior =  getActiveInterior()
+    for grp,data in pairs(module.tgame.object_spawner.placed) do
+        for key,value in pairs(data) do
+            local model, handle = string.match(key,"(%w+)##(%w+)")
+            local _,posx,posy,posz = getObjectCoordinates(handle)
+            local rotx,roty,rotz,rotw = getObjectQuaternion(handle)
+            local interior =  getActiveInterior()
 
-        local inst_line = string.format("%d, dummy, %d, %f, %f, %f, %f, %f, %f, %f, -1\n",model,interior,posx,posy,posz,rotx,roty,rotz,rotw)
-        write_string = write_string .. inst_line
+            local inst_line = string.format("%d, dummy, %d, %f, %f, %f, %f, %f, %f, %f, -1\n",model,interior,posx,posy,posz,rotx,roty,rotz,rotw)
+            write_string = write_string .. inst_line
+        end
     end
     write_string = write_string .. "end"
     file:write(write_string)
