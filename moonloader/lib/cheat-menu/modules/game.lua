@@ -702,6 +702,7 @@ function module.RemoveAllObjects()
             deleteObject(tonumber(handle))
             module.tgame.object_spawner.placed[grp][key] = nil
         end
+        module.tgame.object_spawner.placed[grp] = nil
     end
 end
 
@@ -1080,7 +1081,37 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                     for grp,data in pairs(module.tgame.object_spawner.placed) do
                         fcommon.DropDownMenu(grp,function()
 
-                            if imgui.Button("Increase##X",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("Set collisions on",imgui.ImVec2(fcommon.GetSize(2))) then
+                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                    if grp == lgrp then
+                                        for lkey,value in pairs(ldata) do
+                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                            value.collision[0] = true
+                                            setObjectCollision(handle,true)
+                                        end
+                                        break
+                                    end
+                                end
+                                printHelpString("Group collisions on")
+                            end
+                            imgui.SameLine()
+                            if imgui.Button("Set collisions off",imgui.ImVec2(fcommon.GetSize(2))) then
+                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                    if grp == lgrp then
+                                        for lkey,value in pairs(ldata) do
+                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                            value.collision[0] = false
+                                            setObjectCollision(handle,false)
+                                        end
+                                        break
+                                    end
+                                end
+                                printHelpString("Group collisions off")
+                            end
+                            imgui.Spacing()
+                            local _,size = fcommon.GetSize(10)
+                            imgui.Columns(2,nil,false)
+                            if imgui.Button("+##X",imgui.ImVec2(size,size)) then
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
                                         for lkey,value in pairs(ldata) do
@@ -1094,7 +1125,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                                 end
                             end
                             imgui.SameLine()
-                            if imgui.Button("Decrease##X",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("-##X",imgui.ImVec2(size,size)) then
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
                                         for lkey,value in pairs(ldata) do
@@ -1110,7 +1141,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                             imgui.SameLine()        
                             imgui.Text("Move X coord")
 
-                            if imgui.Button("Increase##Y",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("+##Y",imgui.ImVec2(size,size)) then
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
                                         for lkey,value in pairs(ldata) do
@@ -1124,7 +1155,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                                 end
                             end
                             imgui.SameLine()
-                            if imgui.Button("Decrease##Y",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("-##Y",imgui.ImVec2(size,size)) then
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
                                         for lkey,value in pairs(ldata) do
@@ -1140,7 +1171,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                             imgui.SameLine()        
                             imgui.Text("Move Y coord")
                             
-                            if imgui.Button("Increase##Z",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("+##Z",imgui.ImVec2(size,size)) then
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
                                         for lkey,value in pairs(ldata) do
@@ -1154,7 +1185,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                                 end
                             end
                             imgui.SameLine()
-                            if imgui.Button("Decrease##Z",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("-##Z",imgui.ImVec2(size,size)) then
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
                                         for lkey,value in pairs(ldata) do
@@ -1169,9 +1200,10 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                             end    
                             imgui.SameLine()        
                             imgui.Text("Move Z coord")
-                            imgui.Spacing()
+
+                            imgui.NextColumn()
                             
-                            if imgui.Button("Increase##rotX",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("+##rotX",imgui.ImVec2(size,size)) then
                  
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
@@ -1185,7 +1217,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                                 end
                             end
                             imgui.SameLine()
-                            if imgui.Button("Decrease##rotX",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("-##rotX",imgui.ImVec2(size,size)) then
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
                                         for lkey,value in pairs(ldata) do
@@ -1200,7 +1232,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                             imgui.SameLine()        
                             imgui.Text("Rotate X")
 
-                            if imgui.Button("Increase##rotY",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("+##rotY",imgui.ImVec2(size,size)) then
                  
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
@@ -1214,7 +1246,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                                 end
                             end
                             imgui.SameLine()
-                            if imgui.Button("Decrease##rotY",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("-##rotY",imgui.ImVec2(size,size)) then
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
                                         for lkey,value in pairs(ldata) do
@@ -1229,7 +1261,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                             imgui.SameLine()        
                             imgui.Text("Rotate Y")
 
-                            if imgui.Button("Increase##rotZ",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("+##rotZ",imgui.ImVec2(size,size)) then
                  
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
@@ -1243,7 +1275,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                                 end
                             end
                             imgui.SameLine()
-                            if imgui.Button("Decrease##rotZ",imgui.ImVec2(fcommon.GetSize(4))) then
+                            if imgui.Button("-##rotZ",imgui.ImVec2(size,size)) then
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
                                     if grp == lgrp then
                                         for lkey,value in pairs(ldata) do
@@ -1257,8 +1289,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                             end    
                             imgui.SameLine()        
                             imgui.Text("Rotate Z")
-
-                            imgui.Spacing()
+                            imgui.Columns(1)
                             
                             imgui.Spacing()
                             if imgui.Button("Remove group",imgui.ImVec2(fcommon.GetSize(1))) then

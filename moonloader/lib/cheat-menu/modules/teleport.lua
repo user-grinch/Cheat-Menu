@@ -43,7 +43,7 @@ function module.Teleport(x, y, z,interior_id)
 	if interior_id == nil then
 		interior_id = 0
 	end
-
+	
 	lockPlayerControl(true)
 	doFade(false,200)
 	wait(200)
