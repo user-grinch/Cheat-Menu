@@ -28,11 +28,6 @@ module.tteleport =
 
 -- Teleports player to a specified coordinates
 function module.Teleport(x, y, z,interior_id)
-
-	if math.abs(x) > 99999 or math.abs(y) > 99999 or math.abs(z) > 99999 then
-		printHelpString("Coordinate too high")
-		return
-	end
 	
 	local target = false
 
@@ -43,6 +38,11 @@ function module.Teleport(x, y, z,interior_id)
 			printHelpString("No marker found")
 			return
 		end
+	end
+
+	if math.abs(x) > 99999 or math.abs(y) > 99999 or math.abs(z) > 99999 then
+		printHelpString("Coordinate too high")
+		return
 	end
 
 	if interior_id == nil then
