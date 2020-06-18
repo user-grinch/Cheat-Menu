@@ -99,6 +99,11 @@ function module.RegisterAllCommands()
 	end,"Reload all moonloader scripts")
 
 	module.RegisterCommand("tp",function(t)
+		if t[2] == nil or t[3] == nil then
+			printHelpString("Required coordinate missing")
+			return
+		end
+
         if t[4] == nil then t[4] = getGroundZFor3dCoord(x,y,100) end
 		lua_thread.create(fteleport.Teleport,tonumber(t[2]),tonumber(t[3]),tonumber(t[4]))
 	end,"Teleport to coordinates","{int X} {int Y} {int Z}(optional)")
