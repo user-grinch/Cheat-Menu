@@ -345,7 +345,7 @@ end
 -- Main function
 function module.VisualMain()
     fcommon.Tabs("Visual",{"Checkboxes","Menus","Timecyc editor"},{
-        function()
+        function() -- Checkboxes
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxValue('Armour border',0x589123)
             fcommon.CheckBoxValue('Armour percentage',0x589125)
@@ -389,7 +389,7 @@ function module.VisualMain()
             end)
             imgui.Columns(1)
         end,
-        function()
+        function() -- Menus
             fcommon.RadioButtonFunc("Debt color",{"Red (Default)","Green","Purple","Light purple","White","Black","Yellow","Pink","Gray","Dark red"},{0,1,2,3,4,5,6,7,8,9},0x58F4D4)
             fcommon.RadioButtonFunc("Money color",{"Red","Green (Default)","Purple","Light purple","White","Black","Yellow","Pink","Gray","Dark red"},{0,1,2,3,4,5,6,7,8,9},0x58F492)
             fcommon.RadioButtonFunc("Money font outline",{"No outline","Thin outline","Default outline"},{0,1,2},0x58F58D)
@@ -403,7 +403,7 @@ function module.VisualMain()
             fcommon.RadioButtonFunc("Wanted star color",{"Red","Green","Purple","Light purple","White","Black","Yellow (Default)","Pink","Gray","Dark red"},{0,1,2,3,4,5,6,7,8,9},0x58DDC9)
             fcommon.UpdateAddress({ name = 'Wanted star Y position',address = 0x858CCC,size = 4,is_float = true,min=-500,default = 12,max = 500})
         end,
-        function()
+        function() -- Timecyc editor
             if module.tvisual.timecyc.timecyc_24_plugin ~= 0 then
                 HOUR = 24
             else
@@ -446,7 +446,7 @@ function module.VisualMain()
             imgui.Spacing()
 
             fcommon.Tabs("Timecyc sub tab",{"Colors","Misc"},{
-            function()
+            function() -- Colors
                 
                 if imgui.ColorEdit3("Ambient",module.tvisual.timecyc.ambient) then
                     CTimecyc.ambient_red[val]   = module.tvisual.timecyc.ambient[0]*255
@@ -521,7 +521,7 @@ function module.VisualMain()
                     CTimecyc.water_alpha[val]  = module.tvisual.timecyc.water[3]*255
                 end
             end,
-            function()
+            function() -- Misc
 
                 imgui.PushItemWidth(imgui.GetWindowContentRegionWidth()/2)
                 if imgui.SliderInt("Cloud alpha", module.tvisual.timecyc.cloud_alpha, 0, 255) then

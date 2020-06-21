@@ -846,7 +846,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                 imgui.TextWrapped("Enabled cheats")
                 imgui.Separator()
                 if imgui.BeginChild("Cheats list") then  
-                    for i=0,91,1 do   
+                    for i=0,91,1 do   -- Cheat ids 0 -> 91
                         if module.tgame.random_cheats.disabled_cheats[tostring(i)] then
                             selected = false
                         else

@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.1-beta")
-script_version_number(2020061903) -- YYYYMMDDNN
+script_version_number(2020062101) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -126,7 +126,6 @@ tcheatmenu       =
 
 imgui.OnInitialize(function() -- Called once
     
-    -- Loading fonts
    fstyle.LoadFonts()
 
     if not doesFileExist(tcheatmenu.dir .. "json//styles.json") then 
@@ -180,6 +179,8 @@ function(self) -- render frame
     imgui.Begin(tcheatmenu.window.title, tcheatmenu.window.show,imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoSavedSettings )
 
 
+    --------------------------------------------------
+    -- Warnings 
     if tcheatmenu.window.show_unsupported_resolution_msg[0] and ((resX < 1024 and resY < 720) or (resX > 1920 and resY > 1080)) then
         imgui.Button("Unsupported resolution",imgui.ImVec2(fcommon.GetSize(1)))
         if imgui.Button("Read more",imgui.ImVec2(fcommon.GetSize(2))) then
@@ -218,6 +219,9 @@ function(self) -- render frame
         end
         imgui.Spacing()
     end
+
+    --------------------------------------------------
+    -- Updater code
     if fmenu.tmenu.update_status == fconst.UPDATE_STATUS.NEW_UPDATE then
         imgui.Button("A new update is available",imgui.ImVec2(fcommon.GetSize(1)))
         if imgui.Button("Download now",imgui.ImVec2(fcommon.GetSize(2))) then
@@ -255,12 +259,14 @@ function(self) -- render frame
         end
         imgui.Spacing()
     end
-
+    --------------------------------------------------
+    -- Main code
     fcommon.CreateMenus({"Teleport","Memory","Player","Ped","Animation","Vehicle","Weapon","Mission","Stat","Game","Visual","Menu"},
     {fteleport.TeleportMain,fmemory.MemoryMain,fplayer.PlayerMain,fped.PedMain,fanimation.AnimationMain,fvehicle.VehicleMain,
     fweapon.WeaponMain,fmission.MissionMain,fstat.StatMain,fgame.GameMain,fvisual.VisualMain,fmenu.MenuMain})
-    
-    -- Welcome page
+
+    --------------------------------------------------
+    -- First startup page
     if tcheatmenu.current_menu == 0 then
 
         if imgui.BeginChild("Welcome") then
@@ -297,18 +303,24 @@ This may increase game startup time or\nfreeze it for few seconds.")
             imgui.EndChild()
         end
     end
-
-
+    
+    --------------------------------------------------
+    -- Update the menu size & positon variables so they can be saved later
     tcheatmenu.window.size.X  = imgui.GetWindowWidth()
     tcheatmenu.window.size.Y  = imgui.GetWindowHeight()
     tcheatmenu.window.coord.X = imgui.GetWindowPos().x
     tcheatmenu.window.coord.Y = imgui.GetWindowPos().y
+
+    --------------------------------------------------
     imgui.End()
     imgui.PopStyleVar(pop)
 end)
 
+--------------------------------------------------
 -- Overlay window
 imgui.OnFrame(function() 
+
+    -- return true if any overlay element needs to be displayed
     return not isGamePaused() and fmenu.tmenu.overlay.show[0] and (fmenu.tmenu.overlay.fps[0] or fmenu.tmenu.overlay.coordinates[0] or fmenu.tmenu.overlay.location[0]
     or ((fmenu.tmenu.overlay.speed[0] or fmenu.tmenu.overlay.health[0]) and isCharInAnyCar(PLAYER_PED)))
 end,
@@ -337,75 +349,85 @@ function()
     imgui.PushStyleVarVec2(imgui.StyleVar.WindowMinSize,imgui.ImVec2(0,0))
     imgui.Begin("Overlay", nil, flags)
     
-        if fmenu.tmenu.overlay.fps[0] then
-            imgui.Text("Frames: " .. tostring(math.floor(imgui.GetIO().Framerate)))
-        end
-        if isCharInAnyCar(PLAYER_PED) then
-            car = getCarCharIsUsing(PLAYER_PED)
-            if  fmenu.tmenu.overlay.speed[0] then
-                speed = getCarSpeed(car)
-                total_gears = getCarNumberOfGears(car)
-                current_gear = getCarCurrentGear(car)
-                imgui.Text(string.format("Speed: %d %d/%d",math.floor(speed),current_gear,total_gears))
-            end
-
-            if fmenu.tmenu.overlay.health[0] then
-                imgui.Text(string.format("Health: %.0f%%",getCarHealth(car)/10))
-            end
+    if fmenu.tmenu.overlay.fps[0] then
+        imgui.Text("Frames: " .. tostring(math.floor(imgui.GetIO().Framerate)))
+    end
+    if isCharInAnyCar(PLAYER_PED) then
+        car = getCarCharIsUsing(PLAYER_PED)
+        if  fmenu.tmenu.overlay.speed[0] then
+            speed = getCarSpeed(car)
+            total_gears = getCarNumberOfGears(car)
+            current_gear = getCarCurrentGear(car)
+            imgui.Text(string.format("Speed: %d %d/%d",math.floor(speed),current_gear,total_gears))
         end
 
-        if fmenu.tmenu.overlay.location[0] then
-            imgui.Text(fmenu.GetPlayerLocation())
+        if fmenu.tmenu.overlay.health[0] then
+            imgui.Text(string.format("Health: %.0f%%",getCarHealth(car)/10))
         end
+    end
 
-        if fmenu.tmenu.overlay.coordinates[0] then
-            x,y,z = getCharCoordinates(PLAYER_PED)
-            imgui.Text(string.format("Coordinates: %d %d %d", math.floor(x) , math.floor(y) , math.floor(z)),1000)
-        end
+    if fmenu.tmenu.overlay.location[0] then
+        imgui.Text(fmenu.GetPlayerLocation())
+    end
 
-        imgui.PopStyleVar()
-        if imgui.BeginPopupContextWindow() then
-            imgui.Text("Position")
-            imgui.Separator()
+    if fmenu.tmenu.overlay.coordinates[0] then
+        x,y,z = getCharCoordinates(PLAYER_PED)
+        imgui.Text(string.format("Coordinates: %d %d %d", math.floor(x) , math.floor(y) , math.floor(z)),1000)
+    end
 
-            if imgui.MenuItemBool("Custom",nil,fmenu.tmenu.overlay.position_index[0] == 0) then 
-                fmenu.tmenu.overlay.position_index[0] = 0 
-            end
-            if imgui.MenuItemBool("Top Left",nil,fmenu.tmenu.overlay.position_index[0] == 1) then 
-                fmenu.tmenu.overlay.position_index[0] = 1 
-            end
-            if imgui.MenuItemBool("Top Right",nil,fmenu.tmenu.overlay.position_index[0] == 2) then 
-                fmenu.tmenu.overlay.position_index[0] = 2 
-            end
-            if imgui.MenuItemBool("Bottom Left",nil,fmenu.tmenu.overlay.position_index[0] == 3) then 
-                fmenu.tmenu.overlay.position_index[0] = 3 
-            end
-            if imgui.MenuItemBool("Bottom Right",nil,fmenu.tmenu.overlay.position_index[0] == 4) then 
-                fmenu.tmenu.overlay.position_index[0] = 4 
-            end
-            if imgui.MenuItemBool("Close") then
-                fmenu.tmenu.overlay.fps[0] = false
-                fmenu.tmenu.overlay.speed[0] = false
-                fmenu.tmenu.overlay.health[0] = false
-                fmenu.tmenu.overlay.coordinates[0] = false
-            end
-            imgui.Separator()
-            if imgui.MenuItemBool("Copy coordinates") then 
-                local x,y,z = getCharCoordinates(PLAYER_PED)
-                setClipboardText(string.format( "%d,%d,%d",x,y,z))
-                printHelpString("Coordinates copied")
-            end
-            imgui.EndPopup()        
+    imgui.PopStyleVar()
+
+    --------------------------------------------------
+    -- Overlay right click menu
+    if imgui.BeginPopupContextWindow() then
+        imgui.Text("Position")
+        imgui.Separator()
+
+        if imgui.MenuItemBool("Custom",nil,fmenu.tmenu.overlay.position_index[0] == 0) then 
+            fmenu.tmenu.overlay.position_index[0] = 0 
         end
-        if pos == 0 then
-            fmenu.tmenu.overlay.pos_x[0] = imgui.GetWindowPos().x
-            fmenu.tmenu.overlay.pos_y[0] = imgui.GetWindowPos().y
+        if imgui.MenuItemBool("Top Left",nil,fmenu.tmenu.overlay.position_index[0] == 1) then 
+            fmenu.tmenu.overlay.position_index[0] = 1 
         end
+        if imgui.MenuItemBool("Top Right",nil,fmenu.tmenu.overlay.position_index[0] == 2) then 
+            fmenu.tmenu.overlay.position_index[0] = 2 
+        end
+        if imgui.MenuItemBool("Bottom Left",nil,fmenu.tmenu.overlay.position_index[0] == 3) then 
+            fmenu.tmenu.overlay.position_index[0] = 3 
+        end
+        if imgui.MenuItemBool("Bottom Right",nil,fmenu.tmenu.overlay.position_index[0] == 4) then 
+            fmenu.tmenu.overlay.position_index[0] = 4 
+        end
+        if imgui.MenuItemBool("Close") then
+            fmenu.tmenu.overlay.fps[0] = false
+            fmenu.tmenu.overlay.speed[0] = false
+            fmenu.tmenu.overlay.health[0] = false
+            fmenu.tmenu.overlay.coordinates[0] = false
+        end
+        imgui.Separator()
+        if imgui.MenuItemBool("Copy coordinates") then 
+            local x,y,z = getCharCoordinates(PLAYER_PED)
+            setClipboardText(string.format( "%d,%d,%d",x,y,z))
+            printHelpString("Coordinates copied")
+        end
+        imgui.EndPopup()        
+    end
+
+    --------------------------------------------------
+    -- Update overlay position variables so they can updated later
+    if pos == 0 then
+        fmenu.tmenu.overlay.pos_x[0] = imgui.GetWindowPos().x
+        fmenu.tmenu.overlay.pos_y[0] = imgui.GetWindowPos().y
+    end
+
+    --------------------------------------------------
+
     imgui.End()
     imgui.PopStyleVar()
 
 end).HideCursor = true
 
+--------------------------------------------------
 -- Command window
 imgui.OnFrame(function() 
     return not isGamePaused() and fmenu.tmenu.command.show[0]
@@ -421,8 +443,10 @@ function()
     imgui.PushStyleVarVec2(imgui.StyleVar.FramePadding, imgui.ImVec2(frame_padding[1],resY/130))
     imgui.PushStyleVarVec2(imgui.StyleVar.WindowPadding, imgui.ImVec2(3,3))
 
+
     imgui.Begin("Command Window", nil, imgui.WindowFlags.NoDecoration + imgui.WindowFlags.AlwaysAutoResize 
     + imgui.WindowFlags.NoSavedSettings + imgui.WindowFlags.NoMove)
+
     imgui.SetNextItemWidth(resX)
     imgui.SetKeyboardFocusHere(-1)
     if imgui.InputText("##TEXTFIELD",fmenu.tmenu.command.input_field,ffi.sizeof(fmenu.tmenu.command.input_field),imgui.InputTextFlags.EnterReturnsTrue 
@@ -443,44 +467,39 @@ end).HideCursor = true
 function main()
 
     --------------------------------------------------
-    -- Functions that need to lunch only once on startup
+    -- Functions that need to lunch only once at startup
     if isSampLoaded() then
         fgame.tgame.script_manager.skip_auto_reload = true
         print("SAMP detected, unloading script.")
         thisScript():unload()
     end
 
-    -- Custom Skins
+    math.randomseed(getGameTimer())
+
+    if fmenu.tmenu.auto_update_check[0] then
+        fmenu.CheckUpdates()
+    end
+
     fplayer.CustomSkinsSetup()
 
-    -- Gang weapons
     for x=1,10,1 do          
         setGangWeapons(x-1,fweapon.tweapon.gang.used_weapons[x][1],fweapon.tweapon.gang.used_weapons[x][2],fweapon.tweapon.gang.used_weapons[x][3])
     end
 
-    -- Invisible player
     if fplayer.tplayer.invisible[0] then
         fplayer.tplayer.model_val = readMemory((getCharPointer(PLAYER_PED)+1140),4,false)
         writeMemory(getCharPointer(PLAYER_PED)+1140,4,2,false)
     end
 
-    -- Mission timer
     if fgame.tgame.freeze_mission_timer[0] then
         freezeOnscreenTimer(true)
     end
 
-    -- No traffic vehicles 
     if fvehicle.tvehicle.no_vehicles[0] then
         writeMemory(0x434237,1,0x73,false) -- change condition to unsigned (0-255)
         writeMemory(0x434224,1,0,false)
         writeMemory(0x484D19,1,0x83,false) -- change condition to unsigned (0-255)
         writeMemory(0x484D17,1,0,false)
-    end
-
-    math.randomseed(getGameTimer())
-
-    if fmenu.tmenu.auto_update_check[0] then
-        fmenu.CheckUpdates()
     end
 
     if fgame.tgame.disable_help_popups[0] == true then
@@ -515,14 +534,12 @@ function main()
         writeMemory( 0x7428E7,2,0x9090,1)
     end
 
-    -- Ghost cop cars 
     if  fgame.tgame.ghost_cop_cars[0] then
         for key,value in pairs(fgame.tgame.cop) do
             writeMemory(tonumber(key),4,math.random(400,611),false)
         end
     end
 
-    -- Disable Replay
     if fgame.tgame.disable_replay[0] then
         writeMemory(0x460500,4,0xC3,false)
     end
@@ -538,17 +555,14 @@ function main()
     -- Set saved values of addresses
     fconfig.SetConfigData()
 
-    -- Motion blur
     if fvisual.tvisual.disable_motion_blur[0] then
         writeMemory(0x7030A0,4,0xC3,false)
     end
 
-    -- Radio channel
     if not fvisual.tvisual.radio_channel_names[0] then
        writeMemory(0x507035,4,0x90,false)
     end
 
-    -- Parse files
     fvehicle.ParseCarcols()
     fvehicle.ParseVehiclesIDE()
 
@@ -647,12 +661,15 @@ function main()
         setCharProofs(PLAYER_PED,fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0])
 
         -- Aim skin changer
+        
         fcommon.OnHotKeyPress(tcheatmenu.hot_keys.asc_key,function()
+            
             if fplayer.tplayer.aimSkinChanger[0] then
+                
                 local bool,char = getCharPlayerIsTargeting(PLAYER_HANDLE)
                 if bool == true then
                     local model = getCharModel(char)
-                    fplayer.ChangePlayerModel(model)
+                    fplayer.ChangePlayerModel(tostring(model))
                 end
             end
         end)
@@ -721,7 +738,6 @@ function onScriptTerminate(script, quitGame)
 
         fconfig.Write()
 
-        -- first person camera
         if isCharInAnyCar(PLAYER_PED) then
             local model = getCarModel(getCarCharIsUsing(PLAYER_PED))
             fvehicle.tvehicle.first_person_camera.offsets[tostring(model)].x = fvehicle.tvehicle.first_person_camera.offset_x_var[0]
@@ -769,8 +785,7 @@ function onScriptTerminate(script, quitGame)
 
         fgame.RemoveAllObjects()
         fweapon.RemoveAllWeaponDrops()
-        
-        --Releasing Images
+         
         fcommon.ReleaseImages(fvehicle.tvehicle.images)
         fcommon.ReleaseImages(fweapon.tweapon.images)
         fcommon.ReleaseImages(fvehicle.tvehicle.paintjobs.images)
