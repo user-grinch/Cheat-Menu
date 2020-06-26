@@ -38,14 +38,18 @@ function ShowMissionEntries(title,list,filter)
         for _,i in pairs(list) do
             if filter == nil or filter:PassFilter(module.tmission.names[tostring(i)]) then
                 if imgui.MenuItemBool(module.tmission.names[tostring(i)]) then
-                    if getGameGlobal(glob.ONMISSION) == 0 then
-                        clearWantedLevel(PLAYER_HANDLE)
-                        lockPlayerControl(true)
-                        doFade(true,1000)
-                        loadAndLaunchMissionInternal(i)
-                        lockPlayerControl(false)
+                    if getCharActiveInterior(PLAYER_PED) == 0 then
+                        if getGameGlobal(glob.ONMISSION) == 0 then
+                            lockPlayerControl(true)
+                            doFade(true,1000)
+                            clearWantedLevel(PLAYER_HANDLE)
+                            loadAndLaunchMissionInternal(i)
+                            lockPlayerControl(false)
+                        else
+                            printHelpString('Already in a mission')
+                        end
                     else
-                        printHelpString('Already in a mission')
+                        printHelpString("Can't start mission inside interior")
                     end
                 end
             end
@@ -59,8 +63,6 @@ function module.MissionMain()
 
     if imgui.Button("Fail current mission",imgui.ImVec2(fcommon.GetSize(1))) then
         if isPlayerControlOn(PLAYER_HANDLE) then
-            --test = callFunction(0x5BC520,1,1,1)
-            --callMethod(0x514950,test,1,0)
             failCurrentMission()
             fcommon.CheatActivated()
         end
@@ -68,7 +70,6 @@ function module.MissionMain()
     fcommon.Tabs("Missions",{"LS","SF","LV","Desert","Back to LS","Others","Search"},{
         function()
             ShowMissionEntries('Big smoke',{27,28,29,30})
-            ShowMissionEntries('Catalina',{40})
             ShowMissionEntries('Cesar vialpando',{45})
             ShowMissionEntries('Frank tenpenny',{22,23,39})
             ShowMissionEntries('Introduction',{11,12})

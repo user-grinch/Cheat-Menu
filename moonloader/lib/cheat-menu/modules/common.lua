@@ -200,6 +200,38 @@ function module.Tabs(label,names,func)
     end
 end
 
+function module.CRGBAColorPicker(label,base_addr,default_col,save)
+    save = save or true
+    local CRGBA = imgui.new.float[4](memory.read(base_addr,1)/255,memory.read(base_addr+1,1)/255,memory.read(base_addr+2,1)/255,memory.read(base_addr+3,1)/255)
+    
+    fcommon.DropDownMenu(label,function()
+        if imgui.ColorPicker4("Pick color##" ..label,CRGBA) then
+            memory.write(base_addr,CRGBA[0]*255,1)
+            memory.write(base_addr+1,CRGBA[1]*255,1)
+            memory.write(base_addr+2,CRGBA[2]*255,1)
+            memory.write(base_addr+3,CRGBA[3]*255,1)
+            if save then
+                fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",base_addr),{1,CRGBA[0]*255,false,1})
+                fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",base_addr+1),{1,CRGBA[1]*255,false,1})
+                fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",base_addr+2),{1,CRGBA[2]*255,false,1})
+                fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",base_addr+3),{1,CRGBA[3]*255,false,1})
+            end
+        end
+        imgui.Spacing()
+        if imgui.Button("Reset to default",imgui.ImVec2(fcommon.GetSize(1))) then
+            memory.write(base_addr,default_col[1],1)
+            memory.write(base_addr+1,default_col[2],1)
+            memory.write(base_addr+2,default_col[3],1)
+            memory.write(base_addr+3,255,1)
+
+            fconfig.tconfig.memory_data[tostring(base_addr)] = nil
+            fconfig.tconfig.memory_data[tostring(base_addr+1)] = nil
+            fconfig.tconfig.memory_data[tostring(base_addr+2)] = nil
+            fconfig.tconfig.memory_data[tostring(base_addr+3)] = nil
+        end
+    end)
+end
+
 -- Creates top level menus
 function module.CreateMenus(names,funcs)
 

@@ -84,9 +84,10 @@ function module.SetConfigData()
         setFloatStat(tonumber(k),v)
     end
     setFloatStat(24,module.Get("tstat_data.24",569.0))
-    setCharHealth(PLAYER_PED,module.Get("tmisc_data.Health",100))
     
-    if getCharArmour(PLAYER_PED) < module.Get("tmisc_data.Armour",0) then
+    setCharHealth(PLAYER_PED,module.Get("tmisc_data.Health",getCharHealth(PLAYER_PED)))
+    
+    if getCharArmour(PLAYER_PED) < module.Get("tmisc_data.Armour",getCharArmour(PLAYER_PED)) then
         addArmourToChar(PLAYER_PED,module.Get("tmisc_data.Armour",0)-getCharArmour(PLAYER_PED))
     else
         damageChar(PLAYER_PED,getCharArmour(PLAYER_PED)-module.Get("tmisc_data.Armour",0),true)

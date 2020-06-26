@@ -390,8 +390,10 @@ function module.VisualMain()
             imgui.Columns(1)
         end,
         function() -- Menus
-            fcommon.RadioButtonFunc("Debt color",{"Red (Default)","Green","Purple","Light purple","White","Black","Yellow","Pink","Gray","Dark red"},{0,1,2,3,4,5,6,7,8,9},0x58F4D4)
-            fcommon.RadioButtonFunc("Money color",{"Red","Green (Default)","Purple","Light purple","White","Black","Yellow","Pink","Gray","Dark red"},{0,1,2,3,4,5,6,7,8,9},0x58F492)
+            
+            fcommon.CRGBAColorPicker("Health bar + debt color",0xBAB22C,{180,25,29})
+            fcommon.CRGBAColorPicker("Main menu title border color",0xBAB240,{0,0,0})
+            fcommon.CRGBAColorPicker("Money color",0xBAB230,{54,104,44})
             fcommon.RadioButtonFunc("Money font outline",{"No outline","Thin outline","Default outline"},{0,1,2},0x58F58D)
             fcommon.RadioButtonFunc("Money font style",{"Style 1","Style 2","Default style"},{1,2,3},0x58F57F)
             fcommon.UpdateAddress({ name = 'Radar Height',address = 0x866B74,size = 4,min=0,default = 76,max = 999,is_float = true})
@@ -399,8 +401,11 @@ function module.VisualMain()
             fcommon.UpdateAddress({ name = 'Radar X position',address = 0x858A10,size = 4,min=-999,default = 40,max = 999,is_float = true,help_text = "Changes radar vertical position"})
             fcommon.UpdateAddress({ name = 'Radar Y position',address = 0x866B70,size = 4,min=-999,default = 104,max = 999,is_float = true,help_text = "Changes radar horizantal position"})
             fcommon.UpdateAddress({ name = 'Radar zoom',address = 0xA444A3,size = 1,min=0,default = 0,max = 170})
+            fcommon.CRGBAColorPicker("Radio station color",0xBAB24C,{150,150,150})
+            fcommon.CRGBAColorPicker("Styled text color",0xBAB258,{226,192,99})
+            fcommon.CRGBAColorPicker("Text color",0xBAB234,{50,60,127})
             fcommon.RadioButtonFunc("Wanted star border",{"No border","Default","Bold border"},{0,1,2},0x58DD41)
-            fcommon.RadioButtonFunc("Wanted star color",{"Red","Green","Purple","Light purple","White","Black","Yellow (Default)","Pink","Gray","Dark red"},{0,1,2,3,4,5,6,7,8,9},0x58DDC9)
+            fcommon.CRGBAColorPicker("Wanted star color + some text",0xBAB244,{144,98,16})
             fcommon.UpdateAddress({ name = 'Wanted star Y position',address = 0x858CCC,size = 4,is_float = true,min=-500,default = 12,max = 500})
         end,
         function() -- Timecyc editor
