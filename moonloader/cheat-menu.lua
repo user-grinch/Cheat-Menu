@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.1-beta")
-script_version_number(2020062601) -- YYYYMMDDNN
+script_version_number(2020070201) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -747,32 +747,12 @@ function onScriptTerminate(script, quitGame)
             fcommon.SaveJson("first person camera offsets",fvehicle.tvehicle.first_person_camera.offsets)
         end
 
-        if fconfig.tconfig.reset == false then
-            if fmenu.tmenu.crash_text == "" then
-                fmenu.tmenu.crash_text = "Cheat menu crashed unexpectedly"
-
-                if fmenu.tmenu.auto_reload[0] and not fgame.tgame.script_manager.skip_auto_reload then
-                    for index, script in ipairs(script.list()) do
-                        if script.name ~= thisScript().name then
-                            script.this:reload()
-                            print("Reloading script")
-                        end
-                    end
-                    fmenu.tmenu.crash_text =  fmenu.tmenu.crash_text .. " but reloaded"
-                end
-            end
-        end
-
         if fgame.tgame.camera.bool[0] then
             displayRadar(true)
             displayHud(true)
         end
 
         restoreCameraJumpcut()
-        
-        if fmenu.tmenu.show_crash_message[0] and not fgame.tgame.script_manager.skip_auto_reload then
-            printHelpString(fmenu.tmenu.crash_text)
-        end
 
         fmenu.tmenu.crash_text = ""
 
@@ -793,6 +773,20 @@ function onScriptTerminate(script, quitGame)
         fcommon.ReleaseImages(fvehicle.tvehicle.components.images)
         fcommon.ReleaseImages(fped.tped.images)
         fcommon.ReleaseImages(fplayer.tplayer.clothes.images)
+
+        if fconfig.tconfig.reset == false then
+            if fmenu.tmenu.crash_text == "" then
+                fmenu.tmenu.crash_text = "Cheat menu crashed unexpectedly"
+
+                if fmenu.tmenu.auto_reload[0] and not fgame.tgame.script_manager.skip_auto_reload then
+                    script:reload()
+                    fmenu.tmenu.crash_text =  fmenu.tmenu.crash_text .. " but reloaded"
+                end
+            end
+        end
+        if fmenu.tmenu.show_crash_message[0] and not fgame.tgame.script_manager.skip_auto_reload then
+            printHelpString(fmenu.tmenu.crash_text)
+        end
     end
 end
 

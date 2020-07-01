@@ -83,7 +83,6 @@ function module.SetConfigData()
     for k,v in pairs(module.tconfig.stat_data) do
         setFloatStat(tonumber(k),v)
     end
-    setFloatStat(24,module.Get("tstat_data.24",569.0))
     
     setCharHealth(PLAYER_PED,module.Get("tmisc_data.Health",getCharHealth(PLAYER_PED)))
     
