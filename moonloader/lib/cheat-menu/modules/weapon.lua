@@ -154,28 +154,23 @@ function module.RemoveAllWeaponDrops()
 end
 
 function module.AutoAim()
-    while true do
-        if module.tweapon.auto_aim[0] then
-            while module.tweapon.auto_aim[0] do
-                if isCharOnFoot(PLAYER_PED) then
-                    local x, y =  getPcMouseMovement()
-                    x = math.floor(x/2)
-                    y = math.floor(y/2)
+    while module.tweapon.auto_aim[0] do
+        if isCharOnFoot(PLAYER_PED) then
+            local x, y =  getPcMouseMovement()
+            x = math.floor(x/2)
+            y = math.floor(y/2)
 
-                    if (y ~= 0 or x ~= 0) then
-                        writeMemory(11988014,1,1,false)
-                    else
-                        if isKeyDown(2) then
-                            writeMemory(11988014,1,0,false)
-                        end
-                    end
+            if (y ~= 0 or x ~= 0) then
+                writeMemory(11988014,1,1,false)
+            else
+                if isKeyDown(2) then
+                    writeMemory(11988014,1,0,false)
                 end
-                wait(0)
             end
-            writeMemory(11988014,1,1,false)
         end
         wait(0)
     end
+    writeMemory(11988014,1,1,false)
 end
 
 -- Main function
@@ -240,7 +235,10 @@ function module.WeaponMain()
     fcommon.Tabs("Weapons",{"Checkboxes","Spawn","Gang weapon editor"},{
         function()
             imgui.Columns(2,nil,false)
-            fcommon.CheckBoxVar("Auto aim",module.tweapon.auto_aim,"Enables joypad auto aim feature\n\nControls:\n Q = left\n E = right")
+            fcommon.CheckBoxVar("Auto aim",module.tweapon.auto_aim,"Enables joypad auto aim feature\n\nControls:\n Q = left\n E = right",
+            function()
+                fcommon.SingletonThread(fweapon.AutoAim,"AutoAim")
+            end)
             fcommon.CheckBoxVar("Fast reload",module.tweapon.fast_reload,nil,
             function()
                 setPlayerFastReload(PLAYER_HANDLE,module.tweapon.fast_reload[0])

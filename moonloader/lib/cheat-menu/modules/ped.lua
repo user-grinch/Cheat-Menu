@@ -124,22 +124,20 @@ function module.SpawnPed(model)
 end
 
 function module.PedHealthDisplay()
-    while true do
+    while module.tped.ped_health_display[0] do
+        local result, char = getCharPlayerIsTargeting(PLAYER_HANDLE)
 
-        if module.tped.ped_health_display[0] then
-            local result, char = getCharPlayerIsTargeting(PLAYER_HANDLE)
+        if result then
 
-            if result then
+            local health = getCharHealth(char)
+            local x,y,z = getCharCoordinates(char)
+            local screenX,screenY = convert3DCoordsToScreen(x,y,z+1.0)
+            mad.draw_text(tostring(health),screenX,screenY,1,0.8,0.4,0,false,false,false,255,255,255,255,false)
 
-                local health = getCharHealth(char)
-                local x,y,z = getCharCoordinates(char)
-                local screenX,screenY = convert3DCoordsToScreen(x,y,z+1.0)
-                mad.draw_text(tostring(health),screenX,screenY,1,0.8,0.4,0,false,false,false,255,255,255,255,false)
-
-            end
         end
         wait(0)
     end
+
 end
 
 function module.PedMain()
@@ -161,7 +159,10 @@ function module.PedMain()
         fcommon.Tabs("Ped",{"Checkboxes","Menus","Spawn"},{
             function()
                 imgui.Columns(2,nil,false)
-                fcommon.CheckBoxVar("Display target health",module.tped.ped_health_display)
+                fcommon.CheckBoxVar("Display target health",module.tped.ped_health_display,nil,
+                function()
+                    fcommon.SingletonThread(module.PedHealthDisplay,"PedHealthDisplay")
+                end)
                 fcommon.CheckBoxValue("Elvis everywhere",0x969157)
                 fcommon.CheckBoxValue("Everyone is armed",0x969140)
                 fcommon.CheckBoxValue("Gangs control the streets",0x96915B)

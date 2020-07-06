@@ -221,6 +221,7 @@ function module.Write()
             {
                 auto_update_check   = fmenu.tmenu.auto_update_check[0],
                 auto_reload         = fmenu.tmenu.auto_reload[0],
+                debug_log           = fmenu.tmenu.debug_log[0], 
                 draw_text_only      = fmenu.tmenu.draw_text_only[0], 
                 fast_load_images    = fmenu.tmenu.fast_load_images[0],
                 lock_player         = fmenu.tmenu.lock_player[0],
@@ -298,8 +299,13 @@ function module.Write()
                 },
                 no_damage        = fvehicle.tvehicle.no_damage[0],
                 no_vehicles      = fvehicle.tvehicle.no_vehicles[0],
-                random_colors    = fvehicle.tvehicle.random_colors[0],
-                random_colors_traffic    = fvehicle.tvehicle.random_colors_traffic[0],
+                rainbow_colors    = 
+                {   bool         = fvehicle.tvehicle.rainbow_colors.bool[0],
+                    light        = fvehicle.tvehicle.rainbow_colors.light[0],
+                    saturation   = fvehicle.tvehicle.rainbow_colors.saturation[0],
+                    traffic      = fvehicle.tvehicle.rainbow_colors.traffic[0],
+                    wait_time    = fvehicle.tvehicle.rainbow_colors.wait_time[0],
+                },
                 spawn_inside     = fvehicle.tvehicle.spawn_inside[0],
                 speed            = fvehicle.tvehicle.speed[0],
                 stay_on_bike     = fvehicle.tvehicle.stay_on_bike[0],

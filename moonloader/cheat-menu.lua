@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.1-beta")
-script_version_number(2020070201) -- YYYYMMDDNN
+script_version_number(2020070601) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -43,6 +43,7 @@ glob          = require 'game.globals'
 http          = require 'copas.http'
 imgui         = require 'mimgui'
 lfs           = require 'lfs'
+log           = require 'cheat-menu.libraries.log'
 mad           = require 'MoonAdditions'
 memory        = require 'cheat-menu.libraries.memory'
 os            = require 'os'
@@ -54,6 +55,9 @@ ziplib        = ffi.load(string.format( "%s/lib/ziplib.dll",getWorkingDirectory(
 fcommon       = require 'cheat-menu.modules.common'
 fconfig       = require 'cheat-menu.modules.config'
 fconst        = require 'cheat-menu.modules.const'
+
+WRITE_INFO_TO_LOG = fconfig.Get('tmenu.debug_log',false)
+log.Start()
 
 fanimation    = require 'cheat-menu.modules.animation'
 fgame         = require 'cheat-menu.modules.game'
@@ -77,6 +81,8 @@ ffi.cdef[[
 
 
 resX, resY = getScreenResolution()
+WRITE_INFO_TO_LOG = fmenu.tmenu.debug_log[0]
+
 tcheatmenu       =
 {   
     dir          = tcheatmenu.dir,
@@ -103,6 +109,7 @@ tcheatmenu       =
     },
     read_key_press = false,
     tab_data     = {},
+    thread_locks = {},
     window       =
     {
         coord    = 
@@ -113,6 +120,7 @@ tcheatmenu       =
         fail_loading_json = tcheatmenu.window.fail_loading_json,
         missing_components = tcheatmenu.window.missing_components,
         panel_func = nil,
+        restart_required = false,
         show     = imgui.new.bool(false),
         size     =
         {
@@ -216,6 +224,19 @@ function(self) -- render frame
         imgui.SameLine()
         if imgui.Button("Hide message",imgui.ImVec2(fcommon.GetSize(2))) then
             tcheatmenu.window.missing_components = false
+        end
+        imgui.Spacing()
+    end
+
+    if tcheatmenu.window.restart_required then
+        imgui.Button("Restart is required to apply some changes",imgui.ImVec2(fcommon.GetSize(1)))
+        if imgui.Button("Restart menu",imgui.ImVec2(fcommon.GetSize(2))) then
+            fmenu.tmenu.crash_text = "Cheat Menu ~g~reloaded"
+			thisScript():reload()
+        end
+        imgui.SameLine()
+        if imgui.Button("Hide message",imgui.ImVec2(fcommon.GetSize(2))) then
+            tcheatmenu.window.restart_required = false
         end
         imgui.Spacing()
     end
@@ -566,26 +587,20 @@ function main()
     fvehicle.ParseCarcols()
     fvehicle.ParseVehiclesIDE()
 
-    lua_thread.create(fcommon.ReadKeyPress)
-    lua_thread.create(fplayer.KeepPosition)
-    lua_thread.create(fped.PedHealthDisplay)
-    lua_thread.create(fgame.CameraMode)
-    lua_thread.create(fgame.FreezeTime)
-    lua_thread.create(fgame.LoadScriptsOnKeyPress)
-    lua_thread.create(fgame.RandomCheatsActivate)
-    lua_thread.create(fgame.RandomCheatsDeactivate)
-    lua_thread.create(fgame.SolidWater)
-    lua_thread.create(fgame.SyncSystemTime)
-    lua_thread.create(fvehicle.AircraftCamera)
-    lua_thread.create(fvehicle.FirstPersonCamera)
-    lua_thread.create(fvehicle.OnEnterVehicle)
-    lua_thread.create(fvehicle.GSXProcessVehicles)
-    lua_thread.create(fvehicle.RandomColors)
-    lua_thread.create(fvehicle.RandomTrafficColors)
-    lua_thread.create(fvehicle.TrafficNeons)
-    lua_thread.create(fvehicle.UnlimitedNitro)
-    lua_thread.create(fvisual.LockWeather)
-    lua_thread.create(fweapon.AutoAim)
+    fcommon.SingletonThread(fplayer.KeepPosition,"KeepPosition")
+    fcommon.SingletonThread(fped.PedHealthDisplay,"PedHealthDisplay")
+    fcommon.SingletonThread(fgame.FreezeTime,"FreezeTime")
+    fcommon.SingletonThread(fgame.LoadScriptsOnKeyPress,"LoadScriptsOnKeyPress")
+    fcommon.SingletonThread(fgame.RandomCheatsActivate,"RandomCheatsActivate")
+    fcommon.SingletonThread(fgame.RandomCheatsDeactivate,"RandomCheatsDeactivate")
+    fcommon.SingletonThread(fgame.SolidWater,"SolidWater")
+    fcommon.SingletonThread(fgame.SyncSystemTime,"SyncSystemTime")
+    fcommon.SingletonThread(fvehicle.OnEnterVehicle,"OnEnterVehicle")
+    fcommon.SingletonThread(fvehicle.GSXProcessVehicles,"GSXProcessVehicles")
+    fcommon.SingletonThread(fvehicle.RainbowColors,"RainbowColors")
+    fcommon.SingletonThread(fvehicle.TrafficNeons,"TrafficNeons")
+    fcommon.SingletonThread(fvisual.LockWeather,"LockWeather")
+    fcommon.SingletonThread(fweapon.AutoAim,"AutoAim")
 
     ------------------------------------------------
 
@@ -637,6 +652,7 @@ function main()
         fcommon.OnHotKeyPress(tcheatmenu.hot_keys.camera_mode,function()
             fgame.tgame.camera.bool[0] = not fgame.tgame.camera.bool[0]
             if fgame.tgame.camera.bool[0] then
+                fcommon.SingletonThread(fgame.CameraMode,"CameraMode")
                 printHelpString("Camera mode enabled")
             else
                 printHelpString("Camera mode disabled")
@@ -753,8 +769,6 @@ function onScriptTerminate(script, quitGame)
         end
 
         restoreCameraJumpcut()
-
-        fmenu.tmenu.crash_text = ""
 
         if fvehicle.tvehicle.gsx.handle ~= 0 then
             fvehicle.RemoveNotifyCallback(fvehicle.GSXpNotifyCallback)

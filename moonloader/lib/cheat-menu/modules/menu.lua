@@ -29,6 +29,7 @@ module.tmenu =
 		show            = imgui.new.bool(false),
 	},
 	crash_text          = "",
+	debug_log      		= imgui.new.bool(fconfig.Get('tmenu.debug_log',false)),
 	draw_text_only      = imgui.new.bool(fconfig.Get('tmenu.draw_text_only',false)),
 	fast_load_images    = imgui.new.bool(fconfig.Get('tmenu.fast_load_images',false)),
 	lock_player   		= imgui.new.bool(fconfig.Get('tmenu.lock_player',false)),
@@ -148,7 +149,8 @@ function module.RegisterAllCommands()
 	end,"Restores camera to default")
 
 	module.RegisterCommand("cameramode",function(t)
-        fgame.tgame.camera.bool[0] = not fgame.tgame.camera.bool[0]
+		fgame.tgame.camera.bool[0] = not fgame.tgame.camera.bool[0]
+		fcommon.SingletonThread(fgame.CameraMode,"CameraMode")
 	end,"Enable or disable camera mode")
 	
 	module.RegisterCommand("veh",function(t)
@@ -270,7 +272,7 @@ function module.CheckUpdates()
 
 	module.httpRequest(link, nil, function(body, code, headers, status)
 		if body then
-			print(link, 'OK', status)
+			log.Write(string.format("%s %s",link,status))
 			if string.find( script.this.version,"beta") then
 				repo_version = body:match("script_version_number%((%d+)%)")
 				this_version = script.this.version_num
@@ -290,13 +292,13 @@ function module.CheckUpdates()
 				printHelpString("Couldn't connect to github. The rest of the menu is still functional. You can disable auto update check from 'Menu'")
 			end
 		else
-			print(link, 'Error', code)
+			log.Write(string.format("%s %s",link,tostring(code),"WARN"))
 		end
 	end)
 end
 
 function module.DownloadHandler(id, status, p1, p2)
-	print("Update status: " .. status)
+	log.Write("Update status: " .. status)
 	if status == fconst.UPDATE_STATUS.INSTALL then
 		fmenu.tmenu.update_status = fconst.UPDATE_STATUS.INSTALL
 		printHelpString("Download complete. Click the 'Install update' button to finish.")
@@ -306,12 +308,10 @@ end
 function DownloadUpdate()
 	if string.find( script.this.version,"beta") then
 		module.httpRequest("https://github.com/user-grinch/Cheat-Menu/archive/master.zip", nil, function(body, code, headers, status)  
-			print(link, 'OK', status)
 			downloadUrlToFile("https://github.com/user-grinch/Cheat-Menu/archive/master.zip",string.format("%supdate.zip",tcheatmenu.dir),module.DownloadHandler)
 		end)
 	else
-		module.httpRequest("https://api.github.com/repos/user-grinch/Cheat-Menu/tags", nil, function(body, code, headers, status)  
-			print(link, 'OK', status)
+		module.httpRequest("https://api.github.com/repos/user-grinch/Cheat-Menu/tags", nil, function(body, code, headers, status)  	
 			module.tmenu.repo_version = tostring(decodeJson(body)[1].name)
 			downloadUrlToFile("https://github.com/user-grinch/Cheat-Menu/archive/".. module.tmenu.repo_version .. ".zip",string.format("%supdate.zip",tcheatmenu.dir),module.DownloadHandler)
 		end)
@@ -349,7 +349,11 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 			imgui.NextColumn()
 			fcommon.CheckBoxVar("Lock player",module.tmenu.lock_player,"Lock player controls while the menu is open")
 			fcommon.CheckBoxVar("Show crash message",module.tmenu.show_crash_message)
-			fcommon.CheckBoxVar("Show tooltips",module.tmenu.show_tooltips,"Shows usage tips beside options.")
+			fcommon.CheckBoxVar("Show tooltips",module.tmenu.show_tooltips,"Shows usage tips beside options")
+			fcommon.CheckBoxVar("Write debug info",module.tmenu.debug_log,"Write extra debug infomation in log\nMight have a performance impact",
+			function()
+				tcheatmenu.window.restart_required = true
+			end)
 			imgui.Columns(1)
 			
 		end,

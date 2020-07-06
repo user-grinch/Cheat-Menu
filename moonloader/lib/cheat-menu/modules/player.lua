@@ -57,8 +57,8 @@ function module.CustomSkinsSetup()
 end
 
 function module.KeepPosition()
-    while true do
-        if isPlayerDead(PLAYER_HANDLE) and module.tplayer.keep_position[0] then
+    while module.tplayer.keep_position[0] do
+        if isPlayerDead(PLAYER_HANDLE) then
             local x,y,z = getCharCoordinates(PLAYER_PED)
             wait(1000)
             setCharCoordinates(PLAYER_PED,x,y,z)
@@ -153,10 +153,24 @@ function module.ChangePlayerCloth(name)
     local body_part, model, texture = name:match("([^$]+)$([^$]+)$([^$]+)")
     
     setPlayerModel(PLAYER_HANDLE,0)
-    givePlayerClothesOutsideShop(PLAYER_HANDLE,0,0,body_part)
-    givePlayerClothesOutsideShop(PLAYER_HANDLE,texture,model,body_part)
-    buildPlayerModel(PLAYER_HANDLE)
+    
+    -- char[] Overflow ?
+    if texture == "cutoffchinosblue" then
+        givePlayerClothes(PLAYER_HANDLE,-697413025,744365350,body_part)
+    else 
+        if texture == "sneakerbincblue" then
+            givePlayerClothes(PLAYER_HANDLE,-915574819,-2099005073,body_part)
+        else
+            givePlayerClothesOutsideShop(PLAYER_HANDLE,0,0,body_part)
+            givePlayerClothesOutsideShop(PLAYER_HANDLE,texture,model,body_part)
+        end
+    end
+    buildPlayerModel(PLAYER_HANDLE) 
+
     printHelpString("Clothes changed")
+    -- tex,model = getClothesItem(PLAYER_HANDLE,3)
+    -- printString(string.format("%d %d",tex, model),1000)
+    
     local veh = nil
     local speed = 0
     if isCharInAnyCar(PLAYER_PED) then
@@ -208,7 +222,10 @@ function module.PlayerMain()
                     fcommon.CheatDeactivated()
                 end
             end)
-            fcommon.CheckBoxVar("Keep position",module.tplayer.keep_position,"Auto teleport to the position you died from")
+            fcommon.CheckBoxVar("Keep position",module.tplayer.keep_position,"Auto teleport to the position you died from",
+            function()
+                fcommon.SingletonThread(module.KeepPosition,"KeepPosition")
+            end)
             fcommon.CheckBoxValue("Lock player control",getCharPointer(PLAYER_PED)+0x598)
             fcommon.CheckBoxValue("Mega jump",0x96916C)
             fcommon.CheckBoxValue("Mega punch",0x969173)

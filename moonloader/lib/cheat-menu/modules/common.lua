@@ -31,6 +31,36 @@ function module.spairs(t, f)
     return iter
 end
 
+function module.LockThread(text)
+    
+    if tcheatmenu.thread_locks[text] == nil then
+        tcheatmenu.thread_locks[text] = true
+        return true
+    end
+
+    return false
+end
+
+function module.UnlockThread(text)
+    
+    if tcheatmenu.thread_locks[text] ~= nil then
+        tcheatmenu.thread_locks[text] = nil
+    end
+end
+
+function module.SingletonThread(func,thread_lock_key)
+    thread_lock_key = thread_lock_key or tostring(func) -- get the function address if no key provided
+    lua_thread.create(function()
+        log.Write("Launched " .. thread_lock_key)
+        if module.LockThread(thread_lock_key) then
+            func()
+            module.UnlockThread(thread_lock_key)
+        else
+            log.Write("Thread Locked " .. thread_lock_key)
+        end
+        log.Write("Closed " .. thread_lock_key)
+    end,func,thread_lock_key)
+end
 --------------------------------------------------
 -- imgui functions
 
@@ -98,26 +128,19 @@ function module.ComboBox(label,selected,table,func)
 end
 
 -- Config panel
-function module.ConfigPanel(func_arg_table,func,func_arg_table_func)
+function module.ConfigPanel(label,func)
     if func ~= nil then
         imgui.SameLine()
         imgui.TextColored(imgui.ImVec4(128,128,128,0.3),'c')
         
         if imgui.IsItemClicked(0) then
             tcheatmenu.window.panel_func = function()
-                imgui.TextWrapped(string.format("%s configuraion",func_arg_table[2]))
+                imgui.TextWrapped(string.format("%s configuraion",label))
                 imgui.Separator()
                 if imgui.Button("Hide",imgui.ImVec2(fcommon.GetSize(1))) then
                     tcheatmenu.window.panel_func = nil
                 end
-                if func_arg_table[1] ~= nil then
-                    imgui.Dummy(imgui.ImVec2(0,10))
-                    if func_arg_table[1](func_arg_table[2],func_arg_table[3],func_arg_table[4],func_arg_table[5]) then
-                        if func_arg_table_func ~= nil then
-                            func_arg_table_func()
-                        end
-                    end
-                end
+                
                 imgui.Dummy(imgui.ImVec2(0,10))
                 func()
             end
@@ -562,7 +585,7 @@ function module.CheckBoxVar(name,var,tooltip,func,panel_func,show_help_msg)
     end
 
     module.InformationTooltip(tooltip)
-    module.ConfigPanel({module.CheckBoxVar,name,var,tooltip,func},panel_func)
+    module.ConfigPanel(name,panel_func)
 end
 
 function module.CheckBoxFunc(name,var,func,tooltip,panel_func)
@@ -849,6 +872,7 @@ function module.HotKey(index,info_text)
         else
             tcheatmenu.hot_keys.currently_active = index
             tcheatmenu.read_key_press = true
+            module.SingletonThread(module.ReadKeyPress,"ReadKeyPress")
         end
     end
 
@@ -868,32 +892,27 @@ end
 
 
 function module.ReadKeyPress()
-    while true do
+    while tcheatmenu.read_key_press do
 
-        if tcheatmenu.read_key_press then
+        for i=32,255,1 do
+            if isKeyDown(i) then
+                tcheatmenu.hot_keys.currently_active[1] = i
+                break
+            end
+        end
 
-            for i=32,255,1 do
-                if isKeyDown(i) then
-                    tcheatmenu.hot_keys.currently_active[1] = i
-                    break
-                end
+        for i=255,32,-1 do
+            if isKeyDown(i) then
+                tcheatmenu.hot_keys.currently_active[2] = i
+                break
             end
-    
-            for i=255,32,-1 do
-                if isKeyDown(i) then
-                    tcheatmenu.hot_keys.currently_active[2] = i
-                    break
-                end
-            end
-            
-            if tcheatmenu.hot_keys.currently_active[1] ~= tcheatmenu.hot_keys.currently_active[2] then
-                while isKeyDown(tcheatmenu.hot_keys.currently_active[1]) or isKeyDown(tcheatmenu.hot_keys.currently_active[2]) do
-                    wait(0)
-                end
-            end
-
         end
         
+        if tcheatmenu.hot_keys.currently_active[1] ~= tcheatmenu.hot_keys.currently_active[2] then
+            while isKeyDown(tcheatmenu.hot_keys.currently_active[1]) or isKeyDown(tcheatmenu.hot_keys.currently_active[2]) do
+                wait(0)
+            end
+        end
         wait(0)
     end
 end
