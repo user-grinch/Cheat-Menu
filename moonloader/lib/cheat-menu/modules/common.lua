@@ -51,15 +51,37 @@ end
 function module.SingletonThread(func,thread_lock_key)
     thread_lock_key = thread_lock_key or tostring(func) -- get the function address if no key provided
     lua_thread.create(function()
-        log.Write("Launched " .. thread_lock_key)
         if module.LockThread(thread_lock_key) then
             func()
             module.UnlockThread(thread_lock_key)
-        else
-            log.Write("Thread Locked " .. thread_lock_key)
         end
-        log.Write("Closed " .. thread_lock_key)
-    end,func,thread_lock_key)
+        end,func,thread_lock_key)
+end
+
+--------------------------------------------------
+-- JSON functions
+
+function module.LoadJson(filename)
+    local full_path = tcheatmenu.dir .. "json//" .. filename .. ".json"
+    if doesFileExist(full_path) then
+        local file = io.open(full_path, "r")
+        local status, table = pcall(decodeJson,file:read("*a"))
+        file:close()
+        if status and table then
+            return table
+        else
+            tcheatmenu.window.fail_loading_json = true
+            print("Failed to load json file, " .. filename)
+        end
+    end
+    return {}
+end
+
+function module.SaveJson(filename,table)
+    local full_path = tcheatmenu.dir .. "json//" .. filename .. ".json"
+    local file = assert(io.open(full_path, "w"))
+    file:write(encodeJson(table))
+    file:close()
 end
 --------------------------------------------------
 -- imgui functions
@@ -156,10 +178,16 @@ function module.GetSize(count,no_spacing)
     count = count or 1
     if count == 1 then no_spacing = true end
 
+    local factor = imgui.GetStyle().ItemSpacing.x/2
+
+    if count == 3 then
+        factor = imgui.GetStyle().ItemSpacing.x/1.403
+    end
+
     if no_spacing == true then 
         x = imgui.GetWindowContentRegionWidth()/count
     else
-        x = imgui.GetWindowContentRegionWidth()/count - imgui.StyleVar.ItemSpacing/(count+1)
+        x = imgui.GetWindowContentRegionWidth()/count - factor
     end
 
     y = (tcheatmenu.window.size.Y/25)
@@ -321,7 +349,7 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
 
         if draw_type == fconst.DRAW_TYPE.LIST or filter:PassFilter(model_name) then
             if type(image) ~= "string" then
-                if identifier ~= fconst.IDENTIFIER.COMPONENT or fvehicle.IsValidModForVehicle(tonumber(model),getCarPointer(getCarCharIsUsing(PLAYER_PED))) then
+                if identifier ~= fconst.IDENTIFIER.COMPONENT or casts.CVehicle.IsValidModForVehicle(tonumber(model),getCarPointer(getCarCharIsUsing(PLAYER_PED))) then
                     if imgui.ImageButton(image,imgui.ImVec2(const_image_width,const_image_height),imgui.ImVec2(0,0),imgui.ImVec2(1,1),1,imgui.ImVec4(1,1,1,1),imgui.ImVec4(1,1,1,1)) then
                         func_on_left_click(model)
                     end
@@ -393,7 +421,7 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
         end
 
         if draw_type == fconst.DRAW_TYPE.LIST or filter:PassFilter(model_name) then
-            if identifier ~= fconst.IDENTIFIER.COMPONENT or fvehicle.IsValidModForVehicle(tonumber(model),getCarPointer(getCarCharIsUsing(PLAYER_PED))) then
+            if identifier ~= fconst.IDENTIFIER.COMPONENT or casts.CVehicle.IsValidModForVehicle(tonumber(model),getCarPointer(getCarCharIsUsing(PLAYER_PED))) then
                 if imgui.MenuItemBool(label) and func_on_left_click ~= nil then
                     func_on_left_click(model)
                 end 
@@ -413,7 +441,7 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
                 if identifier == fconst.IDENTIFIER.COMPONENT then
                     show = false
                     for model,image in pairs(image_table) do
-                        if fvehicle.IsValidModForVehicle(tonumber(model),getCarPointer(getCarCharIsUsing(PLAYER_PED))) then
+                        if casts.CVehicle.IsValidModForVehicle(tonumber(model),getCarPointer(getCarCharIsUsing(PLAYER_PED))) then
                             show = true
                         end
                     end
@@ -464,7 +492,7 @@ function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_h
     
 end
 
-function module.RadioButtonFunc(label,label_table,values,memory,save)
+function module.RadioButtonAddressEx(label,label_table,values,memory,save)
     if save == nil then save = true end
     module.DropDownMenu(label,function()
         local button = imgui.new.int(module.RwMemory(memory,1))
@@ -496,7 +524,7 @@ function module.RadioButtonFunc(label,label_table,values,memory,save)
     end)
 end
 
-function module.RadioButton(label,rb_table,addr_table,default)
+function module.RadioButtonAddress(label,rb_table,addr_table,default)
 
     if default == nil then default = true end
 
@@ -534,6 +562,27 @@ function module.RadioButton(label,rb_table,addr_table,default)
         end
     end
     imgui.Columns(1)
+end
+
+
+function module.CallFuncButtons(label,table)
+    local sizeX = fcommon.GetSize(3)
+    local sizeY = imgui.GetWindowHeight()/10
+
+    fcommon.DropDownMenu(label,function()
+        
+        local count = 1
+        for name,address in fcommon.spairs(table) do
+            if imgui.Button(name,imgui.ImVec2(sizeX,sizeY)) then
+                callFunction(address,0,0)
+                fcommon.CheatActivated()
+            end
+            if count % 3 ~= 0 then
+                imgui.SameLine()
+            end
+            count = count + 1
+        end
+    end)
 end
 
 
@@ -916,37 +965,6 @@ function module.ReadKeyPress()
         wait(0)
     end
 end
-
---------------------------------------------------
-
-
---------------------------------------------------
--- Functions for loading & saving files
-
-function module.LoadJson(filename)
-    local full_path = tcheatmenu.dir .. "json//" .. filename .. ".json"
-    if doesFileExist(full_path) then
-        local file = io.open(full_path, "r")
-        local status, table = pcall(decodeJson,file:read("*a"))
-        file:close()
-        if status and table then
-            return table
-        else
-            tcheatmenu.window.fail_loading_json = true
-            print("Failed to load json file, " .. filename)
-        end
-    end
-    return {}
-end
-
-function module.SaveJson(filename,table)
-    local full_path = tcheatmenu.dir .. "json//" .. filename .. ".json"
-    local file = assert(io.open(full_path, "w"))
-    file:write(encodeJson(table))
-    file:close()
-end
---------------------------------------------------
-
 
 --------------------------------------------------
 -- Misc

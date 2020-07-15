@@ -34,6 +34,11 @@ module.tplayer =
     },
     filter              = imgui.ImGuiTextFilter(),
     god                 = imgui.new.bool(fconfig.Get('tplayer.god',false)),
+    health_regeneration = {
+        bool            = imgui.new.bool(fconfig.Get('tplayer.health_regeneration.bool',false)),
+        increment_value = imgui.new.int(fconfig.Get('tplayer.health_regeneration.increment_value',2)),
+        interval        = imgui.new.int(fconfig.Get('tplayer.health_regeneration.interval',5000)),
+    },
     invisible           = imgui.new.bool(fconfig.Get('tplayer.invisible',false)),
     keep_position       = imgui.new.bool(fconfig.Get('tplayer.keep_position',false)),
     model_val           = nil,
@@ -146,6 +151,20 @@ function WantedLevelMenu()
     end)
 end
 
+
+function module.RegenerateHealth()
+    while module.tplayer.health_regeneration.bool[0] do
+        local max_health = math.floor(mad.get_char_max_health(PLAYER_PED))
+        local health = getCharHealth(PLAYER_PED)
+
+        if max_health > health then
+            setCharHealth(PLAYER_PED,health+module.tplayer.health_regeneration.increment_value[0])
+        end
+
+        wait(module.tplayer.health_regeneration.interval[0])
+    end
+end
+
 --------------------------------------------------
 -- Cloth functions
 
@@ -201,16 +220,17 @@ function module.PlayerMain()
     fcommon.Tabs("Player",{"Checkboxes","Menus","Skins","Clothes"},{
         function()
             imgui.Columns(2,nil,false)
-            fcommon.CheckBoxValue("Aim while driving",0x969179)
             fcommon.CheckBoxVar("God mode",module.tplayer.god)
             fcommon.CheckBoxValue("Have bounty on head",0x96913F)
+            fcommon.CheckBoxVar("Health regeneration",module.tplayer.health_regeneration.bool,nil,fcommon.SingletonThread(module.RegenerateHealth,"RegenerateHealth"),
+            function()
+                imgui.SliderInt("Increment value", module.tplayer.health_regeneration.increment_value, 0, 25)
+                imgui.SliderInt("Interval", module.tplayer.health_regeneration.interval, 0, 10000)
+                fcommon.InformationTooltip("The wait time between increment\nin milliseconds")
+            end)
             fcommon.CheckBoxValue("Higher cycle jumps",0x969161)
-            fcommon.CheckBoxValue("Infinite ammo",0x969178)
             fcommon.CheckBoxValue("Infinite oxygen",0x96916E)
             fcommon.CheckBoxValue("Infinite run",0xB7CEE4)
-        
-            imgui.NextColumn()
-
             fcommon.CheckBoxVar("Invisible player",module.tplayer.invisible,"Player can't enter/exit vehicle",
             function()
                 if module.tplayer.invisible[0] then
@@ -222,6 +242,7 @@ function module.PlayerMain()
                     fcommon.CheatDeactivated()
                 end
             end)
+            imgui.NextColumn()
             fcommon.CheckBoxVar("Keep position",module.tplayer.keep_position,"Auto teleport to the position you died from",
             function()
                 fcommon.SingletonThread(module.KeepPosition,"KeepPosition")

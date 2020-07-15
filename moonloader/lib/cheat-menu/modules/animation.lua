@@ -50,7 +50,7 @@ function AnimationEntry(file,animation)
             requestAnimation(file)
             loadAllModelsNow()
         end
-        PlayAnimation(file,animation)
+        module.PlayAnimation(file,animation)
     end
     if imgui.IsItemClicked(1) then
 		module.tanimation.list[file .. "$" .. animation] = nil
@@ -60,7 +60,7 @@ function AnimationEntry(file,animation)
 	end
 end
 
-function PlayAnimation(file,animation)
+function module.PlayAnimation(file,animation)
     if module.tanimation.ped[0] == true then
         if doesCharExist(fped.tped.selected) then
             char = fped.tped.selected

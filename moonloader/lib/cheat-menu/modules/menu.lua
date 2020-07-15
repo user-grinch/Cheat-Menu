@@ -29,7 +29,6 @@ module.tmenu =
 		show            = imgui.new.bool(false),
 	},
 	crash_text          = "",
-	debug_log      		= imgui.new.bool(fconfig.Get('tmenu.debug_log',false)),
 	draw_text_only      = imgui.new.bool(fconfig.Get('tmenu.draw_text_only',false)),
 	fast_load_images    = imgui.new.bool(fconfig.Get('tmenu.fast_load_images',false)),
 	lock_player   		= imgui.new.bool(fconfig.Get('tmenu.lock_player',false)),
@@ -162,7 +161,7 @@ function module.RegisterAllCommands()
 		local model = tonumber(t[2])
 
         if type(model) == "nil" then
-			model = fvehicle.GetModelInfo(string.upper(t[2])) 
+			model = casts.CModelInfo.GetModelFromName(string.upper(t[2])) 
 
 			if model ~= 0 and isModelAvailable(model) then  
 				if isThisModelABoat(model) 
@@ -272,7 +271,7 @@ function module.CheckUpdates()
 
 	module.httpRequest(link, nil, function(body, code, headers, status)
 		if body then
-			log.Write(string.format("%s %s",link,status))
+			print(string.format("%s %s",link,status))
 			if string.find( script.this.version,"beta") then
 				repo_version = body:match("script_version_number%((%d+)%)")
 				this_version = script.this.version_num
@@ -292,13 +291,13 @@ function module.CheckUpdates()
 				printHelpString("Couldn't connect to github. The rest of the menu is still functional. You can disable auto update check from 'Menu'")
 			end
 		else
-			log.Write(string.format("%s %s",link,tostring(code),"WARN"))
+			print(string.format("%s %s",link,tostring(code),"WARN"))
 		end
 	end)
 end
 
 function module.DownloadHandler(id, status, p1, p2)
-	log.Write("Update status: " .. status)
+	print("Update status: " .. status)
 	if status == fconst.UPDATE_STATUS.INSTALL then
 		fmenu.tmenu.update_status = fconst.UPDATE_STATUS.INSTALL
 		printHelpString("Download complete. Click the 'Install update' button to finish.")
@@ -350,10 +349,6 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 			fcommon.CheckBoxVar("Lock player",module.tmenu.lock_player,"Lock player controls while the menu is open")
 			fcommon.CheckBoxVar("Show crash message",module.tmenu.show_crash_message)
 			fcommon.CheckBoxVar("Show tooltips",module.tmenu.show_tooltips,"Shows usage tips beside options")
-			fcommon.CheckBoxVar("Write debug info",module.tmenu.debug_log,"Write extra debug infomation in log\nMight have a performance impact",
-			function()
-				tcheatmenu.window.restart_required = true
-			end)
 			imgui.Columns(1)
 			
 		end,

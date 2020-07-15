@@ -284,33 +284,6 @@ function module.CameraMode()
         wait(0)
     end
 end
-function CheatsEntry(func,status,names)
-    local sizeX = fcommon.GetSize(3)
-    local sizeY = imgui.GetWindowHeight()/10
-
-    fcommon.DropDownMenu(names[1],function()
-        imgui.Spacing()
-
-        for i = 1, #func do
-
-            if imgui.Button(names[i+1],imgui.ImVec2(sizeX,sizeY)) then
-                callFunction(func[i],1,1)
-                if status == nil or status[i] == nil then
-                    fcommon.CheatActivated()
-                else
-                    if readMemory(status[i],1,false) == 0 then
-                        fcommon.CheatDeactivated()
-                    else
-                        fcommon.CheatActivated()
-                    end
-                end
-            end
-            if i % 3 ~= 0 then
-                imgui.SameLine()
-            end
-        end
-    end)
-end
 
 function module.SyncSystemTime()
     while module.tgame.sync_system_time[0] do
@@ -625,6 +598,11 @@ function FollowPed(ped)
 end
 
 function SpawnObject(model,obj_name,grp_name,x,y,z)
+    
+    if isThisModelACar() then
+        printHelpString("Vehicle")
+        return
+    end
     if model < 700 then
         printHelpString("Can't spawn object")
         return
@@ -705,17 +683,9 @@ function module.GameMain()
         printHelpString("Coordinates copied")
     end
     
-    fcommon.Tabs("Game",{"Checkboxes","Menus","Cheats","Script manager","Object spawner"},{
+    fcommon.Tabs("Game",{"Checkboxes","Menus","Script manager","Object spawner"},{
         function()
             
-            local current_day = imgui.new.int(readMemory(0xB7014E,1,false)-1)
-            imgui.SetNextItemWidth(imgui.GetWindowContentRegionWidth()/1.7)
-            if imgui.Combo("Day", current_day,module.tgame.day.array,#module.tgame.day.names) then
-                writeMemory(0xB7014E,1,current_day[0]+1,false)
-                fcommon.CheatActivated()
-            end
-            
-            imgui.Dummy(imgui.ImVec2(0,10))
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Camera mode",module.tgame.camera.bool,string.format("Toggle: %s\n\nForward: %s\tBackward: %s\
 Left: %s\t\t  Right: %s\n\nSlow movement: %s\nFast movement: %s\n\nRotation: Mouse\nZoom in/out : Mouse wheel \n\
@@ -777,7 +747,10 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                     fcommon.CheatDeactivated()
                 end
             end)
-            fcommon.CheckBoxVar("Disable help popups",module.tgame.disable_help_popups,"Disables wasted & arrested popups that\nappear in a new game.Requires restart")
+            fcommon.CheckBoxVar("Disable help popups",module.tgame.disable_help_popups,"Disables wasted & arrested popups that\nappear in a new game.",
+            function()
+                tcheatmenu.window.restart_required = true
+            end)
             fcommon.CheckBoxValue('Free PNS',0x96C009)
             fcommon.CheckBoxVar("Freeze misson timer",module.tgame.freeze_mission_timer,nil,function()
                 if module.tgame.freeze_mission_timer[0] then
@@ -865,6 +838,14 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
         
         end,
         function()
+            fcommon.DropDownMenu('Current day',function()
+                local current_day = imgui.new.int(readMemory(0xB7014E,1,false)-1)
+                imgui.SetNextItemWidth(imgui.GetWindowContentRegionWidth()/1.7)
+                if imgui.Combo("Day", current_day,module.tgame.day.array,#module.tgame.day.names) then
+                    writeMemory(0xB7014E,1,current_day[0]+1,false)
+                    fcommon.CheatActivated()
+                end
+            end)
             fcommon.DropDownMenu('Custom save game name',function()
                 imgui.InputText("Name", module.tgame.gxt_save_name,ffi.sizeof(module.tgame.gxt_save_name))
                 imgui.Spacing()
@@ -877,6 +858,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                     end
                 end
             end)
+            
             fcommon.UpdateAddress({name = 'Days passed',address = 0xB79038 ,size = 4,min = 0,max = 9999})
             fcommon.DropDownMenu('FPS',function()
 
@@ -929,24 +911,10 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
             fcommon.UpdateAddress({name = 'Gravity',address = 0x863984,size = 4,max = 1,min = -1, default = 0.008,cvalue = 0.001 ,is_float = true})
             SetTime()
             fcommon.DropDownMenu('Themes',function()
-                fcommon.RadioButton('Select theme',{'Beach','Country','Fun house','Ninja'},{0x969159,0x96917D,0x969176,0x96915C})
+                fcommon.RadioButtonAddress('Select theme',{'Beach','Country','Fun house','Ninja'},{0x969159,0x96917D,0x969176,0x96915C})
             end)
-        end,
-        function()
-            CheatsEntry({0x439110,0x439150,0x439190},nil,{'Body','Fat','Muscle','Skinny'})
-            CheatsEntry({0x438E40,0x438FF0},nil,{'Fight','Health, armour\n200K money','Suicide'})
-            CheatsEntry({0x438F90,0x438FC0},nil,{'Gameplay','Faster','Slower'})
-            CheatsEntry({0x439360,0x4393D0},{0x96915A,0x96915B},{'Gangs','Gangs\neverywhere','Gang land'})
-            CheatsEntry({0x4393F0,0x439710,0x439DD0,0x439C70,0x439B20},{0x96915D,0x969175,0x969158,0x969140,0x96913E},{'Peds','Slut magnet','Peds riot','Attack with\nrocket','Everyone Armed','Mayhem'})
-            CheatsEntry({0x439930,0x439940,0x4399D0},nil,{'Skills','Stamina','Weapons','Vehicles'})
-            CheatsEntry({0x4395B0,0x439600},nil,{'Spawn','Parachute','Jetpack'})
-            CheatsEntry({0x439230,0x439720,0x439E50},{0x969159,0x969176,0x96915C},{'Themes','Beach','Fun house','Ninja'})
-            CheatsEntry({0x4390D0,0x4390F0,0x4394B0,0x4394E0},{0x969150,0x969151,0x96915E,0x96915F},{'Traffic','Pink','Black','Cheap','Fast'})
-            CheatsEntry({0x438F50,0x438F60,0x438F70,0x438F80,0x439570,0x439590},nil,{'Weather','Very sunny','Overcast','Rainy','Foggy','Thunderstorm','Sandstorm'})
-            CheatsEntry({0x439D80,0x4398D0},{nil,0x969179},{'Vehicles','Blow up','Aim while\ndriving'})
-            CheatsEntry({0x439540,0x4391D0,0x439F60,0x4395A0,0x439880},{0x969168,0x969157},{'Misc','Stop clock','Elvis\neverywhere','Countryside\ninvasion','Predator','Adrenaline'})
-            CheatsEntry({0x438E90,0x438F20,0x4396F0,0x4396C0},{nil,nil,nil,0x969171},{'Wanted level','+2Star','Clear stars','Six star','Never wanted'})
-            CheatsEntry({0x4385B0,0x438890,0x438B30},nil,{'Weapons','Set1','Set2','Set3'})
+            fcommon.CallFuncButtons("Weather",  {["Very Sunny"] = 0x438F50,["Overcast"] = 0x438F60,["Rainy"] = 0x438F70,
+                                                ["Foggy"] = 0x438F80,["Thunderstorm"] = 0x439570,["Sandstorm"] = 0x439590})
         end,
         function()
             if imgui.Button("Reload all scripts",imgui.ImVec2(fcommon.GetSize(1))) then

@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.1-beta")
-script_version_number(2020070601) -- YYYYMMDDNN
+script_version_number(2020071501) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -37,13 +37,13 @@ tcheatmenu =
 
 --------------------------------------------------
 -- Libraries
+casts         = require 'cheat-menu.libraries.casts'
 copas         = require 'copas'
 ffi           = require 'ffi'
 glob          = require 'game.globals'
 http          = require 'copas.http'
 imgui         = require 'mimgui'
 lfs           = require 'lfs'
-log           = require 'cheat-menu.libraries.log'
 mad           = require 'MoonAdditions'
 memory        = require 'cheat-menu.libraries.memory'
 os            = require 'os'
@@ -55,9 +55,6 @@ ziplib        = ffi.load(string.format( "%s/lib/ziplib.dll",getWorkingDirectory(
 fcommon       = require 'cheat-menu.modules.common'
 fconfig       = require 'cheat-menu.modules.config'
 fconst        = require 'cheat-menu.modules.const'
-
-WRITE_INFO_TO_LOG = fconfig.Get('tmenu.debug_log',false)
-log.Start()
 
 fanimation    = require 'cheat-menu.modules.animation'
 fgame         = require 'cheat-menu.modules.game'
@@ -81,7 +78,7 @@ ffi.cdef[[
 
 
 resX, resY = getScreenResolution()
-WRITE_INFO_TO_LOG = fmenu.tmenu.debug_log[0]
+
 
 tcheatmenu       =
 {   
@@ -517,9 +514,9 @@ function main()
     end
 
     if fvehicle.tvehicle.no_vehicles[0] then
-        writeMemory(0x434237,1,0x73,false) -- change condition to unsigned (0-255)
+        writeMemory(0x434237,1,0x73,false) 
         writeMemory(0x434224,1,0,false)
-        writeMemory(0x484D19,1,0x83,false) -- change condition to unsigned (0-255)
+        writeMemory(0x484D19,1,0x83,false) 
         writeMemory(0x484D17,1,0,false)
     end
 
@@ -545,15 +542,6 @@ function main()
     end
     
     setPlayerFastReload(PLAYER_HANDLE,fweapon.tweapon.fast_reload[0])
-    
-    if fweapon.tweapon.no_reload[0] then
-        writeMemory( 0x73FA85,1,0x90,1)
-        writeMemory( 0x73FAAF,1,0x90,1)
-        writeMemory( 0x73FAB0,2,0x9090,1)
-        writeMemory( 0x7428AF,1,0x90,1)
-        writeMemory( 0x7428E6,1,0x90,1)
-        writeMemory( 0x7428E7,2,0x9090,1)
-    end
 
     if  fgame.tgame.ghost_cop_cars[0] then
         for key,value in pairs(fgame.tgame.cop) do
@@ -588,6 +576,7 @@ function main()
     fvehicle.ParseVehiclesIDE()
 
     fcommon.SingletonThread(fplayer.KeepPosition,"KeepPosition")
+    fcommon.SingletonThread(fplayer.RegenerateHealth,"RegenerateHealth")
     fcommon.SingletonThread(fped.PedHealthDisplay,"PedHealthDisplay")
     fcommon.SingletonThread(fgame.FreezeTime,"FreezeTime")
     fcommon.SingletonThread(fgame.LoadScriptsOnKeyPress,"LoadScriptsOnKeyPress")
@@ -604,7 +593,9 @@ function main()
 
     ------------------------------------------------
 
+
     while true do
+
         --------------------------------------------------
         -- Functions that neeed to run constantly
 
@@ -779,6 +770,7 @@ function onScriptTerminate(script, quitGame)
         end
 
         fgame.RemoveAllObjects()
+        fped.RemoveAllSpawnedPeds()   
         fweapon.RemoveAllWeaponDrops()
          
         fcommon.ReleaseImages(fvehicle.tvehicle.images)
@@ -806,5 +798,6 @@ end
 
 function onSaveGame()
     fgame.RemoveAllObjects()
-    fweapon.RemoveAllWeaponDrops()
+    fped.RemoveAllSpawnedPeds()   
+    fweapon.RemoveAllWeaponDrops()  
 end

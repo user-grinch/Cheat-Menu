@@ -83,99 +83,18 @@ module.tvisual =
 
 module.tvisual.timecyc.weather.array  = imgui.new['const char*'][#module.tvisual.timecyc.weather.names](module.tvisual.timecyc.weather.names)
 
-------------------------------------------------
--- CTimecyc
-
-local CTimecyc = 
-{
-    curr_weather          = ffi.cast("short*", 0xC81320),
-    next_weather          = ffi.cast("short*", 0xC8131C),
-      
-    hours                 = ffi.cast("unsigned char*", 0xB70153),  
-    mins                  = ffi.cast("unsigned char*", 0xB70152), 
-    secs                  = ffi.cast("unsigned short*", 0xB70150),
-      
-    time_scale            = ffi.cast("unsigned int*", 0xB7015C),
-      
-    initialise            = ffi.cast("void (__cdecl*)(void)", 0x5BBAC0), 
-      
-    ambient_red           = ffi.cast("unsigned char*", memory.getuint32(0x560C61)),
-    ambient_green         = ffi.cast("unsigned char*", memory.getuint32(0x55F4D6)),
-    ambient_blue          = ffi.cast("unsigned char*", memory.getuint32(0x55F4E8)),
-      
-    ambient_obj_red       = ffi.cast("unsigned char*", memory.getuint32(0x55F4FA)),
-	ambient_obj_green     = ffi.cast("unsigned char*", memory.getuint32(0x55F50C)),
-    ambient_obj_blue      = ffi.cast("unsigned char*", memory.getuint32(0x55F51E)),
-          
-	sky_top_red           = ffi.cast("unsigned char*", memory.getuint32(0x55F531)),
-	sky_top_green         = ffi.cast("unsigned char*", memory.getuint32(0x55F53D)),
-    sky_top_blue          = ffi.cast("unsigned char*", memory.getuint32(0x55F549)),
-          
-	sky_bottom_red        = ffi.cast("unsigned char*", memory.getuint32(0x55F555)),
-	sky_bottom_green      = ffi.cast("unsigned char*", memory.getuint32(0x55F561)),
-    sky_bottom_blue       = ffi.cast("unsigned char*", memory.getuint32(0x55F56D)),
-          
-	sun_core_red          = ffi.cast("unsigned char*", memory.getuint32(0x55F579)),
-	sun_core_green        = ffi.cast("unsigned char*", memory.getuint32(0x55F585)),
-    sun_core_blue         = ffi.cast("unsigned char*", memory.getuint32(0x55F591)),
-          
-	sun_corona_red        = ffi.cast("unsigned char*", memory.getuint32(0x55F59D)),
-	sun_corona_green      = ffi.cast("unsigned char*", memory.getuint32(0x55F5A9)),
-    sun_corona_blue       = ffi.cast("unsigned char*", memory.getuint32(0x55F5B5)),
-          
-	sun_size              = ffi.cast("unsigned char*", memory.getuint32(0x55F5C0)),
-	sprite_size           = ffi.cast("unsigned char*", memory.getuint32(0x55F5D2)),
-    sprite_brightness     = ffi.cast("unsigned char*", memory.getuint32(0x55F5E4)),
-    
-	shadow_strength       = ffi.cast("unsigned char*", memory.getuint32(0x55F5F7)),
-	light_shadow_strength = ffi.cast("unsigned char*", memory.getuint32(0x55F603)),
-    pole_shadow_strength  = ffi.cast("unsigned char*", memory.getuint32(0x55F60F)),
-    
-	far_clip                    = ffi.cast("short*", memory.getuint32(0x55F61B)),
-    fog_start                   = ffi.cast("short*", memory.getuint32(0x55F62E)),
-    lights_on_ground_brightness = ffi.cast("unsigned char*", memory.getuint32(0x55F640)),
-    
-	low_clouds_red   = ffi.cast("unsigned char*", memory.getuint32(0x55F653)),
-	low_clouds_green = ffi.cast("unsigned char*", memory.getuint32(0x55F65F)),
-    low_clouds_blue  = ffi.cast("unsigned char*", memory.getuint32(0x55F66B)),
-    
-	fluffy_clouds_red   = ffi.cast("unsigned char*", memory.getuint32(0x55F677)),
-	fluffy_clouds_green = ffi.cast("unsigned char*", memory.getuint32(0x55F683)),
-    fluffy_clouds_blue  = ffi.cast("unsigned char*", memory.getuint32(0x55F690)),
-    
-	water_red   = ffi.cast("unsigned char*", memory.getuint32(0x55F69C)),
-	water_green = ffi.cast("unsigned char*", memory.getuint32(0x55F6B0)),
-    water_blue  = ffi.cast("unsigned char*", memory.getuint32(0x55F6C3)),
-    water_alpha = ffi.cast("unsigned char*", memory.getuint32(0x55F6D6)),
-    
-	postfx1_red   = ffi.cast("unsigned char*", memory.getuint32(0x55F6E9)),
-	postfx1_green = ffi.cast("unsigned char*", memory.getuint32(0x55F6FC)),
-	postfx1_blue  = ffi.cast("unsigned char*", memory.getuint32(0x55F70F)),
-    postfx1_alpha = ffi.cast("unsigned char*", memory.getuint32(0x55F725)),
-    
-	postfx2_red   = ffi.cast("unsigned char*", memory.getuint32(0x55F73B)),
-	postfx2_green = ffi.cast("unsigned char*", memory.getuint32(0x55F751)),
-	postfx2_blue  = ffi.cast("unsigned char*", memory.getuint32(0x55F767)),
-    postfx2_alpha = ffi.cast("unsigned char*", memory.getuint32(0x55F77D)),
-    
-    cloud_alpha = ffi.cast("unsigned char*", memory.getuint32(0x55F793)),
-    waterfog_alpha   = ffi.cast("unsigned char*", memory.getuint32(0x55F7B8)),
-	high_light_min_intensity = ffi.cast("unsigned char*", memory.getuint32(0x55F7A9)),
-	directional_mult = ffi.cast("unsigned char*", memory.getuint32(0x55F7C7)),
-}
-
 function module.LockWeather()
-    local weather = CTimecyc.curr_weather[0]
+    local weather = casts.CTimeCyc.curr_weather[0]
     while module.tvisual.lock_weather[0] do
-        CTimecyc.curr_weather[0] = weather
-        CTimecyc.next_weather[0] = weather
+        casts.CTimeCyc.curr_weather[0] = weather
+        casts.CTimeCyc.next_weather[0] = weather
         wait(0)
     end
 end
 
 function GetCurrentHourTimeId(hour)
 
-    local h = CTimecyc.hours[0]
+    local h = casts.CTimeCyc.hours[0]
 
     if hour == 24 then 
         return h
@@ -195,70 +114,70 @@ end
 
 function UpdateTimecycData(val)
 
-    module.tvisual.timecyc.ambient[0] = CTimecyc.ambient_red[val]/255
-    module.tvisual.timecyc.ambient[1] = CTimecyc.ambient_green[val]/255
-    module.tvisual.timecyc.ambient[2] = CTimecyc.ambient_blue[val]/255
+    module.tvisual.timecyc.ambient[0] = casts.CTimeCyc.ambient_red[val]/255
+    module.tvisual.timecyc.ambient[1] = casts.CTimeCyc.ambient_green[val]/255
+    module.tvisual.timecyc.ambient[2] = casts.CTimeCyc.ambient_blue[val]/255
 
-    module.tvisual.timecyc.ambient_obj[0] = CTimecyc.ambient_obj_red[val]/255
-    module.tvisual.timecyc.ambient_obj[1] = CTimecyc.ambient_obj_green[val]/255
-    module.tvisual.timecyc.ambient_obj[2] = CTimecyc.ambient_obj_blue[val]/255
+    module.tvisual.timecyc.ambient_obj[0] = casts.CTimeCyc.ambient_obj_red[val]/255
+    module.tvisual.timecyc.ambient_obj[1] = casts.CTimeCyc.ambient_obj_green[val]/255
+    module.tvisual.timecyc.ambient_obj[2] = casts.CTimeCyc.ambient_obj_blue[val]/255
 
-    module.tvisual.timecyc.sky_top[0] = CTimecyc.sky_top_red[val]/255
-    module.tvisual.timecyc.sky_top[1] = CTimecyc.sky_top_green[val]/255
-    module.tvisual.timecyc.sky_top[2] = CTimecyc.sky_top_blue[val]/255
+    module.tvisual.timecyc.sky_top[0] = casts.CTimeCyc.sky_top_red[val]/255
+    module.tvisual.timecyc.sky_top[1] = casts.CTimeCyc.sky_top_green[val]/255
+    module.tvisual.timecyc.sky_top[2] = casts.CTimeCyc.sky_top_blue[val]/255
 
-    module.tvisual.timecyc.sky_bottom[0] = CTimecyc.sky_bottom_red[val]/255
-    module.tvisual.timecyc.sky_bottom[1] = CTimecyc.sky_bottom_green[val]/255
-    module.tvisual.timecyc.sky_bottom[2] = CTimecyc.sky_bottom_blue[val]/255
+    module.tvisual.timecyc.sky_bottom[0] = casts.CTimeCyc.sky_bottom_red[val]/255
+    module.tvisual.timecyc.sky_bottom[1] = casts.CTimeCyc.sky_bottom_green[val]/255
+    module.tvisual.timecyc.sky_bottom[2] = casts.CTimeCyc.sky_bottom_blue[val]/255
 
-    module.tvisual.timecyc.sun_core[0] = CTimecyc.sun_core_red[val]/255
-    module.tvisual.timecyc.sun_core[1] = CTimecyc.sun_core_green[val]/255
-    module.tvisual.timecyc.sun_core[2] = CTimecyc.sun_core_blue[val]/255
+    module.tvisual.timecyc.sun_core[0] = casts.CTimeCyc.sun_core_red[val]/255
+    module.tvisual.timecyc.sun_core[1] = casts.CTimeCyc.sun_core_green[val]/255
+    module.tvisual.timecyc.sun_core[2] = casts.CTimeCyc.sun_core_blue[val]/255
 
-    module.tvisual.timecyc.sun_corona[0] = CTimecyc.sun_corona_red[val]/255
-    module.tvisual.timecyc.sun_corona[1] = CTimecyc.sun_corona_green[val]/255
-    module.tvisual.timecyc.sun_corona[2] = CTimecyc.sun_corona_blue[val]/255
+    module.tvisual.timecyc.sun_corona[0] = casts.CTimeCyc.sun_corona_red[val]/255
+    module.tvisual.timecyc.sun_corona[1] = casts.CTimeCyc.sun_corona_green[val]/255
+    module.tvisual.timecyc.sun_corona[2] = casts.CTimeCyc.sun_corona_blue[val]/255
 
-    module.tvisual.timecyc.sun_size[0] = CTimecyc.sun_size[val]
+    module.tvisual.timecyc.sun_size[0] = casts.CTimeCyc.sun_size[val]
 
-    module.tvisual.timecyc.sprite_brightness[0] = CTimecyc.sprite_brightness[val]
-    module.tvisual.timecyc.sprite_size[0]       = CTimecyc.sprite_size[val]
+    module.tvisual.timecyc.sprite_brightness[0] = casts.CTimeCyc.sprite_brightness[val]
+    module.tvisual.timecyc.sprite_size[0]       = casts.CTimeCyc.sprite_size[val]
 
-    module.tvisual.timecyc.shadow_strength[0]       = CTimecyc.shadow_strength[val]
-    module.tvisual.timecyc.light_shadow_strength[0] = CTimecyc.light_shadow_strength[val]
-    module.tvisual.timecyc.pole_shadow_strength[0]  = CTimecyc.pole_shadow_strength[val]
+    module.tvisual.timecyc.shadow_strength[0]       = casts.CTimeCyc.shadow_strength[val]
+    module.tvisual.timecyc.light_shadow_strength[0] = casts.CTimeCyc.light_shadow_strength[val]
+    module.tvisual.timecyc.pole_shadow_strength[0]  = casts.CTimeCyc.pole_shadow_strength[val]
 
-    module.tvisual.timecyc.fog_start[0]                    = CTimecyc.fog_start[val]
-    module.tvisual.timecyc.far_clip[0]                     = CTimecyc.far_clip[val]
-    module.tvisual.timecyc.lights_on_ground_brightness[0]  = CTimecyc.lights_on_ground_brightness[val]
+    module.tvisual.timecyc.fog_start[0]                    = casts.CTimeCyc.fog_start[val]
+    module.tvisual.timecyc.far_clip[0]                     = casts.CTimeCyc.far_clip[val]
+    module.tvisual.timecyc.lights_on_ground_brightness[0]  = casts.CTimeCyc.lights_on_ground_brightness[val]
    
-    module.tvisual.timecyc.low_clouds[0] = CTimecyc.low_clouds_red[val]/255
-    module.tvisual.timecyc.low_clouds[1] = CTimecyc.low_clouds_green[val]/255
-    module.tvisual.timecyc.low_clouds[2] = CTimecyc.low_clouds_blue[val]/255
+    module.tvisual.timecyc.low_clouds[0] = casts.CTimeCyc.low_clouds_red[val]/255
+    module.tvisual.timecyc.low_clouds[1] = casts.CTimeCyc.low_clouds_green[val]/255
+    module.tvisual.timecyc.low_clouds[2] = casts.CTimeCyc.low_clouds_blue[val]/255
 
-    module.tvisual.timecyc.fluffy_clouds[0] = CTimecyc.fluffy_clouds_red[val]/255
-    module.tvisual.timecyc.fluffy_clouds[1] = CTimecyc.fluffy_clouds_green[val]/255
-    module.tvisual.timecyc.fluffy_clouds[2] = CTimecyc.fluffy_clouds_blue[val]/255
+    module.tvisual.timecyc.fluffy_clouds[0] = casts.CTimeCyc.fluffy_clouds_red[val]/255
+    module.tvisual.timecyc.fluffy_clouds[1] = casts.CTimeCyc.fluffy_clouds_green[val]/255
+    module.tvisual.timecyc.fluffy_clouds[2] = casts.CTimeCyc.fluffy_clouds_blue[val]/255
 
-    module.tvisual.timecyc.water[0] = CTimecyc.water_red[val]/255
-    module.tvisual.timecyc.water[1] = CTimecyc.water_green[val]/255
-    module.tvisual.timecyc.water[2] = CTimecyc.water_blue[val]/255
-    module.tvisual.timecyc.water[3] = CTimecyc.water_alpha[val]/255
+    module.tvisual.timecyc.water[0] = casts.CTimeCyc.water_red[val]/255
+    module.tvisual.timecyc.water[1] = casts.CTimeCyc.water_green[val]/255
+    module.tvisual.timecyc.water[2] = casts.CTimeCyc.water_blue[val]/255
+    module.tvisual.timecyc.water[3] = casts.CTimeCyc.water_alpha[val]/255
 
-    module.tvisual.timecyc.postfx1[0] = CTimecyc.postfx1_red[val]/255
-    module.tvisual.timecyc.postfx1[1] = CTimecyc.postfx1_green[val]/255
-    module.tvisual.timecyc.postfx1[2] = CTimecyc.postfx1_blue[val]/255
-    module.tvisual.timecyc.postfx1[3] = CTimecyc.postfx1_alpha[val]/255
+    module.tvisual.timecyc.postfx1[0] = casts.CTimeCyc.postfx1_red[val]/255
+    module.tvisual.timecyc.postfx1[1] = casts.CTimeCyc.postfx1_green[val]/255
+    module.tvisual.timecyc.postfx1[2] = casts.CTimeCyc.postfx1_blue[val]/255
+    module.tvisual.timecyc.postfx1[3] = casts.CTimeCyc.postfx1_alpha[val]/255
 
-    module.tvisual.timecyc.postfx2[0] = CTimecyc.postfx2_red[val]/255
-    module.tvisual.timecyc.postfx2[1] = CTimecyc.postfx2_green[val]/255
-    module.tvisual.timecyc.postfx2[2] = CTimecyc.postfx2_blue[val]/255
-    module.tvisual.timecyc.postfx2[3] = CTimecyc.postfx2_alpha[val]/255
+    module.tvisual.timecyc.postfx2[0] = casts.CTimeCyc.postfx2_red[val]/255
+    module.tvisual.timecyc.postfx2[1] = casts.CTimeCyc.postfx2_green[val]/255
+    module.tvisual.timecyc.postfx2[2] = casts.CTimeCyc.postfx2_blue[val]/255
+    module.tvisual.timecyc.postfx2[3] = casts.CTimeCyc.postfx2_alpha[val]/255
 
-    module.tvisual.timecyc.cloud_alpha[0]  = CTimecyc.cloud_alpha[val]
-    module.tvisual.timecyc.waterfog_alpha[0]  = CTimecyc.waterfog_alpha[val]
-    module.tvisual.timecyc.high_light_min_intensity[0]  = CTimecyc.high_light_min_intensity[val]
-    module.tvisual.timecyc.directional_mult[0]  = CTimecyc.directional_mult[val]
+    module.tvisual.timecyc.cloud_alpha[0]  = casts.CTimeCyc.cloud_alpha[val]
+    module.tvisual.timecyc.waterfog_alpha[0]  = casts.CTimeCyc.waterfog_alpha[val]
+    module.tvisual.timecyc.high_light_min_intensity[0]  = casts.CTimeCyc.high_light_min_intensity[val]
+    module.tvisual.timecyc.directional_mult[0]  = casts.CTimeCyc.directional_mult[val]
 end
 
 function GenerateTimecycFile(hour)
@@ -312,22 +231,22 @@ function GenerateTimecycFile(hour)
 					"\t%d %d %d %d\t\t" .. -- PostFx1ARGB
 					"\t%d %d %d %d" .. -- PostFx2ARGB
 					"\t%d\t\t\t\t%d\t\t\t\t\t%d\t\t\t\t%.2f\t\t\n", -- CloudAlpha HiLiMinIntensity WaterFogAlpha DirectionalMult
-					CTimecyc.ambient_red[val], CTimecyc.ambient_green[val],	CTimecyc.ambient_blue[val],
-					CTimecyc.ambient_obj_red[val], CTimecyc.ambient_obj_green[val],	CTimecyc.ambient_obj_blue[val],
+					casts.CTimeCyc.ambient_red[val], casts.CTimeCyc.ambient_green[val],	casts.CTimeCyc.ambient_blue[val],
+					casts.CTimeCyc.ambient_obj_red[val], casts.CTimeCyc.ambient_obj_green[val],	casts.CTimeCyc.ambient_obj_blue[val],
 					255, 255, 255,
-					CTimecyc.sky_top_red[val], CTimecyc.sky_top_green[val], CTimecyc.sky_top_blue[val],
-					CTimecyc.sky_bottom_red[val], CTimecyc.sky_bottom_green[val], CTimecyc.sky_bottom_blue[val],
-					CTimecyc.sun_core_red[val],CTimecyc.sun_core_green[val],CTimecyc.sun_core_blue[val],
-					CTimecyc.sun_corona_red[val], CTimecyc.sun_corona_green[val], CTimecyc.sun_corona_blue[val],
-					(CTimecyc.sprite_size[val] - 0.5) / 10.0,(CTimecyc.sprite_size[val] - 0.5) / 10.0,(CTimecyc.sprite_brightness[val] - 0.5) / 10.0,
-					CTimecyc.shadow_strength[val],CTimecyc.light_shadow_strength[val],CTimecyc.pole_shadow_strength[val],
-					CTimecyc.far_clip[val],CTimecyc.fog_start[val],	(CTimecyc.lights_on_ground_brightness[val] - 0.5) / 10.0,
-					CTimecyc.low_clouds_red[val],CTimecyc.low_clouds_green[val],CTimecyc.low_clouds_blue[val],
-					CTimecyc.fluffy_clouds_red[val],CTimecyc.fluffy_clouds_green[val],CTimecyc.fluffy_clouds_blue[val],
-					CTimecyc.water_red[val],CTimecyc.water_blue[val],CTimecyc.water_blue[val],CTimecyc.water_alpha[val],
-					CTimecyc.postfx1_alpha[val],CTimecyc.postfx1_red[val],CTimecyc.postfx1_green[val],CTimecyc.postfx1_blue[val],
-					CTimecyc.postfx2_alpha[val],CTimecyc.postfx2_red[val],CTimecyc.postfx2_green[val],CTimecyc.postfx2_blue[val],
-					CTimecyc.cloud_alpha[val],CTimecyc.high_light_min_intensity[val], CTimecyc.waterfog_alpha[val],	CTimecyc.directional_mult[val] / 100.0
+					casts.CTimeCyc.sky_top_red[val], casts.CTimeCyc.sky_top_green[val], casts.CTimeCyc.sky_top_blue[val],
+					casts.CTimeCyc.sky_bottom_red[val], casts.CTimeCyc.sky_bottom_green[val], casts.CTimeCyc.sky_bottom_blue[val],
+					casts.CTimeCyc.sun_core_red[val],casts.CTimeCyc.sun_core_green[val],casts.CTimeCyc.sun_core_blue[val],
+					casts.CTimeCyc.sun_corona_red[val], casts.CTimeCyc.sun_corona_green[val], casts.CTimeCyc.sun_corona_blue[val],
+					(casts.CTimeCyc.sprite_size[val] - 0.5) / 10.0,(casts.CTimeCyc.sprite_size[val] - 0.5) / 10.0,(casts.CTimeCyc.sprite_brightness[val] - 0.5) / 10.0,
+					casts.CTimeCyc.shadow_strength[val],casts.CTimeCyc.light_shadow_strength[val],casts.CTimeCyc.pole_shadow_strength[val],
+					casts.CTimeCyc.far_clip[val],casts.CTimeCyc.fog_start[val],	(casts.CTimeCyc.lights_on_ground_brightness[val] - 0.5) / 10.0,
+					casts.CTimeCyc.low_clouds_red[val],casts.CTimeCyc.low_clouds_green[val],casts.CTimeCyc.low_clouds_blue[val],
+					casts.CTimeCyc.fluffy_clouds_red[val],casts.CTimeCyc.fluffy_clouds_green[val],casts.CTimeCyc.fluffy_clouds_blue[val],
+					casts.CTimeCyc.water_red[val],casts.CTimeCyc.water_blue[val],casts.CTimeCyc.water_blue[val],casts.CTimeCyc.water_alpha[val],
+					casts.CTimeCyc.postfx1_alpha[val],casts.CTimeCyc.postfx1_red[val],casts.CTimeCyc.postfx1_green[val],casts.CTimeCyc.postfx1_blue[val],
+					casts.CTimeCyc.postfx2_alpha[val],casts.CTimeCyc.postfx2_red[val],casts.CTimeCyc.postfx2_green[val],casts.CTimeCyc.postfx2_blue[val],
+					casts.CTimeCyc.cloud_alpha[val],casts.CTimeCyc.high_light_min_intensity[val], casts.CTimeCyc.waterfog_alpha[val],	casts.CTimeCyc.directional_mult[val] / 100.0
 				)
 			)
         end
@@ -391,8 +310,8 @@ function module.VisualMain()
             fcommon.CRGBAColorPicker("Health bar + debt color",0xBAB22C,{180,25,29})
             fcommon.CRGBAColorPicker("Main menu title border color",0xBAB240,{0,0,0})
             fcommon.CRGBAColorPicker("Money color",0xBAB230,{54,104,44})
-            fcommon.RadioButtonFunc("Money font outline",{"No outline","Thin outline","Default outline"},{0,1,2},0x58F58D)
-            fcommon.RadioButtonFunc("Money font style",{"Style 1","Style 2","Default style"},{1,2,3},0x58F57F)
+            fcommon.RadioButtonAddressEx("Money font outline",{"No outline","Thin outline","Default outline"},{0,1,2},0x58F58D)
+            fcommon.RadioButtonAddressEx("Money font style",{"Style 1","Style 2","Default style"},{1,2,3},0x58F57F)
             fcommon.UpdateAddress({ name = 'Radar Height',address = 0x866B74,size = 4,min=0,default = 76,max = 999,is_float = true})
             fcommon.UpdateAddress({ name = 'Radar Width',address = 0x866B78,size = 4,min=0,default = 94,max = 999,is_float = true})
             fcommon.UpdateAddress({ name = 'Radar X position',address = 0x858A10,size = 4,min=-999,default = 40,max = 999,is_float = true,help_text = "Changes radar vertical position"})
@@ -401,7 +320,7 @@ function module.VisualMain()
             fcommon.CRGBAColorPicker("Radio station color",0xBAB24C,{150,150,150})
             fcommon.CRGBAColorPicker("Styled text color",0xBAB258,{226,192,99})
             fcommon.CRGBAColorPicker("Text color",0xBAB234,{50,60,127})
-            fcommon.RadioButtonFunc("Wanted star border",{"No border","Default","Bold border"},{0,1,2},0x58DD41)
+            fcommon.RadioButtonAddressEx("Wanted star border",{"No border","Default","Bold border"},{0,1,2},0x58DD41)
             fcommon.CRGBAColorPicker("Wanted star color + some text",0xBAB244,{144,98,16})
             fcommon.UpdateAddress({ name = 'Wanted star Y position',address = 0x858CCC,size = 4,is_float = true,min=-500,default = 12,max = 500})
         end,
@@ -412,12 +331,12 @@ function module.VisualMain()
                 HOUR = 8
             end
 
-            local val = 23 * GetCurrentHourTimeId(HOUR) + CTimecyc.curr_weather[0]
+            local val = 23 * GetCurrentHourTimeId(HOUR) + casts.CTimeCyc.curr_weather[0]
             UpdateTimecycData(val)
 
             imgui.SetNextItemWidth(imgui.GetWindowContentRegionWidth()/1.7)
             if imgui.Button("Reset timecyc",imgui.ImVec2(fcommon.GetSize(2))) then
-                CTimecyc.initialise()
+                casts.CTimeCyc.initialise()
                 printHelpString("Timecyc reset")
             end
             imgui.SameLine()
@@ -426,22 +345,22 @@ function module.VisualMain()
                 printHelpString("File generated")
             end
             imgui.Spacing()
-            local weather = imgui.new.int(CTimecyc.curr_weather[0])
+            local weather = imgui.new.int(casts.CTimeCyc.curr_weather[0])
             if imgui.Combo("Current weather", weather,module.tvisual.timecyc.weather.array,#module.tvisual.timecyc.weather.names) then
                 if module.tvisual.lock_weather[0] then
                     printHelpString("Weather locked")
                 else
-                    CTimecyc.curr_weather[0] = weather[0]
+                    casts.CTimeCyc.curr_weather[0] = weather[0]
                     printHelpString("Current weather set")
                 end
             end
 
-            weather = imgui.new.int(CTimecyc.next_weather[0])
+            weather = imgui.new.int(casts.CTimeCyc.next_weather[0])
             if imgui.Combo("Next weather", weather,module.tvisual.timecyc.weather.array,#module.tvisual.timecyc.weather.names) then
                 if module.tvisual.lock_weather[0] then
                     printHelpString("Weather locked")
                 else
-                    CTimecyc.next_weather[0] = weather[0]
+                    casts.CTimeCyc.next_weather[0] = weather[0]
                     printHelpString("Next weather set")
                 end
             end
@@ -451,134 +370,134 @@ function module.VisualMain()
             function() -- Colors
                 
                 if imgui.ColorEdit3("Ambient",module.tvisual.timecyc.ambient) then
-                    CTimecyc.ambient_red[val]   = module.tvisual.timecyc.ambient[0]*255
-                    CTimecyc.ambient_green[val] = module.tvisual.timecyc.ambient[1]*255
-                    CTimecyc.ambient_blue[val]  = module.tvisual.timecyc.ambient[2]*255
+                    casts.CTimeCyc.ambient_red[val]   = module.tvisual.timecyc.ambient[0]*255
+                    casts.CTimeCyc.ambient_green[val] = module.tvisual.timecyc.ambient[1]*255
+                    casts.CTimeCyc.ambient_blue[val]  = module.tvisual.timecyc.ambient[2]*255
                 end
                 fcommon.InformationTooltip("Ambient color on static map objects")
 
                 if imgui.ColorEdit3("Ambient obj",module.tvisual.timecyc.ambient_obj) then
-                    CTimecyc.ambient_obj_red[val]   = module.tvisual.timecyc.ambient_obj[0]*255
-                    CTimecyc.ambient_obj_green[val] = module.tvisual.timecyc.ambient_obj[1]*255
-                    CTimecyc.ambient_obj_blue[val]  = module.tvisual.timecyc.ambient_obj[2]*255
+                    casts.CTimeCyc.ambient_obj_red[val]   = module.tvisual.timecyc.ambient_obj[0]*255
+                    casts.CTimeCyc.ambient_obj_green[val] = module.tvisual.timecyc.ambient_obj[1]*255
+                    casts.CTimeCyc.ambient_obj_blue[val]  = module.tvisual.timecyc.ambient_obj[2]*255
                 end
                 fcommon.InformationTooltip("Ambient color on dynamic map objects")
 
                 if imgui.ColorEdit3("Fluffy clouds",module.tvisual.timecyc.fluffy_clouds) then
-                    CTimecyc.fluffy_clouds_red[val]   = module.tvisual.timecyc.fluffy_clouds[0]*255
-                    CTimecyc.fluffy_clouds_green[val] = module.tvisual.timecyc.fluffy_clouds[1]*255
-                    CTimecyc.fluffy_clouds_blue[val]  = module.tvisual.timecyc.fluffy_clouds[2]*255
+                    casts.CTimeCyc.fluffy_clouds_red[val]   = module.tvisual.timecyc.fluffy_clouds[0]*255
+                    casts.CTimeCyc.fluffy_clouds_green[val] = module.tvisual.timecyc.fluffy_clouds[1]*255
+                    casts.CTimeCyc.fluffy_clouds_blue[val]  = module.tvisual.timecyc.fluffy_clouds[2]*255
                 end
 
                 if imgui.ColorEdit3("Low clouds",module.tvisual.timecyc.low_clouds) then
-                    CTimecyc.low_clouds_red[val]   = module.tvisual.timecyc.low_clouds[0]*255
-                    CTimecyc.low_clouds_green[val] = module.tvisual.timecyc.low_clouds[1]*255
-                    CTimecyc.low_clouds_blue[val]  = module.tvisual.timecyc.low_clouds[2]*255
+                    casts.CTimeCyc.low_clouds_red[val]   = module.tvisual.timecyc.low_clouds[0]*255
+                    casts.CTimeCyc.low_clouds_green[val] = module.tvisual.timecyc.low_clouds[1]*255
+                    casts.CTimeCyc.low_clouds_blue[val]  = module.tvisual.timecyc.low_clouds[2]*255
                 end
 
                 if imgui.ColorEdit4("Postfx 1",module.tvisual.timecyc.postfx1) then
-                    CTimecyc.postfx1_red[val]   = module.tvisual.timecyc.postfx1[0]*255
-                    CTimecyc.postfx1_green[val] = module.tvisual.timecyc.postfx1[1]*255
-                    CTimecyc.postfx1_blue[val]  = module.tvisual.timecyc.postfx1[2]*255
-                    CTimecyc.postfx1_alpha[val] = module.tvisual.timecyc.postfx1[3]*255
+                    casts.CTimeCyc.postfx1_red[val]   = module.tvisual.timecyc.postfx1[0]*255
+                    casts.CTimeCyc.postfx1_green[val] = module.tvisual.timecyc.postfx1[1]*255
+                    casts.CTimeCyc.postfx1_blue[val]  = module.tvisual.timecyc.postfx1[2]*255
+                    casts.CTimeCyc.postfx1_alpha[val] = module.tvisual.timecyc.postfx1[3]*255
                 end
                 fcommon.InformationTooltip("Color correction 1")
 
                 if imgui.ColorEdit4("Postfx 2",module.tvisual.timecyc.postfx2) then
-                    CTimecyc.postfx2_red[val]   = module.tvisual.timecyc.postfx2[0]*255
-                    CTimecyc.postfx2_green[val] = module.tvisual.timecyc.postfx2[1]*255
-                    CTimecyc.postfx2_blue[val]  = module.tvisual.timecyc.postfx2[2]*255
-                    CTimecyc.postfx2_alpha[val] = module.tvisual.timecyc.postfx2[3]*255
+                    casts.CTimeCyc.postfx2_red[val]   = module.tvisual.timecyc.postfx2[0]*255
+                    casts.CTimeCyc.postfx2_green[val] = module.tvisual.timecyc.postfx2[1]*255
+                    casts.CTimeCyc.postfx2_blue[val]  = module.tvisual.timecyc.postfx2[2]*255
+                    casts.CTimeCyc.postfx2_alpha[val] = module.tvisual.timecyc.postfx2[3]*255
                 end
                 fcommon.InformationTooltip("Color correction 2")
 
                 if imgui.ColorEdit3("Sky bottom",module.tvisual.timecyc.sky_bottom) then
-                    CTimecyc.sky_bottom_red[val]   = module.tvisual.timecyc.sky_bottom[0]*255
-                    CTimecyc.sky_bottom_green[val] = module.tvisual.timecyc.sky_bottom[1]*255
-                    CTimecyc.sky_bottom_blue[val]  = module.tvisual.timecyc.sky_bottom[2]*255
+                    casts.CTimeCyc.sky_bottom_red[val]   = module.tvisual.timecyc.sky_bottom[0]*255
+                    casts.CTimeCyc.sky_bottom_green[val] = module.tvisual.timecyc.sky_bottom[1]*255
+                    casts.CTimeCyc.sky_bottom_blue[val]  = module.tvisual.timecyc.sky_bottom[2]*255
                 end
                 
                 if imgui.ColorEdit3("Sun core",module.tvisual.timecyc.sun_core) then
-                    CTimecyc.sun_core_red[val]   = module.tvisual.timecyc.sun_core[0]*255
-                    CTimecyc.sun_core_green[val] = module.tvisual.timecyc.sun_core[1]*255
-                    CTimecyc.sun_core_blue[val]  = module.tvisual.timecyc.sun_core[2]*255
+                    casts.CTimeCyc.sun_core_red[val]   = module.tvisual.timecyc.sun_core[0]*255
+                    casts.CTimeCyc.sun_core_green[val] = module.tvisual.timecyc.sun_core[1]*255
+                    casts.CTimeCyc.sun_core_blue[val]  = module.tvisual.timecyc.sun_core[2]*255
                 end
 
                 if imgui.ColorEdit3("Sun corona",module.tvisual.timecyc.sun_corona) then
-                    CTimecyc.sun_corona_red[val]   = module.tvisual.timecyc.sun_corona[0]*255
-                    CTimecyc.sun_corona_green[val] = module.tvisual.timecyc.sun_corona[1]*255
-                    CTimecyc.sun_corona_blue[val]  = module.tvisual.timecyc.sun_corona[2]*255
+                    casts.CTimeCyc.sun_corona_red[val]   = module.tvisual.timecyc.sun_corona[0]*255
+                    casts.CTimeCyc.sun_corona_green[val] = module.tvisual.timecyc.sun_corona[1]*255
+                    casts.CTimeCyc.sun_corona_blue[val]  = module.tvisual.timecyc.sun_corona[2]*255
                 end
 
                 if imgui.ColorEdit3("Sky top",module.tvisual.timecyc.sky_top) then
-                    CTimecyc.sky_top_red[val]   = module.tvisual.timecyc.sky_top[0]*255
-                    CTimecyc.sky_top_green[val] = module.tvisual.timecyc.sky_top[1]*255
-                    CTimecyc.sky_top_blue[val]  = module.tvisual.timecyc.sky_top[2]*255
+                    casts.CTimeCyc.sky_top_red[val]   = module.tvisual.timecyc.sky_top[0]*255
+                    casts.CTimeCyc.sky_top_green[val] = module.tvisual.timecyc.sky_top[1]*255
+                    casts.CTimeCyc.sky_top_blue[val]  = module.tvisual.timecyc.sky_top[2]*255
                 end
 
                 if imgui.ColorEdit4("Water",module.tvisual.timecyc.water) then
-                    CTimecyc.water_red[val]   = module.tvisual.timecyc.water[0]*255
-                    CTimecyc.water_green[val] = module.tvisual.timecyc.water[1]*255
-                    CTimecyc.water_blue[val]  = module.tvisual.timecyc.water[2]*255
-                    CTimecyc.water_alpha[val]  = module.tvisual.timecyc.water[3]*255
+                    casts.CTimeCyc.water_red[val]   = module.tvisual.timecyc.water[0]*255
+                    casts.CTimeCyc.water_green[val] = module.tvisual.timecyc.water[1]*255
+                    casts.CTimeCyc.water_blue[val]  = module.tvisual.timecyc.water[2]*255
+                    casts.CTimeCyc.water_alpha[val]  = module.tvisual.timecyc.water[3]*255
                 end
             end,
             function() -- Misc
 
                 imgui.PushItemWidth(imgui.GetWindowContentRegionWidth()/2)
                 if imgui.SliderInt("Cloud alpha", module.tvisual.timecyc.cloud_alpha, 0, 255) then
-                    CTimecyc.cloud_alpha[val]   = module.tvisual.timecyc.cloud_alpha[0]
+                    casts.CTimeCyc.cloud_alpha[val]   = module.tvisual.timecyc.cloud_alpha[0]
                 end
 
                 if imgui.SliderInt("Directional mult", module.tvisual.timecyc.directional_mult, 0, 255) then
-                    CTimecyc.directional_mult[val]   = module.tvisual.timecyc.directional_mult[0]
+                    casts.CTimeCyc.directional_mult[val]   = module.tvisual.timecyc.directional_mult[0]
                 end
                 fcommon.InformationTooltip("Direct light on peds & vehicles")
 
                 if imgui.SliderInt("Far clip", module.tvisual.timecyc.far_clip, 0, 2000) then
-                    CTimecyc.far_clip[val]   = module.tvisual.timecyc.far_clip[0]
+                    casts.CTimeCyc.far_clip[val]   = module.tvisual.timecyc.far_clip[0]
                 end
                 fcommon.InformationTooltip("Visibility range")
 
                 if imgui.SliderInt("High light min intensity", module.tvisual.timecyc.high_light_min_intensity, 0, 255) then
-                    CTimecyc.high_light_min_intensity[val]   = module.tvisual.timecyc.high_light_min_intensity[0]
+                    casts.CTimeCyc.high_light_min_intensity[val]   = module.tvisual.timecyc.high_light_min_intensity[0]
                 end
                 fcommon.InformationTooltip("Intensity limit for PS2 radiosity effect")
 
                 if imgui.SliderInt("Fog start", module.tvisual.timecyc.fog_start, 0, 2000) then
-                    CTimecyc.fog_start[val]   = module.tvisual.timecyc.fog_start[0]
+                    casts.CTimeCyc.fog_start[val]   = module.tvisual.timecyc.fog_start[0]
                 end
 
                 if imgui.SliderInt("Light on ground brightness", module.tvisual.timecyc.lights_on_ground_brightness, 0, 255) then
-                    CTimecyc.lights_on_ground_brightness[val]   = module.tvisual.timecyc.lights_on_ground_brightness[0]
+                    casts.CTimeCyc.lights_on_ground_brightness[val]   = module.tvisual.timecyc.lights_on_ground_brightness[0]
                 end
 
                 if imgui.SliderInt("Light shadow strength", module.tvisual.timecyc.light_shadow_strength, 0, 255) then
-                    CTimecyc.light_shadow_strength[val]   = module.tvisual.timecyc.light_shadow_strength[0]
+                    casts.CTimeCyc.light_shadow_strength[val]   = module.tvisual.timecyc.light_shadow_strength[0]
                 end
 
                 if imgui.SliderInt("Pole shadow strength", module.tvisual.timecyc.pole_shadow_strength, 0, 255) then
-                    CTimecyc.pole_shadow_strength[val]   = module.tvisual.timecyc.pole_shadow_strength[0]
+                    casts.CTimeCyc.pole_shadow_strength[val]   = module.tvisual.timecyc.pole_shadow_strength[0]
                 end
 
                 if imgui.SliderInt("Shadow strength", module.tvisual.timecyc.shadow_strength, 0, 255) then
-                    CTimecyc.shadow_strength[val]   = module.tvisual.timecyc.shadow_strength[0]
+                    casts.CTimeCyc.shadow_strength[val]   = module.tvisual.timecyc.shadow_strength[0]
                 end
 
                 if imgui.SliderInt("Sprite brightness", module.tvisual.timecyc.sprite_brightness, 0, 127) then
-                    CTimecyc.sprite_brightness[val]   = module.tvisual.timecyc.sprite_brightness[0]
+                    casts.CTimeCyc.sprite_brightness[val]   = module.tvisual.timecyc.sprite_brightness[0]
                 end
 
                 if imgui.SliderInt("Sprite size", module.tvisual.timecyc.sprite_size, 0, 127) then
-                    CTimecyc.sprite_size[val]   = module.tvisual.timecyc.sprite_size[0]
+                    casts.CTimeCyc.sprite_size[val]   = module.tvisual.timecyc.sprite_size[0]
                 end
                 
                 if imgui.SliderInt("Sun size", module.tvisual.timecyc.sun_size, 0, 127) then
-                    CTimecyc.sun_size[val]   = module.tvisual.timecyc.sun_size[0]
+                    casts.CTimeCyc.sun_size[val]   = module.tvisual.timecyc.sun_size[0]
                 end
 
                 if imgui.SliderInt("Water fog alpha", module.tvisual.timecyc.waterfog_alpha, 0, 255) then
-                    CTimecyc.waterfog_alpha[val]   = module.tvisual.timecyc.waterfog_alpha[0]
+                    casts.CTimeCyc.waterfog_alpha[val]   = module.tvisual.timecyc.waterfog_alpha[0]
                 end
             end})
 

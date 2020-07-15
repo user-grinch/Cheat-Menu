@@ -30,8 +30,7 @@ function module.StatMain()
     fcommon.Tabs("Stats",{"Vehicle","Weapon","Girlfriend","Search"},{
         function()
             if imgui.Button("Max vehicle stats",imgui.ImVec2(fcommon.GetSize(1))) then
-                callFunction(0x4399D0,1,1,false)
-                displayNonMinigameHelpMessages(false)
+                callFunction(0x4399D0,1,1)
                 fcommon.CheatActivated()
             end
             imgui.Spacing()
@@ -42,9 +41,7 @@ function module.StatMain()
         end,
         function()
             if imgui.Button("Max weapon stats",imgui.ImVec2(fcommon.GetSize(1))) then
-                for i=69,79,1 do
-                    setFloatStat(i,1000)
-                end
+                callFunction(0x439940,1,1)
                 fcommon.CheatActivated()
             end
             imgui.Spacing()

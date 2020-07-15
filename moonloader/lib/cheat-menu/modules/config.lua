@@ -221,7 +221,6 @@ function module.Write()
             {
                 auto_update_check   = fmenu.tmenu.auto_update_check[0],
                 auto_reload         = fmenu.tmenu.auto_reload[0],
-                debug_log           = fmenu.tmenu.debug_log[0], 
                 draw_text_only      = fmenu.tmenu.draw_text_only[0], 
                 fast_load_images    = fmenu.tmenu.fast_load_images[0],
                 lock_player         = fmenu.tmenu.lock_player[0],
@@ -343,7 +342,6 @@ function module.Write()
                 },
                 long_target_range = fweapon.tweapon.long_target_range[0],
                 long_weapon_range = fweapon.tweapon.long_weapon_range[0],
-                no_reload         = fweapon.tweapon.no_reload[0],
                 ped               = fweapon.tweapon.ped[0],
             }, 
         }
