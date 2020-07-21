@@ -37,7 +37,6 @@ module.tvehicle =
     },
     components   =
     {
-        filter   = imgui.ImGuiTextFilter(),
         images   = {},
         list     = {},
         names    = {},
@@ -66,7 +65,6 @@ module.tvehicle =
         offset_y_var    = imgui.new.float(0),
         offset_z_var    = imgui.new.float(0),
     },
-    filter          = imgui.ImGuiTextFilter(),
     gsx             =
     {
         handle      = getModuleHandle("gsx.asi"),
@@ -92,7 +90,6 @@ module.tvehicle =
     {
         cache_images     = {},
         current_paintjob = imgui.new.int(-1);
-        filter           = imgui.ImGuiTextFilter(),
         path             =  tcheatmenu.dir .. "vehicles\\paintjobs",
         images           = {},
         texture          = nil
@@ -176,32 +173,26 @@ end
 
 function module.TrafficNeons()
     while module.tvehicle.neon.checkbox[0] and module.tvehicle.neon["Handle"] ~= 0 do
-        local x,y,z = getCharCoordinates(PLAYER_PED)
 
-        local result, car = findAllRandomVehiclesInSphere(x,y,z,100.0,false,true)
-        
-        if result then
-            while result do
+        for hveh in fcommon.pool("veh") do
                 local temp = 0
-                local pCar = getCarPointer(car)
+                local pveh = getCarPointer(hveh)
 
-                if getVehicleClass(car) == fconst.VEHICLE_CLASS.NORMAL then
+                if getVehicleClass(hveh) == fconst.VEHICLE_CLASS.NORMAL then
                     temp = math.random(1,20) -- 5%
                 end
-                if getVehicleClass(car) == fconst.VEHICLE_CLASS.RICH_FAMILY then
+                if getVehicleClass(hveh) == fconst.VEHICLE_CLASS.RICH_FAMILY then
                     temp = math.random(1,5) -- 20%
                 end
-                if getVehicleClass(car) == fconst.VEHICLE_CLASS.EXECUTIVE then
+                if getVehicleClass(hveh) == fconst.VEHICLE_CLASS.EXECUTIVE then
                     temp = math.random(1,3) -- 30%
                 end
-                if temp == 1 and callFunction(module.tvehicle.neon["GetFlag"],1,1,pCar) ~= 0x10 then
-                    if getCarCharIsUsing(PLAYER_PED) ~= car then
-                        InstallNeon(pCar,math.random(0,6),math.random(0,1))
+                if temp == 1 and callFunction(module.tvehicle.neon["GetFlag"],1,1,pveh) ~= 0x10 then
+                    if getCarCharIsUsing(PLAYER_PED) ~= hveh then
+                        InstallNeon(pveh,math.random(0,6),math.random(0,1))
                     end
                 end
-                callFunction(module.tvehicle.neon["SetFlag"],2,2,pCar,0x10)
-                result, car = findAllRandomVehiclesInSphere(x,y,z,100.0,true,true)
-            end
+                callFunction(module.tvehicle.neon["SetFlag"],2,2,pveh,0x10)
         end
         wait(100)
     end
@@ -715,16 +706,11 @@ function module.RainbowColors()
     while module.tvehicle.rainbow_colors.bool[0] do
         
         if module.tvehicle.rainbow_colors.traffic[0] then -- Player + Traffic  
-            local charX,charY,charZ = getCharCoordinates(PLAYER_PED)
         
-            local result, hveh = findAllRandomVehiclesInSphere(charX,charY,charZ,100.0,false,true)
-
-            if result then
-                while result do
-                    ChangeVehicleColorHSL(hveh,hue,module.tvehicle.rainbow_colors.saturation[0],module.tvehicle.rainbow_colors.light[0])
-                    result, hveh = findAllRandomVehiclesInSphere(charX,charY,charZ,100.0,true,true)
-                end
-            end
+            for hveh in fcommon.pool("veh") do
+                ChangeVehicleColorHSL(hveh,hue,module.tvehicle.rainbow_colors.saturation[0],module.tvehicle.rainbow_colors.light[0])    
+            end        
+            
         else -- Only Player
             if isCharInAnyCar(PLAYER_PED) then
                 local hveh = getCarCharIsUsing(PLAYER_PED)
@@ -1231,15 +1217,9 @@ function module.VehicleMain()
             fcommon.CheckBoxVar("Spawn aircraft in air",module.tvehicle.aircraft.spawn_in_air)
             imgui.Columns(1)
 
-            imgui.Spacing()
-            fcommon.Tabs("Vehicles list",{"List","Search"},{
-                function()
-                    fcommon.DrawImages(fconst.IDENTIFIER.VEHICLE,fconst.DRAW_TYPE.LIST,module.tvehicle.images,fconst.VEHICLE.IMAGE_HEIGHT,fconst.VEHICLE.IMAGE_WIDTH,module.GiveVehicleToPlayer,nil,casts.CModelInfo.GetNameFromModel,module.tvehicle.filter)
-                end,
-                function()
-                    fcommon.DrawImages(fconst.IDENTIFIER.VEHICLE,fconst.DRAW_TYPE.SEARCH,module.tvehicle.images,fconst.VEHICLE.IMAGE_HEIGHT,fconst.VEHICLE.IMAGE_WIDTH,module.GiveVehicleToPlayer,nil,casts.CModelInfo.GetNameFromModel,module.tvehicle.filter)
-                end
-            })
+            imgui.Dummy(imgui.ImVec2(0,10))   
+            fcommon.DrawEntries(fconst.IDENTIFIER.VEHICLE,fconst.DRAW_TYPE.IMAGE,module.GiveVehicleToPlayer,nil,casts.CModelInfo.GetNameFromModel,module.tvehicle.images,fconst.VEHICLE.IMAGE_HEIGHT,fconst.VEHICLE.IMAGE_WIDTH)
+
         end,
         function()
             if isCharInAnyCar(PLAYER_PED) then
@@ -1384,8 +1364,7 @@ function module.VehicleMain()
                         end
                     end
                 end
-
-                fcommon.DrawImages(fconst.IDENTIFIER.PAINTJOB,fconst.DRAW_TYPE.SEARCH,module.tvehicle.paintjobs.images,fconst.PAINTJOB.IMAGE_HEIGHT,fconst.PAINTJOB.IMAGE_WIDTH,ApplyTexture,nil,module.GetTextureName,module.tvehicle.paintjobs.filter)
+                fcommon.DrawEntries(fconst.IDENTIFIER.PAINTJOB,fconst.DRAW_TYPE.IMAGE,ApplyTexture,nil,module.GetTextureName,module.tvehicle.paintjobs.images,fconst.VEHICLE.IMAGE_HEIGHT,fconst.VEHICLE.IMAGE_WIDTH)
             else
                 imgui.TextWrapped("Player needs to be inside a vehicle for options to show up here.")
             end
@@ -1405,15 +1384,10 @@ function module.VehicleMain()
                     end
                     printHelpString("Vehicle components reset")
                 end
-                imgui.Spacing()
-                imgui.Text("Info")
-                fcommon.InformationTooltip("Left click to add component\nRight click to remove component")
-                imgui.Spacing()
-                if imgui.BeginChild("Tune") then
-                    imgui.Spacing()
-                    fcommon.DrawImages(fconst.IDENTIFIER.COMPONENT,fconst.DRAW_TYPE.LIST,module.tvehicle.components.images,fconst.COMPONENT.IMAGE_HEIGHT,fconst.COMPONENT.IMAGE_WIDTH,module.AddComponentToVehicle,module.RemoveComponentFromVehicle,nil,module.tvehicle.components.filter)
-                    imgui.EndChild()
-                end
+                
+                imgui.Dummy(imgui.ImVec2(0,10))
+                fcommon.DrawEntries(fconst.IDENTIFIER.COMPONENT,fconst.DRAW_TYPE.IMAGE,module.AddComponentToVehicle,module.RemoveComponentFromVehicle,function(a) return a end,module.tvehicle.components.images,fconst.COMPONENT.IMAGE_HEIGHT,fconst.COMPONENT.IMAGE_WIDTH)
+                
             else
                 imgui.TextWrapped("Player needs to be inside a vehicle for options to show up here.")
             end

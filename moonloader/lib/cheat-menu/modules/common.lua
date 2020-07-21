@@ -31,6 +31,44 @@ function module.spairs(t, f)
     return iter
 end
 
+function module.pool(pool)
+
+    local entities = {}
+    local cur_index = 0
+    local address = nil
+
+    if pool == "veh" then
+        address = 0xB74494 
+    end
+    if pool == "char" then
+        address = 0xB74490  
+    end
+    if pool == "obj" then
+        address = 0xB7449C   
+    end
+
+    local address = readMemory(address,4,false)
+    address = address + 0x04
+    address = readMemory(address,4,false)
+    local x = 0
+
+    while x <= 0x6D00 do
+        local entity = readMemory(address,1,false)
+        address = address + 1
+        if entity >= 0x00 and entity < 0x80 then
+            entity = entity + x
+            table.insert(entities,entity)
+        end
+        x = x + 0x100
+    end
+
+    local iter = function () 
+        cur_index = cur_index + 1
+        return entities[cur_index]
+    end
+    return iter
+end
+
 function module.LockThread(text)
     
     if tcheatmenu.thread_locks[text] == nil then
@@ -67,6 +105,7 @@ function module.LoadJson(filename)
         local file = io.open(full_path, "r")
         local status, table = pcall(decodeJson,file:read("*a"))
         file:close()
+        
         if status and table then
             return table
         else
@@ -86,7 +125,19 @@ end
 --------------------------------------------------
 -- imgui functions
 
--- Custom imgui.CollapsingHeader
+function module.DropDownList(label,table,selected,func)
+    if imgui.BeginCombo(label, selected) then
+        for key,val in fcommon.spairs(table) do
+            if key ~= selected then
+                if imgui.MenuItemBool(key) and func ~= nil then
+                    func(key,val)
+                end
+            end
+        end
+        imgui.EndCombo()
+    end
+end
+
 function module.DropDownMenu(label,func,text_disabled)
     if label ~= nil then
         if text_disabled then
@@ -329,167 +380,139 @@ function LoadImages(image_table)
     
 end
 
--- Shows loaded images with on_click and on_hover calls
-function module.DrawImages(identifier,draw_type,loaded_images_list,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,filter)
+function DrawImage(identifier,func_on_left_click,func_on_right_click,image_table,const_image_height,const_image_width,model,image,model_name)
 
-    -- Calculate image count in a row
-    local images_in_row = math.floor(imgui.GetWindowContentRegionWidth()/const_image_width)
+    if identifier ~= fconst.IDENTIFIER.COMPONENT or casts.CVehicle.IsValidModForVehicle(tonumber(model),getCarPointer(getCarCharIsUsing(PLAYER_PED))) then
+        if type(image) ~= "string" then
+            local images_in_row = math.floor(imgui.GetWindowContentRegionWidth()/const_image_width)
+            local const_image_width = (imgui.GetWindowContentRegionWidth() - imgui.StyleVar.ItemSpacing*(images_in_row-0.6*images_in_row))/images_in_row
 
-    const_image_width = (imgui.GetWindowContentRegionWidth() - imgui.StyleVar.ItemSpacing*(images_in_row-0.4*images_in_row))/images_in_row
-
-    local image_count   = 1
-
-    -------------------------
-    -- Draws a single image
-    draw_image = function(identifier,image_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,filter,model,image)
-        local model_name = nil
-        if func_get_name ~= nil then
-            model_name = func_get_name(model)
-        end
-
-        if draw_type == fconst.DRAW_TYPE.LIST or filter:PassFilter(model_name) then
-            if type(image) ~= "string" then
-                if identifier ~= fconst.IDENTIFIER.COMPONENT or casts.CVehicle.IsValidModForVehicle(tonumber(model),getCarPointer(getCarCharIsUsing(PLAYER_PED))) then
-                    if imgui.ImageButton(image,imgui.ImVec2(const_image_width,const_image_height),imgui.ImVec2(0,0),imgui.ImVec2(1,1),1,imgui.ImVec4(1,1,1,1),imgui.ImVec4(1,1,1,1)) then
-                        func_on_left_click(model)
-                    end
-                    if imgui.IsMouseClicked(1) and func_on_right_click ~= nil then
-                        func_on_right_click(model)
-                    end
-                
-                    if model_name ~= nil then
-                        if imgui.IsItemHovered() then
-                            local drawlist = imgui.GetWindowDrawList()
-                            drawlist:AddRectFilled(imgui.GetItemRectMin(), imgui.GetItemRectMax(), imgui.GetColorU32(imgui.Col.ModalWindowDimBg))
-
-                            if identifier == fconst.IDENTIFIER.CLOTH and func_get_name ~= nil then
-                                model, model_name = func_get_name(model,true)
-                            end
-
-                            if imgui.CalcTextSize(model_name).x > const_image_width then
-                                model_name = model_name:gsub(" ","\n")
-                            end
-
-                            if identifier ~= fconst.IDENTIFIER.PAINTJOB then
-                                local offset_x = (imgui.GetItemRectSize().x - imgui.CalcTextSize(model).x)/2
-                                local offset_y = 5
-
-                                drawlist:AddText(imgui.ImVec2(imgui.GetItemRectMin().x+offset_x,imgui.GetItemRectMin().y+offset_y), imgui.GetColorU32(imgui.Col.Text),model)
-                                
-                                local offset_x = (imgui.GetItemRectSize().x - imgui.CalcTextSize(model_name).x)/2
-                                local offset_y = imgui.CalcTextSize(model).y+5
-                                drawlist:AddText(imgui.ImVec2(imgui.GetItemRectMin().x+offset_x,imgui.GetItemRectMin().y+offset_y), imgui.GetColorU32(imgui.Col.Text),model_name)
-                                
-                            else
-                                local text = string.format("%s",model)
-
-                                local offset_x = (imgui.GetItemRectSize().x - imgui.CalcTextSize(model).x)/2
-                                local offset_y = 5
-
-                                drawlist:AddText(imgui.ImVec2(imgui.GetItemRectMin().x+offset_x,imgui.GetItemRectMin().y+offset_y), imgui.GetColorU32(imgui.Col.Text),model)
-                                
-                            end
-                        end
-                    end
-
-                    if image_count % images_in_row ~= 0 then
-                        imgui.SameLine(0.0,4.0)
-                    end
-                    image_count = image_count + 1
-                end
+            if imgui.ImageButton(image,imgui.ImVec2(const_image_width,const_image_height),imgui.ImVec2(0,0),imgui.ImVec2(1,1),1,imgui.ImVec4(1,1,1,1),imgui.ImVec4(1,1,1,1)) then
+                func_on_left_click(model)
             end
-        end
-    end
-
-    draw_text = function(identifier,func_on_left_click,func_on_right_click,func_get_name,filter,model)
-        local model_name = ""
-        local label = ""
-
-        if func_get_name ~= nil then
-            model_name = func_get_name(model)
-        end
+            if imgui.IsMouseClicked(1) and func_on_right_click ~= nil then
+                func_on_right_click(model)
+            end
         
-        if identifier == fconst.IDENTIFIER.PAINTJOB or identifier == fconst.IDENTIFIER.COMPONENT or identifier == fconst.IDENTIFIER.CLOTHES then
-            if identifier == fconst.IDENTIFIER.CLOTHES then
-                local body_part, model_name , texture_name = fplayer.GetClothName(model,true)
-                label = string.format( "%s - %s - %s",body_part, model_name , texture_name)
-            else
-                label = model:gsub("$"," ")
-            end
-        else
-            label = string.format( "%s - %s",model_name,model)
-        end
+            if imgui.IsItemHovered() then
+                local drawlist = imgui.GetWindowDrawList()
+                drawlist:AddRectFilled(imgui.GetItemRectMin(), imgui.GetItemRectMax(), imgui.GetColorU32(imgui.Col.ModalWindowDimBg))
 
-        if draw_type == fconst.DRAW_TYPE.LIST or filter:PassFilter(model_name) then
-            if identifier ~= fconst.IDENTIFIER.COMPONENT or casts.CVehicle.IsValidModForVehicle(tonumber(model),getCarPointer(getCarCharIsUsing(PLAYER_PED))) then
-                if imgui.MenuItemBool(label) and func_on_left_click ~= nil then
-                    func_on_left_click(model)
-                end 
-                if imgui.IsMouseClicked(1) and func_on_right_click ~= nil then
-                    func_on_right_click(model)
+                if imgui.CalcTextSize(model_name).x > const_image_width then
+                    model_name = model_name:gsub(" ","\n")
+                end
+
+                local offset_x = (imgui.GetItemRectSize().x - imgui.CalcTextSize(model_name).x)/2
+                local offset_y = 10
+                drawlist:AddText(imgui.ImVec2(imgui.GetItemRectMin().x+offset_x,imgui.GetItemRectMin().y+offset_y), imgui.GetColorU32(imgui.Col.Text),model_name)
+            end
+
+            if tcheatmenu.temp_data.draw_entries_func[identifier].entry_count % images_in_row ~= 0 then
+                imgui.SameLine(0.0,4.0)
+            end
+            tcheatmenu.temp_data.draw_entries_func[identifier].entry_count = tcheatmenu.temp_data.draw_entries_func[identifier].entry_count + 1
+        end
+    end
+end
+
+function DrawText(func_on_left_click,func_on_right_click,entry,text,key,category)
+    if imgui.MenuItemBool(text) then
+        func_on_left_click(entry,category)
+    end
+
+    if imgui.IsItemClicked(1) and func_on_right_click ~= nil then
+        func_on_right_click(key,category)
+    end
+end
+
+
+function module.DrawEntries(identifier,draw_type,func_on_left_click,func_on_right_click,func_get_name,data_table,const_image_height,const_image_width)
+
+    --------------------------------------------------
+    -- Setup the temp table
+
+    if tcheatmenu.temp_data.draw_entries_func[identifier] == nil then
+        tcheatmenu.temp_data.draw_entries_func[identifier] = {
+            filter   = imgui.ImGuiTextFilter(),
+            entry_count   = 1,
+            entry_table   = {["All"] = {}},
+            selected = "All",
+            veh_model = nil,
+        }
+    end
+
+    if identifier == fconst.IDENTIFIER.COMPONENT then
+        local hveh = getCarCharIsUsing(PLAYER_PED)
+        local model = getCarModel(hveh)
+
+        if tcheatmenu.temp_data.draw_entries_func[identifier].veh_model ~= model then
+            tcheatmenu.temp_data.draw_entries_func[identifier].veh_model = model
+            for category,table in pairs(data_table) do
+                for model,data in pairs(table) do
+                    if casts.CVehicle.IsValidModForVehicle(tonumber(model),getCarPointer(hveh)) then
+                        if tcheatmenu.temp_data.draw_entries_func[identifier].entry_table[category] == nil then
+                            tcheatmenu.temp_data.draw_entries_func[identifier].entry_table[category] = {}
+                        end
+                        tcheatmenu.temp_data.draw_entries_func[identifier].entry_table[category][model] = data
+                    end
                 end
             end
         end
+    else
+        tcheatmenu.temp_data.draw_entries_func[identifier].entry_table = data_table
+        
+        if tcheatmenu.temp_data.draw_entries_func[identifier].entry_table["All"] == nil then
+            tcheatmenu.temp_data.draw_entries_func[identifier].entry_table["All"] = {}
+        end
     end
-    -------------------------
 
-    -- Draw images in a listed order for list tabs
-    if draw_type == fconst.DRAW_TYPE.LIST then
-        if imgui.BeginChild("") then 
-            for table_name,image_table in module.spairs(loaded_images_list) do
-                local show = true
-                if identifier == fconst.IDENTIFIER.COMPONENT then
-                    show = false
-                    for model,image in pairs(image_table) do
-                        if casts.CVehicle.IsValidModForVehicle(tonumber(model),getCarPointer(getCarCharIsUsing(PLAYER_PED))) then
-                            show = true
+    --------------------------------------------------
+    -- Interface Header
+
+    local width = imgui.GetWindowContentRegionWidth() - 8
+
+    imgui.SetNextItemWidth(width/2)
+    fcommon.DropDownList("##List",tcheatmenu.temp_data.draw_entries_func[identifier].entry_table,tcheatmenu.temp_data.draw_entries_func[identifier].selected,
+    function(key,val) 
+        tcheatmenu.temp_data.draw_entries_func[identifier].selected = key
+    end)
+
+    imgui.SameLine()
+
+    imgui.SetNextItemWidth(width/2)
+    tcheatmenu.temp_data.draw_entries_func[identifier].filter:Draw("##Filter")
+    imgui.Spacing()
+
+    --------------------------------------------------
+    -- Call the drawing function
+
+    if imgui.BeginChild("##Draw") then 
+        for category,table in pairs(tcheatmenu.temp_data.draw_entries_func[identifier].entry_table) do
+            if draw_type == fconst.DRAW_TYPE.IMAGE then
+                lua_thread.create(LoadImages,table)
+            end
+            if tcheatmenu.temp_data.draw_entries_func[identifier].selected == "All" or category == tcheatmenu.temp_data.draw_entries_func[identifier].selected then
+                for label,entry in pairs(table) do
+                    local name = func_get_name(label)
+                    if draw_type == fconst.DRAW_TYPE.IMAGE then
+                        lua_thread.create(LoadImages,table)
+                    end
+                    if tcheatmenu.temp_data.draw_entries_func[identifier].filter:PassFilter(name) then
+                        if draw_type == fconst.DRAW_TYPE.IMAGE then
+                            DrawImage(identifier,func_on_left_click,func_on_right_click,table,const_image_height,const_image_width,label,entry,name)
+                        end
+                        if draw_type == fconst.DRAW_TYPE.TEXT then
+                            DrawText(func_on_left_click,func_on_right_click,entry,name,label,category)
                         end
                     end
                 end
-                if show and imgui.CollapsingHeader(table_name) then
-                    if not fmenu.tmenu.draw_text_only[0] then
-                        lua_thread.create(LoadImages,image_table)
-                    end
-                    imgui.Spacing()
-                    image_count = 1
-                    for model,image in pairs(image_table) do
-                        if fmenu.tmenu.draw_text_only[0] then
-                            draw_text(identifier,func_on_left_click,func_on_right_click,func_get_name,filter,model)
-                        else
-                            draw_image(identifier,valid_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,filter,model,image)
-                        end
-                    end
-                    imgui.Spacing()
-                    imgui.Separator()
-                end
             end
-            imgui.EndChild()
         end
+        tcheatmenu.temp_data.draw_entries_func[identifier].entry_count = 1
+        imgui.EndChild()
     end
+    --------------------------------------------------
 
-    -- Draw all images one by one for search tabs
-    if draw_type == fconst.DRAW_TYPE.SEARCH then 
-
-        filter:Draw("Filter")
-        imgui.Spacing()
-
-        if imgui.BeginChild("") then 
-            for _,image_table in pairs(loaded_images_list) do
-                if not fmenu.tmenu.draw_text_only[0] then
-                    lua_thread.create(LoadImages,image_table)
-                end
-                for model,image in pairs(image_table) do
-                    if fmenu.tmenu.draw_text_only[0] then
-                        draw_text(identifier,func_on_left_click,func_on_right_click,func_get_name,filter,model)
-                    else
-                        draw_image(identifier,valid_table,const_image_height,const_image_width,func_on_left_click,func_on_right_click,func_get_name,filter,model,image)
-                    end
-                end
-            end
-            imgui.EndChild()
-        end
-    end
-    
 end
 
 function module.RadioButtonAddressEx(label,label_table,values,memory,save)

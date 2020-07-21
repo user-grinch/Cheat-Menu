@@ -29,7 +29,6 @@ module.tmenu =
 		show            = imgui.new.bool(false),
 	},
 	crash_text          = "",
-	draw_text_only      = imgui.new.bool(fconfig.Get('tmenu.draw_text_only',false)),
 	fast_load_images    = imgui.new.bool(fconfig.Get('tmenu.fast_load_images',false)),
 	lock_player   		= imgui.new.bool(fconfig.Get('tmenu.lock_player',false)),
 	overlay             = 
@@ -323,7 +322,7 @@ end
 -- Main function
 function module.MenuMain()
 
-	fcommon.Tabs("Menu",{"Config","Overlay","Commands","Hoykeys","Styles","License","About"},{
+	fcommon.Tabs("Menu",{"Config","Overlay","Commands","Hotkeys","Styles","License","About"},{
 		function()
 			if imgui.Button("Reset to default",imgui.ImVec2(fcommon.GetSize(2))) then
 				module.tmenu.crash_text = "Default configuration ~g~restored"
@@ -340,8 +339,6 @@ function module.MenuMain()
 			fcommon.CheckBoxVar("Auto reload",module.tmenu.auto_reload,"Reload cheat menu automatically\nin case of a crash.\n\nMight cause crash loop sometimes.")
 			fcommon.CheckBoxVar("Check for updates",module.tmenu.auto_update_check,"Cheat Menu will automatically check for updates\nonline. This requires an internet connection and\
 will download files from github repository.")
-			fcommon.CheckBoxVar("Draw text only",module.tmenu.draw_text_only,"Replace the menu images with text names\
-This might improve the menu performance")	
 			fcommon.CheckBoxVar("Fast load images",module.tmenu.fast_load_images,"Loads vehicles, weapons, peds etc. images\nat menu startup.\n \
 This may increase game startup time or\nfreeze it for few seconds but improve\nmenu performance.")
 			
@@ -451,6 +448,11 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 					fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
 					fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])
 					fstyle.tstyle.selected_name = fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]
+					
+					if fstyle.tstyle.font_size ~= fstyle.tstyle.font_size_var[0] then
+						tcheatmenu.window.restart_required = true
+						fstyle.tstyle.font_size = fstyle.tstyle.font_size_var[0]
+					end
 					printHelpString("Style saved")
 				end
 			end

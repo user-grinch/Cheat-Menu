@@ -669,18 +669,12 @@ end
 
 -- Main function
 function module.GameMain()
-    if imgui.Button("Save game",imgui.ImVec2(fcommon.GetSize(2))) then
+    if imgui.Button("Save game",imgui.ImVec2(fcommon.GetSize(1))) then
         if isCharOnFoot(PLAYER_PED) then
             activateSaveMenu()
         else
             printHelpString("Player is ~r~not~w~ on foot")
         end
-    end
-    imgui.SameLine()
-    if imgui.Button("Copy coordinates",imgui.ImVec2(fcommon.GetSize(2))) then
-        local x,y,z = getCharCoordinates(PLAYER_PED)
-        setClipboardText(string.format( "%d,%d,%d",x,y,z))
-        printHelpString("Coordinates copied")
     end
     
     fcommon.Tabs("Game",{"Checkboxes","Menus","Script manager","Object spawner"},{

@@ -23,9 +23,10 @@ local module = {}
 module.tstyle = 
 {
     array          = nil,
-    alpha_flags    = imgui.new.int(0),
     current_font   = "",
     fonts          = {},
+    font_size      = fconfig.Get('tstyle.font_size',14),
+    font_size_var  = imgui.new.int(fconfig.Get('tstyle.font_size',14)),
     list           = nil,
     name           = imgui.new.char[256]("Untitled"),
     preparetoapply = false,
@@ -37,40 +38,40 @@ module.tstyle =
 
 local _ImGuiStyle =
 {
-    'Alpha',                      -- Global alpha applies to everything in Dear ImGui.
-    'WindowPadding',              -- Padding within a window.
-    'WindowRounding',             -- Radius of window corners rounding. Set to 0.0f to have rectangular windows.
-    'WindowBorderSize',           -- Thickness of border around windows. Generally set to 0.0f or 1.0f. (Other values are not well tested and more CPU/GPU costly).
-    'WindowMinSize',              -- Minimum window size. This is a global setting. If you want to constraint individual windows, use SetNextWindowSizeConstraints().
-    'WindowTitleAlign',           -- Alignment for title bar text. Defaults to (0.0f,0.5f) for left-aligned,vertically centered.
-    'WindowMenuButtonPosition',   -- Side of the collapsing/docking button in the title bar (None/Left/Right). Defaults to ImGuiDir_Left.
-    'ChildRounding',              -- Radius of child window corners rounding. Set to 0.0f to have rectangular windows.
-    'ChildBorderSize',            -- Thickness of border around child windows. Generally set to 0.0f or 1.0f. (Other values are not well tested and more CPU/GPU costly).
-    'PopupRounding',              -- Radius of popup window corners rounding. (Note that tooltip windows use WindowRounding)
-    'PopupBorderSize',            -- Thickness of border around popup/tooltip windows. Generally set to 0.0f or 1.0f. (Other values are not well tested and more CPU/GPU costly).
-    'FramePadding',               -- Padding within a framed rectangle (used by most widgets).
-    'FrameRounding',              -- Radius of frame corners rounding. Set to 0.0f to have rectangular frame (used by most widgets).
-    'FrameBorderSize',            -- Thickness of border around frames. Generally set to 0.0f or 1.0f. (Other values are not well tested and more CPU/GPU costly).
-    'ItemSpacing',                -- Horizontal and vertical spacing between widgets/lines.
-    'ItemInnerSpacing',           -- Horizontal and vertical spacing between within elements of a composed widget (e.g. a slider and its label).
-    'TouchExtraPadding',          -- Expand reactive bounding box for touch-based system where touch position is not accurate enough. Unfortunately we don't sort widgets so priority on overlap will always be given to the first widget. So don't grow this too much!
-    'IndentSpacing',              -- Horizontal indentation when e.g. entering a tree node. Generally == (FontSize + FramePadding.x*2).
-    'ColumnsMinSpacing',          -- Minimum horizontal spacing between two columns. Preferably > (FramePadding.x + 1).
-    'ScrollbarSize',              -- Width of the vertical scrollbar, Height of the horizontal scrollbar.
-    'ScrollbarRounding',          -- Radius of grab corners for scrollbar.
-    'GrabMinSize',                -- Minimum width/height of a grab box for slider/scrollbar.
-    'GrabRounding',               -- Radius of grabs corners rounding. Set to 0.0f to have rectangular slider grabs.
-    'TabRounding',                -- Radius of upper corners of a tab. Set to 0.0f to have rectangular tabs.
-    'TabBorderSize',              -- Thickness of border around tabs.
-    'ColorButtonPosition',        -- Side of the color button in the ColorEdit4 widget (left/right). Defaults to ImGuiDir_Right.
-    'ButtonTextAlign',            -- Alignment of button text when button is larger than text. Defaults to (0.5f, 0.5f) (centered).
-    'SelectableTextAlign',        -- Alignment of selectable text when selectable is larger than text. Defaults to (0.0f, 0.0f) (top-left aligned).
-    'DisplayWindowPadding',       -- Window position are clamped to be visible within the display area by at least this amount. Only applies to regular windows.
-    'DisplaySafeAreaPadding',     -- If you cannot see the edges of your screen (e.g. on a TV) increase the safe area padding. Apply to popups/tooltips as well regular windows. NB: Prefer configuring your TV sets correctly!
-    'MouseCursorScale',           -- Scale software rendered mouse cursor (when io.MouseDrawCursor is enabled). May be removed later.
-    'AntiAliasedLines',           -- Enable anti-aliasing on lines/borders. Disable if you are really tight on CPU/GPU.
-    'AntiAliasedFill',            -- Enable anti-aliasing on filled shapes (rounded rectangles, circles, etc.)
-    'CurveTessellationTol',       -- Tessellation tolerance when using PathBezierCurveTo() without a specific number of segments. Decrease for highly tessellated curves (higher quality, more polygons), increase to reduce quality.
+    'Alpha',                      
+    'WindowPadding',              
+    'WindowRounding',             
+    'WindowBorderSize',           
+    'WindowMinSize',              
+    'WindowTitleAlign',           
+    'WindowMenuButtonPosition',   
+    'ChildRounding',              
+    'ChildBorderSize',            
+    'PopupRounding',              
+    'PopupBorderSize',            
+    'FramePadding',               
+    'FrameRounding',              
+    'FrameBorderSize',            
+    'ItemSpacing',                
+    'ItemInnerSpacing',           
+    'TouchExtraPadding',          
+    'IndentSpacing',              
+    'ColumnsMinSpacing',          
+    'ScrollbarSize',              
+    'ScrollbarRounding',          
+    'GrabMinSize',                
+    'GrabRounding',               
+    'TabRounding',                
+    'TabBorderSize',              
+    'ColorButtonPosition',        
+    'ButtonTextAlign',            
+    'SelectableTextAlign',        
+    'DisplayWindowPadding',       
+    'DisplaySafeAreaPadding',     
+    'MouseCursorScale',           
+    'AntiAliasedLines',           
+    'AntiAliasedFill',            
+    'CurveTessellationTol',       
     'Colors',
 };
 
@@ -78,12 +79,12 @@ local _ImGuiCol =
 {
     'Text',
     'TextDisabled',
-    'WindowBg',              -- Background of normal windows
-    'ChildBg',               -- Background of child windows
-    'PopupBg',               -- Background of popups, menus, tooltips windows
+    'WindowBg',             
+    'ChildBg',              
+    'PopupBg',              
     'Border',
     'BorderShadow',
-    'FrameBg',               -- Background of checkbox, radio button, plot, slider, text input
+    'FrameBg',              
     'FrameBgHovered',
     'FrameBgActive',
     'TitleBg',
@@ -100,7 +101,7 @@ local _ImGuiCol =
     'Button',
     'ButtonHovered',
     'ButtonActive',
-    'Header',                -- Header* colors are used for CollapsingHeader, TreeNode, Selectable, MenuItem
+    'Header',               
     'HeaderHovered',
     'HeaderActive',
     'Separator',
@@ -120,10 +121,10 @@ local _ImGuiCol =
     'PlotHistogramHovered',
     'TextSelectedBg',
     'DragDropTarget',
-    'NavHighlight',          -- Gamepad/keyboard: current highlighted item
-    'NavWindowingHighlight', -- Highlight window when using CTRL+TAB
-    'NavWindowingDimBg',     -- Darken/colorize entire screen behind the CTRL+TAB window list, when active
-    'ModalWindowDimBg'      -- Darken/colorize entire screen behind a modal window, when one is active
+    'NavHighlight',         
+    'NavWindowingHighlight',
+    'NavWindowingDimBg',    
+    'ModalWindowDimBg'      
 };
 
 local function split(str, delim, plain)
@@ -189,23 +190,8 @@ function module.LoadFonts()
     local handle, name = findFirstFile(mask)
     
     while handle and name do
-        fstyle.tstyle.fonts[name] = imgui.GetIO().Fonts:AddFontFromFileTTF(string.format( "%sfonts//%s",tcheatmenu.dir,name), 14)
+        fstyle.tstyle.fonts[name] = imgui.GetIO().Fonts:AddFontFromFileTTF(string.format( "%sfonts//%s",tcheatmenu.dir,name), module.tstyle.font_size)
         name = findNextFile(handle)
-    end
-end
-
-function FontSelector()
-    if imgui.BeginCombo("Select Font", fstyle.tstyle.current_font) then
-
-        for name,font in pairs(fstyle.tstyle.fonts) do
-            if name ~= fstyle.tstyle.current_font then
-                if imgui.MenuItemBool(name) then
-                    imgui.GetIO().FontDefault = font
-                    fstyle.tstyle.current_font = name
-                end
-            end
-        end
-        imgui.EndCombo()
     end
 end
 
@@ -239,11 +225,47 @@ function StylerSliderFloat2(label,style,min,max)
     return style
 end
 
+function StylerColorPicker(style,i)
+    local name = imgui.GetStyleColorName(i)
+    imgui.PushIDInt(i)
+
+    local float = imgui.new.float[4](style.Colors[i].x,style.Colors[i].y,style.Colors[i].z,style.Colors[i].w)
+    if imgui.ColorEdit4("##color", float,imgui.ColorEditFlags.AlphaBar) then
+        style.Colors[i].x = float[0]
+        style.Colors[i].y = float[1]
+        style.Colors[i].z = float[2]
+        style.Colors[i].w = float[3]
+    end
+
+    imgui.SameLine()
+    imgui.TextUnformatted(name)
+   
+    if fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1] ~= nil
+    and module.tstyle.styles_table[fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]][ffi.string(name)] ~= nil then
+        local s = imgui.ColorConvertU32ToFloat4(tonumber(bit.tohex(module.tstyle.styles_table[fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]][ffi.string(name)]), 16))
+
+        if float[0] ~= s.x or float[1] ~= s.y or float[2] ~= s.z or float[3] ~= s.w then
+            imgui.SameLine(0.0, style.ItemInnerSpacing.x)
+            if imgui.Button("Revert") then
+                style.Colors[i].x = s.x
+                style.Colors[i].y = s.y
+                style.Colors[i].z = s.z
+                style.Colors[i].w = s.w
+            end
+        end
+    end
+    imgui.PopID()
+end
 function module.StyleEditor()
 
     local style = imgui.GetStyle();
 
-    FontSelector()
+    fcommon.DropDownList("Select font",fstyle.tstyle.fonts,fstyle.tstyle.current_font,
+    function(key,val)
+        imgui.GetIO().FontDefault = val
+        fstyle.tstyle.current_font = key
+    end)
+
     imgui.Spacing()
 
     fcommon.Tabs("Style",{"Borders","Colors","Sizes"},{
@@ -262,58 +284,13 @@ function module.StyleEditor()
         end,
         function()
 
-            if imgui.RadioButtonIntPtr("Opaque", module.tstyle.alpha_flags,0) then                                    
-                module.tstyle.alpha_flags[0] = 0
-            end
-
-            imgui.SameLine()
-
-            if imgui.RadioButtonIntPtr("Alpha",  module.tstyle.alpha_flags,imgui.ColorEditFlags.AlphaPreview) then
-                module.tstyle.alpha_flags[0] = imgui.ColorEditFlags.AlphaPreview
-            end
-            
-            imgui.SameLine()
-
-            if imgui.RadioButtonIntPtr("Both",  module.tstyle.alpha_flags,imgui.ColorEditFlags.AlphaPreviewHalf) then  
-                module.tstyle.alpha_flags[0] = imgui.ColorEditFlags.AlphaPreviewHalf
-            end
-
-            fcommon.InformationTooltip("Left-click on colored square to open color picker\nRight-click to open edit options menu.")
-
             imgui.BeginChild("##colors")
             imgui.PushItemWidth(-160)
- 
-            for i=0,imgui.Col.COUNT-1,1 do
-                local name = imgui.GetStyleColorName(i)
-                imgui.PushIDInt(i)
 
-                local float = imgui.new.float[4](style.Colors[i].x,style.Colors[i].y,style.Colors[i].z,style.Colors[i].w)
-                if imgui.ColorEdit4("##color", float,module.tstyle.alpha_flags[0]) then
-                    style.Colors[i].x = float[0]
-                    style.Colors[i].y = float[1]
-                    style.Colors[i].z = float[2]
-                    style.Colors[i].w = float[3]
-                end
-
-                imgui.SameLine(0.0, style.ItemInnerSpacing.x)
-                imgui.TextUnformatted(name)
-               
-                if fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1] ~= nil
-                and module.tstyle.styles_table[fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]][ffi.string(name)] ~= nil then
-                    local s = imgui.ColorConvertU32ToFloat4(tonumber(bit.tohex(module.tstyle.styles_table[fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]][ffi.string(name)]), 16))
-
-                    if float[0] ~= s.x or float[1] ~= s.y or float[2] ~= s.z or float[3] ~= s.w then
-                        imgui.SameLine(0.0, style.ItemInnerSpacing.x)
-                        if imgui.Button("Revert") then
-                            style.Colors[i].x = s.x
-                            style.Colors[i].y = s.y
-                            style.Colors[i].z = s.z
-                            style.Colors[i].w = s.w
-                        end
-                    end
-                end
-                imgui.PopID()
+            for i=0,35,1 do
+                StylerColorPicker(style,i)
             end
+            StylerColorPicker(style,42)
             imgui.PopItemWidth();
             imgui.EndChild();
         end,
@@ -321,33 +298,13 @@ function module.StyleEditor()
             imgui.BeginChild("##sizes");
             imgui.PushItemWidth(imgui.GetWindowWidth() * 0.50);
 
-            imgui.Spacing()
-
-            local string = {"Left","Right"}
-            local list   = imgui.new['const char*'][#string](string)
-            var = imgui.new.int(style.ColorButtonPosition)
-
-            if imgui.Combo("Color button position", var, list,#string) then
-                style.ColorButtonPosition = var[0]
-            end
-
-            string = {"None","Left","Right"}
-            list   = imgui.new['const char*'][#string](string)
-            var = imgui.new.int(style.WindowMenuButtonPosition + 1)
-
-            if imgui.Combo("Window menu button position", var, list,#string) then
-                style.WindowMenuButtonPosition = var[0] - 1
-            end
-
-            imgui.Dummy(imgui.ImVec2(0,10))
-
-            style.DisplaySafeAreaPadding = StylerSliderFloat2("Display safe area padding",style.DisplaySafeAreaPadding,0.0,30.0)
+            imgui.SliderInt("Font size", module.tstyle.font_size_var, 12, 48)
+                
             style.GrabMinSize = StylerSliderFloat("Grab min size",style.GrabMinSize,0.0,20.0)
             style.IndentSpacing = StylerSliderFloat("Indent spacing",style.IndentSpacing,0.0,30.0)
             style.ItemInnerSpacing = StylerSliderFloat2("Item inner spacing",style.ItemInnerSpacing,0.0,20.0)
             style.ItemSpacing = StylerSliderFloat2("Item spacing",style.ItemSpacing,0.0,20.0)
             style.ScrollbarSize = StylerSliderFloat("Scrollbar size",style.ScrollbarSize,1.0,20.0)
-            style.TouchExtraPadding = StylerSliderFloat2("Touch extra padding",style.TouchExtraPadding,0.0,10.0)
             style.WindowPadding = StylerSliderFloat2("Window padding",style.WindowPadding,0.0,20.0)
             
             imgui.Dummy(imgui.ImVec2(0,10))
@@ -358,12 +315,6 @@ function module.StyleEditor()
             style.PopupRounding = StylerSliderFloat("Popup rounding",style.PopupRounding,0.0,12.0)
             style.ScrollbarRounding = StylerSliderFloat("Scrollbar rounding",style.ScrollbarRounding,0.0,12.0)
             style.WindowRounding = StylerSliderFloat("Window rounding",style.WindowRounding,0.0,12.0)
-
-            imgui.Dummy(imgui.ImVec2(0,10))
-
-            style.ButtonTextAlign = StylerSliderFloat2("Button text align",style.ButtonTextAlign,0.0,20.0)
-            style.SelectableTextAlign = StylerSliderFloat2("Selectable text align",style.SelectableTextAlign,0.0,20.0)
-            style.WindowTitleAlign = StylerSliderFloat2("Window title align",style.WindowTitleAlign,0.0,20.0)
 
             imgui.PopItemWidth()
             imgui.EndChild()

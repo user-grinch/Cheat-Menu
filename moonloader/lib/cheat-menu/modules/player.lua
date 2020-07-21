@@ -32,7 +32,6 @@ module.tplayer =
         names           = {},
         path            = string.format("%s\\modloader\\Custom Skins",getGameDirectory())
     },
-    filter              = imgui.ImGuiTextFilter(),
     god                 = imgui.new.bool(fconfig.Get('tplayer.god',false)),
     health_regeneration = {
         bool            = imgui.new.bool(fconfig.Get('tplayer.health_regeneration.bool',false)),
@@ -168,6 +167,11 @@ end
 --------------------------------------------------
 -- Cloth functions
 
+function module.GetClothTextureName(string)
+    local body_part, model, texture = string:match("([^$]+)$([^$]+)$([^$]+)")
+    return texture
+end
+
 function module.ChangePlayerCloth(name)
     local body_part, model, texture = name:match("([^$]+)$([^$]+)$([^$]+)")
     
@@ -212,7 +216,14 @@ end
 
 -- Main function
 function module.PlayerMain()
-    if imgui.Button("Suicide",imgui.ImVec2(fcommon.GetSize(1))) then
+    
+    if imgui.Button("Copy coordinates",imgui.ImVec2(fcommon.GetSize(2))) then
+        local x,y,z = getCharCoordinates(PLAYER_PED)
+        setClipboardText(string.format( "%d,%d,%d",x,y,z))
+        printHelpString("Coordinates copied")
+    end
+    imgui.SameLine()
+    if imgui.Button("Suicide",imgui.ImVec2(fcommon.GetSize(2))) then
         setCharHealth(PLAYER_PED,0)
     end
     imgui.Spacing()
@@ -286,6 +297,10 @@ function module.PlayerMain()
                     fconfig.Set(fconfig.tconfig.misc_data,"Body",3)
                     fcommon.CheatActivated()
                 end
+                if imgui.RadioButtonIntPtr("None",module.tplayer.cjBody,0) then
+                    fconfig.Set(fconfig.tconfig.misc_data,"Body",0)
+                    fcommon.CheatActivated()
+                end
             end)
             fcommon.UpdateStat({ name = "Energy",stat = 165})
             fcommon.UpdateStat({ name = "Fat",stat = 21})
@@ -301,14 +316,10 @@ function module.PlayerMain()
         end,
         function()
             fcommon.CheckBoxVar("Aim skin changer", module.tplayer.aimSkinChanger,"Activate using, Aim ped +".. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.asc_key))
-
-            imgui.Spacing()
-            fcommon.Tabs("Skins",{"List","Search","Custom"},{
+   
+            fcommon.Tabs("Skins",{"Ped skins","Custom skins"},{
                 function()
-                    fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.LIST,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.ChangePlayerModel,nil,fped.GetModelName,module.tplayer.filter)
-                end,
-                function()
-                    fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.SEARCH,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.ChangePlayerModel,nil,fped.GetModelName,module.tplayer.filter)
+                    fcommon.DrawEntries(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.IMAGE,module.ChangePlayerModel,nil,fped.GetModelName,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH)
                 end,
                 function()
                     if module.tplayer.custom_skins.is_modloader_installed then
@@ -344,10 +355,10 @@ Note:\nFile names can't exceed 8 characters.\nDon't change names while the game 
                 buildPlayerModel(PLAYER_HANDLE)
                 printHelpString("Clothes ~r~removed")
             end
-            imgui.Text("Info")
-            fcommon.InformationTooltip("Right click to add clothes\nLeft click to remove clothes")
-            imgui.Spacing()          
-            fcommon.DrawImages(fconst.IDENTIFIER.CLOTHES,fconst.DRAW_TYPE.LIST,module.tplayer.clothes.images,fconst.CLOTH.IMAGE_HEIGHT,fconst.CLOTH.IMAGE_WIDTH,module.ChangePlayerCloth,module.RemoveThisCloth)
+            
+            imgui.Dummy(imgui.ImVec2(0,10))        
+            fcommon.DrawEntries(fconst.IDENTIFIER.CLOTHES,fconst.DRAW_TYPE.IMAGE,module.ChangePlayerCloth,module.RemoveThisCloth,module.GetClothTextureName,module.tplayer.clothes.images,fconst.CLOTH.IMAGE_HEIGHT,fconst.CLOTH.IMAGE_WIDTH)
+
         end
     })
 end

@@ -44,22 +44,6 @@ module.tanimation.fighting.array = imgui.new['const char*'][#module.tanimation.f
 module.tanimation.walking.array  = imgui.new['const char*'][#module.tanimation.walking.names](module.tanimation.walking.names)
 
 
-function AnimationEntry(file,animation)
-    if imgui.MenuItemBool(animation)then
-        if file ~= "PED" then   -- don't request if animation is from ped.ifp
-            requestAnimation(file)
-            loadAllModelsNow()
-        end
-        module.PlayAnimation(file,animation)
-    end
-    if imgui.IsItemClicked(1) then
-		module.tanimation.list[file .. "$" .. animation] = nil
-		fcommon.SaveJson("animation",module.tanimation.list)
-		module.tanimation.list = fcommon.LoadJson("animation")
-		printHelpString("Animation ~r~removed")
-	end
-end
-
 function module.PlayAnimation(file,animation)
     if module.tanimation.ped[0] == true then
         if doesCharExist(fped.tped.selected) then
@@ -104,54 +88,38 @@ function module.AnimationMain()
     imgui.Spacing()
 
     -- Checkboxes
-    imgui.Columns(2,nil,false)
-    fcommon.CheckBoxVar("Loop",module.tanimation.loop)
-    fcommon.CheckBoxVar("Ped ##Animation",module.tanimation.ped,"Play animation on ped.Aim with a gun to select.")
+    imgui.Columns(3,nil,false)
+    fcommon.CheckBoxVar("Loop##Animation",module.tanimation.loop)
     imgui.NextColumn()
-    fcommon.CheckBoxVar("Secondary",module.tanimation.secondary)
+    fcommon.CheckBoxVar("Ped##Animation",module.tanimation.ped,"Play animation on ped.Aim with a gun to select.")
+    imgui.NextColumn()
+    fcommon.CheckBoxVar("Secondary##Animation",module.tanimation.secondary)
     imgui.Columns(1)
 
     imgui.Spacing() 
-    fcommon.Tabs("Animation",{"List","Search","Misc","Custom"},{
+    fcommon.Tabs("Animation",{"Search","Misc","Custom"},{
         function()
-            local menus_shown = {}
-            for key,value in fcommon.spairs(module.tanimation.list) do
-                local temp,_ = key:match("([^$]+)$([^$]+)")
+
+            fcommon.DrawEntries(fconst.IDENTIFIER.ANIMATION,fconst.DRAW_TYPE.TEXT,function(anim,file)
+				module.PlayAnimation(file,anim)
+			end,
+			function(text,category)
+                module.tanimation.list[category][text] = nil
                 
-                local show_menu = true
-                for i=1,#menus_shown,1 do
-                    if menus_shown[i] == temp then
-                        show_menu = false
-                    end
+                local bool = false
+                for k,v in pairs(module.tanimation.list[ffi.string(module.tanimation.ifp_name)]) do
+                    bool = true
+                end
+                
+                if not bool then
+                    module.tanimation.list[category] = nil
                 end
 
-                if show_menu then
-                    fcommon.DropDownMenu(temp,function()
-                        for key,value in fcommon.spairs(module.tanimation.list) do
-                            local file,animation = key:match("([^$]+)$([^$]+)")
-                            if temp == file then
-                                AnimationEntry(file,animation)
-                            end
-                        end
-                    end)
-                    table.insert(menus_shown,temp)
-                end
-            end   
-        end,
-        function()
-            module.tanimation.filter:Draw("Filter")
-            imgui.Spacing()
+				fcommon.SaveJson("animation",module.tanimation.list)
+				module.tanimation.list = fcommon.LoadJson("animation")
+				printHelpString("Animation ~r~removed")
+            end,function(a) return a end,module.tanimation.list)
 
-            if imgui.BeginChild("Stat Entries") then
-                for key,value in pairs(module.tanimation.list) do
-                    file, animation = key:match("([^$]+)$([^$]+)")
-                    if module.tanimation.filter:PassFilter(animation) then
-                        AnimationEntry(file,animation)
-                    end
-                end       
-                imgui.Spacing()
-                imgui.EndChild()
-            end
         end,
         function()
             if imgui.Combo("Fighting", module.tanimation.fighting.selected,module.tanimation.fighting.array,#module.tanimation.fighting.names) then
@@ -181,7 +149,10 @@ function module.AnimationMain()
             imgui.InputText("Animation name",module.tanimation.name,ffi.sizeof(module.tanimation.name))
             imgui.Spacing()
             if imgui.Button("Add animation",imgui.ImVec2(fcommon.GetSize(1))) then
-                module.tanimation.list[ffi.string(module.tanimation.ifp_name) .. "$" .. ffi.string(module.tanimation.name)] = "Animation"
+                if module.tanimation.list[ffi.string(module.tanimation.ifp_name)] == nil then
+                    module.tanimation.list[ffi.string(module.tanimation.ifp_name)] = {}
+                end
+                module.tanimation.list[ffi.string(module.tanimation.ifp_name)][ffi.string(module.tanimation.name)] = ffi.string(module.tanimation.name)
                 fcommon.SaveJson("animation",module.tanimation.list)
                 module.tanimation.list = fcommon.LoadJson("animation")
                 printHelpString("Animation ~g~added")

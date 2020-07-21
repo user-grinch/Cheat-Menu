@@ -21,13 +21,16 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.1-beta")
-script_version_number(2020071501) -- YYYYMMDDNN
+script_version_number(2020072101) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
 tcheatmenu =
 {   
     dir                    = string.format( "%s%s",getWorkingDirectory(),"/lib/cheat-menu/"),
+    temp_data              = {
+        draw_entries_func   = {},
+    },
     window                 = 
     {
         fail_loading_json  = false,
@@ -105,6 +108,7 @@ tcheatmenu       =
         script_manager_temp   = {vkeys.VK_LCONTROL,vkeys.VK_1}
     },
     read_key_press = false,
+    temp_data    = tcheatmenu.temp_data,
     tab_data     = {},
     thread_locks = {},
     window       =
@@ -393,7 +397,7 @@ function()
         imgui.Text(string.format("Coordinates: %d %d %d", math.floor(x) , math.floor(y) , math.floor(z)),1000)
     end
 
-    imgui.PopStyleVar()
+    imgui.PopStyleVar(2)
 
     --------------------------------------------------
     -- Overlay right click menu
@@ -422,12 +426,6 @@ function()
             fmenu.tmenu.overlay.health[0] = false
             fmenu.tmenu.overlay.coordinates[0] = false
         end
-        imgui.Separator()
-        if imgui.MenuItemBool("Copy coordinates") then 
-            local x,y,z = getCharCoordinates(PLAYER_PED)
-            setClipboardText(string.format( "%d,%d,%d",x,y,z))
-            printHelpString("Coordinates copied")
-        end
         imgui.EndPopup()        
     end
 
@@ -441,7 +439,6 @@ function()
     --------------------------------------------------
 
     imgui.End()
-    imgui.PopStyleVar()
 
 end).HideCursor = true
 

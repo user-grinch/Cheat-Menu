@@ -18,10 +18,8 @@ local module = {}
 
 module.tped =
 {
-    filter       = imgui.ImGuiTextFilter(),
     gang =
     {
-        array = {},
         is_exgangwars_installed = false,
         index = imgui.new.int(0),
         list = 
@@ -60,40 +58,10 @@ module.tped =
     spawned_peds= 
     {
         list = {},
-        filter = imgui.ImGuiTextFilter(),
     },
     special     = fcommon.LoadJson("ped special"),
-    type        =
-    {
-        array   = {},
-        names   = 
-        {
-            "CIVMALE",
-            "CIVFEMALE",
-            "COP",
-            "Ballas",
-            "Grove Street Families",
-            "Los Santos Vagos",
-            "San Fierro Rifa",
-            "Da Nang Boys",
-            "Mafia",
-            "Mountain Cloud Triads",
-            "Varrio Los Aztecas",
-            "GANG9",
-            "GANG10",
-            "DEALER",
-            "EMERGENCY",
-            "FIREMAN",
-            "CRIMINAL",
-            "BUM",
-            "SPECIAL",
-            "PROSTITUTE"
-        },
-        index   = imgui.new.int(fconfig.Get('tped.type.index',0)),
-    },
 }
 
-module.tped.type.array = imgui.new['const char*'][#module.tped.type.names](module.tped.type.names)
 module.tped.gang.array = imgui.new['const char*'][#module.tped.gang.list](module.tped.gang.list)
 
 if getModuleHandle("ExGangWars.asi") ~= 0 then
@@ -116,7 +84,7 @@ function module.SpawnPed(model)
             requestModel(model)
             loadAllModelsNow()
             x,y,z = getCharCoordinates(PLAYER_PED)
-            ped = createChar(module.tped.type.index[0]+5,model,x,y,z) -- CIVMALE = PLAYER + 5 
+            ped = createChar(5,model,x,y,z) -- CIVMALE
             markModelAsNoLongerNeeded(model)
             module.tped.spawned_peds.list[ped] = tostring(getCharModel(ped))
         else
@@ -126,7 +94,7 @@ function module.SpawnPed(model)
             loadSpecialCharacter(module.tped.special[tostring(model)],1)
             loadAllModelsNow()
             x,y,z = getCharCoordinates(PLAYER_PED)
-            ped = createChar(module.tped.type.index[0]+5,290,x,y,z) -- CIVMALE = PLAYER + 5
+            ped = createChar(5,290,x,y,z) -- CIVMALE
             markModelAsNoLongerNeeded(module.tped.special[tostring(model)])
         end
         printHelpString("Ped ~g~Spawned")
@@ -252,19 +220,12 @@ function module.PedMain()
             end,
             function()
                 if imgui.Button("Remove all spawned peds",imgui.ImVec2(fcommon.GetSize(1))) then
-                    module.RemoveAllSpawnedPeds()          
+                    module.RemoveAllSpawnedPeds()  
+                    printHelpString("All peds removed")        
                 end
-                imgui.Spacing()
-                imgui.Combo("Ped type", module.tped.type.index,module.tped.type.array,#module.tped.type.names)
-                imgui.Spacing()
-                fcommon.Tabs("Ped List",{"List","Search"},{
-                    function()
-                        fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.LIST,module.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.SpawnPed,nil,module.GetModelName,module.tped.filter)         
-                    end,
-                    function()
-                        fcommon.DrawImages(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.SEARCH,module.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH,module.SpawnPed,nil,module.GetModelName,module.tped.filter)
-                    end
-                })
+                
+                imgui.Dummy(imgui.ImVec2(0,10))                
+                fcommon.DrawEntries(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.IMAGE,module.SpawnPed,nil,module.GetModelName,module.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH)
             end
         })
 end

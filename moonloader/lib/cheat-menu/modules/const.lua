@@ -26,12 +26,16 @@ module.IDENTIFIER =
     COMPONENT = 3,
     PED       = 4,
     CLOTHES   = 5,
+    TELEPORT  = 6,
+    MEMORY    = 8,
+    ANIMATION = 9,
+    MISSION   = 10
 }
 
 module.DRAW_TYPE =
 {
-    LIST    = 0,
-    SEARCH  = 1
+    TEXT = 0,
+    IMAGE = 1,
 }
 
 module.VEHICLE =

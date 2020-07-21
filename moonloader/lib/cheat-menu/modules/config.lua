@@ -221,7 +221,6 @@ function module.Write()
             {
                 auto_update_check   = fmenu.tmenu.auto_update_check[0],
                 auto_reload         = fmenu.tmenu.auto_reload[0],
-                draw_text_only      = fmenu.tmenu.draw_text_only[0], 
                 fast_load_images    = fmenu.tmenu.fast_load_images[0],
                 lock_player         = fmenu.tmenu.lock_player[0],
                 overlay = 
@@ -241,6 +240,7 @@ function module.Write()
             },
             tstyle =
             {
+                font_size       = fstyle.tstyle.font_size,
                 selected_name   = fstyle.tstyle.selected_name,
             },
             tped  =
@@ -250,10 +250,6 @@ function module.Write()
                     wars = fped.tped.gang.wars[0],
                 },
                 ped_health_display = fped.tped.ped_health_display[0],
-                type   =
-                {
-                    index = fped.tped.type.index[0],
-                },
             },
             tplayer =
             {
