@@ -57,7 +57,7 @@ function module.PlayAnimation(file,animation)
     end
 
     if file ~= "PED" then   -- don't remove if animation is from ped.ifp
-        requestAnimation(animation)  
+        requestAnimation(file)  
         loadAllModelsNow()
     end
 
@@ -68,7 +68,7 @@ function module.PlayAnimation(file,animation)
     end
     fcommon.CheatActivated()
     if file ~= "PED" then   -- don't remove if animation is from ped.ifp
-        removeAnimation(animation)  
+        removeAnimation(file)  
     end
 end
 
