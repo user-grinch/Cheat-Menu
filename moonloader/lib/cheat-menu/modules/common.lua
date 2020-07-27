@@ -390,8 +390,13 @@ function DrawImage(identifier,func_on_left_click,func_on_right_click,image_table
             if imgui.ImageButton(image,imgui.ImVec2(const_image_width,const_image_height),imgui.ImVec2(0,0),imgui.ImVec2(1,1),1,imgui.ImVec4(1,1,1,1),imgui.ImVec4(1,1,1,1)) then
                 func_on_left_click(model)
             end
-            if imgui.IsMouseClicked(1) and func_on_right_click ~= nil then
-                func_on_right_click(model)
+            if func_on_right_click ~= nil and imgui.IsItemClicked(1) then
+                tcheatmenu.temp_data.draw_entries_func[identifier].context_menu_data = 
+                {
+                    func = func_on_right_click,
+                    key = model,
+                    category = model_name
+                }
             end
         
             if imgui.IsItemHovered() then
@@ -415,13 +420,18 @@ function DrawImage(identifier,func_on_left_click,func_on_right_click,image_table
     end
 end
 
-function DrawText(func_on_left_click,func_on_right_click,entry,text,key,category)
+function DrawText(identifier,func_on_left_click,func_on_right_click,entry,text,key,category)
     if imgui.MenuItemBool(text) then
         func_on_left_click(entry,category)
     end
 
-    if imgui.IsItemClicked(1) and func_on_right_click ~= nil then
-        func_on_right_click(key,category)
+    if func_on_right_click ~= nil and imgui.IsItemClicked(1) then
+        tcheatmenu.temp_data.draw_entries_func[identifier].context_menu_data = 
+        {
+            func = func_on_right_click,
+            key = key,
+            category = category
+        }
     end
 end
 
@@ -439,6 +449,10 @@ function module.DrawEntries(identifier,draw_type,func_on_left_click,func_on_righ
             selected = "All",
             veh_model = nil,
         }
+    end
+
+    if imgui.IsMouseClicked(1) then
+        tcheatmenu.temp_data.draw_entries_func[identifier].context_menu_data = nil
     end
 
     if identifier == fconst.IDENTIFIER.COMPONENT then
@@ -500,14 +514,29 @@ function module.DrawEntries(identifier,draw_type,func_on_left_click,func_on_righ
                     if tcheatmenu.temp_data.draw_entries_func[identifier].filter:PassFilter(name) then
                         if draw_type == fconst.DRAW_TYPE.IMAGE then
                             DrawImage(identifier,func_on_left_click,func_on_right_click,table,const_image_height,const_image_width,label,entry,name)
-                        end
-                        if draw_type == fconst.DRAW_TYPE.TEXT then
-                            DrawText(func_on_left_click,func_on_right_click,entry,name,label,category)
+                        else
+                            DrawText(identifier,func_on_left_click,func_on_right_click,entry,name,label,category)
                         end
                     end
                 end
             end
         end
+        if tcheatmenu.temp_data.draw_entries_func[identifier].context_menu_data ~= nil and imgui.BeginPopupContextWindow() then	
+            
+            if draw_type == fconst.DRAW_TYPE.IMAGE then
+                imgui.Text(tcheatmenu.temp_data.draw_entries_func[identifier].context_menu_data.category)
+            else
+                imgui.Text(tcheatmenu.temp_data.draw_entries_func[identifier].context_menu_data.key)
+            end
+            imgui.Separator()
+            imgui.Spacing()
+            tcheatmenu.temp_data.draw_entries_func[identifier].context_menu_data.func(tcheatmenu.temp_data.draw_entries_func[identifier].context_menu_data.key,tcheatmenu.temp_data.draw_entries_func[identifier].context_menu_data.category)
+            if imgui.MenuItemBool("Close") then 
+				tcheatmenu.temp_data.draw_entries_func[identifier].context_menu_data = nil	
+            end
+            imgui.EndPopup()       
+        end
+        
         tcheatmenu.temp_data.draw_entries_func[identifier].entry_count = 1
         imgui.EndChild()
     end

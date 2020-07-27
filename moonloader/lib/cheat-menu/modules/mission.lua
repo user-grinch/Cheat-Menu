@@ -50,7 +50,7 @@ function module.MissionMain()
             printHelpString("Can't start mission inside interior")
         end
     end,
-    function()end,function(a) return a end,module.tmission.names)
+    nil,function(a) return a end,module.tmission.names)
     
 end
 return module

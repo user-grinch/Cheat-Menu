@@ -21,7 +21,6 @@ module.tteleport =
 	coords                  = imgui.new.char[64](""),
 	coordinates             = fcommon.LoadJson("coordinate"),
 	coord_name              = imgui.new.char[64](""),
-	filter                  = imgui.ImGuiTextFilter(),
     insert_coords           = imgui.new.bool(fconfig.Get('tteleport.insert_coords',false)),
 	shortcut                = imgui.new.bool(fconfig.Get('tteleport.shortcut',false)),
 }
@@ -56,8 +55,8 @@ function module.Teleport(x, y, z,interior_id)
 	setCharInterior(PLAYER_PED,interior_id)
 	setInteriorVisible(interior_id)
 	clearExtraColours(true)
-	loadScene(x,y,z)
-	requestCollision(x,y)
+	-- loadScene(x,y,z)
+	-- requestCollision(x,y)
 	activateInteriorPeds(true)
 
 	if isCharInAnyCar(PLAYER_PED) then
@@ -140,19 +139,22 @@ function module.TeleportMain()
 				lua_thread.create(module.Teleport,x, y, z,interior_id)
 			end,
 			function(text)
-				for category,table in pairs(module.tteleport.coordinates) do
-					for key,val in pairs(table) do
-						if key == text then
-							module.tteleport.coordinates[category][key] = nil
-							goto end_loop
+				
+				if imgui.MenuItemBool("Remove location") then 
+					for category,table in pairs(module.tteleport.coordinates) do
+						for key,val in pairs(table) do
+							if key == text then
+								print("REMOVED")
+								module.tteleport.coordinates[category][key] = nil
+								goto end_loop
+							end
 						end
 					end
+					::end_loop::
+	
+					printHelpString("Coordinate ~r~removed")
 				end
-				::end_loop::
-
-				fcommon.SaveJson("coordinate",module.tteleport.coordinates)
-				module.tteleport.coordinates = fcommon.LoadJson("coordinate")
-				printHelpString("Coordinate ~r~removed")
+					
 			end,function(a) return a end,module.tteleport.coordinates)
 		end,
 		function()

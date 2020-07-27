@@ -1386,7 +1386,12 @@ function module.VehicleMain()
                 end
                 
                 imgui.Dummy(imgui.ImVec2(0,10))
-                fcommon.DrawEntries(fconst.IDENTIFIER.COMPONENT,fconst.DRAW_TYPE.IMAGE,module.AddComponentToVehicle,module.RemoveComponentFromVehicle,function(a) return a end,module.tvehicle.components.images,fconst.COMPONENT.IMAGE_HEIGHT,fconst.COMPONENT.IMAGE_WIDTH)
+                fcommon.DrawEntries(fconst.IDENTIFIER.COMPONENT,fconst.DRAW_TYPE.IMAGE,module.AddComponentToVehicle,
+                function(component)
+                    if imgui.MenuItemBool("Remove component") then 
+                        module.RemoveComponentFromVehicle(component)
+                    end
+                end,function(a) return a end,module.tvehicle.components.images,fconst.COMPONENT.IMAGE_HEIGHT,fconst.COMPONENT.IMAGE_WIDTH)
                 
             else
                 imgui.TextWrapped("Player needs to be inside a vehicle for options to show up here.")

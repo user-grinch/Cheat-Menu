@@ -208,9 +208,12 @@ function module.ChangePlayerCloth(name)
 end
 
 function module.RemoveThisCloth(name)
-    local body_part, model, texture = name:match("([^$]+)$([^$]+)$([^$]+)")
-    givePlayerClothes(PLAYER_HANDLE,0,0,body_part)
-    buildPlayerModel(PLAYER_HANDLE)
+    if imgui.MenuItemBool("Remove item") then 
+        local body_part, model, texture = name:match("([^$]+)$([^$]+)$([^$]+)")
+        givePlayerClothes(PLAYER_HANDLE,0,0,body_part)
+        buildPlayerModel(PLAYER_HANDLE)
+        printHelpString("Item removed")
+    end
 end
 --------------------------------------------------
 

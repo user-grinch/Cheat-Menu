@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.1-beta")
-script_version_number(2020072101) -- YYYYMMDDNN
+script_version_number(2020072701) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -742,6 +742,9 @@ function onScriptTerminate(script, quitGame)
     if script == thisScript() then
 
         fconfig.Write()
+        fcommon.SaveJson("animation",fanimation.tanimation.list)
+        fcommon.SaveJson("coordinate",fteleport.tteleport.coordinates)
+        fcommon.SaveJson("memory",fmemory.tmemory.list)
 
         if isCharInAnyCar(PLAYER_PED) then
             local model = getCarModel(getCarCharIsUsing(PLAYER_PED))
