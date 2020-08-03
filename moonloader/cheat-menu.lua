@@ -21,9 +21,11 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.1-beta")
-script_version_number(2020072801) -- YYYYMMDDNN
+script_version_number(2020080401) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
+
+resX, resY = getScreenResolution()
 
 tcheatmenu =
 {   
@@ -78,10 +80,6 @@ fweapon       = require 'cheat-menu.modules.weapon'
 ffi.cdef[[
     int zip_extract(const char *zipname, const char *dir,int *func, void *arg);
 ]]
-
-
-resX, resY = getScreenResolution()
-
 
 tcheatmenu       =
 {   

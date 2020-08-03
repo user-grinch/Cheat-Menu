@@ -508,7 +508,7 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 			end
 			imgui.Spacing()
 
-			if imgui.BeginChild("About2") then
+			if imgui.BeginChild("About") then
 
 				imgui.Columns(2,nil,false)
 				imgui.Text(string.format("%s v%s",script.this.name,script.this.version))

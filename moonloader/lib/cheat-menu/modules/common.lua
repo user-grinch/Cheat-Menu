@@ -1049,7 +1049,9 @@ function module.IndexFiles(mainDir,store_table,req_ext,load_images)
                 local file_path = ele_path .. "\\" .. file
                 process_file(file_path,element)
             end
-            wait(0)
+            if not fmenu.tmenu.fast_load_images[0] then
+                wait(0)
+            end
         end
         if doesFileExist(ele_path) then
             process_file(ele_path,element)
