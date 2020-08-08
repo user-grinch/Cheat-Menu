@@ -37,7 +37,7 @@ function module.CModelInfo.GetModelFromName(name)
     local model = readMemory(pmodel,4,false)
     freeMemory(pmodel)
 
-    if model > 0 and model < 1000000 and module.GetNameFromModel(model) ~= "" then
+    if model > 0 and model < 1000000 and module.CModelInfo.GetNameFromModel(model) ~= "" then
         return model
     else
         return 0

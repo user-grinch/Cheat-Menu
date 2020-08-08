@@ -30,6 +30,12 @@ module.tmenu =
 	},
 	crash_text          = "",
 	fast_load_images    = imgui.new.bool(fconfig.Get('tmenu.fast_load_images',false)),
+	font				=
+	{
+		list			= {},
+		selected		= fconfig.Get('tmenu.font.selected',"Trebucbd.ttf"),
+		size  		    = imgui.new.int(fconfig.Get('tmenu.font.size',math.floor(resY*0.0182291666666667))),
+	},
 	lock_player   		= imgui.new.bool(fconfig.Get('tmenu.lock_player',false)),
 	overlay             = 
 	{
@@ -159,18 +165,12 @@ function module.RegisterAllCommands()
 
 		local model = tonumber(t[2])
 
-        if type(model) == "nil" then
+		if type(model) == "nil" then
+			print(string.upper(t[2]))
 			model = casts.CModelInfo.GetModelFromName(string.upper(t[2])) 
 
 			if model ~= 0 and isModelAvailable(model) then  
-				if isThisModelABoat(model) 
-				or isThisModelACar(model)
-				or isThisModelAHeli(model)
-				or isThisModelAPlane(model) then
-					fvehicle.GiveVehicleToPlayer(model)
-				else
-					printHelpString("This is not a vehicle model")
-				end
+				fvehicle.GiveVehicleToPlayer(model)
 			else
 				printHelpString("Invalid vehicle name")
 			end
@@ -334,6 +334,18 @@ function module.MenuMain()
 				module.tmenu.crash_text = "Cheat Menu ~g~reloaded"
 				thisScript():reload()
 			end
+			imgui.Spacing()
+			imgui.PushItemWidth((imgui.GetWindowWidth()-imgui.GetStyle().ItemSpacing.x) * 0.50)
+			fcommon.DropDownList("##Selectfont",fmenu.tmenu.font.list,"Font - " ..fmenu.tmenu.font.selected,
+			function(key,val)
+				imgui.GetIO().FontDefault = val
+				fmenu.tmenu.font.selected = key
+			end)
+			imgui.SameLine()
+			if imgui.SliderInt("##Fontsize", module.tmenu.font.size, 12, 48) then
+				tcheatmenu.window.restart_required = true
+			end
+			imgui.PopItemWidth()
 			imgui.Dummy(imgui.ImVec2(0,5))
 			imgui.Columns(2,nil,false)
 			fcommon.CheckBoxVar("Auto reload",module.tmenu.auto_reload,"Reload cheat menu automatically\nin case of a crash.\n\nMight cause crash loop sometimes.")
@@ -449,10 +461,6 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 					fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])
 					fstyle.tstyle.selected_name = fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]
 					
-					if fstyle.tstyle.font_size ~= fstyle.tstyle.font_size_var[0] then
-						tcheatmenu.window.restart_required = true
-						fstyle.tstyle.font_size = fstyle.tstyle.font_size_var[0]
-					end
 					printHelpString("Style saved")
 				end
 			end
@@ -522,12 +530,6 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 				imgui.Dummy(imgui.ImVec2(0,10))
 				imgui.TextWrapped("Need help/ facing issues/ have suggestions?\nContact me on discord, Grinch_#3311 or on forum.")
 				imgui.TextWrapped("\nPlease provide 'moonloader.log' in case of debugging.")
-				imgui.Dummy(imgui.ImVec2(0,10))
-				imgui.TextWrapped("Minimum resolution: 1024x768")
-				imgui.TextWrapped(string.format("Your resolution: %dx%d",resX,resY))
-				imgui.TextWrapped("Maximum resolution: 1920x1080")
-				imgui.Spacing()
-				imgui.TextWrapped("The menu will work properly on other resolutions but the gui & fonts might have issues.")
 				imgui.Dummy(imgui.ImVec2(0,10))
 				imgui.TextWrapped("Special thanks to,")
 				imgui.Columns(2,nil,false)

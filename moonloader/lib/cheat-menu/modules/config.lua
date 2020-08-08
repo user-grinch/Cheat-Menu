@@ -175,7 +175,6 @@ function module.Write()
                         X = tcheatmenu.window.size.X,
                         Y = tcheatmenu.window.size.Y,
                     },
-                    show_unsupported_resolution_msg = tcheatmenu.window.show_unsupported_resolution_msg[0],
                 },
                 current_menu = tcheatmenu.current_menu,
             },
@@ -222,6 +221,11 @@ function module.Write()
                 auto_update_check   = fmenu.tmenu.auto_update_check[0],
                 auto_reload         = fmenu.tmenu.auto_reload[0],
                 fast_load_images    = fmenu.tmenu.fast_load_images[0],
+                font				=
+                {
+                    selected	    = fmenu.tmenu.font.selected,
+                    size  		    = fmenu.tmenu.font.size[0],
+                },
                 lock_player         = fmenu.tmenu.lock_player[0],
                 overlay = 
                 {           

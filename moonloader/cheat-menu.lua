@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.1-beta")
-script_version_number(2020080401) -- YYYYMMDDNN
+script_version_number(2020080801) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -127,13 +127,21 @@ tcheatmenu       =
             Y    = fconfig.Get('tcheatmenu.window.size.Y',resY/1.2),
         },
         title    = string.format("%s v%s",script.this.name,script.this.version),
-        show_unsupported_resolution_msg = imgui.new.bool(fconfig.Get('tcheatmenu.window.show_unsupported_resolution_msg',true)),
     },
 }
 
 imgui.OnInitialize(function() -- Called once
     
-   fstyle.LoadFonts()
+    -- Load fonts
+    if fmenu.tmenu.font.size[0] < 12 then fmenu.tmenu.font.size[0] = 12 end
+    local mask = tcheatmenu.dir .. "fonts//*.ttf"
+
+    local handle, name = findFirstFile(mask)
+    while handle and name do
+        fmenu.tmenu.font.list[name] = imgui.GetIO().Fonts:AddFontFromFileTTF(string.format( "%sfonts//%s",tcheatmenu.dir,name), fmenu.tmenu.font.size[0])
+        name = findNextFile(handle)
+    end
+    imgui.GetIO().FontDefault = fmenu.tmenu.font.list[fmenu.tmenu.font.selected]
 
     if not doesFileExist(tcheatmenu.dir .. "json//styles.json") then 
         fstyle.saveStyles(imgui.GetStyle(), "Default") 
@@ -188,18 +196,6 @@ function(self) -- render frame
 
     --------------------------------------------------
     -- Warnings 
-    if tcheatmenu.window.show_unsupported_resolution_msg[0] and ((resX < 1024 and resY < 720) or (resX > 1920 and resY > 1080)) then
-        imgui.Button("Unsupported resolution",imgui.ImVec2(fcommon.GetSize(1)))
-        if imgui.Button("Read more",imgui.ImVec2(fcommon.GetSize(2))) then
-            tcheatmenu.current_menu = 12
-            tcheatmenu.tab_data["Menu"] = 7
-        end
-        imgui.SameLine()
-        if imgui.Button("Don't show again",imgui.ImVec2(fcommon.GetSize(2))) then
-            tcheatmenu.window.show_unsupported_resolution_msg[0] = false
-        end
-        imgui.Spacing()
-    end
 
     if tcheatmenu.window.fail_loading_json then
         imgui.Button("Failed to load some json files!",imgui.ImVec2(fcommon.GetSize(1)))

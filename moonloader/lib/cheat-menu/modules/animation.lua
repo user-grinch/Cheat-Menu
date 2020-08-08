@@ -106,8 +106,6 @@ function module.AnimationMain()
         function()
 
             fcommon.DrawEntries(fconst.IDENTIFIER.ANIMATION,fconst.DRAW_TYPE.TEXT,function(anim,file)
-                print(file)
-                print(anim)
 				module.PlayAnimation(file,anim)
 			end,
             function(text,category)
