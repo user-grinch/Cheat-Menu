@@ -132,4 +132,11 @@ module.VEHICLE_CLASS =
     BICYCLE        = 11,
 }
 
+module.CHECKBOX_STATE =
+{
+    OFF = -1,
+    NOT_CONFIGURED = 0,
+    ON = 1,
+}
+
 return module

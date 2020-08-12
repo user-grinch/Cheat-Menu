@@ -168,11 +168,12 @@ function module.DropDownMenu(label,func,text_disabled)
     end
 end
 
--- Information popups used to display controls and details about elements
 function module.InformationTooltip(text)
     if fmenu.tmenu.show_tooltips[0] and text ~= nil then
         imgui.SameLine()
-        imgui.TextDisabled('?')
+        imgui.InvisibleButton("?##".. text,imgui.CalcTextSize("?"))
+        local drawlist = imgui.GetWindowDrawList()
+        drawlist:AddText(imgui.ImVec2(imgui.GetItemRectMin().x,imgui.GetItemRectMin().y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.TextDisabled),"?")
         
         if imgui.IsItemHovered() then
             imgui.BeginTooltip()
@@ -204,7 +205,10 @@ end
 function module.ConfigPanel(label,func)
     if func ~= nil then
         imgui.SameLine()
-        imgui.TextColored(imgui.ImVec4(128,128,128,0.3),'c')
+        imgui.InvisibleButton("c##".. label,imgui.CalcTextSize("c"))
+        local drawlist = imgui.GetWindowDrawList()
+        drawlist:AddText(imgui.ImVec2(imgui.GetItemRectMin().x,imgui.GetItemRectMin().y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.TextDisabled),"c")
+        
         
         if imgui.IsItemClicked(0) then
             tcheatmenu.window.panel_func = function()
@@ -221,11 +225,22 @@ function module.ConfigPanel(label,func)
     end
 end
 
+function module.InputText(label,var,hint)
+    imgui.InputText(label,var,ffi.sizeof(var))
+
+    if hint ~= nil and ffi.string(var) == "" then
+        local min = imgui.GetItemRectMin()
+        local drawlist = imgui.GetWindowDrawList()
+        drawlist:AddText(imgui.ImVec2(min.x+imgui.GetStyle().ItemInnerSpacing.x,min.y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.TextDisabled),hint)
+    end
+
+    return imgui.IsItemActivated()
+end
+
 -- Calculates width of element(button) acoording to count
 function module.GetSize(count,no_spacing)
   
     x = x or 20
-    y = y or 20
     count = count or 1
     if count == 1 then no_spacing = true end
 
@@ -241,10 +256,7 @@ function module.GetSize(count,no_spacing)
         x = imgui.GetWindowContentRegionWidth()/count - factor
     end
 
-    y = (tcheatmenu.window.size.Y/25)
-    if y < 25 then y = 25 end
-
-    return x,y
+    return x,imgui.GetFrameHeight()*1.3
 end
 
 function module.Tabs(label,names,func)
@@ -253,44 +265,41 @@ function module.Tabs(label,names,func)
         tcheatmenu.tab_data[label] = 1
     end
 
-    local button = imgui.ColorConvertFloat4ToU32(imgui.GetStyle()['Colors'][21])
-    local buttonhovered = imgui.ColorConvertFloat4ToU32(imgui.GetStyle()['Colors'][22])
-    local buttonactive = imgui.ColorConvertFloat4ToU32(imgui.GetStyle()['Colors'][23])
-    
     imgui.Spacing()
-    x,y = module.GetSize(1)
-    if imgui.BeginChild(label,imgui.ImVec2(tcheatmenu.window.size.X-imgui.GetStyle().WindowPadding.x*2,y*0.9)) then
-        imgui.PushStyleVarVec2(imgui.StyleVar.ItemSpacing, imgui.ImVec2(4,0))
 
-        imgui.GetStyle().Colors[imgui.Col.Button] = imgui.GetStyle().Colors[imgui.Col.Tab]
-        imgui.GetStyle().Colors[imgui.Col.ButtonHovered] = imgui.GetStyle().Colors[imgui.Col.TabHovered]
-        imgui.GetStyle().Colors[imgui.Col.ButtonActive] = imgui.GetStyle().Colors[imgui.Col.TabActive]
+    local square_sz = imgui.GetFrameHeight()*0.9
+    local drawlist = imgui.GetWindowDrawList()
+    local btn_color = nil
 
+    if imgui.BeginChild(label,imgui.ImVec2(tcheatmenu.window.size.X-imgui.GetStyle().WindowPadding.x*2,square_sz)) then
         for i=1,#names,1 do
             if tcheatmenu.tab_data[label] == i then
-                imgui.GetStyle().Colors[imgui.Col.Button] = imgui.GetStyle().Colors[imgui.Col.TabActive]
+                btn_color = imgui.GetColorU32(imgui.Col.TabActive)
             else
-                imgui.GetStyle().Colors[imgui.Col.Button] = imgui.GetStyle().Colors[imgui.Col.Tab]
+                btn_color = imgui.GetColorU32(imgui.Col.Tab)
             end
       
-            if imgui.Button(names[i],imgui.ImVec2(imgui.CalcTextSize(names[i]).x+10,y*0.75)) then
+            if imgui.InvisibleButton("##InvisibleButton".. names[i], imgui.ImVec2(imgui.CalcTextSize(names[i]).x+10,square_sz)) then
                 tcheatmenu.tab_data[label] = i
             end
+            if imgui.IsItemHovered() then
+                btn_color = imgui.GetColorU32(imgui.Col.TabHovered)
+            end
 
+            drawlist:AddRectFilled(imgui.GetItemRectMin(), imgui.GetItemRectMax(), btn_color)
+            local offset_x = (imgui.GetItemRectSize().x - imgui.CalcTextSize(names[i]).x)/2
+            local offset_y = (imgui.GetItemRectSize().y - imgui.CalcTextSize(names[i]).y)/2
+            
+            drawlist:AddText(imgui.ImVec2(imgui.GetItemRectMin().x+offset_x,imgui.GetItemRectMin().y+offset_y), imgui.GetColorU32(imgui.Col.Text),names[i])
             imgui.SameLine()
         end
-        fcommon.InformationTooltip("If your window width is small you\ncan scroll by Shift + Mouse wheel")
-        imgui.GetStyle().Colors[imgui.Col.Button] = imgui.ColorConvertU32ToFloat4(button)
-        imgui.GetStyle().Colors[imgui.Col.ButtonHovered] = imgui.ColorConvertU32ToFloat4(buttonhovered)
-        imgui.GetStyle().Colors[imgui.Col.ButtonActive] = imgui.ColorConvertU32ToFloat4(buttonactive)
         
-        if not fmenu.tmenu.show_tooltips[0] then
-            imgui.NewLine()
-        end
+        local minx  = imgui.GetWindowPos().x
+        local maxy  = imgui.GetItemRectMax().y
+        drawlist:AddLine(imgui.ImVec2(minx-5,maxy), imgui.ImVec2(minx+tcheatmenu.window.size.X,maxy), imgui.GetColorU32(imgui.Col.TabActive))
+        fcommon.InformationTooltip("If your window width is small you\ncan scroll by Shift + Mouse wheel")
 
-        imgui.Separator()
         imgui.EndChild()
-        imgui.PopStyleVar(1)
     end
     if func[tcheatmenu.tab_data[label]] ~= nil then
         imgui.Spacing()
@@ -494,7 +503,13 @@ function module.DrawEntries(identifier,draw_type,func_on_left_click,func_on_righ
     imgui.SameLine()
 
     imgui.SetNextItemWidth(width/2)
+    
     tcheatmenu.temp_data.draw_entries_func[identifier].filter:Draw("##Filter")
+    if tcheatmenu.temp_data.draw_entries_func[identifier].filter:PassFilter('') then
+        local min = imgui.GetItemRectMin()
+        local drawlist = imgui.GetWindowDrawList()
+        drawlist:AddText(imgui.ImVec2(min.x+imgui.GetStyle().ItemInnerSpacing.x,min.y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.TextDisabled),"Search")
+    end
     imgui.Spacing()
 
     --------------------------------------------------
@@ -697,7 +712,85 @@ function module.CheckBoxFunc(name,var,func,tooltip,panel_func)
 
     module.InformationTooltip(tooltip)
 
+end
+
+
+function RenderCheckMark(drawlist, pos, col, sz)
+
+    local thickness = sz / 5.0
+    thickness = thickness < 1.0 and 1.0 or thickness
+
+    sz = sz - thickness * 0.5
+    pos.x = pos.x + thickness * 0.25
+    pos.y = pos.y + thickness * 0.25
+
+    local third = sz / 3.0
+    local bx = pos.x + third
+    local by = pos.y + sz - third * 0.5
+
+    drawlist:PathLineTo(imgui.ImVec2(bx - third, by - third))
+    drawlist:PathLineTo(imgui.ImVec2(bx, by))
+    drawlist:PathLineTo(imgui.ImVec2(bx + third * 2.0, by - third * 2.0))
+    drawlist:PathStroke(col, false, thickness)
+end
+
+function module.CheckBox3(label,var)
+    local square_sz = imgui.GetFrameHeight()
+    local drawlist = imgui.GetWindowDrawList()
+    local color = imgui.GetColorU32(imgui.Col.FrameBg)
+    local text_size = imgui.CalcTextSize(label)
+
+    if imgui.InvisibleButton("##InvCheckboxBtn" .. label, imgui.ImVec2(square_sz+text_size.x+imgui.GetStyle().ItemInnerSpacing.x,square_sz)) then
+        var[0] = var[0] - 1
+        var[0] = var[0] < -1 and 1 or var[0]
+    end
+
+    if imgui.IsItemClicked(1) then
+        var[0] = var[0] + 1
+        var[0] = var[0] > 1 and -1 or var[0]
+    end
+
+    if imgui.IsItemHovered() then
+        color = imgui.GetColorU32(imgui.Col.FrameBgHovered)
+    end
     
+    local min = imgui.GetItemRectMin()
+    local max = imgui.ImVec2(imgui.GetItemRectMax().x-text_size.x-imgui.GetStyle().ItemInnerSpacing.x,imgui.GetItemRectMax().y)
+    drawlist:AddRectFilled(min, max, color)
+    local pad = math.floor(square_sz / 6.0)
+    pad = pad < 1.0 and 1.0 or pad 
+
+    if var[0] == fconst.CHECKBOX_STATE.NOT_CONFIGURED then
+        drawlist:AddRectFilled(imgui.ImVec2(min.x+3,min.y+3), imgui.ImVec2(max.x-3,max.y-3), imgui.GetColorU32(imgui.Col.CheckMark))
+    end
+    if var[0] == fconst.CHECKBOX_STATE.ON then
+        RenderCheckMark(drawlist, imgui.ImVec2(min.x+pad,min.y+pad), imgui.GetColorU32(imgui.Col.CheckMark), square_sz - pad * 2.0)
+    end
+
+    drawlist:AddText(imgui.ImVec2(max.x+imgui.GetStyle().ItemInnerSpacing.x,min.y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.Text),label)
+    return imgui.IsItemClicked(0)
+end
+
+function module.CheckBox3Var(name,var,tooltip,func,panel_func,show_help_msg)
+    show_help_msg = show_help_msg or true
+
+    if module.CheckBox3(name, var) then
+
+        if show_help_msg then
+            if var[0] == fconst.CHECKBOX_STATE.ON then
+                fcommon.CheatActivated()
+            end
+            if var[0] == fconst.CHECKBOX_STATE.OFF then
+                fcommon.CheatDeactivated()
+            end
+        end
+        if func ~= nil then
+            func()
+        end
+    end
+
+    module.InformationTooltip(tooltip)
+    module.ConfigPanel(name,panel_func)
 end
 
 --------------------------------------------------

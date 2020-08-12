@@ -208,11 +208,11 @@ function module.ChangePlayerCloth(name)
 end
 
 function module.RemoveThisCloth(name)
-    if imgui.MenuItemBool("Remove item") then 
+    if imgui.MenuItemBool("Remove cloth") then 
         local body_part, model, texture = name:match("([^$]+)$([^$]+)$([^$]+)")
         givePlayerClothes(PLAYER_HANDLE,0,0,body_part)
         buildPlayerModel(PLAYER_HANDLE)
-        printHelpString("Item removed")
+        printHelpString("Cloth ~r~removed")
     end
 end
 --------------------------------------------------
@@ -231,7 +231,7 @@ function module.PlayerMain()
     end
     imgui.Spacing()
 
-    fcommon.Tabs("Player",{"Checkboxes","Menus","Skins","Clothes"},{
+    fcommon.Tabs("Player",{"Checkboxes","Menus","Appearance"},{
         function()
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("God mode",module.tplayer.god)
@@ -320,13 +320,43 @@ function module.PlayerMain()
         function()
             fcommon.CheckBoxVar("Aim skin changer", module.tplayer.aimSkinChanger,"Activate using, Aim ped +".. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.asc_key))
    
-            fcommon.Tabs("Skins",{"Ped skins","Custom skins"},{
+            fcommon.Tabs("Appearance",{"Clothes","Ped skins","Custom skins"},{
+                function()
+                    if getCharModel(PLAYER_PED) == 0 then
+                        if imgui.Button("Remove clothes",imgui.ImVec2(fcommon.GetSize(1))) then
+                            for i=0, 17 do givePlayerClothes(PLAYER_HANDLE,0,0,i) end
+                            buildPlayerModel(PLAYER_HANDLE)
+                            printHelpString("Clothes ~r~removed")
+                        end
+                        
+                        imgui.Dummy(imgui.ImVec2(0,10))        
+                        fcommon.DrawEntries(fconst.IDENTIFIER.CLOTHES,fconst.DRAW_TYPE.IMAGE,module.ChangePlayerCloth,module.RemoveThisCloth,module.GetClothTextureName,module.tplayer.clothes.images,fconst.CLOTH.IMAGE_HEIGHT,fconst.CLOTH.IMAGE_WIDTH)    
+                    else
+                        imgui.TextWrapped("You need to be in CJ skin to change clothes.")
+                        imgui.Spacing()
+                        if imgui.Button("Change to CJ skin",imgui.ImVec2(fcommon.GetSize(1))) then
+                            setPlayerModel(PLAYER_HANDLE,0)
+
+                            local veh = nil
+                            local speed = 0
+                            if isCharInAnyCar(PLAYER_PED) then
+                                veh = getCarCharIsUsing(PLAYER_PED)
+                                speed = getCarSpeed(veh)
+                            end
+                            clearCharTasksImmediately(PLAYER_PED)
+                            if veh ~= nil then
+                                taskWarpCharIntoCarAsDriver(PLAYER_PED,veh)
+                                setCarForwardSpeed(veh,speed)
+                            end
+                        end
+                    end
+                end,
                 function()
                     fcommon.DrawEntries(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.IMAGE,module.ChangePlayerModel,nil,fped.GetModelName,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH)
                 end,
                 function()
                     if module.tplayer.custom_skins.is_modloader_installed then
-                        module.tplayer.custom_skins.filter:Draw("Filter")
+                        module.tplayer.custom_skins.filter:Draw("Search")
                         fcommon.InformationTooltip(string.format("Place your dff & txd files inside,\n'%s'\n\
 Note:\nFile names can't exceed 8 characters.\nDon't change names while the game is running",fplayer.tplayer.custom_skins.path))
                         imgui.Spacing()
@@ -351,17 +381,6 @@ Note:\nFile names can't exceed 8 characters.\nDon't change names while the game 
                     end
                 end
             })
-        end,
-        function()
-            if imgui.Button("Remove clothes",imgui.ImVec2(fcommon.GetSize(1))) then
-                for i=0, 17 do givePlayerClothes(PLAYER_HANDLE,0,0,i) end
-                buildPlayerModel(PLAYER_HANDLE)
-                printHelpString("Clothes ~r~removed")
-            end
-            
-            imgui.Dummy(imgui.ImVec2(0,10))        
-            fcommon.DrawEntries(fconst.IDENTIFIER.CLOTHES,fconst.DRAW_TYPE.IMAGE,module.ChangePlayerCloth,module.RemoveThisCloth,module.GetClothTextureName,module.tplayer.clothes.images,fconst.CLOTH.IMAGE_HEIGHT,fconst.CLOTH.IMAGE_WIDTH)
-
         end
     })
 end

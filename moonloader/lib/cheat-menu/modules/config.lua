@@ -276,12 +276,12 @@ function module.Write()
                     index        = fvehicle.tvehicle.aircraft.index,
                     spawn_in_air = fvehicle.tvehicle.aircraft.spawn_in_air[0],
                 },
+                car_engine  = fvehicle.tvehicle.car_engine[0],
                 color =
                 {
                     show_all = fvehicle.tvehicle.color.show_all[0],
                 },
                 apply_material_filter = fvehicle.tvehicle.apply_material_filter[0],
-                disable_car_engine  = fvehicle.tvehicle.disable_car_engine[0],
                 first_person_camera = 
                 {
                     bool            = fvehicle.tvehicle.first_person_camera.bool[0],

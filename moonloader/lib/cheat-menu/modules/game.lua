@@ -923,7 +923,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
 
                 local filter = module.tgame.script_manager.filter
 
-                filter:Draw("Filter")
+                filter:Draw("Search")
                 imgui.Spacing()
                 
                 for index, script in ipairs(script.list()) do
@@ -976,7 +976,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                 imgui.Spacing()
                 local filter = module.tgame.object_spawner.filter
 
-                filter:Draw("Filter")
+                filter:Draw("Search")
                 fcommon.InformationTooltip("All objects will be removed if\nCheat Menu gets terminated")
                 imgui.Spacing()
 
@@ -1032,10 +1032,10 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
             end,
             function()
                 local filter = module.tgame.object_spawner.filter
-                filter:Draw("Filter")
+                filter:Draw("Search")
                 fcommon.InformationTooltip("Changes here affect all object\nof the group")
                 imgui.Spacing()
-
+                local size = imgui.GetFrameHeight()
                 if imgui.BeginChild("Groups") then 
                     for grp,data in pairs(module.tgame.object_spawner.placed) do
                         fcommon.DropDownMenu(grp,function()
@@ -1068,7 +1068,6 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
                                 printHelpString("Group collisions off")
                             end
                             imgui.Spacing()
-                            local _,size = fcommon.GetSize(10)
                             imgui.Columns(2,nil,false)
                             if imgui.Button("+##X",imgui.ImVec2(size,size)) then
                                 for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do

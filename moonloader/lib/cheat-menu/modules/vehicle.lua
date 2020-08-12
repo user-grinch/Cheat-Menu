@@ -26,6 +26,7 @@ module.tvehicle =
         zoom = { -5.0,-15.0,-20.0,-30.0,-40.0},
     },
     apply_material_filter = imgui.new.bool(fconfig.Get('tvehicle.apply_material_filter',true)),
+    car_engine = imgui.new.int(fconfig.Get('tvehicle.car_engine',fconst.CHECKBOX_STATE.NOT_CONFIGURED)),
     color =
     {
         car_data_table = {},
@@ -56,7 +57,6 @@ module.tvehicle =
         "All",
     },
     door_menu_button = imgui.new.int(0),
-    disable_car_engine = imgui.new.bool(fconfig.Get('tvehicle.disable_car_engine',false)),
     first_person_camera = 
     {
         bool            = imgui.new.bool(fconfig.Get('tvehicle.first_person_camera.bool',false)),
@@ -912,12 +912,13 @@ function module.VehicleMain()
             fcommon.CheckBoxValue("All cars have nitro",0x969165)
             fcommon.CheckBoxValue("All taxis have nitro",0x96918B)
             fcommon.CheckBoxValue("Boats fly",0x969153)
+            fcommon.CheckBox3Var("Car engine",module.tvehicle.car_engine,"ON - check mark\nNot Configured - square mark\nOFF - blank box\n\
+Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (disabling car engine)")
             fcommon.CheckBoxValue("Cars fly",0x969160)
             fcommon.CheckBoxVar("Car heavy",module.tvehicle.heavy)
             fcommon.CheckBoxValue("Decreased traffic",0x96917A)
             fcommon.CheckBoxVar("Don't fall off bike",module.tvehicle.stay_on_bike)
             fcommon.CheckBoxValue("Drive on water",0x969152)
-            fcommon.CheckBoxVar("Disable car engine",module.tvehicle.disable_car_engine)
             fcommon.CheckBoxVar("First person camera",module.tvehicle.first_person_camera.bool,nil,
             function()
                 fcommon.SingletonThread(module.FirstPersonCamera,"FirstPersonCamera")

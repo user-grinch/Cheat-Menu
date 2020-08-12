@@ -73,10 +73,8 @@ function module.MemoryMain()
             imgui.Spacing()
 
             imgui.InputText("Address", module.tmemory.address,ffi.sizeof(module.tmemory.address))
-            fcommon.InformationTooltip(fcommon.GetHotKeyNames(tcheatmenu.hot_keys.mc_paste) .. " to paste")
             imgui.InputText("Offset", module.tmemory.offset,ffi.sizeof(module.tmemory.offset))
 
-            fcommon.InformationTooltip("Blank = no offset")
             imgui.SliderInt("Size", module.tmemory.size,1,4)
 
             if module.tmemory.size[0] == 4 then
@@ -143,9 +141,7 @@ function module.MemoryMain()
             
             imgui.InputInt("Value", module.tmemory.value)
             imgui.InputText("Address", module.tmemory.address,ffi.sizeof(module.tmemory.address))
-            fcommon.InformationTooltip(fcommon.GetHotKeyNames(tcheatmenu.hot_keys.mc_paste) .. " to paste")
             imgui.InputText("Offset", module.tmemory.offset,ffi.sizeof(module.tmemory.offset))
-            fcommon.InformationTooltip("Blank = no offset")
             imgui.SliderInt("Size", module.tmemory.size,1,4)
 
             if module.tmemory.size[0] == 4 then

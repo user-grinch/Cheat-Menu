@@ -34,7 +34,7 @@ module.tmenu =
 	{
 		list			= {},
 		selected		= fconfig.Get('tmenu.font.selected',"Trebucbd.ttf"),
-		size  		    = imgui.new.int(fconfig.Get('tmenu.font.size',math.floor(resY*0.0182291666666667))),
+		size  		    = imgui.new.int(fconfig.Get('tmenu.font.size',math.floor(resY/54.85))),
 	},
 	lock_player   		= imgui.new.bool(fconfig.Get('tmenu.lock_player',false)),
 	overlay             = 
@@ -377,7 +377,7 @@ This may increase game startup time or\nfreeze it for few seconds but improve\nm
 			fcommon.InformationTooltip("You can also right click on the\noverlay to access these options")
 		end,
 		function()
-			module.tmenu.command.filter:Draw("Filter")
+			module.tmenu.command.filter:Draw("Search")
 			fcommon.InformationTooltip(string.format("Open command window using %s\nand close using Enter",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.command_window)))
 			imgui.Spacing()
 

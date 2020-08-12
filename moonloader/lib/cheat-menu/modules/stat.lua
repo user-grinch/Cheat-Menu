@@ -75,7 +75,7 @@ function module.StatMain()
             fcommon.UpdateStat({ name = "Millie",stat = 257,max = 100})
         end,
         function()
-            module.tstat.filter:Draw("Filter")
+            module.tstat.filter:Draw("Search")
             imgui.Spacing()
 
             if imgui.BeginChild("Stat Entries") then

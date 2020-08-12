@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.1-beta")
-script_version_number(2020080801) -- YYYYMMDDNN
+script_version_number(2020081201) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -181,7 +181,7 @@ function() -- condition
     return tcheatmenu.window.show[0] and not isGamePaused() 
 end,
 function(self) -- render frame
-
+    
     self.LockPlayer = fmenu.tmenu.lock_player[0] 
     imgui.SetNextWindowSize(imgui.ImVec2(tcheatmenu.window.size.X,tcheatmenu.window.size.Y),imgui.Cond.Once)
     imgui.SetNextWindowPos(imgui.ImVec2(tcheatmenu.window.coord.X,tcheatmenu.window.coord.Y),imgui.Cond.Once)
@@ -677,7 +677,12 @@ function main()
         if isCharInAnyCar(PLAYER_PED) then
             local car = getCarCharIsUsing(PLAYER_PED)
 
-            setCarEngineOn(car,not (fvehicle.tvehicle.disable_car_engine[0]))
+            if fvehicle.tvehicle.car_engine[0] == fconst.CHECKBOX_STATE.ON then
+                setCarEngineOn(car,true)
+            end
+            if fvehicle.tvehicle.car_engine[0] == fconst.CHECKBOX_STATE.OFF then
+                setCarEngineOn(car,false)
+            end
 
             -- Reset car colors if player changed color in tune shop
             if fvehicle.tvehicle.color.default ~= -1 then
