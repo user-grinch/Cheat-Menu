@@ -167,11 +167,6 @@ end
 --------------------------------------------------
 -- Cloth functions
 
-function module.GetClothTextureName(string)
-    local body_part, model, texture = string:match("([^$]+)$([^$]+)$([^$]+)")
-    return texture
-end
-
 function module.ChangePlayerCloth(name)
     local body_part, model, texture = name:match("([^$]+)$([^$]+)$([^$]+)")
     
@@ -191,8 +186,6 @@ function module.ChangePlayerCloth(name)
     buildPlayerModel(PLAYER_HANDLE) 
 
     printHelpString("Clothes changed")
-    -- tex,model = getClothesItem(PLAYER_HANDLE,3)
-    -- printString(string.format("%d %d",tex, model),1000)
     
     local veh = nil
     local speed = 0
@@ -330,7 +323,7 @@ function module.PlayerMain()
                         end
                         
                         imgui.Dummy(imgui.ImVec2(0,10))        
-                        fcommon.DrawEntries(fconst.IDENTIFIER.CLOTHES,fconst.DRAW_TYPE.IMAGE,module.ChangePlayerCloth,module.RemoveThisCloth,module.GetClothTextureName,module.tplayer.clothes.images,fconst.CLOTH.IMAGE_HEIGHT,fconst.CLOTH.IMAGE_WIDTH)    
+                        fcommon.DrawEntries(fconst.IDENTIFIER.CLOTHES,fconst.DRAW_TYPE.IMAGE,module.ChangePlayerCloth,module.RemoveThisCloth,function() return "" end,module.tplayer.clothes.images,fconst.CLOTH.IMAGE_HEIGHT,fconst.CLOTH.IMAGE_WIDTH)    
                     else
                         imgui.TextWrapped("You need to be in CJ skin to change clothes.")
                         imgui.Spacing()

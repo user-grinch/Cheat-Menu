@@ -150,16 +150,25 @@ function module.AnimationMain()
             end
         end,
         function()
-            imgui.InputText("IFP name",module.tanimation.ifp_name,ffi.sizeof(module.tanimation.ifp_name))
-            imgui.InputText("Animation name",module.tanimation.name,ffi.sizeof(module.tanimation.name))
+            fcommon.InputText("File",module.tanimation.ifp_name,"ped")
+            fcommon.InputText("Animation",module.tanimation.name,"cower")
             imgui.Spacing()
             if imgui.Button("Add animation",imgui.ImVec2(fcommon.GetSize(1))) then
-                if module.tanimation.list[ffi.string(module.tanimation.ifp_name)] == nil then
-                    module.tanimation.list[ffi.string(module.tanimation.ifp_name)] = {}
+                if ffi.string(module.tanimation.ifp_name) == "" then
+                    printHelpString("No file name found")
+                else
+                    if ffi.string(module.tanimation.name) then
+                        printHelpString("No animation name found")
+                    else
+                        if module.tanimation.list[ffi.string(module.tanimation.ifp_name)] == nil then
+                            module.tanimation.list[ffi.string(module.tanimation.ifp_name)] = {}
+                        end
+                        module.tanimation.list[ffi.string(module.tanimation.ifp_name)][ffi.string(module.tanimation.name)] = ffi.string(module.tanimation.name)
+        
+                        printHelpString("Animation ~g~added")
+                    end
                 end
-                module.tanimation.list[ffi.string(module.tanimation.ifp_name)][ffi.string(module.tanimation.name)] = ffi.string(module.tanimation.name)
-
-                printHelpString("Animation ~g~added")
+               
             end
         end
     })

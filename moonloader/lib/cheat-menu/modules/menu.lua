@@ -351,11 +351,10 @@ function module.MenuMain()
 			fcommon.CheckBoxVar("Auto reload",module.tmenu.auto_reload,"Reload cheat menu automatically\nin case of a crash.\n\nMight cause crash loop sometimes.")
 			fcommon.CheckBoxVar("Check for updates",module.tmenu.auto_update_check,"Cheat Menu will automatically check for updates\nonline. This requires an internet connection and\
 will download files from github repository.")
-			fcommon.CheckBoxVar("Fast load images",module.tmenu.fast_load_images,"Loads vehicles, weapons, peds etc. images\nat menu startup.\n \
-This may increase game startup time or\nfreeze it for few seconds but improve\nmenu performance.")
+			fcommon.CheckBoxVar("Lock player",module.tmenu.lock_player,"Lock player controls while the menu is open")
 			
 			imgui.NextColumn()
-			fcommon.CheckBoxVar("Lock player",module.tmenu.lock_player,"Lock player controls while the menu is open")
+
 			fcommon.CheckBoxVar("Show crash message",module.tmenu.show_crash_message)
 			fcommon.CheckBoxVar("Show tooltips",module.tmenu.show_tooltips,"Shows usage tips beside options")
 			imgui.Columns(1)

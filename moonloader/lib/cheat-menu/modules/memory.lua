@@ -72,7 +72,7 @@ function module.MemoryMain()
             imgui.Columns(1)
             imgui.Spacing()
 
-            imgui.InputText("Address", module.tmemory.address,ffi.sizeof(module.tmemory.address))
+            fcommon.InputText("Address", module.tmemory.address,"0x000000")
             imgui.InputText("Offset", module.tmemory.offset,ffi.sizeof(module.tmemory.offset))
 
             imgui.SliderInt("Size", module.tmemory.size,1,4)
@@ -97,6 +97,8 @@ function module.MemoryMain()
 
                 if ffi.string(module.tmemory.address) ~= "" then
                     module.tmemory.value[0] = fcommon.RwMemory((tonumber(ffi.string(module.tmemory.address))+tonumber(ffi.string(module.tmemory.offset))),module.tmemory.size[0],nil,module.tmemory.vp[0],module.tmemory.is_float[0])
+                else 
+                    printHelpString("No address found")
                 end
             end
             imgui.SameLine()
@@ -140,7 +142,7 @@ function module.MemoryMain()
             end
             
             imgui.InputInt("Value", module.tmemory.value)
-            imgui.InputText("Address", module.tmemory.address,ffi.sizeof(module.tmemory.address))
+            fcommon.InputText("Address", module.tmemory.address,"0x000000")
             imgui.InputText("Offset", module.tmemory.offset,ffi.sizeof(module.tmemory.offset))
             imgui.SliderInt("Size", module.tmemory.size,1,4)
 
@@ -165,7 +167,9 @@ function module.MemoryMain()
 
                 if ffi.string(module.tmemory.address) ~= "" then
                     fcommon.RwMemory(tonumber(ffi.string(module.tmemory.address))+tonumber(ffi.string(module.tmemory.offset)),module.tmemory.size[0],module.tmemory.value[0],module.tmemory.vp[0],module.tmemory.is_float[0])
-                    printHelpString("Value ~g~Updated")
+                    printHelpString("Value Updated")
+                else 
+                    printHelpString("No address found")
                 end
             end
             imgui.SameLine()
@@ -216,38 +220,47 @@ function module.MemoryMain()
                         end
                         ::end_loop::
 
-                        printHelpString("Memory ~r~removed")
+                        printHelpString("Address removed")
                     end
                 end,
                 function(a) return a end,module.tmemory.list)
         end,
         function()
-            imgui.InputText("Name",module.tmemory.name,ffi.sizeof(module.tmemory.name))
-            imgui.InputText("Address",module.tmemory.address,ffi.sizeof(module.tmemory.address))
+            fcommon.InputText("Name",module.tmemory.name,"New address")
+            fcommon.InputText("Address", module.tmemory.address,"0x000000")
             imgui.SliderInt("Size", module.tmemory.size,1,4)
             imgui.Checkbox("Float",module.tmemory.is_float)
             imgui.Spacing()
             if imgui.Button("Add address",imgui.ImVec2(fcommon.GetSize(1))) then
 
-                local mem_type = ""
-                if module.tmemory.size[0] == 1 then 
-                    mem_type = "byte"
-                end
-                if module.tmemory.size[0] == 2 then 
-                    mem_type = "word"
-                end
-                if module.tmemory.size[0] == 4 then 
-                    if module.tmemory.is_float[0] == true then
-                        mem_type = "float"
+                if ffi.string(module.tmemory.name) == "" then 
+                    printHelpString("No name found")
+                else
+                    if ffi.string(module.tmemory.address) == "" or tonumber(ffi.string(module.tmemory.address)) == nil then
+                        printHelpString("No address found")
                     else
-                        mem_type = "dword"
+                        local mem_type = ""
+                        if module.tmemory.size[0] == 1 then 
+                            mem_type = "byte"
+                        end
+                        if module.tmemory.size[0] == 2 then 
+                            mem_type = "word"
+                        end
+                        if module.tmemory.size[0] == 4 then 
+                            if module.tmemory.is_float[0] == true then
+                                mem_type = "float"
+                            else
+                                mem_type = "dword"
+                            end
+                        end
+                        
+                        module.tmemory.list[mem_type][ffi.string(module.tmemory.name)] = mem_type .. "$" .. ffi.string(module.tmemory.address)
+                        fcommon.SaveJson("memory",module.tmemory.list)
+                        module.tmemory.list = fcommon.LoadJson("memory")
+                        printHelpString("Address added")
                     end
                 end
                 
-                module.tmemory.list[mem_type][ffi.string(module.tmemory.name)] = mem_type .. "$" .. ffi.string(module.tmemory.address)
-                fcommon.SaveJson("memory",module.tmemory.list)
-                module.tmemory.list = fcommon.LoadJson("memory")
-                printHelpString("Address ~g~added")
             end
         end})
 end

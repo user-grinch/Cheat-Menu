@@ -76,7 +76,7 @@ module.WEAPON =
 module.CLOTH =
 {
     IMAGE_HEIGHT = 100,
-    IMAGE_WIDTH  = 80,
+    IMAGE_WIDTH  = 70,
     IMAGE_EXT    = "jpg",
 }
 
@@ -137,6 +137,18 @@ module.CHECKBOX_STATE =
     OFF = -1,
     NOT_CONFIGURED = 0,
     ON = 1,
+}
+
+module.MODEL_TYPE =
+{
+    INVALID = nil,
+	ATOMIC = 1,
+	TIME = 3,
+	WEAPON = 4,
+	CLUMP = 5,
+	VEHICLE = 6,
+	PED = 7,
+	LOD = 8
 }
 
 return module

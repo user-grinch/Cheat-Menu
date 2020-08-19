@@ -340,8 +340,7 @@ function module.Write()
                     {fweapon.tweapon.gang.used_weapons[9][1],fweapon.tweapon.gang.used_weapons[9][2],fweapon.tweapon.gang.used_weapons[9][3]}, -- Gang 9 
                     {fweapon.tweapon.gang.used_weapons[10][1],fweapon.tweapon.gang.used_weapons[10][2],fweapon.tweapon.gang.used_weapons[10][3]}, -- Gang 10
                 },
-                long_target_range = fweapon.tweapon.long_target_range[0],
-                long_weapon_range = fweapon.tweapon.long_weapon_range[0],
+                long_range = fweapon.tweapon.long_range[0],
                 ped               = fweapon.tweapon.ped[0],
             }, 
         }

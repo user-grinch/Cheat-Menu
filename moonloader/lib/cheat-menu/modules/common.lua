@@ -381,10 +381,11 @@ end
 function LoadImages(image_table)
 
     for model,image in pairs(image_table) do
-        if type(image) == "string" then
+        if image_table[model] ~= -1 and type(image) == "string" then
+            image_table[model] = -1 -- Loading in progress
             image_table[model] = imgui.CreateTextureFromFile(image)
+            wait(0)
         end
-        wait(0)
     end
     
 end
@@ -516,16 +517,23 @@ function module.DrawEntries(identifier,draw_type,func_on_left_click,func_on_righ
     -- Call the drawing function
 
     if imgui.BeginChild("##Draw") then 
+        if draw_type == fconst.DRAW_TYPE.IMAGE then
+            --lua_thread.create(LoadImages,table)
+            lua_thread.create(function()
+                for category,table in pairs(tcheatmenu.temp_data.draw_entries_func[identifier].entry_table) do
+                    for model,image in pairs(table) do
+                        if type(image) == "string" then
+                            table[model] = imgui.CreateTextureFromFile(image)
+                            wait(0)
+                        end
+                    end
+                end
+            end)
+        end
         for category,table in pairs(tcheatmenu.temp_data.draw_entries_func[identifier].entry_table) do
-            if draw_type == fconst.DRAW_TYPE.IMAGE then
-                lua_thread.create(LoadImages,table)
-            end
             if tcheatmenu.temp_data.draw_entries_func[identifier].selected == "All" or category == tcheatmenu.temp_data.draw_entries_func[identifier].selected then
                 for label,entry in pairs(table) do
                     local name = func_get_name(label)
-                    if draw_type == fconst.DRAW_TYPE.IMAGE then
-                        lua_thread.create(LoadImages,table)
-                    end
                     if tcheatmenu.temp_data.draw_entries_func[identifier].filter:PassFilter(name) then
                         if draw_type == fconst.DRAW_TYPE.IMAGE then
                             DrawImage(identifier,func_on_left_click,func_on_right_click,table,const_image_height,const_image_width,label,entry,name)
@@ -1115,7 +1123,7 @@ end
 -- Misc
 
 -- Indexes image paths recursively from root directory
-function module.IndexFiles(mainDir,store_table,req_ext,load_images)
+function module.IndexFiles(mainDir,store_table,req_ext)
     load_images = load_images or false
 
     process_file = function(file_path,element)
@@ -1126,11 +1134,7 @@ function module.IndexFiles(mainDir,store_table,req_ext,load_images)
                 if store_table[element] == nil then
                     store_table[element] = {}
                 end
-                if fmenu.tmenu.fast_load_images[0] and load_images then
-                    store_table[element][file_name] = imgui.CreateTextureFromFile(file_path)
-                else
-                    store_table[element][file_name] = file_path
-                end
+                store_table[element][file_name] = file_path
             end
         end
     end
@@ -1150,35 +1154,6 @@ function module.IndexFiles(mainDir,store_table,req_ext,load_images)
             process_file(ele_path,element)
         end
     end
-end
-
-function module.MoveFiles(main_dir,dest_dir)
-    for f in lfs.dir(main_dir) do
-        local main_file = main_dir .. "/" .. f
-
-        if doesDirectoryExist(main_file) and f ~= "." and f ~= ".." then
-            module.MoveFiles(main_file,dest_dir .. "/" .. f)
-        end
-
-        if doesFileExist(main_file) then
-            dest_file = dest_dir .. "/" .. f
-            if not doesDirectoryExist(dest_dir) then
-                lfs.mkdir(dest_dir)
-            end
-            
-            if doesFileExist(dest_file) then
-                os.remove(dest_file)
-            end
-            if doesFileExist(dest_file) then
-                os.remove(main_file)
-                print("[UPDATE] Unable to delete file " .. dest_file)
-            else
-                os.rename(main_file,dest_file)
-            end
-            
-        end
-    end
-    lfs.rmdir(main_dir)
 end
 
 function module.ReleaseImages(main_table)

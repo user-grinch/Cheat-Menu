@@ -7,16 +7,16 @@ ffi.cdef
     typedef unsigned int CBaseModelInfo;
 ]]
 
--- module.CBaseModelInfo = 
--- {
-
--- }
+module.CBaseModelInfo = 
+{
+}
 
 module.CModelInfo = 
 {
     GetModelInfoFromModel = ffi.cast("CBaseModelInfo(*)(unsigned int model)",0x403DA0),
     GetModelInfoFromName = ffi.cast("CBaseModelInfo(*)(const char *modelName, unsigned int pmodel_id_return)",0x4C5940),
     IsTrainModel = ffi.cast('bool(*)(int model)',0x4C5AD0),
+    IsVehicleModel = ffi.cast('int(*)(int model)',0x4C5C80),
     ms_modelInfoPtrs = ffi.cast("uintptr_t*", 0xA9B0C8)
 }
 
@@ -124,13 +124,15 @@ module.CTimeCyc =
 }
 
 
--- function module.CBaseModelInfo.GetModelType(model_id)
+function module.CBaseModelInfo.GetModelType(model_id)
 
---     local name = module.CModelInfo.GetModelInfoFromModel(model_id)
---     name = readMemory(name,4,false)
+    local pinfo = module.CModelInfo.GetModelInfoFromModel(model_id)
+    local info = readMemory(pinfo,4,false)
 
---     printString(tostring(name),100)
--- end
+    if info ~= 0 then
+        return callFunction(readMemory(info+0x10, 4,false), 1, 1, model_id)
+    end
+end
 
 
 

@@ -14,14 +14,14 @@
 -- You should have received a copy of the GNU General Public License
 -- along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-script_name 'Cheat Menu'
+script_name('Cheat Menu')
 script_author("Grinch_")
 script_description("Cheat Menu for Grand Theft Auto San Andreas")
 script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-menu")
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.1-beta")
-script_version_number(2020081201) -- YYYYMMDDNN
+script_version_number(2020081901) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -131,17 +131,21 @@ tcheatmenu       =
 }
 
 imgui.OnInitialize(function() -- Called once
-    
+
+    local io = imgui.GetIO()
     -- Load fonts
     if fmenu.tmenu.font.size[0] < 12 then fmenu.tmenu.font.size[0] = 12 end
     local mask = tcheatmenu.dir .. "fonts//*.ttf"
 
     local handle, name = findFirstFile(mask)
     while handle and name do
-        fmenu.tmenu.font.list[name] = imgui.GetIO().Fonts:AddFontFromFileTTF(string.format( "%sfonts//%s",tcheatmenu.dir,name), fmenu.tmenu.font.size[0])
+        fmenu.tmenu.font.list[name] = io.Fonts:AddFontFromFileTTF(string.format( "%sfonts//%s",tcheatmenu.dir,name), fmenu.tmenu.font.size[0])
         name = findNextFile(handle)
     end
-    imgui.GetIO().FontDefault = fmenu.tmenu.font.list[fmenu.tmenu.font.selected]
+
+    io.FontDefault = fmenu.tmenu.font.list[fmenu.tmenu.font.selected]
+    io.IniFilename = nil
+    io.WantSaveIniSettings = false
 
     if not doesFileExist(tcheatmenu.dir .. "json//styles.json") then 
         fstyle.saveStyles(imgui.GetStyle(), "Default") 
@@ -167,12 +171,12 @@ imgui.OnInitialize(function() -- Called once
     -- Indexing images
     lua_thread.create(
     function() 
-        fcommon.IndexFiles(fvehicle.tvehicle.path,fvehicle.tvehicle.images,fconst.VEHICLE.IMAGE_EXT,true)
-        fcommon.IndexFiles(fweapon.tweapon.path,fweapon.tweapon.images,fconst.WEAPON.IMAGE_EXT,true)
-        fcommon.IndexFiles(fvehicle.tvehicle.paintjobs.path,fvehicle.tvehicle.paintjobs.images,fconst.PAINTJOB.IMAGE_EXT,true)
-        fcommon.IndexFiles(fvehicle.tvehicle.components.path,fvehicle.tvehicle.components.images,fconst.COMPONENT.IMAGE_EXT,true)
-        fcommon.IndexFiles(fped.tped.path,fped.tped.images,fconst.PED.IMAGE_EXT,true)
-        fcommon.IndexFiles(fplayer.tplayer.clothes.path,fplayer.tplayer.clothes.images,fconst.CLOTH.IMAGE_EXT,true)
+        fcommon.IndexFiles(fvehicle.tvehicle.path,fvehicle.tvehicle.images,fconst.VEHICLE.IMAGE_EXT)
+        fcommon.IndexFiles(fweapon.tweapon.path,fweapon.tweapon.images,fconst.WEAPON.IMAGE_EXT)
+        fcommon.IndexFiles(fvehicle.tvehicle.paintjobs.path,fvehicle.tvehicle.paintjobs.images,fconst.PAINTJOB.IMAGE_EXT)
+        fcommon.IndexFiles(fvehicle.tvehicle.components.path,fvehicle.tvehicle.components.images,fconst.COMPONENT.IMAGE_EXT)
+        fcommon.IndexFiles(fped.tped.path,fped.tped.images,fconst.PED.IMAGE_EXT)
+        fcommon.IndexFiles(fplayer.tplayer.clothes.path,fplayer.tplayer.clothes.images,fconst.CLOTH.IMAGE_EXT)
     end)
 end)
 
@@ -185,14 +189,11 @@ function(self) -- render frame
     self.LockPlayer = fmenu.tmenu.lock_player[0] 
     imgui.SetNextWindowSize(imgui.ImVec2(tcheatmenu.window.size.X,tcheatmenu.window.size.Y),imgui.Cond.Once)
     imgui.SetNextWindowPos(imgui.ImVec2(tcheatmenu.window.coord.X,tcheatmenu.window.coord.Y),imgui.Cond.Once)
+
     imgui.PushStyleVarVec2(imgui.StyleVar.WindowMinSize,imgui.ImVec2(250,350))
-
-    local pop = 1
     imgui.PushStyleVarVec2(imgui.StyleVar.FramePadding,imgui.ImVec2(math.floor(tcheatmenu.window.size.X/85),math.floor(tcheatmenu.window.size.Y/200)))
-    pop = pop + 1
-    
-    imgui.Begin(tcheatmenu.window.title, tcheatmenu.window.show,imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoSavedSettings )
 
+    imgui.Begin(tcheatmenu.window.title, tcheatmenu.window.show,imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoSavedSettings )
 
     --------------------------------------------------
     -- Warnings 
@@ -308,8 +309,6 @@ function(self) -- render frame
             fcommon.CheckBoxVar("Check for updates",fmenu.tmenu.auto_update_check,"Cheat Menu will automatically check for updates\nonline. This requires an internet connection and\
 will download files from github repository.")
             imgui.NextColumn()
-            fcommon.CheckBoxVar("Fast load images",fmenu.tmenu.fast_load_images,"Loads vehicles, weapons, peds etc. images\nat menu startup.\n \
-This may increase game startup time or\nfreeze it for few seconds.")
             fcommon.CheckBoxVar("Show tooltips",fmenu.tmenu.show_tooltips,"Shows usage tips beside options.")
             imgui.Columns(1)
             imgui.Spacing()
@@ -324,12 +323,12 @@ This may increase game startup time or\nfreeze it for few seconds.")
     -- Update the menu size & positon variables so they can be saved later
     tcheatmenu.window.size.X  = imgui.GetWindowWidth()
     tcheatmenu.window.size.Y  = imgui.GetWindowHeight()
-    tcheatmenu.window.coord.X = imgui.GetWindowPos().x
+    tcheatmenu.window.coord.X = imgui.GetWindowPos().x 
     tcheatmenu.window.coord.Y = imgui.GetWindowPos().y
 
     --------------------------------------------------
     imgui.End()
-    imgui.PopStyleVar(pop)
+    imgui.PopStyleVar(2)
 end)
 
 --------------------------------------------------
@@ -600,10 +599,8 @@ function main()
         if fweapon.tweapon.huge_damage[0] then
             writeMemory(pWeaponInfo+0x22,2,1000,false)
         end
-        if fweapon.tweapon.long_target_range[0] then
+        if fweapon.tweapon.long_range[0] then
             memory.setfloat(pWeaponInfo+0x04,1000.0)
-        end
-        if fweapon.tweapon.long_weapon_range[0] then
             memory.setfloat(pWeaponInfo+0x08,1000.0)
         end
         if fweapon.tweapon.max_accuracy[0] then
