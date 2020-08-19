@@ -32,9 +32,10 @@ A portuguese translation of the menu is [here](https://github.com/Dowglass/Cheat
 
 1. Install [DirectX](https://www.microsoft.com/en-us/download/details.aspx?id=35) &  [Visual C++ Redistributable 2017](https://aka.ms/vs/16/release/vc_redist.x86.exe) if not already installed.
 2. If your game version isn't v1.0 then you'll need to [downgrade](https://gtaforums.com/topic/927016-san-andreas-downgrader/).
-3. Download [Moonloader](https://gtaforums.com/topic/890987-moonloader/) from [here](https://blast.hk/moonloader/files/moonloader-026.zip).Then extract all these files to your game folder (replace if necessary).
-4. Download [Cheat Menu](https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu) from [here](https://github.com/inanahammad/Cheat-Menu/releases).
-5. Open up that achieve file and extract everything in game directory (replace if necessary).
+3. Install asi loader from [here](https://www.gtagarage.com/mods/show.php?id=21709)
+4. Download [Moonloader](https://gtaforums.com/topic/890987-moonloader/) from [here](https://blast.hk/moonloader/files/moonloader-026.zip).Then extract all these files to your game folder (replace if necessary).
+5. Download [Cheat Menu](https://forum.mixmods.com.br/f5-scripts-codigos/t1777-lua-cheat-menu) from [here](https://github.com/inanahammad/Cheat-Menu/releases).
+6. Open up that achieve file and extract everything in game directory (replace if necessary).
 
 Now try it out in-game. If it doesn't work open an issue here or create a post in one of the topics above with 'moonloader.log'.
 
