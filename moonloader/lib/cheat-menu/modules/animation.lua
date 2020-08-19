@@ -113,7 +113,7 @@ function module.AnimationMain()
                     module.tanimation.list[category][text] = nil
                     
                     local bool = false
-                    for k,v in pairs(module.tanimation.list[ffi.string(module.tanimation.ifp_name)]) do
+                    for k,v in pairs(module.tanimation.list[category]) do
                         bool = true
                     end
                     
@@ -157,7 +157,7 @@ function module.AnimationMain()
                 if ffi.string(module.tanimation.ifp_name) == "" then
                     printHelpString("No file name found")
                 else
-                    if ffi.string(module.tanimation.name) then
+                    if ffi.string(module.tanimation.name) == "" then
                         printHelpString("No animation name found")
                     else
                         if module.tanimation.list[ffi.string(module.tanimation.ifp_name)] == nil then
