@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.1-beta")
-script_version_number(2020082001) -- YYYYMMDDNN
+script_version_number(2020082701) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -173,10 +173,10 @@ imgui.OnInitialize(function() -- Called once
     function() 
         fcommon.IndexFiles(fvehicle.tvehicle.path,fvehicle.tvehicle.images,fconst.VEHICLE.IMAGE_EXT)
         fcommon.IndexFiles(fweapon.tweapon.path,fweapon.tweapon.images,fconst.WEAPON.IMAGE_EXT)
-        fcommon.IndexFiles(fvehicle.tvehicle.paintjobs.path,fvehicle.tvehicle.paintjobs.images,fconst.PAINTJOB.IMAGE_EXT)
-        fcommon.IndexFiles(fvehicle.tvehicle.components.path,fvehicle.tvehicle.components.images,fconst.COMPONENT.IMAGE_EXT)
         fcommon.IndexFiles(fped.tped.path,fped.tped.images,fconst.PED.IMAGE_EXT)
         fcommon.IndexFiles(fplayer.tplayer.clothes.path,fplayer.tplayer.clothes.images,fconst.CLOTH.IMAGE_EXT)
+        fcommon.IndexFiles(fvehicle.tvehicle.components.path,fvehicle.tvehicle.components.images,fconst.COMPONENT.IMAGE_EXT)
+        fcommon.IndexFiles(fvehicle.tvehicle.paintjobs.path,fvehicle.tvehicle.paintjobs.images,fconst.PAINTJOB.IMAGE_EXT)
     end)
 end)
 
@@ -382,7 +382,7 @@ function()
     end
 
     if fmenu.tmenu.overlay.location[0] then
-        imgui.Text(fmenu.GetPlayerLocation())
+        imgui.Text("Location: " .. fcommon.GetLocationInfo(getCharCoordinates(PLAYER_PED)))
     end
 
     if fmenu.tmenu.overlay.coordinates[0] then
@@ -418,6 +418,7 @@ function()
             fmenu.tmenu.overlay.speed[0] = false
             fmenu.tmenu.overlay.health[0] = false
             fmenu.tmenu.overlay.coordinates[0] = false
+            fmenu.tmenu.overlay.location[0] = false
         end
         imgui.EndPopup()        
     end
@@ -583,7 +584,6 @@ function main()
 
     ------------------------------------------------
 
-
     while true do
 
         --------------------------------------------------
@@ -739,6 +739,7 @@ function onScriptTerminate(script, quitGame)
 
         fconfig.Write()
         fcommon.SaveJson("animation",fanimation.tanimation.list)
+        fteleport.tteleport.coordinates["Radar"] = nil
         fcommon.SaveJson("coordinate",fteleport.tteleport.coordinates)
         fcommon.SaveJson("memory",fmemory.tmemory.list)
 

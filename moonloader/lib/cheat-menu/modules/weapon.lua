@@ -26,7 +26,7 @@ module.tweapon =
     max_move_speed      = imgui.new.bool(fconfig.Get('tweapon.max_move_speed',false)),
     huge_damage         = imgui.new.bool(fconfig.Get('tweapon.huge_damage',false)),
     images              = {},
-    long_range   = imgui.new.bool(fconfig.Get('tweapon.long_range',false)),
+    long_range          = imgui.new.bool(fconfig.Get('tweapon.long_range',false)),
     names               = fcommon.LoadJson("weapon"),
     path                = tcheatmenu.dir .. "weapons",
     ped                 = imgui.new.bool(fconfig.Get('tweapon.ped',false)),
@@ -101,7 +101,7 @@ module.tweapon.gang.weapon3[0] = module.tweapon.gang.used_weapons[fped.tped.gang
 -- Returns weapon name
 function module.GetModelName(id)
 
-    if id == "jetpack" then return id end
+    if id == "Jetpack" then return id end
 
     if module.tweapon.names[id] ~= nil then
         return module.tweapon.names[id]
@@ -123,7 +123,7 @@ end
 
 -- Gives weapon to player or ped
 function module.GiveWeapon(weapon)
-    if weapon == "jetpack" then -- exception
+    if weapon == "Jetpack" then -- exception
         taskJetpack(PLAYER_PED)
         fcommon.CheatActivated()
     else

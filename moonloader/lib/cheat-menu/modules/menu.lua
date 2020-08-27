@@ -231,36 +231,6 @@ function module.httpRequest(request, body, handler) -- copas.http
     end
 end
 
-function module.GetPlayerLocation()
-	local interior = getActiveInterior() 
-
-	local town_name = "San Andreas"
-	local city =  getCityPlayerIsIn(PLAYER_PED)
-
-	if city == 0 then
-		town_name = "CS"
-	end
-	if city == 1 then
-		town_name = "LS"
-	end
-	if city == 2 then
-		town_name = "SF"
-	end
-	if city == 3 then
-		town_name = "LV"
-	end
-
-	if interior == 0 then
-
-		local x,y,z = getCharCoordinates(PLAYER_PED)
-		local zone_name = getGxtText(getNameOfZone(x,y,z))
-
-		return string.format("Location: %s, %s",zone_name,town_name)
-	else
-		return string.format("Location: Interior %d, %s",getCharActiveInterior(PLAYER_PED),town_name)
-	end
-end
-
 function module.CheckUpdates()
 	if string.find( script.this.version,"beta") then
 		link = "https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/moonloader/cheat-menu.lua"

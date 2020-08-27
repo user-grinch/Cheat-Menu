@@ -347,6 +347,36 @@ function module.CRGBAColorPicker(label,base_addr,default_col,save)
     end)
 end
 
+
+function module.GetLocationInfo(x,y,z)
+	local interior = getActiveInterior() 
+
+	local town_name = "San Andreas"
+	local city =  getCityPlayerIsIn(PLAYER_PED)
+
+	if city == 0 then
+		town_name = "CS"
+	end
+	if city == 1 then
+		town_name = "LS"
+	end
+	if city == 2 then
+		town_name = "SF"
+	end
+	if city == 3 then
+		town_name = "LV"
+	end
+
+	if interior == 0 then
+		local zone_name = getGxtText(getNameOfZone(x,y,z))
+
+		return string.format("%s, %s",zone_name,town_name)
+	else
+		return string.format("Interior %d, %s",getCharActiveInterior(PLAYER_PED),town_name)
+	end
+end
+
+
 -- Creates top level menus
 function module.CreateMenus(names,funcs)
 
@@ -375,19 +405,6 @@ function module.CreateMenus(names,funcs)
     if tcheatmenu.current_menu ~= 0 then
         funcs[tcheatmenu.current_menu]()
     end
-end
-
-
-function LoadImages(image_table)
-
-    for model,image in pairs(image_table) do
-        if image_table[model] ~= -1 and type(image) == "string" then
-            image_table[model] = -1 -- Loading in progress
-            image_table[model] = imgui.CreateTextureFromFile(image)
-            wait(0)
-        end
-    end
-    
 end
 
 function DrawImage(identifier,func_on_left_click,func_on_right_click,image_table,const_image_height,const_image_width,model,image,model_name)
@@ -1145,9 +1162,6 @@ function module.IndexFiles(mainDir,store_table,req_ext)
             for file in lfs.dir(ele_path) do
                 local file_path = ele_path .. "\\" .. file
                 process_file(file_path,element)
-            end
-            if not fmenu.tmenu.fast_load_images[0] then
-                wait(0)
             end
         end
         if doesFileExist(ele_path) then

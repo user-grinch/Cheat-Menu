@@ -21,7 +21,8 @@ module.tteleport =
 	coords                  = imgui.new.char[64](""),
 	coordinates             = fcommon.LoadJson("coordinate"),
 	coord_name              = imgui.new.char[64](""),
-    insert_coords           = imgui.new.bool(fconfig.Get('tteleport.insert_coords',false)),
+	insert_coords           = imgui.new.bool(fconfig.Get('tteleport.insert_coords',false)),
+	radar_sprites			= fcommon.LoadJson("radar sprite"),
 	shortcut                = imgui.new.bool(fconfig.Get('tteleport.shortcut',false)),
 }
 
@@ -135,6 +136,17 @@ function module.TeleportMain()
 
 		end,
 		function()
+		
+			-- Get sprite data, isn't saved in coordinte.json
+			module.tteleport.coordinates["Radar"] = {}
+			for i = 0xBA86F0,0xBAA248,0x28 do -- 0xBAA248 = 0xBA86F0+175*0x28
+				local radarSprite = memory.read(i+36,1)
+				if radarSprite ~= 0 then
+					local x,y,z = memory.getfloat(i+8),memory.getfloat(i+12),memory.getfloat(i+16)
+					module.tteleport.coordinates["Radar"][string.format("%s, %s",module.tteleport.radar_sprites[tostring(radarSprite)],fcommon.GetLocationInfo(x,y,z):sub(1,-5))] = string.format("0, %f, %f, %f",x,y,z)
+				end
+			end 		
+
 			fcommon.DrawEntries(fconst.IDENTIFIER.TELEPORT,fconst.DRAW_TYPE.TEXT,function(text)
 				local interior_id, x, y, z = text:match("([^, ]+), ([^, ]+), ([^, ]+), ([^, ]+)")
 				lua_thread.create(module.Teleport,x, y, z,interior_id)

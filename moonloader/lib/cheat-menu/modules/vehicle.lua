@@ -1147,7 +1147,7 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
                         imgui.Columns(1)
 
                         imgui.Dummy(imgui.ImVec2(0,20))
-                        fcommon.CheckBoxVar("Pulsing",module.tvehicle.neon.pulsing,"Neons will blink continuously")
+                        fcommon.CheckBoxVar("Blinking neons",module.tvehicle.neon.pulsing)
                         imgui.Spacing()
 
                         if imgui.Button("Install Neon",imgui.ImVec2(fcommon.GetSize(1))) then
