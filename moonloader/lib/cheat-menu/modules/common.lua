@@ -122,6 +122,36 @@ function module.SaveJson(filename,table)
     file:write(encodeJson(table))
     file:close()
 end
+
+
+function module.MoveFiles(main_dir,dest_dir)
+    for f in lfs.dir(main_dir) do
+        local main_file = main_dir .. "/" .. f
+
+        if doesDirectoryExist(main_file) and f ~= "." and f ~= ".." then
+            module.MoveFiles(main_file,dest_dir .. "/" .. f)
+        end
+
+        if doesFileExist(main_file) then
+            dest_file = dest_dir .. "/" .. f
+            if not doesDirectoryExist(dest_dir) then
+                lfs.mkdir(dest_dir)
+            end
+            
+            if doesFileExist(dest_file) then
+                os.remove(dest_file)
+            end
+            if doesFileExist(dest_file) then
+                os.remove(main_file)
+                print("Unable to delete file " .. dest_file)
+            else
+                os.rename(main_file,dest_file)
+            end
+            
+        end
+    end
+    lfs.rmdir(main_dir)
+end
 --------------------------------------------------
 -- imgui functions
 
