@@ -78,9 +78,10 @@ function module.GetModelName(model)
 end
 
 function module.SpawnPed(model)  
-    model = tonumber(model)
-    if  module.tped.names[tostring(model)] ~= nil then
-        if module.tped.special[tostring(model)] == nil then
+ 
+    if  module.tped.names[model] ~= nil then
+        if module.tped.special[model] == nil then
+            model = tonumber(model)
             requestModel(model)
             loadAllModelsNow()
             x,y,z = getCharCoordinates(PLAYER_PED)
@@ -95,6 +96,7 @@ function module.SpawnPed(model)
             loadAllModelsNow()
             x,y,z = getCharCoordinates(PLAYER_PED)
             ped = createChar(5,290,x,y,z) -- CIVMALE
+            module.tped.spawned_peds.list[ped] = tostring(getCharModel(ped))
             markModelAsNoLongerNeeded(module.tped.special[tostring(model)])
         end
         printHelpString("Ped ~g~Spawned")

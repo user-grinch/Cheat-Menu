@@ -439,41 +439,39 @@ end
 
 function DrawImage(identifier,func_on_left_click,func_on_right_click,image_table,const_image_height,const_image_width,model,image,model_name)
 
-    if identifier ~= fconst.IDENTIFIER.COMPONENT or casts.CVehicle.IsValidModForVehicle(tonumber(model),getCarPointer(getCarCharIsUsing(PLAYER_PED))) then
-        if type(image) ~= "string" then
-            local images_in_row = math.floor(imgui.GetWindowContentRegionWidth()/const_image_width)
-            local const_image_width = (imgui.GetWindowContentRegionWidth() - imgui.StyleVar.ItemSpacing*(images_in_row-0.6*images_in_row))/images_in_row
+    if type(image) ~= "string" then
+        local images_in_row = math.floor(imgui.GetWindowContentRegionWidth()/const_image_width)
+        local const_image_width = (imgui.GetWindowContentRegionWidth() - imgui.StyleVar.ItemSpacing*(images_in_row-0.6*images_in_row))/images_in_row
 
-            if imgui.ImageButton(image,imgui.ImVec2(const_image_width,const_image_height),imgui.ImVec2(0,0),imgui.ImVec2(1,1),1,imgui.ImVec4(1,1,1,1),imgui.ImVec4(1,1,1,1)) then
-                func_on_left_click(model)
-            end
-            if func_on_right_click ~= nil and imgui.IsItemClicked(1) then
-                tcheatmenu.temp_data.draw_entries_func[identifier].context_menu_data = 
-                {
-                    func = func_on_right_click,
-                    key = model,
-                    category = model_name
-                }
-            end
-        
-            if imgui.IsItemHovered() then
-                local drawlist = imgui.GetWindowDrawList()
-                drawlist:AddRectFilled(imgui.GetItemRectMin(), imgui.GetItemRectMax(), imgui.GetColorU32(imgui.Col.ModalWindowDimBg))
-
-                if imgui.CalcTextSize(model_name).x > const_image_width then
-                    model_name = model_name:gsub(" ","\n")
-                end
-
-                local offset_x = (imgui.GetItemRectSize().x - imgui.CalcTextSize(model_name).x)/2
-                local offset_y = 10
-                drawlist:AddText(imgui.ImVec2(imgui.GetItemRectMin().x+offset_x,imgui.GetItemRectMin().y+offset_y), imgui.GetColorU32(imgui.Col.Text),model_name)
-            end
-
-            if tcheatmenu.temp_data.draw_entries_func[identifier].entry_count % images_in_row ~= 0 then
-                imgui.SameLine(0.0,4.0)
-            end
-            tcheatmenu.temp_data.draw_entries_func[identifier].entry_count = tcheatmenu.temp_data.draw_entries_func[identifier].entry_count + 1
+        if imgui.ImageButton(image,imgui.ImVec2(const_image_width,const_image_height),imgui.ImVec2(0,0),imgui.ImVec2(1,1),1,imgui.ImVec4(1,1,1,1),imgui.ImVec4(1,1,1,1)) then
+            func_on_left_click(model)
         end
+        if func_on_right_click ~= nil and imgui.IsItemClicked(1) then
+            tcheatmenu.temp_data.draw_entries_func[identifier].context_menu_data = 
+            {
+                func = func_on_right_click,
+                key = model,
+                category = model_name
+            }
+        end
+    
+        if imgui.IsItemHovered() then
+            local drawlist = imgui.GetWindowDrawList()
+            drawlist:AddRectFilled(imgui.GetItemRectMin(), imgui.GetItemRectMax(), imgui.GetColorU32(imgui.Col.ModalWindowDimBg))
+
+            if imgui.CalcTextSize(model_name).x > const_image_width then
+                model_name = model_name:gsub(" ","\n")
+            end
+
+            local offset_x = (imgui.GetItemRectSize().x - imgui.CalcTextSize(model_name).x)/2
+            local offset_y = 10
+            drawlist:AddText(imgui.ImVec2(imgui.GetItemRectMin().x+offset_x,imgui.GetItemRectMin().y+offset_y), imgui.GetColorU32(imgui.Col.Text),model_name)
+        end
+
+        if tcheatmenu.temp_data.draw_entries_func[identifier].entry_count % images_in_row ~= 0 then
+            imgui.SameLine(0.0,4.0)
+        end
+        tcheatmenu.temp_data.draw_entries_func[identifier].entry_count = tcheatmenu.temp_data.draw_entries_func[identifier].entry_count + 1
     end
 end
 
@@ -505,6 +503,7 @@ function module.DrawEntries(identifier,draw_type,func_on_left_click,func_on_righ
             entry_table   = {["All"] = {}},
             selected = "All",
             veh_model = nil,
+            images_loaded = not(draw_type == fconst.DRAW_TYPE.IMAGE),
         }
     end
 
@@ -537,6 +536,20 @@ function module.DrawEntries(identifier,draw_type,func_on_left_click,func_on_righ
         end
     end
 
+    if tcheatmenu.temp_data.draw_entries_func[identifier].images_loaded == false then
+        lua_thread.create(function()
+            for _,table in pairs(tcheatmenu.temp_data.draw_entries_func[identifier].entry_table) do
+                for model,image in pairs(table) do
+                    if type(image) == "string" then
+                        table[model] = imgui.CreateTextureFromFile(image)
+                        wait(0)
+                    end
+                end
+            end
+        end)
+        tcheatmenu.temp_data.draw_entries_func[identifier].images_loaded = true
+    end
+
     --------------------------------------------------
     -- Interface Header
 
@@ -564,19 +577,7 @@ function module.DrawEntries(identifier,draw_type,func_on_left_click,func_on_righ
     -- Call the drawing function
 
     if imgui.BeginChild("##Draw") then 
-        if draw_type == fconst.DRAW_TYPE.IMAGE then
-            --lua_thread.create(LoadImages,table)
-            lua_thread.create(function()
-                for category,table in pairs(tcheatmenu.temp_data.draw_entries_func[identifier].entry_table) do
-                    for model,image in pairs(table) do
-                        if type(image) == "string" then
-                            table[model] = imgui.CreateTextureFromFile(image)
-                            wait(0)
-                        end
-                    end
-                end
-            end)
-        end
+
         for category,table in pairs(tcheatmenu.temp_data.draw_entries_func[identifier].entry_table) do
             if tcheatmenu.temp_data.draw_entries_func[identifier].selected == "All" or category == tcheatmenu.temp_data.draw_entries_func[identifier].selected then
                 for label,entry in pairs(table) do
@@ -830,17 +831,14 @@ function module.CheckBox3Var(name,var,tooltip,func,panel_func,show_help_msg)
     show_help_msg = show_help_msg or true
 
     if module.CheckBox3(name, var) then
-
-        if show_help_msg then
-            if var[0] == fconst.CHECKBOX_STATE.ON then
-                fcommon.CheatActivated()
-            end
-            if var[0] == fconst.CHECKBOX_STATE.OFF then
-                fcommon.CheatDeactivated()
-            end
-        end
         if func ~= nil then
             func()
+        end
+    end
+
+    if imgui.IsItemClicked(0) or imgui.IsItemClicked(1) then
+        if show_help_msg then
+            fcommon.CheatActivated()
         end
     end
 

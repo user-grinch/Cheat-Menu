@@ -252,9 +252,10 @@ function module.CheckUpdates()
 			if  repo_version ~= nil then
 				if tostring(repo_version) > tostring(this_version) then
 					module.tmenu.update_status = fconst.UPDATE_STATUS.NEW_UPDATE
+					module.tmenu.repo_version = tostring(repo_version)
 					printHelpString("New update available")
 				else
-					printHelpString("No updates found")
+					printHelpString("No update found")
 				end
 			else
 				printHelpString("Couldn't connect to github. The rest of the menu is still functional. You can disable auto update check from 'Menu'")
@@ -476,11 +477,15 @@ will download files from github repository.")
 			Copyright (C) 2019-2020 Grinch_ \n")
 		end,
 		function()
-			if imgui.Button("Check for updates",imgui.ImVec2(fcommon.GetSize(2))) then
+			if imgui.Button("Check updates",imgui.ImVec2(fcommon.GetSize(3))) then
 				module.CheckUpdates()
 			end
 			imgui.SameLine()
-			if imgui.Button("Goto GitHub repo",imgui.ImVec2(fcommon.GetSize(2))) then
+			if imgui.Button("Discord server",imgui.ImVec2(fcommon.GetSize(3))) then
+				os.execute('explorer "https://discord.gg/ZzW7kmf"')
+			end
+			imgui.SameLine()
+			if imgui.Button("GitHub repo",imgui.ImVec2(fcommon.GetSize(3))) then
 				os.execute('explorer "https://github.com/user-grinch/Cheat-Menu"')
 			end
 			imgui.Spacing()
@@ -504,13 +509,11 @@ will download files from github repository.")
 				imgui.Columns(2,nil,false)
 				
 				imgui.TextWrapped("Dowglas_")
-				imgui.TextWrapped("Fabio")
 				imgui.TextWrapped("guru guru")
 				imgui.TextWrapped("Israel")
 				imgui.TextWrapped("Junior-Djjr")
 
 				imgui.NextColumn()
-				imgui.TextWrapped("kuba--")
 				imgui.TextWrapped("randazz0")
 				imgui.TextWrapped("Um_Geek")
 				imgui.TextWrapped("Modding community")

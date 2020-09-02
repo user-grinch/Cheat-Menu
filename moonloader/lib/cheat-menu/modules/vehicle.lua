@@ -38,6 +38,8 @@ module.tvehicle =
     },
     components   =
     {
+        enable_saving = imgui.new.bool(fconfig.Get('tvehicle.components.enable_saving',false)),
+        save_data     = fconfig.Get('tvehicle.components.save_data',{}),
         images   = {},
         list     = {},
         names    = {},
@@ -65,12 +67,6 @@ module.tvehicle =
         offset_y_var    = imgui.new.float(0),
         offset_z_var    = imgui.new.float(0),
     },
-    gsx             =
-    {
-        handle      = getModuleHandle("gsx.asi"),
-        p_table     = {},
-        veh_data    = {},
-    },
     gxt_name        = imgui.new.char[32](""),
     gxt_name_table  = fconfig.Get('tvehicle.gxt_name_table',{}),
     handling_flags = fcommon.LoadJson("handling flags"),
@@ -90,6 +86,8 @@ module.tvehicle =
     {
         cache_images     = {},
         current_paintjob = imgui.new.int(-1);
+        enable_saving    = imgui.new.bool(fconfig.Get('tvehicle.paintjobs.enable_saving',false)),
+        save_data        = fconfig.Get('tvehicle.paintjobs.save_data',{}),
         path             =  tcheatmenu.dir .. "vehicles\\paintjobs",
         images           = {},
         texture          = nil
@@ -163,10 +161,6 @@ function InstallNeon(pCar,color,pulsing)
   
             callFunction(module.tvehicle.neon["SetX"],2,2,pCar,data.X)
             callFunction(module.tvehicle.neon["SetY"],2,2,pCar,data.Y)
-            if module.tvehicle.gsx.handle ~= 0  then
-                module.GSXSet(car,"cm_neon_color",color)
-                module.GSXSet(car,"cm_neon_pulsing",pulsing)
-            end
         end
     end
 end
@@ -196,129 +190,6 @@ function module.TrafficNeons()
         end
         wait(100)
     end
-end
-
---------------------------------------------------
--- Garage Save Extender (GSX) https://gtaforums.com/topic/925563-garage-save-extender/
--- gsx-data https://forum.mixmods.com.br/f16-utilidades/t2954-gsx-data-usar-gsx-em-scripts-lua-facilmente
-
-if module.tvehicle.gsx.handle == 0 then
-    tcheatmenu.window.missing_components = true
-else
-    ffi.cdef[[
-    typedef uint32_t GSXCVehicle;
-    typedef struct { float x, y, z; } CVector;
-    typedef struct __attribute__((packed, aligned(1))) {
-        CVector pos;
-        uint32_t handling_flags;
-        uint8_t flags;
-        uint8_t field_11;
-        uint16_t model;
-        uint16_t carmods[15];
-        uint8_t colour[4];
-        uint8_t radio_station;
-        uint8_t extra1;
-        uint8_t extra2;
-        uint8_t bomb_type;
-        uint8_t paintjob;
-        uint8_t nitro_count;
-        uint8_t angleX;
-        uint8_t angleY;
-        uint8_t angleZ;
-        uint8_t field_3F;
-    } CStoredCar;
-    typedef struct __attribute__((packed, aligned(1))) { GSXCVehicle veh; int32_t status; CStoredCar *gameStoredData; } externalCallbackStructure;
-    typedef void(__cdecl externalCbFun_t)(const externalCallbackStructure*);
-    int __cdecl addNotifyCallback(externalCbFun_t fun);
-    void __cdecl removeNotifyCallback(int cbRef);
-    void __cdecl pushDirectlyToSavedData(GSXCVehicle veh, const char *name, int size, void *ptr);
-    int __cdecl dataToLoadExists(GSXCVehicle veh, const char *name);
-    void*  __cdecl getLoadDataByVehPtr(GSXCVehicle veh, const char *name);
-    int __cdecl getDataToLoadSize(GSXCVehicle veh, const char *name);
-    ]]
-
-    local gsx = ffi.load("gsx.asi")
-
-    module.DataToLoadExists = ffi.cast("int (*)(int,const char*)",gsx.dataToLoadExists)
-    module.GetDataToLoadSize = ffi.cast("int (*)(int,const char*)",gsx.getDataToLoadSize)
-    module.GetLoadDataByVehPtr = ffi.cast("int (*)(int,const char*)",gsx.getLoadDataByVehPtr)
-    module.PushDirectlyToSavedData = ffi.cast("int (*)(int,const char*,int,int)",gsx.pushDirectlyToSavedData)
-    module.RemoveNotifyCallback = ffi.cast("void (*)(int)",gsx.removeNotifyCallback)
-
-    module.GSXpNotifyCallback = gsx.addNotifyCallback(function(data)
-        local t = module.tvehicle.gsx.veh_data
-        if data.status == 1 then -- save vehicle
-            local wdata = encodeJson(t[data.veh])
-            if wdata ~= nil then
-                module.PushDirectlyToSavedData(data.veh,"CM_DATA",#wdata,memory.strptr(wdata));
-            end
-        else -- load vehicle
-            if module.DataToLoadExists(data.veh,"CM_DATA") == 1 then
-                local pdata = module.GetLoadDataByVehPtr(data.veh,"CM_DATA")
-                local size = module.GetDataToLoadSize(data.veh,"CM_DATA") 
-                t[data.veh] = decodeJson(memory.tostring(pdata,size,false))
-            end
-        end
-    end)
-
-end
-
-function module.GSXProcessVehicles()
-
-    if module.tvehicle.gsx.handle == 0 then
-        return
-    end
-
-    local t = module.tvehicle.gsx.veh_data
-    local s = module.tvehicle.gsx.p_table
-
-    while true do 
-        
-        for i, car in ipairs(getAllVehicles()) do
-            local pveh = getCarPointer(car)
-            if t[pveh] == nil then 
-                if module.DataToLoadExists(pveh,"CM_DATA") == 1 then
-                    local pdata = module.GetLoadDataByVehPtr(pveh,"CM_DATA")
-                    local size  = module.GetDataToLoadSize(pveh,"CM_DATA") 
-                    t[pveh]     = decodeJson(memory.tostring(pdata,size,false))
-                    s[car]      = pveh
-                end
-            end
-        end
-
-        for car, pveh in pairs(s) do
-            if not doesVehicleExist(car) then 
-                t[pveh] = nil
-                s[car] = nil
-            end
-        end
-        
-        wait(10)
-    end
-end
-
-function module.GSXSet(car,str,val)
-    local t = module.tvehicle.gsx.veh_data
-
-    if doesVehicleExist(car) then 
-        local pveh = getCarPointer(car)
-        if  t[pveh] == nil then 
-            t[pveh] = {}
-        end
-        t[pveh][str] = val
-    end
-end
-
-function module.GSXGet(car,str)
-    local t = module.tvehicle.gsx.veh_data
-
-    if doesVehicleExist(car) then 
-        local pveh = getCarPointer(car)
-        if t[pveh] then
-            return t[pveh][str]
-        end
-    end
-    return nil
 end
 
 --------------------------------------------------
@@ -576,41 +447,39 @@ function module.ParseVehiclesIDE()
 end
 
 function ApplyColor(load_saved_color,car)
+    
 
     module.ForEachCarComponent(function(mat,comp,car)
 
         local r, g, b, old_a = mat:get_color()
+        local model = getCarModel(car)
 
-        -- -1.0 used as nil
-        if load_saved_color and module.tvehicle.gsx.handle ~= 0  then
-            module.tvehicle.color.rgb[0] = module.GSXGet(car,"cm_color_red_" .. comp.name) or -1
-            module.tvehicle.color.rgb[1] = module.GSXGet(car,"cm_color_green_" .. comp.name) or -1
-            module.tvehicle.color.rgb[2] = module.GSXGet(car,"cm_color_blue_" .. comp.name) or -1
+        if load_saved_color then
+            module.tvehicle.color.rgb[0] = fconfig.Get(string.format("%d.%s.red",model,comp.name),-1,module.tvehicle.paintjobs.save_data) 
+            module.tvehicle.color.rgb[1] = fconfig.Get(string.format("%d.%s.green",model,comp.name),-1,module.tvehicle.paintjobs.save_data) 
+            module.tvehicle.color.rgb[2] = fconfig.Get(string.format("%d.%s.blue",model,comp.name),-1,module.tvehicle.paintjobs.save_data) 
         end
 
         if (module.tvehicle.color.rgb[0] ~= -1.0 and module.tvehicle.color.rgb[1] ~= -1.0 and module.tvehicle.color.rgb[2] ~= -1.0)
         and (not module.tvehicle.apply_material_filter[0] or (r == 0x3C and g == 0xFF and b == 0x00) or (r == 0xFF and g == 0x00 and b == 0xAF)) then
             
-            if module.tvehicle.components.selected[0] == 0 and not load_saved_texture then   
+            local save_data = false
+
+            if module.tvehicle.components.selected[0] == 0 and not load_saved_color then   
                 mat:set_color(module.tvehicle.color.rgb[0]*255, module.tvehicle.color.rgb[1]*255, module.tvehicle.color.rgb[2]*255, 255.0)
-                
-                if module.tvehicle.gsx.handle ~= 0  then
-                    module.GSXSet(car,"cm_color_red_" .. comp.name,module.tvehicle.color.rgb[0])
-                    module.GSXSet(car,"cm_color_green_" .. comp.name,module.tvehicle.color.rgb[1])
-                    module.GSXSet(car,"cm_color_blue_" .. comp.name,module.tvehicle.color.rgb[2])
-                end
+                save_data = true
             end
 
             if comp.name == module.tvehicle.components.names[module.tvehicle.components.selected[0]+1] or load_saved_color then     
                 mat:set_color(module.tvehicle.color.rgb[0]*255, module.tvehicle.color.rgb[1]*255, module.tvehicle.color.rgb[2]*255, 255.0)
-                
-                if module.tvehicle.gsx.handle ~= 0  then
-                    module.GSXSet(car,"cm_color_red_" .. comp.name,module.tvehicle.color.rgb[0])
-                    module.GSXSet(car,"cm_color_green_" .. comp.name,module.tvehicle.color.rgb[1])
-                    module.GSXSet(car,"cm_color_blue_" .. comp.name,module.tvehicle.color.rgb[2])
-                end
+                save_data = true
             end
 
+            if save_data and module.tvehicle.paintjobs.enable_saving[0] then
+                fconfig.Set(module.tvehicle.paintjobs.save_data,string.format("%d.%s.red",model,comp.name),module.tvehicle.color.rgb[0])
+                fconfig.Set(module.tvehicle.paintjobs.save_data,string.format("%d.%s.green",model,comp.name),module.tvehicle.color.rgb[1])
+                fconfig.Set(module.tvehicle.paintjobs.save_data,string.format("%d.%s.blue",model,comp.name),module.tvehicle.color.rgb[2])
+            end 
         end
         module.tvehicle.color.default = getCarColours(car)
     end,false,car)  
@@ -623,9 +492,9 @@ function ApplyTexture(filename,load_saved_texture,car)
 
         local model = getCarModel(car)
 
-        if load_saved_texture and module.tvehicle.gsx.handle ~= 0  then
-            filename = module.GSXGet(car,"cm_texture_" .. comp.name)
-        end
+        if load_saved_texture then
+            filename = fconfig.Get(string.format("%d.%s.texture",model,comp.name),nil,module.tvehicle.paintjobs.save_data) 
+        end 
 
         if filename ~= nil then
             local fullpath = module.tvehicle.paintjobs.path .. "\\" .. filename .. ".png"
@@ -640,18 +509,20 @@ function ApplyTexture(filename,load_saved_texture,car)
 
 
                 if not module.tvehicle.apply_material_filter[0] or (r == 0x3C and g == 0xFF and b == 0x00) or (r == 0xFF and g == 0x00 and b == 0xAF) then
+                    local save_data = false
+
                     if module.tvehicle.components.selected[0] == 0 and not load_saved_texture then
                         mat:set_texture(module.tvehicle.paintjobs.texture)
-                        if module.tvehicle.gsx.handle ~= 0  then 
-                            module.GSXSet(car,"cm_texture_" .. comp.name,filename)
-                        end 
+                        save_data = true
                     end
                     if comp.name == module.tvehicle.components.names[module.tvehicle.components.selected[0]+1] or load_saved_texture then
                         mat:set_texture(module.tvehicle.paintjobs.texture)
-                        if module.tvehicle.gsx.handle ~= 0  then 
-                            module.GSXSet(car,"cm_texture_" .. comp.name,filename)
-                        end 
+                        save_data = true
                     end
+                    
+                    if save_data and module.tvehicle.paintjobs.enable_saving[0] then
+                        fconfig.Set(module.tvehicle.paintjobs.save_data,string.format("%d.%s.texture",model,comp.name),filename)
+                    end 
                 end
             end
         end
@@ -732,6 +603,21 @@ end
 --------------------------------------------------
 -- Component/ tune
 
+function StoreComponentData(hveh)
+    if module.tvehicle.components.enable_saving[0] then
+        local model = tostring(getCarModel(hveh))
+        module.tvehicle.components.save_data[model] = {}
+
+        for x=1,14,1 do
+            local comp_model = getCurrentCarMod(hveh,x)
+
+            if comp_model ~= -1 then
+                table.insert(module.tvehicle.components.save_data[model],comp_model)
+            end
+        end
+    end
+end
+
 function module.AddComponentToVehicle(component,car,hide_msg)
     component = tonumber(component)
     if isCharInAnyCar(PLAYER_PED) then
@@ -742,6 +628,9 @@ function module.AddComponentToVehicle(component,car,hide_msg)
             requestVehicleMod(component)
             loadAllModelsNow()
             addVehicleMod(car,component)
+            
+            StoreComponentData(car)
+
             if hide_msg ~= true then
                 printHelpString("Component ~g~added")
             end
@@ -757,6 +646,9 @@ function module.RemoveComponentFromVehicle(component,car,hide_msg)
     end
     if doesVehicleExist(car) then
         removeVehicleMod(car,component)
+        
+        StoreComponentData(car)
+        
         if hide_msg ~= true then
             printHelpString("Component ~r~removed")
         end
@@ -785,15 +677,6 @@ function module.OnEnterVehicle()
                 table.insert(module.tvehicle.components.names,comp.name)
             end,true)
             module.tvehicle.components.list  = imgui.new['const char*'][#module.tvehicle.components.names](module.tvehicle.components.names)
-
-            --Load gsx data
-            if module.tvehicle.gsx.handle ~= 0  then
-                ApplyTexture(nil,true)
-                ApplyColor(true)
-                module.tvehicle.neon.rb_value[0] = module.GSXGet(hveh,"cm_neon_color") or -1
-                module.tvehicle.neon.pulsing[0]  = module.GSXGet(hveh,"cm_neon_pulsing") or false
-                InstallNeon(pVeh)
-            end
             
             imgui.StrCopy(module.tvehicle.gxt_name,model_name)
 
@@ -814,6 +697,17 @@ function module.OnEnterVehicle()
             fcommon.SingletonThread(module.FirstPersonCamera,"FirstPersonCamera")
             fcommon.SingletonThread(module.RainbowColors,"RainbowColors")
             fcommon.SingletonThread(module.UnlimitedNitro,"UnlimitedNitro")
+
+            if module.tvehicle.paintjobs.enable_saving[0] then
+                ApplyColor(true)
+                ApplyTexture(nil,true)
+            end
+
+            if module.tvehicle.components.enable_saving[0] then
+                for _,component in ipairs(module.tvehicle.components.save_data[tostring(model)]) do
+                    module.AddComponentToVehicle(component,car,true)
+                end
+            end
 
             while isCharInCar(PLAYER_PED,hveh) do
                 wait(0)
@@ -1231,11 +1125,6 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
 
                     module.ForEachCarComponent(function(mat,comp,car)
                         mat:reset_color()
-                        if module.tvehicle.gsx.handle ~= 0  then
-                            module.GSXSet(car,"cm_color_red_" .. comp.name,module.tvehicle.color.rgb[0])
-                            module.GSXSet(car,"cm_color_green_" .. comp.name,module.tvehicle.color.rgb[1])
-                            module.GSXSet(car,"cm_color_blue_" .. comp.name,module.tvehicle.color.rgb[2])
-                        end
                     end)
                     module.tvehicle.color.default = -1
                     printHelpString("Color reset")
@@ -1245,9 +1134,6 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
                     fconfig.tconfig.temp_texture_name = nil
                     module.ForEachCarComponent(function(mat,comp,car)
                         mat:reset_texture()
-                        if module.tvehicle.gsx.handle ~= 0  then 
-                            module.GSXSet(car,"cm_texture_" .. comp.name,filename)
-                        end 
                     end)
                     module.tvehicle.paintjobs.texture = nil
                     printHelpString("Texture reset")
@@ -1255,6 +1141,12 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
 
                 imgui.Spacing()
                 imgui.Columns(2,nil,false)
+                fcommon.CheckBoxVar("Enable saving",module.tvehicle.paintjobs.enable_saving,"Save and load vehicle paint data.\nApplies for all vehicles of this model.",
+                function()
+                    if module.tvehicle.paintjobs.enable_saving[0] then
+                        ApplyColor(true)
+                    end
+                end)
                 fcommon.CheckBoxVar("Material filter",module.tvehicle.apply_material_filter,"Filters material while applying color/ texture\nDisable if something doesn't work properly")
                 imgui.NextColumn()
                 fcommon.CheckBoxVar("Rainbow colors",module.tvehicle.rainbow_colors.bool,"Rainbow color effect on players vehicle",function()
@@ -1318,11 +1210,6 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
                                     writeMemory(getCarPointer(car) + 1075 + module.tvehicle.color.radio_btn[0],1,tonumber(v),false)
                                     module.ForEachCarComponent(function(mat,comp,car)
                                         mat:reset_color()
-                                        if module.tvehicle.gsx.handle ~= 0  then
-                                            module.GSXSet(car,"cm_color_red_" .. comp.name,module.tvehicle.color.rgb[0])
-                                            module.GSXSet(car,"cm_color_green_" .. comp.name,module.tvehicle.color.rgb[1])
-                                            module.GSXSet(car,"cm_color_blue_" .. comp.name,module.tvehicle.color.rgb[2])
-                                        end
                                     end)
                                 end
                                 if imgui.IsItemHovered() then
@@ -1385,6 +1272,15 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
                     end
                     printHelpString("Vehicle components reset")
                 end
+                
+                fcommon.CheckBoxVar("Enable saving",module.tvehicle.components.enable_saving,"Save and load vehicle tune data.\nApplies for all vehicles of this model.",
+                function()
+                    if module.tvehicle.components.enable_saving[0] then
+                        for _,component in ipairs(module.tvehicle.components.save_data[tostring(model)]) do
+                            module.AddComponentToVehicle(component,car,true)
+                        end
+                    end
+                end)
                 
                 imgui.Dummy(imgui.ImVec2(0,10))
                 fcommon.DrawEntries(fconst.IDENTIFIER.COMPONENT,fconst.DRAW_TYPE.IMAGE,module.AddComponentToVehicle,

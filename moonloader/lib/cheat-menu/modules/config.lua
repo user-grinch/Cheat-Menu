@@ -27,11 +27,11 @@ module.tconfig =
 }
 
 
-function module.Get(s,default)
-    if module.tconfig.read == nil then return default end
+function module.Get(s,default,t)
+    if t == nil then t = module.tconfig.read end
+    if t == nil then return default end
     
     local status, rtn = pcall(function()
-        local t = module.tconfig.read
         for key in s:gmatch('[^.]+') do
             if t[key] == nil then return default end
             t = t[key]
@@ -148,6 +148,7 @@ function module.Write()
             },
             tcheatmenu =
             {
+                tab_data = tcheatmenu.tab_data,
                 hot_keys = 
                 {
                     asc_key                = tcheatmenu.hot_keys.asc_key,
@@ -281,6 +282,11 @@ function module.Write()
                 {
                     show_all = fvehicle.tvehicle.color.show_all[0],
                 },
+                components = 
+                {
+                    enable_saving = fvehicle.tvehicle.components.enable_saving[0],
+                    save_data     = fvehicle.tvehicle.components.save_data,
+                },
                 apply_material_filter = fvehicle.tvehicle.apply_material_filter[0],
                 first_person_camera = 
                 {
@@ -298,6 +304,11 @@ function module.Write()
                 },
                 no_damage        = fvehicle.tvehicle.no_damage[0],
                 no_vehicles      = fvehicle.tvehicle.no_vehicles[0],
+                paintjobs  = 
+                {
+                    enable_saving    = fvehicle.tvehicle.paintjobs.enable_saving[0],
+                    save_data        = fvehicle.tvehicle.paintjobs.save_data,
+                },
                 rainbow_colors    = 
                 {   bool         = fvehicle.tvehicle.rainbow_colors.bool[0],
                     light        = fvehicle.tvehicle.rainbow_colors.light[0],

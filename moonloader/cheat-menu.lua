@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.1-beta")
-script_version_number(2020082702) -- YYYYMMDDNN
+script_version_number(2020090201) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -107,7 +107,7 @@ tcheatmenu       =
     },
     read_key_press = false,
     temp_data    = tcheatmenu.temp_data,
-    tab_data     = {},
+    tab_data     = fconfig.Get('tcheatmenu.tab_data',{}),
     thread_locks = {},
     window       =
     {
@@ -240,13 +240,21 @@ function(self) -- render frame
     --------------------------------------------------
     -- Updater code
     if fmenu.tmenu.update_status == fconst.UPDATE_STATUS.NEW_UPDATE then
-        imgui.Button("A new update is available",imgui.ImVec2(fcommon.GetSize(1)))
-        if imgui.Button("Download now",imgui.ImVec2(fcommon.GetSize(2))) then
+        imgui.Button("An updated version is available",imgui.ImVec2(fcommon.GetSize(1)))
+        if imgui.Button("Download now",imgui.ImVec2(fcommon.GetSize(3))) then
             DownloadUpdate()
         end
         imgui.SameLine()
-        if imgui.Button("Hide message",imgui.ImVec2(fcommon.GetSize(2))) then
+        if imgui.Button("Hide message",imgui.ImVec2(fcommon.GetSize(3))) then
             fmenu.tmenu.update_status =fconst.UPDATE_STATUS.HIDE_MSG
+        end
+        imgui.SameLine()
+        if imgui.Button("View changelog",imgui.ImVec2(fcommon.GetSize(3))) then
+            if string.find( script.this.version,"beta") then
+                os.execute('explorer "https://github.com/user-grinch/Cheat-Menu/commits/master"')
+            else
+                os.execute('explorer "https://github.com/user-grinch/Cheat-Menu/releases/tag/' .. fmenu.tmenu.repo_version ..'"')
+            end
         end
         imgui.Spacing()
     end
@@ -576,7 +584,6 @@ function main()
     fcommon.SingletonThread(fgame.SolidWater,"SolidWater")
     fcommon.SingletonThread(fgame.SyncSystemTime,"SyncSystemTime")
     fcommon.SingletonThread(fvehicle.OnEnterVehicle,"OnEnterVehicle")
-    fcommon.SingletonThread(fvehicle.GSXProcessVehicles,"GSXProcessVehicles")
     fcommon.SingletonThread(fvehicle.RainbowColors,"RainbowColors")
     fcommon.SingletonThread(fvehicle.TrafficNeons,"TrafficNeons")
     fcommon.SingletonThread(fvisual.LockWeather,"LockWeather")
@@ -686,11 +693,6 @@ function main()
                 if fvehicle.tvehicle.color.default ~= getCarColours(car) then
                     fvehicle.ForEachCarComponent(function(mat,comp,car)
                         mat:reset_color()
-                        if fvehicle.tvehicle.gsx.handle ~= 0  then
-                            fvehicle.GSXSet(car,"cm_color_red_" .. comp.name,fvehicle.tvehicle.color.rgb[0])
-                            fvehicle.GSXSet(car,"cm_color_green_" .. comp.name,fvehicle.tvehicle.color.rgb[1])
-                            fvehicle.GSXSet(car,"cm_color_blue_" .. comp.name,fvehicle.tvehicle.color.rgb[2])
-                        end
                     end)
                 end
             end
@@ -757,10 +759,6 @@ function onScriptTerminate(script, quitGame)
         end
 
         restoreCameraJumpcut()
-
-        if fvehicle.tvehicle.gsx.handle ~= 0 then
-            fvehicle.RemoveNotifyCallback(fvehicle.GSXpNotifyCallback)
-        end
 
         if doesObjectExist(fgame.tgame.solid_water_object) then
             deleteObject(fgame.tgame.solid_water_object)

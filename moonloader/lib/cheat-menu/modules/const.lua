@@ -134,8 +134,8 @@ module.VEHICLE_CLASS =
 
 module.CHECKBOX_STATE =
 {
-    OFF = -1,
-    NOT_CONFIGURED = 0,
+    NOT_CONFIGURED = -1,
+    OFF = 0,
     ON = 1,
 }
 
