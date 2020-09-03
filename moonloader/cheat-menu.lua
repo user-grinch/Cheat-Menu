@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.1-beta")
-script_version_number(2020090201) -- YYYYMMDDNN
+script_version_number(2020090202) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -527,10 +527,16 @@ function main()
         removePickup(glob.Pickup_Info_Police)
     end
 
+    setGameGlobal(glob.STAT_Unlocked_Cities_Number,4)
+
     if fgame.tgame.disable_cheats[0] == true then
         writeMemory(0x4384D0,1,0xE9,false)
         writeMemory(0x4384D1,4,0xD0,false)
         writeMemory(0x4384D5,4,0x90909090,false)
+    end
+
+    if not fgame.tgame.forbidden_area_wanted_level[0] then
+        writeMemory(0x441770,1,0xC3,false)
     end
 
     switchArrestPenalties(not(fgame.tgame.keep_stuff[0]))

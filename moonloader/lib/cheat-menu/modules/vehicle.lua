@@ -704,8 +704,13 @@ function module.OnEnterVehicle()
             end
 
             if module.tvehicle.components.enable_saving[0] then
-                for _,component in ipairs(module.tvehicle.components.save_data[tostring(model)]) do
-                    module.AddComponentToVehicle(component,car,true)
+                for tmodel,table in pairs(module.tvehicle.components.save_data) do
+                    if tmodel == tostring(model) then
+                        for _,component in ipairs(table) do
+                            module.AddComponentToVehicle(component,car,true)
+                        end
+                        break
+                    end
                 end
             end
 
@@ -1276,12 +1281,16 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
                 fcommon.CheckBoxVar("Enable saving",module.tvehicle.components.enable_saving,"Save and load vehicle tune data.\nApplies for all vehicles of this model.",
                 function()
                     if module.tvehicle.components.enable_saving[0] then
-                        for _,component in ipairs(module.tvehicle.components.save_data[tostring(model)]) do
-                            module.AddComponentToVehicle(component,car,true)
+                        for tmodel,table in pairs(module.tvehicle.components.save_data) do
+                            if tmodel == tostring(model) then
+                                for _,component in ipairs(table) do
+                                    module.AddComponentToVehicle(component,car,true)
+                                end
+                                break
+                            end
                         end
                     end
                 end)
-                
                 imgui.Dummy(imgui.ImVec2(0,10))
                 fcommon.DrawEntries(fconst.IDENTIFIER.COMPONENT,fconst.DRAW_TYPE.IMAGE,module.AddComponentToVehicle,
                 function(component)
