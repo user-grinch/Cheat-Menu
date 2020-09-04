@@ -16,7 +16,7 @@ Cheat menu for Grand Theft Auto SanAndreas which allows a large set of modificat
 
 It's based on [Moonloader](https://gtaforums.com/topic/890987-moonloader/) and uses [mimgui](https://github.com/THE-FYP/mimgui) for its interface.
 
-Press Ctrl+M to open the menu.
+Press <kbd>Left Ctrl</kbd> + <kbd>M</kbd> to open the menu. <b>Doesn't work in SAMP</b>.
 
 ## Versions
 
@@ -38,10 +38,6 @@ A portuguese translation of the menu is [here](https://github.com/Dowglass/Cheat
 6. Open up that achieve file and extract everything in game directory (replace if necessary).
 
 Now try it out in-game. If it doesn't work open an issue here or create a post in one of the topics above with 'moonloader.log'.
-
-## Youtubers
-
-If you're making videos about this mod link to this GitHub repository, don't reupload this mod simply cause you can. It'll help me to provide better support & in development. Also it'd be great if you keep my name in your video description. Thanks.
 
 ## Images
 ![Image](https://i.imgur.com/XPbm13b.jpg)
