@@ -51,11 +51,6 @@ Now try it out in-game. If it doesn't work open an issue here or create a post i
 ![Image](https://i.imgur.com/DnsXweQ.jpg)
 ![Image](https://i.imgur.com/MwmZqjM.jpg)
 
-## Video
-
-[![Youtube Video](https://img.youtube.com/vi/XF1bhn74s2M/0.jpg)](https://www.youtube.com/watch?v=XF1bhn74s2M)
-
-
 ## Docs 
 
 ### Adding custom peds/skin images - jpg
