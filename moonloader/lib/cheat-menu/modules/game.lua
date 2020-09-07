@@ -57,6 +57,8 @@ module.tgame                =
             y               = imgui.new.float(0),
             z               = imgui.new.float(0),
         },
+        categories          = {["Group view"] = 1,["Object view"] = 2},
+        selected            = "Object view",
         filter              = imgui.ImGuiTextFilter(),
         group_name          = imgui.new.char[32]("Group 1"),
         obj_name            = imgui.new.char[32]("New object"),
@@ -77,6 +79,8 @@ module.tgame                =
     script_manager          =
     {
         filter              = imgui.ImGuiTextFilter(),
+        categories          = {["All"] = 1,["Loaded"] = 2,["Not loaded"] = 3},
+        selected            = "All",
         scripts             = fconfig.Get('tgame.script_manager.scripts',{}),
         skip_auto_reload    = false,
         not_loaded          = {},
@@ -921,39 +925,60 @@ of LS without completing missions",
                 reloadScripts()
             end
             imgui.Spacing()
+            local width = imgui.GetWindowContentRegionWidth()
+            imgui.SetNextItemWidth(width/2)
+            fcommon.DropDownList("##List",module.tgame.script_manager.categories,module.tgame.script_manager.selected,
+            function(key,val) 
+                module.tgame.script_manager.selected = key
+            end)
+            imgui.SameLine()
+        
+            imgui.SetNextItemWidth(width/2)
+            local filter = module.tgame.script_manager.filter
+
+            filter:Draw("Search")
+            if filter:PassFilter('') then
+                local min = imgui.GetItemRectMin()
+                local drawlist = imgui.GetWindowDrawList()
+                drawlist:AddText(imgui.ImVec2(min.x+imgui.GetStyle().ItemInnerSpacing.x,min.y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.TextDisabled),"Search")
+            end
 
             if imgui.BeginChild("Script entries") then
 
                 module.MonitorScripts()
-
-                local filter = module.tgame.script_manager.filter
-
-                filter:Draw("Search")
-                imgui.Spacing()
                 
-                for index, script in ipairs(script.list()) do
-                    if filter:PassFilter(script.name) then
-                        ShowLoadedScript(script,index)
+                if module.tgame.script_manager.selected ~= "Not loaded" then
+                    for index, script in ipairs(script.list()) do
+                        if filter:PassFilter(script.name) then
+                            ShowLoadedScript(script,index)
+                        end
                     end
                 end
 
-                for name,path in pairs(module.tgame.script_manager.not_loaded) do
-                    if filter:PassFilter(name) then
-                        ShowNotLoadedScripts(name,path)
+                if module.tgame.script_manager.selected ~= "Loaded" then
+                    for name,path in pairs(module.tgame.script_manager.not_loaded) do
+                        if filter:PassFilter(name) then
+                            ShowNotLoadedScripts(name,path)
+                        end
                     end
                 end
 				imgui.EndChild()
 			end
         end,
         function()
-            if imgui.Button("Browse images",imgui.ImVec2(fcommon.GetSize(2))) then
+            if imgui.Button("Browse images",imgui.ImVec2(fcommon.GetSize(3))) then
                 os.execute('explorer "https://dev.prineside.com/en/gtasa_samp_model_id"')
             end
             imgui.SameLine()
-            if imgui.Button("Generate IPL",imgui.ImVec2(fcommon.GetSize(2))) then
+            if imgui.Button("Generate IPL",imgui.ImVec2(fcommon.GetSize(3))) then
                 GenerateIPL()
             end
-            fcommon.Tabs("Object Spawner Tabs",{"Spawn","Objects","Groups"},{
+            imgui.SameLine()
+            if imgui.Button("Remove all",imgui.ImVec2(fcommon.GetSize(3))) then
+                module.RemoveAllObjects()
+                printHelpString("Objects removed")
+            end
+            fcommon.Tabs("Object Spawner Tabs",{"Spawn","Placed"},{
             function()
                 fcommon.CheckBoxVar('Insert player coord',module.tgame.object_spawner.set_player_coord)
                 imgui.Spacing()
@@ -974,301 +999,303 @@ of LS without completing missions",
                 end
             end,
             function()
-                if imgui.Button("Remove all objects",imgui.ImVec2(fcommon.GetSize(1))) then
-                    module.RemoveAllObjects()
-                    printHelpString("Objects removed")
-                end
                 imgui.Spacing()
+                local width = imgui.GetWindowContentRegionWidth()
+                imgui.SetNextItemWidth(width/2)
+                fcommon.DropDownList("##List",module.tgame.object_spawner.categories,module.tgame.object_spawner.selected,
+                function(key,val) 
+                    module.tgame.object_spawner.selected = key
+                end)
+                imgui.SameLine()
+            
+                imgui.SetNextItemWidth(width/2)
                 local filter = module.tgame.object_spawner.filter
 
                 filter:Draw("Search")
-                fcommon.InformationTooltip("All objects will be removed if\nCheat Menu gets terminated")
+                if filter:PassFilter('') then
+                    local min = imgui.GetItemRectMin()
+                    local drawlist = imgui.GetWindowDrawList()
+                    drawlist:AddText(imgui.ImVec2(min.x+imgui.GetStyle().ItemInnerSpacing.x,min.y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.TextDisabled),"Search")
+                end
                 imgui.Spacing()
-
                 if imgui.BeginChild("Placed") then 
-                    for grp,data in pairs(module.tgame.object_spawner.placed) do
-                        for key,value in pairs(data) do
-                            local model, handle = string.match(key,"(%w+)##(%w+)")
-                            if filter:PassFilter(tostring(model)) or filter:PassFilter(value.name) then
-                                handle = tonumber(handle)
-                                fcommon.DropDownMenu(string.format("%s - %s - %s",grp,value.name,key),function()
-                                    local _,x,y,z = getObjectCoordinates(handle)
-                                    
-                                    module.tgame.object_spawner.coord.x[0] = x
-                                    module.tgame.object_spawner.coord.y[0] = y
-                                    module.tgame.object_spawner.coord.z[0] = z
+                    if module.tgame.object_spawner.selected == "Group view" then
+                        local size = imgui.GetFrameHeight()
+                        for grp,data in pairs(module.tgame.object_spawner.placed) do
+                            fcommon.DropDownMenu(grp,function()
 
-                                    if imgui.Checkbox("Collision",value.collision) then
-                                        setObjectCollision(handle,value.collision[0])
-                                    end
-                                    imgui.InputFloat("Coord X",module.tgame.object_spawner.coord.x,1.0, 1.0, "%.5f")
-                                    imgui.InputFloat("Coord Y",module.tgame.object_spawner.coord.y,1.0, 1.0, "%.5f")
-                                    imgui.InputFloat("Coord Z",module.tgame.object_spawner.coord.z,1.0, 1.0, "%.5f")
-                                    setObjectCoordinates(handle,module.tgame.object_spawner.coord.x[0],module.tgame.object_spawner.coord.y[0],module.tgame.object_spawner.coord.z[0])
-                                    
-                                    imgui.Spacing()
-                                    
-                                    imgui.SliderFloat("Rotation X",value.rotx,0,360, "%.5f")
-                                    imgui.SliderFloat("Rotation Y",value.roty,0,360, "%.5f")
-                                    imgui.SliderFloat("Rotation Z",value.rotz,0,360, "%.5f")
-                                    setObjectRotation(handle,value.rotx[0],value.roty[0],value.rotz[0])
-                                    imgui.Spacing()
-                                    if imgui.Button("Remove object",imgui.ImVec2(fcommon.GetSize(1))) then
-                                        for lgrp,data in pairs(module.tgame.object_spawner.placed) do
-                                            if grp == lgrp then
-                                                for lkey,value in pairs(data) do
-                                                    if key == lkey then
-                                                        local model, handle = string.match(key,"(%w+)##(%w+)")
-                                                        deleteObject(tonumber(handle))
-                                                        module.tgame.object_spawner.placed[grp][key] = nil
-                                                    end
-                                                end
-                                                break
+                                if imgui.Button("Set collisions on",imgui.ImVec2(fcommon.GetSize(2))) then
+                                    for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                        if grp == lgrp then
+                                            for lkey,value in pairs(ldata) do
+                                                local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                                value.collision[0] = true
+                                                setObjectCollision(handle,true)
                                             end
+                                            break
                                         end
-                                        printHelpString("Object removed")
                                     end
-                                end)
+                                    printHelpString("Group collisions on")
+                                end
+                                imgui.SameLine()
+                                if imgui.Button("Set collisions off",imgui.ImVec2(fcommon.GetSize(2))) then
+                                    for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                        if grp == lgrp then
+                                            for lkey,value in pairs(ldata) do
+                                                local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                                value.collision[0] = false
+                                                setObjectCollision(handle,false)
+                                            end
+                                            break
+                                        end
+                                    end
+                                    printHelpString("Group collisions off")
+                                end
+                                imgui.Spacing()
+                                imgui.Columns(2,nil,false)
+                                if imgui.Button("+##X",imgui.ImVec2(size,size)) then
+                                    for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                        if grp == lgrp then
+                                            for lkey,value in pairs(ldata) do
+                                                local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                                _,x,y,z = getObjectCoordinates(handle)
+                                                x = x + 1
+                                                setObjectCoordinates(handle,x,y,z)
+                                            end
+                                            break
+                                        end
+                                    end
+                                end
+                                imgui.SameLine()
+                                if imgui.Button("-##X",imgui.ImVec2(size,size)) then
+                                    for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                        if grp == lgrp then
+                                            for lkey,value in pairs(ldata) do
+                                                local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                                _,x,y,z = getObjectCoordinates(handle)
+                                                x = x - 1
+                                                setObjectCoordinates(handle,x,y,z)
+                                            end
+                                            break
+                                        end
+                                    end
+                                end    
+                                imgui.SameLine()        
+                                imgui.Text("Move X coord")
+
+                                if imgui.Button("+##Y",imgui.ImVec2(size,size)) then
+                                    for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                        if grp == lgrp then
+                                            for lkey,value in pairs(ldata) do
+                                                local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                                _,x,y,z = getObjectCoordinates(handle)
+                                                y = y + 1
+                                                setObjectCoordinates(handle,x,y,z)
+                                            end
+                                            break
+                                        end
+                                    end
+                                end
+                                imgui.SameLine()
+                                if imgui.Button("-##Y",imgui.ImVec2(size,size)) then
+                                    for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                        if grp == lgrp then
+                                            for lkey,value in pairs(ldata) do
+                                                local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                                _,x,y,z = getObjectCoordinates(handle)
+                                                y = y - 1
+                                                setObjectCoordinates(handle,x,y,z)
+                                            end
+                                            break
+                                        end
+                                    end
+                                end    
+                                imgui.SameLine()        
+                                imgui.Text("Move Y coord")
+                                
+                                if imgui.Button("+##Z",imgui.ImVec2(size,size)) then
+                                    for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                        if grp == lgrp then
+                                            for lkey,value in pairs(ldata) do
+                                                local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                                _,x,y,z = getObjectCoordinates(handle)
+                                                z = z + 1
+                                                setObjectCoordinates(handle,x,y,z)
+                                            end
+                                            break
+                                        end
+                                    end
+                                end
+                                imgui.SameLine()
+                                if imgui.Button("-##Z",imgui.ImVec2(size,size)) then
+                                    for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                        if grp == lgrp then
+                                            for lkey,value in pairs(ldata) do
+                                                local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                                _,x,y,z = getObjectCoordinates(handle)
+                                                z = z - 1
+                                                setObjectCoordinates(handle,x,y,z)
+                                            end
+                                            break
+                                        end
+                                    end
+                                end    
+                                imgui.SameLine()        
+                                imgui.Text("Move Z coord")
+
+                                imgui.NextColumn()
+                                
+                                if imgui.Button("+##rotX",imgui.ImVec2(size,size)) then
+                        
+                                    for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                        if grp == lgrp then
+                                            for lkey,value in pairs(ldata) do
+                                                local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                                value.rotx[0] = value.rotx[0] + 1
+                                                setObjectRotation(tonumber(handle),value.rotx[0],value.roty[0],value.rotz[0])
+                                            end
+                                            break
+                                        end
+                                    end
+                                end
+                                imgui.SameLine()
+                                if imgui.Button("-##rotX",imgui.ImVec2(size,size)) then
+                                    for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                        if grp == lgrp then
+                                            for lkey,value in pairs(ldata) do
+                                                local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                                value.rotx[0] = value.rotx[0] - 1
+                                                setObjectRotation(tonumber(handle),value.rotx[0],value.roty[0],value.rotz[0])
+                                            end
+                                            break
+                                        end
+                                    end
+                                end    
+                                imgui.SameLine()        
+                                imgui.Text("Rotate X")
+
+                                if imgui.Button("+##rotY",imgui.ImVec2(size,size)) then
+                        
+                                    for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                        if grp == lgrp then
+                                            for lkey,value in pairs(ldata) do
+                                                local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                                value.roty[0] = value.roty[0] + 1
+                                                setObjectRotation(tonumber(handle),value.rotx[0],value.roty[0],value.rotz[0])
+                                            end
+                                            break
+                                        end
+                                    end
+                                end
+                                imgui.SameLine()
+                                if imgui.Button("-##rotY",imgui.ImVec2(size,size)) then
+                                    for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                        if grp == lgrp then
+                                            for lkey,value in pairs(ldata) do
+                                                local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                                value.roty[0] = value.roty[0] - 1
+                                                setObjectRotation(tonumber(handle),value.rotx[0],value.roty[0],value.rotz[0])
+                                            end
+                                            break
+                                        end
+                                    end
+                                end    
+                                imgui.SameLine()        
+                                imgui.Text("Rotate Y")
+
+                                if imgui.Button("+##rotZ",imgui.ImVec2(size,size)) then
+                        
+                                    for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                        if grp == lgrp then
+                                            for lkey,value in pairs(ldata) do
+                                                local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                                value.rotz[0] = value.rotz[0] + 1
+                                                setObjectRotation(tonumber(handle),value.rotx[0],value.roty[0],value.rotz[0])
+                                            end
+                                            break
+                                        end
+                                    end
+                                end
+                                imgui.SameLine()
+                                if imgui.Button("-##rotZ",imgui.ImVec2(size,size)) then
+                                    for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                        if grp == lgrp then
+                                            for lkey,value in pairs(ldata) do
+                                                local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                                value.rotz[0] = value.rotz[0] - 1
+                                                setObjectRotation(tonumber(handle),value.rotx[0],value.roty[0],value.rotz[0])
+                                            end
+                                            break
+                                        end
+                                    end
+                                end    
+                                imgui.SameLine()        
+                                imgui.Text("Rotate Z")
+                                imgui.Columns(1)
+                                
+                                imgui.Spacing()
+                                if imgui.Button("Remove group",imgui.ImVec2(fcommon.GetSize(1))) then
+                                    for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
+                                        if grp == lgrp then
+                                            for lkey,value in pairs(ldata) do
+                                                local model, handle = string.match(lkey,"(%w+)##(%w+)")
+                                                deleteObject(tonumber(handle))
+                                            end
+                                            module.tgame.object_spawner.placed[lgrp] = nil
+                                            break
+                                        end
+                                    end
+                                    printHelpString("Group removed")
+                                end
+                            end)
+                        end
+                    else
+                        for grp,data in pairs(module.tgame.object_spawner.placed) do
+                            for key,value in pairs(data) do
+                                local model, handle = string.match(key,"(%w+)##(%w+)")
+                                if filter:PassFilter(tostring(model)) or filter:PassFilter(value.name) then
+                                    handle = tonumber(handle)
+                                    fcommon.DropDownMenu(string.format("%s - %s - %s",grp,value.name,key),function()
+                                        local _,x,y,z = getObjectCoordinates(handle)
+                                        
+                                        module.tgame.object_spawner.coord.x[0] = x
+                                        module.tgame.object_spawner.coord.y[0] = y
+                                        module.tgame.object_spawner.coord.z[0] = z
+
+                                        if imgui.Checkbox("Collision",value.collision) then
+                                            setObjectCollision(handle,value.collision[0])
+                                        end
+                                        imgui.InputFloat("Coord X",module.tgame.object_spawner.coord.x,1.0, 1.0, "%.5f")
+                                        imgui.InputFloat("Coord Y",module.tgame.object_spawner.coord.y,1.0, 1.0, "%.5f")
+                                        imgui.InputFloat("Coord Z",module.tgame.object_spawner.coord.z,1.0, 1.0, "%.5f")
+                                        setObjectCoordinates(handle,module.tgame.object_spawner.coord.x[0],module.tgame.object_spawner.coord.y[0],module.tgame.object_spawner.coord.z[0])
+                                        
+                                        imgui.Spacing()
+                                        
+                                        imgui.SliderFloat("Rotation X",value.rotx,0,360, "%.5f")
+                                        imgui.SliderFloat("Rotation Y",value.roty,0,360, "%.5f")
+                                        imgui.SliderFloat("Rotation Z",value.rotz,0,360, "%.5f")
+                                        setObjectRotation(handle,value.rotx[0],value.roty[0],value.rotz[0])
+                                        imgui.Spacing()
+                                        if imgui.Button("Remove object",imgui.ImVec2(fcommon.GetSize(1))) then
+                                            for lgrp,data in pairs(module.tgame.object_spawner.placed) do
+                                                if grp == lgrp then
+                                                    for lkey,value in pairs(data) do
+                                                        if key == lkey then
+                                                            local model, handle = string.match(key,"(%w+)##(%w+)")
+                                                            deleteObject(tonumber(handle))
+                                                            module.tgame.object_spawner.placed[grp][key] = nil
+                                                        end
+                                                    end
+                                                    break
+                                                end
+                                            end
+                                            printHelpString("Object removed")
+                                        end
+                                    end)
+                                end
                             end
                         end
-                    end
-                    imgui.EndChild()
-                end
-            end,
-            function()
-                local filter = module.tgame.object_spawner.filter
-                filter:Draw("Search")
-                fcommon.InformationTooltip("Changes here affect all object\nof the group")
-                imgui.Spacing()
-                local size = imgui.GetFrameHeight()
-                if imgui.BeginChild("Groups") then 
-                    for grp,data in pairs(module.tgame.object_spawner.placed) do
-                        fcommon.DropDownMenu(grp,function()
-
-                            if imgui.Button("Set collisions on",imgui.ImVec2(fcommon.GetSize(2))) then
-                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
-                                    if grp == lgrp then
-                                        for lkey,value in pairs(ldata) do
-                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
-                                            value.collision[0] = true
-                                            setObjectCollision(handle,true)
-                                        end
-                                        break
-                                    end
-                                end
-                                printHelpString("Group collisions on")
-                            end
-                            imgui.SameLine()
-                            if imgui.Button("Set collisions off",imgui.ImVec2(fcommon.GetSize(2))) then
-                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
-                                    if grp == lgrp then
-                                        for lkey,value in pairs(ldata) do
-                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
-                                            value.collision[0] = false
-                                            setObjectCollision(handle,false)
-                                        end
-                                        break
-                                    end
-                                end
-                                printHelpString("Group collisions off")
-                            end
-                            imgui.Spacing()
-                            imgui.Columns(2,nil,false)
-                            if imgui.Button("+##X",imgui.ImVec2(size,size)) then
-                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
-                                    if grp == lgrp then
-                                        for lkey,value in pairs(ldata) do
-                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
-                                            _,x,y,z = getObjectCoordinates(handle)
-                                            x = x + 1
-                                            setObjectCoordinates(handle,x,y,z)
-                                        end
-                                        break
-                                    end
-                                end
-                            end
-                            imgui.SameLine()
-                            if imgui.Button("-##X",imgui.ImVec2(size,size)) then
-                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
-                                    if grp == lgrp then
-                                        for lkey,value in pairs(ldata) do
-                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
-                                            _,x,y,z = getObjectCoordinates(handle)
-                                            x = x - 1
-                                            setObjectCoordinates(handle,x,y,z)
-                                        end
-                                        break
-                                    end
-                                end
-                            end    
-                            imgui.SameLine()        
-                            imgui.Text("Move X coord")
-
-                            if imgui.Button("+##Y",imgui.ImVec2(size,size)) then
-                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
-                                    if grp == lgrp then
-                                        for lkey,value in pairs(ldata) do
-                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
-                                            _,x,y,z = getObjectCoordinates(handle)
-                                            y = y + 1
-                                            setObjectCoordinates(handle,x,y,z)
-                                        end
-                                        break
-                                    end
-                                end
-                            end
-                            imgui.SameLine()
-                            if imgui.Button("-##Y",imgui.ImVec2(size,size)) then
-                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
-                                    if grp == lgrp then
-                                        for lkey,value in pairs(ldata) do
-                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
-                                            _,x,y,z = getObjectCoordinates(handle)
-                                            y = y - 1
-                                            setObjectCoordinates(handle,x,y,z)
-                                        end
-                                        break
-                                    end
-                                end
-                            end    
-                            imgui.SameLine()        
-                            imgui.Text("Move Y coord")
-                            
-                            if imgui.Button("+##Z",imgui.ImVec2(size,size)) then
-                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
-                                    if grp == lgrp then
-                                        for lkey,value in pairs(ldata) do
-                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
-                                            _,x,y,z = getObjectCoordinates(handle)
-                                            z = z + 1
-                                            setObjectCoordinates(handle,x,y,z)
-                                        end
-                                        break
-                                    end
-                                end
-                            end
-                            imgui.SameLine()
-                            if imgui.Button("-##Z",imgui.ImVec2(size,size)) then
-                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
-                                    if grp == lgrp then
-                                        for lkey,value in pairs(ldata) do
-                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
-                                            _,x,y,z = getObjectCoordinates(handle)
-                                            z = z - 1
-                                            setObjectCoordinates(handle,x,y,z)
-                                        end
-                                        break
-                                    end
-                                end
-                            end    
-                            imgui.SameLine()        
-                            imgui.Text("Move Z coord")
-
-                            imgui.NextColumn()
-                            
-                            if imgui.Button("+##rotX",imgui.ImVec2(size,size)) then
-                 
-                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
-                                    if grp == lgrp then
-                                        for lkey,value in pairs(ldata) do
-                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
-                                            value.rotx[0] = value.rotx[0] + 1
-                                            setObjectRotation(tonumber(handle),value.rotx[0],value.roty[0],value.rotz[0])
-                                        end
-                                        break
-                                    end
-                                end
-                            end
-                            imgui.SameLine()
-                            if imgui.Button("-##rotX",imgui.ImVec2(size,size)) then
-                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
-                                    if grp == lgrp then
-                                        for lkey,value in pairs(ldata) do
-                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
-                                            value.rotx[0] = value.rotx[0] - 1
-                                            setObjectRotation(tonumber(handle),value.rotx[0],value.roty[0],value.rotz[0])
-                                        end
-                                        break
-                                    end
-                                end
-                            end    
-                            imgui.SameLine()        
-                            imgui.Text("Rotate X")
-
-                            if imgui.Button("+##rotY",imgui.ImVec2(size,size)) then
-                 
-                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
-                                    if grp == lgrp then
-                                        for lkey,value in pairs(ldata) do
-                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
-                                            value.roty[0] = value.roty[0] + 1
-                                            setObjectRotation(tonumber(handle),value.rotx[0],value.roty[0],value.rotz[0])
-                                        end
-                                        break
-                                    end
-                                end
-                            end
-                            imgui.SameLine()
-                            if imgui.Button("-##rotY",imgui.ImVec2(size,size)) then
-                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
-                                    if grp == lgrp then
-                                        for lkey,value in pairs(ldata) do
-                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
-                                            value.roty[0] = value.roty[0] - 1
-                                            setObjectRotation(tonumber(handle),value.rotx[0],value.roty[0],value.rotz[0])
-                                        end
-                                        break
-                                    end
-                                end
-                            end    
-                            imgui.SameLine()        
-                            imgui.Text("Rotate Y")
-
-                            if imgui.Button("+##rotZ",imgui.ImVec2(size,size)) then
-                 
-                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
-                                    if grp == lgrp then
-                                        for lkey,value in pairs(ldata) do
-                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
-                                            value.rotz[0] = value.rotz[0] + 1
-                                            setObjectRotation(tonumber(handle),value.rotx[0],value.roty[0],value.rotz[0])
-                                        end
-                                        break
-                                    end
-                                end
-                            end
-                            imgui.SameLine()
-                            if imgui.Button("-##rotZ",imgui.ImVec2(size,size)) then
-                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
-                                    if grp == lgrp then
-                                        for lkey,value in pairs(ldata) do
-                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
-                                            value.rotz[0] = value.rotz[0] - 1
-                                            setObjectRotation(tonumber(handle),value.rotx[0],value.roty[0],value.rotz[0])
-                                        end
-                                        break
-                                    end
-                                end
-                            end    
-                            imgui.SameLine()        
-                            imgui.Text("Rotate Z")
-                            imgui.Columns(1)
-                            
-                            imgui.Spacing()
-                            if imgui.Button("Remove group",imgui.ImVec2(fcommon.GetSize(1))) then
-                                for lgrp,ldata in pairs(module.tgame.object_spawner.placed) do
-                                    if grp == lgrp then
-                                        for lkey,value in pairs(ldata) do
-                                            local model, handle = string.match(lkey,"(%w+)##(%w+)")
-                                            deleteObject(tonumber(handle))
-                                        end
-                                        module.tgame.object_spawner.placed[lgrp] = nil
-                                        break
-                                    end
-                                end
-                                printHelpString("Group removed")
-                            end
-                        end)
                     end
                     imgui.EndChild()
                 end

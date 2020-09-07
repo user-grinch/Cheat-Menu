@@ -350,6 +350,11 @@ function module.PlayerMain()
                 function()
                     if module.tplayer.custom_skins.is_modloader_installed then
                         module.tplayer.custom_skins.filter:Draw("Search")
+                        if module.tplayer.custom_skins.filter:PassFilter('') then
+                            local min = imgui.GetItemRectMin()
+                            local drawlist = imgui.GetWindowDrawList()
+                            drawlist:AddText(imgui.ImVec2(min.x+imgui.GetStyle().ItemInnerSpacing.x,min.y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.TextDisabled),string.format("Total skins: %d",fcommon.CalcTableSize(fplayer.tplayer.custom_skins.names)))
+                        end
                         fcommon.InformationTooltip(string.format("Place your dff & txd files inside,\n'%s'\n\
 Note:\nFile names can't exceed 8 characters.\nDon't change names while the game is running",fplayer.tplayer.custom_skins.path))
                         imgui.Spacing()

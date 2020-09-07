@@ -110,7 +110,7 @@ module.DEFAULT_GANG_WEAPONS =
 module.UPDATE_STATUS =
 {
     DOWNLOADING   = 5,
-    INSTALL       = 6,
+    DOWNLOADED    = 58,
     HIDE_MSG      = 7,
     NEW_UPDATE    = 9,
 }

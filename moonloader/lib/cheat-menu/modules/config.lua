@@ -189,6 +189,7 @@ function module.Write()
                 disable_cheats      = fgame.tgame.disable_cheats[0],
                 disable_help_popups = fgame.tgame.disable_help_popups[0],
                 disable_replay      = fgame.tgame.disable_replay[0],
+                forbidden_area_wanted_level = fgame.tgame.forbidden_area_wanted_level[0],
                 fps_limit           = fgame.tgame.fps_limit[0],
                 ghost_cop_cars      = fgame.tgame.ghost_cop_cars[0],
                 keep_stuff          = fgame.tgame.keep_stuff[0],

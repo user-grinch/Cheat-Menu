@@ -31,6 +31,14 @@ function module.spairs(t, f)
     return iter
 end
 
+function module.CalcTableSize(table)
+    local count = 0
+    for k,v in pairs(table) do
+        count = count + 1
+    end
+    return count
+end
+
 function module.pool(pool)
 
     local entities = {}
@@ -154,6 +162,78 @@ function module.MoveFiles(main_dir,dest_dir)
 end
 --------------------------------------------------
 -- imgui functions
+
+function module.HorizontalSelector(label,var,table)
+    local rtn = false
+    local drawlist = imgui.GetWindowDrawList()
+    local hframe = imgui.GetFrameHeight()
+    local width = imgui.GetWindowContentRegionWidth()*0.65 - 4*hframe - imgui.StyleVar.ItemInnerSpacing + 6
+
+    imgui.InvisibleButton("##1" .. label,imgui.ImVec2(width,hframe))
+    local min = imgui.GetItemRectMin()
+    local max = imgui.GetItemRectMax()
+    drawlist:AddRectFilled(min, max, imgui.GetColorU32(imgui.Col.FrameBg))
+    drawlist:AddText(imgui.ImVec2(min.x+imgui.GetStyle().ItemInnerSpacing.x,min.y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.Text),table[var[0]+2])
+
+    imgui.SameLine()
+
+    if imgui.Button("<##2" .. label,imgui.ImVec2(2*hframe,hframe)) then
+        rtn = -1
+
+        if var[0] > -1 then
+            var[0] = var[0] - 1
+        else 
+            var[0] = #table-2
+        end
+    end
+
+    imgui.SameLine()
+
+    if imgui.Button(">##2" .. label,imgui.ImVec2(2*hframe,hframe)) then
+        rtn = 1
+
+        if var[0] < (#table-2) then
+            var[0] = var[0] + 1
+        else
+            var[0] = -1
+        end
+    end
+
+    min = imgui.GetItemRectMin()
+    max = imgui.GetItemRectMax()
+    imgui.SameLine()
+    imgui.InvisibleButton("##4" ..label,imgui.ImVec2(imgui.CalcTextSize(label).x,hframe))
+    drawlist:AddText(imgui.ImVec2(max.x+imgui.GetStyle().ItemInnerSpacing.x,min.y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.Text),label)
+
+    return rtn
+end
+
+function module.HoveredColorButton(label,color_vec4,flags,size_vec2)
+    imgui.ColorButton(label,color_vec4,flags,size_vec2)
+    if imgui.IsItemHovered() then
+        local drawlist = imgui.GetWindowDrawList()
+        drawlist:AddRectFilled(imgui.GetItemRectMin(), imgui.GetItemRectMax(), imgui.GetColorU32(imgui.Col.ModalWindowDimBg))
+    end
+
+    return imgui.IsItemClicked()
+end
+
+function module.ListedColorButtons(tlabel,tcolor_vec,func)
+    local x,y = module.GetSize()
+    local btns_in_row = math.floor(imgui.GetWindowContentRegionWidth()/(y*2))
+    local btn_size = (imgui.GetWindowContentRegionWidth() - imgui.StyleVar.ItemSpacing*(btns_in_row-0.75*btns_in_row))/btns_in_row
+    local btn_count = 1
+
+    for k,v in ipairs(tlabel) do
+        if module.HoveredColorButton(tlabel[k],tcolor_vec[k],0,imgui.ImVec2(btn_size,btn_size)) then
+            func(k,v)
+        end
+        if btn_count % btns_in_row ~= 0 then
+            imgui.SameLine(0.0,4.0)
+        end
+        btn_count = btn_count + 1
+    end
+end
 
 function module.DropDownList(label,table,selected,func)
     if imgui.BeginCombo(label, selected) then

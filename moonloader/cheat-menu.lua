@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.1-beta")
-script_version_number(2020090203) -- YYYYMMDDNN
+script_version_number(2020090701) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -36,17 +36,14 @@ tcheatmenu =
     window                 = 
     {
         fail_loading_json  = false,
-        missing_components = false,
     }
 }
 
 --------------------------------------------------
 -- Libraries
 casts         = require 'cheat-menu.libraries.casts'
-copas         = require 'copas'
 ffi           = require 'ffi'
 glob          = require 'game.globals'
-http          = require 'copas.http'
 imgui         = require 'mimgui'
 lfs           = require 'lfs'
 mad           = require 'MoonAdditions'
@@ -117,7 +114,6 @@ tcheatmenu       =
             Y    = fconfig.Get('tcheatmenu.window.coord.Y',50),
         },
         fail_loading_json = tcheatmenu.window.fail_loading_json,
-        missing_components = tcheatmenu.window.missing_components,
         panel_func = nil,
         restart_required = false,
         show     = imgui.new.bool(false),
@@ -211,19 +207,6 @@ function(self) -- render frame
         imgui.Spacing()
     end
 
-    if tcheatmenu.window.missing_components then
-        imgui.Button("Some components of Cheat Menu are missing!",imgui.ImVec2(fcommon.GetSize(1)))
-        if imgui.Button("Reinstall latest",imgui.ImVec2(fcommon.GetSize(2))) then
-            DownloadUpdate()
-            tcheatmenu.window.missing_components = false
-        end
-        imgui.SameLine()
-        if imgui.Button("Hide message",imgui.ImVec2(fcommon.GetSize(2))) then
-            tcheatmenu.window.missing_components = false
-        end
-        imgui.Spacing()
-    end
-
     if tcheatmenu.window.restart_required then
         imgui.Button("Restart is required to apply some changes",imgui.ImVec2(fcommon.GetSize(1)))
         if imgui.Button("Restart menu",imgui.ImVec2(fcommon.GetSize(2))) then
@@ -264,7 +247,7 @@ function(self) -- render frame
         imgui.Spacing()
     end
 
-    if fmenu.tmenu.update_status == fconst.UPDATE_STATUS.INSTALL then
+    if fmenu.tmenu.update_status == fconst.UPDATE_STATUS.DOWNLOADED then
         if imgui.Button("Install update. This might take a while.",imgui.ImVec2(fcommon.GetSize(1))) then
             fmenu.tmenu.update_status = fconst.UPDATE_STATUS.HIDE_MSG
             fgame.tgame.script_manager.skip_auto_reload = true

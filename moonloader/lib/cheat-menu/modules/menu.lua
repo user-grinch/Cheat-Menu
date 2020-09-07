@@ -36,6 +36,7 @@ module.tmenu =
 		selected		= fconfig.Get('tmenu.font.selected',"Trebucbd.ttf"),
 		size  		    = imgui.new.int(fconfig.Get('tmenu.font.size',math.floor(resY/54.85))),
 	},
+	get_beta_updates	= imgui.new.bool(fconfig.Get('tmenu.get_beta_updates',string.find(script.this.version,"beta"))),
 	lock_player   		= imgui.new.bool(fconfig.Get('tmenu.lock_player',false)),
 	overlay             = 
 	{
@@ -232,65 +233,69 @@ function module.httpRequest(request, body, handler) -- copas.http
 end
 
 function module.CheckUpdates()
-	if string.find( script.this.version,"beta") then
+
+	if fmenu.tmenu.get_beta_updates[0] then
 		link = "https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/moonloader/cheat-menu.lua"
 	else
 		link = "https://api.github.com/repos/user-grinch/Cheat-Menu/tags"
 	end
 
-	module.httpRequest(link, nil, function(body, code, headers, status)
-		if body then
-			print(string.format("%s %s",link,status))
-			if string.find( script.this.version,"beta") then
-				repo_version = body:match("script_version_number%((%d+)%)")
-				this_version = script.this.version_num
-			else
-				repo_version = decodeJson(body)[1].name
-				this_version = script.this.version
-			end
+	downloadUrlToFile(link,string.format("%s/version.txt",tcheatmenu.dir),
+	function(id, status, p1, p2)
+		if status == fconst.UPDATE_STATUS.DOWNLOADED then
+			local file_path = string.format("%s\\version.txt",tcheatmenu.dir)
+			if doesFileExist(file_path) then
+				local file = io.open(file_path,"rb")
+				local content = file:read("*all")
 
-			if  repo_version ~= nil then
-				if tostring(repo_version) > tostring(this_version) then
-					module.tmenu.update_status = fconst.UPDATE_STATUS.NEW_UPDATE
-					module.tmenu.repo_version = tostring(repo_version)
-					printHelpString("New update available")
+				if fmenu.tmenu.get_beta_updates[0] then
+					repo_version = content:match("script_version_number%((%d+)%)")
+					this_version = script.this.version_num
 				else
-					printHelpString("No update found")
+					repo_version = decodeJson(content)[1].name
+					this_version = script.this.version
 				end
+	
+				if repo_version ~= nil then
+					if tostring(repo_version) > tostring(this_version) then
+						module.tmenu.update_status = fconst.UPDATE_STATUS.NEW_UPDATE
+						module.tmenu.repo_version = tostring(repo_version)
+						printHelpString("New update available")
+					else
+						printHelpString("No update found")
+					end
+				else
+					printHelpString("Couldn't connect to github. The rest of the menu is still functional. You can disable auto update check from 'Menu'")
+				end
+				io.close(file)
+				os.remove(file_path)
 			else
-				printHelpString("Couldn't connect to github. The rest of the menu is still functional. You can disable auto update check from 'Menu'")
+				print("Version.txt doesn't exist")
 			end
-		else
-			print(string.format("%s %s",link,tostring(code),"WARN"))
 		end
 	end)
 end
 
-function module.DownloadHandler(id, status, p1, p2)
-	print("Update status: " .. status)
-	if status == fconst.UPDATE_STATUS.INSTALL then
-		fmenu.tmenu.update_status = fconst.UPDATE_STATUS.INSTALL
-		printHelpString("Download complete. Click the 'Install update' button to finish.")
-	end
-end
-
-function DownloadUpdate()
-	if string.find( script.this.version,"beta") then
-		module.httpRequest("https://github.com/user-grinch/Cheat-Menu/archive/master.zip", nil, function(body, code, headers, status)  
-			downloadUrlToFile("https://github.com/user-grinch/Cheat-Menu/archive/master.zip",string.format("%supdate.zip",tcheatmenu.dir),module.DownloadHandler)
-		end)
+function module.DownloadUpdate()
+	if fmenu.tmenu.get_beta_updates[0] then
+		link = "https://github.com/user-grinch/Cheat-Menu/archive/master.zip"
 	else
-		module.httpRequest("https://api.github.com/repos/user-grinch/Cheat-Menu/tags", nil, function(body, code, headers, status)  	
-			module.tmenu.repo_version = tostring(decodeJson(body)[1].name)
-			downloadUrlToFile("https://github.com/user-grinch/Cheat-Menu/archive/".. module.tmenu.repo_version .. ".zip",string.format("%supdate.zip",tcheatmenu.dir),module.DownloadHandler)
-		end)
+		link = "https://github.com/user-grinch/Cheat-Menu/archive/".. module.tmenu.repo_version .. ".zip"
 	end
+
+	downloadUrlToFile(link,string.format("%supdate.zip",tcheatmenu.dir),
+	function(id, status, p1, p2)
+		if status == fconst.UPDATE_STATUS.DOWNLOADED then
+			fmenu.tmenu.update_status = fconst.UPDATE_STATUS.DOWNLOADED
+			printHelpString("Download complete. Click the 'Install update' button to finish.")
+		end
+	end)
 	
 	printHelpString("Download has started. You'll get notified when the download completes.")
 	module.tmenu.update_status = fconst.UPDATE_STATUS.DOWNLOADING
 end
 
--- Main function
+
 function module.MenuMain()
 
 	fcommon.Tabs("Menu",{"Config","Overlay","Commands","Hotkeys","Styles","License","About"},{
@@ -322,10 +327,11 @@ function module.MenuMain()
 			fcommon.CheckBoxVar("Auto reload",module.tmenu.auto_reload,"Reload cheat menu automatically\nin case of a crash.\n\nMight cause crash loop sometimes.")
 			fcommon.CheckBoxVar("Check for updates",module.tmenu.auto_update_check,"Cheat Menu will automatically check for updates\nonline. This requires an internet connection and\
 will download files from github repository.")
-			fcommon.CheckBoxVar("Lock player",module.tmenu.lock_player,"Lock player controls while the menu is open")
+			fcommon.CheckBoxVar("Get beta updates",module.tmenu.get_beta_updates,"Receive frequent beta updates.\
+These updates might be unstable.")
 			
 			imgui.NextColumn()
-
+			fcommon.CheckBoxVar("Lock player",module.tmenu.lock_player,"Lock player controls while the menu is open")
 			fcommon.CheckBoxVar("Show crash message",module.tmenu.show_crash_message)
 			fcommon.CheckBoxVar("Show tooltips",module.tmenu.show_tooltips,"Shows usage tips beside options")
 			imgui.Columns(1)
@@ -501,8 +507,6 @@ will download files from github repository.")
 				imgui.Text(string.format("Imgui:   v%s",imgui._VERSION))
 				imgui.Columns(1)
 
-				imgui.Dummy(imgui.ImVec2(0,10))
-				imgui.TextWrapped("Need help/ facing issues/ have suggestions?\nContact me on discord, Grinch_#3311 or on forum.")
 				imgui.TextWrapped("\nPlease provide 'moonloader.log' in case of debugging.")
 				imgui.Dummy(imgui.ImVec2(0,10))
 				imgui.TextWrapped("Special thanks to,")

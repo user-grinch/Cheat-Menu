@@ -72,7 +72,6 @@ module.tvehicle =
     handling_flags = fcommon.LoadJson("handling flags"),
     handling_name = {},
     heavy = imgui.new.bool(fconfig.Get('tvehicle.heavy',false)),
-    hidden_objects = {},
     images = {},
     invisible_car = imgui.new.bool(fconfig.Get('tvehicle.invisible_car',false)),
     license_plate_text = imgui.new.char[9](fconfig.Get('tvehicle.license_plate_text',"GTA__SAN")),
@@ -88,7 +87,9 @@ module.tvehicle =
         current_paintjob = imgui.new.int(-1);
         enable_saving    = imgui.new.bool(fconfig.Get('tvehicle.paintjobs.enable_saving',false)),
         save_data        = fconfig.Get('tvehicle.paintjobs.save_data',{}),
+        names            = 0,
         path             =  tcheatmenu.dir .. "vehicles\\paintjobs",
+        paintjobs_count  = 0,
         images           = {},
         texture          = nil
     },
@@ -130,9 +131,7 @@ module.tvehicle =
 result, handle = loadDynamicLibrary("neon_api.asi")
 module.tvehicle.neon["Handle"] = handle
 
-if module.tvehicle.neon["Handle"] == 0 then
-    tcheatmenu.window.missing_components = true
-else
+if module.tvehicle.neon["Handle"] ~= 0 then
     result, proc = getDynamicLibraryProcedure("SetFlag",module.tvehicle.neon["Handle"])
     module.tvehicle.neon["SetFlag"] = proc
 
@@ -147,46 +146,63 @@ else
 
     result, proc = getDynamicLibraryProcedure("InstallNeon",module.tvehicle.neon["Handle"])
     module.tvehicle.neon["InstallNeon"] = proc
+
+    result, proc = getDynamicLibraryProcedure("SetY",module.tvehicle.neon["Handle"])
+    module.tvehicle.neon["SetRed"] = proc
+
+    result, proc = getDynamicLibraryProcedure("SetY",module.tvehicle.neon["Handle"])
+    module.tvehicle.neon["SetGreen"] = proc
+
+    result, proc = getDynamicLibraryProcedure("SetY",module.tvehicle.neon["Handle"])
+    module.tvehicle.neon["SetBlue"] = proc
 end
 
-function InstallNeon(pCar,color,pulsing)
-    local car = getVehiclePointerHandle(pCar)
+function InstallNeon(car,color,pulsing)
+    car = car or getCarCharIsUsing(PLAYER_PED)
+    local pveh = getCarPointer(car)
+    
     color = color or module.tvehicle.neon.rb_value[0]
     pulsing = pulsing or module.tvehicle.neon.pulsing[0]
     if module.tvehicle.neon["Handle"] ~= 0 then
         if module.tvehicle.neon["InstallNeon"] and module.tvehicle.neon["SetX"] and module.tvehicle.neon["SetY"] then
-            callFunction(module.tvehicle.neon["InstallNeon"],3,3,pCar,color,pulsing)
+            callFunction(module.tvehicle.neon["InstallNeon"],3,3,pveh,color,pulsing)
             
             local data = module.tvehicle.neon.data[casts.CModelInfo.GetNameFromModel(getCarModel(car))] or { X = 0.0, Y = 0.0}
   
-            callFunction(module.tvehicle.neon["SetX"],2,2,pCar,data.X)
-            callFunction(module.tvehicle.neon["SetY"],2,2,pCar,data.Y)
+            callFunction(module.tvehicle.neon["SetX"],2,2,pveh,data.X)
+            callFunction(module.tvehicle.neon["SetY"],2,2,pveh,data.Y)
+
+            callFunction(module.tvehicle.neon["SetRed"],2,2,pveh,0)
+            callFunction(module.tvehicle.neon["SetGreen"],2,2,pveh,0)
+            callFunction(module.tvehicle.neon["SetBlue"],2,2,pveh,255)
+
+            if module.tvehicle.paintjobs.enable_saving[0] then
+                fconfig.Set(module.tvehicle.paintjobs.save_data,string.format("%d.neon",getCarModel(car)),color)
+            end
         end
     end
 end
 
 function module.TrafficNeons()
     while module.tvehicle.neon.checkbox[0] and module.tvehicle.neon["Handle"] ~= 0 do
-
         for hveh in fcommon.pool("veh") do
-                local temp = 0
-                local pveh = getCarPointer(hveh)
+            local temp = 0
 
-                if getVehicleClass(hveh) == fconst.VEHICLE_CLASS.NORMAL then
-                    temp = math.random(1,20) -- 5%
+            if getVehicleClass(hveh) == fconst.VEHICLE_CLASS.NORMAL then
+                temp = math.random(1,20) -- 5%
+            end
+            if getVehicleClass(hveh) == fconst.VEHICLE_CLASS.RICH_FAMILY then
+                temp = math.random(1,5) -- 20%
+            end
+            if getVehicleClass(hveh) == fconst.VEHICLE_CLASS.EXECUTIVE then
+                temp = math.random(1,3) -- 30%
+            end
+            if temp == 1 and callFunction(module.tvehicle.neon["GetFlag"],1,1,hveh) ~= 0x10 then
+                if getCarCharIsUsing(PLAYER_PED) ~= hveh then
+                    InstallNeon(hveh,math.random(0,6),math.random(0,1))
                 end
-                if getVehicleClass(hveh) == fconst.VEHICLE_CLASS.RICH_FAMILY then
-                    temp = math.random(1,5) -- 20%
-                end
-                if getVehicleClass(hveh) == fconst.VEHICLE_CLASS.EXECUTIVE then
-                    temp = math.random(1,3) -- 30%
-                end
-                if temp == 1 and callFunction(module.tvehicle.neon["GetFlag"],1,1,pveh) ~= 0x10 then
-                    if getCarCharIsUsing(PLAYER_PED) ~= hveh then
-                        InstallNeon(pveh,math.random(0,6),math.random(0,1))
-                    end
-                end
-                callFunction(module.tvehicle.neon["SetFlag"],2,2,pveh,0x10)
+            end
+            callFunction(module.tvehicle.neon["SetFlag"],2,2,hveh,0x10)
         end
         wait(100)
     end
@@ -670,7 +686,6 @@ function module.OnEnterVehicle()
             local model_name = module.tvehicle.gxt_name_table[casts.CModelInfo.GetNameFromModel(model)] or getGxtText(casts.CModelInfo.GetNameFromModel(model))
 
             -- Get vehicle components
-            module.tvehicle.hidden_objects = {}
             module.tvehicle.components.names = {"default"}
 
             module.ForEachCarComponent(function(mat,comp,hveh)
@@ -698,9 +713,25 @@ function module.OnEnterVehicle()
             fcommon.SingletonThread(module.RainbowColors,"RainbowColors")
             fcommon.SingletonThread(module.UnlimitedNitro,"UnlimitedNitro")
 
+            module.tvehicle.paintjobs.current_paintjob[0] = fconfig.Get(string.format("%d.paintjob",model),nil,module.tvehicle.paintjobs.save_data)  or getCurrentVehiclePaintjob(hveh)  
+            module.tvehicle.paintjobs.paintjobs_count =  getNumAvailablePaintjobs(hveh)
+
+            module.tvehicle.paintjobs.names = {"None"} 
+
+            for i=1,module.tvehicle.paintjobs.paintjobs_count,1 do
+                table.insert(module.tvehicle.paintjobs.names, string.format("Paintjob %d",i))
+            end
+                
+
             if module.tvehicle.paintjobs.enable_saving[0] then
                 ApplyColor(true)
                 ApplyTexture(nil,true)
+                
+                if getNumAvailablePaintjobs(hveh) >= module.tvehicle.paintjobs.current_paintjob[0] then
+                    giveVehiclePaintjob(hveh,module.tvehicle.paintjobs.current_paintjob[0])
+                end
+
+                InstallNeon(hveh,fconfig.Get(string.format("%d.neon",model),-1,module.tvehicle.paintjobs.save_data))
             end
 
             if module.tvehicle.components.enable_saving[0] then
@@ -1006,56 +1037,6 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
                     end
                     
                 end)
-                -- fcommon.DropDownMenu("Hide components",function()
-                --     if isCharInAnyCar(PLAYER_PED) then
-                --         local count = 1
-
-                --         imgui.Columns(2,nil,false)
-
-                --         for _, comp in ipairs(mad.get_all_vehicle_components(car)) do
-
-                --             if module.tvehicle.hidden_objects[comp.name] == nil then
-                --                 module.tvehicle.hidden_objects[comp.name] = imgui.new.bool(false)
-                --             end
-                --             imgui.Checkbox(comp.name, module.tvehicle.hidden_objects[comp.name])
-                --             for _, obj in ipairs(comp:get_objects()) do
-                --                 obj:hide(module.tvehicle.hidden_objects[comp.name][0])
-                --             end
-                --             count = count + 1 
-                --             if count == math.floor((#module.tvehicle.components.names/2)+1) then
-                --                 imgui.NextColumn()
-                --             end
-
-                --         end
-                --         imgui.Columns(1)
-                --     end
-                -- end)
-                fcommon.DropDownMenu("Neons",function()
-                    if module.tvehicle.neon["Handle"] ~= 0 then
-                        imgui.Columns(3,nil,false)
-                        imgui.RadioButtonIntPtr("Blue", module.tvehicle.neon.rb_value,2) 
-                        imgui.RadioButtonIntPtr("Cyan", module.tvehicle.neon.rb_value,5)
-                        imgui.RadioButtonIntPtr("Green", module.tvehicle.neon.rb_value,1) 
-                        imgui.NextColumn()
-                        imgui.RadioButtonIntPtr("None", module.tvehicle.neon.rb_value,-1)
-                        imgui.RadioButtonIntPtr("Purple", module.tvehicle.neon.rb_value,6)
-                        imgui.RadioButtonIntPtr("Red", module.tvehicle.neon.rb_value,0) 
-                        imgui.NextColumn()
-                        imgui.RadioButtonIntPtr("White", module.tvehicle.neon.rb_value,3)
-                        imgui.RadioButtonIntPtr("Yellow", module.tvehicle.neon.rb_value,4)
-                        imgui.Columns(1)
-
-                        imgui.Dummy(imgui.ImVec2(0,20))
-                        fcommon.CheckBoxVar("Blinking neons",module.tvehicle.neon.pulsing)
-                        imgui.Spacing()
-
-                        if imgui.Button("Install Neon",imgui.ImVec2(fcommon.GetSize(1))) then
-                            InstallNeon(pCar)
-                        end
-                    else
-                        imgui.TextWrapped("Unable to find 'neon_api.asi'. Please reinstall Cheat Menu.")
-                    end
-                end)
                 fcommon.UpdateAddress({name = 'Nitro count',address = pCar + 0x48A ,size = 1,min = 0,max = 15, default = 7.5,is_float = false})
                 fcommon.DropDownMenu("Set name",function()
 
@@ -1124,6 +1105,7 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
         function()
             if isCharInAnyCar(PLAYER_PED) then
                 local car = getCarCharIsUsing(PLAYER_PED)
+                local pveh = getCarPointer(car)
                 local model = getCarModel(car)
             
                 if imgui.Button("Reset color",imgui.ImVec2(fcommon.GetSize(2))) then
@@ -1146,14 +1128,15 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
 
                 imgui.Spacing()
                 imgui.Columns(2,nil,false)
+                fcommon.CheckBoxVar("Blinking neons",module.tvehicle.neon.pulsing)
                 fcommon.CheckBoxVar("Enable saving",module.tvehicle.paintjobs.enable_saving,"Save and load vehicle paint data.\nApplies for all vehicles of this model.",
                 function()
                     if module.tvehicle.paintjobs.enable_saving[0] then
                         ApplyColor(true)
                     end
                 end)
-                fcommon.CheckBoxVar("Material filter",module.tvehicle.apply_material_filter,"Filters material while applying color/ texture\nDisable if something doesn't work properly")
                 imgui.NextColumn()
+                fcommon.CheckBoxVar("Material filter",module.tvehicle.apply_material_filter,"Filters material while applying color/ texture\nDisable if something doesn't work properly")
                 fcommon.CheckBoxVar("Rainbow colors",module.tvehicle.rainbow_colors.bool,"Rainbow color effect on players vehicle",function()
                     fcommon.SingletonThread(module.RainbowColors,"RainbowColors")
                 end,
@@ -1177,7 +1160,7 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
                     if not isCharInAnyCar(PLAYER_PED) then
                         tcheatmenu.window.panel_func = nil
                     end
-                    fcommon.CheckBoxVar("Show all", module.tvehicle.color.show_all,"Show all carcol colors")
+                    fcommon.CheckBoxVar("Show all carcol colors", module.tvehicle.color.show_all)
                     imgui.Spacing()
                     
                     local name = casts.CModelInfo.GetNameFromModel(getCarModel(car))
@@ -1186,11 +1169,11 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
                     imgui.Text("Color:")
                     imgui.Spacing()
                     imgui.Columns(2,nil,false)
-                    imgui.RadioButtonIntPtr("Color 1", module.tvehicle.color.radio_btn, 1)
-                    imgui.RadioButtonIntPtr("Color 2", module.tvehicle.color.radio_btn, 2)
+                    imgui.RadioButtonIntPtr("Primary", module.tvehicle.color.radio_btn, 1)
+                    imgui.RadioButtonIntPtr("Secondary", module.tvehicle.color.radio_btn, 2)
                     imgui.NextColumn()
-                    imgui.RadioButtonIntPtr("Color 3", module.tvehicle.color.radio_btn, 3)
-                    imgui.RadioButtonIntPtr("Color 4", module.tvehicle.color.radio_btn, 4)
+                    imgui.RadioButtonIntPtr("Tertiary", module.tvehicle.color.radio_btn, 3)
+                    imgui.RadioButtonIntPtr("Quaternary", module.tvehicle.color.radio_btn, 4)
                     imgui.Spacing()
                     imgui.Columns(1)
                     imgui.Text("Select color preset:")
@@ -1244,16 +1227,39 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
                     end
                     
                 end)
+
                 imgui.Combo("Component",module.tvehicle.components.selected,module.tvehicle.components.list,#module.tvehicle.components.names)
                 
-                local paintjobs_count =  getNumAvailablePaintjobs(car)
-                
-                module.tvehicle.paintjobs.current_paintjob[0] = getCurrentVehiclePaintjob(car)
+                if fcommon.HorizontalSelector("Neons",module.tvehicle.neon.rb_value,{"None","Red","Green","Blue","White","Yellow","Cyan","Purple"}) then
+                    InstallNeon(car)
+                end
+                fcommon.ConfigPanel("Neons",function()
 
-                if paintjobs_count > 0 then
-                    if imgui.InputInt("Paintjob",module.tvehicle.paintjobs.current_paintjob) then
-                        if module.tvehicle.paintjobs.current_paintjob[0] >= -1 and module.tvehicle.paintjobs.current_paintjob[0] <= paintjobs_count then
+                    imgui.Text("Neon:")
+                    imgui.Spacing()
+                    local x,y = fcommon.GetSize()
+
+                    local btns_in_row = math.floor(imgui.GetWindowContentRegionWidth()/(y*2))
+                    local btn_size = (imgui.GetWindowContentRegionWidth() - imgui.StyleVar.ItemSpacing*(btns_in_row-0.75*btns_in_row))/btns_in_row
+
+                    fcommon.ListedColorButtons({"None","Red","Green","Blue","White","Yellow","Cyan","Purple"},
+                    {imgui.ImVec4(0,0,0,0),imgui.ImVec4(1,0,0,0.5),imgui.ImVec4(0,1,0,0.5),imgui.ImVec4(0,0,1,0.5),imgui.ImVec4(1,1,1,0.5),
+                    imgui.ImVec4(1,1,0,0.5),imgui.ImVec4(0,1,1,0.5),imgui.ImVec4(0.5,0,0.5,0.5)},
+                    function(k,v)
+                        InstallNeon(nil,k-2)
+                    end)
+                end)
+
+                if module.tvehicle.paintjobs.paintjobs_count > 0 then
+                    
+                    if fcommon.HorizontalSelector("Paintjob",module.tvehicle.paintjobs.current_paintjob,
+                    module.tvehicle.paintjobs.names) then
+                        if module.tvehicle.paintjobs.current_paintjob[0] >= -1 and module.tvehicle.paintjobs.current_paintjob[0] <= module.tvehicle.paintjobs.paintjobs_count then
                             giveVehiclePaintjob(car,module.tvehicle.paintjobs.current_paintjob[0])
+                            
+                            if module.tvehicle.paintjobs.enable_saving[0] then
+                                fconfig.Set(module.tvehicle.paintjobs.save_data,string.format("%d.paintjob",model),module.tvehicle.paintjobs.current_paintjob[0])
+                            end
                         end
                     end
                 end
