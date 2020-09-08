@@ -225,7 +225,7 @@ function(self) -- render frame
     if fmenu.tmenu.update_status == fconst.UPDATE_STATUS.NEW_UPDATE then
         imgui.Button("An updated version is available",imgui.ImVec2(fcommon.GetSize(1)))
         if imgui.Button("Download now",imgui.ImVec2(fcommon.GetSize(3))) then
-            DownloadUpdate()
+            fmenu.DownloadUpdate()
         end
         imgui.SameLine()
         if imgui.Button("Hide message",imgui.ImVec2(fcommon.GetSize(3))) then
