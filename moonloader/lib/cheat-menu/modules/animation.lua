@@ -150,8 +150,9 @@ function module.AnimationMain()
             end
         end,
         function()
-            fcommon.InputText("File",module.tanimation.ifp_name,"ped")
-            fcommon.InputText("Animation",module.tanimation.name,"cower")
+            
+            imgui.InputTextWithHint("File","ped",module.tanimation.ifp_name,ffi.sizeof(module.tanimation.ifp_name))
+            imgui.InputTextWithHint("Animation","cower",module.tanimation.name,ffi.sizeof(module.tanimation.ifp_name))
             imgui.Spacing()
             if imgui.Button("Add animation",imgui.ImVec2(fcommon.GetSize(1))) then
                 if ffi.string(module.tanimation.ifp_name) == "" then

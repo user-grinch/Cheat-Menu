@@ -17,7 +17,7 @@ module.CModelInfo =
     GetModelInfoFromName = ffi.cast("CBaseModelInfo(*)(const char *modelName, unsigned int pmodel_id_return)",0x4C5940),
     IsTrainModel = ffi.cast('bool(*)(int model)',0x4C5AD0),
     IsVehicleModel = ffi.cast('int(*)(int model)',0x4C5C80),
-    ms_modelInfoPtrs = ffi.cast("uintptr_t*", 0xA9B0C8)
+    ms_modelInfoPtrs = ffi.cast("uintptr_t*",readMemory(0x403DA4 + 3,4,false))-- 0xA9B0C8)
 }
 
 module.CVehicle = 

@@ -335,18 +335,6 @@ function module.ConfigPanel(label,func)
     end
 end
 
-function module.InputText(label,var,hint)
-    imgui.InputText(label,var,ffi.sizeof(var))
-
-    if hint ~= nil and ffi.string(var) == "" then
-        local min = imgui.GetItemRectMin()
-        local drawlist = imgui.GetWindowDrawList()
-        drawlist:AddText(imgui.ImVec2(min.x+imgui.GetStyle().ItemInnerSpacing.x,min.y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.TextDisabled),hint)
-    end
-
-    return imgui.IsItemActivated()
-end
-
 -- Calculates width of element(button) acoording to count
 function module.GetSize(count,no_spacing)
   

@@ -72,7 +72,7 @@ function module.MemoryMain()
             imgui.Columns(1)
             imgui.Spacing()
 
-            fcommon.InputText("Address", module.tmemory.address,"0x000000")
+            imgui.InputTextWithHint("Address","0x000000",module.tmemory.address,ffi.sizeof(module.tmemory.address))
             imgui.InputText("Offset", module.tmemory.offset,ffi.sizeof(module.tmemory.offset))
 
             imgui.SliderInt("Size", module.tmemory.size,1,4)
@@ -142,7 +142,7 @@ function module.MemoryMain()
             end
             
             imgui.InputInt("Value", module.tmemory.value)
-            fcommon.InputText("Address", module.tmemory.address,"0x000000")
+            imgui.InputTextWithHint("Address","0x000000",module.tmemory.address,ffi.sizeof(module.tmemory.address))
             imgui.InputText("Offset", module.tmemory.offset,ffi.sizeof(module.tmemory.offset))
             imgui.SliderInt("Size", module.tmemory.size,1,4)
 
@@ -226,8 +226,8 @@ function module.MemoryMain()
                 function(a) return a end,module.tmemory.list)
         end,
         function()
-            fcommon.InputText("Name",module.tmemory.name,"New address")
-            fcommon.InputText("Address", module.tmemory.address,"0x000000")
+            imgui.InputTextWithHint("Name","New address",module.tmemory.name,ffi.sizeof(module.tmemory.name))
+            imgui.InputTextWithHint("Address","0x000000",module.tmemory.address,ffi.sizeof(module.tmemory.address))
             imgui.SliderInt("Size", module.tmemory.size,1,4)
             imgui.Checkbox("Float",module.tmemory.is_float)
             imgui.Spacing()
