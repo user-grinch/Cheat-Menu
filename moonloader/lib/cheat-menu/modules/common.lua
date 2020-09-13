@@ -1054,7 +1054,14 @@ function module.BeginTabItem(label)
         _tabs[_tabs.current_bar].bar_data[#(_tabs[_tabs.current_bar].bar_data)+1] = label
     end
 
-    return _tabs[_tabs.current_bar].selected_tab == label
+
+    if _tabs[_tabs.current_bar].selected_tab == label then
+        if tcheatmenu.window.panel_func == nil then
+            return true
+        else
+            tcheatmenu.window.panel_func()
+        end
+    end
 end
 
 function DrawTabElements(draw_list,label)
