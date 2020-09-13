@@ -33,12 +33,12 @@ module.tmemory    =
 -- Main function
 function module.MemoryMain()
  
-    fcommon.OnHotKeyPress(tcheatmenu.hot_keys.mc_paste,function()
-        imgui.StrCopy(module.tmemory.address, imgui.GetClipboardText(),ffi.sizeof(module.tmemory.address))
-    end)
+    -- if isKeyDown(vkeys.VK_LCONTROL) and is isKeyDown(int keyId)
+    --     imgui.StrCopy(module.tmemory.address, imgui.GetClipboardText(),ffi.sizeof(module.tmemory.address))
+    -- end)
 
-    fcommon.Tabs("Memory",{"Read","Write","Search","Custom"},{
-        function()
+    if fcommon.BeginTabBar("MemoryBar") then
+        if fcommon.BeginTabItem("Read") then
             imgui.Text("Pointer")
             imgui.SameLine()
             imgui.RadioButtonIntPtr("None", module.tmemory.radio_button, 0)
@@ -112,8 +112,8 @@ function module.MemoryMain()
                 module.tmemory.radio_button[0] = 0
                 printHelpString("Entries cleared")
             end
-        end,
-        function()
+        end
+        if fcommon.BeginTabItem("Write") then
             imgui.Text("Pointer")
             imgui.SameLine()
             imgui.RadioButtonIntPtr("None", module.tmemory.radio_button, 0)
@@ -183,9 +183,8 @@ function module.MemoryMain()
                 module.tmemory.radio_button[0] = 0
                 printHelpString("Entries cleared")
             end
-        end,
-        function()
-
+        end
+        if fcommon.BeginTabItem("Search") then
             fcommon.DrawEntries(fconst.IDENTIFIER.MEMORY,fconst.DRAW_TYPE.TEXT,
                 function(address,size)
                     imgui.StrCopy(module.tmemory.address,address)
@@ -224,8 +223,8 @@ function module.MemoryMain()
                     end
                 end,
                 function(a) return a end,module.tmemory.list)
-        end,
-        function()
+        end
+        if fcommon.BeginTabItem("Custom") then
             imgui.InputTextWithHint("Name","New address",module.tmemory.name,ffi.sizeof(module.tmemory.name))
             imgui.InputTextWithHint("Address","0x000000",module.tmemory.address,ffi.sizeof(module.tmemory.address))
             imgui.SliderInt("Size", module.tmemory.size,1,4)
@@ -262,7 +261,8 @@ function module.MemoryMain()
                 end
                 
             end
-        end})
+        end
+    end
 end
 
 return module

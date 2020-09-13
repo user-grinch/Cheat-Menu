@@ -36,7 +36,7 @@ module.tmenu =
 		selected		= fconfig.Get('tmenu.font.selected',"Trebucbd.ttf"),
 		size  		    = imgui.new.int(fconfig.Get('tmenu.font.size',math.floor(resY/54.85))),
 	},
-	get_beta_updates	= imgui.new.bool(fconfig.Get('tmenu.get_beta_updates',string.find(script.this.version,"beta"))),
+	get_beta_updates	= imgui.new.bool(fconfig.Get('tmenu.get_beta_updates',true)),
 	lock_player   		= imgui.new.bool(fconfig.Get('tmenu.lock_player',false)),
 	overlay             = 
 	{
@@ -298,8 +298,8 @@ end
 
 function module.MenuMain()
 
-	fcommon.Tabs("Menu",{"Config","Overlay","Commands","Hotkeys","Styles","License","About"},{
-		function()
+	if fcommon.BeginTabBar('MenuBar') then
+		if fcommon.BeginTabItem('Config') then
 			if imgui.Button("Reset to default",imgui.ImVec2(fcommon.GetSize(2))) then
 				module.tmenu.crash_text = "Default configuration ~g~restored"
 				fconfig.tconfig.reset = true
@@ -311,7 +311,7 @@ function module.MenuMain()
 				thisScript():reload()
 			end
 			imgui.Spacing()
-			imgui.PushItemWidth((imgui.GetWindowWidth()-imgui.GetStyle().ItemSpacing.x) * 0.50)
+			imgui.PushItemWidth((imgui.GetWindowContentRegionWidth()-imgui.GetStyle().ItemSpacing.x) * 0.50)
 			fcommon.DropDownList("##Selectfont",fmenu.tmenu.font.list,"Font - " ..fmenu.tmenu.font.selected,
 			function(key,val)
 				imgui.GetIO().FontDefault = val
@@ -335,9 +335,8 @@ These updates might be unstable.")
 			fcommon.CheckBoxVar("Show crash message",module.tmenu.show_crash_message)
 			fcommon.CheckBoxVar("Show tooltips",module.tmenu.show_tooltips,"Shows usage tips beside options")
 			imgui.Columns(1)
-			
-		end,
-		function()
+		end
+		if fcommon.BeginTabItem('Overlay') then
 			imgui.Columns(2,nil,false)
 			fcommon.CheckBoxVar("Show coordinates",module.tmenu.overlay.coordinates)
 			fcommon.CheckBoxVar("Show FPS",module.tmenu.overlay.fps)	
@@ -351,8 +350,8 @@ These updates might be unstable.")
 			imgui.Spacing()
 			imgui.Combo("Position", module.tmenu.overlay.position_index,module.tmenu.overlay.position_array,#module.tmenu.overlay.position)
 			fcommon.InformationTooltip("You can also right click on the\noverlay to access these options")
-		end,
-		function()
+		end
+		if fcommon.BeginTabItem('Commands') then
 			module.tmenu.command.filter:Draw("Search")
 			fcommon.InformationTooltip(string.format("Open command window using %s\nand close using Enter",fcommon.GetHotKeyNames(tcheatmenu.hot_keys.command_window)))
 			imgui.Spacing()
@@ -373,34 +372,36 @@ These updates might be unstable.")
 				end
 				imgui.EndChild()
 			end
-		end,
-		function()
-			fcommon.HotKey(tcheatmenu.hot_keys.menu_open,"Open/ close cheat menu")
-			fcommon.HotKey(tcheatmenu.hot_keys.command_window,"Open command window")
-
-			imgui.Dummy(imgui.ImVec2(0,10))
-
-			fcommon.HotKey(tcheatmenu.hot_keys.asc_key,"Activate aim skin changer")
-			fcommon.HotKey(tcheatmenu.hot_keys.mc_paste,"Paste memory address")
-			fcommon.HotKey(tcheatmenu.hot_keys.quick_screenshot,"Take quick screenshot")
-			fcommon.HotKey(tcheatmenu.hot_keys.quick_teleport,"Toggle quick teleport")
-
-			imgui.Dummy(imgui.ImVec2(0,10))
+		end
+		if fcommon.BeginTabItem('Hotkeys') then
+			local x,y = fcommon.GetSize(3)
+			y = y/1.2
 			
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode,"Enable/ disable camera mode")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_forward,"Camera mode forward")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_backward,"Camera mode backward")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_left,"Camera mode left")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_right,"Camera mode right")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_slow,"Camera mode slower movement")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_fast,"Camera mode faster movement")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_up,"Camera mode up (lock on player)")
-			fcommon.HotKey(tcheatmenu.hot_keys.camera_mode_down,"Camera mode down (lock on player)")
+			fcommon.HotKey("Open/ close cheat menu",tcheatmenu.hot_keys.menu_open)
+			fcommon.HotKey("Open command window",tcheatmenu.hot_keys.command_window)
+
+			imgui.Dummy(imgui.ImVec2(0,10))
+
+			fcommon.HotKey("Activate aim skin changer",tcheatmenu.hot_keys.asc_key)
+			fcommon.HotKey("Take quick screenshot",tcheatmenu.hot_keys.quick_screenshot)
+			fcommon.HotKey("Toggle quick teleport",tcheatmenu.hot_keys.quick_teleport)
+
+			imgui.Dummy(imgui.ImVec2(0,10))
+
+			fcommon.HotKey("Enable/ disable camera mode",tcheatmenu.hot_keys.camera_mode)
+			fcommon.HotKey("Camera mode forward",tcheatmenu.hot_keys.camera_mode_forward)
+			fcommon.HotKey("Camera mode backward",tcheatmenu.hot_keys.camera_mode_backward)
+			fcommon.HotKey("Camera mode left",tcheatmenu.hot_keys.camera_mode_left)
+			fcommon.HotKey("Camera mode right",tcheatmenu.hot_keys.camera_mode_right)
+			fcommon.HotKey("Camera mode slower movement",tcheatmenu.hot_keys.camera_mode_slow)
+			fcommon.HotKey("Camera mode faster movement",tcheatmenu.hot_keys.camera_mode_fast)
+			fcommon.HotKey("Camera mode up (lock on player)",tcheatmenu.hot_keys.camera_mode_up)
+			fcommon.HotKey("Camera mode down (lock on player)",tcheatmenu.hot_keys.camera_mode_down)
 			imgui.Dummy(imgui.ImVec2(0,10))
 
 			imgui.TextWrapped("You can reset these config to default from 'Reset to default' button under 'Config' tab")
-		end,
-		function()
+		end
+		if fcommon.BeginTabItem('Styles') then
 			if fstyle.tstyle.status then
 				if imgui.Button("Delete style",imgui.ImVec2(fcommon.GetSize(2))) then
 					if fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1] == nil then
@@ -446,8 +447,9 @@ These updates might be unstable.")
 			imgui.InputText('##styleName', fstyle.tstyle.name, ffi.sizeof(fstyle.tstyle.name) - 1) 
 			imgui.SameLine()
 			local vec_size = imgui.GetItemRectSize()
-			vec_size.x = fcommon.GetSize(3)
-			if imgui.Button("Add new style",vec_size) then
+			local text = "Add style"
+			vec_size.x = imgui.CalcTextSize(text).x+10
+			if imgui.Button(text,vec_size) then
 				fstyle.saveStyles(imgui.GetStyle(), ffi.string(fstyle.tstyle.name))
 				fstyle.tstyle.list = fstyle.getStyles()
 				fstyle.tstyle.array = imgui.new['const char*'][#fstyle.tstyle.list](fstyle.tstyle.list)
@@ -467,10 +469,10 @@ These updates might be unstable.")
 					fstyle.tstyle.selected_name = fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1]
 				end
 				
-				fstyle.StyleEditor()
+			 	fstyle.StyleEditor()
 			end
-		end,
-		function()
+		end
+		if fcommon.BeginTabItem('License') then
 			imgui.TextWrapped("This program is free software: you can redistribute it and/or modify it under the terms of the \z
 			GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or \z
 			(at your option) any later version. \n\n\z
@@ -481,8 +483,8 @@ These updates might be unstable.")
 			You should have received a copy of the GNU General Public License along with this program. If not, see <http://www.gnu.org/licenses/>.\n\n\n\z
 
 			Copyright (C) 2019-2020 Grinch_ \n")
-		end,
-		function()
+		end
+		if fcommon.BeginTabItem('About') then
 			if imgui.Button("Check updates",imgui.ImVec2(fcommon.GetSize(3))) then
 				module.CheckUpdates()
 			end
@@ -496,7 +498,7 @@ These updates might be unstable.")
 			end
 			imgui.Spacing()
 
-			if imgui.BeginChild("About") then
+			if imgui.BeginChild("AboutChild") then
 
 				imgui.Columns(2,nil,false)
 				imgui.Text(string.format("%s v%s",script.this.name,script.this.version))
@@ -526,7 +528,7 @@ These updates might be unstable.")
 			end
 			imgui.Columns(1)
 		end
-	})
+	end
 end
 
 return module

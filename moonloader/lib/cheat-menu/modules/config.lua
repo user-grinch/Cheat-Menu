@@ -148,21 +148,22 @@ function module.Write()
             },
             tcheatmenu =
             {
-                tab_data = tcheatmenu.tab_data,
                 hot_keys = 
                 {
-                    asc_key                = tcheatmenu.hot_keys.asc_key,
-                    camera_mode            = tcheatmenu.hot_keys.camera_mode,
-                    camera_mode_forward    = tcheatmenu.hot_keys.camera_mode_forward,
-                    camera_mode_flip       = tcheatmenu.hot_keys.camera_mode_flip,
-                    camera_mode_backward   = tcheatmenu.hot_keys.camera_mode_backward,
-                    camera_mode_x_axis     = tcheatmenu.hot_keys.camera_mode_x_axis,
-                    camera_mode_y_axis     = tcheatmenu.hot_keys.camera_mode_y_axis,
-                    camera_mode_z_axis     = tcheatmenu.hot_keys.camera_mode_z_axis,
-                    command_window         = tcheatmenu.hot_keys.command_window,
-                    menu_open              = tcheatmenu.hot_keys.menu_open,
-                    quick_screenshot       = tcheatmenu.hot_keys.quick_screenshot,
-                    quick_teleport         = tcheatmenu.hot_keys.quick_teleport,
+                    asc_key                 = tcheatmenu.hot_keys.asc_key,
+                    camera_mode             = tcheatmenu.hot_keys.camera_mode,
+                    camera_mode_forward     = tcheatmenu.hot_keys.camera_mode_forward,
+                    camera_mode_backward    = tcheatmenu.hot_keys.camera_mode_backward,
+                    camera_mode_left        = tcheatmenu.hot_keys.camera_mode_left,
+                    camera_mode_right       = tcheatmenu.hot_keys.camera_mode_right,
+                    camera_mode_slow        = tcheatmenu.hot_keys.camera_mode_slow,
+                    camera_mode_fast        = tcheatmenu.hot_keys.camera_mode_fast,
+                    camera_mode_up          = tcheatmenu.hot_keys.camera_mode_up,
+                    camera_mode_down        = tcheatmenu.hot_keys.camera_mode_down,
+                    command_window          = tcheatmenu.hot_keys.command_window,
+                    menu_open               = tcheatmenu.hot_keys.menu_open,
+                    quick_screenshot        = tcheatmenu.hot_keys.quick_screenshot,
+                    quick_teleport          = tcheatmenu.hot_keys.quick_teleport,
                 },
                 window =
                 {
@@ -228,6 +229,7 @@ function module.Write()
                     selected	    = fmenu.tmenu.font.selected,
                     size  		    = fmenu.tmenu.font.size[0],
                 },
+                get_beta_updates    = fmenu.tmenu.get_beta_updates[0],
                 lock_player         = fmenu.tmenu.lock_player[0],
                 overlay = 
                 {           
@@ -316,6 +318,13 @@ function module.Write()
                     saturation   = fvehicle.tvehicle.rainbow_colors.saturation[0],
                     traffic      = fvehicle.tvehicle.rainbow_colors.traffic[0],
                     wait_time    = fvehicle.tvehicle.rainbow_colors.wait_time[0],
+                },
+                rainbow_neons    = 
+                {   bool         = fvehicle.tvehicle.rainbow_neons.bool[0],
+                    light        = fvehicle.tvehicle.rainbow_neons.light[0],
+                    saturation   = fvehicle.tvehicle.rainbow_neons.saturation[0],
+                    traffic      = fvehicle.tvehicle.rainbow_neons.traffic[0],
+                    wait_time    = fvehicle.tvehicle.rainbow_neons.wait_time[0],
                 },
                 spawn_inside     = fvehicle.tvehicle.spawn_inside[0],
                 speed            = fvehicle.tvehicle.speed[0],

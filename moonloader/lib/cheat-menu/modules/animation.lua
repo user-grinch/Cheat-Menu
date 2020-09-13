@@ -101,10 +101,8 @@ function module.AnimationMain()
     fcommon.CheckBoxVar("Secondary##Animation",module.tanimation.secondary)
     imgui.Columns(1)
 
-    imgui.Spacing() 
-    fcommon.Tabs("Animation",{"Search","Misc","Custom"},{
-        function()
-
+    if fcommon.BeginTabBar('Animation') then
+        if fcommon.BeginTabItem('Search') then
             fcommon.DrawEntries(fconst.IDENTIFIER.ANIMATION,fconst.DRAW_TYPE.TEXT,function(anim,file)
 				module.PlayAnimation(file,anim)
 			end,
@@ -124,9 +122,8 @@ function module.AnimationMain()
                     printHelpString("Animation ~r~removed")
                 end
             end,function(a) return a end,module.tanimation.list)
-
-        end,
-        function()
+        end
+        if fcommon.BeginTabItem('Misc') then
             if imgui.Combo("Fighting", module.tanimation.fighting.selected,module.tanimation.fighting.array,#module.tanimation.fighting.names) then
                 giveMeleeAttackToChar(PLAYER_PED,module.tanimation.fighting.selected[0]+4,6)
                 fcommon.CheatActivated()
@@ -148,9 +145,8 @@ function module.AnimationMain()
                 end
                 fcommon.CheatActivated()
             end
-        end,
-        function()
-            
+        end
+        if fcommon.BeginTabItem('Custom') then
             imgui.InputTextWithHint("File","ped",module.tanimation.ifp_name,ffi.sizeof(module.tanimation.ifp_name))
             imgui.InputTextWithHint("Animation","cower",module.tanimation.name,ffi.sizeof(module.tanimation.ifp_name))
             imgui.Spacing()
@@ -172,7 +168,7 @@ function module.AnimationMain()
                
             end
         end
-    })
+    end
 end
 
 return module

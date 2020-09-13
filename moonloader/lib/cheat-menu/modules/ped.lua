@@ -147,88 +147,88 @@ end
 
 function module.PedMain()
      
-        fcommon.Tabs("Ped",{"Checkboxes","Menus","Spawn"},{
+    if fcommon.BeginTabBar('PedBar') then
+        if fcommon.BeginTabItem('Checkboxes') then
+            imgui.Columns(2,nil,false)
+            fcommon.CheckBoxVar("Display target health",module.tped.ped_health_display,nil,
             function()
-                imgui.Columns(2,nil,false)
-                fcommon.CheckBoxVar("Display target health",module.tped.ped_health_display,nil,
-                function()
-                    fcommon.SingletonThread(module.PedHealthDisplay,"PedHealthDisplay")
-                end)
-                fcommon.CheckBoxValue("Elvis everywhere",0x969157)
-                fcommon.CheckBoxValue("Everyone is armed",0x969140)
-                fcommon.CheckBoxValue("Gangs control streets",0x96915B)
-                fcommon.CheckBoxValue("Gangs everywhere",0x96915A)
-                fcommon.CheckBoxVar("Gang wars",module.tped.gang.wars,nil,
-                function()
-                    setGangWarsActive(module.tped.gang.wars[0])
-                    if module.tped.gang.wars[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
-                end,
-                function()
-                    if imgui.Button("Start gang war",imgui.ImVec2(fcommon.GetSize(2))) then
-                        if GetLargestGangInZone() == 1 then
-                            callFunction(0x444300,0,0) -- defensive gang war
-                        else
-                            callFunction(0x446050,0,0) -- offensive gang war
-                        end
-                        setGangWarsActive(true)
-                    end   
-                    imgui.SameLine()
-                    if imgui.Button("End gang war",imgui.ImVec2(fcommon.GetSize(2))) then
-                        callFunction(0x4464C0,0,0)
-                        setGangWarsActive(true)
-                    end      
-                    
-                    imgui.Dummy(imgui.ImVec2(0,20))
-                    imgui.TextWrapped("Gang zone density:")
-                    imgui.Spacing()
-                    for title,id in pairs(module.tped.gang.names) do
-
-                        local x,y,z = getCharCoordinates(PLAYER_PED)
-        
-                        local density = imgui.new.int(getZoneGangStrength(getNameOfInfoZone(x,y,z),id))
-                        imgui.PushItemWidth(imgui.GetWindowWidth()/2)
-                        if imgui.SliderInt(title,density,0,255) then
-                            setZoneGangStrength(getNameOfInfoZone(x,y,z),id,density[0])
-                            clearSpecificZonesToTriggerGangWar()
-                        end
+                fcommon.SingletonThread(module.PedHealthDisplay,"PedHealthDisplay")
+            end)
+            fcommon.CheckBoxValue("Elvis everywhere",0x969157)
+            fcommon.CheckBoxValue("Everyone is armed",0x969140)
+            fcommon.CheckBoxValue("Gangs control streets",0x96915B)
+            fcommon.CheckBoxValue("Gangs everywhere",0x96915A)
+            fcommon.CheckBoxVar("Gang wars",module.tped.gang.wars,nil,
+            function()
+                setGangWarsActive(module.tped.gang.wars[0])
+                if module.tped.gang.wars[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
+            end,
+            function()
+                if imgui.Button("Start gang war",imgui.ImVec2(fcommon.GetSize(2))) then
+                    if GetLargestGangInZone() == 1 then
+                        callFunction(0x444300,0,0) -- defensive gang war
+                    else
+                        callFunction(0x446050,0,0) -- offensive gang war
                     end
-                    imgui.PopItemWidth()
-                    imgui.Dummy(imgui.ImVec2(0,20))
-                    if not module.tped.gang.is_exgangwars_installed then
-                        imgui.TextWrapped("You'll need ExGangWars plugin to display some turf colors")
-                        imgui.Spacing()
-                        if imgui.Button("Download ExGangWars",imgui.ImVec2(fcommon.GetSize(1))) then
-                            os.execute('explorer "https://gtaforums.com/topic/682194-extended-gang-wars/"')
-                        end
-                    end
-                end)
+                    setGangWarsActive(true)
+                end   
+                imgui.SameLine()
+                if imgui.Button("End gang war",imgui.ImVec2(fcommon.GetSize(2))) then
+                    callFunction(0x4464C0,0,0)
+                    setGangWarsActive(true)
+                end      
                 
-                imgui.NextColumn()
-
-                fcommon.CheckBoxValue("No road peds",0x8D2538,nil,0,25)
-                fcommon.CheckBoxValue("Peds mayhem",0x96913E)
-                fcommon.CheckBoxValue("Peds attack with rockets",0x969158)
-                fcommon.CheckBoxValue("Peds riot",0x969175)
-                fcommon.CheckBoxValue("Slut magnet",0x96915D)
-                
-                imgui.Columns(1)
+                imgui.Dummy(imgui.ImVec2(0,20))
+                imgui.TextWrapped("Gang zone density:")
                 imgui.Spacing()
-            end,
-            function()
-                fcommon.UpdateAddress({name = 'Pedestrian density multiplier',address = 0x8D2530,size = 4,min = 0,max = 10, default = 1,is_float = true})
-                fcommon.DropDownMenu("Recruit anyone",function()
-                    fcommon.RadioButtonAddress("Select Weapon",{"9mm","AK47","Rockets"},{0x96917C,0x96917D,0x96917E})
-                end)
-            end,
-            function()
-                if imgui.Button("Remove all spawned peds",imgui.ImVec2(fcommon.GetSize(1))) then
-                    module.RemoveAllSpawnedPeds()  
-                    printHelpString("All peds removed")        
+                for title,id in pairs(module.tped.gang.names) do
+
+                    local x,y,z = getCharCoordinates(PLAYER_PED)
+    
+                    local density = imgui.new.int(getZoneGangStrength(getNameOfInfoZone(x,y,z),id))
+                    imgui.PushItemWidth(imgui.GetWindowWidth()/2)
+                    if imgui.SliderInt(title,density,0,255) then
+                        setZoneGangStrength(getNameOfInfoZone(x,y,z),id,density[0])
+                        clearSpecificZonesToTriggerGangWar()
+                    end
                 end
-                
-                imgui.Dummy(imgui.ImVec2(0,10))                
-                fcommon.DrawEntries(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.IMAGE,module.SpawnPed,nil,module.GetModelName,module.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH)
+                imgui.PopItemWidth()
+                imgui.Dummy(imgui.ImVec2(0,20))
+                if not module.tped.gang.is_exgangwars_installed then
+                    imgui.TextWrapped("You'll need ExGangWars plugin to display some turf colors")
+                    imgui.Spacing()
+                    if imgui.Button("Download ExGangWars",imgui.ImVec2(fcommon.GetSize(1))) then
+                        os.execute('explorer "https://gtaforums.com/topic/682194-extended-gang-wars/"')
+                    end
+                end
+            end)
+            
+            imgui.NextColumn()
+
+            fcommon.CheckBoxValue("No road peds",0x8D2538,nil,0,25)
+            fcommon.CheckBoxValue("Peds mayhem",0x96913E)
+            fcommon.CheckBoxValue("Peds attack with rockets",0x969158)
+            fcommon.CheckBoxValue("Peds riot",0x969175)
+            fcommon.CheckBoxValue("Slut magnet",0x96915D)
+            
+            imgui.Columns(1)
+            imgui.Spacing()
+        end
+        if fcommon.BeginTabItem('Menus') then
+            fcommon.UpdateAddress({name = 'Pedestrian density multiplier',address = 0x8D2530,size = 4,min = 0,max = 10, default = 1,is_float = true})
+            fcommon.DropDownMenu("Recruit anyone",function()
+                fcommon.RadioButtonAddress("Select Weapon",{"9mm","AK47","Rockets"},{0x96917C,0x96917D,0x96917E})
+            end)
+        end
+        if fcommon.BeginTabItem('Spawn') then
+            if imgui.Button("Remove all spawned peds",imgui.ImVec2(fcommon.GetSize(1))) then
+                module.RemoveAllSpawnedPeds()  
+                printHelpString("All peds removed")        
             end
-        })
+            
+            imgui.Dummy(imgui.ImVec2(0,10))                
+            fcommon.DrawEntries(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.IMAGE,module.SpawnPed,nil,module.GetModelName,module.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH)
+        end
+    end
 end
 return module

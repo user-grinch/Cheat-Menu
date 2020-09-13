@@ -222,10 +222,9 @@ function module.PlayerMain()
     if imgui.Button("Suicide",imgui.ImVec2(fcommon.GetSize(2))) then
         setCharHealth(PLAYER_PED,0)
     end
-    imgui.Spacing()
 
-    fcommon.Tabs("Player",{"Checkboxes","Menus","Appearance"},{
-        function()
+    if fcommon.BeginTabBar("PlayerBar") then
+        if fcommon.BeginTabItem("Checkboxes") then
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("God mode",module.tplayer.god)
             fcommon.CheckBoxValue("Have bounty on head",0x96913F)
@@ -272,8 +271,8 @@ function module.PlayerMain()
             end)
            
             imgui.Columns(1)
-        end,
-        function()
+        end
+        if fcommon.BeginTabItem("Menus") then
             fcommon.UpdateAddress({name = "Armour",address = getCharPointer(PLAYER_PED)+0x548,size = 4,min = 0,default =0,max = 100, is_float = true})
             fcommon.DropDownMenu("Body",function()
                 if imgui.RadioButtonIntPtr("Fat",module.tplayer.cjBody,1) then
@@ -309,12 +308,12 @@ function module.PlayerMain()
             fcommon.UpdateStat({ name = "Stamina",stat = 22})
             
             WantedLevelMenu()
-        end,
-        function()
+        end
+        if fcommon.BeginTabItem("Appearance") then
             fcommon.CheckBoxVar("Aim skin changer", module.tplayer.aimSkinChanger,"Activate using, Aim ped +".. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.asc_key))
    
-            fcommon.Tabs("Appearance",{"Clothes","Ped skins","Custom skins"},{
-                function()
+            if fcommon.BeginTabBar('Appearance') then
+                if fcommon.BeginTabItem('Clothes') then
                     if getCharModel(PLAYER_PED) == 0 then
                         if imgui.Button("Remove clothes",imgui.ImVec2(fcommon.GetSize(1))) then
                             for i=0, 17 do givePlayerClothes(PLAYER_HANDLE,0,0,i) end
@@ -343,11 +342,11 @@ function module.PlayerMain()
                             end
                         end
                     end
-                end,
-                function()
+                end
+                if fcommon.BeginTabItem('Ped skins') then
                     fcommon.DrawEntries(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.IMAGE,module.ChangePlayerModel,nil,fped.GetModelName,fped.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH)
-                end,
-                function()
+                end
+                if fcommon.BeginTabItem('Custom skins') then
                     if module.tplayer.custom_skins.is_modloader_installed then
                         module.tplayer.custom_skins.filter:Draw("Search")
                         if module.tplayer.custom_skins.filter:PassFilter('') then
@@ -378,9 +377,9 @@ Note:\nFile names can't exceed 8 characters.\nDon't change names while the game 
                         imgui.TextWrapped("Modloader is not installed. Please install modloader.")
                     end
                 end
-            })
+            end
         end
-    })
+    end
 end
 
 return module

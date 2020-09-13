@@ -16,13 +16,12 @@
 
 local module = {}
 
--- Sorted pairs function
 function module.spairs(t, f)
     local a = {}
     for n in pairs(t) do table.insert(a, n) end
     table.sort(a, f)
-    local i = 0      -- iterator variable
-    local iter = function ()   -- iterator function
+    local i = 0    
+    local iter = function ()   
       i = i + 1
       if a[i] == nil then return nil
       else return a[i], t[a[i]]
@@ -160,156 +159,26 @@ function module.MoveFiles(main_dir,dest_dir)
     end
     lfs.rmdir(main_dir)
 end
---------------------------------------------------
--- imgui functions
-
-function module.HorizontalSelector(label,var,table)
-    local rtn = false
-    local drawlist = imgui.GetWindowDrawList()
-    local hframe = imgui.GetFrameHeight()
-    local width = imgui.GetWindowContentRegionWidth()*0.65 - 4*hframe - imgui.StyleVar.ItemInnerSpacing + 6
-
-    imgui.InvisibleButton("##1" .. label,imgui.ImVec2(width,hframe))
-    local min = imgui.GetItemRectMin()
-    local max = imgui.GetItemRectMax()
-    drawlist:AddRectFilled(min, max, imgui.GetColorU32(imgui.Col.FrameBg))
-    drawlist:AddText(imgui.ImVec2(min.x+imgui.GetStyle().ItemInnerSpacing.x,min.y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.Text),table[var[0]+2])
-
-    imgui.SameLine()
-
-    if imgui.Button("<##2" .. label,imgui.ImVec2(2*hframe,hframe)) then
-        rtn = -1
-
-        if var[0] > -1 then
-            var[0] = var[0] - 1
-        else 
-            var[0] = #table-2
-        end
-    end
-
-    imgui.SameLine()
-
-    if imgui.Button(">##2" .. label,imgui.ImVec2(2*hframe,hframe)) then
-        rtn = 1
-
-        if var[0] < (#table-2) then
-            var[0] = var[0] + 1
-        else
-            var[0] = -1
-        end
-    end
-
-    min = imgui.GetItemRectMin()
-    max = imgui.GetItemRectMax()
-    imgui.SameLine()
-    imgui.InvisibleButton("##4" ..label,imgui.ImVec2(imgui.CalcTextSize(label).x,hframe))
-    drawlist:AddText(imgui.ImVec2(max.x+imgui.GetStyle().ItemInnerSpacing.x,min.y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.Text),label)
-
-    return rtn
-end
-
-function module.HoveredColorButton(label,color_vec4,flags,size_vec2)
-    imgui.ColorButton(label,color_vec4,flags,size_vec2)
-    if imgui.IsItemHovered() then
-        local drawlist = imgui.GetWindowDrawList()
-        drawlist:AddRectFilled(imgui.GetItemRectMin(), imgui.GetItemRectMax(), imgui.GetColorU32(imgui.Col.ModalWindowDimBg))
-    end
-
-    return imgui.IsItemClicked()
-end
-
-function module.ListedColorButtons(tlabel,tcolor_vec,func)
-    local x,y = module.GetSize()
-    local btns_in_row = math.floor(imgui.GetWindowContentRegionWidth()/(y*2))
-    local btn_size = (imgui.GetWindowContentRegionWidth() - imgui.StyleVar.ItemSpacing*(btns_in_row-0.75*btns_in_row))/btns_in_row
-    local btn_count = 1
-
-    for k,v in ipairs(tlabel) do
-        if module.HoveredColorButton(tlabel[k],tcolor_vec[k],0,imgui.ImVec2(btn_size,btn_size)) then
-            func(k,v)
-        end
-        if btn_count % btns_in_row ~= 0 then
-            imgui.SameLine(0.0,4.0)
-        end
-        btn_count = btn_count + 1
-    end
-end
-
-function module.DropDownList(label,table,selected,func)
-    if imgui.BeginCombo(label, selected) then
-        for key,val in fcommon.spairs(table) do
-            if key ~= selected then
-                if imgui.MenuItemBool(key) and func ~= nil then
-                    func(key,val)
-                end
-            end
-        end
-        imgui.EndCombo()
-    end
-end
-
-function module.DropDownMenu(label,func,text_disabled)
-    if label ~= nil then
-        if text_disabled then
-            imgui.PushStyleColor(imgui.Col.Text,imgui.ImVec4(128,128,128,0.3))
-        end
-        if imgui.CollapsingHeader(label) then
-            if text_disabled then
-                imgui.PopStyleColor()
-            end
-            imgui.Spacing()
-
-            func()
-
-            imgui.Spacing()
-            imgui.Separator()
-            imgui.Spacing()
-        else
-            if text_disabled then
-                imgui.PopStyleColor()
-            end
-        end
-    else
-        func()
-
-        imgui.Spacing()
-        imgui.Separator()
-        imgui.Spacing()
-    end
-end
 
 function module.InformationTooltip(text)
-    if fmenu.tmenu.show_tooltips[0] and text ~= nil then
-        imgui.SameLine()
-        imgui.InvisibleButton("?##".. text,imgui.CalcTextSize("?"))
-        local drawlist = imgui.GetWindowDrawList()
-        drawlist:AddText(imgui.ImVec2(imgui.GetItemRectMin().x,imgui.GetItemRectMin().y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.TextDisabled),"?")
-        
-        if imgui.IsItemHovered() then
-            imgui.BeginTooltip()
-            imgui.SetTooltip(text)
-            imgui.EndTooltip()
+    if fmenu.tmenu.show_tooltips[0] then
+        if text ~= nil then
+            imgui.SameLine()
+            imgui.InvisibleButton("?##".. text,imgui.CalcTextSize("?"))
+            local drawlist = imgui.GetWindowDrawList()
+            drawlist:AddText(imgui.ImVec2(imgui.GetItemRectMin().x,imgui.GetItemRectMin().y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.TextDisabled),"?")
+            
+            if imgui.IsItemHovered() then
+                imgui.BeginTooltip()
+                imgui.SetTooltip(text)
+                imgui.EndTooltip()
+            end
         end
     end
 end
 
-function module.ComboBox(label,selected,table,func)
-    text = selected
-    
-    imgui.SetNextItemWidth(imgui.GetWindowContentRegionWidth()/2- imgui.StyleVar.ItemSpacing) 
-    if imgui.BeginCombo("##" .. label,imgui.new.char[64](text)) then
-        for k,v in ipairs(table) do
-            imgui.Selectable(v) 
-            if imgui.IsItemClicked(0) then
-                selected = v
-                if func ~= nil then
-                    func(k,v)
-                end
-            end
-        end
-        imgui.EndCombo()
-    end
-end
+--------------------------------------------------
+-- imgui functions
 
 -- Config panel
 function module.ConfigPanel(label,func)
@@ -324,7 +193,7 @@ function module.ConfigPanel(label,func)
             tcheatmenu.window.panel_func = function()
                 imgui.TextWrapped(string.format("%s configuraion",label))
                 imgui.Separator()
-                if imgui.Button("Hide",imgui.ImVec2(fcommon.GetSize(1))) then
+                if imgui.Button("Hide",imgui.ImVec2(module.GetSize(1))) then
                     tcheatmenu.window.panel_func = nil
                 end
                 
@@ -357,62 +226,6 @@ function module.GetSize(count,no_spacing)
     return x,imgui.GetFrameHeight()*1.3
 end
 
-function module.Tabs(label,names,func)
-
-    if tcheatmenu.tab_data[label] == nil then
-        tcheatmenu.tab_data[label] = 1
-    end
-
-    imgui.Spacing()
-
-    local square_sz = imgui.GetFrameHeight()*0.9
-    local drawlist = imgui.GetWindowDrawList()
-    local btn_color = nil
-
-    if imgui.BeginChild(label,imgui.ImVec2(tcheatmenu.window.size.X-imgui.GetStyle().WindowPadding.x*2,square_sz)) then
-        for i=1,#names,1 do
-            if tcheatmenu.tab_data[label] == i then
-                btn_color = imgui.GetColorU32(imgui.Col.TabActive)
-            else
-                btn_color = imgui.GetColorU32(imgui.Col.Tab)
-            end
-      
-            if imgui.InvisibleButton("##InvisibleButton".. names[i], imgui.ImVec2(imgui.CalcTextSize(names[i]).x+10,square_sz)) then
-                tcheatmenu.tab_data[label] = i
-            end
-            if imgui.IsItemHovered() then
-                btn_color = imgui.GetColorU32(imgui.Col.TabHovered)
-            end
-
-            drawlist:AddRectFilled(imgui.GetItemRectMin(), imgui.GetItemRectMax(), btn_color)
-            local offset_x = (imgui.GetItemRectSize().x - imgui.CalcTextSize(names[i]).x)/2
-            local offset_y = (imgui.GetItemRectSize().y - imgui.CalcTextSize(names[i]).y)/2
-            
-            drawlist:AddText(imgui.ImVec2(imgui.GetItemRectMin().x+offset_x,imgui.GetItemRectMin().y+offset_y), imgui.GetColorU32(imgui.Col.Text),names[i])
-            imgui.SameLine()
-        end
-        
-        local minx  = imgui.GetWindowPos().x
-        local maxy  = imgui.GetItemRectMax().y
-        drawlist:AddLine(imgui.ImVec2(minx-5,maxy), imgui.ImVec2(minx+tcheatmenu.window.size.X,maxy), imgui.GetColorU32(imgui.Col.TabActive))
-        fcommon.InformationTooltip("If your window width is small you\ncan scroll by Shift + Mouse wheel")
-
-        imgui.EndChild()
-    end
-    if func[tcheatmenu.tab_data[label]] ~= nil then
-        imgui.Spacing()
-           
-        if imgui.BeginChild("") then
-            if tcheatmenu.window.panel_func == nil then
-                func[tcheatmenu.tab_data[label]]()
-            else
-                tcheatmenu.window.panel_func()
-            end
-            imgui.EndChild()
-        end
-    end
-end
-
 function module.CRGBAColorPicker(label,base_addr,default_col,save)
     save = save or true
     local CRGBA = imgui.new.float[4](memory.read(base_addr,1)/255,memory.read(base_addr+1,1)/255,memory.read(base_addr+2,1)/255,memory.read(base_addr+3,1)/255)
@@ -431,7 +244,7 @@ function module.CRGBAColorPicker(label,base_addr,default_col,save)
             end
         end
         imgui.Spacing()
-        if imgui.Button("Reset to default",imgui.ImVec2(fcommon.GetSize(1))) then
+        if imgui.Button("Reset to default",imgui.ImVec2(module.GetSize(1))) then
             memory.write(base_addr,default_col[1],1)
             memory.write(base_addr+1,default_col[2],1)
             memory.write(base_addr+2,default_col[3],1)
@@ -475,7 +288,6 @@ function module.GetLocationInfo(x,y,z)
 end
 
 
--- Creates top level menus
 function module.CreateMenus(names,funcs)
 
     imgui.PushStyleVarVec2(imgui.StyleVar.ItemSpacing,imgui.ImVec2(0,0.5))
@@ -685,7 +497,7 @@ end
 
 function module.RadioButtonAddressEx(label,label_table,values,memory,save)
     if save == nil then save = true end
-    module.DropDownMenu(label,function()
+    fcommon.DropDownMenu(label,function()
         local button = imgui.new.int(module.RwMemory(memory,1))
 
         local btn_in_column = math.floor(#label_table/2)
@@ -757,7 +569,7 @@ end
 
 
 function module.CallFuncButtons(label,table)
-    local sizeX = fcommon.GetSize(3)
+    local sizeX = module.GetSize(3)
     local sizeY = imgui.GetWindowHeight()/10
 
     fcommon.DropDownMenu(label,function()
@@ -838,67 +650,10 @@ function module.CheckBoxFunc(name,var,func,tooltip,panel_func)
 
 end
 
-
-function RenderCheckMark(drawlist, pos, col, sz)
-
-    local thickness = sz / 5.0
-    thickness = thickness < 1.0 and 1.0 or thickness
-
-    sz = sz - thickness * 0.5
-    pos.x = pos.x + thickness * 0.25
-    pos.y = pos.y + thickness * 0.25
-
-    local third = sz / 3.0
-    local bx = pos.x + third
-    local by = pos.y + sz - third * 0.5
-
-    drawlist:PathLineTo(imgui.ImVec2(bx - third, by - third))
-    drawlist:PathLineTo(imgui.ImVec2(bx, by))
-    drawlist:PathLineTo(imgui.ImVec2(bx + third * 2.0, by - third * 2.0))
-    drawlist:PathStroke(col, false, thickness)
-end
-
-function module.CheckBox3(label,var)
-    local square_sz = imgui.GetFrameHeight()
-    local drawlist = imgui.GetWindowDrawList()
-    local color = imgui.GetColorU32(imgui.Col.FrameBg)
-    local text_size = imgui.CalcTextSize(label)
-
-    if imgui.InvisibleButton("##InvCheckboxBtn" .. label, imgui.ImVec2(square_sz+text_size.x+imgui.GetStyle().ItemInnerSpacing.x,square_sz)) then
-        var[0] = var[0] - 1
-        var[0] = var[0] < -1 and 1 or var[0]
-    end
-
-    if imgui.IsItemClicked(1) then
-        var[0] = var[0] + 1
-        var[0] = var[0] > 1 and -1 or var[0]
-    end
-
-    if imgui.IsItemHovered() then
-        color = imgui.GetColorU32(imgui.Col.FrameBgHovered)
-    end
-    
-    local min = imgui.GetItemRectMin()
-    local max = imgui.ImVec2(imgui.GetItemRectMax().x-text_size.x-imgui.GetStyle().ItemInnerSpacing.x,imgui.GetItemRectMax().y)
-    drawlist:AddRectFilled(min, max, color)
-    local pad = math.floor(square_sz / 6.0)
-    pad = pad < 1.0 and 1.0 or pad 
-
-    if var[0] == fconst.CHECKBOX_STATE.NOT_CONFIGURED then
-        drawlist:AddRectFilled(imgui.ImVec2(min.x+3,min.y+3), imgui.ImVec2(max.x-3,max.y-3), imgui.GetColorU32(imgui.Col.CheckMark))
-    end
-    if var[0] == fconst.CHECKBOX_STATE.ON then
-        RenderCheckMark(drawlist, imgui.ImVec2(min.x+pad,min.y+pad), imgui.GetColorU32(imgui.Col.CheckMark), square_sz - pad * 2.0)
-    end
-
-    drawlist:AddText(imgui.ImVec2(max.x+imgui.GetStyle().ItemInnerSpacing.x,min.y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.Text),label)
-    return imgui.IsItemClicked(0)
-end
-
 function module.CheckBox3Var(name,var,tooltip,func,panel_func,show_help_msg)
     show_help_msg = show_help_msg or true
 
-    if module.CheckBox3(name, var) then
+    if fcommon.CheckBox3(name, var) then
         if func ~= nil then
             func()
         end
@@ -957,7 +712,7 @@ function module.UpdateStat(arg)
     if arg.default == nil then arg.default = 0 end
     if arg.max == nil then arg.max = 1000 end
 
-    module.DropDownMenu(arg.name,function()
+    fcommon.DropDownMenu(arg.name,function()
 
         if arg.help_text ~= nil then
             fcommon.InformationTooltip(arg.help_text)
@@ -985,17 +740,17 @@ function module.UpdateStat(arg)
         imgui.PopItemWidth()
 
         imgui.Spacing()
-        if imgui.Button("Minimum##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Minimum##".. arg.name,imgui.ImVec2(module.GetSize(3))) then
             setFloatStat(arg.stat,arg.min)
             fconfig.Set(fconfig.tconfig.stat_data,tostring(arg.stat),arg.min)
         end
         imgui.SameLine()
-        if imgui.Button("Default##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Default##".. arg.name,imgui.ImVec2(module.GetSize(3))) then
             setFloatStat(arg.stat,arg.default)
             fconfig.Set(fconfig.tconfig.stat_data,tostring(arg.stat),arg.default)
         end
         imgui.SameLine()
-        if imgui.Button("Maximum##".. arg.name,imgui.ImVec2(fcommon.GetSize(3))) then
+        if imgui.Button("Maximum##".. arg.name,imgui.ImVec2(module.GetSize(3))) then
             setFloatStat(arg.stat,arg.max)
             fconfig.Set(fconfig.tconfig.stat_data,tostring(arg.stat),arg.max)
         end
@@ -1030,7 +785,7 @@ function module.UpdateAddress(arg)
         buttons = buttons - 1
     end
 
-    module.DropDownMenu(arg.name,function()
+    fcommon.DropDownMenu(arg.name,function()
 
         local value = imgui.new.float(module.RwMemory(arg.address,arg.size,nil,nil,arg.is_float,arg.mul))
         
@@ -1070,7 +825,7 @@ function module.UpdateAddress(arg)
         imgui.Text("Set")
         if buttons > 0 then
             imgui.Spacing()
-            if imgui.Button("Minimum##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
+            if imgui.Button("Minimum##".. arg.name,imgui.ImVec2(module.GetSize(buttons))) then
                 module.RwMemory(arg.address,arg.size,arg.min,nil,arg.is_float,arg.mul)
                 if arg.save then
                     fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",arg.address),{arg.size,arg.min,arg.is_float,arg.mul})
@@ -1079,7 +834,7 @@ function module.UpdateAddress(arg)
 
             if arg.default ~= nil then
                 imgui.SameLine()
-                if imgui.Button("Default##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
+                if imgui.Button("Default##".. arg.name,imgui.ImVec2(module.GetSize(buttons))) then
                     module.RwMemory(arg.address,arg.size,arg.default,nil,arg.is_float,arg.mul)
                     if arg.save then
                         fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",arg.address),{arg.size,arg.default,arg.is_float,arg.mul})
@@ -1089,7 +844,7 @@ function module.UpdateAddress(arg)
 
             if arg.max ~= nil then
                 imgui.SameLine()
-                if imgui.Button("Maximum##".. arg.name,imgui.ImVec2(fcommon.GetSize(buttons))) then
+                if imgui.Button("Maximum##".. arg.name,imgui.ImVec2(module.GetSize(buttons))) then
                     module.RwMemory(arg.address,arg.size,arg.max,nil,arg.is_float,arg.mul)
                     if arg.save then
                         fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",arg.address),{arg.size,arg.max,arg.is_float,arg.mul})
@@ -1122,7 +877,7 @@ function module.UpdateBits(label,name_table,address,size)
     local bits = size*8
     local val = readMemory(address,size,false)
     local number = 1
-    module.DropDownMenu(label,function()
+    fcommon.DropDownMenu(label,function()
         imgui.Columns(2,nil,false)
         for i=1,bits,1 do
 
@@ -1146,90 +901,6 @@ function module.UpdateBits(label,name_table,address,size)
         end
         imgui.Columns(1)
     end)
-end
-
-function module.GetHotKeyNames(hot_key)
-
-    if hot_key[1] == hot_key[2] then
-        return string.format(" %s",vkeys.id_to_name(hot_key[1]))
-    else
-        return string.format(" %s + %s",vkeys.id_to_name(hot_key[1]),vkeys.id_to_name(hot_key[2]))
-    end
-
-end
-
-function module.OnHotKeyPress(hotkey,func)
-    if isKeyDown(hotkey[1]) and isKeyDown(hotkey[2]) and tcheatmenu.hot_keys.currently_active ~= hotkey then
-        fcommon.KeyWait(hotkey[1],hotkey[2])
-        func()
-    end
-end
-
-function module.HotKey(index,info_text)
-    local active = false
-    local x,y  = fcommon.GetSize(3)
-    
-    if index == tcheatmenu.hot_keys.currently_active then
-        imgui.PushStyleColor(imgui.Col.Button,imgui.GetStyle().Colors[imgui.Col.ButtonActive])
-        active = true
-    end
-
-    if index[1] == index[2] then
-        text = vkeys.id_to_name(index[1])
-    else
-        text = vkeys.id_to_name(index[1]) .. " + " .. vkeys.id_to_name(index[2])
-    end
-
-    if imgui.Button(text,imgui.ImVec2(x,y/1.2)) then
-        if tcheatmenu.hot_keys.currently_active == index then
-            tcheatmenu.read_key_press = false
-            tcheatmenu.hot_keys.currently_active = {}
-        else
-            tcheatmenu.hot_keys.currently_active = index
-            tcheatmenu.read_key_press = true
-            module.SingletonThread(module.ReadKeyPress,"ReadKeyPress")
-        end
-    end
-
-    if active then
-        imgui.PopStyleColor()
-    end  
-
-    if not imgui.IsWindowFocused() or not imgui.IsItemVisible() then
-        tcheatmenu.hot_keys.currently_active = {}
-    end
-
-
-    imgui.SameLine()
-
-    imgui.Text(info_text)
-end
-
-
-function module.ReadKeyPress()
-    while tcheatmenu.read_key_press do
-
-        for i=32,255,1 do
-            if isKeyDown(i) then
-                tcheatmenu.hot_keys.currently_active[1] = i
-                break
-            end
-        end
-
-        for i=255,32,-1 do
-            if isKeyDown(i) then
-                tcheatmenu.hot_keys.currently_active[2] = i
-                break
-            end
-        end
-        
-        if tcheatmenu.hot_keys.currently_active[1] ~= tcheatmenu.hot_keys.currently_active[2] then
-            while isKeyDown(tcheatmenu.hot_keys.currently_active[1]) or isKeyDown(tcheatmenu.hot_keys.currently_active[2]) do
-                wait(0)
-            end
-        end
-        wait(0)
-    end
 end
 
 --------------------------------------------------
@@ -1314,5 +985,354 @@ function module.KeyWait(key1,key2)
     end
 end
 --------------------------------------------------
+
+
+--------------------------------------------------
+-- Custom imgui widgets
+--------------------------------------------------
+-- Scrollable Tabs Implementation
+
+local _tabs = 
+{
+    current_bar = nil,
+}
+
+function module.BeginTabBar(label)
+
+    if _tabs[label] == nil then 
+        _tabs[label] = 
+        {
+            bar_data = {},
+            selected_tab = "",
+        }
+    end
+    _tabs.current_bar = label
+    
+    local draw_list = imgui.GetWindowDrawList(),
+
+    imgui.Spacing()
+    if #_tabs[label].bar_data > 0 then
+        imgui.BeginChild(label,imgui.ImVec2(imgui.GetWindowWidth()-imgui.GetStyle().WindowPadding.x*2,imgui.GetFrameHeight()*0.9))
+
+        imgui.PushStyleVarVec2(imgui.StyleVar.ItemSpacing, imgui.ImVec2(4.0))
+        for k,v in ipairs(_tabs[label].bar_data) do
+            DrawTabElements(draw_list,v)
+        end
+        imgui.PopStyleVar()
+        
+        local minx  = imgui.GetWindowPos().x
+        local maxy  = imgui.GetItemRectMax().y
+        draw_list:AddLine(imgui.ImVec2(minx-5,maxy), imgui.ImVec2(minx+imgui.GetWindowWidth()+3,maxy), imgui.GetColorU32(imgui.Col.TabActive))
+
+        imgui.InvisibleButton("?##InfoTooltip",imgui.CalcTextSize("?"))
+        draw_list:AddText(imgui.ImVec2(imgui.GetItemRectMin().x,imgui.GetItemRectMin().y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.TextDisabled),"?")
+        
+        if imgui.IsItemHovered() then
+            imgui.BeginTooltip()
+            imgui.SetTooltip("If your window width is small you\ncan scroll by Shift + Mouse wheel")
+            imgui.EndTooltip()
+        end
+        imgui.EndChild()
+        imgui.Spacing()
+    end
+
+    return true
+end
+
+function module.BeginTabItem(label)
+
+    if _tabs.current_bar == nil then return false end
+
+    local exists = false
+    
+    for k,v in ipairs(_tabs[_tabs.current_bar].bar_data) do
+        if v == label then
+            exists = true
+        end
+    end
+    if not exists then
+        _tabs[_tabs.current_bar].bar_data[#(_tabs[_tabs.current_bar].bar_data)+1] = label
+    end
+
+    return _tabs[_tabs.current_bar].selected_tab == label
+end
+
+function DrawTabElements(draw_list,label)
+        
+    if _tabs[_tabs.current_bar].selected_tab == "" then _tabs[_tabs.current_bar].selected_tab = label end
+
+    if _tabs[_tabs.current_bar].selected_tab == label then
+        btn_color = imgui.GetColorU32(imgui.Col.TabActive)
+    else
+        btn_color = imgui.GetColorU32(imgui.Col.Tab)
+    end
+
+    if imgui.InvisibleButton("##InvisibleButton".. label, imgui.ImVec2(imgui.CalcTextSize(label).x+10,imgui.GetFrameHeight()*0.9)) then
+        _tabs[_tabs.current_bar].selected_tab = label
+    end
+    if imgui.IsItemHovered() then
+        btn_color = imgui.GetColorU32(imgui.Col.TabHovered)
+    end
+
+    draw_list:AddRectFilled(imgui.GetItemRectMin(), imgui.GetItemRectMax(), btn_color)
+    local offset_x = (imgui.GetItemRectSize().x - imgui.CalcTextSize(label).x)/2
+    local offset_y = (imgui.GetItemRectSize().y - imgui.CalcTextSize(label).y)/2
+    
+    draw_list:AddText(imgui.ImVec2(imgui.GetItemRectMin().x+offset_x,imgui.GetItemRectMin().y+offset_y), imgui.GetColorU32(imgui.Col.Text),label)
+    imgui.SameLine()
+    
+end
+
+function module.EndTabItem(label) end 
+function module.EndTabBar(label) 
+    _tabs.current_bar = nil
+end
+
+--------------------------------------------------
+-- Hotkey Implementation
+
+local _hotkeys = 
+{
+    currently_active = nil,
+}
+
+function module.GetHotKeyNames(hotkeys)
+
+    if hotkeys[1] == hotkeys[2] then
+        return string.format(" %s",vkeys.id_to_name(hotkeys[1]))
+    else
+        return string.format(" %s + %s",vkeys.id_to_name(hotkeys[1]),vkeys.id_to_name(hotkeys[2]))
+    end
+
+end
+
+function module.OnHotKeyPress(hotkeys,func)
+    if isKeyDown(hotkeys[1]) and isKeyDown(hotkeys[2]) and _hotkeys.currently_active ~= hotkeys then
+        while isKeyDown(hotkeys[1]) and isKeyDown(hotkeys[2]) do
+            wait(0)
+        end
+        func()
+    end
+end
+
+
+function ReadKeyPress()
+    while _hotkeys.read_key_press do
+
+        for i=32,255,1 do
+            if isKeyDown(i) then
+                _hotkeys.currently_active[1] = i
+                break
+            end
+        end
+
+        for i=255,32,-1 do
+            if isKeyDown(i) then
+                _hotkeys.currently_active[2] = i
+                break
+            end
+        end
+        
+        if _hotkeys.currently_active[1] ~= _hotkeys.currently_active[2] then
+            while isKeyDown(_hotkeys.currently_active[1]) or isKeyDown(_hotkeys.currently_active[2]) do
+                wait(0)
+            end
+        end
+        wait(0)
+    end
+end
+
+function module.HotKey(label,hotkeys)
+    local active = false
+    local x,y = module.GetSize(3)
+    y = y/1.2
+    
+    if hotkeys == _hotkeys.currently_active then
+        imgui.PushStyleColor(imgui.Col.Button,imgui.GetStyle().Colors[imgui.Col.ButtonActive])
+        active = true
+    end
+
+    if hotkeys[1] == hotkeys[2] then
+        text = vkeys.id_to_name(hotkeys[1])
+    else
+        text = vkeys.id_to_name(hotkeys[1]) .. " + " .. vkeys.id_to_name(hotkeys[2])
+    end
+
+    if imgui.Button(text,imgui.ImVec2(x,y)) then
+        if _hotkeys.currently_active == hotkeys then
+            _hotkeys.read_key_press = false
+            _hotkeys.currently_active = {}
+        else
+            _hotkeys.currently_active = hotkeys
+            _hotkeys.read_key_press = true
+            lua_thread.create(ReadKeyPress)
+        end
+    end
+
+    if active then
+        imgui.PopStyleColor()
+    end  
+
+    if not imgui.IsWindowFocused() or not imgui.IsItemVisible() then
+        _hotkeys.currently_active = {}
+    end
+
+
+    imgui.SameLine()
+
+    imgui.Text(label)
+end
+--------------------------------------------------
+-- Misc
+
+function module.HorizontalSelector(label,var,table)
+    local rtn = false
+    local drawlist = imgui.GetWindowDrawList()
+    local hframe = imgui.GetFrameHeight()
+    local inner_spacing = imgui.GetStyle().ItemInnerSpacing.x
+    local width = imgui.GetWindowContentRegionWidth()*0.65 - 4*hframe - inner_spacing + 6
+
+    imgui.InvisibleButton("##1" .. label,imgui.ImVec2(width,hframe))
+    local min = imgui.GetItemRectMin()
+    local max = imgui.GetItemRectMax()
+    drawlist:AddRectFilled(min, max, imgui.GetColorU32(imgui.Col.FrameBg))
+    drawlist:AddText(imgui.ImVec2(min.x+inner_spacing,min.y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.Text),table[var[0]+2])
+
+    
+    imgui.SameLine(0,inner_spacing)
+
+    if imgui.Button("<##2" .. label,imgui.ImVec2(2*hframe,hframe)) then
+        rtn = -1
+
+        if var[0] > -1 then
+            var[0] = var[0] - 1
+        else 
+            var[0] = #table-2
+        end
+    end
+
+    imgui.SameLine(0,inner_spacing)
+
+    if imgui.Button(">##2" .. label,imgui.ImVec2(2*hframe,hframe)) then
+        rtn = 1
+
+        if var[0] < (#table-2) then
+            var[0] = var[0] + 1
+        else
+            var[0] = -1
+        end
+    end
+
+    min = imgui.GetItemRectMin()
+    max = imgui.GetItemRectMax()
+    imgui.SameLine()
+    imgui.InvisibleButton("##4" ..label,imgui.ImVec2(imgui.CalcTextSize(label).x,hframe))
+    drawlist:AddText(imgui.ImVec2(max.x+imgui.GetStyle().ItemInnerSpacing.x,min.y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.Text),label)
+
+    return rtn
+end
+
+function module.DropDownList(label,table,selected,func)
+    if imgui.BeginCombo(label, selected) then
+        for key,val in module.spairs(table) do
+            if key ~= selected then
+                if imgui.MenuItemBool(key) and func ~= nil then
+                    func(key,val)
+                end
+            end
+        end
+        imgui.EndCombo()
+    end
+end
+
+function module.DropDownMenu(label,func,text_disabled)
+    if label ~= nil then
+        if text_disabled then
+            imgui.PushStyleColor(imgui.Col.Text,imgui.ImVec4(128,128,128,0.3))
+        end
+        if imgui.CollapsingHeader(label) then
+            if text_disabled then
+                imgui.PopStyleColor()
+            end
+            imgui.Spacing()
+
+            func()
+
+            imgui.Spacing()
+            imgui.Separator()
+            imgui.Spacing()
+        else
+            if text_disabled then
+                imgui.PopStyleColor()
+            end
+        end
+    else
+        func()
+
+        imgui.Spacing()
+        imgui.Separator()
+        imgui.Spacing()
+    end
+end
+
+function RenderCheckMark(drawlist, pos, col, sz)
+
+    local thickness = sz / 5.0
+    thickness = thickness < 1.0 and 1.0 or thickness
+
+    sz = sz - thickness * 0.5
+    pos.x = pos.x + thickness * 0.25
+    pos.y = pos.y + thickness * 0.25
+
+    local third = sz / 3.0
+    local bx = pos.x + third
+    local by = pos.y + sz - third * 0.5
+
+    drawlist:PathLineTo(imgui.ImVec2(bx - third, by - third))
+    drawlist:PathLineTo(imgui.ImVec2(bx, by))
+    drawlist:PathLineTo(imgui.ImVec2(bx + third * 2.0, by - third * 2.0))
+    drawlist:PathStroke(col, false, thickness)
+end
+
+-- 3 state checkbox, 1 = enabled, 0 = disabled, -1 = not configured
+function module.CheckBox3(label,var)
+    local square_sz = imgui.GetFrameHeight()
+    local drawlist = imgui.GetWindowDrawList()
+    local color = imgui.GetColorU32(imgui.Col.FrameBg)
+    local text_size = imgui.CalcTextSize(label)
+
+    if imgui.InvisibleButton("##InvCheckboxBtn" .. label, imgui.ImVec2(square_sz+text_size.x+imgui.GetStyle().ItemInnerSpacing.x,square_sz)) then
+        var[0] = var[0] - 1
+        var[0] = var[0] < -1 and 1 or var[0]
+    end
+
+    if imgui.IsItemClicked(1) then
+        var[0] = var[0] + 1
+        var[0] = var[0] > 1 and -1 or var[0]
+    end
+
+    if imgui.IsItemHovered() then
+        color = imgui.GetColorU32(imgui.Col.FrameBgHovered)
+    end
+    
+    local min = imgui.GetItemRectMin()
+    local max = imgui.ImVec2(imgui.GetItemRectMax().x-text_size.x-imgui.GetStyle().ItemInnerSpacing.x,imgui.GetItemRectMax().y)
+    drawlist:AddRectFilled(min, max, color)
+    local pad = math.floor(square_sz / 6.0)
+    pad = pad < 1.0 and 1.0 or pad 
+
+    if var[0] == -1 then
+        drawlist:AddRectFilled(imgui.ImVec2(min.x+3,min.y+3), imgui.ImVec2(max.x-3,max.y-3), imgui.GetColorU32(imgui.Col.CheckMark))
+    end
+    if var[0] == 1 then
+        RenderCheckMark(drawlist, imgui.ImVec2(min.x+pad,min.y+pad), imgui.GetColorU32(imgui.Col.CheckMark), square_sz - pad * 2.0)
+    end
+
+    drawlist:AddText(imgui.ImVec2(max.x+imgui.GetStyle().ItemInnerSpacing.x,min.y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.Text),label)
+    return imgui.IsItemClicked(0)
+end
+
+--------------------------------------------------
+
 
 return module

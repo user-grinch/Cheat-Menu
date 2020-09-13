@@ -236,8 +236,8 @@ function module.WeaponMain()
         end
     end
 
-    fcommon.Tabs("Weapons",{"Checkboxes","Menus","Spawn"},{
-        function()
+    if fcommon.BeginTabBar('Weapons') then
+        if fcommon.BeginTabItem('Checkboxes') then
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Auto aim",module.tweapon.auto_aim,"Enables aim assist on keyboard\n\nQ = left    E = right",
             function()
@@ -282,9 +282,8 @@ function module.WeaponMain()
                 end
             end)
             imgui.Columns(1)
-        end,
-        function()
-            
+        end
+        if fcommon.BeginTabItem('Menus') then
             fcommon.DropDownMenu("Gang weapon editor",function()
                 if imgui.Combo("Gang", fped.tped.gang.index,fped.tped.gang.array,#fped.tped.gang.list) then
                     module.tweapon.gang.weapon1[0] = module.tweapon.gang.used_weapons[fped.tped.gang.index[0]+1][1]
@@ -321,8 +320,8 @@ function module.WeaponMain()
                 end
             end)
             fcommon.CallFuncButtons("Weapon presets", {["Set1"] = 0x4385B0,["Set2"] = 0x438890,["Set3"] = 0x438B30})
-        end,
-        function()
+        end
+        if fcommon.BeginTabItem('Spawn') then
             fcommon.CheckBoxVar("Ped",module.tweapon.ped,"Give weapon to ped. Aim with a gun to select")
             imgui.SameLine()
             imgui.Spacing()
@@ -337,6 +336,6 @@ function module.WeaponMain()
             fcommon.DrawEntries(fconst.IDENTIFIER.WEAPON,fconst.DRAW_TYPE.IMAGE,module.GiveWeapon,nil,module.GetModelName,module.tweapon.images,fconst.WEAPON.IMAGE_HEIGHT,fconst.WEAPON.IMAGE_WIDTH)
 
         end
-    })  
+    end
 end
 return module

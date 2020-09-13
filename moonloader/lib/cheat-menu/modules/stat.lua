@@ -27,8 +27,8 @@ module.tstat      =
 -- Main function
 function module.StatMain()
     
-    fcommon.Tabs("Stats",{"Vehicle","Weapon","Girlfriend","Search"},{
-        function()
+    if fcommon.BeginTabBar('Stats') then
+        if fcommon.BeginTabItem('Vehicle') then
             if imgui.Button("Max vehicle stats",imgui.ImVec2(fcommon.GetSize(1))) then
                 callFunction(0x4399D0,1,1)
                 fcommon.CheatActivated()
@@ -37,9 +37,9 @@ function module.StatMain()
             fcommon.UpdateStat({ name = "Bike",stat = 229})
             fcommon.UpdateStat({ name = "Cycling",stat = 230})
             fcommon.UpdateStat({ name = "Driving",stat = 160})
-            fcommon.UpdateStat({ name = "Flying",stat = 223})  
-        end,
-        function()
+            fcommon.UpdateStat({ name = "Flying",stat = 223}) 
+        end
+        if fcommon.BeginTabItem('Weapon') then
             if imgui.Button("Max weapon stats",imgui.ImVec2(fcommon.GetSize(1))) then
                 callFunction(0x439940,1,1)
                 fcommon.CheatActivated()
@@ -57,8 +57,8 @@ function module.StatMain()
             fcommon.UpdateStat({ name = "Silenced pistol",stat = 70})
             fcommon.UpdateStat({ name = "SMG",stat = 76})
             fcommon.UpdateStat({ name = "Rifle",stat = 79})
-        end,
-        function()
+        end
+        if fcommon.BeginTabItem('Girlfriend') then
             if imgui.Button("Max girlfriend stats",imgui.ImVec2(fcommon.GetSize(1))) then
                 for i=252,257,1 do
                     setFloatStat(i,100)
@@ -73,8 +73,8 @@ function module.StatMain()
             fcommon.UpdateStat({ name = "Katie",stat = 256,max = 100})
             fcommon.UpdateStat({ name = "Michelle",stat = 253,max = 100})
             fcommon.UpdateStat({ name = "Millie",stat = 257,max = 100})
-        end,
-        function()
+        end
+        if fcommon.BeginTabItem('Search') then
             module.tstat.filter:Draw("Search")
             imgui.Spacing()
 
@@ -90,7 +90,7 @@ function module.StatMain()
                 imgui.EndChild()
             end
         end
-    })
+    end
 end
 
 return module
