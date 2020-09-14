@@ -1193,7 +1193,7 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
                     imgui.SliderInt("Wait time",module.tvehicle.rainbow_colors.wait_time,0,1000)
                 end)
                 fcommon.CheckBoxVar("Rainbow neons",module.tvehicle.rainbow_neons.bool,"Rainbow neon effect on players vehicle",function()
-                    fcommon.SingletonThread(module.RainbowColors,"RainbowColors")
+                    fcommon.SingletonThread(module.RainbowNeons,"RainbowNeons")
                 end,
                 function()
                     fcommon.CheckBoxVar("Apply for traffic",module.tvehicle.rainbow_neons.traffic,"Rainbow neon effect on traffic vehicles",
