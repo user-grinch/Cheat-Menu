@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.1-beta")
-script_version_number(2020091403) -- YYYYMMDDNN
+script_version_number(2020092001) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -332,8 +332,8 @@ function()
     local pos = overlay.position_index[0]
 
     if pos > 0 then
-        x = (pos == 1 or pos == 3) and overlay.offset[0] or io.DisplaySize.x - overlay.offset[0]
-        y = (pos == 1 or pos == 2) and overlay.offset[0] or io.DisplaySize.y - overlay.offset[0]
+        x = (pos == 1 or pos == 3) and 10 or io.DisplaySize.x - 10
+        y = (pos == 1 or pos == 2) and 10 or io.DisplaySize.y - 10
         local window_pos_pivot = imgui.ImVec2((pos == 1 or pos == 3) and 0 or 1, (pos == 1 or pos == 2) and 0 or 1)
         imgui.SetNextWindowPos(imgui.ImVec2(x, y), imgui.Cond.Always, window_pos_pivot)
     end
@@ -380,11 +380,12 @@ function()
     imgui.PopStyleVar(2)
 
     --------------------------------------------------
-    -- Overlay right click menu
+    -- Overlay right click context menu
     if imgui.BeginPopupContextWindow() then
+        
         imgui.Text("Position")
         imgui.Separator()
-
+        
         if imgui.MenuItemBool("Custom",nil,fmenu.tmenu.overlay.position_index[0] == 0) then 
             fmenu.tmenu.overlay.position_index[0] = 0 
         end
@@ -411,12 +412,11 @@ function()
     end
 
     --------------------------------------------------
-    -- Update overlay position variables so they can updated later
+    -- Update overlay position variables
     if pos == 0 then
         fmenu.tmenu.overlay.pos_x[0] = imgui.GetWindowPos().x
         fmenu.tmenu.overlay.pos_y[0] = imgui.GetWindowPos().y
     end
-
     --------------------------------------------------
 
     imgui.End()
@@ -464,10 +464,15 @@ function main()
 
     --------------------------------------------------
     -- Functions that need to lunch only once at startup
+    
     if isSampLoaded() then
         fgame.tgame.script_manager.skip_auto_reload = true
         print("SAMP detected, unloading script.")
         thisScript():unload()
+    end
+
+    if tcheatmenu.current_menu == 0 and not string.find(script.this.version,"beta") then -- first startup
+        fmenu.tmenu.get_beta_updates[0] = false
     end
 
     math.randomseed(getGameTimer())
@@ -478,15 +483,33 @@ function main()
 
     fplayer.CustomSkinsSetup()
 
-    for x=1,10,1 do          
-        setGangWeapons(x-1,fweapon.tweapon.gang.used_weapons[x][1],fweapon.tweapon.gang.used_weapons[x][2],fweapon.tweapon.gang.used_weapons[x][3])
+    if fplayer.tplayer.enable_saving[0] then
+        if fplayer.tplayer.save_data["player_skin"] ~= nil then
+            fplayer.ChangePlayerModel(tostring(fplayer.tplayer.save_data["player_skin"]),true)
+        else
+            for i=0, 18 do
+                local name = fplayer.tplayer.save_data["clothes"][tostring(i)] 
+                if name ~= nil then
+                    if name == "none" then
+                        givePlayerClothes(PLAYER_HANDLE,0,0,i) 
+                        buildPlayerModel(PLAYER_HANDLE)
+                    else
+                        fplayer.ChangePlayerCloth(name,true)
+                    end
+                end
+            end
+        end
     end
 
-    if fplayer.tplayer.invisible[0] then
-        fplayer.tplayer.model_val = readMemory((getCharPointer(PLAYER_PED)+1140),4,false)
-        writeMemory(getCharPointer(PLAYER_PED)+1140,4,2,false)
+    if fweapon.tweapon.gang.enable_weapon_editor[0] then
+        local weapons = fweapon.tweapon.gang.used_weapons
+        for x=1,10,1 do          
+            setGangWeapons(x-1,weapons[x][1],weapons[x][2],weapons[x][3])
+        end
     end
 
+    fplayer.SetPlayerInvisible(fplayer.tplayer.invisible[0])
+    
     if fgame.tgame.freeze_mission_timer[0] then
         freezeOnscreenTimer(true)
     end
@@ -577,6 +600,7 @@ function main()
 
     ------------------------------------------------
 
+    local prev_weapon = nil
     while true do
 
         --------------------------------------------------
@@ -584,31 +608,36 @@ function main()
 
         --------------------------------------------------
         -- Weapons
-        local pPed = getCharPointer(PLAYER_PED)
         local CurWeapon = getCurrentCharWeapon(PLAYER_PED)
-        local skill = callMethod(0x5E3B60,pPed,1,0,CurWeapon)
-        local pWeaponInfo = callFunction(0x743C60,2,2,CurWeapon,skill)
 
-        if fweapon.tweapon.huge_damage[0] then
-            writeMemory(pWeaponInfo+0x22,2,1000,false)
-        end
-        if fweapon.tweapon.long_range[0] then
-            memory.setfloat(pWeaponInfo+0x04,1000.0)
-            memory.setfloat(pWeaponInfo+0x08,1000.0)
-        end
-        if fweapon.tweapon.max_accuracy[0] then
-            memory.setfloat(pWeaponInfo+0x38,1.0)
-        end
-        if fweapon.tweapon.max_ammo_clip[0] then
-            writeMemory(pWeaponInfo+0x20,2,9999,false)
-        end
-        if fweapon.tweapon.max_move_speed[0] then
-            memory.setfloat(pWeaponInfo+0x3C,1.0)
+        if prev_weapon ~= CurWeapon then
+            local pPed = getCharPointer(PLAYER_PED)
+            prev_weapon = CurWeapon
+
+            local skill = callMethod(0x5E3B60,pPed,1,0,CurWeapon)
+            local pWeaponInfo = callFunction(0x743C60,2,2,CurWeapon,skill)
+
+            if fweapon.tweapon.huge_damage[0] then
+                writeMemory(pWeaponInfo+0x22,2,1000,false)
+            end
+            if fweapon.tweapon.long_range[0] then
+                memory.setfloat(pWeaponInfo+0x04,1000.0)
+                memory.setfloat(pWeaponInfo+0x08,1000.0)
+            end
+            if fweapon.tweapon.max_accuracy[0] then
+                memory.setfloat(pWeaponInfo+0x38,1.0)
+            end
+            if fweapon.tweapon.max_ammo_clip[0] then
+                writeMemory(pWeaponInfo+0x20,2,9999,false)
+            end
+            if fweapon.tweapon.max_move_speed[0] then
+                memory.setfloat(pWeaponInfo+0x3C,1.0)
+            end
         end
         --------------------------------------------------
 
         if fanimation.tanimation.ped[0] == true or fweapon.tweapon.ped[0] == true then
-            bool, ped = getCharPlayerIsTargeting(PLAYER_HANDLE)
+            local bool, ped = getCharPlayerIsTargeting(PLAYER_HANDLE)
             if bool == true then
                 fped.tped.selected = ped
             end
@@ -632,36 +661,33 @@ function main()
         end)
 
         -- Quick screenshot
-        fcommon.OnHotKeyPress(tcheatmenu.hot_keys.quick_screenshot,function()
-            if fgame.tgame.ss_shortcut[0] then
+        if fgame.tgame.ss_shortcut[0] then
+            fcommon.OnHotKeyPress(tcheatmenu.hot_keys.quick_screenshot,function()
                 takePhoto(true)
                 printHelpString("Screenshot ~g~taken")
-            end
-        end)
+            end)
+        end
 
         -- Qucik teleport
-        fcommon.OnHotKeyPress(tcheatmenu.hot_keys.quick_teleport,function()
-            if fteleport.tteleport.shortcut[0] then
+        if fteleport.tteleport.shortcut[0] then
+            fcommon.OnHotKeyPress(tcheatmenu.hot_keys.quick_teleport,function()
                 fteleport.Teleport()
-            end
-        end)
+            end)
+        end
         
         -- God mode
         setCharProofs(PLAYER_PED,fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0])
 
         -- Aim skin changer
-        
-        fcommon.OnHotKeyPress(tcheatmenu.hot_keys.asc_key,function()
-            
-            if fplayer.tplayer.aimSkinChanger[0] then
-                
+        if fplayer.tplayer.aimSkinChanger[0] then
+            fcommon.OnHotKeyPress(tcheatmenu.hot_keys.asc_key,function()
                 local bool,char = getCharPlayerIsTargeting(PLAYER_HANDLE)
                 if bool == true then
                     local model = getCharModel(char)
                     fplayer.ChangePlayerModel(tostring(model))
                 end
-            end
-        end)
+            end)
+        end
 
         --  Vehicle functions
         if isCharInAnyCar(PLAYER_PED) then

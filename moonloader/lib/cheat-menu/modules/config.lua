@@ -263,9 +263,11 @@ function module.Write()
             {
                 aimSkinChanger      = fplayer.tplayer.aimSkinChanger[0],
                 cjBody              = fplayer.tplayer.cjBody[0],
+                enable_saving           = fplayer.tplayer.enable_saving[0],
                 god                 = fplayer.tplayer.god[0],
                 invisible           = fplayer.tplayer.invisible[0],
                 keep_position       = fplayer.tplayer.keep_position[0],
+                save_data           = fplayer.tplayer.save_data,
             },
             tteleport =
             {
@@ -314,17 +316,13 @@ function module.Write()
                 },
                 rainbow_colors    = 
                 {   bool         = fvehicle.tvehicle.rainbow_colors.bool[0],
-                    light        = fvehicle.tvehicle.rainbow_colors.light[0],
-                    saturation   = fvehicle.tvehicle.rainbow_colors.saturation[0],
                     traffic      = fvehicle.tvehicle.rainbow_colors.traffic[0],
-                    wait_time    = fvehicle.tvehicle.rainbow_colors.wait_time[0],
+                    speed       = fvehicle.tvehicle.rainbow_colors.speed[0],
                 },
                 rainbow_neons    = 
                 {   bool         = fvehicle.tvehicle.rainbow_neons.bool[0],
-                    light        = fvehicle.tvehicle.rainbow_neons.light[0],
-                    saturation   = fvehicle.tvehicle.rainbow_neons.saturation[0],
                     traffic      = fvehicle.tvehicle.rainbow_neons.traffic[0],
-                    wait_time    = fvehicle.tvehicle.rainbow_neons.wait_time[0],
+                    speed    = fvehicle.tvehicle.rainbow_neons.speed[0],
                 },
                 spawn_inside     = fvehicle.tvehicle.spawn_inside[0],
                 speed            = fvehicle.tvehicle.speed[0],
@@ -343,6 +341,10 @@ function module.Write()
             {
                 auto_aim          = fweapon.tweapon.auto_aim[0],
                 ammo_count         = fweapon.tweapon.ammo_count[0],
+                gang               = 
+                {
+                    enable_weapon_editor = fweapon.tweapon.gang.enable_weapon_editor[0],
+                },
                 fast_reload       = fweapon.tweapon.fast_reload[0],
                 max_accuracy      = fweapon.tweapon.max_accuracy[0], 
                 max_ammo_clip     = fweapon.tweapon.max_ammo_clip[0], 

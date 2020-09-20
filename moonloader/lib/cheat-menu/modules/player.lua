@@ -32,6 +32,8 @@ module.tplayer =
         names           = {},
         path            = string.format("%s\\modloader\\Custom Skins",getGameDirectory())
     },
+    enable_saving       = imgui.new.bool(fconfig.Get('tplayer.enable_saving',false)),
+    save_data           = fconfig.Get('tplayer.save_data',{["clothes"] = {}}),
     god                 = imgui.new.bool(fconfig.Get('tplayer.god',false)),
     health_regeneration = {
         bool            = imgui.new.bool(fconfig.Get('tplayer.health_regeneration.bool',false)),
@@ -40,7 +42,6 @@ module.tplayer =
     },
     invisible           = imgui.new.bool(fconfig.Get('tplayer.invisible',false)),
     keep_position       = imgui.new.bool(fconfig.Get('tplayer.keep_position',false)),
-    model_val           = nil,
     never_wanted        = imgui.new.bool(false),
 }
 
@@ -71,8 +72,26 @@ function module.KeepPosition()
     end
 end
 
-function module.ChangePlayerModel(model)
+function module.SetPlayerInvisible(bool)
+    local pplayer = getCharPointer(PLAYER_PED)
+    
+    if pplayer == nil then return end
+    if bool then
+        casts.CEntity.SetRwObjectAlpha(pplayer,0)
+    else
+        casts.CEntity.SetRwObjectAlpha(pplayer,255)
+    end
+end
 
+function SetRwObjectAlpha(handle, alpha)
+    local pedEn = getCharPointer(handle)
+    if pedEn ~= 0 then
+        ffi.cast("void (__thiscall *)(int, int)", 0x5332C0)(pedEn, alpha)
+    end
+end
+
+function module.ChangePlayerModel(model,dont_show_msg)
+    dont_show_msg = dont_show_msg or false
     local modeldff = (model .. ".dff")
 
     if fped.tped.names[model] ~= nil or fplayer.tplayer.custom_skins.names[modeldff] ~= nil then
@@ -83,6 +102,10 @@ function module.ChangePlayerModel(model)
                 loadAllModelsNow()
                 setPlayerModel(PLAYER_HANDLE,model)
                 markModelAsNoLongerNeeded(model)
+                
+                if module.tplayer.enable_saving[0] then 
+                    module.tplayer.save_data["player_skin"] = model
+                end
             end
         else
             if fped.tped.special[model] ~= nil then
@@ -92,6 +115,11 @@ function module.ChangePlayerModel(model)
             loadSpecialCharacter(model,1)
             loadAllModelsNow()
             setPlayerModel(PLAYER_HANDLE,290)
+            
+            if module.tplayer.enable_saving[0] then 
+                module.tplayer.save_data["player_skin"] = model
+            end
+            
             unloadSpecialCharacter(290)
         end
         
@@ -105,7 +133,10 @@ function module.ChangePlayerModel(model)
             taskWarpCharIntoCarAsDriver(PLAYER_PED,hveh)
             setCarForwardSpeed(hveh,speed)
         end
-        printHelpString("~g~Skin~w~ changed")
+
+        if not dont_show_msg then
+            printHelpString("~g~Skin~w~ changed")
+        end
     end
 end
 
@@ -167,7 +198,8 @@ end
 --------------------------------------------------
 -- Cloth functions
 
-function module.ChangePlayerCloth(name)
+function module.ChangePlayerCloth(name,dont_show_msg)
+    dont_show_msg = dont_show_msg or false
     local body_part, model, texture = name:match("([^$]+)$([^$]+)$([^$]+)")
     
     setPlayerModel(PLAYER_HANDLE,0)
@@ -183,9 +215,16 @@ function module.ChangePlayerCloth(name)
             givePlayerClothesOutsideShop(PLAYER_HANDLE,texture,model,body_part)
         end
     end
+
+    if module.tplayer.enable_saving[0] then
+        module.tplayer.save_data["clothes"][body_part] = name
+    end
+
     buildPlayerModel(PLAYER_HANDLE) 
 
-    printHelpString("Clothes changed")
+    if not dont_show_msg then
+        printHelpString("Clothes changed")
+    end
     
     local veh = nil
     local speed = 0
@@ -203,6 +242,11 @@ end
 function module.RemoveThisCloth(name)
     if imgui.MenuItemBool("Remove cloth") then 
         local body_part, model, texture = name:match("([^$]+)$([^$]+)$([^$]+)")
+
+        if module.tplayer.enable_saving[0] then
+            module.tplayer.save_data["clothes"][body_part] = "none"
+        end
+
         givePlayerClothes(PLAYER_HANDLE,0,0,body_part)
         buildPlayerModel(PLAYER_HANDLE)
         printHelpString("Cloth ~r~removed")
@@ -237,16 +281,9 @@ function module.PlayerMain()
             fcommon.CheckBoxValue("Higher cycle jumps",0x969161)
             fcommon.CheckBoxValue("Infinite oxygen",0x96916E)
             fcommon.CheckBoxValue("Infinite run",0xB7CEE4)
-            fcommon.CheckBoxVar("Invisible player",module.tplayer.invisible,"Player can't enter/exit vehicle",
+            fcommon.CheckBoxVar("Invisible player",module.tplayer.invisible,nil,
             function()
-                if module.tplayer.invisible[0] then
-                    module.tplayer.model_val = readMemory((getCharPointer(PLAYER_PED)+1140),4,false)
-                    writeMemory(getCharPointer(PLAYER_PED)+1140,4,2,false)
-                    fcommon.CheatActivated()
-                else
-                    writeMemory((getCharPointer(PLAYER_PED)+1140),4,fplayer.tplayer.model_val,false)
-                    fcommon.CheatDeactivated()
-                end
+                module.SetPlayerInvisible(module.tplayer.invisible[0])
             end)
             imgui.NextColumn()
             fcommon.CheckBoxVar("Keep position",module.tplayer.keep_position,"Auto teleport to the position you died from",
@@ -310,13 +347,21 @@ function module.PlayerMain()
             WantedLevelMenu()
         end
         if fcommon.BeginTabItem("Appearance") then
+            imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Aim skin changer", module.tplayer.aimSkinChanger,"Activate using, Aim ped +".. fcommon.GetHotKeyNames(tcheatmenu.hot_keys.asc_key))
-   
+            imgui.NextColumn()
+            fcommon.CheckBoxVar("Enable saving", module.tplayer.enable_saving,"Save & load clothes & ped skins.\n(Clothes only work with CJ skin)")
+            imgui.Columns(1)
             if fcommon.BeginTabBar('Appearance') then
                 if fcommon.BeginTabItem('Clothes') then
                     if getCharModel(PLAYER_PED) == 0 then
                         if imgui.Button("Remove clothes",imgui.ImVec2(fcommon.GetSize(1))) then
-                            for i=0, 17 do givePlayerClothes(PLAYER_HANDLE,0,0,i) end
+                            for i=0, 18 do 
+                                givePlayerClothes(PLAYER_HANDLE,0,0,i) 
+                                if module.tplayer.enable_saving[0] then
+                                    module.tplayer.save_data["clothes"][tostring(i)] = "none"
+                                end
+                            end
                             buildPlayerModel(PLAYER_HANDLE)
                             printHelpString("Clothes ~r~removed")
                         end
@@ -327,6 +372,11 @@ function module.PlayerMain()
                         imgui.TextWrapped("You need to be in CJ skin to change clothes.")
                         imgui.Spacing()
                         if imgui.Button("Change to CJ skin",imgui.ImVec2(fcommon.GetSize(1))) then
+
+                            if module.tplayer.enable_saving[0] then
+                                module.tplayer.save_data["player_skin"] = nil
+                            end
+                            
                             setPlayerModel(PLAYER_HANDLE,0)
 
                             local veh = nil
@@ -364,6 +414,7 @@ Note:\nFile names can't exceed 8 characters.\nDon't change names while the game 
                                     model_name = string.sub(model_name,1,-5)
                                     if #model_name < 9 and imgui.MenuItemBool(model_name) then
                                         fplayer.ChangePlayerModel(model_name)
+                                        print(model_name)
                                     end
                                 end
                             end

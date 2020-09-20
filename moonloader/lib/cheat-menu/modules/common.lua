@@ -569,14 +569,12 @@ end
 
 
 function module.CallFuncButtons(label,table)
-    local sizeX = module.GetSize(3)
-    local sizeY = imgui.GetWindowHeight()/10
 
     fcommon.DropDownMenu(label,function()
         
         local count = 1
         for name,address in fcommon.spairs(table) do
-            if imgui.Button(name,imgui.ImVec2(sizeX,sizeY)) then
+            if imgui.Button(name,imgui.ImVec2(module.GetSize(3))) then
                 callFunction(address,0,0)
                 fcommon.CheatActivated()
             end

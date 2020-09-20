@@ -44,7 +44,6 @@ module.tmenu =
 		fps             = imgui.new.bool(fconfig.Get('tmenu.overlay.fps',false)),
 		show            = imgui.new.bool(true),
 		location    	= imgui.new.bool(fconfig.Get('tmenu.overlay.location',false)),
-		offset          = imgui.new.int(10),
     	position        = {"Custom","Top Left","Top Right","Bottom Left","Bottom Right"},
     	position_array  = {},
 		position_index  = imgui.new.int(fconfig.Get('tmenu.overlay.position_index',4)),

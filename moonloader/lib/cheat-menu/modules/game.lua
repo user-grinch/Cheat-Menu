@@ -540,7 +540,7 @@ function ShowLoadedScript(script,index)
 
         tcheatmenu.hot_keys.script_manager_temp = module.tgame.script_manager.scripts[file_name] or  tcheatmenu.hot_keys.script_manager_temp
 
-        fcommon.HotKey(tcheatmenu.hot_keys.script_manager_temp,"Load on keypress hotkey",fcommon.GetSize(3))
+        fcommon.HotKey("Load on keypress hotkey",tcheatmenu.hot_keys.script_manager_temp,fcommon.GetSize(3))
         imgui.Spacing()
         
         if imgui.Button("Never load##" .. index,imgui.ImVec2(fcommon.GetSize(2))) then
