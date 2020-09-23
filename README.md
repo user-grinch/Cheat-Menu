@@ -40,15 +40,15 @@ A portuguese translation of the menu is [here](https://github.com/Dowglass/Cheat
 Now try it out in-game. If it doesn't work open an issue here or create a post in one of the topics above with 'moonloader.log'.
 
 ## Images
-![](https://user-grinch.github.io/assets\img\mods\cheat-menu\teleport.gif)
-![](https://user-grinch.github.io/assets\img\mods\cheat-menu\player.gif)
-![](https://user-grinch.github.io/assets\img\mods\cheat-menu\ped.gif)
-![](https://user-grinch.github.io/assets\img\mods\cheat-menu\animation.gif)
-![](https://user-grinch.github.io/assets\img\mods\cheat-menu\vehicle.gif)
-![](https://user-grinch.github.io/assets\img\mods\cheat-menu\weapon.gif)
-![](https://user-grinch.github.io/assets\img\mods\cheat-menu\game.gif)
-![](https://user-grinch.github.io/assets\img\mods\cheat-menu\visual.gif)
-![](https://user-grinch.github.io/assets\img\mods\cheat-menu\menu.gif)
+![1](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/teleport.gif)
+![2](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/player.gif)
+![3](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/ped.gif)
+![4](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/animation.gif)
+![5](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/vehicle.gif)
+![6](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/weapon.gif)
+![7](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/game.gif)
+![8](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/visual.gif)
+![9](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/menu.gif)
 
 ## Docs 
 
