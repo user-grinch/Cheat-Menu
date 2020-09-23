@@ -200,6 +200,7 @@ function module.TeleportMain()
 				end
 			end
 		end
+		fcommon.EndTabBar()
 	end
 end
 

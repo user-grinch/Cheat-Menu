@@ -527,6 +527,7 @@ These updates might be unstable.")
 			end
 			imgui.Columns(1)
 		end
+		fcommon.EndTabBar()
 	end
 end
 

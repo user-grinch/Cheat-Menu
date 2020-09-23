@@ -345,6 +345,7 @@ function module.WeaponMain()
             fcommon.DrawEntries(fconst.IDENTIFIER.WEAPON,fconst.DRAW_TYPE.IMAGE,module.GiveWeapon,nil,module.GetModelName,module.tweapon.images,fconst.WEAPON.IMAGE_HEIGHT,fconst.WEAPON.IMAGE_WIDTH)
 
         end
+        fcommon.EndTabBar()
     end
 end
 return module

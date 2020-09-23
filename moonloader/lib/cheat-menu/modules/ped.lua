@@ -229,6 +229,7 @@ function module.PedMain()
             imgui.Dummy(imgui.ImVec2(0,10))                
             fcommon.DrawEntries(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.IMAGE,module.SpawnPed,nil,module.GetModelName,module.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH)
         end
+        fcommon.EndTabBar()
     end
 end
 return module

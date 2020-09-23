@@ -32,10 +32,6 @@ module.tmemory    =
 
 -- Main function
 function module.MemoryMain()
- 
-    -- if isKeyDown(vkeys.VK_LCONTROL) and is isKeyDown(int keyId)
-    --     imgui.StrCopy(module.tmemory.address, imgui.GetClipboardText(),ffi.sizeof(module.tmemory.address))
-    -- end)
 
     if fcommon.BeginTabBar("MemoryBar") then
         if fcommon.BeginTabItem("Read") then
@@ -253,7 +249,7 @@ function module.MemoryMain()
                             end
                         end
                         
-                        module.tmemory.list[mem_type][ffi.string(module.tmemory.name)] = mem_type .. "$" .. ffi.string(module.tmemory.address)
+                        module.tmemory.list[mem_type][ffi.string(module.tmemory.name)] = ffi.string(module.tmemory.address)
                         fcommon.SaveJson("memory",module.tmemory.list)
                         module.tmemory.list = fcommon.LoadJson("memory")
                         printHelpString("Address added")
@@ -262,6 +258,7 @@ function module.MemoryMain()
                 
             end
         end
+        fcommon.EndTabBar()
     end
 end
 

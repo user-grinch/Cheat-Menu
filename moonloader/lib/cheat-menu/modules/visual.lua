@@ -497,8 +497,10 @@ function module.VisualMain()
                     casts.CTimeCyc.waterfog_alpha[val]   = module.tvisual.timecyc.waterfog_alpha[0]
                 end
                 end
+                fcommon.EndTabBar()
             end
         end
+        fcommon.EndTabBar()
     end
 end
 

@@ -292,18 +292,18 @@ end
 
 function module.SyncSystemTime()
     while module.tgame.sync_system_time[0] do
-        time = os.date("*t")
-        local hour,minute = getTimeOfDay()
-        if hour ~= time.hour or minute ~= time.min then
-            setTimeOfDay(time.hour,time.min)
-        end 
-        wait(0)
+        local time = os.date("*t")
+        setTimeOfDay(time.hour,time.min)
+        wait(30)
     end
 end
 
 function module.RandomCheatsActivate()
     while module.tgame.random_cheats.checkbox[0] do
         wait(module.tgame.random_cheats.cheat_activate_timer[0]*1000)
+
+        if not module.tgame.random_cheats.checkbox[0] then break end
+
         cheatid = math.random(0,91)
         callFunction(0x438370,1,1,cheatid)
         table.insert(module.tgame.random_cheats.activated_cheats,cheatid)
@@ -312,10 +312,13 @@ function module.RandomCheatsActivate()
 end
 
 function module.RandomCheatsDeactivate()
-    while module.tgame.random_cheats.disable_cheat_checkbox[0] and module.tgame.random_cheats.activated_cheats do
+    while module.tgame.random_cheats.disable_cheat_checkbox[0] and module.tgame.random_cheats.checkbox[0] do
         for _,x in ipairs(module.tgame.random_cheats.activated_cheats) do
             if module.tgame.random_cheats.cheat_name[tostring(x)][2] == "true" then
                 wait(module.tgame.random_cheats.cheat_deactivate_timer[0]*1000)
+
+                if not (module.tgame.random_cheats.checkbox[0] or module.tgame.random_cheats.checkbox[0]) then break end
+
                 if module.tgame.random_cheats.disable_cheat_checkbox[0] then
                     callFunction(0x438370,1,1,module.tgame.random_cheats.activated_cheats[x])
                     printHelpString("~r~" .. module.tgame.random_cheats.cheat_name[tostring(x)][1])
@@ -339,50 +342,6 @@ function module.FreezeTime()
         memory.write(0x969168,0,1)  -- Freeze time
         wait(0)
     end
-end
-
-function SetTime()
-    fcommon.DropDownMenu("Set time",function()
-        imgui.Spacing()
-
-        local days_passed = imgui.new.int(memory.read(0xB79038 ,4))
-        local hour = imgui.new.int(memory.read(0xB70153,1))
-        local minute = imgui.new.int(memory.read(0xB70152,1))
-
-        if imgui.InputInt("Current hour",hour) then
-            memory.write(0xB70153 ,hour[0],1)
-        end
-
-        if imgui.InputInt("Current minute",minute) then
-            memory.write(0xB70152 ,minute[0],1)
-        end
-
-        if minute[0] > 59 then
-            hour[0] = hour[0] + 1
-            minute[0] = 0
-        end
-
-        if hour[0] > 23 then
-            memory.write(0xB70153 ,0,1)
-            current_day = memory.read(0xB7014E,1)
-            memory.write(0xB7014E,(current_day+1),1)
-            days_passed = memory.read( 0xB79038,4)
-            memory.write( 0xB79038,(days_passed+1),4)
-        end
-
-        if minute[0] < 0 then
-            hour[0] = hour[0] - 1
-            minute[0] = 59
-        end
-
-        if hour[0] < 0 then
-            memory.write(0xB70153 ,23,1)
-            current_day = memory.read(0xB7014E,1)
-            memory.write(0xB7014E,(current_day-1),1)
-            days_passed = memory.read( 0xB79038,4)
-            memory.write( 0xB79038,(days_passed-1),4)
-        end
-    end)
 end
 
 --------------------------------------------------
@@ -744,7 +703,7 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(tche
             function()
                 tcheatmenu.window.restart_required = true
             end)
-            fcommon.CheckBoxValue('Free PNS',0x96C009)
+            fcommon.CheckBoxValue('Free pay n spray',0x96C009)
             fcommon.CheckBoxVar("Freeze misson timer",module.tgame.freeze_mission_timer,nil,function()
                 if module.tgame.freeze_mission_timer[0] then
                     freezeOnscreenTimer(true)
@@ -840,83 +799,126 @@ of LS without completing missions",
             imgui.Columns(1)
         end
         if fcommon.BeginTabItem('Menus') then
-            fcommon.DropDownMenu('Current day',function()
-                local current_day = imgui.new.int(readMemory(0xB7014E,1,false)-1)
-                imgui.SetNextItemWidth(imgui.GetWindowContentRegionWidth()/1.7)
-                if imgui.Combo("Day", current_day,module.tgame.day.array,#module.tgame.day.names) then
-                    writeMemory(0xB7014E,1,current_day[0]+1,false)
-                    fcommon.CheatActivated()
-                end
-            end)
-            fcommon.DropDownMenu('Custom save game name',function()
-                imgui.InputText("Name", module.tgame.gxt_save_name,ffi.sizeof(module.tgame.gxt_save_name))
-                imgui.Spacing()
-                if imgui.Button("Save game with this name",imgui.ImVec2(fcommon.GetSize(1))) then
-                    if isCharOnFoot(PLAYER_PED) then
-                        registerMissionPassed(setFreeGxtEntry(ffi.string(module.tgame.gxt_save_name)))
-                        activateSaveMenu()
-                    else
-                        printHelpString("Player is ~r~not~w~ on foot")
+            if imgui.BeginChild("MenusChild") then
+                fcommon.DropDownMenu('Current day',function()
+                    local current_day = imgui.new.int(readMemory(0xB7014E,1,false)-1)
+                    imgui.SetNextItemWidth(imgui.GetWindowContentRegionWidth()/1.7)
+                    if imgui.Combo("Day", current_day,module.tgame.day.array,#module.tgame.day.names) then
+                        writeMemory(0xB7014E,1,current_day[0]+1,false)
+                        fcommon.CheatActivated()
                     end
-                end
-            end)
-            
-            fcommon.UpdateAddress({name = 'Days passed',address = 0xB79038 ,size = 4,min = 0,max = 9999})
-            fcommon.DropDownMenu('FPS',function()
-
-                imgui.Columns(2,nil,false)
-                imgui.Text("Minimum" .. " = 1")
+                end)
+                fcommon.DropDownMenu('Custom save game name',function()
+                    imgui.InputText("Name", module.tgame.gxt_save_name,ffi.sizeof(module.tgame.gxt_save_name))
+                    imgui.Spacing()
+                    if imgui.Button("Save game with this name",imgui.ImVec2(fcommon.GetSize(1))) then
+                        if isCharOnFoot(PLAYER_PED) then
+                            registerMissionPassed(setFreeGxtEntry(ffi.string(module.tgame.gxt_save_name)))
+                            activateSaveMenu()
+                        else
+                            printHelpString("Player is ~r~not~w~ on foot")
+                        end
+                    end
+                end)
                 
-                imgui.NextColumn()
-                imgui.Text("Maximum" .. " = 999")
-                imgui.Columns(1)
+                fcommon.UpdateAddress({name = 'Days passed',address = 0xB79038 ,size = 4,min = 0,max = 9999})
+                fcommon.DropDownMenu('FPS',function()
 
-                imgui.PushItemWidth(imgui.GetWindowWidth()-50)
-                if imgui.InputInt('Set',module.tgame.fps_limit) then
-                    memory.write(0xC1704C,(module.tgame.fps_limit[0]+1),1)
-                    memory.write(0xBA6794,1,1)
-                    fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xC1704C),{1,module.tgame.fps_limit[0]+1})
-                    fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xBA6794),{1,1})
-                end
-                if module.tgame.fps_limit[0] < 1 then
-                    module.tgame.fps_limit[0] = 1
-                end
+                    imgui.Columns(2,nil,false)
+                    imgui.Text("Minimum" .. " = 1")
+                    
+                    imgui.NextColumn()
+                    imgui.Text("Maximum" .. " = 999")
+                    imgui.Columns(1)
 
-                imgui.PopItemWidth()
+                    imgui.PushItemWidth(imgui.GetWindowWidth()-50)
+                    if imgui.InputInt('Set',module.tgame.fps_limit) then
+                        memory.write(0xC1704C,(module.tgame.fps_limit[0]+1),1)
+                        memory.write(0xBA6794,1,1)
+                        fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xC1704C),{1,module.tgame.fps_limit[0]+1})
+                        fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xBA6794),{1,1})
+                    end
+                    if module.tgame.fps_limit[0] < 1 then
+                        module.tgame.fps_limit[0] = 1
+                    end
 
-                imgui.Spacing()
-                if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(3))) then
-                    memory.write(0xC1704C,1,1)
-                    memory.write(0xBA6794,1,1)
-                    module.tgame.fps_limit[0] = 1
-                    fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xC1704C),{1,1})
-                    fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xBA6794),{1,1})
-                end
-                imgui.SameLine()
-                if imgui.Button("Default",imgui.ImVec2(fcommon.GetSize(3))) then
-                    memory.write(0xC1704C,30,1)
-                    memory.write(0xBA6794,1,1)
-                    module.tgame.fps_limit[0] = 30
-                    fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xC1704C),{1,30})
-                    fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xBA6794),{1,1})
-                end
-                imgui.SameLine()
-                if imgui.Button("Maximum",imgui.ImVec2(fcommon.GetSize(3))) then
-                    memory.write(0xBA6794,0,1)
-                    memory.write(0xBA6794,1,1)
-                    module.tgame.fps_limit[0] = 999
-                    fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xC1704C),{1,999})
-                    fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xBA6794),{1,1})
-                end
-            end)
-            fcommon.UpdateAddress({name = 'Game speed',address = 0xB7CB64,size = 4,max = 10,min = 0, is_float =true, default = 1})
-            fcommon.UpdateAddress({name = 'Gravity',address = 0x863984,size = 4,max = 1,min = -1, default = 0.008,cvalue = 0.001 ,is_float = true})
-            SetTime()
-            fcommon.DropDownMenu('Themes',function()
-                fcommon.RadioButtonAddress('Select theme',{'Beach','Country','Fun house','Ninja'},{0x969159,0x96917D,0x969176,0x96915C})
-            end)
-            fcommon.CallFuncButtons("Weather",  {["Very Sunny"] = 0x438F50,["Overcast"] = 0x438F60,["Rainy"] = 0x438F70,
-                                                ["Foggy"] = 0x438F80,["Thunderstorm"] = 0x439570,["Sandstorm"] = 0x439590})
+                    imgui.PopItemWidth()
+
+                    imgui.Spacing()
+                    if imgui.Button("Minimum",imgui.ImVec2(fcommon.GetSize(3))) then
+                        memory.write(0xC1704C,1,1)
+                        memory.write(0xBA6794,1,1)
+                        module.tgame.fps_limit[0] = 1
+                        fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xC1704C),{1,1})
+                        fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xBA6794),{1,1})
+                    end
+                    imgui.SameLine()
+                    if imgui.Button("Default",imgui.ImVec2(fcommon.GetSize(3))) then
+                        memory.write(0xC1704C,30,1)
+                        memory.write(0xBA6794,1,1)
+                        module.tgame.fps_limit[0] = 30
+                        fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xC1704C),{1,30})
+                        fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xBA6794),{1,1})
+                    end
+                    imgui.SameLine()
+                    if imgui.Button("Maximum",imgui.ImVec2(fcommon.GetSize(3))) then
+                        memory.write(0xBA6794,0,1)
+                        memory.write(0xBA6794,1,1)
+                        module.tgame.fps_limit[0] = 999
+                        fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xC1704C),{1,999})
+                        fconfig.Set(fconfig.tconfig.memory_data,string.format("0x%6.6X",0xBA6794),{1,1})
+                    end
+                end)
+                fcommon.UpdateAddress({name = 'Game speed',address = 0xB7CB64,size = 4,max = 10,min = 0, is_float =true, default = 1})
+                fcommon.UpdateAddress({name = 'Gravity',address = 0x863984,size = 4,max = 1,min = -1, default = 0.008,cvalue = 0.001 ,is_float = true})
+                fcommon.DropDownMenu("Set time",function()
+                    imgui.Spacing()
+            
+                    local days_passed = imgui.new.int(memory.read(0xB79038 ,4))
+                    local hour = imgui.new.int(memory.read(0xB70153,1))
+                    local minute = imgui.new.int(memory.read(0xB70152,1))
+            
+                    if imgui.InputInt("Current hour",hour) then
+                        memory.write(0xB70153 ,hour[0],1)
+                    end
+            
+                    if imgui.InputInt("Current minute",minute) then
+                        memory.write(0xB70152 ,minute[0],1)
+                    end
+            
+                    if minute[0] > 59 then
+                        hour[0] = hour[0] + 1
+                        minute[0] = 0
+                    end
+            
+                    if hour[0] > 23 then
+                        memory.write(0xB70153 ,0,1)
+                        current_day = memory.read(0xB7014E,1)
+                        memory.write(0xB7014E,(current_day+1),1)
+                        days_passed = memory.read( 0xB79038,4)
+                        memory.write( 0xB79038,(days_passed+1),4)
+                    end
+            
+                    if minute[0] < 0 then
+                        hour[0] = hour[0] - 1
+                        minute[0] = 59
+                    end
+            
+                    if hour[0] < 0 then
+                        memory.write(0xB70153 ,23,1)
+                        current_day = memory.read(0xB7014E,1)
+                        memory.write(0xB7014E,(current_day-1),1)
+                        days_passed = memory.read( 0xB79038,4)
+                        memory.write( 0xB79038,(days_passed-1),4)
+                    end
+                end)
+                fcommon.DropDownMenu('Themes',function()
+                    fcommon.RadioButtonAddress('Select theme',{'Beach','Country','Fun house','Ninja'},{0x969159,0x96917D,0x969176,0x96915C})
+                end)
+                fcommon.CallFuncButtons("Weather",  {["Very Sunny"] = 0x438F50,["Overcast"] = 0x438F60,["Rainy"] = 0x438F70,
+                                                    ["Foggy"] = 0x438F80,["Thunderstorm"] = 0x439570,["Sandstorm"] = 0x439590})
+                imgui.EndChild()
+            end
         end
         if fcommon.BeginTabItem('Script manager') then
             if imgui.Button("Reload all scripts",imgui.ImVec2(fcommon.GetSize(1))) then
@@ -1299,8 +1301,10 @@ of LS without completing missions",
                         imgui.EndChild()
                     end
                 end
+                fcommon.EndTabBar()
             end
         end
+        fcommon.EndTabBar()
     end
 end
 

@@ -24,6 +24,7 @@ module.tconfig =
     reset       = false,
     read        = fcommon.LoadJson("config"),
     stat_data   = {},
+    save_config = true,
 }
 
 
@@ -128,6 +129,9 @@ function module.SetConfigData()
 end
 
 function module.Write()
+
+    if not module.tconfig.save_config then return end
+
     local write_table = {}
     if not module.tconfig.reset then
         write_table =

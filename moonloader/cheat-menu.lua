@@ -20,8 +20,8 @@ script_description("Cheat Menu for Grand Theft Auto San Andreas")
 script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-menu")
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
-script_version("2.1-beta")
-script_version_number(2020092001) -- YYYYMMDDNN
+script_version("2.1")
+script_version_number(2020092301) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -257,6 +257,11 @@ function(self) -- render frame
             end
             
             os.remove(tcheatmenu.dir .. "update.zip")
+
+            -- Delete the old config file too, causes crash?
+            os.remove(string.format(tcheatmenu.dir .. "/json/config.json"))
+            fconfig.tconfig.save_config = false
+
             printHelpString("Update ~g~Installed")
             print("Update installed. Reloading script.")
             thisScript():reload()
@@ -445,7 +450,7 @@ function()
 
     imgui.SetNextItemWidth(resX)
     imgui.SetKeyboardFocusHere(-1)
-    if imgui.InputText("##TEXTFIELD",fmenu.tmenu.command.input_field,ffi.sizeof(fmenu.tmenu.command.input_field),imgui.InputTextFlags.EnterReturnsTrue 
+    if imgui.InputTextWithHint("##TEXTFIELD","Enter command",fmenu.tmenu.command.input_field,ffi.sizeof(fmenu.tmenu.command.input_field),imgui.InputTextFlags.EnterReturnsTrue 
     or imgui.InputTextFlags.CallbackCompletion or imgui.InputTextFlags.CallbackHistory) then
         if imgui.IsKeyPressed(vkeys.VK_RETURN,false) then
             fmenu.tmenu.command.show[0] = not fmenu.tmenu.command.show[0]
@@ -600,7 +605,6 @@ function main()
 
     ------------------------------------------------
 
-    local prev_weapon = nil
     while true do
 
         --------------------------------------------------
@@ -610,29 +614,27 @@ function main()
         -- Weapons
         local CurWeapon = getCurrentCharWeapon(PLAYER_PED)
 
-        if prev_weapon ~= CurWeapon then
-            local pPed = getCharPointer(PLAYER_PED)
-            prev_weapon = CurWeapon
+        local pPed = getCharPointer(PLAYER_PED)
+        prev_weapon = CurWeapon
 
-            local skill = callMethod(0x5E3B60,pPed,1,0,CurWeapon)
-            local pWeaponInfo = callFunction(0x743C60,2,2,CurWeapon,skill)
+        local skill = callMethod(0x5E3B60,pPed,1,0,CurWeapon)
+        local pWeaponInfo = callFunction(0x743C60,2,2,CurWeapon,skill)
 
-            if fweapon.tweapon.huge_damage[0] then
-                writeMemory(pWeaponInfo+0x22,2,1000,false)
-            end
-            if fweapon.tweapon.long_range[0] then
-                memory.setfloat(pWeaponInfo+0x04,1000.0)
-                memory.setfloat(pWeaponInfo+0x08,1000.0)
-            end
-            if fweapon.tweapon.max_accuracy[0] then
-                memory.setfloat(pWeaponInfo+0x38,1.0)
-            end
-            if fweapon.tweapon.max_ammo_clip[0] then
-                writeMemory(pWeaponInfo+0x20,2,9999,false)
-            end
-            if fweapon.tweapon.max_move_speed[0] then
-                memory.setfloat(pWeaponInfo+0x3C,1.0)
-            end
+        if fweapon.tweapon.huge_damage[0] then
+            writeMemory(pWeaponInfo+0x22,2,1000,false)
+        end
+        if fweapon.tweapon.long_range[0] then
+            memory.setfloat(pWeaponInfo+0x04,1000.0)
+            memory.setfloat(pWeaponInfo+0x08,1000.0)
+        end
+        if fweapon.tweapon.max_accuracy[0] then
+            memory.setfloat(pWeaponInfo+0x38,1.0)
+        end
+        if fweapon.tweapon.max_ammo_clip[0] then
+            writeMemory(pWeaponInfo+0x20,2,9999,false)
+        end
+        if fweapon.tweapon.max_move_speed[0] then
+            memory.setfloat(pWeaponInfo+0x3C,1.0)
         end
         --------------------------------------------------
 

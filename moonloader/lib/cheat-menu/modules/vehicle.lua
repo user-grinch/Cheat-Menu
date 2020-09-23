@@ -1041,7 +1041,6 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
                     end
                     
                 end)
-                fcommon.UpdateAddress({name = 'Nitro count',address = pCar + 0x48A ,size = 1,min = 0,max = 15, default = 7.5,is_float = false})
                 fcommon.DropDownMenu("Set name",function()
 
                     imgui.Text(string.format( "Model name = %s",casts.CModelInfo.GetNameFromModel(getCarModel(car))))
@@ -1069,7 +1068,7 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
                     imgui.InputInt("Set",module.tvehicle.speed)
                      
                     imgui.Spacing()
-                    if imgui.Button("Set speed",imgui.ImVec2(fcommon.GetSize(2))) then
+                    if imgui.Button("Set speed##brn",imgui.ImVec2(fcommon.GetSize(2))) then
                         if isCharInAnyCar(PLAYER_PED) then
                             car = getCarCharIsUsing(PLAYER_PED)
                             setCarForwardSpeed(car,module.tvehicle.speed[0])
@@ -1464,6 +1463,7 @@ data file with these values changed here")
                 imgui.TextWrapped("Player needs to be inside a vehicle for options to show up here.")
             end
         end
+        fcommon.EndTabBar()
     end
 end
 

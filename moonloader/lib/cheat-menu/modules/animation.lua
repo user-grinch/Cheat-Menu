@@ -148,7 +148,7 @@ function module.AnimationMain()
         end
         if fcommon.BeginTabItem('Custom') then
             imgui.InputTextWithHint("File","ped",module.tanimation.ifp_name,ffi.sizeof(module.tanimation.ifp_name))
-            imgui.InputTextWithHint("Animation","cower",module.tanimation.name,ffi.sizeof(module.tanimation.ifp_name))
+            imgui.InputTextWithHint("Animation##input","cower",module.tanimation.name,ffi.sizeof(module.tanimation.name))
             imgui.Spacing()
             if imgui.Button("Add animation",imgui.ImVec2(fcommon.GetSize(1))) then
                 if ffi.string(module.tanimation.ifp_name) == "" then
@@ -168,6 +168,7 @@ function module.AnimationMain()
                
             end
         end
+        fcommon.EndTabBar()
     end
 end
 

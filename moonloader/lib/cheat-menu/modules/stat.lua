@@ -90,6 +90,7 @@ function module.StatMain()
                 imgui.EndChild()
             end
         end
+        fcommon.EndTabBar()
     end
 end
 
