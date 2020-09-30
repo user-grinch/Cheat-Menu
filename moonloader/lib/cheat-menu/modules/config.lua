@@ -246,6 +246,7 @@ function module.Write()
                     pos_y           = fmenu.tmenu.overlay.pos_y[0],
                     show            = fmenu.tmenu.overlay.show[0],
                     speed           = fmenu.tmenu.overlay.speed[0],
+                    transparent_bg  = fmenu.tmenu.overlay.transparent_bg[0],
                 },
                 show_tooltips       = fmenu.tmenu.show_tooltips[0],
                 show_crash_message  = fmenu.tmenu.show_crash_message[0],

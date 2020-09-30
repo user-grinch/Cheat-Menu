@@ -217,10 +217,13 @@ end
 
 function module.GiveVehicleToPlayer(model)
     model = tonumber(model)
+    local vehicle = nil
+    local interior = getCharActiveInterior(PLAYER_PED)
 
     if isModelAvailable(model) then
 
         local x,y,z = getCharCoordinates(PLAYER_PED)
+
         local speed = 0
         
         if isCharInAnyCar(PLAYER_PED) and module.tvehicle.spawn_inside[0] then
@@ -238,10 +241,14 @@ function module.GiveVehicleToPlayer(model)
             end
         end
 
-        if (module.tvehicle.aircraft.spawn_in_air[0]) and (isThisModelAHeli(model) or isThisModelAPlane(model)) then
-            z = 400
+        if interior == 0 then
+            if (module.tvehicle.aircraft.spawn_in_air[0]) and (isThisModelAHeli(model) or isThisModelAPlane(model)) then
+                z = 400
+            end
+        else
+            z = z - 5
         end
-
+        
         if casts.CModelInfo.IsTrainModel(model) then
 
             local train_id_table = module.tvehicle.trains[tostring(model)]
@@ -296,6 +303,10 @@ function module.GiveVehicleToPlayer(model)
 
             markCarAsNoLongerNeeded(vehicle)
             markModelAsNoLongerNeeded(model)
+        end
+
+        if doesVehicleExist(vehicle) then
+            setVehicleInterior(vehicle,interior)
         end
         
         fcommon.CheatActivated()

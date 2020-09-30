@@ -61,8 +61,9 @@ function module.Teleport(x, y, z,interior_id)
 	activateInteriorPeds(true)
 
 	if isCharInAnyCar(PLAYER_PED) then
-		local car = getCarCharIsUsing(PLAYER_PED)
-		setCarCoordinates(car,x,y,z)
+		local hveh = getCarCharIsUsing(PLAYER_PED)
+		setCarCoordinates(hveh,x,y,z)
+        setVehicleInterior(hveh,interior_id)
 	else
 		setCharCoordinates(PLAYER_PED, x, y, z)
 	end
@@ -75,8 +76,9 @@ function module.Teleport(x, y, z,interior_id)
 			local px,py = getCharCoordinates(PLAYER_PED)
 
 			if isCharInAnyCar(PLAYER_PED) then
-				local car = getCarCharIsUsing(PLAYER_PED)
-				setCarCoordinates(car,x,y,-100)
+				local hveh = getCarCharIsUsing(PLAYER_PED)
+				setVehicleInterior(hveh,0)
+				setCarCoordinates(hveh,x,y,-100)
 			else
 				setCharCoordinates(PLAYER_PED, x, y, -100)
 			end
@@ -91,6 +93,7 @@ function module.Teleport(x, y, z,interior_id)
 
 		end
 	end
+
 	doFade(true,200)
 	lockPlayerControl(false)
 end

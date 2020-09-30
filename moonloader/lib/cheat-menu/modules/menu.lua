@@ -51,6 +51,7 @@ module.tmenu =
 		pos_x           = imgui.new.int(fconfig.Get('tmenu.overlay.pos_x',0)),
 		pos_y           = imgui.new.int(fconfig.Get('tmenu.overlay.pos_y',0)),
 		speed           = imgui.new.bool(fconfig.Get('tmenu.overlay.speed',false)),		
+		transparent_bg  = imgui.new.bool(fconfig.Get('tmenu.overlay.transparent_bg',false)),
 	},
 	repo_version        = nil,
 	show_tooltips	    = imgui.new.bool(fconfig.Get('tmenu.show_tooltips',true)),
@@ -337,11 +338,12 @@ These updates might be unstable.")
 		end
 		if fcommon.BeginTabItem('Overlay') then
 			imgui.Columns(2,nil,false)
+			fcommon.CheckBoxVar("No background",module.tmenu.overlay.transparent_bg)
 			fcommon.CheckBoxVar("Show coordinates",module.tmenu.overlay.coordinates)
 			fcommon.CheckBoxVar("Show FPS",module.tmenu.overlay.fps)	
-			fcommon.CheckBoxVar("Show location",module.tmenu.overlay.location)
 			imgui.NextColumn()
 
+			fcommon.CheckBoxVar("Show location",module.tmenu.overlay.location)
 			fcommon.CheckBoxVar("Show vehicle health",module.tmenu.overlay.health)
 			fcommon.CheckBoxVar("Show vehicle speed",module.tmenu.overlay.speed)
 			imgui.Columns(1)

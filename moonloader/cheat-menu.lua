@@ -20,8 +20,8 @@ script_description("Cheat Menu for Grand Theft Auto San Andreas")
 script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-menu")
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
-script_version("2.1")
-script_version_number(2020092301) -- YYYYMMDDNN
+script_version("2.2-beta")
+script_version_number(2020093001) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -354,6 +354,11 @@ function()
 
     imgui.PushStyleVarFloat(imgui.StyleVar.Alpha,0.65)
     imgui.PushStyleVarVec2(imgui.StyleVar.WindowMinSize,imgui.ImVec2(0,0))
+    
+    if fmenu.tmenu.overlay.transparent_bg[0] then 
+        imgui.PushStyleColor(imgui.Col.WindowBg,imgui.ImVec4(0,0,0,0))
+    end
+
     imgui.Begin("Overlay", nil, flags)
     
     if fmenu.tmenu.overlay.fps[0] then
@@ -382,6 +387,10 @@ function()
         imgui.Text(string.format("Coordinates: %d %d %d", math.floor(x) , math.floor(y) , math.floor(z)),1000)
     end
 
+    if fmenu.tmenu.overlay.transparent_bg[0] then 
+        imgui.PopStyleColor()
+    end
+
     imgui.PopStyleVar(2)
 
     --------------------------------------------------
@@ -405,6 +414,10 @@ function()
         end
         if imgui.MenuItemBool("Bottom Right",nil,fmenu.tmenu.overlay.position_index[0] == 4) then 
             fmenu.tmenu.overlay.position_index[0] = 4 
+        end
+        imgui.Separator()
+        if imgui.MenuItemBool("No background",nil,fmenu.tmenu.overlay.transparent_bg[0]) then 
+            fmenu.tmenu.overlay.transparent_bg[0] = not fmenu.tmenu.overlay.transparent_bg[0]
         end
         if imgui.MenuItemBool("Close") then
             fmenu.tmenu.overlay.fps[0] = false

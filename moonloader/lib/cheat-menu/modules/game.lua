@@ -23,7 +23,7 @@ module.tgame                =
         bool                = imgui.new.bool(false),
         fov                 = imgui.new.int(fconfig.Get('tgame.camera.fov',70)),
         lock_on_player      = imgui.new.bool(false),
-        movement_speed      = imgui.new.float(fconfig.Get('tgame.camera.movement_speed',0.2)),
+        movement_speed      = imgui.new.float(fconfig.Get('tgame.camera.movement_speed',0.4)),
         shake               = imgui.new.float(0.0),
     },
     cop = 
@@ -150,8 +150,8 @@ function module.CameraMode()
             total_mouse_x = total_mouse_x - mouse_x/6
             total_mouse_y = total_mouse_y + mouse_y/3
             
-            if total_mouse_y > 170 then total_mouse_y = 170 end
-            if total_mouse_y < -170 then total_mouse_y = -170 end
+            if total_mouse_y > 150 then total_mouse_y = 150 end
+            if total_mouse_y < -150 then total_mouse_y = -150 end
             
 
             if isKeyDown(tcheatmenu.hot_keys.camera_mode_slow[1] and tcheatmenu.hot_keys.camera_mode_slow[2]) then 
