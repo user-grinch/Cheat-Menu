@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.2-beta")
-script_version_number(2020093001) -- YYYYMMDDNN
+script_version_number(2020100101) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
 
@@ -229,7 +229,7 @@ function(self) -- render frame
         end
         imgui.SameLine()
         if imgui.Button("View changelog",imgui.ImVec2(fcommon.GetSize(3))) then
-            if string.find( script.this.version,"beta") then
+            if fmenu.tmenu.get_beta_updates[0] then
                 os.execute('explorer "https://github.com/user-grinch/Cheat-Menu/commits/master"')
             else
                 os.execute('explorer "https://github.com/user-grinch/Cheat-Menu/releases/tag/' .. fmenu.tmenu.repo_version ..'"')
