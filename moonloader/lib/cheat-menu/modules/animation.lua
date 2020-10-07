@@ -21,9 +21,8 @@ module.tanimation =
 {
     fighting      =
     {
-        selected  = imgui.new.int(fconfig.Get('tanimation.fighting.selected',0)),
+        selected  = imgui.new.int(fconfig.Get('tanimation.fighting.selected',1)),
         names     = {"Default","Boxing","Kung fu","Kick Boxing","Punch Kick"},
-        array     = {},
     }, 
     filter = imgui.ImGuiTextFilter(),
     ifp_name      = imgui.new.char[20](),
@@ -34,15 +33,10 @@ module.tanimation =
     secondary     = imgui.new.bool(fconfig.Get('tanimation.secondary',false)),
     walking       = 
     { 
-        selected  = imgui.new.int(fconfig.Get('tanimation.walking.selected',0)),
+        selected  = imgui.new.int(fconfig.Get('tanimation.walking.selected',1)),
         names     = {"default","man","shuffle","oldman","gang1","gang2","oldfatman","fatman","jogger","drunkman","blindman","swat","woman","shopping","busywoman","sexywoman","pro","oldwoman","fatwoman","jogwoman","oldfatwoman","skate"},
-        array     = {},
     },
 }
-
-module.tanimation.fighting.array = imgui.new['const char*'][#module.tanimation.fighting.names](module.tanimation.fighting.names)
-module.tanimation.walking.array  = imgui.new['const char*'][#module.tanimation.walking.names](module.tanimation.walking.names)
-
 
 function module.PlayAnimation(file,animation)
     if module.tanimation.ped[0] == true then
@@ -124,24 +118,22 @@ function module.AnimationMain()
             end,function(a) return a end,module.tanimation.list)
         end
         if fcommon.BeginTabItem('Misc') then
-            if imgui.Combo("Fighting", module.tanimation.fighting.selected,module.tanimation.fighting.array,#module.tanimation.fighting.names) then
-                giveMeleeAttackToChar(PLAYER_PED,module.tanimation.fighting.selected[0]+4,6)
+            if fcommon.DropDownListNumber("Fighting",module.tanimation.fighting.names,module.tanimation.fighting.selected) then
+                giveMeleeAttackToChar(PLAYER_PED,module.tanimation.fighting.selected[0]+3,6)
                 fcommon.CheatActivated()
             end
-
-            if imgui.Combo("Walking", module.tanimation.walking.selected,module.tanimation.walking.array,#module.tanimation.walking.names) then
-              
-                if module.tanimation.walking.names[module.tanimation.walking.selected[0]+1] == "default" then
+            if fcommon.DropDownListNumber("Walking",module.tanimation.walking.names,module.tanimation.walking.selected) then
+                if module.tanimation.walking.names[module.tanimation.walking.selected[0]] == "default" then
                     writeMemory(0x609A4E,4,0x4D48689,false)
                     writeMemory(0x609A52,2,0,false)
                 else
                     writeMemory(0x609A4E,4,-0x6F6F6F70,false)
                     writeMemory(0x609A52,2,0x9090,false)
                     
-                    requestAnimation(module.tanimation.walking.names[module.tanimation.walking.selected[0]+1])
+                    requestAnimation(module.tanimation.walking.names[module.tanimation.walking.selected[0]])
                     loadAllModelsNow()
-                    setAnimGroupForChar(PLAYER_PED,module.tanimation.walking.names[module.tanimation.walking.selected[0]+1])
-                    removeAnimation(module.tanimation.walking.names[module.tanimation.walking.selected[0]+1])
+                    setAnimGroupForChar(PLAYER_PED,module.tanimation.walking.names[module.tanimation.walking.selected[0]])
+                    removeAnimation(module.tanimation.walking.names[module.tanimation.walking.selected[0]])
                 end
                 fcommon.CheatActivated()
             end

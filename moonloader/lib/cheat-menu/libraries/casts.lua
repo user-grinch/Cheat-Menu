@@ -139,7 +139,4 @@ function module.CBaseModelInfo.GetModelType(model_id)
     end
 end
 
-
-
-
 return module

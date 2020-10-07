@@ -107,7 +107,7 @@ function module.TeleportMain()
 			imgui.Columns(2,nil,false)
 			fcommon.CheckBoxVar("Insert coordinates",module.tteleport.insert_coords)
 			imgui.NextColumn()
-			fcommon.CheckBoxVar("Quick teleport",module.tteleport.shortcut,"Teleport to marker using" ..  fcommon.GetHotKeyNames(tcheatmenu.hot_keys.quick_teleport))
+			fcommon.CheckBoxVar("Quick teleport",module.tteleport.shortcut,"Teleport to marker using" ..  fcommon.GetHotKeyNames(fmenu.tmenu.hot_keys.quick_teleport))
 			imgui.Columns(1)
 			
 			imgui.Spacing()

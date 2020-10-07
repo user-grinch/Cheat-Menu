@@ -717,10 +717,10 @@ function module.OnEnterVehicle()
             module.tvehicle.first_person_camera.offset_y_var[0] = module.tvehicle.first_person_camera.offsets[tostring(model)]["y"]
             module.tvehicle.first_person_camera.offset_z_var[0] = module.tvehicle.first_person_camera.offsets[tostring(model)]["z"]
 
-            fcommon.SingletonThread(module.AircraftCamera,"AircraftCamera")
-            fcommon.SingletonThread(module.FirstPersonCamera,"FirstPersonCamera")
-            fcommon.SingletonThread(module.RainbowColors,"RainbowColors")
-            fcommon.SingletonThread(module.UnlimitedNitro,"UnlimitedNitro")
+            fcommon.CreateThread(module.AircraftCamera)
+            fcommon.CreateThread(module.FirstPersonCamera)
+            fcommon.CreateThread(module.RainbowColors)
+            fcommon.CreateThread(module.UnlimitedNitro)
 
             module.tvehicle.paintjobs.current_paintjob[0] = fconfig.Get(string.format("%d.paintjob",model),nil,module.tvehicle.paintjobs.save_data)  or getCurrentVehiclePaintjob(hveh)  
             module.tvehicle.paintjobs.paintjobs_count =  getNumAvailablePaintjobs(hveh)
@@ -866,7 +866,7 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
             fcommon.CheckBoxValue("Drive on water",0x969152)
             fcommon.CheckBoxVar("First person camera",module.tvehicle.first_person_camera.bool,nil,
             function()
-                fcommon.SingletonThread(module.FirstPersonCamera,"FirstPersonCamera")
+                fcommon.CreateThread(module.FirstPersonCamera)
             end,
             function()
                 fcommon.InputFloat("Offset X", module.tvehicle.first_person_camera.offset_x_var,nil,-5,5,0.02)
@@ -875,7 +875,7 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
             end)
             fcommon.CheckBoxVar("Fixed aircraft camera",module.tvehicle.aircraft.camera,nil,
             function()
-                fcommon.SingletonThread(module.AircraftCamera,"AircraftCamera")
+                fcommon.CreateThread(module.AircraftCamera)
             end)
             fcommon.CheckBoxValue("Fixed train camera",5416239,nil,fconst.TRAIN_CAM_FIX.ON,fconst.TRAIN_CAM_FIX.OFF)
             
@@ -947,11 +947,11 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
             fcommon.CheckBoxValue("Tank mode",0x969164) 
             fcommon.CheckBoxVar("Traffic neons",module.tvehicle.neon.checkbox,"Adds neon lights to traffic vehicles.\nOnly some vehicles will have them.",
             function()
-                fcommon.SingletonThread(fvehicle.TrafficNeons,"TrafficNeons")
+                fcommon.CreateThread(fvehicle.TrafficNeons)
             end)
             fcommon.CheckBoxVar("Unlimited nitro",module.tvehicle.unlimited_nitro,"Nitro will activate when left clicked\n\nEnabling this would disable\nAll cars have nitro\nAll taxis have nitro",
             function()
-                fcommon.SingletonThread(module.UnlimitedNitro,"UnlimitedNitro")
+                fcommon.CreateThread(module.UnlimitedNitro)
             end)
             fcommon.CheckBoxVar("Watertight car",module.tvehicle.watertight_car,nil,
             function()
@@ -1151,23 +1151,23 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
                 fcommon.CheckBoxVar("Material filter",module.tvehicle.apply_material_filter,"Filters material while applying color/ texture\nDisable if something doesn't work properly")
                 imgui.NextColumn()
                 fcommon.CheckBoxVar("Rainbow colors",module.tvehicle.rainbow_colors.bool,"Rainbow color effect on players vehicle",function()
-                    fcommon.SingletonThread(module.RainbowColors,"RainbowColors")
+                    fcommon.CreateThread(module.RainbowColors)
                 end,
                 function()
                     fcommon.CheckBoxVar("Apply for traffic",module.tvehicle.rainbow_colors.traffic,"Rainbow color effect on traffic vehicles",
                     function()
-                        fcommon.SingletonThread(module.RainbowColors,"RainbowColors")
+                        fcommon.CreateThread(module.RainbowColors)
                     end)
                     imgui.Dummy(imgui.ImVec2(0,20))
                     imgui.SliderFloat("Speed",module.tvehicle.rainbow_colors.speed,0,2)
                 end)
                 fcommon.CheckBoxVar("Rainbow neons",module.tvehicle.rainbow_neons.bool,"Rainbow neon effect on players vehicle",function()
-                    fcommon.SingletonThread(module.RainbowNeons,"RainbowNeons")
+                    fcommon.CreateThread(module.RainbowNeons)
                 end,
                 function()
                     fcommon.CheckBoxVar("Apply for traffic",module.tvehicle.rainbow_neons.traffic,"Rainbow neon effect on traffic vehicles",
                     function()
-                        fcommon.SingletonThread(module.RainbowNeons,"RainbowNeons")
+                        fcommon.CreateThread(module.RainbowNeons)
                     end)
                     imgui.Dummy(imgui.ImVec2(0,20))
                     imgui.SliderFloat("Speed",module.tvehicle.rainbow_neons.speed,0,2)
@@ -1179,73 +1179,72 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
                     ApplyColor()
                 end
                 fcommon.ConfigPanel("Color",function()
-                    if not isCharInAnyCar(PLAYER_PED) then
-                        tcheatmenu.window.panel_func = nil
-                    end
-                    fcommon.CheckBoxVar("Show all carcol colors", module.tvehicle.color.show_all)
-                    imgui.Spacing()
-                    
-                    local name = casts.CModelInfo.GetNameFromModel(getCarModel(car))
-                    
-                    local shown_colors = {}
-                    imgui.Text("Color:")
-                    imgui.Spacing()
-                    imgui.Columns(2,nil,false)
-                    imgui.RadioButtonIntPtr("Primary", module.tvehicle.color.radio_btn, 1)
-                    imgui.RadioButtonIntPtr("Secondary", module.tvehicle.color.radio_btn, 2)
-                    imgui.NextColumn()
-                    imgui.RadioButtonIntPtr("Tertiary", module.tvehicle.color.radio_btn, 3)
-                    imgui.RadioButtonIntPtr("Quaternary", module.tvehicle.color.radio_btn, 4)
-                    imgui.Spacing()
-                    imgui.Columns(1)
-                    imgui.Text("Select color preset:")
-                    imgui.Spacing()
-
-                    if imgui.BeginChild("Colors") then
-                        local x,y = fcommon.GetSize(1)
-                        local btns_in_row = math.floor(imgui.GetWindowContentRegionWidth()/(y*2))
-                        local btn_size = (imgui.GetWindowContentRegionWidth() - imgui.StyleVar.ItemSpacing*(btns_in_row-0.75*btns_in_row))/btns_in_row
-                        local btn_count = 1
-
-                        func = function(v)
-                            if not shown_colors[v] then
-                                local t = {}
-                                local k =  1
-                                
-                                for i in string.gmatch(module.tvehicle.color.col_data_table[v+1],"%w+") do 
-                                    table.insert( t,tonumber(i))
+                    if isCharInAnyCar(PLAYER_PED) then
+                        fcommon.CheckBoxVar("Show all carcol colors", module.tvehicle.color.show_all)
+                        imgui.Spacing()
+                        
+                        local name = casts.CModelInfo.GetNameFromModel(getCarModel(car))
+                        
+                        local shown_colors = {}
+                        imgui.Text("Color:")
+                        imgui.Spacing()
+                        imgui.Columns(2,nil,false)
+                        imgui.RadioButtonIntPtr("Primary", module.tvehicle.color.radio_btn, 1)
+                        imgui.RadioButtonIntPtr("Secondary", module.tvehicle.color.radio_btn, 2)
+                        imgui.NextColumn()
+                        imgui.RadioButtonIntPtr("Tertiary", module.tvehicle.color.radio_btn, 3)
+                        imgui.RadioButtonIntPtr("Quaternary", module.tvehicle.color.radio_btn, 4)
+                        imgui.Spacing()
+                        imgui.Columns(1)
+                        imgui.Text("Select color preset:")
+                        imgui.Spacing()
+    
+                        if imgui.BeginChild("Colors") then
+                            local x,y = fcommon.GetSize(1)
+                            local btns_in_row = math.floor(imgui.GetWindowContentRegionWidth()/(y*2))
+                            local btn_size = (imgui.GetWindowContentRegionWidth() - imgui.StyleVar.ItemSpacing*(btns_in_row-0.75*btns_in_row))/btns_in_row
+                            local btn_count = 1
+    
+                            func = function(v)
+                                if not shown_colors[v] then
+                                    local t = {}
+                                    local k =  1
+                                    
+                                    for i in string.gmatch(module.tvehicle.color.col_data_table[v+1],"%w+") do 
+                                        table.insert( t,tonumber(i))
+                                    end
+    
+                                    if imgui.ColorButton("Color " .. tostring(v),imgui.ImVec4(t[1]/255,t[2]/255,t[3]/255,255),0,imgui.ImVec2(btn_size,btn_size)) then
+                                        writeMemory(getCarPointer(car) + 1075 + module.tvehicle.color.radio_btn[0],1,tonumber(v),false)
+                                        module.ForEachCarComponent(function(mat,comp,car)
+                                            mat:reset_color()
+                                        end)
+                                    end
+                                    if imgui.IsItemHovered() then
+                                        local drawlist = imgui.GetWindowDrawList()
+                                        drawlist:AddRectFilled(imgui.GetItemRectMin(), imgui.GetItemRectMax(), imgui.GetColorU32(imgui.Col.ModalWindowDimBg))
+                                    end
+                                    shown_colors[v] = true
+                                    if btn_count % btns_in_row ~= 0 then
+                                        imgui.SameLine(0.0,4.0)
+                                    end
+                                    btn_count = btn_count + 1
                                 end
-
-                                if imgui.ColorButton("Color " .. tostring(v),imgui.ImVec4(t[1]/255,t[2]/255,t[3]/255,255),0,imgui.ImVec2(btn_size,btn_size)) then
-                                    writeMemory(getCarPointer(car) + 1075 + module.tvehicle.color.radio_btn[0],1,tonumber(v),false)
-                                    module.ForEachCarComponent(function(mat,comp,car)
-                                        mat:reset_color()
-                                    end)
-                                end
-                                if imgui.IsItemHovered() then
-                                    local drawlist = imgui.GetWindowDrawList()
-                                    drawlist:AddRectFilled(imgui.GetItemRectMin(), imgui.GetItemRectMax(), imgui.GetColorU32(imgui.Col.ModalWindowDimBg))
-                                end
-                                shown_colors[v] = true
-                                if btn_count % btns_in_row ~= 0 then
-                                    imgui.SameLine(0.0,4.0)
-                                end
-                                btn_count = btn_count + 1
                             end
-                        end
-
-                        if module.tvehicle.color.show_all[0] then       
-                            for v=0,(#module.tvehicle.color.col_data_table-1),1 do
-                                func(v)
-                            end
-                        else
-                            if module.tvehicle.color.car_data_table[name] ~= nil then
-                                for k,v in ipairs(module.tvehicle.color.car_data_table[name]) do
+    
+                            if module.tvehicle.color.show_all[0] then       
+                                for v=0,(#module.tvehicle.color.col_data_table-1),1 do
                                     func(v)
                                 end
+                            else
+                                if module.tvehicle.color.car_data_table[name] ~= nil then
+                                    for k,v in ipairs(module.tvehicle.color.car_data_table[name]) do
+                                        func(v)
+                                    end
+                                end
                             end
+                            imgui.EndChild()
                         end
-                        imgui.EndChild()
                     end
                     
                 end)

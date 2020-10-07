@@ -152,37 +152,17 @@ function module.Write()
             },
             tcheatmenu =
             {
-                hot_keys = 
+                coord =
                 {
-                    asc_key                 = tcheatmenu.hot_keys.asc_key,
-                    camera_mode             = tcheatmenu.hot_keys.camera_mode,
-                    camera_mode_forward     = tcheatmenu.hot_keys.camera_mode_forward,
-                    camera_mode_backward    = tcheatmenu.hot_keys.camera_mode_backward,
-                    camera_mode_left        = tcheatmenu.hot_keys.camera_mode_left,
-                    camera_mode_right       = tcheatmenu.hot_keys.camera_mode_right,
-                    camera_mode_slow        = tcheatmenu.hot_keys.camera_mode_slow,
-                    camera_mode_fast        = tcheatmenu.hot_keys.camera_mode_fast,
-                    camera_mode_up          = tcheatmenu.hot_keys.camera_mode_up,
-                    camera_mode_down        = tcheatmenu.hot_keys.camera_mode_down,
-                    command_window          = tcheatmenu.hot_keys.command_window,
-                    menu_open               = tcheatmenu.hot_keys.menu_open,
-                    quick_screenshot        = tcheatmenu.hot_keys.quick_screenshot,
-                    quick_teleport          = tcheatmenu.hot_keys.quick_teleport,
-                },
-                window =
-                {
-                    coord =
-                    {
-                        X = tcheatmenu.window.coord.X,
-                        Y = tcheatmenu.window.coord.Y,
-                    },
-                    size =
-                    {
-                        X = tcheatmenu.window.size.X,
-                        Y = tcheatmenu.window.size.Y,
-                    },
+                    X = tcheatmenu.coord.X,
+                    Y = tcheatmenu.coord.Y,
                 },
                 current_menu = tcheatmenu.current_menu,
+                size =
+                {
+                    X = tcheatmenu.size.X,
+                    Y = tcheatmenu.size.Y,
+                },
             },
             tgame =
             {
@@ -234,6 +214,23 @@ function module.Write()
                     size  		    = fmenu.tmenu.font.size[0],
                 },
                 get_beta_updates    = fmenu.tmenu.get_beta_updates[0],
+                hot_keys = 
+                {
+                    asc_key                 = fmenu.tmenu.hot_keys.asc_key,
+                    camera_mode             = fmenu.tmenu.hot_keys.camera_mode,
+                    camera_mode_forward     = fmenu.tmenu.hot_keys.camera_mode_forward,
+                    camera_mode_backward    = fmenu.tmenu.hot_keys.camera_mode_backward,
+                    camera_mode_left        = fmenu.tmenu.hot_keys.camera_mode_left,
+                    camera_mode_right       = fmenu.tmenu.hot_keys.camera_mode_right,
+                    camera_mode_slow        = fmenu.tmenu.hot_keys.camera_mode_slow,
+                    camera_mode_fast        = fmenu.tmenu.hot_keys.camera_mode_fast,
+                    camera_mode_up          = fmenu.tmenu.hot_keys.camera_mode_up,
+                    camera_mode_down        = fmenu.tmenu.hot_keys.camera_mode_down,
+                    command_window          = fmenu.tmenu.hot_keys.command_window,
+                    menu_open               = fmenu.tmenu.hot_keys.menu_open,
+                    quick_screenshot        = fmenu.tmenu.hot_keys.quick_screenshot,
+                    quick_teleport          = fmenu.tmenu.hot_keys.quick_teleport,
+                },
                 lock_player         = fmenu.tmenu.lock_player[0],
                 overlay = 
                 {           

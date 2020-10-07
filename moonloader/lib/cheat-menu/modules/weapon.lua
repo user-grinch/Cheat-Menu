@@ -165,16 +165,16 @@ function module.AutoAim()
             y = math.floor(y/2)
 
             if (y ~= 0 or x ~= 0) then
-                writeMemory(11988014,1,1,false)
+                writeMemory(0xB6EC2E,1,1,false)
             else
                 if isKeyDown(2) then
-                    writeMemory(11988014,1,0,false)
+                    writeMemory(0xB6EC2E,1,0,false)
                 end
             end
         end
         wait(0)
     end
-    writeMemory(11988014,1,1,false)
+    writeMemory(0xB6EC2E,1,1,false)
 end
 
 -- Main function
@@ -241,7 +241,7 @@ function module.WeaponMain()
             imgui.Columns(2,nil,false)
             fcommon.CheckBoxVar("Auto aim",module.tweapon.auto_aim,"Enables aim assist on keyboard\n\nQ = left    E = right",
             function()
-                fcommon.SingletonThread(fweapon.AutoAim,"AutoAim")
+                fcommon.CreateThread(fweapon.AutoAim)
             end)
             fcommon.CheckBoxVar("Fast reload",module.tweapon.fast_reload,nil,
             function()

@@ -21,22 +21,16 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.2-beta")
-script_version_number(2020100101) -- YYYYMMDDNN
+script_version_number(2020100701) -- YYYYMMDDNN
 
-print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num)) -- For debugging purposes
+print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num))
 
 resX, resY = getScreenResolution()
 
 tcheatmenu =
 {   
-    dir                    = string.format( "%s%s",getWorkingDirectory(),"/lib/cheat-menu/"),
-    temp_data              = {
-        draw_entries_func   = {},
-    },
-    window                 = 
-    {
-        fail_loading_json  = false,
-    }
+    dir                 = string.format( "%s%s",getWorkingDirectory(),"/lib/cheat-menu/"),
+    fail_loading_json   = false,
 }
 
 --------------------------------------------------
@@ -78,53 +72,30 @@ ffi.cdef[[
     int zip_extract(const char *zipname, const char *dir,int *func, void *arg);
 ]]
 
-tcheatmenu       =
+tcheatmenu   =
 {   
+    coord    = 
+    {
+        X    = fconfig.Get('tcheatmenu.coord.X',50),
+        Y    = fconfig.Get('tcheatmenu.coord.Y',50),
+    },
     dir          = tcheatmenu.dir,
     current_menu = fconfig.Get('tcheatmenu.current_menu',0),
-    hot_keys     =
+    fail_loading_json = tcheatmenu.fail_loading_json,
+    restart_required = false,
+    show     = imgui.new.bool(false),
+    size     =
     {
-        asc_key               = fconfig.Get('tcheatmenu.hot_keys.asc_key',{vkeys.VK_RETURN,vkeys.VK_RETURN}),
-        camera_mode           = fconfig.Get('tcheatmenu.hot_keys.camera_mode',{vkeys.VK_LMENU,vkeys.VK_C}),
-        camera_mode_forward   = fconfig.Get('tcheatmenu.hot_keys.camera_mode_forward',{vkeys.VK_I,vkeys.VK_I}),
-        camera_mode_backward  = fconfig.Get('tcheatmenu.hot_keys.camera_mode_backward',{vkeys.VK_K,vkeys.VK_K}),
-        camera_mode_left      = fconfig.Get('tcheatmenu.hot_keys.camera_mode_left',{vkeys.VK_J,vkeys.VK_J}),
-        camera_mode_right     = fconfig.Get('tcheatmenu.hot_keys.camera_mode_right',{vkeys.VK_L,vkeys.VK_L}),
-        camera_mode_slow      = fconfig.Get('tcheatmenu.hot_keys.camera_mode_slow',{vkeys.VK_RCONTROL,vkeys.VK_RCONTROL}),
-        camera_mode_fast      = fconfig.Get('tcheatmenu.hot_keys.camera_mode_fast',{vkeys.VK_RSHIFT,vkeys.VK_RSHIFT}),
-        camera_mode_up        = fconfig.Get('tcheatmenu.hot_keys.camera_mode_up',{vkeys.VK_O,vkeys.VK_O}),
-        camera_mode_down      = fconfig.Get('tcheatmenu.hot_keys.camera_mode_down',{vkeys.VK_P,vkeys.VK_P}),
-        command_window        = fconfig.Get('tcheatmenu.hot_keys.command_window',{vkeys.VK_LMENU,vkeys.VK_M}),
-        menu_open             = fconfig.Get('tcheatmenu.hot_keys.menu_open',{vkeys.VK_LCONTROL,vkeys.VK_M}),
-        quick_screenshot      = fconfig.Get('tcheatmenu.hot_keys.quick_screenshot',{vkeys.VK_LCONTROL,vkeys.VK_S}),
-        quick_teleport        = fconfig.Get('tcheatmenu.hot_keys.quick_teleport',{vkeys.VK_X,vkeys.VK_Y}),
-        script_manager_temp   = {vkeys.VK_LCONTROL,vkeys.VK_1}
+        X    = fconfig.Get('tcheatmenu.size.X',resX/4),
+        Y    = fconfig.Get('tcheatmenu.size.Y',resY/1.2),
     },
-    temp_data    = tcheatmenu.temp_data,
-    thread_locks = {},
-    window       =
-    {
-        coord    = 
-        {
-            X    = fconfig.Get('tcheatmenu.window.coord.X',50),
-            Y    = fconfig.Get('tcheatmenu.window.coord.Y',50),
-        },
-        fail_loading_json = tcheatmenu.window.fail_loading_json,
-        panel_func = nil,
-        restart_required = false,
-        show     = imgui.new.bool(false),
-        size     =
-        {
-            X    = fconfig.Get('tcheatmenu.window.size.X',resX/4),
-            Y    = fconfig.Get('tcheatmenu.window.size.Y',resY/1.2),
-        },
-        title    = string.format("%s v%s",script.this.name,script.this.version),
-    },
+    title    = string.format("%s v%s",script.this.name,script.this.version),
 }
 
 imgui.OnInitialize(function() -- Called once
 
     local io = imgui.GetIO()
+
     -- Load fonts
     if fmenu.tmenu.font.size[0] < 12 then fmenu.tmenu.font.size[0] = 12 end
     local mask = tcheatmenu.dir .. "fonts//*.ttf"
@@ -157,53 +128,53 @@ imgui.OnInitialize(function() -- Called once
 
         fstyle.applyStyle(imgui.GetStyle(), fstyle.tstyle.list[fstyle.tstyle.selected[0] + 1])
     else 
-        print("Can't load styles")
+        print("Failed loading styles")
     end
 
     -- Indexing images
     lua_thread.create(
     function() 
-        fcommon.IndexFiles(fvehicle.tvehicle.path,fvehicle.tvehicle.images,fconst.VEHICLE.IMAGE_EXT)
-        fcommon.IndexFiles(fweapon.tweapon.path,fweapon.tweapon.images,fconst.WEAPON.IMAGE_EXT)
-        fcommon.IndexFiles(fped.tped.path,fped.tped.images,fconst.PED.IMAGE_EXT)
-        fcommon.IndexFiles(fplayer.tplayer.clothes.path,fplayer.tplayer.clothes.images,fconst.CLOTH.IMAGE_EXT)
-        fcommon.IndexFiles(fvehicle.tvehicle.components.path,fvehicle.tvehicle.components.images,fconst.COMPONENT.IMAGE_EXT)
-        fcommon.IndexFiles(fvehicle.tvehicle.paintjobs.path,fvehicle.tvehicle.paintjobs.images,fconst.PAINTJOB.IMAGE_EXT)
+        fcommon.IndexFiles(fvehicle.tvehicle.path,fvehicle.tvehicle.images,"jpg")
+        fcommon.IndexFiles(fweapon.tweapon.path,fweapon.tweapon.images,"jpg")
+        fcommon.IndexFiles(fped.tped.path,fped.tped.images,"jpg")
+        fcommon.IndexFiles(fplayer.tplayer.clothes.path,fplayer.tplayer.clothes.images,"jpg")
+        fcommon.IndexFiles(fvehicle.tvehicle.components.path,fvehicle.tvehicle.components.images,"jpg")
+        fcommon.IndexFiles(fvehicle.tvehicle.paintjobs.path,fvehicle.tvehicle.paintjobs.images,"png")
     end)
 end)
 
 imgui.OnFrame(
 function() -- condition
-    return tcheatmenu.window.show[0] and not isGamePaused() 
+    return tcheatmenu.show[0] and not isGamePaused() 
 end,
 function(self) -- render frame
     
     self.LockPlayer = fmenu.tmenu.lock_player[0] 
-    imgui.SetNextWindowSize(imgui.ImVec2(tcheatmenu.window.size.X,tcheatmenu.window.size.Y),imgui.Cond.Once)
-    imgui.SetNextWindowPos(imgui.ImVec2(tcheatmenu.window.coord.X,tcheatmenu.window.coord.Y),imgui.Cond.Once)
+    imgui.SetNextWindowSize(imgui.ImVec2(tcheatmenu.size.X,tcheatmenu.size.Y),imgui.Cond.Once)
+    imgui.SetNextWindowPos(imgui.ImVec2(tcheatmenu.coord.X,tcheatmenu.coord.Y),imgui.Cond.Once)
 
     imgui.PushStyleVarVec2(imgui.StyleVar.WindowMinSize,imgui.ImVec2(250,350))
-    imgui.PushStyleVarVec2(imgui.StyleVar.FramePadding,imgui.ImVec2(math.floor(tcheatmenu.window.size.X/85),math.floor(tcheatmenu.window.size.Y/200)))
+    imgui.PushStyleVarVec2(imgui.StyleVar.FramePadding,imgui.ImVec2(math.floor(tcheatmenu.size.X/85),math.floor(tcheatmenu.size.Y/200)))
 
-    imgui.Begin(tcheatmenu.window.title, tcheatmenu.window.show,imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoSavedSettings )
+    imgui.Begin(tcheatmenu.title, tcheatmenu.show,imgui.WindowFlags.NoCollapse + imgui.WindowFlags.NoSavedSettings)
 
     --------------------------------------------------
     -- Warnings 
 
-    if tcheatmenu.window.fail_loading_json then
+    if tcheatmenu.fail_loading_json then
         imgui.Button("Failed to load some json files!",imgui.ImVec2(fcommon.GetSize(1)))
         if imgui.Button("Reinstall latest",imgui.ImVec2(fcommon.GetSize(2))) then
             fmenu.DownloadUpdate()
-            tcheatmenu.window.fail_loading_json = false
+            tcheatmenu.fail_loading_json = false
         end
         imgui.SameLine()
         if imgui.Button("Hide message",imgui.ImVec2(fcommon.GetSize(2))) then
-            tcheatmenu.window.fail_loading_json = false
+            tcheatmenu.fail_loading_json = false
         end
         imgui.Spacing()
     end
 
-    if tcheatmenu.window.restart_required then
+    if tcheatmenu.restart_required then
         imgui.Button("Restart is required to apply some changes",imgui.ImVec2(fcommon.GetSize(1)))
         if imgui.Button("Restart menu",imgui.ImVec2(fcommon.GetSize(2))) then
             fmenu.tmenu.crash_text = "Cheat Menu ~g~reloaded"
@@ -211,7 +182,7 @@ function(self) -- render frame
         end
         imgui.SameLine()
         if imgui.Button("Hide message",imgui.ImVec2(fcommon.GetSize(2))) then
-            tcheatmenu.window.restart_required = false
+            tcheatmenu.restart_required = false
         end
         imgui.Spacing()
     end
@@ -245,26 +216,7 @@ function(self) -- render frame
 
     if fmenu.tmenu.update_status == fconst.UPDATE_STATUS.DOWNLOADED then
         if imgui.Button("Install update. This might take a while.",imgui.ImVec2(fcommon.GetSize(1))) then
-            fmenu.tmenu.update_status = fconst.UPDATE_STATUS.HIDE_MSG
-            fgame.tgame.script_manager.skip_auto_reload = true
-            ziplib.zip_extract(tcheatmenu.dir .. "update.zip",tcheatmenu.dir,nil,nil)
-            
-            if string.find( script.this.version,"beta") then
-                fcommon.MoveFiles(getWorkingDirectory() .. "\\lib\\cheat-menu\\Cheat-Menu-master\\",getGameDirectory())
-            else
-                print(fmenu.tmenu.repo_version)
-                fcommon.MoveFiles(getWorkingDirectory() .. "\\lib\\cheat-menu\\Cheat-Menu-" .. fmenu.tmenu.repo_version .. "\\",getGameDirectory())
-            end
-            
-            os.remove(tcheatmenu.dir .. "update.zip")
-
-            -- Delete the old config file too, causes crash?
-            os.remove(string.format(tcheatmenu.dir .. "/json/config.json"))
-            fconfig.tconfig.save_config = false
-
-            printHelpString("Update ~g~Installed")
-            print("Update installed. Reloading script.")
-            thisScript():reload()
+           fmenu.InstallUpdate()
         end
         imgui.Spacing()
     end
@@ -275,12 +227,12 @@ function(self) -- render frame
     fweapon.WeaponMain,fmission.MissionMain,fstat.StatMain,fgame.GameMain,fvisual.VisualMain,fmenu.MenuMain})
 
     --------------------------------------------------
-    -- First startup page
+    -- Welcome page
     if tcheatmenu.current_menu == 0 then
 
         if imgui.BeginChild("Welcome") then
             imgui.Dummy(imgui.ImVec2(0,10))
-            imgui.TextWrapped("Welcome to " .. tcheatmenu.window.title .. " by Grinch_")
+            imgui.TextWrapped("Welcome to " .. tcheatmenu.title .. " by Grinch_")
             imgui.Dummy(imgui.ImVec2(0,10))
             imgui.TextWrapped("Please configure the settings below,\n(Recommanded settings are already applied)")
             imgui.Dummy(imgui.ImVec2(0,20))
@@ -292,7 +244,7 @@ function(self) -- render frame
                 end
             end
             imgui.Spacing()
-            fcommon.HotKey("Cheat Menu open/close hotkey",tcheatmenu.hot_keys.menu_open)
+            fcommon.HotKey("Cheat Menu open/close hotkey",fmenu.tmenu.hot_keys.menu_open)
 
             imgui.Dummy(imgui.ImVec2(0,10))
 
@@ -313,10 +265,10 @@ will download files from github repository.")
     
     --------------------------------------------------
     -- Update the menu size & positon variables so they can be saved later
-    tcheatmenu.window.size.X  = imgui.GetWindowWidth()
-    tcheatmenu.window.size.Y  = imgui.GetWindowHeight()
-    tcheatmenu.window.coord.X = imgui.GetWindowPos().x 
-    tcheatmenu.window.coord.Y = imgui.GetWindowPos().y
+    tcheatmenu.size.X  = imgui.GetWindowWidth()
+    tcheatmenu.size.Y  = imgui.GetWindowHeight()
+    tcheatmenu.coord.X = imgui.GetWindowPos().x 
+    tcheatmenu.coord.Y = imgui.GetWindowPos().y
 
     --------------------------------------------------
     imgui.End()
@@ -365,16 +317,14 @@ function()
         imgui.Text("Frames: " .. tostring(math.floor(imgui.GetIO().Framerate)))
     end
     if isCharInAnyCar(PLAYER_PED) then
-        car = getCarCharIsUsing(PLAYER_PED)
+        local hveh = getCarCharIsUsing(PLAYER_PED)
         if  fmenu.tmenu.overlay.speed[0] then
-            speed = getCarSpeed(car)
-            total_gears = getCarNumberOfGears(car)
-            current_gear = getCarCurrentGear(car)
-            imgui.Text(string.format("Speed: %d %d/%d",math.floor(speed),current_gear,total_gears))
+            imgui.Text(string.format("Speed: %d %d/%d",math.floor(getCarSpeed(hveh)),getCarCurrentGear(hveh)
+            ,getCarNumberOfGears(hveh)))
         end
 
         if fmenu.tmenu.overlay.health[0] then
-            imgui.Text(string.format("Health: %.0f%%",getCarHealth(car)/10))
+            imgui.Text(string.format("Health: %.0f%%",getCarHealth(hveh)/10))
         end
     end
 
@@ -383,7 +333,7 @@ function()
     end
 
     if fmenu.tmenu.overlay.coordinates[0] then
-        x,y,z = getCharCoordinates(PLAYER_PED)
+        local x,y,z = getCharCoordinates(PLAYER_PED)
         imgui.Text(string.format("Coordinates: %d %d %d", math.floor(x) , math.floor(y) , math.floor(z)),1000)
     end
 
@@ -483,6 +433,7 @@ function main()
     --------------------------------------------------
     -- Functions that need to lunch only once at startup
     
+    --writeMemory(0x4b331f,6,0xE9,false)
     if isSampLoaded() then
         fgame.tgame.script_manager.skip_auto_reload = true
         print("SAMP detected, unloading script.")
@@ -600,21 +551,21 @@ function main()
     fvehicle.ParseCarcols()
     fvehicle.ParseVehiclesIDE()
 
-    fcommon.SingletonThread(fplayer.KeepPosition,"KeepPosition")
-    fcommon.SingletonThread(fplayer.RegenerateHealth,"RegenerateHealth")
-    fcommon.SingletonThread(fped.PedHealthDisplay,"PedHealthDisplay")
-    fcommon.SingletonThread(fgame.FreezeTime,"FreezeTime")
-    fcommon.SingletonThread(fgame.LoadScriptsOnKeyPress,"LoadScriptsOnKeyPress")
-    fcommon.SingletonThread(fgame.RandomCheatsActivate,"RandomCheatsActivate")
-    fcommon.SingletonThread(fgame.RandomCheatsDeactivate,"RandomCheatsDeactivate")
-    fcommon.SingletonThread(fgame.SolidWater,"SolidWater")
-    fcommon.SingletonThread(fgame.SyncSystemTime,"SyncSystemTime")
-    fcommon.SingletonThread(fvehicle.OnEnterVehicle,"OnEnterVehicle")
-    fcommon.SingletonThread(fvehicle.RainbowColors,"RainbowColors")
-    fcommon.SingletonThread(fvehicle.RainbowNeons,"RainbowNeons")
-    fcommon.SingletonThread(fvehicle.TrafficNeons,"TrafficNeons")
-    fcommon.SingletonThread(fvisual.LockWeather,"LockWeather")
-    fcommon.SingletonThread(fweapon.AutoAim,"AutoAim")
+    fcommon.CreateThread(fplayer.KeepPosition)
+    fcommon.CreateThread(fplayer.RegenerateHealth)
+    fcommon.CreateThread(fped.PedHealthDisplay)
+    fcommon.CreateThread(fgame.FreezeTime)
+    fcommon.CreateThread(fgame.LoadScriptsOnKeyPress)
+    fcommon.CreateThread(fgame.RandomCheatsActivate)
+    fcommon.CreateThread(fgame.RandomCheatsDeactivate)
+    fcommon.CreateThread(fgame.SolidWater)
+    fcommon.CreateThread(fgame.SyncSystemTime)
+    fcommon.CreateThread(fvehicle.OnEnterVehicle)
+    fcommon.CreateThread(fvehicle.RainbowColors)
+    fcommon.CreateThread(fvehicle.RainbowNeons)
+    fcommon.CreateThread(fvehicle.TrafficNeons)
+    fcommon.CreateThread(fvisual.LockWeather)
+    fcommon.CreateThread(fweapon.AutoAim)
 
     ------------------------------------------------
 
@@ -628,7 +579,6 @@ function main()
         local CurWeapon = getCurrentCharWeapon(PLAYER_PED)
 
         local pPed = getCharPointer(PLAYER_PED)
-        prev_weapon = CurWeapon
 
         local skill = callMethod(0x5E3B60,pPed,1,0,CurWeapon)
         local pWeaponInfo = callFunction(0x743C60,2,2,CurWeapon,skill)
@@ -665,10 +615,10 @@ function main()
         end
 
         -- Camera mode
-        fcommon.OnHotKeyPress(tcheatmenu.hot_keys.camera_mode,function()
+        fcommon.OnHotKeyPress(fmenu.tmenu.hot_keys.camera_mode,function()
             fgame.tgame.camera.bool[0] = not fgame.tgame.camera.bool[0]
             if fgame.tgame.camera.bool[0] then
-                fcommon.SingletonThread(fgame.CameraMode,"CameraMode")
+                fcommon.CreateThread(fgame.CameraMode,"CameraMode")
                 printHelpString("Camera mode enabled")
             else
                 printHelpString("Camera mode disabled")
@@ -677,7 +627,7 @@ function main()
 
         -- Quick screenshot
         if fgame.tgame.ss_shortcut[0] then
-            fcommon.OnHotKeyPress(tcheatmenu.hot_keys.quick_screenshot,function()
+            fcommon.OnHotKeyPress(fmenu.tmenu.hot_keys.quick_screenshot,function()
                 takePhoto(true)
                 printHelpString("Screenshot ~g~taken")
             end)
@@ -685,17 +635,19 @@ function main()
 
         -- Qucik teleport
         if fteleport.tteleport.shortcut[0] then
-            fcommon.OnHotKeyPress(tcheatmenu.hot_keys.quick_teleport,function()
+            fcommon.OnHotKeyPress(fmenu.tmenu.hot_keys.quick_teleport,function()
                 fteleport.Teleport()
             end)
         end
-        
-        -- God mode
-        setCharProofs(PLAYER_PED,fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0],fplayer.tplayer.god[0])
+    
+        if fplayer.tplayer.god[0] then
+            writeMemory(0x96916D,1,1,false)
+            setCharProofs(PLAYER_PED,true,true,true,true,true)
+        end
 
         -- Aim skin changer
         if fplayer.tplayer.aimSkinChanger[0] then
-            fcommon.OnHotKeyPress(tcheatmenu.hot_keys.asc_key,function()
+            fcommon.OnHotKeyPress(fmenu.tmenu.hot_keys.asc_key,function()
                 local bool,char = getCharPlayerIsTargeting(PLAYER_HANDLE)
                 if bool == true then
                     local model = getCharModel(char)
@@ -751,11 +703,11 @@ function main()
 
         ------------------------------------------------
         -- Menu open close
-        fcommon.OnHotKeyPress(tcheatmenu.hot_keys.menu_open,function()
-            tcheatmenu.window.show[0] = not tcheatmenu.window.show[0]
+        fcommon.OnHotKeyPress(fmenu.tmenu.hot_keys.menu_open,function()
+            tcheatmenu.show[0] = not tcheatmenu.show[0]
         end)
 
-        fcommon.OnHotKeyPress(tcheatmenu.hot_keys.command_window,function()
+        fcommon.OnHotKeyPress(fmenu.tmenu.hot_keys.command_window,function()
             fmenu.tmenu.command.show[0] = not fmenu.tmenu.command.show[0]
         end)
 

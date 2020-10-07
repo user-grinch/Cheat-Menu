@@ -293,7 +293,7 @@ function module.VisualMain()
             fcommon.CheckBoxValue('Hide wanted level',0x58DD1B,nil,0x90)
             fcommon.CheckBoxVar('Lock weather',module.tvisual.lock_weather,nil,
             function()
-                fcommon.SingletonThread(fvisual.LockWeather,"LockWeather")
+                fcommon.CreateThread(fvisual.LockWeather)
             end)
             fcommon.CheckBoxVar('Radio channel names',module.tvisual.radio_channel_names,nil,
             function()     
@@ -334,15 +334,16 @@ function module.VisualMain()
             UpdateTimecycData(val)
 
             imgui.SetNextItemWidth(imgui.GetWindowContentRegionWidth()/1.7)
-            if imgui.Button("Reset timecyc",imgui.ImVec2(fcommon.GetSize(2))) then
-                casts.CTimeCyc.initialise()
-                printHelpString("Timecyc reset")
-            end
-            imgui.SameLine()
             if imgui.Button("Generate timecyc file",imgui.ImVec2(fcommon.GetSize(2))) then
                 GenerateTimecycFile(HOUR)
                 printHelpString("File generated")
             end
+            imgui.SameLine()
+            if imgui.Button("Reset timecyc",imgui.ImVec2(fcommon.GetSize(2))) then
+                casts.CTimeCyc.initialise()
+                printHelpString("Timecyc reset")
+            end
+            
             imgui.Spacing()
             local weather = imgui.new.int(casts.CTimeCyc.curr_weather[0])
             if imgui.Combo("Current weather", weather,module.tvisual.timecyc.weather.array,#module.tvisual.timecyc.weather.names) then

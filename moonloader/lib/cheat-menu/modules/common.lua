@@ -76,31 +76,21 @@ function module.pool(pool)
     return iter
 end
 
-function module.LockThread(text)
-    
-    if tcheatmenu.thread_locks[text] == nil then
-        tcheatmenu.thread_locks[text] = true
-        return true
-    end
 
-    return false
-end
+local thread_locks = {} 
 
-function module.UnlockThread(text)
-    
-    if tcheatmenu.thread_locks[text] ~= nil then
-        tcheatmenu.thread_locks[text] = nil
-    end
-end
+function module.CreateThread(func)
+    lock_key = func -- get the function address if no key provided
 
-function module.SingletonThread(func,thread_lock_key)
-    thread_lock_key = thread_lock_key or tostring(func) -- get the function address if no key provided
-    lua_thread.create(function()
-        if module.LockThread(thread_lock_key) then
+    lua_thread.create(function(func,lock_key)
+
+        if thread_locks[text] == nil then -- is thread key unlcoked
+            thread_locks[lock_key] = true
             func()
-            module.UnlockThread(thread_lock_key)
+            thread_locks[lock_key] = nil -- unlock the thread key
         end
-        end,func,thread_lock_key)
+
+    end,func,lock_key)
 end
 
 --------------------------------------------------
@@ -116,7 +106,7 @@ function module.LoadJson(filename)
         if status and table then
             return table
         else
-            tcheatmenu.window.fail_loading_json = true
+            tcheatmenu.fail_loading_json = true
             print("Failed to load json file, " .. filename)
         end
     end
@@ -179,30 +169,6 @@ end
 
 --------------------------------------------------
 -- imgui functions
-
--- Config panel
-function module.ConfigPanel(label,func)
-    if func ~= nil then
-        imgui.SameLine()
-        imgui.InvisibleButton("c##".. label,imgui.CalcTextSize("c"))
-        local drawlist = imgui.GetWindowDrawList()
-        drawlist:AddText(imgui.ImVec2(imgui.GetItemRectMin().x,imgui.GetItemRectMin().y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.TextDisabled),"c")
-        
-        
-        if imgui.IsItemClicked(0) then
-            tcheatmenu.window.panel_func = function()
-                imgui.TextWrapped(string.format("%s configuraion",label))
-                imgui.Separator()
-                if imgui.Button("Hide",imgui.ImVec2(module.GetSize(1))) then
-                    tcheatmenu.window.panel_func = nil
-                end
-                
-                imgui.Dummy(imgui.ImVec2(0,10))
-                func()
-            end
-        end
-    end
-end
 
 -- Calculates width of element(button) acoording to count
 function module.GetSize(count,no_spacing)
@@ -317,6 +283,11 @@ function module.CreateMenus(names,funcs)
     end
 end
 
+--------------------------------------------------
+-- Function DrawEntries
+
+local draw_entries_data = {}
+
 function DrawImage(identifier,func_on_left_click,func_on_right_click,image_table,const_image_height,const_image_width,model,image,model_name)
 
     if type(image) ~= "string" then
@@ -327,7 +298,7 @@ function DrawImage(identifier,func_on_left_click,func_on_right_click,image_table
             func_on_left_click(model)
         end
         if func_on_right_click ~= nil and imgui.IsItemClicked(1) then
-            tcheatmenu.temp_data.draw_entries_func[identifier].context_menu_data = 
+            draw_entries_data[identifier].context_menu_data = 
             {
                 func = func_on_right_click,
                 key = model,
@@ -348,10 +319,10 @@ function DrawImage(identifier,func_on_left_click,func_on_right_click,image_table
             drawlist:AddText(imgui.ImVec2(imgui.GetItemRectMin().x+offset_x,imgui.GetItemRectMin().y+offset_y), imgui.GetColorU32(imgui.Col.Text),model_name)
         end
 
-        if tcheatmenu.temp_data.draw_entries_func[identifier].entry_count % images_in_row ~= 0 then
+        if draw_entries_data[identifier].entry_count % images_in_row ~= 0 then
             imgui.SameLine(0.0,4.0)
         end
-        tcheatmenu.temp_data.draw_entries_func[identifier].entry_count = tcheatmenu.temp_data.draw_entries_func[identifier].entry_count + 1
+        draw_entries_data[identifier].entry_count = draw_entries_data[identifier].entry_count + 1
     end
 end
 
@@ -361,7 +332,7 @@ function DrawText(identifier,func_on_left_click,func_on_right_click,entry,text,k
     end
 
     if func_on_right_click ~= nil and imgui.IsItemClicked(1) then
-        tcheatmenu.temp_data.draw_entries_func[identifier].context_menu_data = 
+        draw_entries_data[identifier].context_menu_data = 
         {
             func = func_on_right_click,
             key = key,
@@ -376,8 +347,8 @@ function module.DrawEntries(identifier,draw_type,func_on_left_click,func_on_righ
     --------------------------------------------------
     -- Setup the temp table
 
-    if tcheatmenu.temp_data.draw_entries_func[identifier] == nil then
-        tcheatmenu.temp_data.draw_entries_func[identifier] = {
+    if draw_entries_data[identifier] == nil then
+        draw_entries_data[identifier] = {
             filter   = imgui.ImGuiTextFilter(),
             entry_count   = 1,
             entry_table   = {["All"] = {}},
@@ -388,37 +359,37 @@ function module.DrawEntries(identifier,draw_type,func_on_left_click,func_on_righ
     end
 
     if imgui.IsMouseClicked(1) then
-        tcheatmenu.temp_data.draw_entries_func[identifier].context_menu_data = nil
+        draw_entries_data[identifier].context_menu_data = nil
     end
 
     if identifier == fconst.IDENTIFIER.COMPONENT then
         local hveh = getCarCharIsUsing(PLAYER_PED)
         local model = getCarModel(hveh)
 
-        if tcheatmenu.temp_data.draw_entries_func[identifier].veh_model ~= model then
-            tcheatmenu.temp_data.draw_entries_func[identifier].veh_model = model
+        if draw_entries_data[identifier].veh_model ~= model then
+            draw_entries_data[identifier].veh_model = model
             for category,table in pairs(data_table) do
                 for model,data in pairs(table) do
                     if casts.CVehicle.IsValidModForVehicle(tonumber(model),getCarPointer(hveh)) then
-                        if tcheatmenu.temp_data.draw_entries_func[identifier].entry_table[category] == nil then
-                            tcheatmenu.temp_data.draw_entries_func[identifier].entry_table[category] = {}
+                        if draw_entries_data[identifier].entry_table[category] == nil then
+                            draw_entries_data[identifier].entry_table[category] = {}
                         end
-                        tcheatmenu.temp_data.draw_entries_func[identifier].entry_table[category][model] = data
+                        draw_entries_data[identifier].entry_table[category][model] = data
                     end
                 end
             end
         end
     else
-        tcheatmenu.temp_data.draw_entries_func[identifier].entry_table = data_table
+        draw_entries_data[identifier].entry_table = data_table
         
-        if tcheatmenu.temp_data.draw_entries_func[identifier].entry_table["All"] == nil then
-            tcheatmenu.temp_data.draw_entries_func[identifier].entry_table["All"] = {}
+        if draw_entries_data[identifier].entry_table["All"] == nil then
+            draw_entries_data[identifier].entry_table["All"] = {}
         end
     end
 
-    if tcheatmenu.temp_data.draw_entries_func[identifier].images_loaded == false then
+    if draw_entries_data[identifier].images_loaded == false then
         lua_thread.create(function()
-            for _,table in pairs(tcheatmenu.temp_data.draw_entries_func[identifier].entry_table) do
+            for _,table in pairs(draw_entries_data[identifier].entry_table) do
                 for model,image in pairs(table) do
                     if type(image) == "string" then
                         table[model] = imgui.CreateTextureFromFile(image)
@@ -427,7 +398,7 @@ function module.DrawEntries(identifier,draw_type,func_on_left_click,func_on_righ
                 end
             end
         end)
-        tcheatmenu.temp_data.draw_entries_func[identifier].images_loaded = true
+        draw_entries_data[identifier].images_loaded = true
     end
 
     --------------------------------------------------
@@ -436,17 +407,17 @@ function module.DrawEntries(identifier,draw_type,func_on_left_click,func_on_righ
     local width = imgui.GetWindowContentRegionWidth() - 8
 
     imgui.SetNextItemWidth(width/2)
-    fcommon.DropDownList("##List",tcheatmenu.temp_data.draw_entries_func[identifier].entry_table,tcheatmenu.temp_data.draw_entries_func[identifier].selected,
+    fcommon.DropDownListStr("##List",draw_entries_data[identifier].entry_table,draw_entries_data[identifier].selected,
     function(key,val) 
-        tcheatmenu.temp_data.draw_entries_func[identifier].selected = key
+        draw_entries_data[identifier].selected = key
     end)
 
     imgui.SameLine()
 
     imgui.SetNextItemWidth(width/2)
     
-    tcheatmenu.temp_data.draw_entries_func[identifier].filter:Draw("##Filter")
-    if tcheatmenu.temp_data.draw_entries_func[identifier].filter:PassFilter('') then
+    draw_entries_data[identifier].filter:Draw("##Filter")
+    if draw_entries_data[identifier].filter:PassFilter('') then
         local min = imgui.GetItemRectMin()
         local drawlist = imgui.GetWindowDrawList()
         drawlist:AddText(imgui.ImVec2(min.x+imgui.GetStyle().ItemInnerSpacing.x,min.y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.TextDisabled),"Search")
@@ -458,11 +429,11 @@ function module.DrawEntries(identifier,draw_type,func_on_left_click,func_on_righ
 
     if imgui.BeginChild("##Draw") then 
 
-        for category,table in pairs(tcheatmenu.temp_data.draw_entries_func[identifier].entry_table) do
-            if tcheatmenu.temp_data.draw_entries_func[identifier].selected == "All" or category == tcheatmenu.temp_data.draw_entries_func[identifier].selected then
+        for category,table in pairs(draw_entries_data[identifier].entry_table) do
+            if draw_entries_data[identifier].selected == "All" or category == draw_entries_data[identifier].selected then
                 for label,entry in pairs(table) do
                     local name = func_get_name(label)
-                    if tcheatmenu.temp_data.draw_entries_func[identifier].filter:PassFilter(name) then
+                    if draw_entries_data[identifier].filter:PassFilter(name) then
                         if draw_type == fconst.DRAW_TYPE.IMAGE then
                             DrawImage(identifier,func_on_left_click,func_on_right_click,table,const_image_height,const_image_width,label,entry,name)
                         else
@@ -472,28 +443,29 @@ function module.DrawEntries(identifier,draw_type,func_on_left_click,func_on_righ
                 end
             end
         end
-        if tcheatmenu.temp_data.draw_entries_func[identifier].context_menu_data ~= nil and imgui.BeginPopupContextWindow() then	
+        if draw_entries_data[identifier].context_menu_data ~= nil and imgui.BeginPopupContextWindow() then	
             
             if draw_type == fconst.DRAW_TYPE.IMAGE then
-                imgui.Text(tcheatmenu.temp_data.draw_entries_func[identifier].context_menu_data.category)
+                imgui.Text(draw_entries_data[identifier].context_menu_data.category)
             else
-                imgui.Text(tcheatmenu.temp_data.draw_entries_func[identifier].context_menu_data.key)
+                imgui.Text(draw_entries_data[identifier].context_menu_data.key)
             end
             imgui.Separator()
             imgui.Spacing()
-            tcheatmenu.temp_data.draw_entries_func[identifier].context_menu_data.func(tcheatmenu.temp_data.draw_entries_func[identifier].context_menu_data.key,tcheatmenu.temp_data.draw_entries_func[identifier].context_menu_data.category)
+            draw_entries_data[identifier].context_menu_data.func(draw_entries_data[identifier].context_menu_data.key,draw_entries_data[identifier].context_menu_data.category)
             if imgui.MenuItemBool("Close") then 
-				tcheatmenu.temp_data.draw_entries_func[identifier].context_menu_data = nil	
+				draw_entries_data[identifier].context_menu_data = nil	
             end
             imgui.EndPopup()       
         end
         
-        tcheatmenu.temp_data.draw_entries_func[identifier].entry_count = 1
+        draw_entries_data[identifier].entry_count = 1
         imgui.EndChild()
     end
     --------------------------------------------------
 
 end
+--------------------------------------------------
 
 function module.RadioButtonAddressEx(label,label_table,values,memory,save)
     if save == nil then save = true end
@@ -993,7 +965,9 @@ end
 local _tabs = 
 {
     current_bar = nil,
+    panel_func = nil,
 }
+
 
 function module.BeginTabBar(label)
 
@@ -1054,10 +1028,10 @@ function module.BeginTabItem(label)
 
 
     if _tabs[_tabs.current_bar].selected_tab == label then
-        if tcheatmenu.window.panel_func == nil then
+        if _tabs.panel_func == nil then
             return true
         else
-            tcheatmenu.window.panel_func()
+            _tabs.panel_func()
         end
     end
 end
@@ -1074,7 +1048,9 @@ function DrawTabElements(draw_list,label)
 
     if imgui.InvisibleButton("##InvisibleButton".. label, imgui.ImVec2(imgui.CalcTextSize(label).x+10,imgui.GetFrameHeight()*0.9)) then
         _tabs[_tabs.current_bar].selected_tab = label
+        _tabs.panel_func = nil
     end
+    
     if imgui.IsItemHovered() then
         btn_color = imgui.GetColorU32(imgui.Col.TabHovered)
     end
@@ -1092,6 +1068,30 @@ function module.EndTabItem(label) end
 function module.EndTabBar(label) 
     imgui.EndChild()
     _tabs.current_bar = nil
+end
+
+
+function module.ConfigPanel(label,func)
+    if func ~= nil then
+        imgui.SameLine()
+        imgui.InvisibleButton("c##".. label,imgui.CalcTextSize("c"))
+        local drawlist = imgui.GetWindowDrawList()
+        drawlist:AddText(imgui.ImVec2(imgui.GetItemRectMin().x,imgui.GetItemRectMin().y+imgui.GetStyle().FramePadding.y), imgui.GetColorU32(imgui.Col.TextDisabled),"c")
+        
+        
+        if imgui.IsItemClicked(0) then
+            _tabs.panel_func = function()
+                imgui.TextWrapped(string.format("%s configuraion",label))
+                imgui.Separator()
+                if imgui.Button("Hide",imgui.ImVec2(module.GetSize(1))) then
+                    _tabs.panel_func = nil
+                end
+                
+                imgui.Dummy(imgui.ImVec2(0,10))
+                func()
+            end
+        end
+    end
 end
 
 --------------------------------------------------
@@ -1238,7 +1238,7 @@ function module.HorizontalSelector(label,var,table)
     return rtn
 end
 
-function module.DropDownList(label,table,selected,func)
+function module.DropDownListStr(label,table,selected,func)
     if imgui.BeginCombo(label, selected) then
         for key,val in module.spairs(table) do
             if key ~= selected then
@@ -1249,6 +1249,23 @@ function module.DropDownList(label,table,selected,func)
         end
         imgui.EndCombo()
     end
+end
+
+function module.DropDownListNumber(label,table,selected)
+    local rtn = false
+
+    if imgui.BeginCombo(label, table[selected[0]]) then
+        for key,val in ipairs(table) do
+            if key ~= selected[0] then
+                if imgui.MenuItemBool(val)then
+                    rtn = true
+                    selected[0] = key
+                end
+            end
+        end
+        imgui.EndCombo()
+    end
+    return rtn
 end
 
 function module.DropDownMenu(label,func,text_disabled)
