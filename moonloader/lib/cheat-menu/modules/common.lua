@@ -326,7 +326,7 @@ function DrawImage(identifier,func_on_left_click,func_on_right_click,image_table
     end
 end
 
-function DrawText(identifier,func_on_left_click,func_on_right_click,entry,text,key,category)
+function DrawText(identifier,func_on_left_click,func_on_right_click,entry,text,key)
     if imgui.MenuItemBool(text) then
         func_on_left_click(entry,category)
     end
@@ -335,8 +335,7 @@ function DrawText(identifier,func_on_left_click,func_on_right_click,entry,text,k
         draw_entries_data[identifier].context_menu_data = 
         {
             func = func_on_right_click,
-            key = key,
-            category = category
+            key = key
         }
     end
 end
@@ -351,54 +350,26 @@ function module.DrawEntries(identifier,draw_type,func_on_left_click,func_on_righ
         draw_entries_data[identifier] = {
             filter   = imgui.ImGuiTextFilter(),
             entry_count   = 1,
-            entry_table   = {["All"] = {}},
             selected = "All",
-            veh_model = nil,
-            images_loaded = not(draw_type == fconst.DRAW_TYPE.IMAGE),
         }
+        
+        if draw_type == fconst.DRAW_TYPE.IMAGE then
+            lua_thread.create(function(data_table)
+                for _,table in pairs(data_table) do
+                    for model,image in pairs(table) do
+                        if type(image) == "string" then
+                            table[model] = imgui.CreateTextureFromFile(image)
+                            wait(0)
+                        end
+                    end
+                end
+            end,data_table)
+        end
+        data_table[draw_entries_data[identifier].selected] = {}
     end
 
     if imgui.IsMouseClicked(1) then
         draw_entries_data[identifier].context_menu_data = nil
-    end
-
-    if identifier == fconst.IDENTIFIER.COMPONENT then
-        local hveh = getCarCharIsUsing(PLAYER_PED)
-        local model = getCarModel(hveh)
-
-        if draw_entries_data[identifier].veh_model ~= model then
-            draw_entries_data[identifier].veh_model = model
-            for category,table in pairs(data_table) do
-                for model,data in pairs(table) do
-                    if casts.CVehicle.IsValidModForVehicle(tonumber(model),getCarPointer(hveh)) then
-                        if draw_entries_data[identifier].entry_table[category] == nil then
-                            draw_entries_data[identifier].entry_table[category] = {}
-                        end
-                        draw_entries_data[identifier].entry_table[category][model] = data
-                    end
-                end
-            end
-        end
-    else
-        draw_entries_data[identifier].entry_table = data_table
-        
-        if draw_entries_data[identifier].entry_table["All"] == nil then
-            draw_entries_data[identifier].entry_table["All"] = {}
-        end
-    end
-
-    if draw_entries_data[identifier].images_loaded == false then
-        lua_thread.create(function()
-            for _,table in pairs(draw_entries_data[identifier].entry_table) do
-                for model,image in pairs(table) do
-                    if type(image) == "string" then
-                        table[model] = imgui.CreateTextureFromFile(image)
-                        wait(0)
-                    end
-                end
-            end
-        end)
-        draw_entries_data[identifier].images_loaded = true
     end
 
     --------------------------------------------------
@@ -407,7 +378,7 @@ function module.DrawEntries(identifier,draw_type,func_on_left_click,func_on_righ
     local width = imgui.GetWindowContentRegionWidth() - 8
 
     imgui.SetNextItemWidth(width/2)
-    fcommon.DropDownListStr("##List",draw_entries_data[identifier].entry_table,draw_entries_data[identifier].selected,
+    fcommon.DropDownListStr("##List",data_table,draw_entries_data[identifier].selected,
     function(key,val) 
         draw_entries_data[identifier].selected = key
     end)
@@ -429,15 +400,18 @@ function module.DrawEntries(identifier,draw_type,func_on_left_click,func_on_righ
 
     if imgui.BeginChild("##Draw") then 
 
-        for category,table in pairs(draw_entries_data[identifier].entry_table) do
+        for category,table in pairs(data_table) do
             if draw_entries_data[identifier].selected == "All" or category == draw_entries_data[identifier].selected then
                 for label,entry in pairs(table) do
                     local name = func_get_name(label)
                     if draw_entries_data[identifier].filter:PassFilter(name) then
                         if draw_type == fconst.DRAW_TYPE.IMAGE then
-                            DrawImage(identifier,func_on_left_click,func_on_right_click,table,const_image_height,const_image_width,label,entry,name)
+                            if identifier ~= fconst.IDENTIFIER.COMPONENT
+                            or casts.CVehicle.IsValidModForVehicle(tonumber(label),getCarPointer(getCarCharIsUsing(PLAYER_PED))) then
+                                DrawImage(identifier,func_on_left_click,func_on_right_click,table,const_image_height,const_image_width,label,entry,name)
+                            end
                         else
-                            DrawText(identifier,func_on_left_click,func_on_right_click,entry,name,label,category)
+                            DrawText(identifier,func_on_left_click,func_on_right_click,entry,name,label)
                         end
                     end
                 end
@@ -446,8 +420,6 @@ function module.DrawEntries(identifier,draw_type,func_on_left_click,func_on_righ
         if draw_entries_data[identifier].context_menu_data ~= nil and imgui.BeginPopupContextWindow() then	
             
             if draw_type == fconst.DRAW_TYPE.IMAGE then
-                imgui.Text(draw_entries_data[identifier].context_menu_data.category)
-            else
                 imgui.Text(draw_entries_data[identifier].context_menu_data.key)
             end
             imgui.Separator()
@@ -589,8 +561,9 @@ function module.CheckBoxValue(name,address,tooltip,enable_value,disable_value)
 
 end
 
-function module.CheckBoxVar(name,var,tooltip,func,panel_func,show_help_msg)
+function module.CheckBoxVar(name,var,tooltip,panel_func,show_help_msg)
     show_help_msg = show_help_msg or true
+    local temp = var[0]
 
     if imgui.Checkbox(name, var) then
 
@@ -601,16 +574,15 @@ function module.CheckBoxVar(name,var,tooltip,func,panel_func,show_help_msg)
                 fcommon.CheatDeactivated()
             end
         end
-        if func ~= nil then
-            func()
-        end
-    end
+    end    
 
     module.InformationTooltip(tooltip)
     module.ConfigPanel(name,panel_func)
+
+    if temp ~= var[0] then return true end
 end
 
-function module.CheckBoxFunc(name,var,func,tooltip,panel_func)
+function module.CheckBoxFunc(name,var,func,tooltip)
 
     if imgui.Checkbox(name, var) then
         func()
@@ -620,14 +592,12 @@ function module.CheckBoxFunc(name,var,func,tooltip,panel_func)
 
 end
 
-function module.CheckBox3Var(name,var,tooltip,func,panel_func,show_help_msg)
+function module.CheckBox3Var(name,var,tooltip,panel_func,show_help_msg)
     show_help_msg = show_help_msg or true
+    local temp = var[0]
+    tooltip = "Check mark - Enabled\nSquare mark - No changes\nEmpty box - Disabled\n\n" .. tooltip
 
-    if fcommon.CheckBox3(name, var) then
-        if func ~= nil then
-            func()
-        end
-    end
+    fcommon.CheckBox3(name, var)
 
     if imgui.IsItemClicked(0) or imgui.IsItemClicked(1) then
         if show_help_msg then
@@ -637,6 +607,8 @@ function module.CheckBox3Var(name,var,tooltip,func,panel_func,show_help_msg)
 
     module.InformationTooltip(tooltip)
     module.ConfigPanel(name,panel_func)
+
+    if temp ~= var[0] then return true end
 end
 
 --------------------------------------------------

@@ -150,19 +150,14 @@ function module.PedMain()
     if fcommon.BeginTabBar('PedBar') then
         if fcommon.BeginTabItem('Checkboxes') then
             imgui.Columns(2,nil,false)
-            fcommon.CheckBoxVar("Display target health",module.tped.ped_health_display,nil,
-            function()
+            if fcommon.CheckBoxVar("Display target health",module.tped.ped_health_display) then
                 fcommon.CreateThread(module.PedHealthDisplay)
-            end)
+            end
             fcommon.CheckBoxValue("Elvis everywhere",0x969157)
             fcommon.CheckBoxValue("Everyone is armed",0x969140)
             fcommon.CheckBoxValue("Gangs control streets",0x96915B)
             fcommon.CheckBoxValue("Gangs everywhere",0x96915A)
-            fcommon.CheckBoxVar("Gang wars",module.tped.gang.wars,nil,
-            function()
-                setGangWarsActive(module.tped.gang.wars[0])
-                if module.tped.gang.wars[0] then fcommon.CheatActivated() else fcommon.CheatDeactivated() end
-            end,
+            if fcommon.CheckBoxVar("Gang wars",module.tped.gang.wars,nil,
             function()
                 if imgui.Button("Start gang war",imgui.ImVec2(fcommon.GetSize(2))) then
                     if GetLargestGangInZone() == 1 then
@@ -201,7 +196,9 @@ function module.PedMain()
                         os.execute('explorer "https://gtaforums.com/topic/682194-extended-gang-wars/"')
                     end
                 end
-            end)
+            end) then
+                setGangWarsActive(module.tped.gang.wars[0])
+            end
             
             imgui.NextColumn()
 

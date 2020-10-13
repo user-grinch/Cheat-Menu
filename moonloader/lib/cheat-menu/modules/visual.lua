@@ -264,24 +264,21 @@ function module.VisualMain()
             fcommon.CheckBoxValue('Armour percentage',0x589125)
             fcommon.CheckBoxValue('Breath border',0x589207)
             fcommon.CheckBoxValue('Breath percentage',0x589209)
-            fcommon.CheckBoxVar('Display car names',module.tvisual.car_names,nil,
-            function()    
+            if fcommon.CheckBoxVar('Display car names',module.tvisual.car_names) then
                 displayCarNames(module.tvisual.car_names[0]) 
                 fconfig.Set(fconfig.tconfig.misc_data,"Display Car Names",module.tvisual.car_names[0])
-            end)
-            fcommon.CheckBoxVar('Disable motion blur',module.tvisual.disable_motion_blur,nil,
-            function()    
+            end
+            if fcommon.CheckBoxVar('Disable motion blur',module.tvisual.disable_motion_blur) then
                 if module.tvisual.disable_motion_blur[0] then
                     writeMemory(0x7030A0,4,0xC3,false)
                 else
                     writeMemory(0x7030A0,4,0xF3CEC83,false)
                 end
-            end)
-            fcommon.CheckBoxVar('Display zone names',module.tvisual.zone_names,nil,
-            function()     
+            end
+            if fcommon.CheckBoxVar('Display zone names',module.tvisual.zone_names) then
                 displayZoneNames(module.tvisual.zone_names[0])
                 fconfig.Set(fconfig.tconfig.misc_data,"Display Zone Names",module.tvisual.zone_names[0])
-            end)
+            end
             fcommon.CheckBoxValue('Enable hud',0xBA6769)
 
             imgui.NextColumn()
@@ -291,18 +288,16 @@ function module.VisualMain()
             fcommon.CheckBoxValue('Health border',0x589353)
             fcommon.CheckBoxValue('Health percentage',0x589355)
             fcommon.CheckBoxValue('Hide wanted level',0x58DD1B,nil,0x90)
-            fcommon.CheckBoxVar('Lock weather',module.tvisual.lock_weather,nil,
-            function()
+            if fcommon.CheckBoxVar('Lock weather',module.tvisual.lock_weather) then
                 fcommon.CreateThread(fvisual.LockWeather)
-            end)
-            fcommon.CheckBoxVar('Radio channel names',module.tvisual.radio_channel_names,nil,
-            function()     
+            end
+            if fcommon.CheckBoxVar('Radio channel names',module.tvisual.radio_channel_names) then
                 if module.tvisual.radio_channel_names[0] then
                     writeMemory(0x507035,5,-30533911,false)
                 else
                     writeMemory(0x507035,4,0x90,false)
                 end
-            end)
+            end
             imgui.Columns(1)
         end
         if fcommon.BeginTabItem('Menus') then

@@ -274,40 +274,38 @@ function module.PlayerMain()
     if fcommon.BeginTabBar("PlayerBar") then
         if fcommon.BeginTabItem("Checkboxes") then
             imgui.Columns(2,nil,false)
-            fcommon.CheckBoxVar("God mode",module.tplayer.god,nil,
-            function()
+            if fcommon.CheckBoxVar("God mode",module.tplayer.god) then
                 if not module.tplayer.god[0] then
                     writeMemory(0x96916D,1,0,false)
                     setCharProofs(PLAYER_PED,false,false,false,false,false)
                 end
-            end)
+            end
             fcommon.CheckBoxValue("Have bounty on head",0x96913F)
-            fcommon.CheckBoxVar("Health regeneration",module.tplayer.health_regeneration.bool,nil,fcommon.CreateThread(module.RegenerateHealth),
+            if fcommon.CheckBoxVar("Health regeneration",module.tplayer.health_regeneration.bool,nil,
             function()
                 imgui.SliderInt("Increment value", module.tplayer.health_regeneration.increment_value, 0, 25)
                 imgui.SliderInt("Interval", module.tplayer.health_regeneration.interval, 0, 10000)
                 fcommon.InformationTooltip("The wait time between increment\nin milliseconds")
-            end)
+            end) then
+                fcommon.CreateThread(module.RegenerateHealth)
+            end
             fcommon.CheckBoxValue("Higher cycle jumps",0x969161)
             fcommon.CheckBoxValue("Infinite oxygen",0x96916E)
             fcommon.CheckBoxValue("Infinite run",0xB7CEE4)
-            fcommon.CheckBoxVar("Invisible player",module.tplayer.invisible,nil,
-            function()
+            if fcommon.CheckBoxVar("Invisible player",module.tplayer.invisible) then
                 module.SetPlayerInvisible(module.tplayer.invisible[0])
-            end)
+            end
             imgui.NextColumn()
-            fcommon.CheckBoxVar("Keep position",module.tplayer.keep_position,"Auto teleport to the position you died from",
-            function()
+            if fcommon.CheckBoxVar("Keep position",module.tplayer.keep_position,"Auto teleport to the position you died from") then
                 fcommon.CreateThread(module.KeepPosition)
-            end)
+            end
             fcommon.CheckBoxValue("Lock player control",getCharPointer(PLAYER_PED)+0x598)
             fcommon.CheckBoxValue("Mega jump",0x96916C)
             fcommon.CheckBoxValue("Mega punch",0x969173)
             fcommon.CheckBoxValue("Never get hungry",0x969174)
 
             module.tplayer.never_wanted[0] = readMemory(0x969171 ,1,false)
-            fcommon.CheckBoxVar("Never wanted",module.tplayer.never_wanted,nil,
-            function()
+            if fcommon.CheckBoxVar("Never wanted",module.tplayer.never_wanted) then
                 callFunction(0x4396C0,1,0,false)
                 if module.tplayer.never_wanted[0] then
                     fcommon.CheatActivated()
@@ -315,7 +313,7 @@ function module.PlayerMain()
                     fcommon.CheatDeactivated()
                 end
                 fconfig.Set(fconfig.tconfig.misc_data,"Never Wanted",module.tplayer.never_wanted[0])
-            end)
+            end
            
             imgui.Columns(1)
         end

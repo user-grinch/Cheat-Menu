@@ -838,7 +838,7 @@ function module.VehicleMain()
     if imgui.Button("Flip vehicle",imgui.ImVec2(fcommon.GetSize(3))) then
         
         if isCharInAnyCar(PLAYER_PED) then
-            local car   = getCarCharIsUsing(PLAYER_PED)
+            local car = getCarCharIsUsing(PLAYER_PED)
 
             setCarRoll(car,getCarRoll(car) + 180)
             setCarRoll(car,getCarRoll(car)) -- rotation fix
@@ -857,59 +857,54 @@ function module.VehicleMain()
             fcommon.CheckBoxValue("All cars have nitro",0x969165)
             fcommon.CheckBoxValue("All taxis have nitro",0x96918B)
             fcommon.CheckBoxValue("Boats fly",0x969153)
-            fcommon.CheckBox3Var("Car engine",module.tvehicle.car_engine,"ON - check mark\nNot Configured - square mark\nOFF - blank box\n\
-Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (disabling car engine)")
+            fcommon.CheckBox3Var("Car engine",module.tvehicle.car_engine,"Set to 'No changes' if you're using\
+mods which involve fuel systems")
             fcommon.CheckBoxValue("Cars fly",0x969160)
             fcommon.CheckBoxVar("Car heavy",module.tvehicle.heavy)
             fcommon.CheckBoxValue("Decreased traffic",0x96917A)
             fcommon.CheckBoxVar("Don't fall off bike",module.tvehicle.stay_on_bike)
             fcommon.CheckBoxValue("Drive on water",0x969152)
-            fcommon.CheckBoxVar("First person camera",module.tvehicle.first_person_camera.bool,nil,
-            function()
-                fcommon.CreateThread(module.FirstPersonCamera)
-            end,
+            if fcommon.CheckBoxVar("First person camera",module.tvehicle.first_person_camera.bool,nil,
             function()
                 fcommon.InputFloat("Offset X", module.tvehicle.first_person_camera.offset_x_var,nil,-5,5,0.02)
                 fcommon.InputFloat("Offset Y", module.tvehicle.first_person_camera.offset_y_var,nil,-5,5,0.02)
                 fcommon.InputFloat("Offset Z", module.tvehicle.first_person_camera.offset_z_var,nil,-5,5,0.02)
-            end)
-            fcommon.CheckBoxVar("Fixed aircraft camera",module.tvehicle.aircraft.camera,nil,
-            function()
+            end) then
+                fcommon.CreateThread(module.FirstPersonCamera)
+            end
+            if fcommon.CheckBoxVar("Fixed aircraft camera",module.tvehicle.aircraft.camera) then
                 fcommon.CreateThread(module.AircraftCamera)
-            end)
+            end
             fcommon.CheckBoxValue("Fixed train camera",5416239,nil,fconst.TRAIN_CAM_FIX.ON,fconst.TRAIN_CAM_FIX.OFF)
             
             imgui.NextColumn()
 
             fcommon.CheckBoxValue("Float away when hit",0x969166)
             fcommon.CheckBoxValue("Green traffic lights",0x96914E)
-            fcommon.CheckBoxVar("Invisible car",module.tvehicle.invisible_car,nil,
-            function()
+            if fcommon.CheckBoxVar("Invisible car",module.tvehicle.invisible_car) then
                 if isCharInAnyCar(PLAYER_PED) then
                     local car = getCarCharIsUsing(PLAYER_PED)
                     setCarVisible(car,not module.tvehicle.invisible_car[0])
                 end
-            end)
-            fcommon.CheckBoxVar("Lights on",module.tvehicle.lights,nil,
-            function()
+            end
+            if fcommon.CheckBoxVar("Lights on",module.tvehicle.lights,nil,nil,false) then
                 if isCharInAnyCar(PLAYER_PED) then
-                    car = getCarCharIsUsing(PLAYER_PED)
+                    local hveh = getCarCharIsUsing(PLAYER_PED)
                     if module.tvehicle.lights[0] then
-                        forceCarLights(car,2)
+                        forceCarLights(hveh,2)
                         addOneOffSound(x,y,z,1052)
                         fcommon.CheatActivated()
                     else
-                        forceCarLights(car,1)
+                        forceCarLights(hveh,1)
                         addOneOffSound(x,y,z,1053)
                         fcommon.CheatDeactivated()
                     end
                 else
                     printHelpString("Player ~r~not~w~ in car")
                 end
-            end,nil,false)
+            end
 
-            fcommon.CheckBoxVar("Lock doors",module.tvehicle.lock_doors,nil,
-            function()
+            if fcommon.CheckBoxVar("Lock doors",module.tvehicle.lock_doors,nil,nil,false) then
                 if isCharInAnyCar(PLAYER_PED) then
                     local car   = getCarCharIsUsing(PLAYER_PED)
                     if getCarDoorLockStatus(car) == 4 then
@@ -922,44 +917,38 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
                 else
                     printHelpString("Player ~r~not~w~ in car")
                 end
-            end,nil,false)
+            end
  
             fcommon.CheckBoxVar("No damage",module.tvehicle.no_damage)
-            fcommon.CheckBoxVar("No traffic vehicles",module.tvehicle.no_vehicles,nil,
-            function()
+            if fcommon.CheckBoxVar("No traffic vehicles",module.tvehicle.no_vehicles) then
                 if module.tvehicle.no_vehicles[0] then
                     writeMemory(0x434237,1,0x73,false) -- change condition to unsigned (0-255)
                     writeMemory(0x434224,1,0,false)
                     writeMemory(0x484D19,1,0x83,false) -- change condition to unsigned (0-255)
                     writeMemory(0x484D17,1,0,false)
-                    fcommon.CheatActivated()
                 else
                     writeMemory(0x434237,1,-1063242627,false) -- change condition to unsigned (0-255)
                     writeMemory(0x434224,1,940431405,false)
                     writeMemory(0x484D19,1,292493,false) -- change condition to unsigned (0-255)
                     writeMemory(0x484D17,1,1988955949,false)
-                    fcommon.CheatDeactivated()
                 end
-            end,nil,false)
+            end
             
             fcommon.CheckBoxVar("No visual damage",module.tvehicle.visual_damage)
             fcommon.CheckBoxValue("Perfect handling",0x96914C)
             fcommon.CheckBoxValue("Tank mode",0x969164) 
-            fcommon.CheckBoxVar("Traffic neons",module.tvehicle.neon.checkbox,"Adds neon lights to traffic vehicles.\nOnly some vehicles will have them.",
-            function()
+            if fcommon.CheckBoxVar("Traffic neons",module.tvehicle.neon.checkbox,"Adds neon lights to traffic vehicles.\nOnly some vehicles will have them.") then
                 fcommon.CreateThread(fvehicle.TrafficNeons)
-            end)
-            fcommon.CheckBoxVar("Unlimited nitro",module.tvehicle.unlimited_nitro,"Nitro will activate when left clicked\n\nEnabling this would disable\nAll cars have nitro\nAll taxis have nitro",
-            function()
+            end
+            if fcommon.CheckBoxVar("Unlimited nitro",module.tvehicle.unlimited_nitro,"Nitro will activate when left clicked\n\nEnabling this would disable\nAll cars have nitro\nAll taxis have nitro") then
                 fcommon.CreateThread(module.UnlimitedNitro)
-            end)
-            fcommon.CheckBoxVar("Watertight car",module.tvehicle.watertight_car,nil,
-            function()
+            end
+            if fcommon.CheckBoxVar("Watertight car",module.tvehicle.watertight_car) then
                 if isCharInAnyCar(PLAYER_PED) then
                     local car = getCarCharIsUsing(PLAYER_PED)
                     setCarWatertight(car,module.tvehicle.watertight_car[0])
                 end
-            end)
+            end
             fcommon.CheckBoxValue("Wheels only",0x96914B)
     
             imgui.Columns(1)
@@ -1142,28 +1131,25 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
 
                 imgui.Spacing()
                 imgui.Columns(2,nil,false)
-                fcommon.CheckBoxVar("Enable saving",module.tvehicle.paintjobs.enable_saving,"Save and load vehicle paint data.\nApplies for all vehicles of this model.",
-                function()
+                if fcommon.CheckBoxVar("Enable saving",module.tvehicle.paintjobs.enable_saving,"Save and load vehicle paint data.\nApplies for all vehicles of this model.") then
                     if module.tvehicle.paintjobs.enable_saving[0] then
                         ApplyColor(true)
                     end
-                end)
+                end
                 fcommon.CheckBoxVar("Material filter",module.tvehicle.apply_material_filter,"Filters material while applying color/ texture\nDisable if something doesn't work properly")
                 imgui.NextColumn()
-                fcommon.CheckBoxVar("Rainbow colors",module.tvehicle.rainbow_colors.bool,"Rainbow color effect on players vehicle",function()
-                    fcommon.CreateThread(module.RainbowColors)
-                end,
+                if fcommon.CheckBoxVar("Rainbow colors",module.tvehicle.rainbow_colors.bool,"Rainbow color effect on players vehicle",
                 function()
-                    fcommon.CheckBoxVar("Apply for traffic",module.tvehicle.rainbow_colors.traffic,"Rainbow color effect on traffic vehicles",
-                    function()
+                    if fcommon.CheckBoxVar("Apply for traffic",module.tvehicle.rainbow_colors.traffic,"Rainbow color effect on traffic vehicles") then
                         fcommon.CreateThread(module.RainbowColors)
-                    end)
+                    end
                     imgui.Dummy(imgui.ImVec2(0,20))
                     imgui.SliderFloat("Speed",module.tvehicle.rainbow_colors.speed,0,2)
-                end)
-                fcommon.CheckBoxVar("Rainbow neons",module.tvehicle.rainbow_neons.bool,"Rainbow neon effect on players vehicle",function()
-                    fcommon.CreateThread(module.RainbowNeons)
-                end,
+                end) then
+                    fcommon.CreateThread(module.RainbowColors)
+                end
+
+                if fcommon.CheckBoxVar("Rainbow neons",module.tvehicle.rainbow_neons.bool,"Rainbow neon effect on players vehicle",
                 function()
                     fcommon.CheckBoxVar("Apply for traffic",module.tvehicle.rainbow_neons.traffic,"Rainbow neon effect on traffic vehicles",
                     function()
@@ -1171,7 +1157,9 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
                     end)
                     imgui.Dummy(imgui.ImVec2(0,20))
                     imgui.SliderFloat("Speed",module.tvehicle.rainbow_neons.speed,0,2)
-                end)
+                end) then
+                    fcommon.CreateThread(module.RainbowNeons)
+                end
                 imgui.Columns(1)
                 imgui.Spacing()
                 
@@ -1289,8 +1277,7 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
                     printHelpString("Vehicle components reset")
                 end
                 
-                fcommon.CheckBoxVar("Enable saving",module.tvehicle.components.enable_saving,"Save and load vehicle tune data.\nApplies for all vehicles of this model.",
-                function()
+                if fcommon.CheckBoxVar("Enable saving",module.tvehicle.components.enable_saving,"Save and load vehicle tune data.\nApplies for all vehicles of this model.") then
                     if module.tvehicle.components.enable_saving[0] then
                         for tmodel,table in pairs(module.tvehicle.components.save_data) do
                             if tmodel == tostring(model) then
@@ -1301,7 +1288,7 @@ Set to 'Not Configured' if you're using any mods\nwhich involve fuel systems (di
                             end
                         end
                     end
-                end)
+                end
                 imgui.Dummy(imgui.ImVec2(0,10))
                 fcommon.DrawEntries(fconst.IDENTIFIER.COMPONENT,fconst.DRAW_TYPE.IMAGE,module.AddComponentToVehicle,
                 function(component)
