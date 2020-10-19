@@ -83,13 +83,6 @@ function module.SetPlayerInvisible(bool)
     end
 end
 
-function SetRwObjectAlpha(handle, alpha)
-    local pedEn = getCharPointer(handle)
-    if pedEn ~= 0 then
-        ffi.cast("void (__thiscall *)(int, int)", 0x5332C0)(pedEn, alpha)
-    end
-end
-
 function module.ChangePlayerModel(model,dont_show_msg)
     dont_show_msg = dont_show_msg or false
     local modeldff = (model .. ".dff")

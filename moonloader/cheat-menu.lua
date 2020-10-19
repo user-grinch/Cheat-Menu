@@ -21,7 +21,7 @@ script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-men
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
 script_version("2.2-beta")
-script_version_number(2020101302) -- YYYYMMDDNN
+script_version_number(2020101901) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num))
 
@@ -83,7 +83,7 @@ tcheatmenu   =
     current_menu = fconfig.Get('tcheatmenu.current_menu',0),
     fail_loading_json = tcheatmenu.fail_loading_json,
     restart_required = false,
-    show     = imgui.new.bool(false),
+    show     = imgui.new.bool(fmenu.tmenu.fast_load_images[0]),
     size     =
     {
         X    = fconfig.Get('tcheatmenu.size.X',resX/4),
@@ -93,7 +93,7 @@ tcheatmenu   =
 }
 
 imgui.OnInitialize(function() -- Called once
-
+    
     local io = imgui.GetIO()
 
     -- Load fonts
@@ -131,6 +131,11 @@ imgui.OnInitialize(function() -- Called once
         print("Failed loading styles")
     end
 
+    if fmenu.tmenu.fast_load_images[0] then
+        showCursor(false)
+        tcheatmenu.show[0] = false
+    end
+
     -- Indexing images
     lua_thread.create(
     function() 
@@ -141,6 +146,7 @@ imgui.OnInitialize(function() -- Called once
         fcommon.IndexFiles(fvehicle.tvehicle.components.path,fvehicle.tvehicle.components.images,"jpg")
         fcommon.IndexFiles(fvehicle.tvehicle.paintjobs.path,fvehicle.tvehicle.paintjobs.images,"png")
     end)
+
 end)
 
 imgui.OnFrame(
@@ -253,6 +259,8 @@ function(self) -- render frame
             fcommon.CheckBoxVar("Check for updates",fmenu.tmenu.auto_update_check,"Cheat Menu will automatically check for updates\nonline. This requires an internet connection and\
 will download files from github repository.")
             imgui.NextColumn()
+            fcommon.CheckBoxVar("Fast load images",fmenu.tmenu.fast_load_images,"Loads images at the menu startup. Enabling this may\ndecrease fps loss when opening the image tabs but\
+can freeze the game at startup for a few seconds.\n\nBest to enable if you won't reload the menu frequently.")
             fcommon.CheckBoxVar("Show tooltips",fmenu.tmenu.show_tooltips,"Shows usage tips beside options.")
             imgui.Columns(1)
             imgui.Spacing()
@@ -518,12 +526,6 @@ function main()
     end
     
     setPlayerFastReload(PLAYER_HANDLE,fweapon.tweapon.fast_reload[0])
-
-    if  fgame.tgame.ghost_cop_cars[0] then
-        for key,value in pairs(fgame.tgame.cop) do
-            writeMemory(tonumber(key),4,math.random(400,611),false)
-        end
-    end
 
     if fgame.tgame.disable_replay[0] then
         writeMemory(0x460500,4,0xC3,false)

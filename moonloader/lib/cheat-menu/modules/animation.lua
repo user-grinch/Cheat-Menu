@@ -38,7 +38,7 @@ module.tanimation =
     },
 }
 
-function module.PlayAnimation(file,animation)
+function PlayAnimation(file,animation)
     if module.tanimation.ped[0] == true then
         if doesCharExist(fped.tped.selected) then
             char = fped.tped.selected
@@ -98,7 +98,7 @@ function module.AnimationMain()
     if fcommon.BeginTabBar('Animation') then
         if fcommon.BeginTabItem('Search') then
             fcommon.DrawEntries(fconst.IDENTIFIER.ANIMATION,fconst.DRAW_TYPE.TEXT,function(anim,file)
-				module.PlayAnimation(file,anim)
+				PlayAnimation(file,anim)
 			end,
             function(text,category)
                 if imgui.MenuItemBool("Remove animation") then 

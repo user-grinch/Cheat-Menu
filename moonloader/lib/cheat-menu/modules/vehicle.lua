@@ -48,16 +48,7 @@ module.tvehicle =
         selected = imgui.new.int(0),
         value    = imgui.new.int(0),
     },
-    doors = 
-    {
-        "Hood",
-    	"Boot",
-    	"Front left door",
-    	"Front right door",
-    	"Rear left door",
-        "Rear right door",
-        "All",
-    },
+    doors = {"Hood","Boot","Front left door","Front right door","Rear left door","Rear right door","All"},
     door_menu_button = imgui.new.int(0),
     first_person_camera = 
     {
@@ -229,7 +220,6 @@ function module.GiveVehicleToPlayer(model)
         if isCharInAnyCar(PLAYER_PED) and module.tvehicle.spawn_inside[0] then
 
             local hveh = getCarCharIsUsing(PLAYER_PED)
-            local previous_model = getCarModel(hveh)
             speed = getCarSpeed(hveh)
 
             warpCharFromCarToCoord(PLAYER_PED,x,y,z)
@@ -318,57 +308,61 @@ end
 
 function module.AircraftCamera()
 
-    while module.tvehicle.aircraft.camera[0] do
-        while isCharInAnyHeli(PLAYER_PED)
-        or isCharInAnyPlane(PLAYER_PED) do
-            
-            -- FirstPersonCamera controls the camera if its enabled
-            if module.tvehicle.aircraft.camera[0] == false or module.tvehicle.first_person_camera.bool[0] then break end 
+    if module.tvehicle.aircraft.camera[0] then
+        if isCharInAnyHeli(PLAYER_PED)
+        or isCharInAnyPlane(PLAYER_PED) then
+            while isCharInAnyHeli(PLAYER_PED)
+            or isCharInAnyPlane(PLAYER_PED) do
+                
+                -- FirstPersonCamera controls the camera if its enabled
+                if module.tvehicle.aircraft.camera[0] == false or module.tvehicle.first_person_camera.bool[0] then break end 
 
-            local vehicle = getCarCharIsUsing(PLAYER_PED)
-            local roll = getCarRoll(vehicle)
+                local vehicle = getCarCharIsUsing(PLAYER_PED)
+                local roll = getCarRoll(vehicle)
 
-            attachCameraToVehicle(vehicle,0.0,module.tvehicle.aircraft.zoom[module.tvehicle.aircraft.index],2.5,0.0,0.0,0.0,(roll*-1),2)
-            if isKeyDown(0x56) then
-                while isKeyDown(0x56) do
-                    wait(0)
+                attachCameraToVehicle(vehicle,0.0,module.tvehicle.aircraft.zoom[module.tvehicle.aircraft.index],2.5,0.0,0.0,0.0,(roll*-1),2)
+                if isKeyDown(0x56) then
+                    while isKeyDown(0x56) do
+                        wait(0)
+                    end
+                    module.tvehicle.aircraft.index = module.tvehicle.aircraft.index + 1
+                    if module.tvehicle.aircraft.index > #module.tvehicle.aircraft.zoom then
+                        module.tvehicle.aircraft.index  = 0
+                    end
                 end
-                module.tvehicle.aircraft.index = module.tvehicle.aircraft.index + 1
-                if module.tvehicle.aircraft.index > #module.tvehicle.aircraft.zoom then
-                    module.tvehicle.aircraft.index  = 0
-                end
+                wait(0)
             end
-            wait(0)
+            restoreCameraJumpcut()
         end
-        wait(100)
     end
-    restoreCameraJumpcut()
 end
 
 function module.FirstPersonCamera()
     local total_x = 0
     local total_y = 0
 
-    while module.tvehicle.first_person_camera.bool[0] and not isCharOnFoot(PLAYER_PED) and not fgame.tgame.camera.bool[0] do
+    if module.tvehicle.first_person_camera.bool[0] and not isCharOnFoot(PLAYER_PED) and not fgame.tgame.camera.bool[0] then
+        while module.tvehicle.first_person_camera.bool[0] and not isCharOnFoot(PLAYER_PED) and not fgame.tgame.camera.bool[0] do
 
-        local hveh = getCarCharIsUsing(PLAYER_PED)        
-        
-        x,y = getPcMouseMovement()
-        total_x = total_x + x
-        total_y = total_y + y
+            local hveh = getCarCharIsUsing(PLAYER_PED)        
+            
+            x,y = getPcMouseMovement()
+            total_x = total_x + x
+            total_y = total_y + y
 
-        local roll = 0.0
-        if module.tvehicle.aircraft.camera[0] == true then -- check if new aircraft camera is enabled
-            roll = getCarRoll(hveh)
+            local roll = 0.0
+            if module.tvehicle.aircraft.camera[0] == true then -- check if new aircraft camera is enabled
+                roll = getCarRoll(hveh)
+            end
+
+            if fgame.tgame.camera.bool[0] then
+                break
+            end
+            attachCameraToChar(PLAYER_PED,module.tvehicle.first_person_camera.offset_x_var[0], module.tvehicle.first_person_camera.offset_y_var[0], module.tvehicle.first_person_camera.offset_z_var[0], total_x, 180, total_y, (roll*-1), 2)
+            wait(0)
         end
-
-        if fgame.tgame.camera.bool[0] then
-            break
-        end
-        attachCameraToChar(PLAYER_PED,module.tvehicle.first_person_camera.offset_x_var[0], module.tvehicle.first_person_camera.offset_y_var[0], module.tvehicle.first_person_camera.offset_z_var[0], total_x, 180, total_y, (roll*-1), 2)
-        wait(0)
+        restoreCameraJumpcut()  
     end
-    restoreCameraJumpcut()  
 end
 
 --------------------------------------------------
@@ -955,7 +949,7 @@ mods which involve fuel systems")
         end
         if fcommon.BeginTabItem('Menus') then
             fcommon.DropDownMenu("Enter nearest vehicle as",function()
-                local vehicle,ped = storeClosestEntities(PLAYER_PED)
+                local vehicle = storeClosestEntities(PLAYER_PED)
                 if vehicle ~= -1 then
                     local seats = getMaximumNumberOfPassengers(vehicle)
                     imgui.Spacing()
@@ -1089,8 +1083,6 @@ mods which involve fuel systems")
                     end
                 end)
                 fcommon.UpdateAddress({name = 'Wheel scale',address = pCar+0x458,size = 4,min = 0,max = 10, default = 1,is_float = true})
-                --fcommon.UpdateAddress({name = 'ZZZZZ',address = pCar+0x489,size = 4,min = -10,max = 10, default = 1,is_float = false})
-
             end    
         end
         if fcommon.BeginTabItem('Spawn') then
@@ -1108,7 +1100,6 @@ mods which involve fuel systems")
         if fcommon.BeginTabItem('Paint') then
             if isCharInAnyCar(PLAYER_PED) then
                 local car = getCarCharIsUsing(PLAYER_PED)
-                local pveh = getCarPointer(car)
                 local model = getCarModel(car)
             
                 if imgui.Button("Reset color",imgui.ImVec2(fcommon.GetSize(2))) then

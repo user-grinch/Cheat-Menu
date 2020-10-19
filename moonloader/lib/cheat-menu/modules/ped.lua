@@ -58,6 +58,13 @@ module.tped =
     spawned_peds= 
     {
         list = {},
+        ped_bleed = imgui.new.bool(false),
+        ped_health = imgui.new.int(100),
+        ped_type_list = {"Civ male","Civ female","Cop","Ballas","Grove Street Families","Los Santos Vagos",
+                        "San Fierro Rifa","Da Nang Boys","Mafia","Mountain Cloud Triads","Varrio Los Aztecas",
+                        "Gang 9","Medic","Dealer","Criminal","Fireman","Prostitute"},
+        ped_type_selected = imgui.new.int(1),
+        stand_still = imgui.new.bool(fconfig.Get('tped.spawned_peds.stand_still',true)),
     },
     special     = fcommon.LoadJson("ped special"),
 }
@@ -80,26 +87,39 @@ end
 function module.SpawnPed(model)  
  
     if  module.tped.names[model] ~= nil then
+        local ped = nil
         if module.tped.special[model] == nil then
             model = tonumber(model)
             requestModel(model)
             loadAllModelsNow()
-            x,y,z = getCharCoordinates(PLAYER_PED)
-            ped = createChar(5,model,x,y,z) -- CIVMALE
+
+            local x,y,z = getCharCoordinates(PLAYER_PED)
+            ped = createChar(module.tped.spawned_peds.ped_type_selected[0]+3,model,x,y,z) -- CIVMALE
+
             markModelAsNoLongerNeeded(model)
             module.tped.spawned_peds.list[ped] = tostring(getCharModel(ped))
+        
         else
             if hasSpecialCharacterLoaded(model) then
                 unloadSpecialCharacter(model)
             end
             loadSpecialCharacter(module.tped.special[tostring(model)],1)
             loadAllModelsNow()
-            x,y,z = getCharCoordinates(PLAYER_PED)
-            ped = createChar(5,290,x,y,z) -- CIVMALE
+
+            local x,y,z = getCharCoordinates(PLAYER_PED)
+            ped = createChar(module.tped.spawned_peds.ped_type_selected[0]+3,290,x,y,z) -- CIVMALE
+
             module.tped.spawned_peds.list[ped] = tostring(getCharModel(ped))
             markModelAsNoLongerNeeded(module.tped.special[tostring(model)])
         end
-        printHelpString("Ped ~g~Spawned")
+        if ped ~= nil then
+            if not module.tped.spawned_peds.stand_still[0] then
+                markCharAsNoLongerNeeded(ped)
+            end
+            setCharHealth(ped,module.tped.spawned_peds.ped_health[0])
+            setCharBleeding(ped,module.tped.spawned_peds.ped_bleed[0])
+            printHelpString("Ped ~g~Spawned")
+        end
     end
 end
 
@@ -222,9 +242,24 @@ function module.PedMain()
                 module.RemoveAllSpawnedPeds()  
                 printHelpString("All peds removed")        
             end
+            imgui.Spacing()
             
-            imgui.Dummy(imgui.ImVec2(0,10))                
-            fcommon.DrawEntries(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.IMAGE,module.SpawnPed,nil,module.GetModelName,module.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH)
+            if fcommon.BeginTabBar("SpawnPedBar") then
+                if fcommon.BeginTabItem('Spawner') then
+                    fcommon.DrawEntries(fconst.IDENTIFIER.PED,fconst.DRAW_TYPE.IMAGE,module.SpawnPed,nil,module.GetModelName,module.tped.images,fconst.PED.IMAGE_HEIGHT,fconst.PED.IMAGE_WIDTH)
+                end
+                if fcommon.BeginTabItem('Config') then
+                    imgui.Columns(2,nil,false)
+                    fcommon.CheckBoxVar("Don't move",module.tped.spawned_peds.stand_still)   
+                    imgui.NextColumn()
+                    fcommon.CheckBoxVar("Ped bleed",module.tped.spawned_peds.ped_bleed)   
+                    imgui.Columns(1)                 
+                    imgui.Spacing()
+                    imgui.SliderInt("Ped health", module.tped.spawned_peds.ped_health, 0.0, 100.0)
+                    fcommon.DropDownListNumber("Ped type",module.tped.spawned_peds.ped_type_list,module.tped.spawned_peds.ped_type_selected)
+                end
+                fcommon.EndTabBar()
+            end
         end
         fcommon.EndTabBar()
     end

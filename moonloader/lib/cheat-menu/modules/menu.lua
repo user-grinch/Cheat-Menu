@@ -29,7 +29,8 @@ module.tmenu =
 		show            = imgui.new.bool(false),
 	},
 	crash_text          = "",
-	fast_load_images    = imgui.new.bool(fconfig.Get('tmenu.fast_load_images',false)),
+	dont_save			= imgui.new.bool(fconfig.Get('tmenu.dont_save',false)),
+	fast_load_images    = imgui.new.bool(fconfig.Get('tmenu.fast_load_images',true)),
 	font				=
 	{
 		list			= {},
@@ -342,10 +343,12 @@ function module.MenuMain()
 			fcommon.CheckBoxVar("Auto reload",module.tmenu.auto_reload,"Reload cheat menu automatically\nin case of a crash.\n\nMight cause crash loop sometimes.")
 			fcommon.CheckBoxVar("Check for updates",module.tmenu.auto_update_check,"Cheat Menu will automatically check for updates\nonline. This requires an internet connection and\
 will download files from github repository.")
+			fcommon.CheckBoxVar("Don't save changes",module.tmenu.dont_save,"Saves & loads the game changes.")
+			fcommon.CheckBoxVar("Fast load images",module.tmenu.fast_load_images,"Loads images at the menu startup. Enabling this may\ndecrease fps loss when opening the image tabs but\
+can freeze the game at startup for a few seconds.\n\nBest to enable if you won't reload the menu frequently.")
+			imgui.NextColumn()
 			fcommon.CheckBoxVar("Get beta updates",module.tmenu.get_beta_updates,"Receive frequent beta updates.\
 These updates might be unstable.")
-			
-			imgui.NextColumn()
 			fcommon.CheckBoxVar("Lock player",module.tmenu.lock_player,"Lock player controls while the menu is open")
 			fcommon.CheckBoxVar("Show crash message",module.tmenu.show_crash_message)
 			fcommon.CheckBoxVar("Show tooltips",module.tmenu.show_tooltips,"Shows usage tips beside options")

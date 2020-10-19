@@ -56,8 +56,6 @@ function module.Teleport(x, y, z,interior_id)
 	setCharInterior(PLAYER_PED,interior_id)
 	setInteriorVisible(interior_id)
 	clearExtraColours(true)
-	-- loadScene(x,y,z)
-	-- requestCollision(x,y)
 	activateInteriorPeds(true)
 
 	if isCharInAnyCar(PLAYER_PED) then
@@ -96,6 +94,19 @@ function module.Teleport(x, y, z,interior_id)
 
 	doFade(true,200)
 	lockPlayerControl(false)
+end
+
+function FetchRadarSpriteDara()
+	-- Get sprite data, isn't saved in coordinte.json
+	module.tteleport.coordinates["Radar"] = {}
+	for i = 0xBA86F0,0xBAA248,0x28 do -- 0xBAA248 = 0xBA86F0+175*0x28
+		local radarSprite = memory.read(i+36,1)
+		if radarSprite ~= 0 then
+			local x,y,z = memory.getfloat(i+8),memory.getfloat(i+12),memory.getfloat(i+16)
+			module.tteleport.coordinates["Radar"][string.format("%s, %s",module.tteleport.radar_sprites[tostring(radarSprite)],fcommon.GetLocationInfo(x,y,z):sub(1,-5))] = string.format("0, %f, %f, %f",x,y,z)
+		end
+	end 	
+	wait(5000) -- delay
 end
 
 -- Main function
@@ -140,16 +151,8 @@ function module.TeleportMain()
 			fcommon.EndTabItem()
 		end
 		if fcommon.BeginTabItem("Search") then
-
-			-- Get sprite data, isn't saved in coordinte.json
-			module.tteleport.coordinates["Radar"] = {}
-			for i = 0xBA86F0,0xBAA248,0x28 do -- 0xBAA248 = 0xBA86F0+175*0x28
-				local radarSprite = memory.read(i+36,1)
-				if radarSprite ~= 0 then
-					local x,y,z = memory.getfloat(i+8),memory.getfloat(i+12),memory.getfloat(i+16)
-					module.tteleport.coordinates["Radar"][string.format("%s, %s",module.tteleport.radar_sprites[tostring(radarSprite)],fcommon.GetLocationInfo(x,y,z):sub(1,-5))] = string.format("0, %f, %f, %f",x,y,z)
-				end
-			end 		
+	
+			fcommon.CreateThread(FetchRadarSpriteDara)
 
 			fcommon.DrawEntries(fconst.IDENTIFIER.TELEPORT,fconst.DRAW_TYPE.TEXT,function(text)
 				local interior_id, x, y, z = text:match("([^, ]+), ([^, ]+), ([^, ]+), ([^, ]+)")
@@ -161,7 +164,6 @@ function module.TeleportMain()
 					for category,table in pairs(module.tteleport.coordinates) do
 						for key,val in pairs(table) do
 							if key == text then
-								print("REMOVED")
 								module.tteleport.coordinates[category][key] = nil
 								goto end_loop
 							end

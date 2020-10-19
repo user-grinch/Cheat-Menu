@@ -80,17 +80,16 @@ end
 local thread_locks = {} 
 
 function module.CreateThread(func)
-    lock_key = func -- get the function address if no key provided
 
-    lua_thread.create(function(func,lock_key)
+    lua_thread.create(function(func)
 
-        if thread_locks[text] == nil then -- is thread key unlcoked
-            thread_locks[lock_key] = true
+        if thread_locks[func] == nil then -- is thread key unlcoked
+            thread_locks[func] = true
             func()
-            thread_locks[lock_key] = nil -- unlock the thread key
+            thread_locks[func] = nil -- unlock the thread key
         end
 
-    end,func,lock_key)
+    end,func)
 end
 
 --------------------------------------------------
@@ -326,7 +325,7 @@ function DrawImage(identifier,func_on_left_click,func_on_right_click,image_table
     end
 end
 
-function DrawText(identifier,func_on_left_click,func_on_right_click,entry,text,key)
+function DrawText(identifier,func_on_left_click,func_on_right_click,entry,text,key,category)
     if imgui.MenuItemBool(text) then
         func_on_left_click(entry,category)
     end
@@ -411,7 +410,7 @@ function module.DrawEntries(identifier,draw_type,func_on_left_click,func_on_righ
                                 DrawImage(identifier,func_on_left_click,func_on_right_click,table,const_image_height,const_image_width,label,entry,name)
                             end
                         else
-                            DrawText(identifier,func_on_left_click,func_on_right_click,entry,name,label)
+                            DrawText(identifier,func_on_left_click,func_on_right_click,entry,name,label,category)
                         end
                     end
                 end
@@ -860,7 +859,11 @@ function module.IndexFiles(mainDir,store_table,req_ext)
                 if store_table[element] == nil then
                     store_table[element] = {}
                 end
-                store_table[element][file_name] = file_path
+                if (req_ext == "jpg" or req_ext == "png") and fmenu.tmenu.fast_load_images[0] then
+                    store_table[element][file_name] = imgui.CreateTextureFromFile(file_path)
+                else
+                    store_table[element][file_name] = file_path
+                end
             end
         end
     end

@@ -26,14 +26,6 @@ module.tgame                =
         movement_speed      = imgui.new.float(fconfig.Get('tgame.camera.movement_speed',0.4)),
         shake               = imgui.new.float(0.0),
     },
-    cop = 
-    {
-        ["0x8a5a8c"] = 599, -- policeranger
-        ["0x8a5a90"] = 596, -- policels
-        ["0x8a5a94"] = 597, -- policesf
-        ["0x8a5a98"] = 598, -- policelv
-        ["0x8a8a9c"] = 523, -- policebike
-    },
     day_names               = {"Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"},
     disable_cheats          = imgui.new.bool(fconfig.Get('tgame.disable_cheats',false)),
     disable_help_popups     = imgui.new.bool(fconfig.Get('tgame.disable_help_popups',false)),
@@ -42,7 +34,6 @@ module.tgame                =
     forbidden_area_wanted_level = imgui.new.bool(fconfig.Get('tgame.forbidden_area_wanted_level',true)),
     freeze_mission_timer    = imgui.new.bool(fconfig.Get('tgame.freeze_mission_timer',false)), 
     freeze_time             = imgui.new.bool(fconfig.Get('tgame.freeze_time',false)), 
-    ghost_cop_cars          = imgui.new.bool(fconfig.Get('tgame.ghost_cop_cars',false)),
     gxt_save_name           = imgui.new.char[22]("Untitled Save"),
     keep_stuff              = imgui.new.bool(fconfig.Get('tgame.keep_stuff',false)),
     object_spawner          = 
@@ -714,16 +705,6 @@ of LS without completing missions") then
 
             if fcommon.CheckBoxVar("Freeze time",module.tgame.freeze_time) then
                 fcommon.CreateThread(module.FreezeTime)
-            end
-
-            if fcommon.CheckBoxVar("Ghost cop vehicles",module.tgame.ghost_cop_cars) then
-                for key,value in pairs(module.tgame.cop) do
-                    if  module.tgame.ghost_cop_cars[0] then
-                        writeMemory(tonumber(key),4,math.random(400,611),false)
-                    else
-                        writeMemory(tonumber(key),4,value,false)
-                    end
-                end
             end
             if fcommon.CheckBoxVar("Keep stuff",module.tgame.keep_stuff,"Keep stuff after arrest/death") then
                 switchArrestPenalties(module.tgame.keep_stuff[0])
