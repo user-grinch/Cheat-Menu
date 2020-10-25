@@ -20,6 +20,8 @@ module.tgame                =
 {
     camera                  = 
     {
+        ped                 = nil,
+        move_player         = imgui.new.bool(fconfig.Get('tgame.camera.move_player',true)),
         bool                = imgui.new.bool(false),
         fov                 = imgui.new.int(fconfig.Get('tgame.camera.fov',70)),
         lock_on_player      = imgui.new.bool(false),
@@ -105,30 +107,35 @@ function module.CameraMode()
 
         local x,y,z = getCharCoordinates(PLAYER_PED)
 
-        local ped =  createRandomChar(x,y,z)
+        module.tgame.camera.ped = PLAYER_PED
+        if module.tgame.camera.move_player[0] then
+            module.tgame.camera.lock_on_player[0] = false
+        else
+            module.tgame.camera.ped = createRandomChar(x,y,z)
+            setCharVisible(module.tgame.camera.ped,false)
+        end
+        
 
-        freezeCharPositionAndDontLoadCollision(ped,true)
-        setCharCollision(ped,false)
-        setLoadCollisionForCharFlag(ped,false)
+        freezeCharPositionAndDontLoadCollision(module.tgame.camera.ped,true)
+        setCharCollision(module.tgame.camera.ped,false)
+        setLoadCollisionForCharFlag(module.tgame.camera.ped,false)
         setEveryoneIgnorePlayer(0,true)
         
         displayRadar(false)
         displayHud(false)
-        setCharVisible(ped,false)
 
         local total_mouse_x = getCharHeading(PLAYER_PED)
         local total_mouse_y = 0
         local total_mouse_delta = 0
         
-
-        setCharCoordinates(ped,x,y,z-20) 
+        setCharCoordinates(module.tgame.camera.ped,x,y,z-20) 
 
         cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
         cameraPersistFov(true) 
 
         while module.tgame.camera.bool[0] do
             local factor = 1.0
-            x, y, z = getCharCoordinates(ped)  
+            x, y, z = getCharCoordinates(module.tgame.camera.ped)  
             local mouse_x, mouse_y =  getPcMouseMovement()
 
             total_mouse_x = total_mouse_x - mouse_x/6
@@ -147,30 +154,30 @@ function module.CameraMode()
 
 
             if isKeyDown(fmenu.tmenu.hot_keys.camera_mode_forward[1] and fmenu.tmenu.hot_keys.camera_mode_forward[2]) then 
-                local angle = getCharHeading(ped) + 90
+                local angle = getCharHeading(module.tgame.camera.ped) + 90
 
                 x = x + module.tgame.camera.movement_speed[0] * math.cos(angle * math.pi/180) * factor
                 y = y + module.tgame.camera.movement_speed[0] * math.sin(angle * math.pi/180) * factor
-                z = z + module.tgame.camera.movement_speed[0] * math.sin(total_mouse_y* math.pi/180) * factor
+                z = z + module.tgame.camera.movement_speed[0] * math.sin(total_mouse_y/3* math.pi/180) * factor
             end
     
             if isKeyDown(fmenu.tmenu.hot_keys.camera_mode_backward[1] and fmenu.tmenu.hot_keys.camera_mode_backward[2]) then 
-                local angle = getCharHeading(ped) + 90
-                
+                local angle = getCharHeading(module.tgame.camera.ped) + 90
+
                 x = x - module.tgame.camera.movement_speed[0] * math.cos(angle * math.pi/180) * factor
                 y = y - module.tgame.camera.movement_speed[0] * math.sin(angle * math.pi/180) * factor
-                z = z - module.tgame.camera.movement_speed[0] * math.sin(total_mouse_y* math.pi/180) * factor
+                z = z - module.tgame.camera.movement_speed[0] * math.sin(total_mouse_y/3* math.pi/180) * factor
             end
 
             if isKeyDown(fmenu.tmenu.hot_keys.camera_mode_left[1] and fmenu.tmenu.hot_keys.camera_mode_left[2]) then 
-                local angle = getCharHeading(ped)
+                local angle = getCharHeading(module.tgame.camera.ped)
                 
                 x = x - module.tgame.camera.movement_speed[0] * math.cos(angle * math.pi/180) * factor
                 y = y - module.tgame.camera.movement_speed[0] * math.sin(angle * math.pi/180) * factor
             end
 
             if isKeyDown(fmenu.tmenu.hot_keys.camera_mode_right[1] and fmenu.tmenu.hot_keys.camera_mode_right[2]) then 
-                local angle = getCharHeading(ped)
+                local angle = getCharHeading(module.tgame.camera.ped)
                 
                 x = x + module.tgame.camera.movement_speed[0] * math.cos(angle * math.pi/180) * factor
                 y = y + module.tgame.camera.movement_speed[0] * math.sin(angle * math.pi/180) * factor
@@ -242,9 +249,9 @@ function module.CameraMode()
                     wait(0)
                 end
             else
-                setCharHeading(ped,total_mouse_x)
-                attachCameraToChar(ped,0.0, 0.0, 20.0, 0.0, 180, total_mouse_y, 0.0, 2)
-                setCharCoordinates(ped,x,y,z-1.0)
+                setCharHeading(module.tgame.camera.ped,total_mouse_x)
+                attachCameraToChar(module.tgame.camera.ped,0.0, 0.0, 20.0, 0.0, 180, total_mouse_y, 0.0, 2)
+                setCharCoordinates(module.tgame.camera.ped,x,y,z-1.0)
             end
 
             if total_mouse_delta + getMousewheelDelta() ~= total_mouse_delta then
@@ -267,9 +274,22 @@ function module.CameraMode()
         displayRadar(true)
         displayHud(true)
 
+        freezeCharPositionAndDontLoadCollision(module.tgame.camera.ped,false)
+        setCharCollision(module.tgame.camera.ped,true)
+        setLoadCollisionForCharFlag(module.tgame.camera.ped,true)
+        setEveryoneIgnorePlayer(0,false)
+
+        if module.tgame.camera.move_player[0] then
+            local x,y,z = getCharCoordinates(PLAYER_PED)
+            z = getGroundZFor3dCoord(x,y,1000)
+            setCharCoordinates(PLAYER_PED,x,y,z)
+        else
+            markCharAsNoLongerNeeded(module.tgame.camera.ped)
+            deleteChar(module.tgame.camera.ped)
+        end
+        module.tgame.camera.ped = nil
+
         restoreCameraJumpcut()
-        markCharAsNoLongerNeeded(ped)
-        deleteChar(ped)
         wait(0)
     end
 end
@@ -626,7 +646,47 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(fmen
             fcommon.GetHotKeyNames(fmenu.tmenu.hot_keys.camera_mode_up),
             fcommon.GetHotKeyNames(fmenu.tmenu.hot_keys.camera_mode_down)),
             function()
-                fcommon.CheckBoxVar("Lock on player",module.tgame.camera.lock_on_player,"Locks camera on player")
+                imgui.Columns(2,nil,false)
+                if fcommon.CheckBoxVar("Move player",module.tgame.camera.move_player,"Moves the player with the camera\nSimilar to how airbreak modes work") then
+                    
+                    module.tgame.camera.lock_on_player[0] = false
+                    -- Update the camera mode stuff while it's running
+                    if module.tgame.camera.bool[0] and module.tgame.camera.ped ~= nil then
+                        
+                        local heading =  getCharHeading(module.tgame.camera.ped)
+                        local x,y,z = getCharCoordinates(module.tgame.camera.ped)
+                        z = z - 1
+
+                        freezeCharPositionAndDontLoadCollision(module.tgame.camera.ped,false)
+                        setCharCollision(module.tgame.camera.ped,true)
+                        setLoadCollisionForCharFlag(module.tgame.camera.ped,true)
+
+                        if module.tgame.camera.move_player[0] then
+                            markCharAsNoLongerNeeded(module.tgame.camera.ped)
+                            deleteChar(module.tgame.camera.ped)
+                            module.tgame.camera.ped = PLAYER_PED
+                        else
+                            module.tgame.camera.ped = createRandomChar(x,y,z)
+
+                            -- place place properly at ground 
+                            local cx,cy,cz = getActiveCameraCoordinates()
+                            cz = getGroundZFor3dCoord(cx,cy,cz)
+                            setCharCoordinates(PLAYER_PED,cx,cy,cz)
+                        end
+                        
+                        freezeCharPositionAndDontLoadCollision(module.tgame.camera.ped,true)
+                        setCharCollision(module.tgame.camera.ped,false)
+                        setLoadCollisionForCharFlag(module.tgame.camera.ped,false)
+
+                        setCharCoordinates(module.tgame.camera.ped,x,y,z)
+                        setCharHeading(module.tgame.camera.ped,heading)
+                    end
+                end
+                imgui.NextColumn()
+                if not module.tgame.camera.move_player[0] then
+                    fcommon.CheckBoxVar("Lock on player",module.tgame.camera.lock_on_player,"Locks camera on player")
+                end
+                imgui.Columns(1)
 
                 imgui.Spacing()
                 if imgui.SliderInt("FOV", module.tgame.camera.fov, 5,120) then
@@ -642,22 +702,14 @@ Up : %s (Lock on player)\nDown: %s (Lock on player)",fcommon.GetHotKeyNames(fmen
                     end
                 end
                 
-                imgui.Spacing()
-                if imgui.Button("Restore Camera",imgui.ImVec2(fcommon.GetSize(2))) then
-                    restoreCamera()
-                    module.tgame.camera.fov[0] = 70
-                    cameraSetLerpFov(getCameraFov(),module.tgame.camera.fov[0],1000,true)
-                    cameraPersistFov(true) 
-                    module.tgame.camera.shake[0] = 0.0
-                    cameraSetShakeSimulationSimple(1,1,0.0)
-                    module.tgame.camera.movement_speed[0] = 0.2
-                end
-                imgui.SameLine()
-                if imgui.Button("Warp player",imgui.ImVec2(fcommon.GetSize(2))) then
-                    local cx,cy,cz = getActiveCameraCoordinates()
-                    cz = getGroundZFor3dCoord(cx,cy,cz)
-                    setCharCoordinates(PLAYER_PED,cx,cy,cz)
-                    printHelpString("Player warped")
+                if not module.tgame.camera.move_player[0] then
+                    imgui.Spacing()
+                    if imgui.Button("Warp player to camera location",imgui.ImVec2(fcommon.GetSize(1))) then
+                        local cx,cy,cz = getActiveCameraCoordinates()
+                        cz = getGroundZFor3dCoord(cx,cy,cz)
+                        setCharCoordinates(PLAYER_PED,cx,cy,cz)
+                        printHelpString("Player warped")
+                    end
                 end
             end) then
                 fcommon.CreateThread(module.CameraMode)

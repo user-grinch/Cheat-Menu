@@ -11,6 +11,11 @@ module.CBaseModelInfo =
 {
 }
 
+module.CCutsceneMgr =
+{
+    ms_running = readMemory(0x00B5F851,1,false)
+}
+
 module.CEntity = 
 {
     SetRwObjectAlpha = ffi.cast("int(__thiscall *)(int pentity, int alpha)",0x5332C0)

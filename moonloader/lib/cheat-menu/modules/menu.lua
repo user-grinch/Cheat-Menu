@@ -30,6 +30,7 @@ module.tmenu =
 	},
 	crash_text          = "",
 	dont_save			= imgui.new.bool(fconfig.Get('tmenu.dont_save',false)),
+	enable_stat_saving  = imgui.new.bool(fconfig.Get('tmenu.enable_stat_saving',false)),
 	fast_load_images    = imgui.new.bool(fconfig.Get('tmenu.fast_load_images',true)),
 	font				=
 	{
@@ -343,7 +344,9 @@ function module.MenuMain()
 			fcommon.CheckBoxVar("Auto reload",module.tmenu.auto_reload,"Reload cheat menu automatically\nin case of a crash.\n\nMight cause crash loop sometimes.")
 			fcommon.CheckBoxVar("Check for updates",module.tmenu.auto_update_check,"Cheat Menu will automatically check for updates\nonline. This requires an internet connection and\
 will download files from github repository.")
-			fcommon.CheckBoxVar("Don't save changes",module.tmenu.dont_save,"Saves & loads the game changes.")
+			fcommon.CheckBoxVar("Don't save changes",module.tmenu.dont_save,"Don't save any changes done to the menu.\nMenu will always start as a new install.")
+			fcommon.CheckBoxVar("Enable stat saving",module.tmenu.enable_stat_saving,"Save stats data in config file. These will be loaded\non new game start or save game load.\n\
+Includes health, armour, stamina, body, fat etc.")
 			fcommon.CheckBoxVar("Fast load images",module.tmenu.fast_load_images,"Loads images at the menu startup. Enabling this may\ndecrease fps loss when opening the image tabs but\
 can freeze the game at startup for a few seconds.\n\nBest to enable if you won't reload the menu frequently.")
 			imgui.NextColumn()

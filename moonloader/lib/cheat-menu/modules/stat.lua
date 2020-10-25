@@ -26,7 +26,6 @@ module.tstat      =
 
 -- Main function
 function module.StatMain()
-    
     if fcommon.BeginTabBar('Stats') then
         if fcommon.BeginTabItem('Vehicle') then
             if imgui.Button("Max vehicle stats",imgui.ImVec2(fcommon.GetSize(1))) then

@@ -81,34 +81,36 @@ function module.SetConfigData()
         fcommon.RwMemory(tonumber(k),v[1],v[2],nil,v[3],v[4])
     end
 
-    for k,v in pairs(module.tconfig.stat_data) do
-        setFloatStat(tonumber(k),v)
-    end
-    
-    setCharHealth(PLAYER_PED,module.Get("tmisc_data.Health",getCharHealth(PLAYER_PED)))
-    
-    if getCharArmour(PLAYER_PED) < module.Get("tmisc_data.Armour",getCharArmour(PLAYER_PED)) then
-        addArmourToChar(PLAYER_PED,module.Get("tmisc_data.Armour",0)-getCharArmour(PLAYER_PED))
-    else
-        damageChar(PLAYER_PED,getCharArmour(PLAYER_PED)-module.Get("tmisc_data.Armour",0),true)
+    if fmenu.tmenu.enable_stat_saving[0] then
+        for k,v in pairs(module.tconfig.stat_data) do
+            setFloatStat(tonumber(k),v)
+        end
+        
+        setCharHealth(PLAYER_PED,module.Get("tmisc_data.Health",getCharHealth(PLAYER_PED)))
+        
+        if getCharArmour(PLAYER_PED) < module.Get("tmisc_data.Armour",getCharArmour(PLAYER_PED)) then
+            addArmourToChar(PLAYER_PED,module.Get("tmisc_data.Armour",0)-getCharArmour(PLAYER_PED))
+        else
+            damageChar(PLAYER_PED,getCharArmour(PLAYER_PED)-module.Get("tmisc_data.Armour",0),true)
+        end
+
+        -- Body
+        local body = module.Get("tmisc_data.Body",nil)
+        if body == 1 then
+            callFunction(0x439110,1,1,false)
+        end
+        if body == 2 then
+            callFunction(0x439190,1,1,false)
+            callFunction(0x439150,1,1,false)
+        end
+        if body == 3 then
+            callFunction(0x439190,1,1,false)
+        end
     end
 
     -- Never Wanted
     if readMemory(0x969171,1,false) == 0 and  module.Get("tmisc_data.Never Wanted",0) == true then
         callFunction(0x4396C0,1,0,false)
-    end
-
-    -- Body
-    local body = module.Get("tmisc_data.Body",nil)
-    if body == 1 then
-        callFunction(0x439110,1,1,false)
-    end
-    if body == 2 then
-        callFunction(0x439190,1,1,false)
-        callFunction(0x439150,1,1,false)
-    end
-    if body == 3 then
-        callFunction(0x439190,1,1,false)
     end
 
     -- Car & zone names
@@ -136,6 +138,15 @@ function module.Write()
 
     if not fmenu.tmenu.dont_save[0] then
         if not module.tconfig.reset then
+            if not fmenu.tmenu.enable_stat_saving[0] then
+                fmenu.tmenu.stat_data = {}
+
+                -- Remove player health & armor too
+                module.tconfig.memory_data[string.format("0x%6.6X",getCharPointer(PLAYER_PED)+0x548)] = nil -- player armor
+                module.tconfig.memory_data[string.format("0x%6.6X",getCharPointer(PLAYER_PED)+0x540)] = nil -- player health
+                module.tconfig.memory_data[tostring(0xB7CE50)] = nil -- money
+                module.tconfig.misc_data["Body"] = nil 
+            end
             write_table =
             {
                 tanimation =
@@ -170,6 +181,7 @@ function module.Write()
                 {
                     camera            =
                     {    
+                        move_player     = fgame.tgame.camera.move_player[0],   
                         fov             = fgame.tgame.camera.fov[0],   
                         movement_speed  = fgame.tgame.camera.movement_speed[0],
                     },
@@ -209,6 +221,7 @@ function module.Write()
                     auto_update_check   = fmenu.tmenu.auto_update_check[0],
                     auto_reload         = fmenu.tmenu.auto_reload[0],
                     dont_save           = fmenu.tmenu.dont_save[0],
+                    enable_stat_saving  = fmenu.tmenu.enable_stat_saving[0],
                     fast_load_images    = fmenu.tmenu.fast_load_images[0],
                     font				=
                     {
@@ -264,6 +277,13 @@ function module.Write()
                     ped_health_display = fped.tped.ped_health_display[0],
                     spawned_peds = 
                     {
+                        ped_bleed = fped.tped.spawned_peds.ped_bleed[0],
+                        ped_accuracy= fped.tped.spawned_peds.ped_accuracy[0],
+                        ped_health = fped.tped.spawned_peds.ped_health[0],
+                        ped_type_selected = fped.tped.spawned_peds.ped_type_selected[0],
+                        ped_weapon_ammo = fped.tped.spawned_peds.ped_weapon_ammo[0],
+                        ped_weapon_selected = fped.tped.spawned_peds.ped_weapon_selected,
+                        ped_weapon_id = fped.tped.spawned_peds.ped_weapon_id[0],
                         stand_still = fped.tped.spawned_peds.stand_still[0],
                     },
                 },
@@ -271,7 +291,7 @@ function module.Write()
                 {
                     aimSkinChanger      = fplayer.tplayer.aimSkinChanger[0],
                     cjBody              = fplayer.tplayer.cjBody[0],
-                    enable_saving           = fplayer.tplayer.enable_saving[0],
+                    enable_saving       = fplayer.tplayer.enable_saving[0],
                     god                 = fplayer.tplayer.god[0],
                     invisible           = fplayer.tplayer.invisible[0],
                     keep_position       = fplayer.tplayer.keep_position[0],

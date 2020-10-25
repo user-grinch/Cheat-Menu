@@ -252,36 +252,6 @@ function module.GetLocationInfo(x,y,z)
 	end
 end
 
-
-function module.CreateMenus(names,funcs)
-
-    imgui.PushStyleVarVec2(imgui.StyleVar.ItemSpacing,imgui.ImVec2(0,0.5))
-
-    local button = imgui.ColorConvertFloat4ToU32(imgui.GetStyle()['Colors'][21])
-
-    for i=1,#names,1 do
-        if tcheatmenu.current_menu == i then
-            imgui.GetStyle().Colors[imgui.Col.Button] = imgui.GetStyle().Colors[imgui.Col.ButtonActive]
-        end
-        if imgui.Button(names[i],imgui.ImVec2(module.GetSize(4,true))) then
-            tcheatmenu.current_menu = i
-        end
-        if tcheatmenu.current_menu == i then
-            imgui.GetStyle().Colors[imgui.Col.Button] = imgui.ColorConvertU32ToFloat4(button)
-        end
-       
-        if i%4 ~= 0 then
-            imgui.SameLine()
-        end
-    end
-
-    imgui.PopStyleVar()
-    imgui.Dummy(imgui.ImVec2(0,5))
-    if tcheatmenu.current_menu ~= 0 then
-        funcs[tcheatmenu.current_menu]()
-    end
-end
-
 --------------------------------------------------
 -- Function DrawEntries
 
@@ -340,7 +310,7 @@ function DrawText(identifier,func_on_left_click,func_on_right_click,entry,text,k
 end
 
 
-function module.DrawEntries(identifier,draw_type,func_on_left_click,func_on_right_click,func_get_name,data_table,const_image_height,const_image_width)
+function module.DrawEntries(identifier,draw_type,func_on_left_click,func_on_right_click,func_get_name,data_table,const_image_height,const_image_width,verify_model_func)
 
     --------------------------------------------------
     -- Setup the temp table
@@ -403,7 +373,7 @@ function module.DrawEntries(identifier,draw_type,func_on_left_click,func_on_righ
             if draw_entries_data[identifier].selected == "All" or category == draw_entries_data[identifier].selected then
                 for label,entry in pairs(table) do
                     local name = func_get_name(label)
-                    if draw_entries_data[identifier].filter:PassFilter(name) then
+                    if draw_entries_data[identifier].filter:PassFilter(name) and (verify_model_func == nil or verify_model_func(label)) then
                         if draw_type == fconst.DRAW_TYPE.IMAGE then
                             if identifier ~= fconst.IDENTIFIER.COMPONENT
                             or casts.CVehicle.IsValidModForVehicle(tonumber(label),getCarPointer(getCarCharIsUsing(PLAYER_PED))) then
@@ -1068,6 +1038,38 @@ function module.ConfigPanel(label,func)
         end
     end
 end
+
+
+function module.CreateMenus(names,funcs)
+
+    imgui.PushStyleVarVec2(imgui.StyleVar.ItemSpacing,imgui.ImVec2(0,0.5))
+
+    local button = imgui.ColorConvertFloat4ToU32(imgui.GetStyle()['Colors'][21])
+
+    for i=1,#names,1 do
+        if tcheatmenu.current_menu == i then
+            imgui.GetStyle().Colors[imgui.Col.Button] = imgui.GetStyle().Colors[imgui.Col.ButtonActive]
+        end
+        if imgui.Button(names[i],imgui.ImVec2(module.GetSize(4,true))) then
+            tcheatmenu.current_menu = i
+            _tabs.panel_func = nil
+        end
+        if tcheatmenu.current_menu == i then
+            imgui.GetStyle().Colors[imgui.Col.Button] = imgui.ColorConvertU32ToFloat4(button)
+        end
+       
+        if i%4 ~= 0 then
+            imgui.SameLine()
+        end
+    end
+
+    imgui.PopStyleVar()
+    imgui.Dummy(imgui.ImVec2(0,5))
+    if tcheatmenu.current_menu ~= 0 then
+        funcs[tcheatmenu.current_menu]()
+    end
+end
+
 
 --------------------------------------------------
 -- Hotkey Implementation

@@ -311,7 +311,8 @@ function module.PlayerMain()
             imgui.Columns(1)
         end
         if fcommon.BeginTabItem("Menus") then
-            fcommon.UpdateAddress({name = "Armour",address = getCharPointer(PLAYER_PED)+0x548,size = 4,min = 0,default =0,max = 100, is_float = true})
+            local pChar = getCharPointer(PLAYER_PED)
+            fcommon.UpdateAddress({name = "Armour",address = pChar+0x548,size = 4,min = 0,default =0,max = 150, is_float = true})
             fcommon.DropDownMenu("Body",function()
                 if getCharModel(PLAYER_PED) == 0 then
                     if imgui.RadioButtonIntPtr("Fat",module.tplayer.cjBody,1) then
@@ -357,10 +358,10 @@ function module.PlayerMain()
             end)
             fcommon.UpdateStat({ name = "Energy",stat = 165})
             fcommon.UpdateStat({ name = "Fat",stat = 21})
-            fcommon.UpdateAddress({name = "Health",address = getCharPointer(PLAYER_PED)+0x540,size = 4,min = 0,default =100,max = 255, is_float = true})
+            fcommon.UpdateAddress({name = "Health",address = pChar+0x540,size = 4,min = 0,default =100,max = math.floor(mad.get_char_max_health(PLAYER_PED)), is_float = true})
             fcommon.UpdateStat({ name = "Lung capacity",stat = 225})
             fcommon.UpdateStat({ name = "Max health",stat = 24,min = 0,default = 569,max = 1450})
-            fcommon.UpdateAddress({name = "Money",address = 0xB7CE50,size = 4,min = -9999999,max = 9999999})
+            fcommon.UpdateAddress({name = "Money",address = 0xB7CE50,size = 4,min = -9999999,default = 0,max = 9999999})
             fcommon.UpdateStat({ name = "Muscle",stat = 23})
             fcommon.UpdateStat({ name = "Respect",stat = 68,max = 2450}) 
             fcommon.UpdateStat({ name = "Stamina",stat = 22})
