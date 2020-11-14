@@ -98,7 +98,7 @@ function module.SpawnPed(model)
             loadAllModelsNow()
 
             local x,y,z = getCharCoordinates(PLAYER_PED)
-            ped = createChar(module.tped.spawned_peds.ped_type_selected[0]+3,model,x,y,z) -- CIVMALE
+            ped = createChar(module.tped.spawned_peds.ped_type_selected[0]+3,model,x,y,z)
 
             markModelAsNoLongerNeeded(model)
             module.tped.spawned_peds.list[ped] = tostring(getCharModel(ped))
@@ -290,7 +290,10 @@ function module.PedMain()
                     end)
                     imgui.Spacing()
                     imgui.SliderInt("Accuracy", module.tped.spawned_peds.ped_accuracy, 0.0, 100.0)
-                    imgui.SliderInt("Health", module.tped.spawned_peds.ped_health, 0.0, 100.0) 
+                    if imgui.InputInt("Health", module.tped.spawned_peds.ped_health)  then
+                        module.tped.spawned_peds.ped_health[0] = module.tped.spawned_peds.ped_health[0] < 0 and 0 or module.tped.spawned_peds.ped_health[0]
+                        module.tped.spawned_peds.ped_health[0] = module.tped.spawned_peds.ped_health[0] > 1000 and 1000 or module.tped.spawned_peds.ped_health[0]
+                    end
                     fcommon.DropDownListNumber("Ped type",module.tped.spawned_peds.ped_type_list,module.tped.spawned_peds.ped_type_selected)
                 end
                 fcommon.EndTabBar()
