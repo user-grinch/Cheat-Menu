@@ -20,8 +20,8 @@ script_description("Cheat Menu for Grand Theft Auto San Andreas")
 script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-menu")
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
-script_version("2.2-beta")
-script_version_number(2020111501) -- YYYYMMDDNN
+script_version("2.2")
+script_version_number(2020111701) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num))
 
