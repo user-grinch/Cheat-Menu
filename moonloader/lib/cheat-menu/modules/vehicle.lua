@@ -1161,7 +1161,7 @@ mods which involve fuel systems")
                     if isCharInAnyCar(PLAYER_PED) then
                         fcommon.CheckBoxVar("Show all carcol colors", module.tvehicle.color.show_all)
                         imgui.Spacing()
-                        
+                        local car = getCarCharIsUsing(PLAYER_PED)
                         local name = casts.CModelInfo.GetNameFromModel(getCarModel(car))
                         
                         local shown_colors = {}

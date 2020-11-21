@@ -20,8 +20,8 @@ script_description("Cheat Menu for Grand Theft Auto San Andreas")
 script_url("https://forum.mixmods.com.br/f5-scripts-codigos/t1777-moon-cheat-menu")
 script_dependencies("ffi","lfs","memory","mimgui","MoonAdditions")
 script_properties('work-in-pause')
-script_version("2.2")
-script_version_number(2020111701) -- YYYYMMDDNN
+script_version("2.3-beta")
+script_version_number(2020112201) -- YYYYMMDDNN
 
 print(string.format("Loading v%s (%d)",script.this.version,script.this.version_num))
 
@@ -497,7 +497,7 @@ function main()
         writeMemory(0x484D19,1,0x83,false) 
         writeMemory(0x484D17,1,0,false)
     end
-
+    
     if fgame.tgame.disable_help_popups[0] == true then
         setGameGlobal(glob.Help_Wasted_Shown,1)
         setGameGlobal(glob.Help_Busted_Shown,1)
@@ -571,6 +571,8 @@ function main()
 
     ------------------------------------------------
 
+    print("Sweet total missions passed " .. tostring(getGameGlobal(glob.Sweet_Total_Passed_Missions)))
+    print("CRASH LS total missions passed " .. tostring(getGameGlobal(glob.CRASH_LS_Total_Passed_Missions)))
     while true do
 
         --------------------------------------------------
