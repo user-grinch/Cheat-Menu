@@ -571,8 +571,6 @@ function main()
 
     ------------------------------------------------
 
-    print("Sweet total missions passed " .. tostring(getGameGlobal(glob.Sweet_Total_Passed_Missions)))
-    print("CRASH LS total missions passed " .. tostring(getGameGlobal(glob.CRASH_LS_Total_Passed_Missions)))
     while true do
 
         --------------------------------------------------
