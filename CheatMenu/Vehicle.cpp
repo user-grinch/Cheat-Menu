@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Vehicle.h"
 
+bool Vehicle::bike_fly = false;
 bool Vehicle::dont_fall_bike = false;
 bool Vehicle::veh_engine = false;
 bool Vehicle::veh_heavy = false;
@@ -91,10 +92,10 @@ Vehicle::Vehicle()
 
 		static CPlayerPed *player = FindPlayerPed();
 		static int hplayer = CPools::GetPedRef(player);
+		CVehicle *veh = player->m_pVehicle;
 
 		if (Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer))
 		{
-			CVehicle *veh = player->m_pVehicle;
 			int hveh = CPools::GetVehicleRef(veh);
 
 			Command<Commands::SET_CAR_ENGINE_ON>(hveh, !veh_engine);
@@ -171,6 +172,21 @@ Vehicle::Vehicle()
 					InstallNeon(veh, Vehicle::neon::random_val(gen), Vehicle::neon::random_val(gen), Vehicle::neon::random_val(gen));
 			}
 			neon::traffic_timer = timer;
+		}
+
+		if (bike_fly && veh && veh->IsDriver(player))
+		{
+			if (veh->m_nVehicleSubClass == VEHICLE_BIKE || veh->m_nVehicleSubClass == VEHICLE_BMX)
+			{
+					if (sqrt( veh->m_vecMoveSpeed.x * veh->m_vecMoveSpeed.x
+							+ veh->m_vecMoveSpeed.y * veh->m_vecMoveSpeed.y
+							+ veh->m_vecMoveSpeed.z * veh->m_vecMoveSpeed.z
+							) > 0.0
+					&& CTimer::ms_fTimeStep > 0.0)
+				{
+					veh->FlyingControl(3, -9999.9902, -9999.9902, -9999.9902, -9999.9902);
+				}
+			}
 		}
 	};
 }
@@ -615,17 +631,18 @@ void Vehicle::Main()
 			Ui::CheckboxAddress("Aim while driving", 0x969179);
 			Ui::CheckboxAddress("All cars have nitro", 0x969165);
 			Ui::CheckboxAddress("All taxis have nitro", 0x96918B);
+			Ui::CheckboxWithHint("Bikes fly", &bike_fly);
 			Ui::CheckboxAddress("Boats fly", 0x969153);
 			Ui::CheckboxWithHint("Car engine", &veh_engine);
-			Ui::CheckboxBitFlag("Cars fly", 0x969160);
+			Ui::CheckboxAddress("Cars fly", 0x969160);
 			Ui::CheckboxWithHint("Car heavy", &veh_heavy);
-			Ui::CheckboxBitFlag("Decreased traffic", 0x96917A);
+			Ui::CheckboxAddress("Decreased traffic", 0x96917A);
 			Ui::CheckboxWithHint("Don't fall off bike", &dont_fall_bike);
-			Ui::CheckboxBitFlag("Drive on water", 0x969152);
-			Ui::CheckboxAddressEx("Lock train camera", 0x52A52F, 171, 6);
+			Ui::CheckboxAddress("Drive on water", 0x969152);
 
 			ImGui::NextColumn();
 
+			Ui::CheckboxAddressEx("Lock train camera", 0x52A52F, 171, 6);
 			Ui::CheckboxAddress("Float away when hit", 0x969166);
 			Ui::CheckboxAddress("Green traffic lights", 0x96914E);
 			Ui::CheckboxWithHint("Invisible car", &veh_invisible);

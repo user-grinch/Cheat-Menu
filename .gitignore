@@ -39,3 +39,6 @@ luac.out
 *.hex
 
 moonloader/lib/cheat-menu/json/config.json
+/CheatMenu.VC.VC.opendb
+/CheatMenu.VC.db
+.vs/CheatMenu/v14/.suo

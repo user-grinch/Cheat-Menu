@@ -385,9 +385,10 @@ void Menu::Main()
 						
 				ImGui::TextWrapped("Dowglas_");
 				ImGui::TextWrapped("Israel");
-						
+				
 				ImGui::NextColumn();
 				ImGui::TextWrapped("Junior-Djjr");
+				ImGui::TextWrapped("Um-geek");
 
 				ImGui::Columns(1);
 

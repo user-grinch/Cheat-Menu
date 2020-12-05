@@ -5,6 +5,7 @@
 class Vehicle : NeonAPI, Paint
 {
 private:
+	static bool bike_fly;
 	static bool dont_fall_bike;
 	static bool veh_engine;
 	static bool veh_heavy;

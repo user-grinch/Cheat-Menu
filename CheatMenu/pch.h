@@ -3,8 +3,8 @@
 
 #define INPUT_BUFFER_SIZE 64
 #define SPAWN_PED_LIMIT 20
-#define MENU_VERSION "2.5-alpha"
-#define BUILD_NUMBER "20201112"
+#define MENU_VERSION "2.5-beta"
+#define BUILD_NUMBER "20201206"
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <ctime>

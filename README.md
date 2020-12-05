@@ -15,7 +15,7 @@
 
 Cheat menu for Grand Theft Auto SanAndreas which allows a large set of modifications/cheats to be applied enabling a much more easier & amusing gameplay.
 
-Get stable binaries from [here](https://github.com/user-grinch/Cheat-Menu/releases). Alpha binaries are available at the discord server.
+Get stable binaries from [here](https://github.com/user-grinch/Cheat-Menu/releases). Beta binaries are available at the discord server.
 
 A portuguese translation of the menu is [here](https://github.com/Dowglass/Cheat-Menu)
 

@@ -32,5 +32,6 @@ void CJson::LoadJsonData(std::vector<std::string>& vec, std::string& selected)
 CJson::~CJson()
 {
 	std::ofstream file(file_path);
-	file << data.dump(4) << std::endl;
+	file << data.dump(4,' ',false, nlohmann::json::error_handler_t::replace) << std::endl;
+	file.close();
 }

@@ -24,10 +24,8 @@ LRESULT Hook::InputProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 HRESULT Hook::ResetDx9(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters)
 {
 	ImGui_ImplDX9_InvalidateDeviceObjects();
-	long result = oReset9(pDevice, pPresentationParameters);
-	ImGui_ImplDX9_CreateDeviceObjects();
 
-	return result;
+	return oReset9(pDevice, pPresentationParameters);
 }
 
 HRESULT Hook::PresentDx9(IDirect3DDevice9 *pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion)
@@ -88,13 +86,9 @@ HRESULT Hook::PresentDx11(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Fl
 
 	if (Globals::init_done)
 	{
-		static RwBool fullscreen = RsGlobal.ps->fullScreen;
-
-		if (fullscreen != RsGlobal.ps->fullScreen)
-		{
-			fullscreen = RsGlobal.ps->fullScreen;
+		HRESULT hr = pSwapChain->Present(1, 0);
+		if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
 			ImGui_ImplDX11_InvalidateDeviceObjects();
-		}
 
 		// Change font size if the game resolution changes
 		if (Globals::font_screen_size.x != screen::GetScreenWidth()
