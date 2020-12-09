@@ -97,10 +97,5 @@ struct TextureStructure
 extern CJson config;
 extern std::ofstream flog;
 
-// Random cheats
-//extern std::random_device rd; 
-//extern std::mt19937 gen;
-//extern std::uniform_int_distribution<> cheat_id;
-
 #include "Ui.h"
 #include "Util.h"

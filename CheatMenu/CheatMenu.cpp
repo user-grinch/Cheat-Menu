@@ -29,39 +29,11 @@ void CheatMenu::ProcessWindow()
 
 	if (!FrontEndMenuManager.m_bMenuActive && (Globals::show_menu || Menu::commands::show_menu))
 	{
-		CPlayerPed* player = FindPlayerPed();
-		CPad *pad = player->GetPadFromPlayer();
-		pad->bPlayerSafe = 1;
-
 		if (Globals::show_menu)
-		{
 			ProcessMenu();
-
-			if (Globals::show_menu)
-				patch::PutRetn(0x6194A0);
-			else
-			{
-				patch::SetUChar(0x6194A0, 0xE9);
-				pad->bPlayerSafe = 0;
-			}
-
-			io.MouseDrawCursor = true;
-		}
-		else
-		{
-			io.MouseDrawCursor = false;
-		}
-
-		if (Menu::commands::show_menu)
-		{
+		else 
 			Menu::ProcessShortcutsWindow();
-
-			if (!Menu::commands::show_menu)
-				pad->bPlayerSafe = 0;
-		}
 	}
-	else
-		io.MouseDrawCursor = false;
 
 	Menu::ProcessOverlay();
 }
@@ -83,7 +55,6 @@ CheatMenu::CheatMenu()
 
 	Events::processScriptsEvent += [this]
 	{
-		Hook::disable_controls = ImGui::GetIO().WantCaptureKeyboard || Menu::commands::show_menu;
 
 		if (Globals::init_done && !FrontEndMenuManager.m_bMenuActive && CTimer::m_snTimeInMilliseconds - Globals::last_key_timer > 250)
 		{
@@ -93,30 +64,16 @@ CheatMenu::CheatMenu()
 			if (Ui::HotKeyPressed(hotkey::menu_open))
 			{
 				Globals::show_menu = !Globals::show_menu;
-
-				if (Globals::show_menu)
-					Util::ClearCharTasksVehCheck(player);
-
-				pad->bPlayerSafe = Globals::show_menu;
 				Globals::last_key_timer = CTimer::m_snTimeInMilliseconds;
 			}
 
 			if (Ui::HotKeyPressed(hotkey::command_window))
 			{
 				Menu::commands::show_menu = !Menu::commands::show_menu;
-
-				if (Menu::commands::show_menu)
-					Util::ClearCharTasksVehCheck(player);
-				else
-				{
-					Menu::ProcessCommands();
-					strcpy(Menu::commands::input_buffer, "");
-				}
-
-				pad->bPlayerSafe = Menu::commands::show_menu;
-
 				Globals::last_key_timer = CTimer::m_snTimeInMilliseconds;
 			}
+
+			Hook::show_mouse = Globals::show_menu || Menu::commands::show_menu;
 		}
 	};
 

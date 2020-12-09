@@ -8,14 +8,16 @@ f_Reset Hook::oReset9 = NULL;
 f_Present11 Hook::oPresent11 = NULL;
 f_Present9 Hook::oPresent9 = NULL;
 
-bool Hook::disable_controls = false;
+bool Hook::mouse_visibility = false;
+bool Hook::show_mouse = false;
+
 std::function<void()> Hook::window_func = NULL;
 
 LRESULT Hook::InputProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 
-	if (disable_controls)
+	if (ImGui::GetIO().WantCaptureKeyboard)
 		return 1;
 	else
 		return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
@@ -34,6 +36,12 @@ HRESULT Hook::PresentDx9(IDirect3DDevice9 *pDevice, RECT* pSourceRect, RECT* pDe
 
 	if (Globals::init_done)
 	{
+		if (mouse_visibility != show_mouse)
+		{
+			Hook::ShowMouse(show_mouse);
+			mouse_visibility = show_mouse;
+		}
+
 		// Change font size if the game resolution changes
 		if (Globals::font_screen_size.x != screen::GetScreenWidth()
 			&& Globals::font_screen_size.y != screen::GetScreenHeight())
@@ -141,6 +149,30 @@ HRESULT Hook::PresentDx11(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Fl
 	}
 
 	return oPresent11(pSwapChain, SyncInterval, Flags);
+}
+
+void Hook::ShowMouse(bool state)
+{
+	if (state)
+	{
+		patch::PutRetn(0x6194A0);
+		patch::Nop(0x53F417, 5); // don't call CPad__getMouseState
+		patch::SetRaw(0x53F41F, "\x33\xC0\x0F\x84", 4);
+	}
+	else
+	{
+		patch::SetRaw(0x541DF5, "\xE8\x46\xF3\xFE\xFF", 5); // call CControllerConfigManager::AffectPadFromKeyBoard
+		patch::SetRaw(0x53F417, "\xE8\xB4\x7A\x20\x00", 5); // call CPad__getMouseState
+		patch::SetRaw(0x53F41F, "\x85\xC0\x0F\x8C", 4); // xor eax, eax -> test eax, eax
+														// jz loc_53F526 -> jl loc_53F526
+		patch::SetUChar(0x6194A0, 0xE9); // jmp setup
+	}
+
+	ImGui::GetIO().MouseDrawCursor = state;
+	CPad::NewMouseControllerState.X = 0;
+	CPad::NewMouseControllerState.Y = 0;
+	Call<0x541BD0>(); // CPad::ClearMouseHistory
+	Call<0x541DD0>(); // CPad::UpdatePads
 }
 
 Hook::Hook()

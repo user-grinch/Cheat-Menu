@@ -12,7 +12,3 @@ ID3D11Device *Globals::device11 = nullptr;
 
 CJson config = CJson("config", true);
 std::ofstream flog = std::ofstream("CheatMenu.log");
-//
-//std::random_device rd;
-//std::mt19937 gen(rd());
-//std::uniform_int_distribution<> cheat_id(0, 91);

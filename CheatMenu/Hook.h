@@ -13,6 +13,7 @@ private:
 	static f_Reset oReset9;
 	static f_Present11 oPresent11;
 	static f_Present9 oPresent9;
+	static bool mouse_visibility;
 
 	static HRESULT CALLBACK ResetDx9(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
 	static HRESULT CALLBACK PresentDx9(IDirect3DDevice9 *pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion);
@@ -20,8 +21,9 @@ private:
 	static LRESULT CALLBACK InputProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
 protected:
-	static bool disable_controls;
+	static bool show_mouse;
 	static std::function<void()> window_func;
+	static void ShowMouse(bool state);
 
 public:
 	Hook();
