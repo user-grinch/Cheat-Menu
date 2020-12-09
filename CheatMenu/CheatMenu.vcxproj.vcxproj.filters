@@ -41,6 +41,7 @@
     <ClCompile Include="Paint.cpp" />
     <ClCompile Include="external\kiero\kiero.cpp" />
     <ClCompile Include="external\imgui\imgui_impl_dx11.cpp" />
+    <ClCompile Include="CustomWidgets.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CheatMenu.h" />
@@ -94,6 +95,7 @@
     <ClInclude Include="external\kiero\minhook\include\MinHook.h" />
     <ClInclude Include="external\imgui\imgui_impl_dx11.h" />
     <ClInclude Include="external\imgui\stb_image.h" />
+    <ClInclude Include="CustomWidgets.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="external">

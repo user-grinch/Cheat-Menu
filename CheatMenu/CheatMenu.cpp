@@ -78,6 +78,7 @@ CheatMenu::CheatMenu()
 		// Load menu settings
 		Globals::menu_size.x = config.GetValue<float>("window.sizeX", screen::GetScreenWidth() / 4.0f);
 		Globals::menu_size.y = config.GetValue<float>("window.sizeY", screen::GetScreenHeight() / 1.2f);
+		srand(CTimer::m_snTimeInMilliseconds);
 	};
 
 	Events::processScriptsEvent += [this]

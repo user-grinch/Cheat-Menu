@@ -6,14 +6,21 @@ void Util::ClearCharTasksVehCheck(CPed* ped)
 {
 	uint hped = CPools::GetPedRef(ped);
 	uint hveh = NULL;
+	bool veh_engine = true;
 
 	if (Command<Commands::IS_CHAR_IN_ANY_CAR>(hped))
+	{
 		hveh = CPools::GetVehicleRef(ped->m_pVehicle);
+		veh_engine = ped->m_pVehicle->m_nVehicleFlags.bEngineOn;
+	}
 
 	Command<Commands::CLEAR_CHAR_TASKS_IMMEDIATELY>(hped);
 
 	if (hveh)
+	{
 		Command<Commands::TASK_WARP_CHAR_INTO_CAR_AS_DRIVER>(hped, hveh);
+		ped->m_pVehicle->m_nVehicleFlags.bEngineOn = veh_engine;
+	}
 }
 
 void Util::LoadTexturesInDirRecursive(const char * path, const char * file_ext,std::vector<std::string>& category_vec, std::vector<std::unique_ptr<TextureStructure>> &store_vec)

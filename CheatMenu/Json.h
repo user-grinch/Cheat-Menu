@@ -8,6 +8,11 @@ private:
 	std::string file_path;
 public:
 	nlohmann::json data;
+
+	/*
+		Returns a value from json structure hierarchy using '.' 
+		Example: "Menu.Window.X"
+	*/
 	template <typename T>
 	T GetValue(std::string&& key, T&& default_val)
 	{
@@ -32,6 +37,11 @@ public:
 			return default_val;
 		}
 	}
+
+	/*
+		Allows to save values in json hierarchy using '.' 
+		Example: "Menu.Window.X"
+	*/
 	template <typename T>
 	void SetValue(std::string&& key, T&& val)
 	{
@@ -49,6 +59,11 @@ public:
 		else
 			*json = val;
 	}
+
+	/*
+		Loads the section names into a category vector. 
+		Used to create drop down category menus
+	*/
 	void LoadJsonData(std::vector<std::string>& vec, std::string& selected);
 	CJson(const char* text, bool create_new = false);
 	virtual ~CJson();

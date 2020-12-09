@@ -6,7 +6,7 @@ private:
 
 public:
 	static void ClearCharTasksVehCheck(CPed* ped);
-	static CVehicle* GetClosestVehicle(CPlayerPed* player);
+	static CVehicle *GetClosestVehicle(CPlayerPed* player);
 	static int GetLargestGangInZone();
 	static void LoadTexturesInDirRecursive(const char * path, const char * file_ext, std::vector<std::string>& category_vec, std::vector<std::unique_ptr<TextureStructure>> &store_vec);
 	static bool IsOnMission();

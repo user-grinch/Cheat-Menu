@@ -17,10 +17,39 @@ std::string Teleport::selected_item = "All";
 uint quick_teleport_timer = 0;
 
 CJson Teleport::json = CJson("teleport");
+CJson Teleport::sprite_name_json = CJson("radar sprite");
+
+void Teleport::FetchRadarSpriteData()
+{
+	uint cur_timer = CTimer::m_snTimeInMilliseconds;
+	static uint timer = cur_timer;
+
+	// Update the radar list each 5 seconds
+	if (cur_timer - timer < 5000)
+		return;
+
+	json.data.erase("Radar");
+
+	// 175 is the max number of sprites, FLA can increase this limit, might need to update this
+	for (int i = 0; i != 175; ++i)	
+	{
+		CVector pos = CRadar::ms_RadarTrace[i].m_vPosition;
+		uchar sprite = CRadar::ms_RadarTrace[i].m_nBlipSprite;
+		std::string sprite_name = sprite_name_json.data[std::to_string(sprite)].get<std::string>();
+		std::string key_name = sprite_name + ", " + Util::GetLocationName(&pos);
+
+		json.data["Radar"][key_name] = "0, " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z);
+
+		/*
+			"Radar" : {
+				"key_name" : "0, x, y, z",
+			}
+		*/
+	}
+}
 
 Teleport::Teleport()
 {
-
 	json.LoadJsonData(search_categories, selected_item);
 
 	Events::initGameEvent += []
@@ -39,13 +68,9 @@ Teleport::Teleport()
 			STeleport::pos.z = CWorld::FindGroundZFor3DCoord(Teleport::STeleport::pos.x, Teleport::STeleport::pos.y, STeleport::pos.z + 100.0f, 0, &player_entity) + 1.0f;
 
 			if (player->m_pVehicle)
-			{
 				player->m_pVehicle->Teleport(STeleport::pos, false);
-			}
 			else
-			{
 				player->Teleport(STeleport::pos, false);
-			}
 
 			STeleport::_bool = false;
 			Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(player), false);
@@ -65,6 +90,11 @@ Teleport::Teleport()
 
 	Events::shutdownRwEvent += []
 	{
+		// Clear the Radar coordinates
+		json.data.erase("Radar");
+		json.data["Radar"] = {};
+
+
 		config.SetValue("quick_teleport", quick_teleport);
 	};
 }
@@ -104,9 +134,7 @@ void Teleport::TeleportPlayer(bool get_marker, CVector* pos, short interior_id)
 		Command<Commands::SET_VEHICLE_AREA_VISIBLE>(CPools::GetVehicleRef(player->m_pVehicle), interior_id); // setvehicleinterior
 	}
 	else
-	{
 		player->Teleport(CVector(pos->x, pos->y, pos->z), false);
-	}
 
 	Command<Commands::SET_CHAR_AREA_VISIBLE>(CPools::GetPedRef(player), interior_id); // setcharinterior
 	Command<Commands::SET_AREA_VISIBLE>(interior_id);
@@ -212,6 +240,7 @@ void Teleport::Main()
 
 		if (ImGui::BeginTabItem("Search"))
 		{
+			FetchRadarSpriteData();
 			ImGui::Spacing();
 			Ui::DrawJSON(json, search_categories, selected_item, filter, &TeleportToLocation, &RemoveTeleportEntry);
 			ImGui::EndTabItem();

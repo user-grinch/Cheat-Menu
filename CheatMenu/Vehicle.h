@@ -7,11 +7,7 @@ class Vehicle : NeonAPI, Paint
 private:
 	static bool bike_fly;
 	static bool dont_fall_bike;
-	static bool veh_engine;
 	static bool veh_heavy;
-	static bool veh_invisible;
-	static bool veh_lights;
-	static bool veh_no_dmg;
 	static bool veh_watertight;
 
 	static int door_menu_button;
@@ -39,7 +35,6 @@ private:
 		static uint rainbow_timer;
 		static bool traffic;
 		static uint traffic_timer;
-		static std::uniform_int_distribution<> random_val;
 	};
 
 	struct spawner 

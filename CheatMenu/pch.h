@@ -4,10 +4,9 @@
 #define INPUT_BUFFER_SIZE 64
 #define SPAWN_PED_LIMIT 20
 #define MENU_VERSION "2.5-beta"
-#define BUILD_NUMBER "20201206"
+#define BUILD_NUMBER "20201209"
 #define STB_IMAGE_IMPLEMENTATION
 
-#include <ctime>
 #include <d3d9.h>
 #include <d3d11.h>
 #include <d3d11Shader.h>
@@ -17,7 +16,7 @@
 #include <fstream>
 #include <functional>
 #include <memory>
-#include <random>
+#include <stdlib.h>     
 #include <sstream>
 #include <vector>
 #include <windows.h>
@@ -61,6 +60,7 @@
 // Globals
 typedef std::vector<std::pair<std::string, void(*)(void)>> unsortedMap;
 using namespace plugin;
+namespace fs = std::experimental::filesystem;
 
 enum Renderer
 {
@@ -98,11 +98,9 @@ extern CJson config;
 extern std::ofstream flog;
 
 // Random cheats
-extern std::random_device rd; 
-extern std::mt19937 gen;
-extern std::uniform_int_distribution<> cheat_id;
+//extern std::random_device rd; 
+//extern std::mt19937 gen;
+//extern std::uniform_int_distribution<> cheat_id;
 
 #include "Ui.h"
 #include "Util.h"
-
-namespace fs = std::experimental::filesystem;

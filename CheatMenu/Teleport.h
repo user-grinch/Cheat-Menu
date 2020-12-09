@@ -21,6 +21,14 @@ private:
 		static uint timer;
 	};
 
+	static CJson sprite_name_json;
+
+	/*
+		Generates radar sprite coordinates on the fly.
+		Shouldn't get saved in 'teleport.json', needs to be cleared at game shutdown.
+	*/
+	static void FetchRadarSpriteData();
+
 protected:
 	Teleport();
 	virtual ~Teleport();

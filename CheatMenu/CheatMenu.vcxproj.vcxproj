@@ -111,6 +111,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animation.cpp" />
+    <ClCompile Include="CustomWidgets.cpp" />
     <ClCompile Include="external\imgui\imgui_impl_dx11.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GTASA zDebug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">NotUsing</PrecompiledHeader>
@@ -176,6 +177,7 @@
     <ClCompile Include="Weapon.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="CustomWidgets.h" />
     <ClInclude Include="Events.h" />
     <ClInclude Include="Animation.h" />
     <ClInclude Include="external\imgui\imgui_impl_dx11.h" />

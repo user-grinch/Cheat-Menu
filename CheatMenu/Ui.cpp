@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Ui.h"
+#include "CustomWidgets.h"
 
 std::string Ui::current_hotkey = "";
 
@@ -123,15 +124,12 @@ void Ui::ShowTooltip(const char* text)
 	}
 }
 
-bool Ui::CheckboxWithHint(const char* label, bool* state, const char* hint)
+bool Ui::CheckboxWithHint(const char* label, bool* state, const char* hint, const bool is_disabled)
 {
 	bool rtn = false;
 
-	if (ImGui::Checkbox(label, state))
+	if (CustomWidgets::Checkbox(label,state,hint,is_disabled))
 		rtn = true;
-
-	if (hint != nullptr)
-		ShowTooltip(hint);
 
 	return rtn; 
 }

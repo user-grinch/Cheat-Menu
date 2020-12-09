@@ -37,7 +37,7 @@ public:
 	static bool CheckboxAddressVar(const char* label, bool val, int addr, const char* hint = nullptr);
 	static bool CheckboxAddressVarEx(const char* label, bool val, int addr, int enabled_val, int disabled_val, const char* hint = nullptr);
 	static bool CheckboxBitFlag(const char* label, uint flag, const char* hint = nullptr);
-	static bool CheckboxWithHint(const char* label, bool* state, const char* hint = nullptr);
+	static bool CheckboxWithHint(const char* label, bool* state, const char* hint = nullptr, const bool is_disabled = false);
 	static void DrawHeaders(unsortedMap& data);
 
 	static void DrawJSON(CJson& json, std::vector<std::string>& combo_items, std::string& selected_item, ImGuiTextFilter& filter,

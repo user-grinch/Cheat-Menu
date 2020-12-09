@@ -121,7 +121,7 @@ Game::Game()
 		if (random_cheats::enable 
 		&& (timer - random_cheats::timer) >  (uint(random_cheats::enable_wait_time)*1000))
 		{
-			int id = cheat_id(gen);
+			int id = rand() % 92;
 
 			for (int i = 0; i < 92; i++)
 			{

@@ -3,11 +3,7 @@
 
 bool Vehicle::bike_fly = false;
 bool Vehicle::dont_fall_bike = false;
-bool Vehicle::veh_engine = false;
 bool Vehicle::veh_heavy = false;
-bool Vehicle::veh_invisible = false;
-bool Vehicle::veh_lights = false;
-bool Vehicle::veh_no_dmg = false;
 bool Vehicle::veh_watertight = false;
 
 bool Vehicle::lock_speed = false;
@@ -48,7 +44,6 @@ bool Vehicle::neon::rainbow = false;
 uint Vehicle::neon::rainbow_timer = 0;
 bool Vehicle::neon::traffic = false;
 uint Vehicle::neon::traffic_timer = 0;
-std::uniform_int_distribution<> Vehicle::neon::random_val(0,255);
 
 bool Vehicle::unlimited_nitro::enabled = false;
 bool Vehicle::unlimited_nitro::comp_added = false;
@@ -98,15 +93,10 @@ Vehicle::Vehicle()
 		{
 			int hveh = CPools::GetVehicleRef(veh);
 
-			Command<Commands::SET_CAR_ENGINE_ON>(hveh, !veh_engine);
 			Command<Commands::SET_CAR_HEAVY>(hveh, veh_heavy);
 			Command<Commands::SET_CHAR_CAN_BE_KNOCKED_OFF_BIKE>(hplayer, !dont_fall_bike);
 			Command<Commands::SET_CAR_WATERTIGHT>(hveh, veh_watertight);
-			veh->m_bIsVisible = !veh_invisible;
 
-			if (veh_no_dmg)
-				Command<Commands::SET_CAR_CAN_BE_DAMAGED>(hveh, false);
-			
 			if (unlimited_nitro::enabled && player->m_pVehicle->m_nVehicleSubClass == VEHICLE_AUTOMOBILE)
 			{
 				patch::Set<BYTE>(0x969165, 0, true); // All cars have nitro
@@ -151,25 +141,16 @@ Vehicle::Vehicle()
 				int chance = 0;
 
 				if (veh->m_nVehicleClass == CLASS_NORMAL) // Normal
-				{
-					std::uniform_int_distribution<> class_random(1,20); // 5%
-					chance = class_random(gen);
-				}
+					chance = rand() % 21 + 1;
 
 				if (veh->m_nVehicleClass == CLASS_RICHFAMILY) // Rich family
-				{
-					std::uniform_int_distribution<> class_random(1, 5); // 20%
-					chance = class_random(gen);
-				}
+					chance = rand() % 5 + 1;
 
 				if (veh->m_nVehicleClass == CLASS_EXECUTIVE) // Executive
-				{
-					std::uniform_int_distribution<> class_random(1, 3); // 33%
-					chance = class_random(gen);
-				}
+					chance = rand() % 3 + 1;
 
 				if (chance == 1 && !IsNeonInstalled(veh) && veh->m_pDriver != player)
-					InstallNeon(veh, Vehicle::neon::random_val(gen), Vehicle::neon::random_val(gen), Vehicle::neon::random_val(gen));
+					InstallNeon(veh, rand() % 255, rand() % 255, rand() % 255);
 			}
 			neon::traffic_timer = timer;
 		}
@@ -184,13 +165,12 @@ Vehicle::Vehicle()
 							) > 0.0
 					&& CTimer::ms_fTimeStep > 0.0)
 				{
-					veh->FlyingControl(3, -9999.9902, -9999.9902, -9999.9902, -9999.9902);
+					veh->FlyingControl(3, -9999.9902f, -9999.9902f, -9999.9902f, -9999.9902f);
 				}
 			}
 		}
 	};
 }
-
 
 void Vehicle::AddComponent(const std::string& component, const bool display_message)
 {
@@ -261,8 +241,7 @@ int Vehicle::GetRandomTrainIdForModel(int model)
 		return -1;
 	}
 
-	std::uniform_int_distribution<> random(_start, _end);
-	return train_ids[random(gen)];
+	return train_ids[rand() % _end + _start];
 }
 
 // Get vehicle HandlingId
@@ -619,6 +598,7 @@ void Vehicle::Main()
 
 	if (ImGui::BeginTabBar("Vehicle", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
 	{
+		bool is_driver = player->m_pVehicle && player->m_pVehicle->IsDriver(player);
 		ImGui::Spacing();
 
 		if (ImGui::BeginTabItem("Checkboxes"))
@@ -633,61 +613,49 @@ void Vehicle::Main()
 			Ui::CheckboxAddress("All taxis have nitro", 0x96918B);
 			Ui::CheckboxWithHint("Bikes fly", &bike_fly);
 			Ui::CheckboxAddress("Boats fly", 0x969153);
-			Ui::CheckboxWithHint("Car engine", &veh_engine);
 			Ui::CheckboxAddress("Cars fly", 0x969160);
-			Ui::CheckboxWithHint("Car heavy", &veh_heavy);
+			Ui::CheckboxWithHint("Cars heavy", &veh_heavy);
 			Ui::CheckboxAddress("Decreased traffic", 0x96917A);
 			Ui::CheckboxWithHint("Don't fall off bike", &dont_fall_bike);
 			Ui::CheckboxAddress("Drive on water", 0x969152);
 
+			bool engine = is_driver 
+				&& (!player->m_pVehicle->m_nVehicleFlags.bEngineBroken || player->m_pVehicle->m_nVehicleFlags.bEngineOn);
+			if (Ui::CheckboxWithHint("Engine on", &engine, "Applies to this vehicle only", !is_driver))
+			{
+				player->m_pVehicle->m_nVehicleFlags.bEngineBroken = !engine;
+				player->m_pVehicle->m_nVehicleFlags.bEngineOn = engine;
+			}
+
+			
 			ImGui::NextColumn();
 
 			Ui::CheckboxAddressEx("Lock train camera", 0x52A52F, 171, 6);
 			Ui::CheckboxAddress("Float away when hit", 0x969166);
 			Ui::CheckboxAddress("Green traffic lights", 0x96914E);
-			Ui::CheckboxWithHint("Invisible car", &veh_invisible);
-			if (Ui::CheckboxWithHint("Lights on", &veh_lights))
+
+			bool visible = is_driver && !player->m_pVehicle->m_bIsVisible;
+			if (Ui::CheckboxWithHint("Invisible car", &visible, "Applies to this vehicle only", !is_driver))
+				player->m_pVehicle->m_bIsVisible = !visible;
+
+			bool lights = is_driver && !player->m_pVehicle->ms_forceVehicleLightsOff;
+			if (Ui::CheckboxWithHint("Lights on", &lights, "Applies to this vehicle only", !is_driver))
+				player->m_pVehicle->ms_forceVehicleLightsOff = !lights;
+
+			bool lock_status = is_driver && (player->m_pVehicle->m_nDoorLock == CARLOCK_LOCKED_PLAYER_INSIDE);
+			if (Ui::CheckboxWithHint("Lock doors", &lock_status, "Applies to this vehicle only", !is_driver))
 			{
-				if (Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer))
-				{
-					int hveh = CPools::GetVehicleRef(player->m_pVehicle);
-					Command<Commands::FORCE_CAR_LIGHTS>(hveh, !veh_lights);
-				}
+				if (lock_status)
+					player->m_pVehicle->m_nDoorLock = CARLOCK_LOCKED_PLAYER_INSIDE;
+				else
+					player->m_pVehicle->m_nDoorLock = CARLOCK_UNLOCKED;
 			}
 
-			bool doors_locked = false;
+			bool no_dmg = is_driver && (!player->m_pVehicle->m_nVehicleFlags.bCanBeDamaged);
 
-			if (Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer))
-			{
-				int hveh = CPools::GetVehicleRef(player->m_pVehicle);
-				int door;
-				Command<Commands::GET_CAR_DOOR_LOCK_STATUS>(hveh, &door);
-				doors_locked = (door == CARLOCK_LOCKED_PLAYER_INSIDE);
-			}
+			if (Ui::CheckboxWithHint("No damage", &no_dmg, "Applies to this vehicle only", !is_driver))
+				player->m_pVehicle->m_nVehicleFlags.bCanBeDamaged = !no_dmg;
 
-			if (Ui::CheckboxWithHint("Lock doors", &doors_locked))
-			{
-				if (Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer))
-				{
-					int hveh = CPools::GetVehicleRef(player->m_pVehicle);
-
-					if (doors_locked)
-						Command<Commands::LOCK_CAR_DOORS>(hveh, CARLOCK_LOCKED_PLAYER_INSIDE);
-					else
-						Command<Commands::LOCK_CAR_DOORS>(hveh, CARLOCK_UNLOCKED);
-				}
-			}
-
-			if (Ui::CheckboxWithHint("No damage", &veh_no_dmg))
-			{
-				if (Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer))
-				{
-					int hveh = CPools::GetVehicleRef(player->m_pVehicle);
-
-					if (!veh_no_dmg)
-						Command<Commands::SET_CAR_CAN_BE_DAMAGED>(hveh, true);
-				}
-			}
 			Ui::CheckboxAddress("Perfect handling", 0x96914C);
 			Ui::CheckboxAddress("Tank mode", 0x969164);
 			Ui::CheckboxWithHint("Unlimited nitro", &unlimited_nitro::enabled, "Nitro will activate when left clicked\n\

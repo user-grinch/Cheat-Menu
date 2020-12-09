@@ -23,7 +23,7 @@ CJson::CJson(const char* name,bool create_new)
 	}
 }
 
-void CJson::LoadJsonData(std::vector<std::string>& vec, std::string& selected)
+void CJson::LoadJsonData(std::vector<std::string>& vec, std::string& selected) // Test
 {
 	for (auto element : data.items())
 		vec.push_back(element.key());
