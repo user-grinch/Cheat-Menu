@@ -58,9 +58,6 @@ CheatMenu::CheatMenu()
 
 		if (Globals::init_done && !FrontEndMenuManager.m_bMenuActive && CTimer::m_snTimeInMilliseconds - Globals::last_key_timer > 250)
 		{
-			CPlayerPed* player = FindPlayerPed();
-			CPad *pad = player->GetPadFromPlayer();
-
 			if (Ui::HotKeyPressed(hotkey::menu_open))
 			{
 				Globals::show_menu = !Globals::show_menu;
@@ -75,6 +72,11 @@ CheatMenu::CheatMenu()
 
 			Hook::show_mouse = Globals::show_menu || Menu::commands::show_menu;
 		}
+	};
+
+	Events::drawMenuBackgroundEvent += [this]
+	{
+		Hook::show_mouse = false;
 	};
 
 	Events::shutdownRwEvent += []

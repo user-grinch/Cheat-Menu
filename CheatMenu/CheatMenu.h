@@ -34,28 +34,27 @@ class Launcher
 public:
 	Launcher()
 	{
-		bool launch = true;
-
-		uint gameVersion = GetGameVersion();
-		if (gameVersion != GAME_10US_HOODLUM && gameVersion != GAME_10US_COMPACT) {
-			MessageBox(HWND_DESKTOP, "CheatMenu requires v1.0 US of the game.", "CheatMenu", MB_ICONERROR);
-			flog << "Game version isn't 1.0" << std::endl;
-			launch = false;
-		}
-		else
+		Events::initRwEvent += []()
 		{
-			Events::initRwEvent += [&launch]()
-			{
-				if (GetModuleHandleA("SAMP.dll")) {
-					MessageBox(HWND_DESKTOP, "SAMP detected. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
-					flog << "SAMP detected. Exiting..." << std::endl;
-					launch = false;
-				}
+			bool launch = true;
 
-				if (launch)
-					static CheatMenu cheatmenu;
-			};
-		}
+			uint gameVersion = GetGameVersion();
+			if (gameVersion != GAME_10US_HOODLUM && gameVersion != GAME_10US_COMPACT) {
+				MessageBox(HWND_DESKTOP, "CheatMenu requires v1.0 US of the game.", "CheatMenu", MB_ICONERROR);
+				launch = false;
+			}
+
+			if (GetModuleHandleA("SAMP.dll")) {
+				MessageBox(HWND_DESKTOP, "SAMP detected. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
+				launch = false;
+			}
+
+			if (launch)
+			{
+				flog << "Loading CheatMenu" << std::endl;
+				static CheatMenu cheatmenu;
+			}
+		};
 	}
 } launcher;
 

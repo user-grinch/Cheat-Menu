@@ -474,17 +474,23 @@ void Vehicle::SpawnVehicle(std::string &smodel)
 			if (spawner::license_text != "")
 				Command<Commands::CUSTOM_PLATE_FOR_NEXT_CAR>(imodel, spawner::license_text);
 
-			if (!spawner::spawn_inside)
-				veh = CCheat::VehicleCheat(imodel);
-			else
+			if (spawner::spawn_inside)
 			{
 				int hveh = 0;
-
-				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z, &hveh);
+				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 4.0f, &hveh);
 				veh = CPools::GetVehicle(hveh);
 				veh->SetHeading(player->GetHeading());
 				Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
 				Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, speed);
+			}
+			else
+			{	
+				int hveh = 0;
+				player->TransformFromObjectSpace(pos, CVector(0, 10, 0));
+
+				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 4.0f, &hveh);
+				veh = CPools::GetVehicle(hveh);
+				veh->SetHeading(player->GetHeading()+55.0f);
 			}
 			CStreaming::SetModelIsDeletable(imodel);
 		}
@@ -830,6 +836,7 @@ void Vehicle::Main()
 			ImGui::NextColumn();
 			Ui::CheckboxWithHint("Spawn aircraft in air", &spawner::spawn_in_air);
 			ImGui::Columns(1);
+			
 
 			ImGui::Spacing();
 			ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() - 2.5);

@@ -65,6 +65,7 @@ HRESULT Hook::PresentDx9(IDirect3DDevice9 *pDevice, RECT* pSourceRect, RECT* pDe
 		ImGui::EndFrame();
 		ImGui::Render();
 		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+
 	}
 	else
 	{
@@ -121,6 +122,7 @@ HRESULT Hook::PresentDx11(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Fl
 		ImGui::EndFrame();
 		ImGui::Render();
 		ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+
 	}
 	else
 	{
@@ -171,7 +173,10 @@ void Hook::ShowMouse(bool state)
 	ImGui::GetIO().MouseDrawCursor = state;
 	CPad::NewMouseControllerState.X = 0;
 	CPad::NewMouseControllerState.Y = 0;
+
+	// Broken in psdk
 	Call<0x541BD0>(); // CPad::ClearMouseHistory
+	Call<0x53F1E0>(); // CPad::ClearKeyboardHistory
 	Call<0x541DD0>(); // CPad::UpdatePads
 }
 
