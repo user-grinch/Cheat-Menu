@@ -6,6 +6,7 @@ set(PROJECT_NAME CheatMenu)
 # This contains the utility functions needed for sub project, src/CMakeLists.txt
 # Need to clean things up later, maybe switch to original cmake alternatives
 # CMake-Converter https://github.com/pavelliavonau/cmakeconverter
+# Tested with MSVC v140
 ################################################################################
 
 ################################################################################
