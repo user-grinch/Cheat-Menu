@@ -1,5 +1,5 @@
 #pragma once
-#pragma warning(disable:4503 4244)
+#pragma warning(disable:4503 4244 4005)
 
 #define INPUT_BUFFER_SIZE 64
 #define SPAWN_PED_LIMIT 20
