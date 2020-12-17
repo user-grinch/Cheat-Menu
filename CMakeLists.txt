@@ -3,6 +3,16 @@ project(CheatMenu CXX)
 set(PROJECT_NAME CheatMenu)
 
 ################################################################################
+# Configure paths
+################################################################################
+set(GTA_SA_DIR F:/GTASanAndreas)
+
+# Can ignore the below paths if you got them (yes by default) in system paths
+set(PLUGIN_SDK_DIR $ENV{PLUGIN_SDK_DIR})
+set(DX9_DIR $ENV{DIRECTX9_SDK_DIR})
+################################################################################
+
+################################################################################
 # This contains the utility functions needed for sub project, src/CMakeLists.txt
 # Need to clean things up later, maybe switch to original cmake alternatives
 # CMake-Converter https://github.com/pavelliavonau/cmakeconverter

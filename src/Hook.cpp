@@ -17,8 +17,11 @@ LRESULT Hook::InputProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 {
 	ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 
-	if (ImGui::GetIO().WantCaptureKeyboard)
-		return 1;
+	if (ImGui::GetIO().WantTextInput)
+	{
+		Call<0x53F1E0>(); // CPad::ClearKeyboardHistory
+	 	return 1;
+	}
 	else
 		return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
 }
@@ -176,7 +179,6 @@ void Hook::ShowMouse(bool state)
 
 	// Broken in psdk
 	Call<0x541BD0>(); // CPad::ClearMouseHistory
-	Call<0x53F1E0>(); // CPad::ClearKeyboardHistory
 	Call<0x541DD0>(); // CPad::UpdatePads
 }
 

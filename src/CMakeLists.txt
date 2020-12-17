@@ -96,7 +96,7 @@ string(CONCAT "MSVC_RUNTIME_LIBRARY_STR"
 )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY  "F:/GTASanAndreas/$<0:>/"
+    RUNTIME_OUTPUT_DIRECTORY  "${GTA_SA_DIR}/$<0:>/"
     SUFFIX ".asi"
     MSVC_RUNTIME_LIBRARY ${MSVC_RUNTIME_LIBRARY_STR}
 )
@@ -105,11 +105,11 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 # Include directories
 ################################################################################
 include_directories(
-    "$ENV{PLUGIN_SDK_DIR}/plugin_sa"
-    "$ENV{PLUGIN_SDK_DIR}/plugin_sa/game_sa"
-    "$ENV{PLUGIN_SDK_DIR}/shared"
-    "$ENV{PLUGIN_SDK_DIR}/shared/game"
-    "$ENV{DIRECTX9_SDK_DIR}/include"
+    "${PLUGIN_SDK_DIR}/plugin_sa"
+    "${PLUGIN_SDK_DIR}/plugin_sa/game_sa"
+    "${PLUGIN_SDK_DIR}/shared"
+    "${PLUGIN_SDK_DIR}/shared/game"
+    "${DX9_DIR}/include"
 )
 
 ################################################################################
@@ -237,7 +237,7 @@ XInput9_1_0
 )
 
 target_link_directories(${PROJECT_NAME} PUBLIC
-    "$ENV{PLUGIN_SDK_DIR}/output/lib/"
+    "${PLUGIN_SDK_DIR}/output/lib/"
     "$ENV{DIRECTX9_SDK_DIR}/lib/x86/"
     "external/kiero/minhook/lib/"
 )
