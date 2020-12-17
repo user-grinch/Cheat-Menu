@@ -68,12 +68,10 @@ HRESULT Hook::PresentDx9(IDirect3DDevice9 *pDevice, RECT* pSourceRect, RECT* pDe
 		ImGui::EndFrame();
 		ImGui::Render();
 		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
-
 	}
 	else
 	{
 		Globals::init_done = true;
-
 		ImGui::CreateContext();
 
 		ImGuiStyle& style = ImGui::GetStyle();
@@ -189,19 +187,23 @@ Hook::Hook()
 	{
 		if (kiero::init(kiero::RenderType::D3D9) == kiero::Status::Success)
 		{
-			assert(kiero::bind(16, (void**)&oReset9, ResetDx9) == kiero::Status::Success);
-			assert(kiero::bind(17, (void**)&oPresent9, PresentDx9) == kiero::Status::Success);
-			Globals::renderer = Render_DirectX9;
-
-			flog << "Successfully hooked dx9 device." << std::endl;
+			if (kiero::bind(16, (void**)&oReset9, ResetDx9) == kiero::Status::Success
+			&& kiero::bind(17, (void**)&oPresent9, PresentDx9) == kiero::Status::Success) 
+			{
+				Globals::renderer = Render_DirectX9;
+				flog << "Successfully hooked dx9 device." << std::endl;
+			}
 		}
 		else
 		{
 			// gtaRenderHook
 			if (kiero::init(kiero::RenderType::D3D11) == kiero::Status::Success)
 			{
-				kiero::bind(8, (void**)&oPresent11, PresentDx11);
-				Globals::renderer = Render_DirectX11;
+				if (kiero::bind(8, (void**)&oPresent11, PresentDx11) == kiero::Status::Success) 
+				{
+					Globals::renderer = Render_DirectX11;
+					flog << "Successfully hooked dx11 device." << std::endl;
+				}
 
 				flog << "Successfully hooked dx11 device." << std::endl;
 			}

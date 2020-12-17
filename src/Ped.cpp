@@ -49,7 +49,6 @@ Ped::~Ped()
 	}
 }
 
-
 void Ped::SpawnPed(std::string& model)
 {
 	if (spawn_ped::list.size() == SPAWN_PED_LIMIT)

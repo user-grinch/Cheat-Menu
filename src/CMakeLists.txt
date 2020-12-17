@@ -116,10 +116,10 @@ include_directories(
 # Compile definitions
 ################################################################################
 target_compile_definitions(${PROJECT_NAME} PRIVATE
-    "$<$<CONFIG:GTASARelease>:"
+    "$<$<CONFIG:Release>:"
         "_NDEBUG"
     ">"
-    "$<$<CONFIG:GTASAzDebug>:"
+    "$<$<CONFIG:Debug>:"
         "_DEBUG"
     ">"
     "_CRT_SECURE_NO_WARNINGS;"
@@ -141,12 +141,12 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
 ################################################################################
 if(MSVC)
     target_compile_options(${PROJECT_NAME} PRIVATE
-        $<$<CONFIG:GTASARelease>:
+        $<$<CONFIG:Release>:
             /O2;
             /Oi;
             /Gy
         >
-        $<$<CONFIG:GTASAzDebug>:
+        $<$<CONFIG:Debug>:
             /Od
         >
         /std:c++latest;
@@ -197,13 +197,15 @@ if(MSVC)
     )
     source_file_compile_options(external/imgui/imgui_widgets.cpp ${FILE_CL_OPTIONS})
     target_link_options(${PROJECT_NAME} PRIVATE
-        $<$<CONFIG:GTASARelease>:
+        $<$<CONFIG:Release>:
             /SAFESEH:NO;
             /OPT:REF;
             /LTCG;
             /OPT:ICF
         >
-        /DEBUG:FULL;
+        $<$<CONFIG:Debug>:
+            /DEBUG:FULL;
+        >
         /SUBSYSTEM:WINDOWS
     )
 endif()
@@ -215,8 +217,8 @@ add_custom_command_if(
     TARGET ${PROJECT_NAME}
     PRE_BUILD
     COMMANDS
-    COMMAND $<CONFIG:GTASARelease> taskkill /f /fi "imagename eq gta_sa.exe"
-    COMMAND  $<CONFIG:GTASAzDebug> taskkill /f /fi "imagename eq gta_sa.exe"
+    COMMAND $<CONFIG:Release> taskkill /f /fi "imagename eq gta_sa.exe"
+    COMMAND  $<CONFIG:Debug> taskkill /f /fi "imagename eq gta_sa.exe"
 )
 
 ################################################################################
