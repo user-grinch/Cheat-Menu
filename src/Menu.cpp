@@ -380,15 +380,13 @@ void Menu::Main()
 				ImGui::Columns(1);
 						
 				ImGui::Dummy(ImVec2(0, 10));
-				ImGui::TextWrapped("Special thanks to,");
+				ImGui::TextWrapped("Thanks to,");
 				ImGui::Columns(2, NULL, false);
 						
-				ImGui::TextWrapped("Dowglas_");
 				ImGui::TextWrapped("Israel");
 				
 				ImGui::NextColumn();
 				ImGui::TextWrapped("Junior-Djjr");
-				ImGui::TextWrapped("Um-geek");
 
 				ImGui::Columns(1);
 

@@ -85,16 +85,15 @@ Vehicle::Vehicle()
 	{
 		uint timer = CTimer::m_snTimeInMilliseconds;
 
-		static CPlayerPed *player = FindPlayerPed();
-		static int hplayer = CPools::GetPedRef(player);
+		CPlayerPed *player = FindPlayerPed();
 		CVehicle *veh = player->m_pVehicle;
 
-		if (Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer))
+		if (player && veh)
 		{
 			int hveh = CPools::GetVehicleRef(veh);
 
+			player->m_nPedFlags.CantBeKnockedOffBike  = dont_fall_bike ? 1 : 2;
 			Command<Commands::SET_CAR_HEAVY>(hveh, veh_heavy);
-			Command<Commands::SET_CHAR_CAN_BE_KNOCKED_OFF_BIKE>(hplayer, !dont_fall_bike);
 			Command<Commands::SET_CAR_WATERTIGHT>(hveh, veh_watertight);
 
 			if (unlimited_nitro::enabled && player->m_pVehicle->m_nVehicleSubClass == VEHICLE_AUTOMOBILE)
@@ -154,7 +153,7 @@ Vehicle::Vehicle()
 			}
 			neon::traffic_timer = timer;
 		}
-
+		
 		if (bike_fly && veh && veh->IsDriver(player))
 		{
 			if (veh->m_nVehicleSubClass == VEHICLE_BIKE || veh->m_nVehicleSubClass == VEHICLE_BMX)
