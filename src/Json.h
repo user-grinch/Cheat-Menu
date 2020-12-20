@@ -64,9 +64,14 @@ public:
 		Loads the section names into a category vector. 
 		Used to create drop down category menus
 	*/
-	void LoadJsonData(std::vector<std::string>& vec, std::string& selected);
+	void LoadData(std::vector<std::string>& vec, std::string& selected);
+
+	/*
+		Saves json data to disk
+	*/
+	void WriteToDisk();
 	CJson(const char* text, bool create_new = false);
-	virtual ~CJson();
+	~CJson();
 };
 
 

@@ -50,7 +50,7 @@ void Teleport::FetchRadarSpriteData()
 
 Teleport::Teleport()
 {
-	json.LoadJsonData(search_categories, selected_item);
+	json.LoadData(search_categories, selected_item);
 
 	Events::initGameEvent += []
 	{
@@ -255,6 +255,7 @@ void Teleport::Main()
 			if (ImGui::Button("Add location", Ui::GetSize()))
 			{
 				json.data["Custom"][location_buffer] = ("0, " + std::string(input_buffer));
+				json.WriteToDisk();
 			}
 			ImGui::EndTabItem();
 		}

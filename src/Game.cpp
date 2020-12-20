@@ -47,8 +47,8 @@ Game::Game()
 {
 	Events::initGameEvent += []
 	{
-		json.LoadJsonData(search_categories, selected_item);
-		stat::json.LoadJsonData(stat::search_categories, stat::selected_item);
+		json.LoadData(search_categories, selected_item);
+		stat::json.LoadData(stat::search_categories, stat::selected_item);
 
 		// Generate enabled cheats vector
 		for (auto element : random_cheats::name_json.data.items())

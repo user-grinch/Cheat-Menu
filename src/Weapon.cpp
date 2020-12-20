@@ -35,7 +35,7 @@ Weapon::Weapon()
 {
 	Events::initGameEvent += []
 	{
-		std::string dir_path = (std::string(".\\CheatMenu\\weapons\\")).c_str();
+		std::string dir_path = Globals::menu_path + "\\CheatMenu\\weapons\\";
 		Util::LoadTexturesInDirRecursive(dir_path.c_str(), ".jpg", Weapon::search_categories, Weapon::weapon_vec);
 	};
 

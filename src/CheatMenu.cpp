@@ -85,6 +85,7 @@ CheatMenu::CheatMenu()
 		config.SetValue("window.sizeX", Globals::menu_size.x);
 		config.SetValue("window.sizeY", Globals::menu_size.y);
 
+		config.WriteToDisk();
 		flog << "Log Finished." << std::endl;
 	};
 }

@@ -3,8 +3,7 @@
         {
             "name": "Win32",
             "includePath": [
-                "${workspaceFolder}/**",
-                "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt",
+                "${workspaceFolder}/src/",
                 "${DIRECTX9_SDK_DIR}/include",
                 "${PLUGIN_SDK_DIR}/plugin_sa",
                 "${PLUGIN_SDK_DIR}/plugin_sa/game_sa",
@@ -20,7 +19,7 @@
             "windowsSdkVersion": "10.0.10240.0",
             "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/bin/cl.exe",
             "cStandard": "c99",
-            "cppStandard": "c++17",
+            "cppStandard": "c++14",
             "intelliSenseMode": "msvc-x86",
             "configurationProvider": "ms-vscode.cmake-tools"
         }

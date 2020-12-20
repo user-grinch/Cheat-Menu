@@ -68,13 +68,13 @@ Vehicle::Vehicle()
 {
 	Events::initGameEvent += []
 	{
-		std::string dir_path = (std::string(".\\CheatMenu\\vehicles\\images\\")).c_str();
+		std::string dir_path = std::string(Globals::menu_path + "\\CheatMenu\\vehicles\\images\\");
 		Util::LoadTexturesInDirRecursive(dir_path.c_str(), ".jpg", spawner::search_categories, spawner::image_vec);
 
-		dir_path = (std::string(".\\CheatMenu\\vehicles\\components\\")).c_str();
+		dir_path = std::string(Globals::menu_path + "\\CheatMenu\\vehicles\\components\\");
 		Util::LoadTexturesInDirRecursive(dir_path.c_str(), ".jpg", tune::search_categories, tune::image_vec);
 
-		dir_path = (std::string(".\\CheatMenu\\vehicles\\paintjobs\\")).c_str();
+		dir_path = std::string(Globals::menu_path + "\\CheatMenu\\vehicles\\paintjobs\\");
 		Util::LoadTexturesInDirRecursive(dir_path.c_str(), ".png", texture9::search_categories, texture9::image_vec);
 
 		ParseVehiclesIDE();
@@ -211,7 +211,7 @@ void Vehicle::RemoveComponent(const std::string& component, const bool display_m
 	}
 }
 
-// Why did I do this shit?
+// Why did I do this shit? Guess it was the weather
 int Vehicle::GetRandomTrainIdForModel(int model)
 {
 	static int train_ids[] = {
@@ -239,8 +239,8 @@ int Vehicle::GetRandomTrainIdForModel(int model)
 		CHud::SetHelpMessage("Invalid train model", false, false, false);
 		return -1;
 	}
-
-	return train_ids[rand() % _end + _start];
+	int id = rand() % (_end + 1 - _start) + _start;
+	return train_ids[id];
 }
 
 // Get vehicle HandlingId
@@ -727,7 +727,7 @@ void Vehicle::Main()
 				ImGui::Spacing();
 				ImGui::Separator();
 			}
-			if (Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer))
+			if (player && player->m_pVehicle)
 			{
 				CVehicle *veh = player->m_pVehicle;
 				int hveh = CPools::GetVehicleRef(veh);
@@ -735,6 +735,50 @@ void Vehicle::Main()
 				Ui::EditFloat("Density multiplier", 0x8A5B20, 0, 1, 10);
 				Ui::EditFloat("Dirt level", (int)veh + 0x4B0, 0, 7.5, 15);
 
+				if (ImGui::CollapsingHeader("Damage flags"))
+				{
+					ImGui::Spacing();
+					ImGui::TextWrapped("Flags apply to this vehicle only");
+					ImGui::Spacing();
+
+					bool no_dmg_flag = veh->m_nVehicleFlags.bCanBeDamaged;
+
+					bool state = is_driver && (!no_dmg_flag);
+					ImGui::Spacing();
+					ImGui::SameLine();
+					if (Ui::CheckboxWithHint("No damage", &state, nullptr, !is_driver))
+						veh->m_nVehicleFlags.bCanBeDamaged = !state;
+
+					ImGui::Spacing();
+
+					ImGui::Columns(2, 0, false);
+
+					state = is_driver && (veh->m_nPhysicalFlags.bBulletProof);
+					if (Ui::CheckboxWithHint("Bullet proof", &state, nullptr, !no_dmg_flag))
+						veh->m_nPhysicalFlags.bBulletProof = state;
+
+					state = is_driver && (veh->m_nPhysicalFlags.bCollisionProof);
+					if (Ui::CheckboxWithHint("Collision proof", &state, nullptr, !no_dmg_flag))
+						veh->m_nPhysicalFlags.bCollisionProof = state;
+					
+					state = is_driver && (veh->m_nPhysicalFlags.bExplosionProof);
+					if (Ui::CheckboxWithHint("Explosion proof", &state, nullptr, !no_dmg_flag))
+						veh->m_nPhysicalFlags.bExplosionProof = state;
+
+					ImGui::NextColumn();
+
+					state = is_driver && (veh->m_nPhysicalFlags.bFireProof);
+					if (Ui::CheckboxWithHint("Fire proof", &state, nullptr, !no_dmg_flag))
+						veh->m_nPhysicalFlags.bFireProof = state;
+
+					state = is_driver && (veh->m_nPhysicalFlags.bMeeleProof);
+					if (Ui::CheckboxWithHint("Melee proof", &state, nullptr, !no_dmg_flag))
+						veh->m_nPhysicalFlags.bMeeleProof = state;
+
+					ImGui::Columns(1);
+					ImGui::Spacing();
+					ImGui::Separator();
+				}
 				if (veh->m_nVehicleClass == VEHICLE_AUTOMOBILE && ImGui::CollapsingHeader("Doors"))
 				{
 					ImGui::Columns(2, 0, false);

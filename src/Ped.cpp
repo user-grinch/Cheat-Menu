@@ -31,7 +31,7 @@ Ped::Ped()
 {
 	Events::initGameEvent += []
 	{
-		std::string dir_path = (std::string(".\\CheatMenu\\peds\\")).c_str();
+		std::string dir_path = Globals::menu_path +"\\CheatMenu\\peds\\";
 		Util::LoadTexturesInDirRecursive(dir_path.c_str(), ".jpg", search_categories, peds_vec);
 
 		if (LoadLibraryW(L"ExGangWars.asi"))

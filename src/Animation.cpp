@@ -23,7 +23,7 @@ std::string walking_selected = "default";
 
 Animation::Animation()
 {
-	json.LoadJsonData(search_categories, selected_item);
+	json.LoadData(search_categories, selected_item);
 }
 
 void Animation::Main()
@@ -102,6 +102,7 @@ void Animation::Main()
 			if (ImGui::Button("Add animation", Ui::GetSize()))
 			{
 				json.data["Custom"][anim_buffer] = ("0, " + std::string(ifp_buffer));
+				json.WriteToDisk();
 			}
 			ImGui::EndTabItem();
 		}

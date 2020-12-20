@@ -63,5 +63,7 @@
         "xstddef": "cpp",
         "xtr1common": "cpp",
         "xtree": "cpp"
-    }
+    },
+    "C_Cpp.errorSquiggles": "Enabled",
+    "C_Cpp.intelliSenseEngineFallback": "Enabled"
 }

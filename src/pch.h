@@ -4,7 +4,7 @@
 #define INPUT_BUFFER_SIZE 64
 #define SPAWN_PED_LIMIT 20
 #define MENU_VERSION "2.5-beta"
-#define BUILD_NUMBER "20201209"
+#define BUILD_NUMBER "20201220"
 #define STB_IMAGE_IMPLEMENTATION
 
 #include <d3d9.h>
@@ -46,6 +46,7 @@
 #include "extensions/ScriptCommands.h"
 #include "extensions/Screen.h"
 #include "eVehicleClass.h"
+#include "extensions\Paths.h"
 
 #include "external/imgui/imgui.h"
 #include "external/imgui/imgui_impl_dx9.h"
@@ -83,6 +84,7 @@ struct Globals
 	static bool init_done;
 	static Renderer renderer;
 	static ID3D11Device* device11;
+	static std::string menu_path;
 };
 
 struct TextureStructure

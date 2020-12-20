@@ -23,7 +23,7 @@ void Util::ClearCharTasksVehCheck(CPed* ped)
 	}
 }
 
-void Util::LoadTexturesInDirRecursive(const char * path, const char * file_ext,std::vector<std::string>& category_vec, std::vector<std::unique_ptr<TextureStructure>> &store_vec)
+void Util::LoadTexturesInDirRecursive(const char *path, const char *file_ext,std::vector<std::string>& category_vec, std::vector<std::unique_ptr<TextureStructure>> &store_vec)
 {
 	std::string folder = "";
 	for (auto &p : std::experimental::filesystem::recursive_directory_iterator(path))
@@ -33,7 +33,7 @@ void Util::LoadTexturesInDirRecursive(const char * path, const char * file_ext,s
 		{
 			store_vec.push_back(std::make_unique<TextureStructure>());
 			HRESULT hr = -1;
-
+			flog << p.path().string() << std::endl;
 			if (Globals::renderer == Render_DirectX9)
 				hr = D3DXCreateTextureFromFileA(GetD3DDevice(), p.path().string().c_str(), &store_vec.back().get()->texture9);
 

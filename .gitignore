@@ -1,2 +1,5 @@
 .vs/
 build/
+.vscode/.BROWSE.VC.DB
+.gitignore
+.vscode/BROWSE.VC.DB

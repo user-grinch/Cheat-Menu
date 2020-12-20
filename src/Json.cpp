@@ -4,7 +4,7 @@
 CJson::CJson(const char* name,bool create_new)
 {
 	file_path = "./CheatMenu/json/"+ std::string(name) +".json";
-
+	
 	if (std::experimental::filesystem::exists(file_path))
 	{
 		std::ifstream file(file_path);
@@ -23,7 +23,14 @@ CJson::CJson(const char* name,bool create_new)
 	}
 }
 
-void CJson::LoadJsonData(std::vector<std::string>& vec, std::string& selected) // Test
+void CJson::WriteToDisk()
+{
+	std::ofstream file(file_path);
+	file << data.dump(4,' ',false, nlohmann::json::error_handler_t::replace) << std::endl;
+	file.close();
+}
+
+void CJson::LoadData(std::vector<std::string>& vec, std::string& selected) // Test
 {
 	for (auto element : data.items())
 		vec.push_back(element.key());
@@ -31,7 +38,5 @@ void CJson::LoadJsonData(std::vector<std::string>& vec, std::string& selected) /
 
 CJson::~CJson()
 {
-	std::ofstream file(file_path);
-	file << data.dump(4,' ',false, nlohmann::json::error_handler_t::replace) << std::endl;
-	file.close();
+	// Saving here won't work on crash
 }
