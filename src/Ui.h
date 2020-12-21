@@ -30,7 +30,7 @@ public:
 		std::function<void(std::string&)> function;
 		std::string value;
 	};
-
+	static void CenterdText(const std::string& text);
 	static bool ColorButton(int color_id, std::vector<float> &color, ImVec2 size);
 	static bool CheckboxAddress(const char* label, const int addr = NULL, const char* hint = nullptr);
 	static bool CheckboxAddressEx(const char* label, const int addr = NULL, int enabled_val = 1, int disabled_val = 0, const char* hint = nullptr);
@@ -61,7 +61,7 @@ public:
 
 	static ImVec2 GetSize(short count = 1, bool spacing = true);
 
-	static void HotKey(const char* label, int* key_array);
+	static bool HotKey(const char* label, int* key_array);
 	static bool HotKeyPressed(int *hotkey);
 	static std::string GetHotKeyNameString(int *hotkey);
 

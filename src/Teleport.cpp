@@ -87,16 +87,6 @@ Teleport::Teleport()
 			}
 		}
 	};
-
-	Events::shutdownRwEvent += []
-	{
-		// Clear the Radar coordinates
-		json.data.erase("Radar");
-		json.data["Radar"] = {};
-
-
-		config.SetValue("quick_teleport", quick_teleport);
-	};
 }
 
 void Teleport::TeleportPlayer(bool get_marker, CVector* pos, short interior_id)
@@ -190,8 +180,11 @@ void Teleport::Main()
 				ImGui::Columns(2, 0, false);
 				ImGui::Checkbox("Insert coordinates", &insert_coord);
 				ImGui::NextColumn();
-				Ui::CheckboxWithHint("Quick teleport", &quick_teleport,
-					(std::string("Teleport to marker using ") + Ui::GetHotKeyNameString(Menu::hotkey::quick_tp)).c_str());
+				if (Ui::CheckboxWithHint("Quick teleport", &quick_teleport,
+					(std::string("Teleport to marker using ") + Ui::GetHotKeyNameString(Menu::hotkey::quick_tp)).c_str()))
+				{
+					config.SetValue("quick_teleport", quick_teleport);
+				}
 
 				ImGui::Columns(1);
 				ImGui::Spacing();
@@ -255,6 +248,11 @@ void Teleport::Main()
 			if (ImGui::Button("Add location", Ui::GetSize()))
 			{
 				json.data["Custom"][location_buffer] = ("0, " + std::string(input_buffer));
+
+				// Clear the Radar coordinates
+				json.data.erase("Radar");
+				json.data["Radar"] = {};
+
 				json.WriteToDisk();
 			}
 			ImGui::EndTabItem();

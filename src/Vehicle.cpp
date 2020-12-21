@@ -5,6 +5,7 @@ bool Vehicle::bike_fly = false;
 bool Vehicle::dont_fall_bike = false;
 bool Vehicle::veh_heavy = false;
 bool Vehicle::veh_watertight = false;
+bool Vehicle::veh_nodmg = false;
 
 bool Vehicle::lock_speed = false;
 float Vehicle::lock_speed_val = 0;
@@ -91,6 +92,16 @@ Vehicle::Vehicle()
 		if (player && veh)
 		{
 			int hveh = CPools::GetVehicleRef(veh);
+
+			if (veh_nodmg)
+			{
+				veh->m_nPhysicalFlags.bBulletProof = true;
+				veh->m_nPhysicalFlags.bExplosionProof = true;
+				veh->m_nPhysicalFlags.bFireProof = true;
+				veh->m_nPhysicalFlags.bCollisionProof = true;
+				veh->m_nPhysicalFlags.bMeeleProof = true;
+				veh->m_nVehicleFlags.bCanBeDamaged = true;				
+			}
 
 			player->m_nPedFlags.CantBeKnockedOffBike  = dont_fall_bike ? 1 : 2;
 			Command<Commands::SET_CAR_HEAVY>(hveh, veh_heavy);
@@ -579,8 +590,12 @@ void Vehicle::Main()
 
 	if (ImGui::Button("Fix vehicle", ImVec2(Ui::GetSize(3))))
 	{
-		if (Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer))
+		if (player && player->m_pVehicle)
+		{
 			player->m_pVehicle->Fix();
+			player->m_pVehicle->m_fHealth = 1000.0f;
+		}
+
 	}
 
 	ImGui::SameLine();
@@ -603,7 +618,9 @@ void Vehicle::Main()
 
 	if (ImGui::BeginTabBar("Vehicle", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
 	{
-		bool is_driver = player->m_pVehicle && player->m_pVehicle->IsDriver(player);
+		CVehicle *pVeh = player->m_pVehicle;
+		bool is_driver = pVeh && player->m_pVehicle->IsDriver(player);
+		
 		ImGui::Spacing();
 
 		if (ImGui::BeginTabItem("Checkboxes"))
@@ -620,55 +637,89 @@ void Vehicle::Main()
 			Ui::CheckboxAddress("Boats fly", 0x969153);
 			Ui::CheckboxAddress("Cars fly", 0x969160);
 			Ui::CheckboxWithHint("Cars heavy", &veh_heavy);
-			Ui::CheckboxAddress("Decreased traffic", 0x96917A);
-			Ui::CheckboxWithHint("Don't fall off bike", &dont_fall_bike);
-			Ui::CheckboxAddress("Drive on water", 0x969152);
-
-			bool engine = is_driver 
-				&& (!player->m_pVehicle->m_nVehicleFlags.bEngineBroken || player->m_pVehicle->m_nVehicleFlags.bEngineOn);
-			if (Ui::CheckboxWithHint("Engine on", &engine, "Applies to this vehicle only", !is_driver))
+			if (Ui::CheckboxWithHint("Damage proof", &veh_nodmg, "Every vehicle entered will be damage proof\nBullet, Collision, Explosion, Fire, Meele etc"))
 			{
-				player->m_pVehicle->m_nVehicleFlags.bEngineBroken = !engine;
-				player->m_pVehicle->m_nVehicleFlags.bEngineOn = engine;
+				if (pVeh && !veh_nodmg)
+				{
+					pVeh->m_nVehicleFlags.bCanBeDamaged = true;
+					pVeh->m_nPhysicalFlags.bBulletProof = false;
+					pVeh->m_nPhysicalFlags.bExplosionProof = false;
+					pVeh->m_nPhysicalFlags.bFireProof = false;
+					pVeh->m_nPhysicalFlags.bCollisionProof = false;
+					pVeh->m_nPhysicalFlags.bMeeleProof = false;
+				}
 			}
-
+			Ui::CheckboxAddress("Decreased traffic", 0x96917A);
 			
 			ImGui::NextColumn();
 
+			Ui::CheckboxWithHint("Don't fall off bike", &dont_fall_bike);
+			Ui::CheckboxAddress("Drive on water", 0x969152);
 			Ui::CheckboxAddressEx("Lock train camera", 0x52A52F, 171, 6);
 			Ui::CheckboxAddress("Float away when hit", 0x969166);
 			Ui::CheckboxAddress("Green traffic lights", 0x96914E);
-
-			bool visible = is_driver && !player->m_pVehicle->m_bIsVisible;
-			if (Ui::CheckboxWithHint("Invisible car", &visible, "Applies to this vehicle only", !is_driver))
-				player->m_pVehicle->m_bIsVisible = !visible;
-
-			bool lights = is_driver && !player->m_pVehicle->ms_forceVehicleLightsOff;
-			if (Ui::CheckboxWithHint("Lights on", &lights, "Applies to this vehicle only", !is_driver))
-				player->m_pVehicle->ms_forceVehicleLightsOff = !lights;
-
-			bool lock_status = is_driver && (player->m_pVehicle->m_nDoorLock == CARLOCK_LOCKED_PLAYER_INSIDE);
-			if (Ui::CheckboxWithHint("Lock doors", &lock_status, "Applies to this vehicle only", !is_driver))
-			{
-				if (lock_status)
-					player->m_pVehicle->m_nDoorLock = CARLOCK_LOCKED_PLAYER_INSIDE;
-				else
-					player->m_pVehicle->m_nDoorLock = CARLOCK_UNLOCKED;
-			}
-
-			bool no_dmg = is_driver && (!player->m_pVehicle->m_nVehicleFlags.bCanBeDamaged);
-
-			if (Ui::CheckboxWithHint("No damage", &no_dmg, "Applies to this vehicle only", !is_driver))
-				player->m_pVehicle->m_nVehicleFlags.bCanBeDamaged = !no_dmg;
-
 			Ui::CheckboxAddress("Perfect handling", 0x96914C);
 			Ui::CheckboxAddress("Tank mode", 0x969164);
 			Ui::CheckboxWithHint("Unlimited nitro", &unlimited_nitro::enabled, "Nitro will activate when left clicked\n\
 \nEnabling this would disable\nAll cars have nitro\nAll taxis have nitro");
 			Ui::CheckboxWithHint("Watertight car", &veh_watertight);
 			Ui::CheckboxAddress("Wheels only", 0x96914B);
-
 			ImGui::Columns(1);
+
+			if (is_driver)
+			{
+				ImGui::NewLine();
+				ImGui::TextWrapped("For current vehicle,");
+
+				ImGui::Columns(2, 0, false);
+
+				bool state = pVeh->m_nPhysicalFlags.bBulletProof;
+				if (Ui::CheckboxWithHint("Bullet proof", &state, nullptr, veh_nodmg))
+					pVeh->m_nPhysicalFlags.bBulletProof = state;
+
+				state = pVeh->m_nPhysicalFlags.bCollisionProof;
+				if (Ui::CheckboxWithHint("Collision proof", &state, nullptr, veh_nodmg))
+					pVeh->m_nPhysicalFlags.bCollisionProof = state;
+
+				state = !pVeh->m_nVehicleFlags.bEngineBroken || pVeh->m_nVehicleFlags.bEngineOn;
+				if (Ui::CheckboxWithHint("Engine on", &state, nullptr, !is_driver))
+				{
+					pVeh->m_nVehicleFlags.bEngineBroken = !state;
+					pVeh->m_nVehicleFlags.bEngineOn = state;
+				}	
+				state = pVeh->m_nPhysicalFlags.bExplosionProof;
+				if (Ui::CheckboxWithHint("Explosion proof", &state, nullptr, veh_nodmg))
+					pVeh->m_nPhysicalFlags.bExplosionProof = state;
+
+				state = pVeh->m_nPhysicalFlags.bFireProof;
+				if (Ui::CheckboxWithHint("Fire proof", &state, nullptr, veh_nodmg))
+					pVeh->m_nPhysicalFlags.bFireProof = state;
+
+				ImGui::NextColumn();
+
+				state = !pVeh->m_bIsVisible;
+				if (Ui::CheckboxWithHint("Invisible car", &state, nullptr, !is_driver))
+					pVeh->m_bIsVisible = !state;
+
+				state = !pVeh->ms_forceVehicleLightsOff;
+				if (Ui::CheckboxWithHint("Lights on", &state, nullptr, !is_driver))
+					pVeh->ms_forceVehicleLightsOff = !state;
+
+				state = pVeh->m_nDoorLock == CARLOCK_LOCKED_PLAYER_INSIDE;
+				if (Ui::CheckboxWithHint("Lock doors", &state, nullptr, !is_driver))
+				{
+					if (state)
+						pVeh->m_nDoorLock = CARLOCK_LOCKED_PLAYER_INSIDE;
+					else
+						pVeh->m_nDoorLock = CARLOCK_UNLOCKED;
+				}
+
+				state = pVeh->m_nPhysicalFlags.bMeeleProof;
+				if (Ui::CheckboxWithHint("Melee proof", &state, nullptr, veh_nodmg))
+					pVeh->m_nPhysicalFlags.bMeeleProof = state;
+					
+				ImGui::Columns(1);
+			}
 
 			ImGui::EndChild();
 			ImGui::EndTabItem();
@@ -677,7 +728,7 @@ void Vehicle::Main()
 		{
 			ImGui::Spacing();
 			ImGui::BeginChild("MenusChild");
-
+			Ui::EditFloat("Density multiplier", 0x8A5B20, 0, 1, 10);
 			if (ImGui::CollapsingHeader("Enter nearest vehicle as"))
 			{
 				CPlayerPed *player = FindPlayerPed();
@@ -727,58 +778,13 @@ void Vehicle::Main()
 				ImGui::Spacing();
 				ImGui::Separator();
 			}
+
 			if (player && player->m_pVehicle)
 			{
 				CVehicle *veh = player->m_pVehicle;
 				int hveh = CPools::GetVehicleRef(veh);
 
-				Ui::EditFloat("Density multiplier", 0x8A5B20, 0, 1, 10);
 				Ui::EditFloat("Dirt level", (int)veh + 0x4B0, 0, 7.5, 15);
-
-				if (ImGui::CollapsingHeader("Damage flags"))
-				{
-					ImGui::Spacing();
-					ImGui::TextWrapped("Flags apply to this vehicle only");
-					ImGui::Spacing();
-
-					bool no_dmg_flag = veh->m_nVehicleFlags.bCanBeDamaged;
-
-					bool state = is_driver && (!no_dmg_flag);
-					ImGui::Spacing();
-					ImGui::SameLine();
-					if (Ui::CheckboxWithHint("No damage", &state, nullptr, !is_driver))
-						veh->m_nVehicleFlags.bCanBeDamaged = !state;
-
-					ImGui::Spacing();
-
-					ImGui::Columns(2, 0, false);
-
-					state = is_driver && (veh->m_nPhysicalFlags.bBulletProof);
-					if (Ui::CheckboxWithHint("Bullet proof", &state, nullptr, !no_dmg_flag))
-						veh->m_nPhysicalFlags.bBulletProof = state;
-
-					state = is_driver && (veh->m_nPhysicalFlags.bCollisionProof);
-					if (Ui::CheckboxWithHint("Collision proof", &state, nullptr, !no_dmg_flag))
-						veh->m_nPhysicalFlags.bCollisionProof = state;
-					
-					state = is_driver && (veh->m_nPhysicalFlags.bExplosionProof);
-					if (Ui::CheckboxWithHint("Explosion proof", &state, nullptr, !no_dmg_flag))
-						veh->m_nPhysicalFlags.bExplosionProof = state;
-
-					ImGui::NextColumn();
-
-					state = is_driver && (veh->m_nPhysicalFlags.bFireProof);
-					if (Ui::CheckboxWithHint("Fire proof", &state, nullptr, !no_dmg_flag))
-						veh->m_nPhysicalFlags.bFireProof = state;
-
-					state = is_driver && (veh->m_nPhysicalFlags.bMeeleProof);
-					if (Ui::CheckboxWithHint("Melee proof", &state, nullptr, !no_dmg_flag))
-						veh->m_nPhysicalFlags.bMeeleProof = state;
-
-					ImGui::Columns(1);
-					ImGui::Spacing();
-					ImGui::Separator();
-				}
 				if (veh->m_nVehicleClass == VEHICLE_AUTOMOBILE && ImGui::CollapsingHeader("Doors"))
 				{
 					ImGui::Columns(2, 0, false);

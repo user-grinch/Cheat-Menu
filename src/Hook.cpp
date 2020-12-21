@@ -58,6 +58,14 @@ HRESULT Hook::PresentDx9(IDirect3DDevice9 *pDevice, RECT* pSourceRect, RECT* pDe
 			Globals::font_screen_size = ImVec2(screen::GetScreenWidth(), screen::GetScreenHeight());
 		}
 
+		static RwBool fullscreen = RsGlobal.ps->fullScreen;
+		if (fullscreen != RsGlobal.ps->fullScreen)	
+		{	
+			flog << "LETS GO" << std::endl;
+			fullscreen = RsGlobal.ps->fullScreen;	
+			ImGui_ImplDX9_InvalidateDeviceObjects();
+		}
+
 		ImGui_ImplDX9_NewFrame();
 		ImGui_ImplWin32_NewFrame();
 		ImGui::NewFrame();
@@ -158,15 +166,15 @@ void Hook::ShowMouse(bool state)
 {
 	if (state)
 	{
-		patch::PutRetn(0x6194A0);
+		patch::SetUChar(0x6194A0, 0xC3);
 		patch::Nop(0x53F417, 5); // don't call CPad__getMouseState
-		patch::SetRaw(0x53F41F, "\x33\xC0\x0F\x84", 4);
+		patch::SetRaw(0x53F41F, "\x33\xC0\x0F\x84", 4); // disable camera mouse movement
 	}
 	else
 	{
 		patch::SetRaw(0x541DF5, "\xE8\x46\xF3\xFE\xFF", 5); // call CControllerConfigManager::AffectPadFromKeyBoard
 		patch::SetRaw(0x53F417, "\xE8\xB4\x7A\x20\x00", 5); // call CPad__getMouseState
-		patch::SetRaw(0x53F41F, "\x85\xC0\x0F\x8C", 4); // xor eax, eax -> test eax, eax
+		patch::SetRaw(0x53F41F, "\x85\xC0\x0F\x8C", 4); // xor eax, eax -> test eax, eax , enable camera mouse movement
 														// jz loc_53F526 -> jl loc_53F526
 		patch::SetUChar(0x6194A0, 0xE9); // jmp setup
 	}

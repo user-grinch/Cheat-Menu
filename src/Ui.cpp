@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Ui.h"
-#include "CustomWidgets.h"
 
 std::string Ui::current_hotkey = "";
 
@@ -69,6 +68,14 @@ ImVec2 Ui::GetSize(short count,bool spacing)
 	return ImVec2(x, ImGui::GetFrameHeight()*1.3f);
 }
 
+void Ui::CenterdText(const std::string& text) 
+{
+	float font_size = ImGui::GetFontSize() * text.size() / 2;
+	ImGui::NewLine();
+	ImGui::SameLine(ImGui::GetWindowSize().x / 2 -font_size + (font_size / 1.8));
+	ImGui::Text(text.c_str());
+}
+
 void Ui::DrawHeaders(unsortedMap& data)
 {
 
@@ -83,12 +90,16 @@ void Ui::DrawHeaders(unsortedMap& data)
 		const char* btn_text = it->first.c_str();
 
 		if (btn_text == Globals::header_id)
+		{
 			colors[ImGuiCol_Button] = colors[ImGuiCol_ButtonActive];
+			func = it->second;
+		}
 
 
 		if (ImGui::Button(btn_text, GetSize(3, false)))
 		{
 			Globals::header_id = btn_text;
+			config.SetValueStr("window.id", Globals::header_id);
 			func = it->second;
 		}
 
@@ -101,9 +112,34 @@ void Ui::DrawHeaders(unsortedMap& data)
 	ImGui::PopStyleVar();
 	ImGui::Dummy(ImVec2(0, 10));
 
-	if (Globals::header_id != "" && func != nullptr)
+	if (Globals::header_id == "")
 	{
-		if (ImGui::BeginChild("TABSBAR"))
+		// Show Welcome page
+		ImGui::NewLine();
+
+		std::string title = "Welcome to " + Globals::menu_title + " (" + BUILD_NUMBER + ")"; 
+		Ui::CenterdText(title.c_str());
+		Ui::CenterdText("Author: Grinch_");
+
+		ImGui::NewLine();
+		ImGui::TextWrapped("Please ensure you have the latest version from GitHub.");
+		ImGui::NewLine();
+		if (ImGui::Button("Discord server", ImVec2(Ui::GetSize(2))))
+			ShellExecute(NULL, "open", DISCORD_INVITE, NULL, NULL, SW_SHOWNORMAL);
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("GitHub repo", ImVec2(Ui::GetSize(2))))
+			ShellExecute(NULL, "open", GITHUB_LINK, NULL, NULL, SW_SHOWNORMAL);
+
+		ImGui::NewLine();
+		ImGui::TextWrapped("If you find bugs or have suggestions, you can let me know at discord :)");
+		ImGui::NewLine();
+		Ui::CenterdText("Copyright GPLv3 2019-2021");
+	}
+	else
+	{
+		if ( func != nullptr && ImGui::BeginChild("TABSBAR"))
 		{
 			((void(*)(void))func)();
 			ImGui::EndChild();
@@ -124,14 +160,90 @@ void Ui::ShowTooltip(const char* text)
 	}
 }
 
-bool Ui::CheckboxWithHint(const char* label, bool* state, const char* hint, const bool is_disabled)
+bool Ui::CheckboxWithHint(const char* label, bool *v, const char * hint, bool is_disabled)
 {
-	bool rtn = false;
+	// set things up
+	bool pressed = false;
+	const ImGuiStyle& style = ImGui::GetStyle();
+	const ImVec2 text_size = ImGui::CalcTextSize(label, NULL, true);
+	float square_sz = ImGui::GetFrameHeight();
+	ImDrawList *drawlist = ImGui::GetWindowDrawList();
+	ImU32 color = ImGui::GetColorU32(ImGuiCol_FrameBg);
+	std::string slabel = "##InvCheckboxBtn" + std::string(label);
 
-	if (CustomWidgets::Checkbox(label,state,hint,is_disabled))
-		rtn = true;
+	if (is_disabled)
+		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 
-	return rtn; 
+	// process the button states
+	if (ImGui::InvisibleButton(slabel.c_str(), ImVec2(square_sz, square_sz)) && !is_disabled)
+	{
+		pressed = true;
+		*v = !*v;
+	}
+
+	if (ImGui::IsItemHovered() && !is_disabled)
+		color = ImGui::GetColorU32(ImGuiCol_FrameBgHovered);
+
+	// draw the button
+	ImVec2 min = ImGui::GetItemRectMin();
+	ImVec2 max = ImGui::GetItemRectMax();
+	drawlist->AddRectFilled(min, max, color);
+
+	int pad = int(square_sz / 6.0);
+	pad = (pad < 1) ? 1 : pad;
+
+	if (*v)
+	{   // draw the checkmark
+		float sz = (square_sz - pad * 2.0);
+		float thickness = sz / 5.0;
+		thickness = (thickness < 1.0) ? 1.0 : thickness;
+		sz = sz - thickness * 0.5;
+
+		ImVec2 pos = ImVec2(min.x + pad, min.y + pad);
+		pos.x = pos.x + thickness * 0.25;
+		pos.y = pos.y + thickness * 0.25;
+
+		float third = sz / 3.0;
+		float bx = pos.x + third;
+		float by = pos.y + sz - third * 0.5;
+
+		drawlist->PathLineTo(ImVec2(bx - third, by - third));
+		drawlist->PathLineTo(ImVec2(bx, by));
+		drawlist->PathLineTo(ImVec2(bx + third * 2.0, by - third * 2.0));
+		drawlist->PathStroke(ImGui::GetColorU32(ImGuiCol_CheckMark), false, thickness);
+	}
+
+	// draw label
+	ImGui::SameLine(0, style.ItemInnerSpacing.x);
+	if (ImGui::InvisibleButton(label, ImVec2(ImGui::CalcTextSize(label, NULL, true).x, square_sz)) && !is_disabled)
+	{
+		pressed = true;
+		*v = !*v;
+	}
+	min = ImGui::GetItemRectMin();
+	drawlist->AddText(ImVec2(min.x, min.y + style.ItemInnerSpacing.y), ImGui::GetColorU32(ImGuiCol_Text), label);
+
+	// draw hint
+	if (hint != nullptr)
+	{
+		ImGui::SameLine(0, style.ItemInnerSpacing.x);
+		ImGui::InvisibleButton("?", ImGui::CalcTextSize("?", NULL, true));
+		min = ImGui::GetItemRectMin();
+		drawlist->AddText(ImVec2(min.x, min.y + style.ItemInnerSpacing.y), ImGui::GetColorU32(ImGuiCol_TextDisabled), "?");
+
+		if (ImGui::IsItemHovered() && !is_disabled)
+		{
+			ImGui::BeginTooltip();
+			ImGui::Text(hint);
+			ImGui::Spacing();
+			ImGui::EndTooltip();
+		}
+	}
+
+	if (is_disabled)
+		ImGui::PopStyleVar();
+	
+	return pressed;
 }
 
 bool Ui::CheckboxAddress(const char* label, const int addr, const char* hint)
@@ -674,9 +786,10 @@ void Ui::EditFloat(const char *label, const int address, const float min, const 
 	}
 }
 
-void Ui::HotKey(const char* label, int* key_array)
+bool Ui::HotKey(const char* label, int* key_array)
 {
 	bool active = current_hotkey == label;
+	bool state = false;
 
 	if (active)
 	{
@@ -709,7 +822,10 @@ void Ui::HotKey(const char* label, int* key_array)
 	if (ImGui::Button((text + std::string("##") + std::string(label)).c_str(), ImVec2(ImGui::GetWindowContentRegionWidth() / 3, ImGui::GetFrameHeight())))
 	{
 		if (active)
+		{
 			current_hotkey = "";
+			state = true;
+		}
 		else
 			current_hotkey = label;;
 	}
@@ -721,6 +837,8 @@ void Ui::HotKey(const char* label, int* key_array)
 
 	if (!(ImGui::IsWindowFocused() || ImGui::IsItemVisible()))
 		current_hotkey = "";
+	
+	return state;
 }
 
 bool Ui::HotKeyPressed(int *hotkey)

@@ -18,6 +18,9 @@ void CheatMenu::ProcessMenu()
 		Ui::DrawHeaders(header);
 
 		Globals::menu_size = ImGui::GetWindowSize();
+		config.SetValue("window.sizeX", Globals::menu_size.x);
+		config.SetValue("window.sizeY", Globals::menu_size.y);
+
 		ImGui::PopStyleVar(2);
 		ImGui::End();
 	}
@@ -48,8 +51,9 @@ CheatMenu::CheatMenu()
 		flog << "Log Started." << std::endl;
 
 		// Load menu settings
-		Globals::menu_size.x = config.GetValue<float>("window.sizeX", screen::GetScreenWidth() / 4.0f);
-		Globals::menu_size.y = config.GetValue<float>("window.sizeY", screen::GetScreenHeight() / 1.2f);
+		Globals::header_id = config.GetValueStr("window.id","");
+		Globals::menu_size.x = config.GetValue("window.sizeX", screen::GetScreenWidth() / 4.0f);
+		Globals::menu_size.y = config.GetValue("window.sizeY", screen::GetScreenHeight() / 1.2f);
 		srand(CTimer::m_snTimeInMilliseconds);
 
 	};
@@ -70,7 +74,14 @@ CheatMenu::CheatMenu()
 				Globals::last_key_timer = CTimer::m_snTimeInMilliseconds;
 			}
 
-			Hook::show_mouse = Globals::show_menu || Menu::commands::show_menu;
+			bool windows_visible = Globals::show_menu || Menu::commands::show_menu;
+			if (Hook::show_mouse != windows_visible)
+			{
+				if (Hook::show_mouse) // Only write when the menu closes
+					config.WriteToDisk();
+					
+				Hook::show_mouse = windows_visible;
+			}
 		}
 	};
 
@@ -81,11 +92,6 @@ CheatMenu::CheatMenu()
 
 	Events::shutdownRwEvent += []
 	{
-		// Save config data
-		config.SetValue("window.sizeX", Globals::menu_size.x);
-		config.SetValue("window.sizeY", Globals::menu_size.y);
-
-		config.WriteToDisk();
 		flog << "Log Finished." << std::endl;
 	};
 }

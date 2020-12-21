@@ -9,7 +9,7 @@ private:
 	static bool dont_fall_bike;
 	static bool veh_heavy;
 	static bool veh_watertight;
-
+	static bool veh_nodmg;
 	static int door_menu_button;
 	static std::string door_names[6];
 

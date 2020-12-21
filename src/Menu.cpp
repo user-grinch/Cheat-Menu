@@ -55,36 +55,6 @@ Menu::Menu()
 		hotkey::command_window[0] = config.GetValue("hotkey.command_window.key1", VK_LMENU);
 		hotkey::command_window[1] = config.GetValue("hotkey.command_window.key2", VK_KEY_C);
 	};
-
-	Events::shutdownRwEvent += []
-	{
-		// save config data 
-		config.SetValue("overlay.coord", overlay::coord);
-		config.SetValue("overlay.fps", overlay::fps);
-		config.SetValue("overlay.loc_name", overlay::loc_name);
-		config.SetValue("overlay.transparent", overlay::transparent);
-		config.SetValue("overlay.veh_health", overlay::veh_health);
-		config.SetValue("overlay.veh_speed", overlay::veh_speed);
-		config.SetValue("overlay.selected_pos", overlay::selected_pos);
-		config.SetValue("overlay.posX", overlay::posX);
-		config.SetValue("overlay.posY", overlay::posY);
-
-		// Hotkeys
-		config.SetValue("hotkey.aim_skin_changer.key1", hotkey::aim_skin_changer[0]);
-		config.SetValue("hotkey.aim_skin_changer.key2", hotkey::aim_skin_changer[1]);
-							   
-		config.SetValue("hotkey.quick_screenshot.key1", hotkey::quick_ss[0]);
-		config.SetValue("hotkey.quick_screenshot.key2", hotkey::quick_ss[1]);
-							   
-		config.SetValue("hotkey.quick_tp.key1", hotkey::quick_tp[0]);
-		config.SetValue("hotkey.quick_tp.key2", hotkey::quick_tp[1]);
-							   
-		config.SetValue("hotkey.menu_open.key1", hotkey::menu_open[0]);
-		config.SetValue("hotkey.menu_open.key2", hotkey::menu_open[1]);
-							   
-		config.SetValue("hotkey.command_window.key1", hotkey::command_window[0]);
-		config.SetValue("hotkey.command_window.key2", hotkey::command_window[1]);
-	};
 }
 
 Menu::~Menu()
@@ -112,7 +82,11 @@ void Menu::ProcessOverlay()
 	else
 	{
 		if (overlay::posX != NULL && overlay::posY != NULL)
+		{
+			config.SetValue("overlay.posX", overlay::posX);
+			config.SetValue("overlay.posY", overlay::posY);
 			ImGui::SetNextWindowPos(ImVec2(overlay::posX, overlay::posY), ImGuiCond_Once);
+		}
 	}
 
 	ImGui::SetNextWindowBgAlpha(overlay::transparent ? 0.0f : 0.5f);
@@ -278,34 +252,69 @@ void Menu::Main()
 			ImGui::Spacing();
 			ImGui::Spacing();
 			ImGui::SameLine();
-			Ui::ListBox("Overlay", overlay::pos_names, overlay::selected_pos);
+			if (Ui::ListBox("Overlay", overlay::pos_names, overlay::selected_pos))
+				config.SetValue("overlay.selected_pos", overlay::selected_pos);
+
 			ImGui::Spacing();
 
 			ImGui::Columns(2, NULL, false);
-			ImGui::Checkbox("No background", &overlay::transparent);
-			ImGui::Checkbox("Show coordinates", &overlay::coord);
-			ImGui::Checkbox("Show FPS", &overlay::fps);
+			if (ImGui::Checkbox("No background", &overlay::transparent))
+				config.SetValue("overlay.transparent", overlay::transparent);
+
+			if (ImGui::Checkbox("Show coordinates", &overlay::coord))
+				config.SetValue("overlay.coord", overlay::coord);
+
+			if (ImGui::Checkbox("Show FPS", &overlay::fps))
+				config.SetValue("overlay.fps", overlay::fps);
+
 			ImGui::NextColumn();
 
-			ImGui::Checkbox("Show location", &overlay::loc_name);
-			ImGui::Checkbox("Show veh health", &overlay::veh_health);
-			ImGui::Checkbox("Show veh speed", &overlay::veh_speed);
+			if (ImGui::Checkbox("Show location", &overlay::loc_name))
+				config.SetValue("overlay.loc_name", overlay::loc_name);
+
+			if (ImGui::Checkbox("Show veh health", &overlay::veh_health))
+				config.SetValue("overlay.veh_health", overlay::veh_health);
+
+			if (ImGui::Checkbox("Show veh speed", &overlay::veh_speed))
+				config.SetValue("overlay.veh_speed", overlay::veh_speed);
+
 			ImGui::Columns(1);
 			
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem("Hotkeys"))
 		{
+
 			ImGui::Spacing();
 			ImGui::BeginChild("Hotkeys");
-			Ui::HotKey("Open/ close cheat menu", hotkey::menu_open);
-			Ui::HotKey("Open/ close command window", hotkey::command_window);
+			if (Ui::HotKey("Open/ close cheat menu", hotkey::menu_open))
+			{
+				config.SetValue("hotkey.menu_open.key1", hotkey::menu_open[0]);
+				config.SetValue("hotkey.menu_open.key2", hotkey::menu_open[1]);
+			}
+			if (Ui::HotKey("Open/ close command window", hotkey::command_window))
+			{
+				config.SetValue("hotkey.command_window.key1", hotkey::command_window[0]);
+				config.SetValue("hotkey.command_window.key2", hotkey::command_window[1]);
+			}
 
 			ImGui::Dummy(ImVec2(0,10));
 
-			Ui::HotKey("Activate aim skin changer", hotkey::aim_skin_changer);
-			Ui::HotKey("Take quick screenshot", hotkey::quick_ss);
-			Ui::HotKey("Toggle quick teleport", hotkey::quick_tp);
+			if (Ui::HotKey("Activate aim skin changer", hotkey::aim_skin_changer))
+			{
+				config.SetValue("hotkey.aim_skin_changer.key1", hotkey::aim_skin_changer[0]);
+				config.SetValue("hotkey.aim_skin_changer.key2", hotkey::aim_skin_changer[1]);
+			}
+			if (Ui::HotKey("Take quick screenshot", hotkey::quick_ss))
+			{
+				config.SetValue("hotkey.quick_screenshot.key1", hotkey::quick_ss[0]);
+				config.SetValue("hotkey.quick_screenshot.key2", hotkey::quick_ss[1]);
+			}
+			if (Ui::HotKey("Toggle quick teleport", hotkey::quick_tp))
+			{
+				config.SetValue("hotkey.quick_tp.key1", hotkey::quick_tp[0]);
+				config.SetValue("hotkey.quick_tp.key2", hotkey::quick_tp[1]);
+			}
 
 			ImGui::Dummy(ImVec2(0, 10));
 
@@ -357,12 +366,12 @@ void Menu::Main()
 			ImGui::Spacing();
 
 			if (ImGui::Button("Discord server", ImVec2(Ui::GetSize(2))))
-				ShellExecute(NULL, "open", "https://discord.gg/ZzW7kmf", NULL, NULL, SW_SHOWNORMAL);
+				ShellExecute(NULL, "open", DISCORD_INVITE, NULL, NULL, SW_SHOWNORMAL);
 
 			ImGui::SameLine();
 
 			if (ImGui::Button("GitHub repo", ImVec2(Ui::GetSize(2))))
-				ShellExecute(NULL, "open", "https://github.com/user-grinch/Cheat-Menu", NULL, NULL, SW_SHOWNORMAL);
+				ShellExecute(NULL, "open", GITHUB_LINK, NULL, NULL, SW_SHOWNORMAL);
 					
 			ImGui::Spacing();
 
@@ -391,7 +400,7 @@ void Menu::Main()
 				ImGui::Columns(1);
 
 				ImGui::Dummy(ImVec2(0, 10));
-				ImGui::TextWrapped("Copyright GPLv3 2019-2020 Grinch_");
+				ImGui::TextWrapped("Copyright GPLv3 2019-2021 Grinch_");
 				
 				ImGui::EndChild();
 			}

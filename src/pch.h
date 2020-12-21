@@ -6,6 +6,8 @@
 #define MENU_VERSION "2.5-beta"
 #define BUILD_NUMBER "20201220"
 #define STB_IMAGE_IMPLEMENTATION
+#define DISCORD_INVITE "https://discord.gg/ZzW7kmf"
+#define GITHUB_LINK "https://github.com/user-grinch/Cheat-Menu"
 
 #include <d3d9.h>
 #include <d3d11.h>

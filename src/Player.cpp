@@ -53,11 +53,6 @@ Player::Player()
 		}
 	};
 
-	Events::shutdownRwEvent += []
-	{
-		config.SetValue("aim_skin_changer", aim_skin_changer);
-	};
-
 	Events::processScriptsEvent += []
 	{
 		uint timer = CTimer::m_snTimeInMilliseconds;
@@ -338,8 +333,8 @@ void Player::Main()
 		if (ImGui::BeginTabItem("Appearance"))
 		{
 			ImGui::Spacing();
-			Ui::CheckboxWithHint("Aim skin changer", &aim_skin_changer,
-				(("Activate using Aim ped + ") + Ui::GetHotKeyNameString(Menu::hotkey::aim_skin_changer)).c_str());
+			if (Ui::CheckboxWithHint("Aim skin changer", &aim_skin_changer,(("Activate using Aim ped + ") + Ui::GetHotKeyNameString(Menu::hotkey::aim_skin_changer)).c_str()))
+				config.SetValue("aim_skin_changer", aim_skin_changer);
 
 			if (ImGui::BeginTabBar("AppearanceTabBar"))
 			{

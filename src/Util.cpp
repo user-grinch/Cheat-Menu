@@ -33,7 +33,6 @@ void Util::LoadTexturesInDirRecursive(const char *path, const char *file_ext,std
 		{
 			store_vec.push_back(std::make_unique<TextureStructure>());
 			HRESULT hr = -1;
-			flog << p.path().string() << std::endl;
 			if (Globals::renderer == Render_DirectX9)
 				hr = D3DXCreateTextureFromFileA(GetD3DDevice(), p.path().string().c_str(), &store_vec.back().get()->texture9);
 

@@ -6,8 +6,6 @@ set(no_group_source_files
     "Animation.h"
     "CheatMenu.cpp"
     "CheatMenu.h"
-    "CustomWidgets.cpp"
-    "CustomWidgets.h"
     "Events.cpp"
     "Events.h"
     "external/imgui/imgui_impl_dx11.cpp"
