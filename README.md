@@ -23,7 +23,7 @@ A portuguese translation of the menu is [here](https://github.com/Dowglass/Cheat
 
 1. Install [DirectX9](https://www.microsoft.com/en-us/download/details.aspx?id=35) &  [Visual C++ Redistributable 2015 x86](https://download.microsoft.com/download/9/3/F/93FCF1E7-E6A4-478B-96E7-D4B285925B00/vc_redist.x86.exe) if not already installed.
 2. If your game version isn't v1.0 then you'll need to [downgrade](https://gtaforums.com/topic/927016-san-andreas-downgrader/).
-3. Install asi loader from [here](https://www.gtagarage.com/mods/show.php?id=21709)
+3. Install [asi loader](https://www.gtagarage.com/mods/show.php?id=21709) & [silent patch](https://gtaforums.com/topic/669045-silentpatch/)
 4. Download CheatMenu and extract everything in game directory (replace if necessary).
 
 ## Building

@@ -406,9 +406,8 @@ void Vehicle::SpawnVehicle(std::string &smodel)
 	int imodel = std::stoi(smodel);
 	CVehicle *veh = nullptr;
 
-	int interior = 0;
-	Command<Commands::GET_CHAR_AREA_VISIBLE>(hplayer, &interior);
-
+	int interior = player->m_nAreaCode;
+	
 	if (Command<Commands::IS_MODEL_AVAILABLE>(imodel))
 	{
 		CVector pos = player->GetPosition();
@@ -456,9 +455,15 @@ void Vehicle::SpawnVehicle(std::string &smodel)
 			CStreaming::RequestModel(449, PRIORITY_REQUEST);
 
 			CStreaming::LoadAllRequestedModels(false);
-			Command<Commands::CREATE_MISSION_TRAIN>(train_id, pos.x, pos.y, pos.z, (CTimer::m_snTimeInMilliseconds % 2 == 0) ? true : false, &hveh);
-			veh = CPools::GetVehicle(hveh);
 
+			CTrain *train = nullptr;
+			CTrain *carraige = nullptr;
+			int track = rand() % 2;
+			int node = CTrain::FindClosestTrackNode(pos,&track);
+			CTrain::CreateMissionTrain(pos,(rand() % 2) == 1 ? true : false,train_id,&train,&carraige,node,track,false);
+
+			veh = (CVehicle*)train;
+			hveh = CPools::GetVehicleRef(veh);
 			if (veh->m_pDriver)
 				Command<Commands::DELETE_CHAR>(CPools::GetPedRef(veh->m_pDriver));
 
@@ -468,7 +473,7 @@ void Vehicle::SpawnVehicle(std::string &smodel)
 				Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, speed);
 			}
 			Command<Commands::MARK_MISSION_TRAIN_AS_NO_LONGER_NEEDED>(hveh);
-
+			Command<Commands::MARK_CAR_AS_NO_LONGER_NEEDED>(hveh);
 			CStreaming::SetModelIsDeletable(590);
 			CStreaming::SetModelIsDeletable(538);
 			CStreaming::SetModelIsDeletable(570);
@@ -484,9 +489,9 @@ void Vehicle::SpawnVehicle(std::string &smodel)
 			if (spawner::license_text != "")
 				Command<Commands::CUSTOM_PLATE_FOR_NEXT_CAR>(imodel, spawner::license_text);
 
+			int hveh = 0;
 			if (spawner::spawn_inside)
 			{
-				int hveh = 0;
 				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 4.0f, &hveh);
 				veh = CPools::GetVehicle(hveh);
 				veh->SetHeading(player->GetHeading());
@@ -495,18 +500,17 @@ void Vehicle::SpawnVehicle(std::string &smodel)
 			}
 			else
 			{	
-				int hveh = 0;
 				player->TransformFromObjectSpace(pos, CVector(0, 10, 0));
 
 				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 4.0f, &hveh);
 				veh = CPools::GetVehicle(hveh);
 				veh->SetHeading(player->GetHeading()+55.0f);
 			}
+			veh->m_nAreaCode = interior;
+			Command<Commands::MARK_CAR_AS_NO_LONGER_NEEDED>(CPools::GetVehicleRef(veh));
 			CStreaming::SetModelIsDeletable(imodel);
 		}
-
-		if(veh)
-			Command<Commands::SET_VEHICLE_AREA_VISIBLE>(CPools::GetVehicleRef(veh), interior);
+		veh->m_nVehicleFlags.bHasBeenOwnedByPlayer = true;
 	}
 }
 
@@ -673,13 +677,25 @@ void Vehicle::Main()
 
 				ImGui::Columns(2, 0, false);
 
-				bool state = pVeh->m_nPhysicalFlags.bBulletProof;
+				bool state = pVeh->m_nVehicleFlags.bAlwaysSkidMarks;
+				if (Ui::CheckboxWithHint("Always skid marks", &state, nullptr))
+					pVeh->m_nVehicleFlags.bAlwaysSkidMarks = state;
+
+				state = pVeh->m_nPhysicalFlags.bBulletProof;
 				if (Ui::CheckboxWithHint("Bullet proof", &state, nullptr, veh_nodmg))
 					pVeh->m_nPhysicalFlags.bBulletProof = state;
 
 				state = pVeh->m_nPhysicalFlags.bCollisionProof;
 				if (Ui::CheckboxWithHint("Collision proof", &state, nullptr, veh_nodmg))
 					pVeh->m_nPhysicalFlags.bCollisionProof = state;
+
+				state = pVeh->m_nVehicleFlags.bDisableParticles;
+				if (Ui::CheckboxWithHint("Disable particles", &state, nullptr))
+					pVeh->m_nVehicleFlags.bDisableParticles = state;
+
+				state = pVeh->m_nVehicleFlags.bVehicleCanBeTargetted;
+				if (Ui::CheckboxWithHint("Driver targetable", &state, "Driver can be targeted"))
+					pVeh->m_nVehicleFlags.bVehicleCanBeTargetted = state;
 
 				state = !pVeh->m_nVehicleFlags.bEngineBroken || pVeh->m_nVehicleFlags.bEngineOn;
 				if (Ui::CheckboxWithHint("Engine on", &state, nullptr, !is_driver))
@@ -691,11 +707,15 @@ void Vehicle::Main()
 				if (Ui::CheckboxWithHint("Explosion proof", &state, nullptr, veh_nodmg))
 					pVeh->m_nPhysicalFlags.bExplosionProof = state;
 
+				ImGui::NextColumn();
+
 				state = pVeh->m_nPhysicalFlags.bFireProof;
 				if (Ui::CheckboxWithHint("Fire proof", &state, nullptr, veh_nodmg))
 					pVeh->m_nPhysicalFlags.bFireProof = state;
 
-				ImGui::NextColumn();
+				state = pVeh->m_nVehicleFlags.bVehicleCanBeTargettedByHS;
+				if (Ui::CheckboxWithHint("HS targetable", &state, "Heat Seaker missile can target this"))
+					pVeh->m_nVehicleFlags.bVehicleCanBeTargettedByHS = state;
 
 				state = !pVeh->m_bIsVisible;
 				if (Ui::CheckboxWithHint("Invisible car", &state, nullptr, !is_driver))
@@ -717,7 +737,11 @@ void Vehicle::Main()
 				state = pVeh->m_nPhysicalFlags.bMeeleProof;
 				if (Ui::CheckboxWithHint("Melee proof", &state, nullptr, veh_nodmg))
 					pVeh->m_nPhysicalFlags.bMeeleProof = state;
-					
+
+				state = pVeh->m_nVehicleFlags.bTakeLessDamage;
+				if (Ui::CheckboxWithHint("Take less dmg", &state, nullptr))
+					pVeh->m_nVehicleFlags.bTakeLessDamage = state;
+				
 				ImGui::Columns(1);
 			}
 

@@ -117,7 +117,7 @@ void Ui::DrawHeaders(unsortedMap& data)
 		// Show Welcome page
 		ImGui::NewLine();
 
-		std::string title = "Welcome to " + Globals::menu_title + " (" + BUILD_NUMBER + ")"; 
+		std::string title = "Welcome to " + Globals::menu_title; 
 		Ui::CenterdText(title.c_str());
 		Ui::CenterdText("Author: Grinch_");
 
@@ -133,7 +133,7 @@ void Ui::DrawHeaders(unsortedMap& data)
 			ShellExecute(NULL, "open", GITHUB_LINK, NULL, NULL, SW_SHOWNORMAL);
 
 		ImGui::NewLine();
-		ImGui::TextWrapped("If you find bugs or have suggestions, you can let me know at discord :)");
+		ImGui::TextWrapped("If you find bugs or have suggestions, you can let me know on discord :)");
 		ImGui::NewLine();
 		Ui::CenterdText("Copyright GPLv3 2019-2021");
 	}

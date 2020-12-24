@@ -49,6 +49,16 @@ public:
 				launch = false;
 			}
 
+			/*
+				WndProc is extremely buggy without SilentPatch
+				Should have a better fix for this but everyone should have 
+				SilentPatch installed so mehh...
+			*/
+			if (!GetModuleHandleA("SilentPatchSA.asi")) {
+				MessageBox(HWND_DESKTOP, "SilentPatch isn't installed. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
+				launch = false;
+			}
+
 			if (launch)
 			{
 				flog << "Loading CheatMenu" << std::endl;

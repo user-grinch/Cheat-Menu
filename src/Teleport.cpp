@@ -91,8 +91,9 @@ Teleport::Teleport()
 
 void Teleport::TeleportPlayer(bool get_marker, CVector* pos, short interior_id)
 {
-	CPlayerPed* player = FindPlayerPed();
-	
+	CPlayerPed *player = FindPlayerPed();
+	CVehicle *pVeh = player->m_pVehicle;
+
 	if (get_marker)
 	{
 		auto target_blip = CRadar::ms_RadarTrace[LOWORD(FrontEndMenuManager.m_nTargetBlipIndex)];
@@ -118,15 +119,19 @@ void Teleport::TeleportPlayer(bool get_marker, CVector* pos, short interior_id)
 	CStreaming::LoadSceneCollision(&Teleport::STeleport::pos);
 	CStreaming::LoadAllRequestedModels(false);
 
-	if (player->m_pVehicle)
+	if (pVeh)
 	{
-		player->m_pVehicle->Teleport(CVector(pos->x, pos->y, pos->z), false);
-		Command<Commands::SET_VEHICLE_AREA_VISIBLE>(CPools::GetVehicleRef(player->m_pVehicle), interior_id); // setvehicleinterior
+		pVeh->Teleport(CVector(pos->x, pos->y, pos->z), false);
+
+		if (pVeh->m_nVehicleClass == VEHICLE_BIKE)
+			reinterpret_cast<CBike*>(pVeh)->PlaceOnRoadProperly();
+		else if (pVeh->m_nVehicleClass != VEHICLE_BOAT)
+			reinterpret_cast<CAutomobile*>(pVeh)->PlaceOnRoadProperly();
+			
+		pVeh->m_nAreaCode = interior_id;
 	}
 	else
 		player->Teleport(CVector(pos->x, pos->y, pos->z), false);
-
-	Command<Commands::SET_CHAR_AREA_VISIBLE>(CPools::GetPedRef(player), interior_id); // setcharinterior
 	Command<Commands::SET_AREA_VISIBLE>(interior_id);
 }
 

@@ -15,6 +15,7 @@ std::function<void()> Hook::window_func = NULL;
 
 LRESULT Hook::InputProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+
 	ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 
 	if (ImGui::GetIO().WantTextInput)
@@ -24,6 +25,7 @@ LRESULT Hook::InputProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	}
 	else
 		return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
+
 }
 
 HRESULT Hook::ResetDx9(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters)

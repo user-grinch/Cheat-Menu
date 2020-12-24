@@ -4,7 +4,7 @@
 #define INPUT_BUFFER_SIZE 64
 #define SPAWN_PED_LIMIT 20
 #define MENU_VERSION "2.5-beta"
-#define BUILD_NUMBER "20201220"
+#define BUILD_NUMBER "20201225"
 #define STB_IMAGE_IMPLEMENTATION
 #define DISCORD_INVITE "https://discord.gg/ZzW7kmf"
 #define GITHUB_LINK "https://github.com/user-grinch/Cheat-Menu"
@@ -23,6 +23,7 @@
 #include <windows.h>
 
 #include "plugin.h"
+#include "CBike.h"
 #include "CCamera.h"
 #include "CCheat.h"
 #include "CClothes.h"
@@ -43,6 +44,7 @@
 #include "CTheZones.h"
 #include "CTimer.h"
 #include "CTimeCycle.h"
+#include "CTrain.h"
 #include "CWeather.h"
 #include "CWorld.h"
 #include "extensions/ScriptCommands.h"

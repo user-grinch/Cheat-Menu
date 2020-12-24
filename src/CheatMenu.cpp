@@ -48,14 +48,11 @@ CheatMenu::CheatMenu()
 
 	Events::initRwEvent += []()
 	{
-		flog << "Log Started." << std::endl;
-
 		// Load menu settings
 		Globals::header_id = config.GetValueStr("window.id","");
 		Globals::menu_size.x = config.GetValue("window.sizeX", screen::GetScreenWidth() / 4.0f);
 		Globals::menu_size.y = config.GetValue("window.sizeY", screen::GetScreenHeight() / 1.2f);
 		srand(CTimer::m_snTimeInMilliseconds);
-
 	};
 
 	Events::processScriptsEvent += [this]
@@ -74,13 +71,12 @@ CheatMenu::CheatMenu()
 				Globals::last_key_timer = CTimer::m_snTimeInMilliseconds;
 			}
 
-			bool windows_visible = Globals::show_menu || Menu::commands::show_menu;
-			if (Hook::show_mouse != windows_visible)
+			if (Hook::show_mouse != Globals::show_menu)
 			{
 				if (Hook::show_mouse) // Only write when the menu closes
 					config.WriteToDisk();
 					
-				Hook::show_mouse = windows_visible;
+				Hook::show_mouse = Globals::show_menu;
 			}
 		}
 	};
