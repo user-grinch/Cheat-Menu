@@ -16,10 +16,8 @@ set(no_group_source_files
     "external/kiero/kiero.h"
     "external/kiero/minhook/include/MinHook.h"
     "external/moon/pool_object_extender.h"
-    "external/moon/texture_manager.cpp"
-    "external/moon/texture_manager.h"
-    "external/moon/vehicle_renderer.cpp"
     "external/moon/vehicle_renderer.h"
+    "external/moon/vehicle_renderer.cpp"
     "Game.cpp"
     "Game.h"
     "Hook.cpp"
@@ -162,10 +160,6 @@ if(MSVC)
         "/Y-"
     )
     source_file_compile_options(external/kiero/kiero.cpp ${FILE_CL_OPTIONS})
-    string(CONCAT FILE_CL_OPTIONS
-        "/Y-"
-    )
-    source_file_compile_options(external/moon/texture_manager.cpp ${FILE_CL_OPTIONS})
     string(CONCAT FILE_CL_OPTIONS
         "/Y-"
     )

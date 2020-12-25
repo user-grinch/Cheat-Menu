@@ -390,15 +390,7 @@ void Menu::Main()
 						
 				ImGui::Dummy(ImVec2(0, 10));
 				ImGui::TextWrapped("Thanks to,");
-				ImGui::Columns(2, NULL, false);
-						
-				ImGui::TextWrapped("Israel");
-				
-				ImGui::NextColumn();
 				ImGui::TextWrapped("Junior-Djjr");
-
-				ImGui::Columns(1);
-
 				ImGui::Dummy(ImVec2(0, 10));
 				ImGui::TextWrapped("Copyright GPLv3 2019-2021 Grinch_");
 				

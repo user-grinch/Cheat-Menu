@@ -28,7 +28,6 @@ void Util::LoadTexturesInDirRecursive(const char *path, const char *file_ext,std
 	std::string folder = "";
 	for (auto &p : std::experimental::filesystem::recursive_directory_iterator(path))
 	{
-		
 		if (p.path().extension() == file_ext)
 		{
 			store_vec.push_back(std::make_unique<TextureStructure>());
@@ -194,4 +193,32 @@ void Util::RainbowValues(int &r, int&g, int &b, float speed)
 	r = sin(timer * speed) * 127 + 128;
 	g = sin(timer * speed + 2) * 127 + 128;
 	b = sin(timer * speed + 4) * 127 + 128;
+}
+
+RwTexture* CreateRwTextureFromRwImage(RwImage* image)
+{
+	RwInt32 width, height, depth, flags;
+	RwImageFindRasterFormat(image, 4, &width, &height, &depth, &flags);
+	RwRaster* raster = RwRasterCreate(width, height, depth, flags);
+	RwRasterSetFromImage(raster, image);
+	RwImageDestroy(image);
+	RwTexture* texture = RwTextureCreate(raster);
+	return texture;
+}
+
+RwTexture* Util::LoadTextureFromPngFile(fs::path path)
+{
+	RwImage* image = RtPNGImageRead(path.string().c_str());
+	if (!image)
+		return nullptr;
+	RwTexture* texture = CreateRwTextureFromRwImage(image);
+	path.stem().string().copy(texture->name, sizeof(texture->name) - 1);
+	return texture;
+}
+
+void Util::UnloadTexture(RwTexture* texture)
+{
+	if (!texture)
+		return;
+	RwTextureDestroy(texture);
 }

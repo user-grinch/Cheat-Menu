@@ -1,0 +1,42 @@
+{
+    "aim_skin_changer": null,
+    "hotkey": {
+        "aim_skin_changer": {
+            "key1": null,
+            "key2": null
+        },
+        "command_window": {
+            "key1": null,
+            "key2": null
+        },
+        "menu_open": {
+            "key1": null,
+            "key2": null
+        },
+        "quick_screenshot": {
+            "key1": null,
+            "key2": null
+        },
+        "quick_tp": {
+            "key1": null,
+            "key2": null
+        }
+    },
+    "overlay": {
+        "coord": null,
+        "fps": null,
+        "loc_name": null,
+        "posX": null,
+        "posY": null,
+        "selected_pos": null,
+        "transparent": null,
+        "veh_health": null,
+        "veh_speed": null
+    },
+    "quick_teleport": null,
+    "window": {
+        "id": "Player",
+        "sizeX": 341.0,
+        "sizeY": 638.0
+    }
+}

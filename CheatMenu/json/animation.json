@@ -476,7 +476,6 @@
         "PED_Console_Loose": "CRIB",
         "PED_Console_Win": "CRIB"
     },
-    "Custom": {},
     "DAM_JUMP": {
         "DAM_Dive_Loop": "DAM_JUMP",
         "DAM_Land": "DAM_JUMP",

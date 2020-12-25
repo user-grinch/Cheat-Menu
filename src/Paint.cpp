@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "Paint.h"
 #include "NodeName.h"
-#include "external/moon/texture_manager.h"
 
 std::vector<std::string> Paint::veh_nodes::names_vec{ "Default" };
 std::string Paint::veh_nodes::selected = "Default";
@@ -20,7 +19,7 @@ Paint::Paint()
 			if (p.path().extension() == ".png")
 			{
 				std::string file_name = p.path().stem().string();
-				textures[file_name]= std::make_shared<RwTexture>(*(texture_manager::loadTextureFromPngFile(p.path())));
+				textures[file_name]= std::make_shared<RwTexture>(*(Util::LoadTextureFromPngFile(p.path())));
 			}
 		}
 	};

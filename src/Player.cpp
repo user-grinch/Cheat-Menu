@@ -25,9 +25,8 @@ Player::Player()
 {
 	Events::initGameEvent += []
 	{
-		std::string dir_path = (std::string(".\\CheatMenu\\clothes\\")).c_str();
 		aim_skin_changer = config.GetValue("aim_skin_changer", false);
-		Util::LoadTexturesInDirRecursive(dir_path.c_str(), ".jpg", search_categories, clothes_vec);
+		Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\clothes\\"), ".jpg", search_categories, clothes_vec);
 
 		// Custom skins setup
 		if (LoadLibraryW(L"modloader.asi"))
