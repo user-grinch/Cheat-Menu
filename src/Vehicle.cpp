@@ -821,7 +821,7 @@ void Vehicle::Main()
 					ImGui::Spacing();
 
 					int seats = veh->m_nMaxPassengers + 1; // passenger + driver
-					int doors = seats == 4 ? 5 : 3;
+					int doors = seats == 4 ? 6 : 4;
 					int hveh = CPools::GetVehicleRef(veh);
 
 					if (ImGui::Button("All", ImVec2(Ui::GetSize())))
@@ -848,7 +848,7 @@ void Vehicle::Main()
 						}
 					}
 
-					for (int i = 0; i != doors+1; ++i)
+					for (int i = 0; i != doors; ++i)
 					{
 						if (ImGui::Button(door_names[i].c_str(), ImVec2(Ui::GetSize(2))))
 						{
