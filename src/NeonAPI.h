@@ -3,8 +3,6 @@
 class NeonAPI
 {
 private:
-	static bool api_installed;
-	static HMODULE hapi;
 	static RwTexture* neon_texture;
 
 	class NeonData {

@@ -492,7 +492,7 @@ void Vehicle::SpawnVehicle(std::string &smodel)
 			int hveh = 0;
 			if (spawner::spawn_inside)
 			{
-				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 4.0f, &hveh);
+				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 2.0f, &hveh);
 				veh = CPools::GetVehicle(hveh);
 				veh->SetHeading(player->GetHeading());
 				Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
@@ -502,10 +502,11 @@ void Vehicle::SpawnVehicle(std::string &smodel)
 			{	
 				player->TransformFromObjectSpace(pos, CVector(0, 10, 0));
 
-				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 4.0f, &hveh);
+				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 2.0f, &hveh);
 				veh = CPools::GetVehicle(hveh);
 				veh->SetHeading(player->GetHeading()+55.0f);
 			}
+			veh->m_nDoorLock = CARLOCK_UNLOCKED;
 			veh->m_nAreaCode = interior;
 			Command<Commands::MARK_CAR_AS_NO_LONGER_NEEDED>(CPools::GetVehicleRef(veh));
 			CStreaming::SetModelIsDeletable(imodel);

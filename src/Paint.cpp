@@ -12,9 +12,7 @@ Paint::Paint()
 
 	Events::initGameEvent += []
 	{
-		std::string dir_path = std::string(".\\CheatMenu\\vehicles\\paintjobs\\").c_str();
-
-		for (auto &p : fs::recursive_directory_iterator(dir_path))
+		for (auto &p : fs::recursive_directory_iterator(PLUGIN_PATH((char*)"\\CheatMenu\\vehicles\\paintjobs\\")))
 		{
 			if (p.path().extension() == ".png")
 			{

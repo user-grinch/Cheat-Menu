@@ -1,8 +1,6 @@
 #include "pch.h"
 #include "NeonAPI.h"
 
-bool NeonAPI::api_installed = false;
-HMODULE NeonAPI::hapi = false;
 VehicleExtendedData<NeonAPI::NeonData> NeonAPI::VehNeon;
 RwTexture* NeonAPI::neon_texture = nullptr;
 

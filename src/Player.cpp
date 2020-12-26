@@ -25,6 +25,13 @@ Player::Player()
 {
 	Events::initGameEvent += []
 	{
+		/* 
+			Nop call to CClothes::RebuildPlayerIfNeeded
+			So player model doesn't get fked 
+			This probably gonna fuck me up in future but oh well
+		*/
+		patch::Nop(0x44070A,5,false);
+
 		aim_skin_changer = config.GetValue("aim_skin_changer", false);
 		Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\clothes\\"), ".jpg", search_categories, clothes_vec);
 
@@ -190,7 +197,6 @@ void Player::Main()
 	ImGui::SameLine();
 	if (ImGui::Button("Suicide", ImVec2(Ui::GetSize(2))))
 		player->m_fHealth = 0.0;
-
 	ImGui::Spacing();
 
 	if (ImGui::BeginTabBar("Player", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))

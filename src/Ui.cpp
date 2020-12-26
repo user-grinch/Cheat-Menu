@@ -678,10 +678,10 @@ void Ui::ColorPickerAddress(const char* label, int base_addr, ImVec4&& default_c
 
 		if (ImGui::Button("Reset to default", Ui::GetSize()))
 		{
-			patch::SetRaw(base_addr, &default_color.w, 1, false);
-			patch::SetRaw(base_addr + 1, &default_color.x, 1, false);
-			patch::SetRaw(base_addr + 2, &default_color.y, 1, false);
-			patch::SetRaw(base_addr + 3, &default_color.z, 1, false);
+			patch::Set<BYTE>(base_addr, default_color.x, false);
+			patch::Set<BYTE>(base_addr + 1, default_color.y, false);
+			patch::Set<BYTE>(base_addr + 2, default_color.z, false);
+			patch::Set<BYTE>(base_addr + 3, default_color.w, false);
 		}
 
 		ImGui::Spacing();

@@ -389,8 +389,9 @@ void Menu::Main()
 				ImGui::Columns(1);
 						
 				ImGui::Dummy(ImVec2(0, 10));
-				ImGui::TextWrapped("Thanks to,");
-				ImGui::TextWrapped("Junior-Djjr");
+				ImGui::TextWrapped("If you find bugs or have suggestions, let me know on discord.");
+				ImGui::Dummy(ImVec2(0, 10));
+				ImGui::TextWrapped("Thanks to Junior-Djjr");
 				ImGui::Dummy(ImVec2(0, 10));
 				ImGui::TextWrapped("Copyright GPLv3 2019-2021 Grinch_");
 				
