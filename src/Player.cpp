@@ -21,16 +21,20 @@ ImGuiTextFilter Player::custom_skins::filter = "";
 
 bool Player::modloader_installed = false;
 
+static void PlayerModelBrokenFix()
+{
+	CPlayerPed *player = FindPlayerPed();
+
+	if (player->m_nModelIndex == 0)
+		Call<0x5A81E0>(0, player->m_pPlayerData->m_pPedClothesDesc,0xBC1C78,false);
+}
+
 Player::Player()
 {
 	Events::initGameEvent += []
 	{
-		/* 
-			Nop call to CClothes::RebuildPlayerIfNeeded
-			So player model doesn't get fked 
-			This probably gonna fuck me up in future but oh well
-		*/
-		patch::Nop(0x44070A,5,false);
+		//	Fix player model being broken after rebuild
+		patch::RedirectCall(0x5A834D,&PlayerModelBrokenFix);
 
 		aim_skin_changer = config.GetValue("aim_skin_changer", false);
 		Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\clothes\\"), ".jpg", search_categories, clothes_vec);

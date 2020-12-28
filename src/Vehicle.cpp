@@ -69,14 +69,9 @@ Vehicle::Vehicle()
 {
 	Events::initGameEvent += []
 	{
-		std::string dir_path = std::string(Globals::menu_path + "\\CheatMenu\\vehicles\\images\\");
-		Util::LoadTexturesInDirRecursive(dir_path.c_str(), ".jpg", spawner::search_categories, spawner::image_vec);
-
-		dir_path = std::string(Globals::menu_path + "\\CheatMenu\\vehicles\\components\\");
-		Util::LoadTexturesInDirRecursive(dir_path.c_str(), ".jpg", tune::search_categories, tune::image_vec);
-
-		dir_path = std::string(Globals::menu_path + "\\CheatMenu\\vehicles\\paintjobs\\");
-		Util::LoadTexturesInDirRecursive(dir_path.c_str(), ".png", texture9::search_categories, texture9::image_vec);
+		Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\vehicles\\images\\"), ".jpg", spawner::search_categories, spawner::image_vec);
+		Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\vehicles\\components\\"), ".jpg", tune::search_categories, tune::image_vec);
+		Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\vehicles\\paintjobs\\"), ".png", texture9::search_categories, texture9::image_vec);
 
 		ParseVehiclesIDE();
 		ParseCarcolsDAT();
@@ -492,7 +487,7 @@ void Vehicle::SpawnVehicle(std::string &smodel)
 			int hveh = 0;
 			if (spawner::spawn_inside)
 			{
-				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 2.0f, &hveh);
+				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 3.0f, &hveh);
 				veh = CPools::GetVehicle(hveh);
 				veh->SetHeading(player->GetHeading());
 				Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
@@ -502,7 +497,7 @@ void Vehicle::SpawnVehicle(std::string &smodel)
 			{	
 				player->TransformFromObjectSpace(pos, CVector(0, 10, 0));
 
-				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 2.0f, &hveh);
+				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 3.0f, &hveh);
 				veh = CPools::GetVehicle(hveh);
 				veh->SetHeading(player->GetHeading()+55.0f);
 			}

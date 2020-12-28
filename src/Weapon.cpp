@@ -11,6 +11,11 @@ bool Weapon::auto_aim = false;
 bool Weapon::fast_reload = false;
 bool Weapon::huge_damage = false;
 bool Weapon::long_range = false;
+bool Weapon::rapid_fire = false;
+bool Weapon::dual_weild = false;
+bool Weapon::move_aim = false;
+bool Weapon::move_fire = false;
+
 uchar Weapon::cur_weapon_slot = -1;
 int Weapon::ammo_count = 99999;
 
@@ -35,8 +40,7 @@ Weapon::Weapon()
 {
 	Events::initGameEvent += []
 	{
-		std::string dir_path = Globals::menu_path + "\\CheatMenu\\weapons\\";
-		Util::LoadTexturesInDirRecursive(dir_path.c_str(), ".jpg", Weapon::search_categories, Weapon::weapon_vec);
+		Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\weapons\\"), ".jpg", Weapon::search_categories, Weapon::weapon_vec);
 	};
 
 	Events::processScriptsEvent += []
@@ -44,9 +48,7 @@ Weapon::Weapon()
 		CPlayerPed *player = FindPlayerPed();
 		if (auto_aim)
 		{
-			float mouseX, mouseY;
-			Command<Commands::GET_PC_MOUSE_MOVEMENT>(&mouseX, &mouseY);
-			if (static_cast<int>(mouseY/2) == 0 || static_cast<int>(mouseX/2) == 0)
+			if (CPad::NewMouseControllerState.X == 0 && CPad::NewMouseControllerState.Y == 0)
 			{
 				if (KeyPressed(2))
 					CCamera::m_bUseMouse3rdPerson = false;
@@ -62,14 +64,27 @@ Weapon::Weapon()
 			CWeaponInfo *pweapon_info = CWeaponInfo::GetWeaponInfo(weapon_type, player->GetWeaponSkill(weapon_type));
 
 			if (huge_damage)
-				pweapon_info->m_nDamage = 1000;
+				pweapon_info->m_nDamage = 5000;
 
 			if (long_range)
 			{
 				pweapon_info->m_fTargetRange = 1000.0f;
 				pweapon_info->m_fWeaponRange = 1000.0f;
 				pweapon_info->m_fAccuracy = 1.0f;
+				pweapon_info->m_nFlags.bReload2Start = true;
 			}
+
+			if (rapid_fire)
+				pweapon_info->m_nFlags.bContinuosFire = true;
+
+			if (dual_weild  && (weapon_type == WEAPON_PISTOL || weapon_type == WEAPON_MICRO_UZI || weapon_type == WEAPON_TEC9 || weapon_type == WEAPON_SAWNOFF))
+				pweapon_info->m_nFlags.bTwinPistol = true;
+
+			if (move_aim)
+				pweapon_info->m_nFlags.bMoveAim = true;
+			
+			if (move_fire)
+				pweapon_info->m_nFlags.bMoveFire = true;
 
 			cur_weapon_slot = slot;
 		}
@@ -150,6 +165,11 @@ void Weapon::Main()
 			ImGui::Columns(2, 0, false);
 
 			Ui::CheckboxWithHint("Auto aim", &auto_aim, "Enables aim assist on keyboard\n\nQ = left    E = right");
+			if (Ui::CheckboxWithHint("Dual weild", &dual_weild,"Dual weild pistol, shawoff, uzi, tec9\n(Other weapons don't work)"))
+			{
+				if (!dual_weild)
+					CWeaponInfo::LoadWeaponData();
+			}
 			if (Ui::CheckboxWithHint("Huge damage", &huge_damage))
 			{
 				if (!huge_damage)
@@ -158,11 +178,28 @@ void Weapon::Main()
 			if (Ui::CheckboxWithHint("Fast reload", &fast_reload))
 				Command<Commands::SET_PLAYER_FAST_RELOAD>(hplayer, fast_reload);
 
-			ImGui::NextColumn();
 			Ui::CheckboxAddress("Infinite ammo", 0x969178);
+
+			ImGui::NextColumn();
+			
 			if (Ui::CheckboxWithHint("Long range", &long_range))
 			{
 				if (!long_range)
+					CWeaponInfo::LoadWeaponData();
+			}
+			if (Ui::CheckboxWithHint("Move when aiming", &move_aim))
+			{
+				if (!move_aim)
+					CWeaponInfo::LoadWeaponData();
+			}
+			if (Ui::CheckboxWithHint("Move when firing", &move_fire))
+			{
+				if (!move_fire)
+					CWeaponInfo::LoadWeaponData();
+			}
+			if (Ui::CheckboxWithHint("Rapid fire", &rapid_fire))
+			{
+				if (!rapid_fire)
 					CWeaponInfo::LoadWeaponData();
 			}
 			ImGui::Columns(1, 0, false);

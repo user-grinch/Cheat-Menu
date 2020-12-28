@@ -43,6 +43,25 @@ uint Game::solid_water_object = 0;
 
 CJson Game::random_cheats::name_json = CJson("cheat name");
 
+// Thanks to aap
+void RealTimeClock(void)
+{	
+	static int lastday;
+	time_t tmp = time(NULL);
+	struct tm *now = localtime(&tmp);
+	
+	if(now->tm_yday != lastday)
+		CStats::SetStatValue(0x86, CStats::GetStatValue(0x86) + 1.0f);
+
+	lastday = now->tm_yday;
+	CClock::ms_nGameClockMonth = now->tm_mon+1;
+	CClock::ms_nGameClockDays = now->tm_mday;
+	CClock::CurrentDay = now->tm_wday+1;
+	CClock::ms_nGameClockHours = now->tm_hour;
+	CClock::ms_nGameClockMinutes = now->tm_min;
+	CClock::ms_nGameClockSeconds = now->tm_sec;
+}
+
 Game::Game()
 {
 	Events::initGameEvent += []
@@ -294,7 +313,14 @@ of LS without completing missions"))
 					solid_water_object = 0;
 				}
 			}
-			ImGui::Checkbox("Sync system time", &sync_time);
+			if (ImGui::Checkbox("Sync system time", &sync_time))
+			{
+				Globals::gsync_time = sync_time;
+				if (sync_time)
+					patch::RedirectCall(0x53BFBD, &RealTimeClock);
+				else
+					patch::RedirectCall(0x53BFBD, &CClock::Update);
+			}
 
 			ImGui::Columns(1);
 			ImGui::EndTabItem();
@@ -342,7 +368,7 @@ of LS without completing missions"))
 			}
 			Ui::EditAddress<int>("Days passed", 0xB79038, 0, 9999);
 			Ui::EditReference("FPS limit", RsGlobal.frameLimit, 1, 30, 60);
-			Ui::EditReference("Game speed", CTimer::ms_fTimeScale,0, 1, 10);
+			Ui::EditReference("Game speed", CTimer::ms_fTimeScale,1, 1, 10);
 			Ui::EditFloat("Gravity", 0x863984, -1.0f, 0.008f, 1.0f);
 
 			if (ImGui::CollapsingHeader("Set time"))

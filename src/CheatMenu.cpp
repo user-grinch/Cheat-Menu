@@ -57,7 +57,8 @@ CheatMenu::CheatMenu()
 
 	Events::processScriptsEvent += [this]
 	{
-		if (Globals::init_done && !FrontEndMenuManager.m_bMenuActive && CTimer::m_snTimeInMilliseconds - Globals::last_key_timer > 250)
+		if (Globals::init_done && !FrontEndMenuManager.m_bMenuActive 
+		&& CTimer::m_snTimeInMilliseconds - Globals::last_key_timer > 250*CTimer::ms_fTimeScale)
 		{
 			if (Ui::HotKeyPressed(hotkey::menu_open))
 			{

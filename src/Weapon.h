@@ -14,6 +14,10 @@ private:
 	static bool fast_reload;
 	static bool huge_damage;
 	static bool long_range;
+	static bool rapid_fire;
+	static bool dual_weild;
+	static bool move_aim;
+	static bool move_fire;
 
 	static int ammo_count;
 	static uchar cur_weapon_slot;

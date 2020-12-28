@@ -10,6 +10,7 @@ bool Globals::init_done = false;
 Renderer Globals::renderer = Render_Unknown;
 ID3D11Device *Globals::device11 = nullptr;
 std::string Globals::menu_path = paths::GetPluginDirPathA();
+bool Globals::gsync_time = false;
 
 std::ofstream flog = std::ofstream("CheatMenu.log");
 CJson config = CJson("config");

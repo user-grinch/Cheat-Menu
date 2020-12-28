@@ -54,6 +54,7 @@
 #include "extensions\Paths.h"
 
 #include "external/imgui/imgui.h"
+#include "external/imgui/imgui_internal.h"
 #include "external/imgui/imgui_impl_dx9.h"
 #include "external/imgui/imgui_impl_dx11.h"
 #include "external/imgui/imgui_impl_win32.h"
@@ -90,6 +91,7 @@ struct Globals
 	static Renderer renderer;
 	static ID3D11Device* device11;
 	static std::string menu_path;
+	static bool gsync_time;
 };
 
 struct TextureStructure
