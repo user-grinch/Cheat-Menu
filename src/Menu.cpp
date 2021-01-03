@@ -1,7 +1,11 @@
 #include "pch.h"
+#include "MenuInfo.h"
 #include "Menu.h"
 #include "Teleport.h"
 #include "Weapon.h"
+#include "Vehicle.h"
+#include "Ui.h"
+#include "Util.h"
 
 bool Menu::overlay::coord = false;
 bool Menu::overlay::fps = false;
@@ -150,7 +154,12 @@ void Menu::ProcessShortcutsWindow()
 			ImGui::SetNextItemWidth(resX);
 			ImGui::SetKeyboardFocusHere(-1);
 
-			ImGui::InputTextWithHint("##TEXTFIELD", "Enter command", commands::input_buffer, INPUT_BUFFER_SIZE);
+			if (ImGui::InputTextWithHint("##TEXTFIELD", "Enter command", commands::input_buffer, INPUT_BUFFER_SIZE, ImGuiInputTextFlags_EnterReturnsTrue))
+			{
+				ProcessCommands();
+				commands::show_menu = false;
+				strcpy(commands::input_buffer,"");
+			}
 			
 			ImGui::PopStyleVar(2);
 			ImGui::End();
@@ -239,6 +248,22 @@ void Menu::ProcessCommands()
 				CHud::SetHelpMessage("Invalid command", false, false, false);
 		}
 		
+		return;
+	}
+	if (command == "veh")
+	{ 
+		std::string veh_name;
+		ss >> veh_name;
+		
+		int model = Vehicle::GetModelFromName(veh_name.c_str());
+		if (model != 0)
+		{
+			Vehicle::SpawnVehicle(std::to_string(model));
+			CHud::SetHelpMessage("Vehicle spawned", false, false, false);
+		}
+		else
+			CHud::SetHelpMessage("Invalid command", false, false, false);
+
 		return;
 	}
 }

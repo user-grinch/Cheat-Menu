@@ -12,6 +12,7 @@ private:
 	static bool veh_nodmg;
 	static int door_menu_button;
 	static std::string door_names[6];
+	static int veh_remove_radius;
 
 	static bool lock_speed;
 	static float lock_speed_val;
@@ -69,17 +70,16 @@ private:
 		static bool enabled;
 		static bool comp_added;
 	};
-	
+public:
 	static void AddComponent(const std::string& component, const bool display_message = true);
 	static void RemoveComponent(const std::string& component, const bool display_message = true);
 	static std::string GetNameFromModel(int model);
+	static int Vehicle::GetModelFromName(const char* name);
 	static void SpawnVehicle(std::string &name);
 	static int GetRandomTrainIdForModel(int model);
 	static void ParseVehiclesIDE();
 	static void ParseCarcolsDAT();
 	static void GenerateHandlingDataFile(int phandling);
-	
-public:
 	Vehicle();
 	~Vehicle();
 	static void Main();

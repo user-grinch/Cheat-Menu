@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Teleport.h"
 #include "Menu.h"
+#include "Ui.h"
+#include "Util.h"
 
 bool Teleport::insert_coord = false;
 bool Teleport::quick_teleport = false;
@@ -75,6 +77,7 @@ Teleport::Teleport()
 			STeleport::_bool = false;
 			Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(player), false);
 			Command<Commands::SET_CAMERA_BEHIND_PLAYER>();
+			TheCamera.Fade(0,1);
 		}
 		
 		if (quick_teleport)
@@ -111,7 +114,7 @@ void Teleport::TeleportPlayer(bool get_marker, CVector* pos, short interior_id)
 		Teleport::STeleport::pos = *pos;
 		Teleport::STeleport::timer = CTimer::m_snTimeInMilliseconds;
 		Teleport::STeleport::_bool = true;
-
+		TheCamera.Fade(0,0);
 		Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(player), true);
 	}
 
@@ -221,7 +224,7 @@ void Teleport::Main()
 						pos.y = std::stof(temp);
 
 						getline(ss, temp, ',');
-						pos.z = std::stof(temp);
+						pos.z = std::stof(temp) + 1.0f;
 
 						Teleport::TeleportPlayer(false,&pos);
 					}

@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "Animation.h"
+#include "Ui.h"
+#include "Util.h"
 
 bool Animation::loop = false;
 bool Animation::secondary = false;

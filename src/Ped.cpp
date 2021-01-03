@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "Ped.h"
+#include "Ui.h"
+#include "Util.h"
 
 ImGuiTextFilter Ped::filter = "";
 std::string Ped::selected_item = "All";
@@ -13,6 +15,7 @@ std::vector<std::string> Ped::gang_names = { "Ballas", "Grove street families", 
 "Da nang boys", "Mafia", "Mountain cloud triad", "Varrio los aztecas", "Gang9", "Gang10" };
 
 bool Ped::exgangwars_installed = false;
+int Ped::ped_remove_radius = 5;
 
 std::vector<CPed*> Ped::spawn_ped::list;
 int Ped::spawn_ped::accuracy = 50;
@@ -25,14 +28,11 @@ int Ped::spawn_ped::weapon_id = 0;
 std::vector<std::string> Ped::spawn_ped::ped_type = {"Civ male","Civ female","Cop","Ballas","Grove Street Families","Los Santos Vagos",
 											"San Fierro Rifa","Da Nang Boys","Mafia","Mountain Cloud Triads","Varrio Los Aztecas",
 											"Gang 9","Medic","Dealer","Criminal","Fireman","Prostitute"};
-
-
 Ped::Ped()
 {
 	Events::initGameEvent += []
 	{
-		std::string dir_path = Globals::menu_path +"\\CheatMenu\\peds\\";
-		Util::LoadTexturesInDirRecursive(dir_path.c_str(), ".jpg", search_categories, peds_vec);
+		Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\peds\\"), ".jpg", search_categories, peds_vec);
 
 		if (LoadLibraryW(L"ExGangWars.asi"))
 			exgangwars_installed = true;
@@ -200,11 +200,28 @@ void Ped::Main()
 
 			if (ImGui::CollapsingHeader("Recruit anyone"))
 			{
-				Ui::RadioButtonAddress("Select weapon", std::vector<Ui::NamedMemory>{ {"9mm", 0x96917C}, { "AK47", 0x96917D }, { "Rockets", 0x96917E }});
+				static std::vector<Ui::NamedMemory> select_weapon{ {"9mm", 0x96917C}, { "AK47", 0x96917D }, { "Rockets", 0x96917E }};
+				Ui::RadioButtonAddress("Select weapon", select_weapon);
 				ImGui::Spacing();
 				ImGui::Separator();
 			}
-
+			if (ImGui::CollapsingHeader("Remove peds in radius"))
+			{
+				ImGui::InputInt("Radius", &ped_remove_radius);
+				ImGui::Spacing();
+				if (ImGui::Button("Remove peds",Ui::GetSize(1)))
+				{
+					CPlayerPed *player = FindPlayerPed();
+					for (CPed *ped : CPools::ms_pPedPool)
+					{
+						if (DistanceBetweenPoints(ped->GetPosition(),player->GetPosition()) < ped_remove_radius
+						&& ped->m_pVehicle == nullptr && ped != player)
+							Command<Commands::DELETE_CHAR>(CPools::GetPedRef(ped));
+					}
+				}
+				ImGui::Spacing();
+				ImGui::Separator();
+			}
 			ImGui::EndChild();
 			ImGui::EndTabItem();
 		}

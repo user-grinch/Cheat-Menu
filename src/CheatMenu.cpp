@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "CheatMenu.h"
+#include "MenuInfo.h"
+#include "Ui.h"
 
 unsortedMap CheatMenu::header{
 	{ "Teleport", &Teleport::Main },{ "Player", &Player::Main },{ "Ped", &Ped::Main },
@@ -10,7 +12,7 @@ unsortedMap CheatMenu::header{
 void CheatMenu::ProcessMenu()
 {
 	ImGui::SetNextWindowSize(Globals::menu_size);
-	if (ImGui::Begin(Globals::menu_title.c_str(), &Globals::show_menu, ImGuiWindowFlags_NoCollapse))
+	if (ImGui::Begin(MENU_TITLE, &Globals::show_menu, ImGuiWindowFlags_NoCollapse))
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(250, 350));
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetWindowWidth() / 85, ImGui::GetWindowHeight() / 200));
@@ -49,7 +51,7 @@ CheatMenu::CheatMenu()
 	Events::initRwEvent += []()
 	{
 		// Load menu settings
-		Globals::header_id = config.GetValueStr("window.id","");
+		Globals::header_id = config.GetValue("window.id",std::string(""));
 		Globals::menu_size.x = config.GetValue("window.sizeX", screen::GetScreenWidth() / 4.0f);
 		Globals::menu_size.y = config.GetValue("window.sizeY", screen::GetScreenHeight() / 1.2f);
 		srand(CTimer::m_snTimeInMilliseconds);
@@ -68,7 +70,13 @@ CheatMenu::CheatMenu()
 
 			if (Ui::HotKeyPressed(hotkey::command_window))
 			{
+				if (Menu::commands::show_menu)
+				{
+					Menu::ProcessCommands();
+					strcpy(commands::input_buffer,"");
+				}
 				Menu::commands::show_menu = !Menu::commands::show_menu;
+
 				Globals::last_key_timer = CTimer::m_snTimeInMilliseconds;
 			}
 

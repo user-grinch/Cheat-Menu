@@ -99,7 +99,7 @@ void Ui::DrawHeaders(unsortedMap& data)
 		if (ImGui::Button(btn_text, GetSize(3, false)))
 		{
 			Globals::header_id = btn_text;
-			config.SetValueStr("window.id", Globals::header_id);
+			config.SetValue("window.id", Globals::header_id);
 			func = it->second;
 		}
 
@@ -117,8 +117,7 @@ void Ui::DrawHeaders(unsortedMap& data)
 		// Show Welcome page
 		ImGui::NewLine();
 
-		std::string title = "Welcome to " + Globals::menu_title; 
-		Ui::CenterdText(title.c_str());
+		Ui::CenterdText("Welcome to Cheat Menu");
 		Ui::CenterdText("Author: Grinch_");
 
 		ImGui::NewLine();

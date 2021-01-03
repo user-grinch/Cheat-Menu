@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "NeonAPI.h"
+#include "Util.h"
 
 VehicleExtendedData<NeonAPI::NeonData> NeonAPI::VehNeon;
 RwTexture* NeonAPI::neon_texture = nullptr;

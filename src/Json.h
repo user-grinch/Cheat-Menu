@@ -1,5 +1,5 @@
 #pragma once
-#include "external\json.hpp"
+#include "vendor\json.hpp"
 
 class CJson
 {
@@ -13,8 +13,7 @@ public:
 		Returns a value from json structure hierarchy using '.' 
 		Example: "Menu.Window.X"
 	*/
-	// overload since typeid(std::string) doesn't work
-	std::string GetValueStr(std::string&& key, std::string&& default_val);
+	// specialize since typeid(std::string) doesn't work
 
 	template <typename T>
 	T GetValue(std::string&& key, T&& default_val)
@@ -40,6 +39,25 @@ public:
 			return default_val;
 		}
 	}
+	
+	template<>
+	std::string GetValue(std::string&& key, std::string&& default_val)
+	{
+		try {
+			std::stringstream ss(key);
+			std::string line;
+
+			nlohmann::json *json = &data;
+
+			while (getline(ss, line, '.'))
+				json = &((*json)[line]);
+
+			return json->get<std::string>();
+		}
+		catch (...) {
+			return default_val;
+		}
+	}
 
 	/*
 		Allows to save values in json hierarchy using '.' 
@@ -47,7 +65,7 @@ public:
 	*/
 
 	template <typename T>
-	void SetValue(std::string&& key, T&& val)
+	void SetValue(std::string&& key, T& val)
 	{
 		std::stringstream ss(key);
 		std::string line;
@@ -64,7 +82,19 @@ public:
 			*json = val;
 	}
 
-	void SetValueStr(std::string&& key, std::string& val);
+	template<>
+	void SetValue(std::string&& key, std::string& val)
+	{
+		std::stringstream ss(key);
+		std::string line;
+
+		nlohmann::json *json = &data;
+
+		while (getline(ss, line, '.'))
+			json = &((*json)[line]);
+
+		*json = val;
+	}
 	/*
 		Loads the section names into a category vector. 
 		Used to create drop down category menus

@@ -3,8 +3,6 @@
 
 #define INPUT_BUFFER_SIZE 64
 #define SPAWN_PED_LIMIT 20
-#define MENU_VERSION "2.5-beta"
-#define BUILD_NUMBER "20201227"
 #define STB_IMAGE_IMPLEMENTATION
 #define DISCORD_INVITE "https://discord.gg/ZzW7kmf"
 #define GITHUB_LINK "https://github.com/user-grinch/Cheat-Menu"
@@ -53,11 +51,11 @@
 #include "eVehicleClass.h"
 #include "extensions\Paths.h"
 
-#include "external/imgui/imgui.h"
-#include "external/imgui/imgui_internal.h"
-#include "external/imgui/imgui_impl_dx9.h"
-#include "external/imgui/imgui_impl_dx11.h"
-#include "external/imgui/imgui_impl_win32.h"
+#include "vendor/imgui/imgui.h"
+#include "vendor/imgui/imgui_internal.h"
+#include "vendor/imgui/imgui_impl_dx9.h"
+#include "vendor/imgui/imgui_impl_dx11.h"
+#include "vendor/imgui/imgui_impl_win32.h"
 
 #include "Events.h"
 #include "Json.h"
@@ -84,13 +82,11 @@ struct Globals
 	static std::string header_id;
 	static int last_key_timer;
 	static ImVec2 menu_size;
-	static std::string menu_title;
 	static ImVec2 font_screen_size;
 	static bool show_menu;
 	static bool init_done;
 	static Renderer renderer;
 	static ID3D11Device* device11;
-	static std::string menu_path;
 	static bool gsync_time;
 };
 
@@ -104,6 +100,3 @@ struct TextureStructure
 
 extern CJson config;
 extern std::ofstream flog;
-
-#include "Ui.h"
-#include "Util.h"

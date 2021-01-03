@@ -1,5 +1,5 @@
 #pragma once
-#include "external/moon/vehicle_renderer.h"
+#include "vendor/moon/vehicle_renderer.h"
 
 class Paint : VehicleRenderer
 {

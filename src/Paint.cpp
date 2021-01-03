@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Paint.h"
 #include "NodeName.h"
+#include "Util.h"
 
 std::vector<std::string> Paint::veh_nodes::names_vec{ "Default" };
 std::string Paint::veh_nodes::selected = "Default";

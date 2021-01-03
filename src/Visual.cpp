@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "Visual.h"
+#include "Ui.h"
+#include "Util.h"
 
 bool Visual::lock_weather = false;
 int Visual::weather_type_backup = 0;

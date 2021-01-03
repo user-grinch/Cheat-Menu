@@ -1,12 +1,14 @@
 #include "pch.h"
 #include "Vehicle.h"
+#include "Ui.h"
+#include "Util.h"
 
 bool Vehicle::bike_fly = false;
 bool Vehicle::dont_fall_bike = false;
 bool Vehicle::veh_heavy = false;
 bool Vehicle::veh_watertight = false;
 bool Vehicle::veh_nodmg = false;
-
+int Vehicle::veh_remove_radius = 5;
 bool Vehicle::lock_speed = false;
 float Vehicle::lock_speed_val = 0;
 
@@ -517,6 +519,17 @@ std::string Vehicle::GetNameFromModel(int model)
 	return (const char*)info + 0x32;
 }
 
+int Vehicle::GetModelFromName(const char* name)
+{
+	int model = 0;
+	CBaseModelInfo* model_info = CModelInfo::GetModelInfo((char*)name,&model);
+
+	if (model > 0 && model < 1000000 && GetNameFromModel(model) != "")
+		return model;
+	else
+		return 0;
+}
+
 Vehicle::~Vehicle()
 {
 }
@@ -753,7 +766,7 @@ void Vehicle::Main()
 			{
 				CPlayerPed *player = FindPlayerPed();
 				int hplayer = CPools::GetPedRef(player);
-				CVehicle *veh = Util::GetClosestVehicle(player);
+				CVehicle *veh = Util::GetClosestVehicle();
 
 				if (veh)
 				{
@@ -786,7 +799,23 @@ void Vehicle::Main()
 				ImGui::Spacing();
 				ImGui::Separator();
 			}
-
+			if (ImGui::CollapsingHeader("Remove vehicles in radius"))
+			{
+				ImGui::InputInt("Radius", &veh_remove_radius);
+				ImGui::Spacing();
+				if (ImGui::Button("Remove vehicles",Ui::GetSize(1)))
+				{
+					CPlayerPed *player = FindPlayerPed();
+					for (CVehicle *veh : CPools::ms_pVehiclePool)
+					{
+						if (DistanceBetweenPoints(veh->GetPosition(),player->GetPosition()) < veh_remove_radius
+						&& player->m_pVehicle != veh)
+							Command<Commands::DELETE_CAR>(CPools::GetVehicleRef(veh));
+					}
+				}
+				ImGui::Spacing();
+				ImGui::Separator();
+			}
 			if (ImGui::CollapsingHeader("Traffic options"))
 			{
 				static std::vector<Ui::NamedMemory> color{ {"Black", 0x969151}, { "Pink",0x969150 } };

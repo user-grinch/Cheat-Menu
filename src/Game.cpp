@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "Game.h"
 #include "Menu.h"
+#include "Ui.h"
+#include "Util.h"
 
 ImGuiTextFilter Game::filter = "";
 std::vector<std::string> Game::search_categories;
@@ -42,6 +44,8 @@ uint Game::sync_time_timer = 0;
 uint Game::solid_water_object = 0;
 
 CJson Game::random_cheats::name_json = CJson("cheat name");
+
+static bool mission_warning_shown = false;
 
 // Thanks to aap
 void RealTimeClock(void)
@@ -431,15 +435,26 @@ of LS without completing missions"))
 		{
 			ImGui::Spacing();
 
-			if (ImGui::Button("Fail current mission", ImVec2(Ui::GetSize())))
+			if (!mission_warning_shown)
 			{
-				if (!CCutsceneMgr::ms_running)
-					Command<Commands::FAIL_CURRENT_MISSION>();
+				ImGui::TextWrapped("Mission selector might cause unintended changes to your game. \
+It's recommanded not to save your game after using this. Use it at your own risk!");
+				ImGui::Spacing();
+				if (ImGui::Button("Show mission selector", ImVec2(Ui::GetSize())))\
+					mission_warning_shown = true;
 			}
+			else
+			{
+				if (ImGui::Button("Fail current mission", ImVec2(Ui::GetSize())))
+				{
+					if (!CCutsceneMgr::ms_running)
+						Command<Commands::FAIL_CURRENT_MISSION>();
+				}
 
-			ImGui::Spacing();
+				ImGui::Spacing();
 
-			Ui::DrawJSON(json, search_categories, selected_item, filter, SetPlayerMission, nullptr);
+				Ui::DrawJSON(json, search_categories, selected_item, filter, SetPlayerMission, nullptr);
+			}
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem("Stats"))

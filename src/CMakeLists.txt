@@ -1,23 +1,13 @@
 ################################################################################
 # Source groups
 ################################################################################
-set(no_group_source_files
+set(src_files
     "Animation.cpp"
     "Animation.h"
     "CheatMenu.cpp"
     "CheatMenu.h"
     "Events.cpp"
     "Events.h"
-    "external/imgui/imgui_impl_dx11.cpp"
-    "external/imgui/imgui_impl_dx11.h"
-    "external/imgui/stb_image.h"
-    "external/json.hpp"
-    "external/kiero/kiero.cpp"
-    "external/kiero/kiero.h"
-    "external/kiero/minhook/include/MinHook.h"
-    "external/moon/pool_object_extender.h"
-    "external/moon/vehicle_renderer.h"
-    "external/moon/vehicle_renderer.cpp"
     "Game.cpp"
     "Game.h"
     "Hook.cpp"
@@ -26,6 +16,7 @@ set(no_group_source_files
     "Json.h"
     "Menu.cpp"
     "Menu.h"
+    "MenuInfo.h"
     "NeonAPI.cpp"
     "NeonAPI.h"
     "Paint.cpp"
@@ -50,35 +41,11 @@ set(no_group_source_files
     "Weapon.cpp"
     "Weapon.h"
 )
-source_group("" FILES ${no_group_source_files})
-
-set(external
-    "external/imgui/imconfig.h"
-    "external/imgui/imgui.cpp"
-    "external/imgui/imgui.h"
-    "external/imgui/imgui_demo.cpp"
-    "external/imgui/imgui_draw.cpp"
-    "external/imgui/imgui_impl_dx9.cpp"
-    "external/imgui/imgui_impl_dx9.h"
-    "external/imgui/imgui_impl_win32.cpp"
-    "external/imgui/imgui_impl_win32.h"
-    "external/imgui/imgui_internal.h"
-    "external/imgui/imgui_widgets.cpp"
-    "external/imgui/imstb_rectpack.h"
-    "external/imgui/imstb_textedit.h"
-    "external/imgui/imstb_truetype.h"
-)
-source_group("external" FILES ${external})
-
-set(ALL_FILES
-    ${no_group_source_files}
-    ${external}
-)
 
 ################################################################################
 # Target
 ################################################################################
-add_library(${PROJECT_NAME} SHARED ${ALL_FILES})
+add_library(${PROJECT_NAME} SHARED ${src_files})
 
 add_precompiled_header(${PROJECT_NAME} "pch.h" "pch.cpp")
 
@@ -155,48 +122,15 @@ if(MSVC)
     string(CONCAT FILE_CL_OPTIONS
         "/Y-"
     )
-    source_file_compile_options(external/imgui/imgui_impl_dx11.cpp ${FILE_CL_OPTIONS})
-    string(CONCAT FILE_CL_OPTIONS
-        "/Y-"
-    )
-    source_file_compile_options(external/kiero/kiero.cpp ${FILE_CL_OPTIONS})
-    string(CONCAT FILE_CL_OPTIONS
-        "/Y-"
-    )
-    source_file_compile_options(external/moon/vehicle_renderer.cpp ${FILE_CL_OPTIONS})
-    string(CONCAT FILE_CL_OPTIONS
-        "/Y-"
-    )
-    source_file_compile_options(external/imgui/imgui.cpp ${FILE_CL_OPTIONS})
-    string(CONCAT FILE_CL_OPTIONS
-        "/Y-"
-    )
-    source_file_compile_options(external/imgui/imgui_demo.cpp ${FILE_CL_OPTIONS})
-    string(CONCAT FILE_CL_OPTIONS
-        "/Y-"
-    )
-    source_file_compile_options(external/imgui/imgui_draw.cpp ${FILE_CL_OPTIONS})
-    string(CONCAT FILE_CL_OPTIONS
-        "/Y-"
-    )
-    source_file_compile_options(external/imgui/imgui_impl_dx9.cpp ${FILE_CL_OPTIONS})
-    string(CONCAT FILE_CL_OPTIONS
-        "/Y-"
-    )
-    source_file_compile_options(external/imgui/imgui_impl_win32.cpp ${FILE_CL_OPTIONS})
-    string(CONCAT FILE_CL_OPTIONS
-        "/Y-"
-    )
-    source_file_compile_options(external/imgui/imgui_widgets.cpp ${FILE_CL_OPTIONS})
     target_link_options(${PROJECT_NAME} PRIVATE
         $<$<CONFIG:Release>:
-            /SAFESEH:NO;
             /OPT:REF;
             /LTCG;
-            /OPT:ICF
+            /OPT:ICF;
         >
         $<$<CONFIG:Debug>:
             /DEBUG:FULL;
+            /SAFESEH:NO;
         >
         /SUBSYSTEM:WINDOWS
     )
@@ -218,21 +152,23 @@ add_custom_command_if(
 ################################################################################
 target_link_libraries(${PROJECT_NAME} PUBLIC 
 optimized plugin
-optimized libMinHook-x86-v140-mt
-optimized libMinHook-x86-v140-md
 debug plugin_d
-debug libMinHook-x86-v140-mtd
-debug libMinHook-x86-v140-mdd
 d3d9
 d3dx9
 d3d11
 d3dx11
 XInput9_1_0
+Vendor
 )
 
 target_link_directories(${PROJECT_NAME} PUBLIC
     "${PLUGIN_SDK_DIR}/output/lib/"
-    "$ENV{DIRECTX9_SDK_DIR}/lib/x86/"
-    "external/kiero/minhook/lib/"
+    "${DX9_DIR}/lib/x86/"
+    "$<$<CONFIG:Release>:"
+        "vendor/Release/"
+    ">"
+    "$<$<CONFIG:Debug>:"
+        "vendor/Debug/"
+    ">"
 )
 

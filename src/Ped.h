@@ -16,6 +16,7 @@ private:
 	static std::vector<std::string> gang_names;
 	static bool exgangwars_installed;
 
+	static int ped_remove_radius;
 
 	struct spawn_ped {
 		static std::vector<CPed*> list;

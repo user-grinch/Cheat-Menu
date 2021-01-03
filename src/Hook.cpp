@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Hook.h"
-#include "external/kiero/kiero.h"
-#include "external/kiero/minhook/include/MinHook.h"
+#include "vendor/kiero/kiero.h"
+#include "vendor/kiero/minhook/include/MinHook.h"
 
 WNDPROC Hook::oWndProc = NULL;
 f_Reset Hook::oReset9 = NULL; 
@@ -15,7 +15,6 @@ std::function<void()> Hook::window_func = NULL;
 
 LRESULT Hook::InputProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-
 	ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 
 	if (ImGui::GetIO().WantTextInput)
@@ -58,14 +57,6 @@ HRESULT Hook::PresentDx9(IDirect3DDevice9 *pDevice, RECT* pSourceRect, RECT* pDe
 			ImGui_ImplDX9_InvalidateDeviceObjects();
 
 			Globals::font_screen_size = ImVec2(screen::GetScreenWidth(), screen::GetScreenHeight());
-		}
-
-		static RwBool fullscreen = RsGlobal.ps->fullScreen;
-		if (fullscreen != RsGlobal.ps->fullScreen)	
-		{	
-			flog << "LETS GO" << std::endl;
-			fullscreen = RsGlobal.ps->fullScreen;	
-			ImGui_ImplDX9_InvalidateDeviceObjects();
 		}
 
 		ImGui_ImplDX9_NewFrame();
@@ -164,6 +155,7 @@ HRESULT Hook::PresentDx11(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Fl
 	return oPresent11(pSwapChain, SyncInterval, Flags);
 }
 
+// Thanks imring
 void Hook::ShowMouse(bool state)
 {
 	if (state)

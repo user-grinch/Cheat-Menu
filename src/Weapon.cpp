@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "Weapon.h"
+#include "Ui.h"
+#include "Util.h"
 
 ImGuiTextFilter Weapon::filter = "";
 std::string Weapon::selected_item = "All";
@@ -117,9 +119,17 @@ void Weapon::GiveWeaponToPlayer(std::string& weapon_type)
 		Command<Commands::GET_WEAPONTYPE_MODEL>(iweapon_type, &model);
 
 		CStreaming::RequestModel(model,PRIORITY_REQUEST);
+
+		if (model == 363) // remote bomb
+			CStreaming::RequestModel(364,PRIORITY_REQUEST); // detonator
+
 		CStreaming::LoadAllRequestedModels(false);
 
 		Command<Commands::GIVE_WEAPON_TO_CHAR>(hplayer, iweapon_type, ammo_count);
+
+		if (model == 363) // remote bomb
+			Command<Commands::MARK_MODEL_AS_NO_LONGER_NEEDED>(364); // detonator
+
 		Command<Commands::MARK_MODEL_AS_NO_LONGER_NEEDED>(model);
 	} 
 }

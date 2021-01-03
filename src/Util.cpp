@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Util.h"
-#include "external/imgui/stb_image.h"
+#include "vendor/imgui/stb_image.h"
 
 void Util::ClearCharTasksVehCheck(CPed* ped)
 {
@@ -166,10 +166,11 @@ int Util::GetLargestGangInZone()
 	return gang_id;
 }
 
-// partial implemention of opcode 0AB5 (STORE_CLOSEST_ENTITIES)
+// implemention of opcode 0AB5 (STORE_CLOSEST_ENTITIES)
 // https://github.com/cleolibrary/CLEO4/blob/916d400f4a731ba1dd0ff16e52bdb056f42b7038/source/CCustomOpcodeSystem.cpp#L1671
-CVehicle* Util::GetClosestVehicle(CPlayerPed* player)
+CVehicle* Util::GetClosestVehicle()
 {
+	CPlayerPed *player = FindPlayerPed();
 	CPedIntelligence *pedintel;
 	if (player && (pedintel = player->m_pIntelligence))
 	{
@@ -183,6 +184,27 @@ CVehicle* Util::GetClosestVehicle(CPlayerPed* player)
 		}
 
 		return veh;
+	}
+	return nullptr;
+}
+
+CPed* Util::GetClosestPed()
+{
+	CPlayerPed *player = FindPlayerPed();
+	CPedIntelligence * pedintel;
+	if (player && (pedintel = player->m_pIntelligence))
+	{
+		CPed *ped = nullptr;
+
+		for (int i = 0; i < 16; i++)
+		{
+			ped = (CPed*)pedintel->m_pedScanner.m_apEntities[i];
+			if (ped && ped != player && (ped->m_nCreatedBy & 0xFF) == 1 && !ped->m_nPedFlags.bFadeOut)
+				break;
+			ped = nullptr;
+		}
+
+		return ped;
 	}
 	return nullptr;
 }

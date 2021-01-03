@@ -39,37 +39,6 @@ void CJson::LoadData(std::vector<std::string>& vec, std::string& selected) // Te
 		vec.push_back(element.key());
 }
 
-std::string CJson::GetValueStr(std::string&& key, std::string&& default_val)
-{
-	try {
-		std::stringstream ss(key);
-		std::string line;
-
-		nlohmann::json *json = &data;
-
-		while (getline(ss, line, '.'))
-			json = &((*json)[line]);
-		
-		return json->get<std::string>();
-	}
-	catch (...) {
-		return default_val;
-	}
-}
-
-void CJson::SetValueStr(std::string&& key, std::string& val)
-{
-	std::stringstream ss(key);
-	std::string line;
-
-	nlohmann::json *json = &data;
-
-	while (getline(ss, line, '.'))
-		json = &((*json)[line]);
-
-	*json = val;
-}
-
 CJson::~CJson()
 {
 	// Saving here won't work on crash

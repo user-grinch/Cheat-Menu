@@ -1,8 +1,9 @@
 #include "pch.h"
 #include "Player.h"
 #include "Ped.h"
-#include "CCheat.h"
 #include "Menu.h"
+#include "Ui.h"
+#include "Util.h"
 
 bool Player::keep_position::state = false;
 CVector Player::keep_position::pos = CVector();
