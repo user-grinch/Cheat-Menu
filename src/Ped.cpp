@@ -169,9 +169,10 @@ void Ped::Main()
 				for (int i = 0; i != 10; ++i)
 				{
 					CVector pos = FindPlayerPed()->GetPosition();
-					CZone *zone = &CZone();
+					CZone szone = CZone();
+					CZone *pZone = &szone;
 
-					CZoneExtraInfo *zone_info = CTheZones::GetZoneInfo(&pos, &zone);
+					CZoneExtraInfo *zone_info = CTheZones::GetZoneInfo(&pos, &pZone);
 					int density = zone_info->m_nGangDensity[i];
 
 					if (ImGui::SliderInt(Ped::gang_names[i].c_str(), &density, 0, 127))

@@ -256,7 +256,7 @@ void Vehicle::ParseVehiclesIDE()
 {
 	std::string file_path = std::string(paths::GetGameDirPathA()) + "/data/vehicles.ide";
 
-	if (std::experimental::filesystem::exists(file_path))
+	if (fs::exists(file_path))
 	{
 		std::ifstream file(file_path);
 		std::string line;
@@ -301,7 +301,7 @@ void Vehicle::ParseCarcolsDAT()
 {
 	std::string file_path = std::string(paths::GetGameDirPathA()) + "/data/carcols.dat";
 
-	if (std::experimental::filesystem::exists(file_path))
+	if (fs::exists(file_path))
 	{
 		std::ifstream file(file_path);
 		std::string line;
@@ -483,7 +483,7 @@ void Vehicle::SpawnVehicle(std::string &smodel)
 			CStreaming::RequestModel(imodel, PRIORITY_REQUEST);
 			CStreaming::LoadAllRequestedModels(false);
 
-			if (spawner::license_text != "")
+			if (spawner::license_text[0] != '\0')
 				Command<Commands::CUSTOM_PLATE_FOR_NEXT_CAR>(imodel, spawner::license_text);
 
 			int hveh = 0;
@@ -992,7 +992,7 @@ void Vehicle::Main()
 
 				ImVec2 size = Ui::GetSize();
 				int btns_in_row = ImGui::GetWindowContentRegionWidth() / (size.y * 2);
-				int btn_size = (ImGui::GetWindowContentRegionWidth() - ImGuiStyleVar_ItemSpacing*(btns_in_row - 0.6*btns_in_row)) / btns_in_row;
+				int btn_size = (ImGui::GetWindowContentRegionWidth() - int(ImGuiStyleVar_ItemSpacing)*(btns_in_row - 0.6*btns_in_row)) / btns_in_row;
 
 				ImGui::BeginChild("Colorss");
 
@@ -1060,7 +1060,7 @@ Only some vehicles will have them.");
 				int count = (int)carcols_color_values.size();
 				ImVec2 size = Ui::GetSize();
 				int btns_in_row = ImGui::GetWindowContentRegionWidth() / (size.y * 2);
-				int btn_size = (ImGui::GetWindowContentRegionWidth() - ImGuiStyleVar_ItemSpacing*(btns_in_row - 0.6*btns_in_row)) / btns_in_row;
+				int btn_size = (ImGui::GetWindowContentRegionWidth() - int(ImGuiStyleVar_ItemSpacing)*(btns_in_row - 0.6*btns_in_row)) / btns_in_row;
 
 				ImGui::BeginChild("Neonss");
 
@@ -1176,7 +1176,8 @@ Only some vehicles will have them.");
 				
 				ImGui::BeginChild("HandlingChild");
 
-				Ui::EditRadioButtonAddressEx("Abs", phandling + 0x9C, std::vector<Ui::NamedValue>{{ "On", 1 }, { "Off", 0 }});
+				static std::vector<Ui::NamedValue> abs{{ "On", 1 }, { "Off", 0 }};
+				Ui::EditRadioButtonAddressEx("Abs", phandling + 0x9C, abs);
 
 				Ui::EditFloat("Anti dive multiplier", phandling + 0xC4, 0.0f, 0.0f, 1.0f);
 				Ui::EditFloat("Brake bias", phandling + 0x98, 0.0f, 0.0f, 1.0f);
@@ -1188,13 +1189,17 @@ Only some vehicles will have them.");
 				Ui::EditFloat("Damping level", phandling + 0xB0, -10.0f, -10.0f, 10.0f); // test later
 				Ui::EditFloat("Drag mult", phandling + 0x10, 0.0f, 0.0f, 30.0f);
 
-				Ui::EditRadioButtonAddressEx("Drive type", phandling + 0x74, std::vector<Ui::NamedValue>{ { "Front wheel drive", 70 }, { "Rear wheel drive", 82 }, { "Four wheel drive", 52 }});
+				static std::vector<Ui::NamedValue> drive_type{ { "Front wheel drive", 70 }, { "Rear wheel drive", 82 }, { "Four wheel drive", 52 }};
+				Ui::EditRadioButtonAddressEx("Drive type", phandling + 0x74, drive_type);
 
 				Ui::EditFloat("Engine acceleration", phandling + 0x7C, 0.0f, 0.0f, 49.0f, 12500.0f);
 				Ui::EditFloat("Engine inertia", phandling + 0x80, 0.0f, 0.0f, 400.0f);
 
-				Ui::EditRadioButtonAddressEx("Engine type", phandling + 0x75, std::vector<Ui::NamedValue>{ { "Petrol", 80 }, { "Diseal", 68 }, { "Electric", 69 }});
-				Ui::EditRadioButtonAddressEx("Front lights", phandling + 0xDC, std::vector<Ui::NamedValue>{ { "Long", 0 }, { "Small", 1 }, { "Big", 2 }, { "Tall", 3 }});
+				static std::vector<Ui::NamedValue> engine_type{ { "Petrol", 80 }, { "Diseal", 68 }, { "Electric", 69 }};
+				Ui::EditRadioButtonAddressEx("Engine type", phandling + 0x75, engine_type);
+
+				std::vector<Ui::NamedValue> front_lights{ { "Long", 0 }, { "Small", 1 }, { "Big", 2 }, { "Tall", 3 }};
+				Ui::EditRadioButtonAddressEx("Front lights", phandling + 0xDC, front_lights);
 
 				Ui::EditFloat("Force level", phandling + 0xAC, -10.0f, -10.0f, 10.0f); // test later
 
@@ -1212,7 +1217,8 @@ Only some vehicles will have them.");
 				Ui::EditAddress<BYTE>("Number of gears", phandling + 0x76, 1, 1, 10);
 				Ui::EditAddress<BYTE>("Percent submerged", phandling + 0x20, 10, 10, 120);
 
-				Ui::EditRadioButtonAddressEx("Rear lights", phandling + 0xDD, std::vector<Ui::NamedValue>{ { "Long", 0 }, { "Small", 1 }, { "Big", 2 }, { "Tall", 3 }});
+				static std::vector<Ui::NamedValue> rear_lights{ { "Long", 0 }, { "Small", 1 }, { "Big", 2 }, { "Tall", 3 }};
+				Ui::EditRadioButtonAddressEx("Rear lights", phandling + 0xDD, rear_lights);
 
 				Ui::EditFloat("Seat offset distance", phandling + 0xD4, 0.0f, 0.0f, 1.0f);
 				Ui::EditFloat("Steering lock", phandling + 0xA0, 10.0f, 10.0f, 50.0f);

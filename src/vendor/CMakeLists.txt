@@ -71,6 +71,7 @@ target_compile_options(${PROJECT_NAME} PRIVATE
     >
     $<$<CONFIG:Debug>:
         /Od
+        /DEBUG:FULL
     >
     /std:c++latest;
     /sdl-;

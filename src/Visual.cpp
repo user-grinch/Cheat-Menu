@@ -210,8 +210,10 @@ void Visual::Main()
 			Ui::ColorPickerAddress("Health bar + debt color", 0xBAB22C, ImVec4(180,25,29,255));
 			Ui::ColorPickerAddress("Main menu title border color", 0xBAB240, ImVec4(0,0,0,255));
 			Ui::ColorPickerAddress("Money color", 0xBAB230, ImVec4(54,104,44,255));	
-			Ui::EditRadioButtonAddressEx("Money font outline", 0x58F58D, std::vector<Ui::NamedValue>{{ "No outline", 0 }, { "Thin outline" ,1 }, { "Default outline" ,2 }});
-			Ui::EditRadioButtonAddressEx("Money font style", 0x58F57F, std::vector<Ui::NamedValue>{ { "Style 1", 1 }, { "Style 2" ,2 }, { "Default style" ,3 }});
+			static std::vector<Ui::NamedValue> font_outline{{ "No outline", 0 }, { "Thin outline" ,1 }, { "Default outline" ,2 }};
+			Ui::EditRadioButtonAddressEx("Money font outline", 0x58F58D, font_outline);
+			static std::vector<Ui::NamedValue> style{ { "Style 1", 1 }, { "Style 2" ,2 }, { "Default style" ,3 }};
+			Ui::EditRadioButtonAddressEx("Money font style", 0x58F57F, style);
 			Ui::EditAddress<float>("Radar Height", 0x866B74, 0, 76, 999);
 			Ui::EditAddress<float>("Radar Width", 0x866B78, 0, 94, 999);
 			Ui::EditAddress<float>("Radar X position", 0x858A10, -999, 40, 999);
@@ -220,7 +222,8 @@ void Visual::Main()
 			Ui::ColorPickerAddress("Radio station color", 0xBAB24C, ImVec4(150,150,150,255));
 			Ui::ColorPickerAddress("Styled text color", 0xBAB258, ImVec4(226,192,99,255));
 			Ui::ColorPickerAddress("Text color", 0xBAB234, ImVec4(50,60,127,255));
-			Ui::EditRadioButtonAddressEx("Wanted star border", 0x58DD41, std::vector<Ui::NamedValue>{ { "No border", 0 }, { "Default" ,1 }, { "Bold border" ,2 }});
+			static std::vector<Ui::NamedValue> star_border{ { "No border", 0 }, { "Default" ,1 }, { "Bold border" ,2 }};
+			Ui::EditRadioButtonAddressEx("Wanted star border", 0x58DD41, star_border);
 			Ui::ColorPickerAddress("Wanted star color + some text", 0xBAB244, ImVec4(144,98,16,255));
 
 			ImGui::EndTabItem();

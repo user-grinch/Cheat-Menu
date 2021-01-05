@@ -5,7 +5,7 @@ CJson::CJson(const char* name)
 {
 	file_path = "./CheatMenu/json/"+ std::string(name) +".json";
 	
-	if (std::experimental::filesystem::exists(file_path))
+	if (fs::exists(file_path))
 	{
 		try
 		{

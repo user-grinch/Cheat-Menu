@@ -17,9 +17,9 @@
                 "_UNICODE"
             ],
             "windowsSdkVersion": "10.0.10240.0",
-            "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/bin/cl.exe",
+            "compilerPath": "cl.exe",
             "cStandard": "c99",
-            "cppStandard": "c++14",
+            "cppStandard": "c++20",
             "intelliSenseMode": "msvc-x86",
             "configurationProvider": "ms-vscode.cmake-tools"
         }

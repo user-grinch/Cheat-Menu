@@ -364,7 +364,11 @@ void Ui::DrawJSON(CJson& json, std::vector<std::string>& combo_items, std::strin
 				{
 					if (ImGui::MenuItem(name.c_str()) && func_left_click != nullptr)
 					{
-						func_left_click(std::string(root.key()),std::string(_data.key()), std::string(_data.value()));
+						std::string root_key = root.key();
+						std::string data_key = _data.key();
+						std::string data_val = _data.value();
+
+						func_left_click(root_key,data_key,data_val);
 					}
 
 					if (ImGui::IsItemClicked(1) && func_right_click != nullptr)
@@ -462,7 +466,7 @@ void Ui::DrawImages(std::vector<std::unique_ptr<TextureStructure>> &img_vec, ImV
 {
 
 	int images_in_row = static_cast<int>(ImGui::GetWindowContentRegionWidth() / image_size.x);
-	image_size.x = ImGui::GetWindowContentRegionWidth() / images_in_row - ImGuiStyleVar_ItemSpacing*0.65f;
+	image_size.x = ImGui::GetWindowContentRegionWidth() / images_in_row - int(ImGuiStyleVar_ItemSpacing)*0.65f;
 
 	int images_count = 1;
 

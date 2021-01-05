@@ -231,17 +231,19 @@ void Menu::ProcessCommands()
 
 		if (wep_name == "jetpack")
 		{
-			Weapon::GiveWeaponToPlayer(std::string("-1"));
+			std::string weapon = "-1";
+			Weapon::GiveWeaponToPlayer(weapon);
 			CHud::SetHelpMessage("Weapon given", false, false, false);
 		}
 		else
 		{
 			eWeaponType weapon = CWeaponInfo::FindWeaponType((char*)wep_name.c_str());
+			std::string weapon_name = std::to_string(weapon);
 			CWeaponInfo* pweaponinfo = CWeaponInfo::GetWeaponInfo(weapon, 1);
 
 			if (wep_name != "" && pweaponinfo->m_nModelId1 != -1)
 			{
-				Weapon::GiveWeaponToPlayer(std::to_string(weapon));
+				Weapon::GiveWeaponToPlayer(weapon_name);
 				CHud::SetHelpMessage("Weapon given", false, false, false);
 			}
 			else
@@ -258,7 +260,8 @@ void Menu::ProcessCommands()
 		int model = Vehicle::GetModelFromName(veh_name.c_str());
 		if (model != 0)
 		{
-			Vehicle::SpawnVehicle(std::to_string(model));
+			std::string smodel = std::to_string(model);
+			Vehicle::SpawnVehicle(smodel);
 			CHud::SetHelpMessage("Vehicle spawned", false, false, false);
 		}
 		else

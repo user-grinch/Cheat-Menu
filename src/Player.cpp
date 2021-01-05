@@ -43,9 +43,9 @@ Player::Player()
 		// Custom skins setup
 		if (LoadLibraryW(L"modloader.asi"))
 		{
-			if (std::experimental::filesystem::is_directory(custom_skins::dir))
+			if (fs::is_directory(custom_skins::dir))
 			{
-				for (auto &p : std::experimental::filesystem::recursive_directory_iterator(custom_skins::dir))
+				for (auto &p : fs::recursive_directory_iterator(custom_skins::dir))
 				{
 					if (p.path().extension() == ".dff")
 					{
@@ -58,7 +58,7 @@ Player::Player()
 					}
 				}
 			}
-			else std::experimental::filesystem::create_directory(custom_skins::dir);
+			else fs::create_directory(custom_skins::dir);
 
 			modloader_installed = true;
 		}

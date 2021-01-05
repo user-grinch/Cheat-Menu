@@ -64,7 +64,7 @@
 // Globals
 typedef std::vector<std::pair<std::string, void(*)(void)>> unsortedMap;
 using namespace plugin;
-namespace fs = std::experimental::filesystem;
+namespace fs = std::filesystem;
 
 enum Renderer
 {

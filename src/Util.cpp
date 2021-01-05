@@ -26,7 +26,7 @@ void Util::ClearCharTasksVehCheck(CPed* ped)
 void Util::LoadTexturesInDirRecursive(const char *path, const char *file_ext,std::vector<std::string>& category_vec, std::vector<std::unique_ptr<TextureStructure>> &store_vec)
 {
 	std::string folder = "";
-	for (auto &p : std::experimental::filesystem::recursive_directory_iterator(path))
+	for (auto &p : fs::recursive_directory_iterator(path))
 	{
 		if (p.path().extension() == file_ext)
 		{
@@ -151,7 +151,7 @@ int Util::GetLargestGangInZone()
 	for (int i = 0; i != 10; ++i)
 	{
 		CVector pos = FindPlayerPed()->GetPosition();
-		CZone *zone = &CZone();
+		CZone *zone = new CZone();
 		
 		CZoneExtraInfo *zone_info = CTheZones::GetZoneInfo(&pos, &zone);
 		int density = zone_info->m_nGangDensity[i];
@@ -161,6 +161,7 @@ int Util::GetLargestGangInZone()
 			max_density = density;
 			gang_id = i;
 		}
+		delete zone;
 	}
 
 	return gang_id;

@@ -74,7 +74,7 @@ public:
 	static void AddComponent(const std::string& component, const bool display_message = true);
 	static void RemoveComponent(const std::string& component, const bool display_message = true);
 	static std::string GetNameFromModel(int model);
-	static int Vehicle::GetModelFromName(const char* name);
+	static int GetModelFromName(const char* name);
 	static void SpawnVehicle(std::string &name);
 	static int GetRandomTrainIdForModel(int model);
 	static void ParseVehiclesIDE();

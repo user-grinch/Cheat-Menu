@@ -46,9 +46,8 @@ public:
 
 	DataT& get(const ObjT* obj)
 	{
-		auto& it = _pool.find(obj);
-		if (it != _pool.end())
-			return *it->second;
+		if (_pool.find(obj) != _pool.end())
+			return *_pool.find(obj)->second;
 		return *(_pool[obj] = std::make_unique<DataT>(obj));
 	}
 
