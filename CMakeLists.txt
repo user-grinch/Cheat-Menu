@@ -133,7 +133,7 @@ if(MSVC)
             /Od
             /DEBUG:FULL
         >
-        /std:c++latest;
+        $<$<COMPILE_LANGUAGE:CXX>:/std:c++latest>
         /sdl-;
         /W3;
         ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};

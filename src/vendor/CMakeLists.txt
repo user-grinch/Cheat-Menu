@@ -26,7 +26,12 @@ set(vendor_files
     "json.hpp"
     "kiero/kiero.cpp"
     "kiero/kiero.h"
-    "kiero/minhook/include/MinHook.h"
+    "kiero/minhook/MinHook.h"
+    "kiero/minhook/buffer.c"
+    "kiero/minhook/hook.c"
+    "kiero/minhook/trampoline.c"
+    "kiero/minhook/hde/hde32.c"
+    "kiero/minhook/trampoline.c"
     "moon/pool_object_extender.h"
     "moon/vehicle_renderer.h"
     "moon/vehicle_renderer.cpp"
@@ -73,7 +78,7 @@ target_compile_options(${PROJECT_NAME} PRIVATE
         /Od
         /DEBUG:FULL
     >
-    /std:c++latest;
+    $<$<COMPILE_LANGUAGE:CXX>:/std:c++latest>
     /sdl-;
     /W3;
     ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};
@@ -106,8 +111,4 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
     d3d11
     d3dx11
     XInput9_1_0
-    optimized libMinHook-x86-v140-mt
-    optimized libMinHook-x86-v140-md
-    debug libMinHook-x86-v140-mtd
-    debug libMinHook-x86-v140-mdd
 )

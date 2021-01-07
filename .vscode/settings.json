@@ -73,7 +73,9 @@
         "mutex": "cpp",
         "optional": "cpp",
         "shared_mutex": "cpp",
-        "thread": "cpp"
+        "thread": "cpp",
+        "trampoline.h": "c",
+        "minhook.h": "c"
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "C_Cpp.intelliSenseEngineFallback": "Enabled"

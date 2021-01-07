@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Hook.h"
 #include "vendor/kiero/kiero.h"
-#include "vendor/kiero/minhook/include/MinHook.h"
+#include "vendor/kiero/minhook/MinHook.h"
 
 WNDPROC Hook::oWndProc = NULL;
 f_Reset Hook::oReset9 = NULL; 
