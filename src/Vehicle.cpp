@@ -1043,6 +1043,11 @@ void Vehicle::Main()
 
 				ImGui::Spacing();
 				ImGui::Columns(2, NULL, false);
+				
+				bool pulsing = NeonAPI::IsPulsingEnabled(veh);
+				if (Ui::CheckboxWithHint("Pulsing neons", &pulsing))
+					NeonAPI::SetPulsing(veh,pulsing);
+
 				Ui::CheckboxWithHint("Rainbow neons", &neon::rainbow, "Rainbow effect to neon lights");
 				ImGui::NextColumn();
 				Ui::CheckboxWithHint("Traffic neons", &neon::traffic, "Adds neon lights to traffic vehicles.\n\

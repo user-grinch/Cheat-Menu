@@ -7,8 +7,8 @@ ImVec2 Globals::font_screen_size = ImVec2(-1, -1);
 bool Globals::show_menu = false;
 bool Globals::init_done = false;
 Renderer Globals::renderer = Render_Unknown;
-ID3D11Device *Globals::device11 = nullptr;
 bool Globals::gsync_time = false;
+void *Globals::device = nullptr;
 
 std::ofstream flog = std::ofstream("CheatMenu.log");
 CJson config = CJson("config");

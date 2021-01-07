@@ -33,11 +33,11 @@ void Util::LoadTexturesInDirRecursive(const char *path, const char *file_ext,std
 			store_vec.push_back(std::make_unique<TextureStructure>());
 			HRESULT hr = -1;
 			if (Globals::renderer == Render_DirectX9)
-				hr = D3DXCreateTextureFromFileA(GetD3DDevice(), p.path().string().c_str(), &store_vec.back().get()->texture9);
+				hr = D3DXCreateTextureFromFileA(GetD3DDevice(), p.path().string().c_str(), reinterpret_cast<PDIRECT3DTEXTURE9*>(&store_vec.back().get()->texture));
 
 			if (Globals::renderer == Render_DirectX11)
 			{
-				if (LoadTextureFromFileDx11(p.path().string().c_str(), &store_vec.back().get()->texture11))
+				if (LoadTextureFromFileDx11(p.path().string().c_str(), reinterpret_cast<ID3D11ShaderResourceView**>(&store_vec.back().get()->texture)))
 					hr = S_OK;
 			}
 
@@ -89,7 +89,7 @@ bool Util::LoadTextureFromFileDx11(const char* filename, ID3D11ShaderResourceVie
 	subResource.SysMemPitch = desc.Width * 4;
 	subResource.SysMemSlicePitch = 0;
 
-	Globals::device11->CreateTexture2D(&desc, &subResource, &pTexture);
+	reinterpret_cast<ID3D11Device*>(Globals::device)->CreateTexture2D(&desc, &subResource, &pTexture);
 
 	// Create texture view
 	D3D11_SHADER_RESOURCE_VIEW_DESC srvDesc;
@@ -98,7 +98,7 @@ bool Util::LoadTextureFromFileDx11(const char* filename, ID3D11ShaderResourceVie
 	srvDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 	srvDesc.Texture2D.MipLevels = desc.MipLevels;
 	srvDesc.Texture2D.MostDetailedMip = 0;
-	Globals::device11->CreateShaderResourceView(pTexture, &srvDesc, out_srv);
+	reinterpret_cast<ID3D11Device*>(Globals::device)->CreateShaderResourceView(pTexture, &srvDesc, out_srv);
 	pTexture->Release();
 
 	stbi_image_free(image_data);

@@ -493,14 +493,7 @@ void Ui::DrawImages(std::vector<std::unique_ptr<TextureStructure>> &img_vec, ImV
 			&& (verify_func == nullptr || verify_func(text))
 			)
 		{
-			void *texture = nullptr;
-
-			if (Globals::renderer == Render_DirectX9)
-				texture = img_vec[i]->texture9;
-			else // consider 11
-				texture = img_vec[i]->texture11;
-
-			if (ImGui::ImageButton(texture, image_size, ImVec2(0, 0), ImVec2(1, 1), 1, ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 1)))
+			if (ImGui::ImageButton(img_vec[i]->texture, image_size, ImVec2(0, 0), ImVec2(1, 1), 1, ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 1)))
 				on_left_click(text);
 
 			if (ImGui::IsItemClicked(1) && on_right_click != nullptr)

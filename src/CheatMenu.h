@@ -1,7 +1,9 @@
 /*
 	Required:
-		Visual Studio 2015.3 (v140)
+		DirectX 9 SDK
 		Plugin SDK
+		Visual Studio 2019 (v142)
+		Windows SDK
 */
 
 #pragma once
@@ -50,7 +52,7 @@ public:
 			}
 
 			/*
-				WndProc is extremely buggy without SilentPatch
+				Mouse is extremely buggy without SilentPatch
 				Should have a better fix for this but everyone should have 
 				SilentPatch installed so mehh...
 			*/

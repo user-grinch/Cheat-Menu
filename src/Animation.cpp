@@ -58,7 +58,7 @@ void Animation::Main()
 			if (ImGui::BeginChild("Anims Child"))
 			{
 				ImGui::Spacing();
-				Ui::DrawJSON(json, search_categories, selected_item, filter, &PlayAnimation, &RemoveEntry);
+				Ui::DrawJSON(json, search_categories, selected_item, filter, &PlayAnimation, &RemoveAnimation);
 				ImGui::EndChild();
 			}
 			ImGui::EndTabItem();
@@ -132,7 +132,7 @@ void Animation::PlayAnimation(std::string& ifp, std::string& anim, std::string& 
 		Command<Commands::REMOVE_ANIMATION>(ifp.c_str());
 }
 
-void Animation::RemoveEntry(std::string& ifp, std::string& anim, std::string& ifp_repeat)
+void Animation::RemoveAnimation(std::string& ifp, std::string& anim, std::string& ifp_repeat)
 {
 	flog << ifp << std::endl;
 	if (ifp == "Custom")

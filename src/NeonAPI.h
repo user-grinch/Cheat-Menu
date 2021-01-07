@@ -12,6 +12,7 @@ private:
 		float val;
 		uint timer;
 		bool increment;
+		bool pulsing; 
 
         NeonData(CVehicle *pVeh) 
 		{ 
@@ -29,6 +30,8 @@ public:
 	~NeonAPI();
 	static void InstallNeon(CVehicle *veh, int red, int green, int blue);
 	static bool IsNeonInstalled(CVehicle *veh);
+	static bool IsPulsingEnabled(CVehicle *veh);
+	static void SetPulsing(CVehicle *veh, bool state);
 	static void RemoveNeon(CVehicle *veh);
 };
 

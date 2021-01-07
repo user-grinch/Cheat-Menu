@@ -17,6 +17,14 @@ LRESULT Hook::InputProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 {
 	ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 
+	if (Hook::show_mouse)
+	{
+		patch::Nop(0x4EB9F4, 5); //  disable radio scroll
+		Call<0x541BD0>(); // CPad::ClearMouseHistory
+	}
+	else
+		patch::SetRaw(0x4EB9F4, (void*)"\xE8\x67\xFC\xFF\xFF", 5); // enable radio scroll
+
 	if (ImGui::GetIO().WantTextInput)
 	{
 		Call<0x53F1E0>(); // CPad::ClearKeyboardHistory
@@ -24,7 +32,6 @@ LRESULT Hook::InputProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 	}
 	else
 		return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
-
 }
 
 HRESULT Hook::ResetDx9(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters)
@@ -97,9 +104,11 @@ HRESULT Hook::PresentDx11(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Fl
 
 	if (Globals::init_done)
 	{
-		HRESULT hr = pSwapChain->Present(1, 0);
-		if (hr == DXGI_ERROR_DEVICE_REMOVED || hr == DXGI_ERROR_DEVICE_RESET)
-			ImGui_ImplDX11_InvalidateDeviceObjects();
+		if (mouse_visibility != show_mouse)
+		{
+			Hook::ShowMouse(show_mouse);
+			mouse_visibility = show_mouse;
+		}
 
 		// Change font size if the game resolution changes
 		if (Globals::font_screen_size.x != screen::GetScreenWidth()
@@ -135,13 +144,13 @@ HRESULT Hook::PresentDx11(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Fl
 		DXGI_SWAP_CHAIN_DESC desc;
 		pSwapChain->GetDesc(&desc);
 
-		pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&Globals::device11);
+		pSwapChain->GetDevice(__uuidof(ID3D11Device), (void**)&Globals::device);
 		ID3D11DeviceContext* context;
-		Globals::device11->GetImmediateContext(&context);
+		reinterpret_cast<ID3D11Device*>(Globals::device)->GetImmediateContext(&context);
 
 		ImGui::CreateContext();
 		ImGui_ImplWin32_Init(desc.OutputWindow);
-		ImGui_ImplDX11_Init(Globals::device11, context);
+		ImGui_ImplDX11_Init(reinterpret_cast<ID3D11Device*>(Globals::device), context);
 		ImGui_ImplWin32_EnableDpiAwareness();
 
 		io.IniFilename = NULL;
@@ -163,6 +172,7 @@ void Hook::ShowMouse(bool state)
 		patch::SetUChar(0x6194A0, 0xC3);
 		patch::Nop(0x53F417, 5); // don't call CPad__getMouseState
 		patch::SetRaw(0x53F41F, (void*)"\x33\xC0\x0F\x84", 4); // disable camera mouse movement
+		//patch::Nop(0x4EB9F4, 5); //  disable radio scroll
 	}
 	else
 	{
@@ -171,6 +181,7 @@ void Hook::ShowMouse(bool state)
 		patch::SetRaw(0x53F41F, (void*)"\x85\xC0\x0F\x8C", 4); // xor eax, eax -> test eax, eax , enable camera mouse movement
 														// jz loc_53F526 -> jl loc_53F526
 		patch::SetUChar(0x6194A0, 0xE9); // jmp setup
+		//patch::SetRaw(0x4EB9F4, (void*)"\xE8\x67\xFC\xFF\xFF", 5); // enable radio scroll
 	}
 
 	ImGui::GetIO().MouseDrawCursor = state;
@@ -206,8 +217,6 @@ Hook::Hook()
 					Globals::renderer = Render_DirectX11;
 					flog << "Successfully hooked dx11 device." << std::endl;
 				}
-
-				flog << "Successfully hooked dx11 device." << std::endl;
 			}
 			else
 			{

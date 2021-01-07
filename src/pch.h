@@ -49,7 +49,7 @@
 #include "extensions/ScriptCommands.h"
 #include "extensions/Screen.h"
 #include "eVehicleClass.h"
-#include "extensions\Paths.h"
+#include "extensions/Paths.h"
 
 #include "vendor/imgui/imgui.h"
 #include "vendor/imgui/imgui_internal.h"
@@ -86,16 +86,15 @@ struct Globals
 	static bool show_menu;
 	static bool init_done;
 	static Renderer renderer;
-	static ID3D11Device* device11;
 	static bool gsync_time;
+	static void* device;
 };
 
 struct TextureStructure
 {
 	std::string file_name;
 	std::string category_name;
-	PDIRECT3DTEXTURE9 texture9;
-	ID3D11ShaderResourceView* texture11;
+	void *texture = nullptr;
 };
 
 extern CJson config;

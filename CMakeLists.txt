@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.19 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 set(PROJECT_NAME CheatMenu)
 project(${PROJECT_NAME} CXX)
 
@@ -16,6 +16,7 @@ set(DIRECTX9_SDK_DIR $ENV{DIRECTX9_SDK_DIR})
 # Required projects
 ################################################################################
 add_subdirectory(src/vendor)
+add_subdirectory(src/tests)
 
 ################################################################################
 # Source groups

@@ -67,7 +67,13 @@
         "*.def": "cpp",
         "atomic": "cpp",
         "compare": "cpp",
-        "concepts": "cpp"
+        "concepts": "cpp",
+        "charconv": "cpp",
+        "condition_variable": "cpp",
+        "mutex": "cpp",
+        "optional": "cpp",
+        "shared_mutex": "cpp",
+        "thread": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "C_Cpp.intelliSenseEngineFallback": "Enabled"

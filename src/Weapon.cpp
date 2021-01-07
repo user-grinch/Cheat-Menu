@@ -66,7 +66,7 @@ Weapon::Weapon()
 			CWeaponInfo *pweapon_info = CWeaponInfo::GetWeaponInfo(weapon_type, player->GetWeaponSkill(weapon_type));
 
 			if (huge_damage)
-				pweapon_info->m_nDamage = 5000;
+				pweapon_info->m_nDamage = 1000;
 
 			if (long_range)
 			{

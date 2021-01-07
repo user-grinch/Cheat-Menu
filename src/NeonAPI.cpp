@@ -30,17 +30,19 @@ NeonAPI::NeonAPI()
 			{
 				data->timer = CTimer::m_snTimeInMilliseconds;
 
-				if (data->val < 0.0f)
+				if (data->pulsing)
+				{
+					if (data->val < 0.0f)
 					data->increment = true;
 
-				if (data->val > 0.3f)
-					data->increment = false;
+					if (data->val > 0.3f)
+						data->increment = false;
 
-				if (data->increment)
-					data->val += 0.1f;
-				else
-					data->val -= 0.1f;
-
+					if (data->increment)
+						data->val += 0.1f;
+					else
+						data->val -= 0.1f;
+				}
 			}
 		}
 	};
@@ -54,6 +56,16 @@ NeonAPI::~NeonAPI()
 bool NeonAPI::IsNeonInstalled(CVehicle *pVeh)
 {
 	return VehNeon.Get(pVeh).neon_installed;
+}
+
+bool NeonAPI::IsPulsingEnabled(CVehicle *pVeh)
+{
+	return VehNeon.Get(pVeh).pulsing;
+}
+
+void NeonAPI::SetPulsing(CVehicle *pVeh, bool state)
+{
+	VehNeon.Get(pVeh).pulsing = state;
 }
 
 void NeonAPI::InstallNeon(CVehicle *pVeh, int red, int green, int blue)
