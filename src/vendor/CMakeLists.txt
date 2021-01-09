@@ -6,6 +6,12 @@ cmake_minimum_required(VERSION 3.0)
 project(Vendor)
 
 set(vendor_files
+    "fla/Main.h"
+    "fla/Main.cpp"
+    "fla/IDaccess.h"
+    "fla/IDaccess.cpp"
+    "fla/Library/Library.h"
+    "fla/Library/Library.cpp"
     "imgui/imconfig.h"
     "imgui/imgui.cpp"
     "imgui/imgui.h"
@@ -58,6 +64,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     "_DX9_SDK_INSTALLED;"
     "PLUGIN_SGV_10US;"
     "_MBCS"
+    "IS_PLATFORM_WIN"
 )
 
 include_directories(

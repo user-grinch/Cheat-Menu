@@ -1,4 +1,6 @@
 #include "plugin.h"
+#include "../vendor/fla/IDaccess.h"
+#include "CHud.h"
 
 using namespace plugin;
 
@@ -6,17 +8,26 @@ class Test
 {
 public:
     Test()
-    {
+    {   
+        Events::initRwEvent += []
+        {
+            CFastman92limitAdjuster::Init();
+        };
+
         Events::processScriptsEvent += [] 
         {
-           if(KeyPressed(VK_UP))
-           {
-                patch::Nop(0x4EB9F4, 5);    //  disable
-           } 
-           if(KeyPressed(VK_DOWN))
-           {
-                patch::SetRaw(0x4EB9F4, (void*)"\xE8\x67\xFC\xFF\xFF", 5);    //  enable
-           } 
+            CPlayerPed *player = FindPlayerPed();
+
+            if(KeyPressed(VK_UP) && player && player->m_pVehicle)
+            {
+                uint8_replacement &primary_color = *(uint8_replacement *)(int(player->m_pVehicle) + 0x434);
+                primary_color = 74;
+                CHud::SetHelpMessage("Color changed",false,false,false);
+            } 
+            if(KeyPressed(VK_DOWN))
+            {
+
+            } 
         };
     }
 } test;

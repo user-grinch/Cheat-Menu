@@ -9,7 +9,18 @@ project(Test)
 ################################################################################
 # Target
 ################################################################################
-add_library(${PROJECT_NAME} SHARED "Test.cpp")
+
+set(test_files
+    "../vendor/fla/Main.h"
+    "../vendor/fla/Main.cpp"
+    "../vendor/fla/IDaccess.h"
+    "../vendor/fla/IDaccess.cpp"
+    "../vendor/fla/Library/Library.h"
+    "../vendor/fla/Library/Library.cpp"
+    "Test.cpp"
+)
+
+add_library(${PROJECT_NAME} SHARED ${test_files})
 
 string(CONCAT "MSVC_RUNTIME_LIBRARY_STR"
     $<$<CONFIG:Release>:
@@ -34,7 +45,6 @@ include_directories(
     "${PLUGIN_SDK_DIR}/plugin_sa/game_sa"
     "${PLUGIN_SDK_DIR}/shared"
     "${PLUGIN_SDK_DIR}/shared/game"
-    "${DIRECTX9_SDK_DIR}/include"
 )
 
 ################################################################################
@@ -59,6 +69,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     "_DX9_SDK_INSTALLED;"
     "PLUGIN_SGV_10US;"
     "_MBCS"
+    "IS_PLATFORM_WIN"
 )
 
 ################################################################################

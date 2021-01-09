@@ -172,7 +172,6 @@ void Hook::ShowMouse(bool state)
 		patch::SetUChar(0x6194A0, 0xC3);
 		patch::Nop(0x53F417, 5); // don't call CPad__getMouseState
 		patch::SetRaw(0x53F41F, (void*)"\x33\xC0\x0F\x84", 4); // disable camera mouse movement
-		//patch::Nop(0x4EB9F4, 5); //  disable radio scroll
 	}
 	else
 	{
@@ -181,7 +180,6 @@ void Hook::ShowMouse(bool state)
 		patch::SetRaw(0x53F41F, (void*)"\x85\xC0\x0F\x8C", 4); // xor eax, eax -> test eax, eax , enable camera mouse movement
 														// jz loc_53F526 -> jl loc_53F526
 		patch::SetUChar(0x6194A0, 0xE9); // jmp setup
-		//patch::SetRaw(0x4EB9F4, (void*)"\xE8\x67\xFC\xFF\xFF", 5); // enable radio scroll
 	}
 
 	ImGui::GetIO().MouseDrawCursor = state;

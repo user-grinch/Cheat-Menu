@@ -117,6 +117,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     "_DX9_SDK_INSTALLED;"
     "PLUGIN_SGV_10US;"
     "_MBCS"
+    "IS_PLATFORM_WIN"
 )
 
 ################################################################################

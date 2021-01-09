@@ -1000,7 +1000,7 @@ void Vehicle::Main()
 					for (int color_id = 0; color_id < count; ++color_id)
 					{
 						if (Ui::ColorButton(color_id, carcols_color_values[color_id], ImVec2(btn_size,btn_size)))
-							patch::Set<BYTE>(int(veh) + 1075 + color::radio_btn, color_id);
+							*(uint8_replacement *)(int(veh) + 0x433  + color::radio_btn) = color_id;
 
 						if ((color_id + 1) % btns_in_row != 0)
 							ImGui::SameLine(0.0, 4.0);
@@ -1010,14 +1010,13 @@ void Vehicle::Main()
 					std::string veh_name = GetNameFromModel(player->m_pVehicle->m_nModelIndex);
 					for (auto entry : carcols_car_data)
 					{
-
 						if (entry.first == veh_name)
 						{
 							int count = 1;
 							for (int color_id : entry.second)
 							{
 								if (Ui::ColorButton(color_id, carcols_color_values[color_id], ImVec2(btn_size, btn_size)))
-									patch::Set<BYTE>(int(veh) + 1075 + color::radio_btn, color_id);
+									*(uint8_replacement *)(int(veh) + 0x433  + color::radio_btn) = color_id;
 
 								if (count % btns_in_row != 0)
 									ImGui::SameLine(0.0, 4.0);

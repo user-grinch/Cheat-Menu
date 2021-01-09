@@ -20,7 +20,7 @@ NeonAPI::NeonAPI()
 		NeonData *data = &VehNeon.Get(pVeh);
 		if (data->neon_installed && !pVeh->IsUpsideDown())
 		{
-			CVector Pos = CModelInfo::ms_modelInfoPtrs[pVeh->m_nModelIndex]->m_pColModel->m_boundBox.m_vecMin;
+			CVector Pos = CModelInfo::GetModelInfo(pVeh->m_nModelIndex)->m_pColModel->m_boundBox.m_vecMin;
         	CVector center = pVeh->TransformFromObjectSpace(CVector(0.0f, 0.0f, 0.0f));
 			CVector up = pVeh->TransformFromObjectSpace(CVector(0.0f, -Pos.y - data->val, 0.0f)) - center;
         	CVector right = pVeh->TransformFromObjectSpace(CVector(Pos.x + data->val, 0.0f, 0.0f)) - center;

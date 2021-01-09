@@ -4,6 +4,9 @@
 #include "Ui.h"
 #include "Util.h"
 
+// FlA
+tRadarTrace* CRadar::ms_RadarTrace = reinterpret_cast<tRadarTrace *>(patch::GetPointer(0x5838B0 + 2));
+
 bool Teleport::insert_coord = false;
 bool Teleport::quick_teleport = false;
 char Teleport::input_buffer[INPUT_BUFFER_SIZE] = "";

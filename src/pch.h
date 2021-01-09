@@ -51,6 +51,7 @@
 #include "eVehicleClass.h"
 #include "extensions/Paths.h"
 
+#include "vendor/fla/IDaccess.h"
 #include "vendor/imgui/imgui.h"
 #include "vendor/imgui/imgui_internal.h"
 #include "vendor/imgui/imgui_impl_dx9.h"

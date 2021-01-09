@@ -64,6 +64,7 @@ public:
 			if (launch)
 			{
 				flog << "Loading CheatMenu" << std::endl;
+				CFastman92limitAdjuster::Init();
 				static CheatMenu cheatmenu;
 			}
 		};

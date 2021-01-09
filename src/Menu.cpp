@@ -421,7 +421,7 @@ void Menu::Main()
 				ImGui::Dummy(ImVec2(0, 10));
 				ImGui::TextWrapped("Thanks to Junior-Djjr");
 				ImGui::Dummy(ImVec2(0, 10));
-				ImGui::TextWrapped("Copyright GPLv3 2019-2021 Grinch_");
+				Ui::CenterdText("Copyright GPLv3 2019-2021 Grinch_");
 				
 				ImGui::EndChild();
 			}

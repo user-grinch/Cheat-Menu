@@ -76,7 +76,7 @@ Weapon::Weapon()
 				pweapon_info->m_nFlags.bReload2Start = true;
 			}
 
-			if (rapid_fire)
+			if (rapid_fire && weapon_type != WEAPON_MINIGUN) // mingun doesn't work with rapidfire
 				pweapon_info->m_nFlags.bContinuosFire = true;
 
 			if (dual_weild  && (weapon_type == WEAPON_PISTOL || weapon_type == WEAPON_MICRO_UZI || weapon_type == WEAPON_TEC9 || weapon_type == WEAPON_SAWNOFF))

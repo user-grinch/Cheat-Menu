@@ -49,7 +49,7 @@ CheatMenu::CheatMenu()
 	Hook::window_func = std::bind(&ProcessWindow);
 
 	Events::initRwEvent += []()
-	{
+	{	
 		// Load menu settings
 		Globals::header_id = config.GetValue("window.id",std::string(""));
 		Globals::menu_size.x = config.GetValue("window.sizeX", screen::GetScreenWidth() / 4.0f);
