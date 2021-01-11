@@ -83,7 +83,7 @@ struct Globals
 	static std::string header_id;
 	static int last_key_timer;
 	static ImVec2 menu_size;
-	static ImVec2 font_screen_size;
+	static ImVec2 screen_size;
 	static bool show_menu;
 	static bool init_done;
 	static Renderer renderer;

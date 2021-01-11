@@ -18,6 +18,7 @@ set(test_files
     "../vendor/fla/Library/Library.h"
     "../vendor/fla/Library/Library.cpp"
     "Test.cpp"
+    "Dllmain.cpp"
 )
 
 add_library(${PROJECT_NAME} SHARED ${test_files})

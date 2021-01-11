@@ -1,5 +1,5 @@
-// #include <Windows.h>
-// #include "../vendor\fla\Main.h"
+#include <Windows.h>
+#include "../vendor\fla\Main.h"
 
 BOOL WINAPI DllMain(
     HINSTANCE hinstDLL,  // handle to DLL module

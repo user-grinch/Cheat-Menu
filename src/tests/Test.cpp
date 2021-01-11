@@ -20,7 +20,7 @@ public:
 
             if(KeyPressed(VK_UP) && player && player->m_pVehicle)
             {
-                uint8_replacement &primary_color = *(uint8_replacement *)(int(player->m_pVehicle) + 0x434);
+                uint8_replacement &primary_color = *(uint8_replacement*)&player->m_pVehicle->m_nPrimaryColor;
                 primary_color = 74;
                 CHud::SetHelpMessage("Color changed",false,false,false);
             } 

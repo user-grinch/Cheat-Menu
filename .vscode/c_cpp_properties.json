@@ -4,7 +4,7 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/src/",
-                "${DIRECTX9_SDK_DIR}/include",
+                "${DIRECTX9_SDK_DIR}/Include",
                 "${PLUGIN_SDK_DIR}/plugin_sa",
                 "${PLUGIN_SDK_DIR}/plugin_sa/game_sa",
                 "${PLUGIN_SDK_DIR}/shared",
