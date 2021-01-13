@@ -187,7 +187,7 @@ void Vehicle::AddComponent(const std::string& component, const bool display_mess
 		int hveh = CPools::GetVehicleRef(player->m_pVehicle);
 
 		CStreaming::RequestModel(icomp,eStreamingFlags::PRIORITY_REQUEST);
-		CStreaming::LoadAllRequestedModels(false);
+		CStreaming::LoadAllRequestedModels(true);
 		player->m_pVehicle->AddVehicleUpgrade(icomp);
 		CStreaming::SetModelIsDeletable(icomp);
 

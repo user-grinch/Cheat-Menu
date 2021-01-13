@@ -176,6 +176,7 @@ void Teleport::RemoveTeleportEntry(std::string& category, std::string& key, std:
 	{
 		json.data["Custom"].erase(key);
 		CHud::SetHelpMessage("Location removed", false, false, false);
+		json.WriteToDisk();
 	}
 	else CHud::SetHelpMessage("You can only remove custom location", false, false, false);
 }

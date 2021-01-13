@@ -138,6 +138,7 @@ void Animation::RemoveAnimation(std::string& ifp, std::string& anim, std::string
 	if (ifp == "Custom")
 	{
 		json.data["Custom"].erase(anim);
+		json.WriteToDisk();
 		CHud::SetHelpMessage("Animation removed", false, false, false);
 	}else CHud::SetHelpMessage("You can only remove custom anims", false, false, false);
 

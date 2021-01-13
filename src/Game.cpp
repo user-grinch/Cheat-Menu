@@ -287,7 +287,7 @@ void Game::Main()
 
 			Ui::CheckboxAddress("Faster clock", 0x96913B);
 
-			if (Ui::CheckboxWithHint("Forbidden area wl", &forbidden_area_wl, "Wanted levels that appears outside\
+			if (Ui::CheckboxWithHint("Forbidden area wl", &forbidden_area_wl, "Wanted levels that appears outside \
 of LS without completing missions"))
 			{
 				if (forbidden_area_wl)
@@ -308,7 +308,8 @@ of LS without completing missions"))
 				Command<Commands::SWITCH_ARREST_PENALTIES>(keep_stuff);
 				Command<Commands::SWITCH_DEATH_PENALTIES>(keep_stuff);
 			}
-			Ui::CheckboxWithHint("Screenshot shortcut", &ss_shortcut, (("Take screenshot using ") + Ui::GetHotKeyNameString(Menu::hotkey::quick_ss)).c_str());
+			Ui::CheckboxWithHint("Screenshot shortcut", &ss_shortcut, (("Take screenshot using ") + Ui::GetHotKeyNameString(Menu::hotkey::quick_ss)
+			+ "\nSaved inside 'GTA San Andreas User Files\\Gallery'").c_str());
 			if (Ui::CheckboxWithHint("Solid water", &solid_water, "Player can walk on water"))
 			{
 				if (!solid_water && solid_water_object != 0)

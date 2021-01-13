@@ -39,7 +39,6 @@ public:
 		Events::initRwEvent += []()
 		{
 			bool launch = true;
-
 			uint gameVersion = GetGameVersion();
 			if (gameVersion != GAME_10US_HOODLUM && gameVersion != GAME_10US_COMPACT) {
 				MessageBox(HWND_DESKTOP, "CheatMenu requires v1.0 US of the game.", "CheatMenu", MB_ICONERROR);

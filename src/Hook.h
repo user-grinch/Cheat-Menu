@@ -15,7 +15,9 @@ private:
 	static f_Reset oReset9;
 	static bool mouse_visibility;
 
-	static HRESULT CALLBACK Present(void *ptr, int u1, int u2, int u3 = NULL, int u4 = NULL);
+	static void CALLBACK Present(void *ptr);
+	static HRESULT CALLBACK PresentDx9Handler(IDirect3DDevice9 *pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion);
+	static HRESULT CALLBACK PresentDx11Handler(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
 	static HRESULT CALLBACK Reset(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters);
 	static LRESULT CALLBACK InputProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static void ShowMouse(bool state);

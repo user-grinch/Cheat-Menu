@@ -303,22 +303,22 @@ void Player::Main()
 			if (ImGui::CollapsingHeader("Wanted level"))
 			{
 				int val = player->m_pPlayerData->m_pWanted->m_nWantedLevel;
+				int max_wl = player->m_pPlayerData->m_pWanted->MaximumWantedLevel;
 
 				ImGui::Columns(3, 0, false);
 				ImGui::Text("Min: 0");
 				ImGui::NextColumn();
 				ImGui::Text("Def: 0");
 				ImGui::NextColumn();
-				ImGui::Text("Max: 6");
+				ImGui::Text("Max: %d",max_wl);
 				ImGui::Columns(1);
 
 				ImGui::Spacing();
 
 				if (ImGui::InputInt("Set value##Wanted level", &val))
 					player->CheatWantedLevel(val);
-
+					
 				ImGui::Spacing();
-
 				if (ImGui::Button("Minimum##Wanted level", Ui::GetSize(3)))
 					player->CheatWantedLevel(0);
 
@@ -330,7 +330,7 @@ void Player::Main()
 				ImGui::SameLine();
 
 				if (ImGui::Button("Maximum##Wanted level", Ui::GetSize(3)))
-					player->CheatWantedLevel(6);
+					player->CheatWantedLevel(max_wl);
 
 				ImGui::Spacing();
 				ImGui::Separator();

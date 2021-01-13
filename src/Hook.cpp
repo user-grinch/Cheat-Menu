@@ -41,7 +41,7 @@ HRESULT Hook::Reset(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresent
 	return oReset9(pDevice, pPresentationParameters);
 }
 
-HRESULT Hook::Present(void *ptr, int u1, int u2, int u3, int u4)
+void Hook::Present(void *ptr)
 {
 	ImGuiIO& io = ImGui::GetIO();
 
@@ -121,11 +121,18 @@ HRESULT Hook::Present(void *ptr, int u1, int u2, int u3, int u4)
 		style.WindowTitleAlign = ImVec2(0.5, 0.5);
 		oWndProc = (WNDPROC)SetWindowLongPtr(RsGlobal.ps->window, GWL_WNDPROC, (LRESULT)InputProc);
 	}
+}
 
-	if (Globals::renderer == Render_DirectX9)
-		return oPresent9((IDirect3DDevice9*)ptr, (RECT*)u1, (RECT*)u2, (HWND)u3, (RGNDATA*)u4);
-	else
-		return oPresent11((IDXGISwapChain*)ptr, u1, u2);
+HRESULT Hook::PresentDx9Handler(IDirect3DDevice9 *pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion)
+{
+	Present(pDevice);
+	return oPresent9(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);;
+}
+
+HRESULT Hook::PresentDx11Handler(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
+{
+	Present(pSwapChain);
+	return oPresent11(pSwapChain, SyncInterval, Flags);
 }
 
 // Thanks imring
@@ -164,7 +171,7 @@ Hook::Hook()
 		{
 			Globals::renderer = Render_DirectX9;
 			if (kiero::bind(16, (void**)&oReset9, Reset) == kiero::Status::Success
-			&& kiero::bind(17, (void**)&oPresent9, Present) == kiero::Status::Success) 
+			&& kiero::bind(17, (void**)&oPresent9, PresentDx9Handler) == kiero::Status::Success) 
 				flog << "Successfully hooked dx9 device." << std::endl;
 		}
 		else
@@ -173,7 +180,7 @@ Hook::Hook()
 			if (kiero::init(kiero::RenderType::D3D11) == kiero::Status::Success)
 			{
 				Globals::renderer = Render_DirectX11;
-				if (kiero::bind(8, (void**)&oPresent11, Present) == kiero::Status::Success) 
+				if (kiero::bind(8, (void**)&oPresent11, PresentDx11Handler) == kiero::Status::Success) 
 					flog << "Successfully hooked dx11 device." << std::endl;
 			}
 			else

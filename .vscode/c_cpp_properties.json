@@ -5,6 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/src/",
                 "${DIRECTX9_SDK_DIR}/Include",
+                "C:/Program Files (x86)/DirectXSDK/Include",
                 "${PLUGIN_SDK_DIR}/plugin_sa",
                 "${PLUGIN_SDK_DIR}/plugin_sa/game_sa",
                 "${PLUGIN_SDK_DIR}/shared",
