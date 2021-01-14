@@ -948,7 +948,7 @@ void Vehicle::Main()
 
 			ImGui::EndTabItem();
 		}
-		if (Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer))
+		if (player && player->m_pVehicle)
 		{
 			CVehicle *veh = FindPlayerPed()->m_pVehicle;
 			int hveh = CPools::GetVehicleRef(veh);
