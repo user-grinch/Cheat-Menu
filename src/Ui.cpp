@@ -782,7 +782,7 @@ void Ui::EditFloat(const char *label, const int address, const float min, const 
 	}
 }
 
-bool Ui::HotKey(const char* label, int* key_array)
+bool Ui::HotKey(const char* label, HotKeyData& key_data)
 {
 	bool active = current_hotkey == label;
 	bool state = false;
@@ -795,7 +795,7 @@ bool Ui::HotKey(const char* label, int* key_array)
 		{
 			if (KeyPressed(key))
 			{
-				key_array[0] = key;
+				key_data.key1 = key;
 				break;
 			}
 		}
@@ -804,16 +804,16 @@ bool Ui::HotKey(const char* label, int* key_array)
 		{
 			if (KeyPressed(key))
 			{
-				key_array[1] = key;
+				key_data.key2 = key;
 				break;
 			}
 		}
 	}
 	
-	std::string text = key_names[key_array[0]-1];
+	std::string text = key_names[key_data.key1-1];
 
-	if (key_array[0] != key_array[1])
-		text += (" + " + key_names[key_array[1]-1]);
+	if (key_data.key1 != key_data.key2)
+		text += (" + " + key_names[key_data.key2-1]);
 
 	if (ImGui::Button((text + std::string("##") + std::string(label)).c_str(), ImVec2(ImGui::GetWindowContentRegionWidth() / 3, ImGui::GetFrameHeight())))
 	{
@@ -837,21 +837,26 @@ bool Ui::HotKey(const char* label, int* key_array)
 	return state;
 }
 
-bool Ui::HotKeyPressed(int *hotkey)
+bool Ui::HotKeyPressed(HotKeyData& hotkey)
 {
-	return current_hotkey == "" && KeyPressed(hotkey[0]) && KeyPressed(hotkey[1]);
+	if (CTimer::m_snTimeInMilliseconds - hotkey.timer > 250*CTimer::ms_fTimeScale)
+	{
+		hotkey.timer = CTimer::m_snTimeInMilliseconds;
+		return current_hotkey == "" && KeyPressed(hotkey.key1) && KeyPressed(hotkey.key2);
+	}
+	else
+		return false;
 }
 
-std::string Ui::GetHotKeyNameString(int *hotkey)
+std::string Ui::GetHotKeyNameString(HotKeyData& hotkey)
 {
-	std::string text = key_names[hotkey[0] - 1];
+	std::string text = key_names[hotkey.key1 - 1];
 
-	if (hotkey[0] != hotkey[1])
-		text += (" + " + key_names[hotkey[1] - 1]);
+	if (hotkey.key1 != hotkey.key2)
+		text += (" + " + key_names[hotkey.key2 - 1]);
 
 	return text;
 }
-
 
 bool Ui::ColorButton(int color_id, std::vector<float> &color, ImVec2 size)
 {

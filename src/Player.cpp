@@ -98,7 +98,7 @@ Player::Player()
 			player->m_nPhysicalFlags.bMeeleProof = 1;
 		}
 		
-		if (aim_skin_changer && Ui::HotKeyPressed(Menu::hotkey::aim_skin_changer))
+		if (aim_skin_changer && Ui::HotKeyPressed(Menu::hotkeys::aim_skin_changer))
 		{
 			CPed *target_ped = player->m_pPlayerTargettedPed;
 			if (target_ped)
@@ -343,7 +343,7 @@ void Player::Main()
 		if (ImGui::BeginTabItem("Appearance"))
 		{
 			ImGui::Spacing();
-			if (Ui::CheckboxWithHint("Aim skin changer", &aim_skin_changer,(("Activate using Aim ped + ") + Ui::GetHotKeyNameString(Menu::hotkey::aim_skin_changer)).c_str()))
+			if (Ui::CheckboxWithHint("Aim skin changer", &aim_skin_changer,(("Activate using Aim ped + ") + Ui::GetHotKeyNameString(Menu::hotkeys::aim_skin_changer)).c_str()))
 				config.SetValue("aim_skin_changer", aim_skin_changer);
 
 			if (ImGui::BeginTabBar("AppearanceTabBar"))

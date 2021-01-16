@@ -11,14 +11,7 @@ project(Test)
 ################################################################################
 
 set(test_files
-    "../vendor/fla/Main.h"
-    "../vendor/fla/Main.cpp"
-    "../vendor/fla/IDaccess.h"
-    "../vendor/fla/IDaccess.cpp"
-    "../vendor/fla/Library/Library.h"
-    "../vendor/fla/Library/Library.cpp"
     "Test.cpp"
-    "Dllmain.cpp"
 )
 
 add_library(${PROJECT_NAME} SHARED ${test_files})

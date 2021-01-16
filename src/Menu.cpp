@@ -18,11 +18,12 @@ int Menu::overlay::selected_pos = 4;
 float Menu::overlay::posX = NULL;
 float Menu::overlay::posY = NULL;
 
-int Menu::hotkey::command_window[]{ VK_LMENU ,VK_KEY_C };
-int Menu::hotkey::menu_open[]{VK_LCONTROL ,VK_KEY_M};
-int Menu::hotkey::aim_skin_changer[]{ VK_RETURN ,VK_RETURN };
-int Menu::hotkey::quick_ss[]{ VK_LCONTROL ,VK_KEY_S };
-int Menu::hotkey::quick_tp[]{ VK_KEY_X ,VK_KEY_Y };
+HotKeyData Menu::hotkeys::command_window{};
+HotKeyData Menu::hotkeys::menu_open{};
+HotKeyData Menu::hotkeys::aim_skin_changer{};
+HotKeyData Menu::hotkeys::quick_ss{};
+HotKeyData Menu::hotkeys::quick_tp{};
+HotKeyData Menu::hotkeys::airbreak{};
 
 bool Menu::commands::show_menu = false;
 char Menu::commands::input_buffer[INPUT_BUFFER_SIZE] = "";
@@ -44,20 +45,23 @@ Menu::Menu()
 		overlay::posY = config.GetValue("overlay.posY", 0);
 
 		// Hotkeys
-		hotkey::aim_skin_changer[0] = config.GetValue("hotkey.aim_skin_changer.key1", VK_RETURN);
-		hotkey::aim_skin_changer[1] = config.GetValue("hotkey.aim_skin_changer.key2", VK_RETURN);
+		hotkeys::aim_skin_changer.key1 = config.GetValue("hotkey.aim_skin_changer.key1", VK_RETURN);
+		hotkeys::aim_skin_changer.key2 = config.GetValue("hotkey.aim_skin_changer.key2", VK_RETURN);
 
-		hotkey::quick_ss[0] = config.GetValue("hotkey.quick_screenshot.key1", VK_LCONTROL);
-		hotkey::quick_ss[1] = config.GetValue("hotkey.quick_screenshot.key2", VK_KEY_S);
+		hotkeys::airbreak.key1 = config.GetValue("hotkey.airbreak.key1", VK_LMENU);
+		hotkeys::airbreak.key2 = config.GetValue("hotkey.airbreak.key2", VK_KEY_A);
 
-		hotkey::quick_tp[0] = config.GetValue("hotkey.quick_tp.key1", VK_KEY_X);
-		hotkey::quick_tp[1] = config.GetValue("hotkey.quick_tp.key2", VK_KEY_Y);
+		hotkeys::quick_ss.key1 = config.GetValue("hotkey.quick_screenshot.key1", VK_LCONTROL);
+		hotkeys::quick_ss.key2 = config.GetValue("hotkey.quick_screenshot.key2", VK_KEY_S);
 
-		hotkey::menu_open[0] = config.GetValue("hotkey.menu_open.key1", VK_LCONTROL);
-		hotkey::menu_open[1] = config.GetValue("hotkey.menu_open.key2", VK_KEY_M);
+		hotkeys::quick_tp.key1 = config.GetValue("hotkey.quick_tp.key1", VK_KEY_X);
+		hotkeys::quick_tp.key2 = config.GetValue("hotkey.quick_tp.key2", VK_KEY_Y);
 
-		hotkey::command_window[0] = config.GetValue("hotkey.command_window.key1", VK_LMENU);
-		hotkey::command_window[1] = config.GetValue("hotkey.command_window.key2", VK_KEY_C);
+		hotkeys::menu_open.key1 = config.GetValue("hotkey.menu_open.key1", VK_LCONTROL);
+		hotkeys::menu_open.key2 = config.GetValue("hotkey.menu_open.key2", VK_KEY_M);
+
+		hotkeys::command_window.key1 = config.GetValue("hotkey.command_window.key1", VK_LMENU);
+		hotkeys::command_window.key2 = config.GetValue("hotkey.command_window.key2", VK_KEY_C);
 	};
 }
 
@@ -315,33 +319,38 @@ void Menu::Main()
 
 			ImGui::Spacing();
 			ImGui::BeginChild("Hotkeys");
-			if (Ui::HotKey("Open/ close cheat menu", hotkey::menu_open))
+			if (Ui::HotKey("Open/ close cheat menu", hotkeys::menu_open))
 			{
-				config.SetValue("hotkey.menu_open.key1", hotkey::menu_open[0]);
-				config.SetValue("hotkey.menu_open.key2", hotkey::menu_open[1]);
+				config.SetValue("hotkey.menu_open.key1", hotkeys::menu_open.key1);
+				config.SetValue("hotkey.menu_open.key2", hotkeys::menu_open.key2);
 			}
-			if (Ui::HotKey("Open/ close command window", hotkey::command_window))
+			if (Ui::HotKey("Open/ close command window", hotkeys::command_window))
 			{
-				config.SetValue("hotkey.command_window.key1", hotkey::command_window[0]);
-				config.SetValue("hotkey.command_window.key2", hotkey::command_window[1]);
+				config.SetValue("hotkey.command_window.key1", hotkeys::command_window.key1);
+				config.SetValue("hotkey.command_window.key2", hotkeys::command_window.key2);
 			}
 
 			ImGui::Dummy(ImVec2(0,10));
 
-			if (Ui::HotKey("Activate aim skin changer", hotkey::aim_skin_changer))
+			if (Ui::HotKey("Activate aim skin changer", hotkeys::aim_skin_changer))
 			{
-				config.SetValue("hotkey.aim_skin_changer.key1", hotkey::aim_skin_changer[0]);
-				config.SetValue("hotkey.aim_skin_changer.key2", hotkey::aim_skin_changer[1]);
+				config.SetValue("hotkey.aim_skin_changer.key1", hotkeys::aim_skin_changer.key1);
+				config.SetValue("hotkey.aim_skin_changer.key2", hotkeys::aim_skin_changer.key2);
 			}
-			if (Ui::HotKey("Take quick screenshot", hotkey::quick_ss))
+			if (Ui::HotKey("Airbreak mode", hotkeys::airbreak))
 			{
-				config.SetValue("hotkey.quick_screenshot.key1", hotkey::quick_ss[0]);
-				config.SetValue("hotkey.quick_screenshot.key2", hotkey::quick_ss[1]);
+				config.SetValue("hotkey.airbreak.key1", hotkeys::airbreak.key1);
+				config.SetValue("hotkey.airbreak.key2", hotkeys::airbreak.key2);
 			}
-			if (Ui::HotKey("Toggle quick teleport", hotkey::quick_tp))
+			if (Ui::HotKey("Take quick screenshot", hotkeys::quick_ss))
 			{
-				config.SetValue("hotkey.quick_tp.key1", hotkey::quick_tp[0]);
-				config.SetValue("hotkey.quick_tp.key2", hotkey::quick_tp[1]);
+				config.SetValue("hotkey.quick_screenshot.key1", hotkeys::quick_ss.key1);
+				config.SetValue("hotkey.quick_screenshot.key2", hotkeys::quick_ss.key2);
+			}
+			if (Ui::HotKey("Toggle quick teleport", hotkeys::quick_tp))
+			{
+				config.SetValue("hotkey.quick_tp.key1", hotkeys::quick_tp.key1);
+				config.SetValue("hotkey.quick_tp.key2", hotkeys::quick_tp.key2);
 			}
 
 			ImGui::Dummy(ImVec2(0, 10));
@@ -353,7 +362,7 @@ void Menu::Main()
 		{
 			if (ImGui::BeginChild("CommandsChild"))
 			{
-				ImGui::TextWrapped(std::string("Open or close command window using " + Ui::GetHotKeyNameString(hotkey::command_window)).c_str());
+				ImGui::TextWrapped(std::string("Open or close command window using " + Ui::GetHotKeyNameString(hotkeys::command_window)).c_str());
 				ImGui::Spacing();
 				if (ImGui::CollapsingHeader("Set health"))
 				{

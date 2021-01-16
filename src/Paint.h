@@ -14,8 +14,6 @@ public:
 	};
 	static std::map<std::string, std::shared_ptr<RwTexture>> textures;
 
-protected:
-
 	static void UpdateNodeListRecursive(CVehicle* pVeh);
 	static void NodeWrapperRecursive(RwFrame * frame, CVehicle* pVeh, std::function<void(RwFrame*)> func);
 	static void SetNodeColor(CVehicle* pVeh, std::string node_name, CRGBA color, bool filter_mat = false);

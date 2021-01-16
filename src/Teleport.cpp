@@ -85,7 +85,7 @@ Teleport::Teleport()
 		
 		if (quick_teleport)
 		{
-			if (Ui::HotKeyPressed(Menu::hotkey::quick_tp)
+			if (Ui::HotKeyPressed(Menu::hotkeys::quick_tp)
 				&& ((CTimer::m_snTimeInMilliseconds - quick_teleport_timer) > 500))
 			{
 				quick_teleport_timer = CTimer::m_snTimeInMilliseconds;
@@ -195,7 +195,7 @@ void Teleport::Main()
 				ImGui::Checkbox("Insert coordinates", &insert_coord);
 				ImGui::NextColumn();
 				if (Ui::CheckboxWithHint("Quick teleport", &quick_teleport,
-					(std::string("Teleport to marker using ") + Ui::GetHotKeyNameString(Menu::hotkey::quick_tp)).c_str()))
+					(std::string("Teleport to marker using ") + Ui::GetHotKeyNameString(Menu::hotkeys::quick_tp)).c_str()))
 				{
 					config.SetValue("quick_teleport", quick_teleport);
 				}

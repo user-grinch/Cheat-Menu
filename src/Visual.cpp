@@ -2,6 +2,7 @@
 #include "Visual.h"
 #include "Ui.h"
 #include "Util.h"
+#include "Game.h"
 
 bool Visual::lock_weather = false;
 int Visual::weather_type_backup = 0;
@@ -257,28 +258,27 @@ void Visual::Main()
 			int hour = CClock::ms_nGameClockHours;
 			int minute = CClock::ms_nGameClockMinutes;
 
-			if (Globals::gsync_time)
+			if (Game::sync_time)
 			{
 				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 			}
-
 			
-			if (ImGui::InputInt("Hour", &hour) & !Globals::gsync_time)
+			if (ImGui::InputInt("Hour", &hour) & !Game::sync_time)
 			{
 				if (hour < 0) hour = 23;
 				if (hour > 23) hour = 0;
 				CClock::ms_nGameClockHours = hour;
 			}
 
-			if (ImGui::InputInt("Minute", &minute) & !Globals::gsync_time)
+			if (ImGui::InputInt("Minute", &minute) & !Game::sync_time)
 			{
 				if (minute < 0) minute = 59;
 				if (minute > 59) minute = 0;
 				CClock::ms_nGameClockMinutes = minute;
 			}
 
-			if (Globals::gsync_time)
+			if (Game::sync_time)
 			{
 				ImGui::PopStyleVar();
 				ImGui::PopItemFlag();

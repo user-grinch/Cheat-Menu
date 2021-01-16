@@ -156,8 +156,8 @@ Vehicle::Vehicle()
 				if (veh->m_nVehicleClass == CLASS_EXECUTIVE) // Executive
 					chance = rand() % 3 + 1;
 
-				if (chance == 1 && !IsNeonInstalled(veh) && veh->m_pDriver != player)
-					InstallNeon(veh, rand() % 255, rand() % 255, rand() % 255);
+				if (chance == 1 && !NeonAPI::IsNeonInstalled(veh) && veh->m_pDriver != player)
+					NeonAPI::InstallNeon(veh, rand() % 255, rand() % 255, rand() % 255);
 			}
 			neon::traffic_timer = timer;
 		}

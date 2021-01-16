@@ -61,9 +61,9 @@ public:
 
 	static ImVec2 GetSize(short count = 1, bool spacing = true);
 
-	static bool HotKey(const char* label, int* key_array);
-	static bool HotKeyPressed(int *hotkey);
-	static std::string GetHotKeyNameString(int *hotkey);
+	static bool HotKey(const char* label, HotKeyData& key_data);
+	static bool HotKeyPressed(HotKeyData& hotkey);
+	static std::string GetHotKeyNameString(HotKeyData& hotkey);
 
 	static bool ListBox(const char* label, std::vector<std::string>& all_items, int& selected);
 	static bool ListBoxStr(const char* label, std::vector<std::string>& all_items, std::string& selected);

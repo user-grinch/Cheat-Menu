@@ -17,13 +17,14 @@ private:
 		static float posY;
 	};
 public:
-	struct hotkey
+	struct hotkeys
 	{
-		static int command_window[2];
-		static int menu_open[2];
-		static int aim_skin_changer[2];
-		static int quick_ss[2];
-		static int quick_tp[2];
+		static HotKeyData command_window;
+		static HotKeyData menu_open;
+		static HotKeyData aim_skin_changer;
+		static HotKeyData quick_ss;
+		static HotKeyData quick_tp;
+		static HotKeyData airbreak;
 	};
 	struct commands
 	{

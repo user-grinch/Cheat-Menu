@@ -59,16 +59,12 @@ CheatMenu::CheatMenu()
 
 	Events::processScriptsEvent += [this]
 	{
-		if (Globals::init_done && !FrontEndMenuManager.m_bMenuActive 
-		&& CTimer::m_snTimeInMilliseconds - Globals::last_key_timer > 250*CTimer::ms_fTimeScale)
+		if (Globals::init_done && !FrontEndMenuManager.m_bMenuActive)
 		{
-			if (Ui::HotKeyPressed(hotkey::menu_open))
-			{
+			if (Ui::HotKeyPressed(hotkeys::menu_open))
 				Globals::show_menu = !Globals::show_menu;
-				Globals::last_key_timer = CTimer::m_snTimeInMilliseconds;
-			}
 
-			if (Ui::HotKeyPressed(hotkey::command_window))
+			if (Ui::HotKeyPressed(hotkeys::command_window))
 			{
 				if (Menu::commands::show_menu)
 				{
@@ -76,8 +72,6 @@ CheatMenu::CheatMenu()
 					strcpy(commands::input_buffer,"");
 				}
 				Menu::commands::show_menu = !Menu::commands::show_menu;
-
-				Globals::last_key_timer = CTimer::m_snTimeInMilliseconds;
 			}
 
 			if (Hook::show_mouse != Globals::show_menu)

@@ -10,7 +10,6 @@ std::map<std::string, std::shared_ptr<RwTexture>> Paint::textures;
 
 Paint::Paint()
 {
-
 	Events::initGameEvent += []
 	{
 		for (auto &p : fs::recursive_directory_iterator(PLUGIN_PATH((char*)"\\CheatMenu\\vehicles\\paintjobs\\")))

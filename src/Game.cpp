@@ -94,7 +94,7 @@ Game::Game()
 
 		if (ss_shortcut)
 		{
-			if (Ui::HotKeyPressed(Menu::hotkey::quick_ss) && timer - ss_shotcut_timer > 1000)
+			if (Ui::HotKeyPressed(Menu::hotkeys::quick_ss) && timer - ss_shotcut_timer > 1000)
 			{
 				Command<Commands::TAKE_PHOTO>();
 				CHud::SetHelpMessage("Screenshot taken", false, false, false);
@@ -160,11 +160,18 @@ Game::Game()
 				}
 			}
 		}
-
-		if (airbreak::enable)
+		
+		if (Ui::HotKeyPressed(Menu::hotkeys::airbreak))
 		{
-			AirbreakMode(player,hplayer);
+			if (airbreak::enable)
+			{
+				airbreak::enable = false;
+				ClearAirbreakStuff();
+			}
+			else airbreak::enable = true;
 		}
+		if (airbreak::enable)
+			AirbreakMode(player,hplayer);
 	};
 }
 
@@ -250,6 +257,28 @@ void Game::AirbreakMode(CPlayerPed* player, int hplayer)
 	player->SetPosn(pos);
 }
 
+void Game::ClearAirbreakStuff()
+{
+	CPlayerPed *player = FindPlayerPed();
+	uint hplayer = CPools::GetPedRef(player);
+
+	airbreak::init_done = false;
+	Command<Commands::SET_EVERYONE_IGNORE_PLAYER>(0, false);
+	Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(hplayer, false);
+	Command<Commands::SET_CHAR_COLLISION>(hplayer, true);
+	Command<Commands::SET_LOAD_COLLISION_FOR_CHAR_FLAG>(hplayer, true);
+	player->m_nPedFlags.bDontRender = false;
+
+	CHud::bScriptDontDisplayRadar = false;
+	CHud::m_Wants_To_Draw_Hud = true;
+
+	CVector pos = player->GetPosition();
+	CEntity* player_entity = FindPlayerEntity(-1);
+	pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, 0, &player_entity) + 0.5f;
+	player->SetPosn(pos);
+	Command<Commands::RESTORE_CAMERA_JUMPCUT>();
+}
+
 void Game::Main()
 {
 	ImGui::Spacing();
@@ -308,7 +337,7 @@ of LS without completing missions"))
 				Command<Commands::SWITCH_ARREST_PENALTIES>(keep_stuff);
 				Command<Commands::SWITCH_DEATH_PENALTIES>(keep_stuff);
 			}
-			Ui::CheckboxWithHint("Screenshot shortcut", &ss_shortcut, (("Take screenshot using ") + Ui::GetHotKeyNameString(Menu::hotkey::quick_ss)
+			Ui::CheckboxWithHint("Screenshot shortcut", &ss_shortcut, (("Take screenshot using ") + Ui::GetHotKeyNameString(Menu::hotkeys::quick_ss)
 			+ "\nSaved inside 'GTA San Andreas User Files\\Gallery'").c_str());
 			if (Ui::CheckboxWithHint("Solid water", &solid_water, "Player can walk on water"))
 			{
@@ -320,7 +349,6 @@ of LS without completing missions"))
 			}
 			if (ImGui::Checkbox("Sync system time", &sync_time))
 			{
-				Globals::gsync_time = sync_time;
 				if (sync_time)
 					patch::RedirectCall(0x53BFBD, &RealTimeClock);
 				else
@@ -338,23 +366,7 @@ of LS without completing missions"))
 \nLeft: J\t\t  Right: L\n\nSlower: RCtrl\tFaster: RShift"))
 				{
 					if (!airbreak::enable)
-					{
-						airbreak::init_done = false;
-						Command<Commands::SET_EVERYONE_IGNORE_PLAYER>(0, false);
-						Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(hplayer, false);
-						Command<Commands::SET_CHAR_COLLISION>(hplayer, true);
-						Command<Commands::SET_LOAD_COLLISION_FOR_CHAR_FLAG>(hplayer, true);
-						player->m_nPedFlags.bDontRender = false;
-
-						CHud::bScriptDontDisplayRadar = false;
-						CHud::m_Wants_To_Draw_Hud = true;
-
-						CVector pos = player->GetPosition();
-						CEntity* player_entity = FindPlayerEntity(-1);
-						pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, 0, &player_entity) + 0.5f;
-						player->SetPosn(pos);
-						Command<Commands::RESTORE_CAMERA_JUMPCUT>();
-					}
+						ClearAirbreakStuff();
 				}
 				ImGui::Spacing();
 

@@ -15,7 +15,6 @@ public:
 	static std::string GetLocationName(CVector *pos);
 	static void RainbowValues(int &r, int&g, int &b, float speed);
 
-
 	// This below source is taken from MoonAdditions https://github.com/THE-FYP/MoonAdditions
 	// MIT License
 

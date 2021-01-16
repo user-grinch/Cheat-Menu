@@ -1,8 +1,8 @@
+#pragma once
 #include "NeonAPI.h"
 #include "Paint.h"
 
-#pragma once
-class Vehicle : NeonAPI, Paint
+class Vehicle : Paint, NeonAPI
 {
 private:
 	static bool bike_fly;

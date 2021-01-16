@@ -1,7 +1,7 @@
 #pragma once
 class Game
 {
-private:
+public:
 	static CJson json;
 	static ImGuiTextFilter filter;
 	static std::vector<std::string> search_categories;
@@ -49,10 +49,10 @@ private:
 		static std::string selected_item;
 	};
 
-public:
 	Game();
 	~Game();
 	static void Main();
 	static void AirbreakMode(CPlayerPed* player, int hplayer);
+	static void ClearAirbreakStuff();
 };
 
