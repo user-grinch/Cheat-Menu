@@ -24,7 +24,7 @@ std::string Game::random_cheats::enabled_cheats[92][2];
 
 bool Game::airbreak::init_done = false;
 bool Game::airbreak::enable = false;
-float Game::airbreak::speed = 0.4f;
+float Game::airbreak::speed = 0.08f;
 float Game::airbreak::tmouseX = 0;
 float Game::airbreak::tmouseY = 0;
 
@@ -198,6 +198,7 @@ void SetPlayerMission(std::string& rootkey, std::string& name, std::string& id)
 void Game::AirbreakMode(CPlayerPed* player, int hplayer)
 {
 	CVector pos = player->GetPosition();
+	uint delta_speed = airbreak::speed * (CTimer::m_snTimeInMillisecondsNonClipped - CTimer::m_snPreviousTimeInMillisecondsNonClipped);
 
 	if (!airbreak::init_done)
 	{
@@ -224,6 +225,7 @@ void Game::AirbreakMode(CPlayerPed* player, int hplayer)
 	airbreak::tmouseY = (airbreak::tmouseY < -17.1887f) ? -17.1887f : airbreak::tmouseY;
 
 	TheCamera.m_fOrientation = airbreak::tmouseY * (3.1416 / 180);
+	CHud::SetMessage((char*)std::to_string(TheCamera.m_fOrientation).c_str());
 
 	if (KeyPressed(VK_RCONTROL))
 		mul /= 2;
@@ -238,9 +240,9 @@ void Game::AirbreakMode(CPlayerPed* player, int hplayer)
 
 		float angle = TheCamera.GetHeading() + (90.0f * 3.1416f / 180.0f);
 
-		pos.x += airbreak::speed * cos(angle) * mul;
-		pos.y += airbreak::speed * sin(angle) * mul;
-		pos.z += airbreak::speed * sin(TheCamera.m_fOrientation*2) * mul;
+		pos.x += delta_speed * cos(angle) * mul;
+		pos.y += delta_speed * sin(angle) * mul;
+		pos.z += delta_speed * sin(TheCamera.m_fOrientation*2) * mul;
 	}
 
 	if (KeyPressed(VK_KEY_J) || KeyPressed(VK_KEY_L))
@@ -248,10 +250,10 @@ void Game::AirbreakMode(CPlayerPed* player, int hplayer)
 		if (KeyPressed(VK_KEY_J))
 			mul *= -1;
 		
-		float angle = TheCamera.GetHeading() + (90.0f * 3.1416f / 180.0f);
+		float angle = TheCamera.GetHeading() + (3.1416f / 180.0f);
 
-		pos.x += airbreak::speed * cos(angle) * mul;
-		pos.y += airbreak::speed * sin(angle) * mul;
+		pos.x += delta_speed * cos(angle) * mul;
+		pos.y += delta_speed * sin(angle) * mul;
 	}
 
 	player->SetPosn(pos);
@@ -370,7 +372,7 @@ of LS without completing missions"))
 				}
 				ImGui::Spacing();
 
-				ImGui::SliderFloat("Movement Speed", &airbreak::speed, 0.0, 5.0);
+				ImGui::SliderFloat("Movement Speed", &airbreak::speed, 0.0, 0.5);
 
 				ImGui::Spacing();
 				ImGui::Separator();

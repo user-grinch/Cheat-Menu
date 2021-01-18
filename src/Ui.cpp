@@ -744,13 +744,13 @@ void Ui::EditFloat(const char *label, const int address, const float min, const 
 			patch::Set<float>(address, val/mul, false);
 		
 		ImGui::SameLine(0.0, 4.0);
-		if (ImGui::Button("-",ImVec2(size, size)))
+		if (ImGui::Button("-",ImVec2(size, size)) && val > min)
 		{
 			val -= 1;
 			patch::Set<float>(address, val / mul, false);
 		}
 		ImGui::SameLine(0.0, 4.0);
-		if (ImGui::Button("+",ImVec2(size, size)))
+		if (ImGui::Button("+",ImVec2(size, size)) && val < max)
 		{
 			val += 1;
 			patch::Set<float>(address, val / mul, false);

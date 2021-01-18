@@ -53,6 +53,7 @@ public:
 	~Game();
 	static void Main();
 	static void AirbreakMode(CPlayerPed* player, int hplayer);
+	static void CameraMode();
 	static void ClearAirbreakStuff();
 };
 
