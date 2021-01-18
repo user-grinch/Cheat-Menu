@@ -791,7 +791,7 @@ bool Ui::HotKey(const char* label, HotKeyData& key_data)
 	{
 		ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ButtonActive]);
 
-		for (int key = 2; key != 90; ++key)
+		for (int key = 3; key != 90; ++key)
 		{
 			if (KeyPressed(key))
 			{
@@ -800,7 +800,7 @@ bool Ui::HotKey(const char* label, HotKeyData& key_data)
 			}
 		}
 
-		for (int key = 90; key != 2; --key)
+		for (int key = 90; key != 3; --key)
 		{
 			if (KeyPressed(key))
 			{
@@ -810,7 +810,13 @@ bool Ui::HotKey(const char* label, HotKeyData& key_data)
 		}
 	}
 	
-	std::string text = key_names[key_data.key1-1];
+
+	std::string text;
+
+	if (key_data.key1 != VK_NONE)
+		text = key_names[key_data.key1-1];
+	else
+		text = "None";
 
 	if (key_data.key1 != key_data.key2)
 		text += (" + " + key_names[key_data.key2-1]);
@@ -825,6 +831,13 @@ bool Ui::HotKey(const char* label, HotKeyData& key_data)
 		else
 			current_hotkey = label;;
 	}
+
+	if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(1)) // right click
+	{
+		key_data.key1 = VK_NONE;
+		key_data.key2 = VK_NONE;
+	}
+	
 	ImGui::SameLine();
 	ImGui::Text(label);
 
@@ -850,7 +863,12 @@ bool Ui::HotKeyPressed(HotKeyData& hotkey)
 
 std::string Ui::GetHotKeyNameString(HotKeyData& hotkey)
 {
-	std::string text = key_names[hotkey.key1 - 1];
+	std::string text;
+
+	if (hotkey.key1 != VK_NONE)
+		text = key_names[hotkey.key1-1];
+	else
+		text = "None";
 
 	if (hotkey.key1 != hotkey.key2)
 		text += (" + " + key_names[hotkey.key2 - 1]);

@@ -18,12 +18,16 @@ int Menu::overlay::selected_pos = 4;
 float Menu::overlay::posX = NULL;
 float Menu::overlay::posY = NULL;
 
-HotKeyData Menu::hotkeys::command_window{};
-HotKeyData Menu::hotkeys::menu_open{};
 HotKeyData Menu::hotkeys::aim_skin_changer{};
+HotKeyData Menu::hotkeys::airbreak{};
+HotKeyData Menu::hotkeys::command_window{};
+HotKeyData Menu::hotkeys::flip_veh{};
+HotKeyData Menu::hotkeys::fix_veh{};
+HotKeyData Menu::hotkeys::god_mode{};
+HotKeyData Menu::hotkeys::menu_open{};
+
 HotKeyData Menu::hotkeys::quick_ss{};
 HotKeyData Menu::hotkeys::quick_tp{};
-HotKeyData Menu::hotkeys::airbreak{};
 
 bool Menu::commands::show_menu = false;
 char Menu::commands::input_buffer[INPUT_BUFFER_SIZE] = "";
@@ -62,6 +66,15 @@ Menu::Menu()
 
 		hotkeys::command_window.key1 = config.GetValue("hotkey.command_window.key1", VK_LMENU);
 		hotkeys::command_window.key2 = config.GetValue("hotkey.command_window.key2", VK_KEY_C);
+
+		hotkeys::flip_veh.key1 = config.GetValue("hotkey.flip_veh.key1", VK_NONE);
+		hotkeys::flip_veh.key2 = config.GetValue("hotkey.flip_veh.key2", VK_NONE);
+
+		hotkeys::fix_veh.key1 = config.GetValue("hotkey.fix_veh.key1", VK_NONE);
+		hotkeys::fix_veh.key2 = config.GetValue("hotkey.fix_veh.key2", VK_NONE);
+
+		hotkeys::god_mode.key1 = config.GetValue("hotkey.god_mode.key1", VK_NONE);
+		hotkeys::god_mode.key2 = config.GetValue("hotkey.god_mode.key2", VK_NONE);
 	};
 }
 
@@ -316,7 +329,8 @@ void Menu::Main()
 		}
 		if (ImGui::BeginTabItem("Hotkeys"))
 		{
-
+			ImGui::Spacing();
+			ImGui::TextWrapped("Right clicking will set hotkey to none. Some are set to none by default. Choose keys for them if you want to use them.");
 			ImGui::Spacing();
 			ImGui::BeginChild("Hotkeys");
 			if (Ui::HotKey("Open/ close cheat menu", hotkeys::menu_open))
@@ -351,6 +365,26 @@ void Menu::Main()
 			{
 				config.SetValue("hotkey.quick_tp.key1", hotkeys::quick_tp.key1);
 				config.SetValue("hotkey.quick_tp.key2", hotkeys::quick_tp.key2);
+			}
+
+			ImGui::Dummy(ImVec2(0,10));
+
+			if (Ui::HotKey("Fix current vehicle", hotkeys::fix_veh))
+			{
+				config.SetValue("hotkey.fix_veh.key1", hotkeys::fix_veh.key1);
+				config.SetValue("hotkey.fix_veh.key2", hotkeys::fix_veh.key2);
+			}
+
+			if (Ui::HotKey("Flip current vehicle", hotkeys::flip_veh))
+			{
+				config.SetValue("hotkey.flip_veh.key1", hotkeys::flip_veh.key1);
+				config.SetValue("hotkey.flip_veh.key2", hotkeys::flip_veh.key2);
+			}
+
+			if (Ui::HotKey("Toggle god mode", hotkeys::god_mode))
+			{
+				config.SetValue("hotkey.god_mode.key1", hotkeys::god_mode.key1);
+				config.SetValue("hotkey.god_mode.key2", hotkeys::god_mode.key2);
 			}
 
 			ImGui::Dummy(ImVec2(0, 10));

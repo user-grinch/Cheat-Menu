@@ -38,9 +38,6 @@ set(vendor_files
     "kiero/minhook/trampoline.c"
     "kiero/minhook/hde/hde32.c"
     "kiero/minhook/trampoline.c"
-    "moon/pool_object_extender.h"
-    "moon/vehicle_renderer.h"
-    "moon/vehicle_renderer.cpp"
 )
 
 add_library(${PROJECT_NAME} STATIC ${vendor_files})

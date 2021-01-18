@@ -1,11 +1,11 @@
 #include "pch.h"
-#include "NeonAPI.h"
+#include "Neon.h"
 #include "Util.h"
 
-VehicleExtendedData<NeonAPI::NeonData> NeonAPI::VehNeon;
-RwTexture* NeonAPI::neon_texture = nullptr;
+VehicleExtendedData<Neon::NeonData> Neon::VehNeon;
+RwTexture* Neon::neon_texture = nullptr;
 
-NeonAPI::NeonAPI()
+Neon::Neon()
 {
 	Events::initGameEvent += [this]
 	{
@@ -48,27 +48,27 @@ NeonAPI::NeonAPI()
 	};
 }
 
-NeonAPI::~NeonAPI()
+Neon::~Neon()
 {
 	delete neon_texture;
 }
 
-bool NeonAPI::IsNeonInstalled(CVehicle *pVeh)
+bool Neon::IsNeonInstalled(CVehicle *pVeh)
 {
 	return VehNeon.Get(pVeh).neon_installed;
 }
 
-bool NeonAPI::IsPulsingEnabled(CVehicle *pVeh)
+bool Neon::IsPulsingEnabled(CVehicle *pVeh)
 {
 	return VehNeon.Get(pVeh).pulsing;
 }
 
-void NeonAPI::SetPulsing(CVehicle *pVeh, bool state)
+void Neon::SetPulsing(CVehicle *pVeh, bool state)
 {
 	VehNeon.Get(pVeh).pulsing = state;
 }
 
-void NeonAPI::InstallNeon(CVehicle *pVeh, int red, int green, int blue)
+void Neon::InstallNeon(CVehicle *pVeh, int red, int green, int blue)
 {
 	CRGBA &color = VehNeon.Get(pVeh).color;
 
@@ -80,7 +80,7 @@ void NeonAPI::InstallNeon(CVehicle *pVeh, int red, int green, int blue)
 	VehNeon.Get(pVeh).neon_installed = true;
 }
 
-void NeonAPI::RemoveNeon(CVehicle *pVeh)
+void Neon::RemoveNeon(CVehicle *pVeh)
 {
 	VehNeon.Get(pVeh).neon_installed = false;
 }

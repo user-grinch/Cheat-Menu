@@ -107,6 +107,27 @@ Player::Player()
 				Util::ClearCharTasksVehCheck(player);
 			}
 		}
+
+		if (Ui::HotKeyPressed(Menu::hotkeys::god_mode))
+		{
+			if (god_mode)
+			{
+				CHud::SetHelpMessage("God mode disabled",false,false,false);
+				
+				patch::Set<bool>(0x96916D, god_mode, false);
+				player->m_nPhysicalFlags.bBulletProof = false;
+				player->m_nPhysicalFlags.bCollisionProof = false;
+				player->m_nPhysicalFlags.bExplosionProof = false;
+				player->m_nPhysicalFlags.bFireProof = false;
+				player->m_nPhysicalFlags.bMeeleProof = false;
+				god_mode = false;
+			}
+			else
+			{
+				CHud::SetHelpMessage("God mode enabled",false,false,false);
+				god_mode = true;
+			}
+		}
 	};
 }
 

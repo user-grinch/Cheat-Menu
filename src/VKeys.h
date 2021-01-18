@@ -1,5 +1,6 @@
 #pragma once
 
+#define VK_NONE  -1
 #define	VK_KEY_0 0x30 
 #define	VK_KEY_1 0x31 
 #define	VK_KEY_2 0x32 

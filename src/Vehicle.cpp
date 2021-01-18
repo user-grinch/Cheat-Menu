@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Vehicle.h"
+#include "Menu.h"
 #include "Ui.h"
 #include "Util.h"
 
@@ -89,7 +90,23 @@ Vehicle::Vehicle()
 		if (player && veh)
 		{
 			int hveh = CPools::GetVehicleRef(veh);
+			
+			if (Ui::HotKeyPressed(Menu::hotkeys::flip_veh))
+			{
+				float roll;
+				Command<Commands::GET_CAR_ROLL>(hveh, &roll);
+				roll += 180;
+				Command<Commands::SET_CAR_ROLL>(hveh, roll);
+				Command<Commands::SET_CAR_ROLL>(hveh, roll); // z rot fix
+			}
 
+			if (Ui::HotKeyPressed(Menu::hotkeys::fix_veh))
+			{
+				player->m_pVehicle->Fix();
+				player->m_pVehicle->m_fHealth = 1000.0f;
+				CHud::SetHelpMessage("Vehicle fixed",false,false,false);
+			}
+			
 			if (veh_nodmg)
 			{
 				veh->m_nPhysicalFlags.bBulletProof = true;
@@ -135,7 +152,7 @@ Vehicle::Vehicle()
 				int red, green, blue;
 
 				Util::RainbowValues(red, green, blue, 0.25);
-				NeonAPI::InstallNeon(veh, red, green, blue);
+				InstallNeon(veh, red, green, blue);
 				neon::rainbow_timer = timer;
 			}
 		}
@@ -156,8 +173,8 @@ Vehicle::Vehicle()
 				if (veh->m_nVehicleClass == CLASS_EXECUTIVE) // Executive
 					chance = rand() % 3 + 1;
 
-				if (chance == 1 && !NeonAPI::IsNeonInstalled(veh) && veh->m_pDriver != player)
-					NeonAPI::InstallNeon(veh, rand() % 255, rand() % 255, rand() % 255);
+				if (chance == 1 && !IsNeonInstalled(veh) && veh->m_pDriver != player)
+					InstallNeon(veh, rand() % 255, rand() % 255, rand() % 255);
 			}
 			neon::traffic_timer = timer;
 		}
@@ -716,11 +733,11 @@ void Vehicle::Main()
 				if (Ui::CheckboxWithHint("Explosion proof", &state, nullptr, veh_nodmg))
 					pVeh->m_nPhysicalFlags.bExplosionProof = state;
 
-				ImGui::NextColumn();
-
 				state = pVeh->m_nPhysicalFlags.bFireProof;
 				if (Ui::CheckboxWithHint("Fire proof", &state, nullptr, veh_nodmg))
 					pVeh->m_nPhysicalFlags.bFireProof = state;
+					
+				ImGui::NextColumn();
 
 				state = pVeh->m_nVehicleFlags.bVehicleCanBeTargettedByHS;
 				if (Ui::CheckboxWithHint("HS targetable", &state, "Heat Seaker missile can target this"))
@@ -746,6 +763,14 @@ void Vehicle::Main()
 				state = pVeh->m_nPhysicalFlags.bMeeleProof;
 				if (Ui::CheckboxWithHint("Melee proof", &state, nullptr, veh_nodmg))
 					pVeh->m_nPhysicalFlags.bMeeleProof = state;
+
+				state = pVeh->m_nVehicleFlags.bPetrolTankIsWeakPoint;
+				if (Ui::CheckboxWithHint("Petrol tank blow", &state, "Vehicle will blow up if petrol tank is shot"))
+					pVeh->m_nVehicleFlags.bPetrolTankIsWeakPoint = state;
+
+				state = pVeh->m_nVehicleFlags.bSirenOrAlarm; 
+				if (Ui::CheckboxWithHint("Siren", &state))
+					pVeh->m_nVehicleFlags.bSirenOrAlarm = state;
 
 				state = pVeh->m_nVehicleFlags.bTakeLessDamage;
 				if (Ui::CheckboxWithHint("Take less dmg", &state, nullptr))
@@ -1036,16 +1061,16 @@ void Vehicle::Main()
 				ImGui::Spacing();
 				if (ImGui::Button("Remove neon", ImVec2(Ui::GetSize())))
 				{
-					NeonAPI::RemoveNeon(veh);
+					RemoveNeon(veh);
 					CHud::SetHelpMessage("Neon removed", false, false, false);
 				}
 
 				ImGui::Spacing();
 				ImGui::Columns(2, NULL, false);
 				
-				bool pulsing = NeonAPI::IsPulsingEnabled(veh);
+				bool pulsing = IsPulsingEnabled(veh);
 				if (Ui::CheckboxWithHint("Pulsing neons", &pulsing))
-					NeonAPI::SetPulsing(veh,pulsing);
+					SetPulsing(veh,pulsing);
 
 				Ui::CheckboxWithHint("Rainbow neons", &neon::rainbow, "Rainbow effect to neon lights");
 				ImGui::NextColumn();
@@ -1056,7 +1081,7 @@ Only some vehicles will have them.");
 				ImGui::Spacing();
 
 				if (ImGui::ColorEdit3("Color picker", neon::color_picker))
-					NeonAPI::InstallNeon(veh, neon::color_picker[0] * 255, neon::color_picker[1] * 255, neon::color_picker[2] * 255);
+					InstallNeon(veh, neon::color_picker[0] * 255, neon::color_picker[1] * 255, neon::color_picker[2] * 255);
 
 				ImGui::Spacing();
 				ImGui::Text("Select neon preset:");
@@ -1073,7 +1098,7 @@ Only some vehicles will have them.");
 					if (Ui::ColorButton(color_id, carcols_color_values[color_id], ImVec2(btn_size, btn_size)))
 					{
 						std::vector<float> &color = carcols_color_values[color_id];
-						NeonAPI::InstallNeon(veh, color[0]*255, color[1]*255, color[2]*255);
+						InstallNeon(veh, color[0]*255, color[1]*255, color[2]*255);
 					}
 
 					if ((color_id + 1) % btns_in_row != 0)

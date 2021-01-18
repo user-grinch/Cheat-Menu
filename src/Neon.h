@@ -1,6 +1,6 @@
 #pragma once
 
-class NeonAPI
+class Neon
 {
 private:
 	static RwTexture* neon_texture;
@@ -26,8 +26,8 @@ private:
     static VehicleExtendedData<NeonData> VehNeon;
 
 public:
-	NeonAPI();
-	~NeonAPI();
+	Neon();
+	~Neon();
 	static void InstallNeon(CVehicle *veh, int red, int green, int blue);
 	static bool IsNeonInstalled(CVehicle *veh);
 	static bool IsPulsingEnabled(CVehicle *veh);

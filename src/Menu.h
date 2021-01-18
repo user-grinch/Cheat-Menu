@@ -19,12 +19,15 @@ private:
 public:
 	struct hotkeys
 	{
-		static HotKeyData command_window;
-		static HotKeyData menu_open;
 		static HotKeyData aim_skin_changer;
+		static HotKeyData airbreak;
+		static HotKeyData command_window;
+		static HotKeyData fix_veh;
+		static HotKeyData flip_veh;
+		static HotKeyData god_mode;
+		static HotKeyData menu_open;
 		static HotKeyData quick_ss;
 		static HotKeyData quick_tp;
-		static HotKeyData airbreak;
 	};
 	struct commands
 	{

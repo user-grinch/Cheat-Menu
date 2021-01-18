@@ -8,7 +8,9 @@
                 "${PLUGIN_SDK_DIR}/plugin_sa",
                 "${PLUGIN_SDK_DIR}/plugin_sa/game_sa",
                 "${PLUGIN_SDK_DIR}/shared",
-                "${PLUGIN_SDK_DIR}/shared/game"
+                "${PLUGIN_SDK_DIR}/shared/game",
+                "E:/plugin-sdk-master/plugin_sa/game_sa",
+                "E:/plugin-sdk-master/shared"
             ],
             "defines": [
                 "GTASA",
