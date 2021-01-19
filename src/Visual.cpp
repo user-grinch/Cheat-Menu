@@ -3,6 +3,7 @@
 #include "Ui.h"
 #include "Util.h"
 #include "Game.h"
+#include "CHudColours.h"
 
 bool Visual::lock_weather = false;
 int Visual::weather_type_backup = 0;
@@ -13,6 +14,15 @@ std::vector<std::string> Visual::weather_names{
 "SUNNY VEGAS","EXTRASUNNY VEGAS","CLOUDY VEGAS","EXTRASUNNY COUNTRYSIDE","SUNNY COUNTRYSIDE","CLOUDY COUNTRYSIDE","RAINY COUNTRYSIDE",
 "EXTRASUNNY DESERT","SUNNY DESERT","SANDSTORM DESERT","UNDERWATER","EXTRACOLOURS 1","EXTRACOLOURS 2"
 };
+
+// Let's just use our own variables
+static float radar_posX;
+static float radar_posY;
+static float radar_width = 76.0f;
+static float radar_height = 104.0f;
+static CHudColour health_bar;
+//static CHudColour armour_bar;
+static bool init_patches = false;
 
 Visual::Visual()
 {
@@ -208,24 +218,62 @@ void Visual::Main()
 		}
 		if (ImGui::BeginTabItem("Menus"))
 		{
-			Ui::ColorPickerAddress("Health bar + debt color", 0xBAB22C, ImVec4(180,25,29,255));
+
+			if (!init_patches)
+			{
+				// read those values from game
+				health_bar = HudColour.m_aColours[0];
+				//armour_bar = HudColour.m_aColours[4];
+
+				radar_posX = *(float*)*(int*)0x5834D4;
+				radar_posY = *(float*)*(int*)0x583500;
+				radar_height = *(float*)*(int*)0x5834F6;
+				radar_width = *(float*)*(int*)0x5834C2;
+				
+				// patch radar stuff oof
+				patch::SetPointer(0x5834D4, &radar_posX);
+				patch::SetPointer(0x583500, &radar_posY);
+				patch::SetPointer(0x5834F6, &radar_height);
+				patch::SetPointer(0x5834C2, &radar_width);
+ 
+				patch::SetPointer(0x58A79B, &radar_posX);
+				patch::SetPointer(0x58A7C7, &radar_posY);
+				patch::SetPointer(0x58A801, &radar_height);
+				patch::SetPointer(0x58A7E9, &radar_width);
+				patch::SetPointer(0x58A836, &radar_posX);
+				patch::SetPointer(0x58A868, &radar_posY);
+				patch::SetPointer(0x58A8AB, &radar_height);
+				patch::SetPointer(0x58A840, &radar_width);
+				patch::SetPointer(0x58A8E9, &radar_posX);
+				patch::SetPointer(0x58A913, &radar_posY);
+				patch::SetPointer(0x58A921, &radar_height);
+				patch::SetPointer(0x58A943, &radar_width);
+				patch::SetPointer(0x58A98A, &radar_posX);
+				patch::SetPointer(0x58A9C7, &radar_posY);
+				patch::SetPointer(0x58A9D5, &radar_height);
+				patch::SetPointer(0x58A99D, &radar_width);
+ 
+				patch::SetPointer(0x589331, &health_bar);
+				//patch::SetPointer(0x5890FC,&armour_bar);
+				init = true;
+			}
+
+			Ui::ColorPickerAddress("Armour bar", *(int*)0x5890FC, ImVec4(180,25,29,255));
+			Ui::ColorPickerAddress("Health bar", *(int*)0x589331, ImVec4(180,25,29,255));
 			Ui::ColorPickerAddress("Main menu title border color", 0xBAB240, ImVec4(0,0,0,255));
 			Ui::ColorPickerAddress("Money color", 0xBAB230, ImVec4(54,104,44,255));	
 			static std::vector<Ui::NamedValue> font_outline{{ "No outline", 0 }, { "Thin outline" ,1 }, { "Default outline" ,2 }};
 			Ui::EditRadioButtonAddressEx("Money font outline", 0x58F58D, font_outline);
 			static std::vector<Ui::NamedValue> style{ { "Style 1", 1 }, { "Style 2" ,2 }, { "Default style" ,3 }};
 			Ui::EditRadioButtonAddressEx("Money font style", 0x58F57F, style);
-			Ui::EditAddress<float>("Radar Height", 0x866B74, 0, 76, 999);
-			Ui::EditAddress<float>("Radar Width", 0x866B78, 0, 94, 999);
-			Ui::EditAddress<float>("Radar X position", 0x858A10, -999, 40, 999);
-			Ui::EditAddress<float>("Radar Y position", 0x866B70, -999, 104, 999);
+			Ui::EditAddress<float>("Radar Height", *(int*)0x5834F6, 0, 76, 999);
+			Ui::EditAddress<float>("Radar Width", *(int*)0x5834C2, 0, 94, 999);
+			Ui::EditAddress<float>("Radar X position", *(int*)0x5834D4, -999, 40, 999);
+			Ui::EditAddress<float>("Radar Y position", *(int*)0x583500, -999, 104, 999);
 			Ui::EditAddress<int>("Radar zoom", 0xA444A3, 0, 0, 170);
 			Ui::ColorPickerAddress("Radio station color", 0xBAB24C, ImVec4(150,150,150,255));
-			Ui::ColorPickerAddress("Styled text color", 0xBAB258, ImVec4(226,192,99,255));
-			Ui::ColorPickerAddress("Text color", 0xBAB234, ImVec4(50,60,127,255));
 			static std::vector<Ui::NamedValue> star_border{ { "No border", 0 }, { "Default" ,1 }, { "Bold border" ,2 }};
 			Ui::EditRadioButtonAddressEx("Wanted star border", 0x58DD41, star_border);
-			Ui::ColorPickerAddress("Wanted star color + some text", 0xBAB244, ImVec4(144,98,16,255));
 
 			ImGui::EndTabItem();
 		}

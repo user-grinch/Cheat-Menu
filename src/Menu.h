@@ -20,7 +20,7 @@ public:
 	struct hotkeys
 	{
 		static HotKeyData aim_skin_changer;
-		static HotKeyData airbreak;
+		static HotKeyData freecam;
 		static HotKeyData command_window;
 		static HotKeyData fix_veh;
 		static HotKeyData flip_veh;

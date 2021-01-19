@@ -19,12 +19,14 @@ public:
 		static std::string enabled_cheats[92][2];
 	};
 
-	struct airbreak
+	struct freecam
 	{
 		static bool enable;
 		static float speed;
 		static bool init_done;
-		static float tmouseX, tmouseY;
+		static CPed *ped;
+		static int hped;
+		static float mouseX, mouseY, tmouseX, tmouseY;
 	};
 
 	static bool disable_cheats;
@@ -52,8 +54,7 @@ public:
 	Game();
 	~Game();
 	static void Main();
-	static void AirbreakMode(CPlayerPed* player, int hplayer);
-	static void CameraMode();
-	static void ClearAirbreakStuff();
+	static void FreeCam();
+	static void ClearFreecamStuff();
 };
 

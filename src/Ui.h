@@ -107,6 +107,12 @@ void Ui::EditAddress(const char *label, const int address, const int min, const 
 
 		ImGui::Spacing();
 
+		if (val < min)
+			val = min;
+		
+		if (val > max)
+			val = max;
+
 		if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), Ui::GetSize(items)))
 			patch::Set<T>(address, min, false);
 

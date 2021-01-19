@@ -3,6 +3,7 @@
 #include "Menu.h"
 #include "Ui.h"
 #include "Util.h"
+#include "CIplStore.h"
 
 ImGuiTextFilter Game::filter = "";
 std::vector<std::string> Game::search_categories;
@@ -22,11 +23,15 @@ int Game::random_cheats::enable_wait_time = 10;
 uint Game::random_cheats::timer = 0;
 std::string Game::random_cheats::enabled_cheats[92][2];
 
-bool Game::airbreak::init_done = false;
-bool Game::airbreak::enable = false;
-float Game::airbreak::speed = 0.08f;
-float Game::airbreak::tmouseX = 0;
-float Game::airbreak::tmouseY = 0;
+bool Game::freecam::init_done = false;
+bool Game::freecam::enable = false;
+float Game::freecam::speed = 0.08f;
+float Game::freecam::tmouseX = 0;
+float Game::freecam::tmouseY = 0;
+float Game::freecam::mouseX = 0;
+float Game::freecam::mouseY = 0;
+int Game::freecam::hped = -1;
+CPed *Game::freecam::ped = nullptr;
 
 bool Game::disable_cheats = false;
 bool Game::disable_replay = false;
@@ -161,17 +166,17 @@ Game::Game()
 			}
 		}
 		
-		if (Ui::HotKeyPressed(Menu::hotkeys::airbreak))
+		if (Ui::HotKeyPressed(Menu::hotkeys::freecam))
 		{
-			if (airbreak::enable)
+			if (freecam::enable)
 			{
-				airbreak::enable = false;
-				ClearAirbreakStuff();
+				freecam::enable = false;
+				ClearFreecamStuff();
 			}
-			else airbreak::enable = true;
+			else freecam::enable = true;
 		}
-		if (airbreak::enable)
-			AirbreakMode(player,hplayer);
+		if (freecam::enable)
+			FreeCam();
 	};
 }
 
@@ -195,89 +200,104 @@ void SetPlayerMission(std::string& rootkey, std::string& name, std::string& id)
 		
 }
 
-void Game::AirbreakMode(CPlayerPed* player, int hplayer)
+void Game::FreeCam()
 {
-	CVector pos = player->GetPosition();
-	uint delta_speed = airbreak::speed * (CTimer::m_snTimeInMillisecondsNonClipped - CTimer::m_snPreviousTimeInMillisecondsNonClipped);
+	uint delta_speed = freecam::speed * (CTimer::m_snTimeInMillisecondsNonClipped - CTimer::m_snPreviousTimeInMillisecondsNonClipped);
 
-	if (!airbreak::init_done)
+	if (!freecam::init_done)
 	{
+		CPlayerPed *player = FindPlayerPed(-1);
 		Command<Commands::SET_EVERYONE_IGNORE_PLAYER>(0, true);
-		Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(hplayer,true);
-		Command<Commands::SET_CHAR_COLLISION>(hplayer, false);
-		Command<Commands::SET_LOAD_COLLISION_FOR_CHAR_FLAG>(hplayer, false);
-		player->m_nPedFlags.bDontRender = true;
-
 		CHud::bScriptDontDisplayRadar = true;
 		CHud::m_Wants_To_Draw_Hud = false;
+		CVector player_pos = player->GetPosition();
+		CPad::GetPad(0)->DisablePlayerControls = true;
 
-		airbreak::tmouseX = TheCamera.GetHeading() + (90.0f * 3.1416f / 180.0f);
-		airbreak::tmouseY = 0;
-		airbreak::init_done = true;
+		Command<Commands::CREATE_RANDOM_CHAR>(player_pos.x,player_pos.y,player_pos.z, &freecam::hped);
+		freecam::ped = CPools::GetPed(freecam::hped);
+		freecam::ped->m_bIsVisible = false;
+		
+		Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(freecam::hped,true);
+		Command<Commands::SET_CHAR_COLLISION>(freecam::hped, false);
+		Command<Commands::SET_LOAD_COLLISION_FOR_CHAR_FLAG>(freecam::hped, false);
+
+		freecam::tmouseX = player->GetHeading();
+		freecam::tmouseY = 0;
+
+		freecam::init_done = true;
+		player_pos.z -= 20;
+		freecam::ped->SetPosn(player_pos);
 	}
+	CVector pos = freecam::ped->GetPosition();
 
-	float mul = 1.0f;
+	Command<Commands::GET_PC_MOUSE_MOVEMENT>(&freecam::mouseX, &freecam::mouseY);
+	freecam::tmouseX = freecam::tmouseX - freecam::mouseX/250;
+	freecam::tmouseY = freecam::tmouseY + freecam::mouseY/3;
 	
-	airbreak::tmouseX -= (CPad::NewMouseControllerState.X / 6.0f);
-	airbreak::tmouseY += (CPad::NewMouseControllerState.Y / 3.0f);
+	if (freecam::tmouseY > 150)
+		freecam::tmouseY = 150;
 
-	airbreak::tmouseY = (airbreak::tmouseY > 17.1887f) ? 17.1887f : airbreak::tmouseY;
-	airbreak::tmouseY = (airbreak::tmouseY < -17.1887f) ? -17.1887f : airbreak::tmouseY;
+	if (freecam::tmouseY < -150)
+		freecam::tmouseY = -150;
 
-	TheCamera.m_fOrientation = airbreak::tmouseY * (3.1416 / 180);
-	CHud::SetMessage((char*)std::to_string(TheCamera.m_fOrientation).c_str());
-
+	if (KeyPressed(VK_RETURN))
+	{
+		CPlayerPed *player = FindPlayerPed(-1);
+		CVector pos = freecam::ped->GetPosition();
+		CEntity* player_entity = FindPlayerEntity(-1);
+		pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, 0, &player_entity) + 0.5f;
+		Command<Commands::SET_CHAR_COORDINATES>(CPools::GetPedRef(player),pos.x,pos.y,pos.z);
+	}
+	
 	if (KeyPressed(VK_RCONTROL))
-		mul /= 2;
+		delta_speed /= 2;
 
 	if (KeyPressed(VK_RSHIFT))
-		mul *= 2;
+		delta_speed *= 2;
 
 	if (KeyPressed(VK_KEY_I) || KeyPressed(VK_KEY_K))
 	{
 		if (KeyPressed(VK_KEY_K))
-			mul *= -1;
+			delta_speed *= -1;
 
-		float angle = TheCamera.GetHeading() + (90.0f * 3.1416f / 180.0f);
-
-		pos.x += delta_speed * cos(angle) * mul;
-		pos.y += delta_speed * sin(angle) * mul;
-		pos.z += delta_speed * sin(TheCamera.m_fOrientation*2) * mul;
+		float angle;
+		Command<Commands::GET_CHAR_HEADING>(freecam::hped,&angle);
+		
+		pos.x += delta_speed * cos(angle * 3.14159f/180.0f);
+		pos.y += delta_speed * sin(angle * 3.14159f/180.0f);
+		pos.z += delta_speed* 2 * sin(freecam::tmouseY/3* 3.14159f/180.0f);
 	}
 
 	if (KeyPressed(VK_KEY_J) || KeyPressed(VK_KEY_L))
 	{
 		if (KeyPressed(VK_KEY_J))
-			mul *= -1;
+			delta_speed *= -1;
 		
-		float angle = TheCamera.GetHeading() + (3.1416f / 180.0f);
+		float angle;
+		Command<Commands::GET_CHAR_HEADING>(freecam::hped,&angle);
+		angle -= 90.0f;
 
-		pos.x += delta_speed * cos(angle) * mul;
-		pos.y += delta_speed * sin(angle) * mul;
+		pos.x += delta_speed * cos(angle * 3.14159f/180.0f);
+		pos.y += delta_speed * sin(angle * 3.14159f/180.0f);
 	}
 
-	player->SetPosn(pos);
+	freecam::ped->SetHeading(freecam::tmouseX);
+	Command<Commands::ATTACH_CAMERA_TO_CHAR>(freecam::hped,0.0,0.0,20.0,90.0,180,freecam::tmouseY,0.0,2);
+	freecam::ped->SetPosn(pos);
+	CIplStore::AddIplsNeededAtPosn(pos);
 }
 
-void Game::ClearAirbreakStuff()
+void Game::ClearFreecamStuff()
 {
-	CPlayerPed *player = FindPlayerPed();
-	uint hplayer = CPools::GetPedRef(player);
-
-	airbreak::init_done = false;
+	freecam::init_done = false;
 	Command<Commands::SET_EVERYONE_IGNORE_PLAYER>(0, false);
-	Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(hplayer, false);
-	Command<Commands::SET_CHAR_COLLISION>(hplayer, true);
-	Command<Commands::SET_LOAD_COLLISION_FOR_CHAR_FLAG>(hplayer, true);
-	player->m_nPedFlags.bDontRender = false;
-
 	CHud::bScriptDontDisplayRadar = false;
 	CHud::m_Wants_To_Draw_Hud = true;
+	CPad::GetPad(0)->DisablePlayerControls = false;
 
-	CVector pos = player->GetPosition();
-	CEntity* player_entity = FindPlayerEntity(-1);
-	pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, 0, &player_entity) + 0.5f;
-	player->SetPosn(pos);
+	Command<Commands::DELETE_CHAR>(freecam::hped);
+	freecam::ped = nullptr;
+
 	Command<Commands::RESTORE_CAMERA_JUMPCUT>();
 }
 
@@ -362,21 +382,6 @@ of LS without completing missions"))
 		}
 		if (ImGui::BeginTabItem("Menus"))
 		{
-			if (ImGui::CollapsingHeader("Airbreak mode"))
-			{
-				if (Ui::CheckboxWithHint("Enable", &airbreak::enable, "Forward: I\tBackward: K\
-\nLeft: J\t\t  Right: L\n\nSlower: RCtrl\tFaster: RShift"))
-				{
-					if (!airbreak::enable)
-						ClearAirbreakStuff();
-				}
-				ImGui::Spacing();
-
-				ImGui::SliderFloat("Movement Speed", &airbreak::speed, 0.0, 0.5);
-
-				ImGui::Spacing();
-				ImGui::Separator();
-			}
 			if (ImGui::CollapsingHeader("Current day"))
 			{
 				int day = CClock::CurrentDay-1;
@@ -387,6 +392,23 @@ of LS without completing missions"))
 			}
 			Ui::EditAddress<int>("Days passed", 0xB79038, 0, 9999);
 			Ui::EditReference("FPS limit", RsGlobal.frameLimit, 1, 30, 60);
+			if (ImGui::CollapsingHeader("Free cam"))
+			{
+				if (Ui::CheckboxWithHint("Enable", &freecam::enable, "Forward: I\tBackward: K\
+\nLeft: J\t\t  Right: L\n\nSlower: RCtrl\tFaster: RShift"))
+				{
+					if (!freecam::enable)
+						ClearFreecamStuff();
+				}
+				ImGui::Spacing();
+
+				ImGui::SliderFloat("Movement Speed", &freecam::speed, 0.0, 0.5);
+
+				ImGui::Spacing();
+				ImGui::TextWrapped("Press Enter to teleport player to camera location");
+				ImGui::Spacing();
+				ImGui::Separator();
+			}
 			Ui::EditReference("Game speed", CTimer::ms_fTimeScale,1, 1, 10);
 			Ui::EditFloat("Gravity", 0x863984, -1.0f, 0.008f, 1.0f);
 

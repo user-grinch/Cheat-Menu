@@ -19,7 +19,7 @@ float Menu::overlay::posX = NULL;
 float Menu::overlay::posY = NULL;
 
 HotKeyData Menu::hotkeys::aim_skin_changer{};
-HotKeyData Menu::hotkeys::airbreak{};
+HotKeyData Menu::hotkeys::freecam{};
 HotKeyData Menu::hotkeys::command_window{};
 HotKeyData Menu::hotkeys::flip_veh{};
 HotKeyData Menu::hotkeys::fix_veh{};
@@ -52,8 +52,8 @@ Menu::Menu()
 		hotkeys::aim_skin_changer.key1 = config.GetValue("hotkey.aim_skin_changer.key1", VK_RETURN);
 		hotkeys::aim_skin_changer.key2 = config.GetValue("hotkey.aim_skin_changer.key2", VK_RETURN);
 
-		hotkeys::airbreak.key1 = config.GetValue("hotkey.airbreak.key1", VK_LMENU);
-		hotkeys::airbreak.key2 = config.GetValue("hotkey.airbreak.key2", VK_KEY_A);
+		hotkeys::freecam.key1 = config.GetValue("hotkey.freecam.key1", VK_LMENU);
+		hotkeys::freecam.key2 = config.GetValue("hotkey.freecam.key2", VK_KEY_A);
 
 		hotkeys::quick_ss.key1 = config.GetValue("hotkey.quick_screenshot.key1", VK_LCONTROL);
 		hotkeys::quick_ss.key2 = config.GetValue("hotkey.quick_screenshot.key2", VK_KEY_S);
@@ -351,10 +351,10 @@ void Menu::Main()
 				config.SetValue("hotkey.aim_skin_changer.key1", hotkeys::aim_skin_changer.key1);
 				config.SetValue("hotkey.aim_skin_changer.key2", hotkeys::aim_skin_changer.key2);
 			}
-			if (Ui::HotKey("Airbreak mode", hotkeys::airbreak))
+			if (Ui::HotKey("Freecam", hotkeys::freecam))
 			{
-				config.SetValue("hotkey.airbreak.key1", hotkeys::airbreak.key1);
-				config.SetValue("hotkey.airbreak.key2", hotkeys::airbreak.key2);
+				config.SetValue("hotkey.freecam.key1", hotkeys::freecam.key1);
+				config.SetValue("hotkey.freecam.key2", hotkeys::freecam.key2);
 			}
 			if (Ui::HotKey("Take quick screenshot", hotkeys::quick_ss))
 			{
