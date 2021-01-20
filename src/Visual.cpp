@@ -255,7 +255,7 @@ void Visual::Main()
  
 				patch::SetPointer(0x589331, &health_bar);
 				//patch::SetPointer(0x5890FC,&armour_bar);
-				init = true;
+				init_patches = true;
 			}
 
 			Ui::ColorPickerAddress("Armour bar", *(int*)0x5890FC, ImVec4(180,25,29,255));

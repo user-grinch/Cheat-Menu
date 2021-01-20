@@ -202,7 +202,7 @@ void SetPlayerMission(std::string& rootkey, std::string& name, std::string& id)
 
 void Game::FreeCam()
 {
-	uint delta_speed = freecam::speed * (CTimer::m_snTimeInMillisecondsNonClipped - CTimer::m_snPreviousTimeInMillisecondsNonClipped);
+	int delta_speed = freecam::speed * (CTimer::m_snTimeInMillisecondsNonClipped - CTimer::m_snPreviousTimeInMillisecondsNonClipped);
 
 	if (!freecam::init_done)
 	{
@@ -262,7 +262,6 @@ void Game::FreeCam()
 
 		float angle;
 		Command<Commands::GET_CHAR_HEADING>(freecam::hped,&angle);
-		
 		pos.x += delta_speed * cos(angle * 3.14159f/180.0f);
 		pos.y += delta_speed * sin(angle * 3.14159f/180.0f);
 		pos.z += delta_speed* 2 * sin(freecam::tmouseY/3* 3.14159f/180.0f);
@@ -272,11 +271,11 @@ void Game::FreeCam()
 	{
 		if (KeyPressed(VK_KEY_J))
 			delta_speed *= -1;
-		
+
 		float angle;
 		Command<Commands::GET_CHAR_HEADING>(freecam::hped,&angle);
-		angle -= 90.0f;
-
+		angle -= 90;
+		
 		pos.x += delta_speed * cos(angle * 3.14159f/180.0f);
 		pos.y += delta_speed * sin(angle * 3.14159f/180.0f);
 	}
