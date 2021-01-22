@@ -247,6 +247,11 @@ void Game::FreeCam()
 		CEntity* player_entity = FindPlayerEntity(-1);
 		pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, 0, &player_entity) + 0.5f;
 		Command<Commands::SET_CHAR_COORDINATES>(CPools::GetPedRef(player),pos.x,pos.y,pos.z);
+
+		// disble them again cause they get enabled
+		CHud::bScriptDontDisplayRadar = true;
+		CHud::m_Wants_To_Draw_Hud = false;
+		CHud::SetHelpMessage((char*)"Player telported",false,false,false);
 	}
 	
 	if (KeyPressed(VK_RCONTROL))

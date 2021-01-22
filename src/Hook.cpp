@@ -1,4 +1,3 @@
-#include "pch.h"
 #include "Hook.h"
 #include "vendor/kiero/kiero.h"
 #include "vendor/kiero/minhook/MinHook.h"
@@ -47,11 +46,7 @@ void Hook::Present(void *ptr)
 
 	if (Globals::init_done)
 	{
-		if (mouse_visibility != show_mouse)
-		{
-			Hook::ShowMouse(show_mouse);
-			mouse_visibility = show_mouse;
-		}
+		Hook::ShowMouse(show_mouse);
 
 		// Change font size if the game resolution changes
 		if (Globals::screen_size.x != screen::GetScreenWidth()
@@ -97,6 +92,9 @@ void Hook::Present(void *ptr)
 		ImGuiStyle& style = ImGui::GetStyle();
 
 		ImGui_ImplWin32_Init(RsGlobal.ps->window);
+		
+		// shift trigger fix
+		patch::Nop(0x00531155,5);
 
 		if (Globals::renderer == Render_DirectX9)
 		{
@@ -146,11 +144,15 @@ void Hook::ShowMouse(bool state)
 	}
 	else
 	{
-		patch::SetRaw(0x541DF5, (void*)"\xE8\x46\xF3\xFE\xFF", 5); // call CControllerConfigManager::AffectPadFromKeyBoard
-		patch::SetRaw(0x53F417, (void*)"\xE8\xB4\x7A\x20\x00", 5); // call CPad__getMouseState
-		patch::SetRaw(0x53F41F, (void*)"\x85\xC0\x0F\x8C", 4); // xor eax, eax -> test eax, eax , enable camera mouse movement
-														// jz loc_53F526 -> jl loc_53F526
-		patch::SetUChar(0x6194A0, 0xE9); // jmp setup
+		if (mouse_visibility != show_mouse)
+		{
+			patch::SetRaw(0x541DF5, (void*)"\xE8\x46\xF3\xFE\xFF", 5); // call CControllerConfigManager::AffectPadFromKeyBoard
+			patch::SetRaw(0x53F417, (void*)"\xE8\xB4\x7A\x20\x00", 5); // call CPad__getMouseState
+			patch::SetRaw(0x53F41F, (void*)"\x85\xC0\x0F\x8C", 4); // xor eax, eax -> test eax, eax , enable camera mouse movement
+															// jz loc_53F526 -> jl loc_53F526
+			patch::SetUChar(0x6194A0, 0xE9); // jmp setup
+			mouse_visibility = show_mouse;
+		}
 	}
 
 	ImGui::GetIO().MouseDrawCursor = state;

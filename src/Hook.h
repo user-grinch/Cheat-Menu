@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 
 typedef HRESULT(CALLBACK *f_Present9)(IDirect3DDevice9*, RECT*, RECT*, HWND, RGNDATA*);
 typedef HRESULT(CALLBACK *f_Present11)(IDXGISwapChain*, UINT, UINT);
@@ -26,7 +27,6 @@ protected:
 	static bool show_mouse;
 	static std::function<void()> window_func;
 
-public:
 	Hook();
 	~Hook();
 };
