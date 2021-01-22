@@ -151,17 +151,21 @@ void Hook::ShowMouse(bool state)
 			patch::SetRaw(0x53F41F, (void*)"\x85\xC0\x0F\x8C", 4); // xor eax, eax -> test eax, eax , enable camera mouse movement
 															// jz loc_53F526 -> jl loc_53F526
 			patch::SetUChar(0x6194A0, 0xE9); // jmp setup
-			mouse_visibility = show_mouse;
 		}
 	}
 
-	ImGui::GetIO().MouseDrawCursor = state;
-	CPad::NewMouseControllerState.X = 0;
-	CPad::NewMouseControllerState.Y = 0;
+	if (mouse_visibility != show_mouse)
+	{
+		CPad::NewMouseControllerState.X = 0;
+		CPad::NewMouseControllerState.Y = 0;
 
-	// Broken in psdk
-	Call<0x541BD0>(); // CPad::ClearMouseHistory
-	Call<0x541DD0>(); // CPad::UpdatePads
+		// Broken in psdk
+		Call<0x541BD0>(); // CPad::ClearMouseHistory
+		Call<0x541DD0>(); // CPad::UpdatePads
+
+		ImGui::GetIO().MouseDrawCursor = state;
+		mouse_visibility = show_mouse;
+	}
 }
 
 Hook::Hook()
