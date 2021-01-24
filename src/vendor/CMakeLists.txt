@@ -25,6 +25,7 @@ set(vendor_files
     "imgui/imgui_impl_win32.h"
     "imgui/imgui_internal.h"
     "imgui/imgui_widgets.cpp"
+    "imgui/imgui_tables.cpp"
     "imgui/imstb_rectpack.h"
     "imgui/imstb_textedit.h"
     "imgui/imstb_truetype.h"

@@ -1,4 +1,4 @@
-// dear imgui: Platform Binding for Windows (standard windows API for 32 and 64 bits applications)
+// dear imgui: Platform Backend for Windows (standard windows API for 32 and 64 bits applications)
 // This needs to be used along with a Renderer (e.g. DirectX11, OpenGL3, Vulkan..)
 
 // Implemented features:
@@ -6,6 +6,10 @@
 //  [X] Platform: Mouse cursor shape and visibility. Disable with 'io.ConfigFlags |= ImGuiConfigFlags_NoMouseCursorChange'.
 //  [X] Platform: Keyboard arrays indexed using VK_* Virtual Key Codes, e.g. ImGui::IsKeyPressed(VK_SPACE).
 //  [X] Platform: Gamepad support. Enabled with 'io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad'.
+
+// You can copy and use unmodified imgui_impl_* files in your project. See examples/ folder for examples of using this.
+// If you are new to Dear ImGui, read documentation from the docs/ folder + read the top of imgui.cpp.
+// Read online: https://github.com/ocornut/imgui/tree/master/docs
 
 #include "imgui.h"
 #include "imgui_impl_win32.h"
@@ -28,6 +32,7 @@
 
 // CHANGELOG
 // (minor and older changes stripped away, please see git history for details)
+//  2020-12-04: Misc: Fixed setting of io.DisplaySize to invalid/uninitialized data when after hwnd has been closed.
 //  2020-03-03: Inputs: Calling AddInputCharacterUTF16() to support surrogate pairs leading to codepoint >= 0x10000 (for more complete CJK inputs)
 //  2020-02-17: Added ImGui_ImplWin32_EnableDpiAwareness(), ImGui_ImplWin32_GetDpiScaleForHwnd(), ImGui_ImplWin32_GetDpiScaleForMonitor() helper functions.
 //  2020-01-14: Inputs: Added support for #define IMGUI_IMPL_WIN32_DISABLE_GAMEPAD/IMGUI_IMPL_WIN32_DISABLE_LINKING_XINPUT.
@@ -63,12 +68,12 @@ static bool                 g_WantUpdateHasGamepad = true;
 // Functions
 bool    ImGui_ImplWin32_Init(void* hwnd)
 {
-    if (!::QueryPerformanceFrequency((LARGE_INTEGER *)&g_TicksPerSecond))
+    if (!::QueryPerformanceFrequency((LARGE_INTEGER*)&g_TicksPerSecond))
         return false;
-    if (!::QueryPerformanceCounter((LARGE_INTEGER *)&g_Time))
+    if (!::QueryPerformanceCounter((LARGE_INTEGER*)&g_Time))
         return false;
 
-    // Setup back-end capabilities flags
+    // Setup backend capabilities flags
     g_hWnd = (HWND)hwnd;
     ImGuiIO& io = ImGui::GetIO();
     io.BackendFlags |= ImGuiBackendFlags_HasMouseCursors;         // We can honor GetMouseCursor() values (optional)
@@ -149,8 +154,8 @@ static void ImGui_ImplWin32_UpdateMousePos()
     if (io.WantSetMousePos)
     {
         POINT pos = { (int)io.MousePos.x, (int)io.MousePos.y };
-        ::ClientToScreen(g_hWnd, &pos);
-        ::SetCursorPos(pos.x, pos.y);
+        if (::ClientToScreen(g_hWnd, &pos))
+            ::SetCursorPos(pos.x, pos.y);
     }
 
     // Set mouse position
@@ -214,16 +219,16 @@ static void ImGui_ImplWin32_UpdateGamepads()
 void    ImGui_ImplWin32_NewFrame()
 {
     ImGuiIO& io = ImGui::GetIO();
-    IM_ASSERT(io.Fonts->IsBuilt() && "Font atlas not built! It is generally built by the renderer back-end. Missing call to renderer _NewFrame() function? e.g. ImGui_ImplOpenGL3_NewFrame().");
+    IM_ASSERT(io.Fonts->IsBuilt() && "Font atlas not built! It is generally built by the renderer backend. Missing call to renderer _NewFrame() function? e.g. ImGui_ImplOpenGL3_NewFrame().");
 
     // Setup display size (every frame to accommodate for window resizing)
-    RECT rect;
+    RECT rect = { 0, 0, 0, 0 };
     ::GetClientRect(g_hWnd, &rect);
     io.DisplaySize = ImVec2((float)(rect.right - rect.left), (float)(rect.bottom - rect.top));
 
     // Setup time step
-    INT64 current_time;
-    ::QueryPerformanceCounter((LARGE_INTEGER *)&current_time);
+    INT64 current_time = 0;
+    ::QueryPerformanceCounter((LARGE_INTEGER*)&current_time);
     io.DeltaTime = (float)(current_time - g_Time) / g_TicksPerSecond;
     g_Time = current_time;
 
@@ -259,7 +264,7 @@ void    ImGui_ImplWin32_NewFrame()
 
 // Win32 message handler (process Win32 mouse/keyboard inputs, etc.)
 // Call from your application's message handler.
-// When implementing your own back-end, you can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if Dear ImGui wants to use your inputs.
+// When implementing your own backend, you can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if Dear ImGui wants to use your inputs.
 // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application.
 // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application.
 // Generally you may always pass all inputs to Dear ImGui, and hide them from your application based on those two flags.
@@ -352,14 +357,14 @@ IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hwnd, UINT msg, WPARA
 //---------------------------------------------------------------------------------------------------------
 // This is the scheme successfully used by GLFW (from which we borrowed some of the code) and other apps aiming to be highly portable.
 // ImGui_ImplWin32_EnableDpiAwareness() is just a helper called by main.cpp, we don't call it automatically.
-// If you are trying to implement your own back-end for your own engine, you may ignore that noise.
+// If you are trying to implement your own backend for your own engine, you may ignore that noise.
 //---------------------------------------------------------------------------------------------------------
 
 // Implement some of the functions and types normally declared in recent Windows SDK.
 #if !defined(_versionhelpers_H_INCLUDED_) && !defined(_INC_VERSIONHELPERS)
 static BOOL IsWindowsVersionOrGreater(WORD major, WORD minor, WORD sp)
 {
-    OSVERSIONINFOEXW osvi = { sizeof(osvi), major, minor, 0, 0, { 0 }, sp };
+    OSVERSIONINFOEXW osvi = { sizeof(osvi), major, minor, 0, 0, { 0 }, sp, 0, 0, 0, 0 };
     DWORD mask = VER_MAJORVERSION | VER_MINORVERSION | VER_SERVICEPACKMAJOR;
     ULONGLONG cond = ::VerSetConditionMask(0, VER_MAJORVERSION, VER_GREATER_EQUAL);
     cond = ::VerSetConditionMask(cond, VER_MINORVERSION, VER_GREATER_EQUAL);
@@ -405,22 +410,26 @@ void ImGui_ImplWin32_EnableDpiAwareness()
             return;
         }
     }
-    SetProcessDPIAware();
+#if _WIN32_WINNT >= 0x0600
+    ::SetProcessDPIAware();
+#endif
 }
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(NOGDI)
 #pragma comment(lib, "gdi32")   // Link with gdi32.lib for GetDeviceCaps()
 #endif
 
 float ImGui_ImplWin32_GetDpiScaleForMonitor(void* monitor)
 {
     UINT xdpi = 96, ydpi = 96;
-    if (IsWindows8Point1OrGreater())
+    static BOOL bIsWindows8Point1OrGreater = IsWindows8Point1OrGreater();
+    if (bIsWindows8Point1OrGreater)
     {
         static HINSTANCE shcore_dll = ::LoadLibraryA("shcore.dll"); // Reference counted per-process
         if (PFN_GetDpiForMonitor GetDpiForMonitorFn = (PFN_GetDpiForMonitor)::GetProcAddress(shcore_dll, "GetDpiForMonitor"))
             GetDpiForMonitorFn((HMONITOR)monitor, MDT_EFFECTIVE_DPI, &xdpi, &ydpi);
     }
+#ifndef NOGDI
     else
     {
         const HDC dc = ::GetDC(NULL);
@@ -428,6 +437,7 @@ float ImGui_ImplWin32_GetDpiScaleForMonitor(void* monitor)
         ydpi = ::GetDeviceCaps(dc, LOGPIXELSY);
         ::ReleaseDC(NULL, dc);
     }
+#endif
     IM_ASSERT(xdpi == ydpi); // Please contact me if you hit this assert!
     return xdpi / 96.0f;
 }
