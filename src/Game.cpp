@@ -221,7 +221,7 @@ void Game::FreeCam()
 		Command<Commands::SET_CHAR_COLLISION>(freecam::hped, false);
 		Command<Commands::SET_LOAD_COLLISION_FOR_CHAR_FLAG>(freecam::hped, false);
 
-		freecam::tmouseX = player->GetHeading();
+		freecam::tmouseX = player->GetHeading() + 89.6f;
 		freecam::tmouseY = 0;
 
 		freecam::init_done = true;

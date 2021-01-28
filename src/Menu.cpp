@@ -52,11 +52,11 @@ Menu::Menu()
 		hotkeys::aim_skin_changer.key1 = config.GetValue("hotkey.aim_skin_changer.key1", VK_RETURN);
 		hotkeys::aim_skin_changer.key2 = config.GetValue("hotkey.aim_skin_changer.key2", VK_RETURN);
 
-		hotkeys::freecam.key1 = config.GetValue("hotkey.freecam.key1", VK_LMENU);
-		hotkeys::freecam.key2 = config.GetValue("hotkey.freecam.key2", VK_KEY_A);
+		hotkeys::freecam.key1 = config.GetValue("hotkey.freecam.key1", VK_F6);
+		hotkeys::freecam.key2 = config.GetValue("hotkey.freecam.key2", VK_F6);
 
-		hotkeys::quick_ss.key1 = config.GetValue("hotkey.quick_screenshot.key1", VK_LCONTROL);
-		hotkeys::quick_ss.key2 = config.GetValue("hotkey.quick_screenshot.key2", VK_KEY_S);
+		hotkeys::quick_ss.key1 = config.GetValue("hotkey.quick_screenshot.key1", VK_F5);
+		hotkeys::quick_ss.key2 = config.GetValue("hotkey.quick_screenshot.key2", VK_F5);
 
 		hotkeys::quick_tp.key1 = config.GetValue("hotkey.quick_tp.key1", VK_KEY_X);
 		hotkeys::quick_tp.key2 = config.GetValue("hotkey.quick_tp.key2", VK_KEY_Y);

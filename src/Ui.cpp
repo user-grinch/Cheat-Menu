@@ -791,7 +791,7 @@ bool Ui::HotKey(const char* label, HotKeyData& key_data)
 	{
 		ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ButtonActive]);
 
-		for (int key = 3; key != 90; ++key)
+		for (int key = 3; key != 135; ++key)
 		{
 			if (KeyPressed(key))
 			{
@@ -800,7 +800,7 @@ bool Ui::HotKey(const char* label, HotKeyData& key_data)
 			}
 		}
 
-		for (int key = 90; key != 3; --key)
+		for (int key = 135; key != 3; --key)
 		{
 			if (KeyPressed(key))
 			{
@@ -836,6 +836,7 @@ bool Ui::HotKey(const char* label, HotKeyData& key_data)
 	{
 		key_data.key1 = VK_NONE;
 		key_data.key2 = VK_NONE;
+		state = true;
 	}
 	
 	ImGui::SameLine();
@@ -852,7 +853,7 @@ bool Ui::HotKey(const char* label, HotKeyData& key_data)
 
 bool Ui::HotKeyPressed(HotKeyData& hotkey)
 {
-	if (CTimer::m_snTimeInMilliseconds - hotkey.timer > 250*CTimer::ms_fTimeScale)
+	if (CTimer::m_snTimeInMilliseconds - hotkey.timer > 150*CTimer::ms_fTimeScale)
 	{
 		hotkey.timer = CTimer::m_snTimeInMilliseconds;
 		return current_hotkey == "" && KeyPressed(hotkey.key1) && KeyPressed(hotkey.key2);
