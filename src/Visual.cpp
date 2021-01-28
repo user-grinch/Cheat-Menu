@@ -200,9 +200,6 @@ void Visual::Main()
 			if (Ui::CheckboxWithHint("Hide area names", &CHud::bScriptDontDisplayAreaName))
 				Command<Commands::DISPLAY_ZONE_NAMES>(!CHud::bScriptDontDisplayAreaName);
 
-			if (Ui::CheckboxWithHint("Hide hud", &CHud::m_Wants_To_Draw_Hud))
-				Command<Commands::DISPLAY_HUD>(!CHud::m_Wants_To_Draw_Hud);
-
 			if (Ui::CheckboxWithHint("Hide veh names", &CHud::bScriptDontDisplayVehicleName))
 				Command<Commands::DISPLAY_CAR_NAMES>(!CHud::bScriptDontDisplayVehicleName);
 
@@ -212,6 +209,9 @@ void Visual::Main()
 			Ui::CheckboxAddressEx("Hide wanted level", 0x58DD1B, 0x90, 1);
 			if (Ui::CheckboxWithHint("Lock weather", &lock_weather))
 				weather_type_backup = CWeather::OldWeatherType;
+
+			if (Ui::CheckboxWithHint("Show hud", &CHud::m_Wants_To_Draw_Hud))
+				Command<Commands::DISPLAY_HUD>(CHud::m_Wants_To_Draw_Hud);
 
 			ImGui::Columns(1);
 			ImGui::EndTabItem();

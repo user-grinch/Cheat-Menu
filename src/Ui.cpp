@@ -853,13 +853,17 @@ bool Ui::HotKey(const char* label, HotKeyData& key_data)
 
 bool Ui::HotKeyPressed(HotKeyData& hotkey)
 {
-	if (CTimer::m_snTimeInMilliseconds - hotkey.timer > 150*CTimer::ms_fTimeScale)
-	{
-		hotkey.timer = CTimer::m_snTimeInMilliseconds;
-		return current_hotkey == "" && KeyPressed(hotkey.key1) && KeyPressed(hotkey.key2);
-	}
+	if (KeyPressed(hotkey.key1) && KeyPressed(hotkey.key2))
+		hotkey.is_down = true;
 	else
-		return false;
+	{
+		if (hotkey.is_down)
+		{
+			hotkey.is_down = false;
+			return current_hotkey == "";
+		}
+	}
+	return false;
 }
 
 std::string Ui::GetHotKeyNameString(HotKeyData& hotkey)

@@ -165,16 +165,16 @@ Vehicle::Vehicle()
 				int chance = 0;
 
 				if (veh->m_nVehicleClass == CLASS_NORMAL) // Normal
-					chance = rand() % 21 + 1;
+					chance = Random(1,20);
 
 				if (veh->m_nVehicleClass == CLASS_RICHFAMILY) // Rich family
-					chance = rand() % 5 + 1;
+					chance = Random(1,4);
 
 				if (veh->m_nVehicleClass == CLASS_EXECUTIVE) // Executive
-					chance = rand() % 3 + 1;
+					chance = Random(1,3);
 
 				if (chance == 1 && !IsNeonInstalled(veh) && veh->m_pDriver != player)
-					InstallNeon(veh, rand() % 255, rand() % 255, rand() % 255);
+					InstallNeon(veh, Random(0,255), Random(0,255), Random(0,255));
 			}
 			neon::traffic_timer = timer;
 		}
@@ -264,7 +264,7 @@ int Vehicle::GetRandomTrainIdForModel(int model)
 		CHud::SetHelpMessage("Invalid train model", false, false, false);
 		return -1;
 	}
-	int id = rand() % (_end + 1 - _start) + _start;
+	int id = Random(_start,_end);
 	return train_ids[id];
 }
 
@@ -472,9 +472,9 @@ void Vehicle::SpawnVehicle(std::string &smodel)
 
 			CTrain *train = nullptr;
 			CTrain *carraige = nullptr;
-			int track = rand() % 2;
+			int track = Random(0,1);
 			int node = CTrain::FindClosestTrackNode(pos,&track);
-			CTrain::CreateMissionTrain(pos,(rand() % 2) == 1 ? true : false,train_id,&train,&carraige,node,track,false);
+			CTrain::CreateMissionTrain(pos,(Random(0,1)) == 1 ? true : false,train_id,&train,&carraige,node,track,false);
 
 			veh = (CVehicle*)train;
 			hveh = CPools::GetVehicleRef(veh);

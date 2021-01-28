@@ -45,7 +45,7 @@ public:
 				launch = false;
 			}
 
-			if (GetModuleHandleA("SAMP.dll")) {
+			if (IsPluginInstalled("SAMP.dll")) {
 				MessageBox(HWND_DESKTOP, "SAMP detected. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
 				launch = false;
 			}
@@ -55,7 +55,7 @@ public:
 				Should have a better fix for this but everyone should have 
 				SilentPatch installed so mehh...
 			*/
-			if (!GetModuleHandleA("SilentPatchSA.asi")) {
+			if (!IsPluginInstalled("SilentPatchSA.asi")) {
 				MessageBox(HWND_DESKTOP, "SilentPatch isn't installed. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
 				launch = false;
 			}

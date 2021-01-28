@@ -100,7 +100,7 @@ struct HotKeyData
 {
 	int key1;
 	int key2;
-	uint timer = 0;
+	bool is_down = false;
 };
 
 extern CJson config;
