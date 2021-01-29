@@ -141,7 +141,11 @@ void Hook::ShowMouse(bool state)
 		CPad::NewMouseControllerState.X = 0;
 		CPad::NewMouseControllerState.Y = 0;
 		patch::SetUChar(0x6194A0, 0xC3);
-		patch::Nop(0x53F417, 5); // don't call CPad__getMouseState
+
+		// Since Windowed mode by ThirteenAG hooks this too 
+		// patch::Nop(0x53F417, 5); // don't call CPad__getMouseState
+		patch::SetUChar(0x746ED0, 0xC3);
+
 		patch::SetRaw(0x53F41F, (void*)"\x33\xC0\x0F\x84", 4); // disable camera mouse movement
 	}
 	else
@@ -149,7 +153,7 @@ void Hook::ShowMouse(bool state)
 		if (mouse_visibility != show_mouse)
 		{
 			patch::SetRaw(0x541DF5, (void*)"\xE8\x46\xF3\xFE\xFF", 5); // call CControllerConfigManager::AffectPadFromKeyBoard
-			patch::SetRaw(0x53F417, (void*)"\xE8\xB4\x7A\x20\x00", 5); // call CPad__getMouseState
+			patch::SetUChar(0x746ED0, 0xA1);
 			patch::SetRaw(0x53F41F, (void*)"\x85\xC0\x0F\x8C", 4); // xor eax, eax -> test eax, eax , enable camera mouse movement
 															// jz loc_53F526 -> jl loc_53F526
 			patch::SetUChar(0x6194A0, 0xE9); // jmp setup
@@ -177,9 +181,8 @@ Hook::Hook()
 		if (kiero::init(kiero::RenderType::D3D9) == kiero::Status::Success)
 		{
 			Globals::renderer = Render_DirectX9;
-			if (kiero::bind(16, (void**)&oReset9, Reset) == kiero::Status::Success
-			&& kiero::bind(17, (void**)&oPresent9, PresentDx9Handler) == kiero::Status::Success) 
-				flog << "Successfully hooked dx9 device." << std::endl;
+			kiero::bind(16, (void**)&oReset9, Reset);
+			kiero::bind(17, (void**)&oPresent9, PresentDx9Handler);
 		}
 		else
 		{
@@ -187,12 +190,7 @@ Hook::Hook()
 			if (kiero::init(kiero::RenderType::D3D11) == kiero::Status::Success)
 			{
 				Globals::renderer = Render_DirectX11;
-				if (kiero::bind(8, (void**)&oPresent11, PresentDx11Handler) == kiero::Status::Success) 
-					flog << "Successfully hooked dx11 device." << std::endl;
-			}
-			else
-			{
-				flog << "Failed to hook device" << std::endl;
+				kiero::bind(8, (void**)&oPresent11, PresentDx11Handler);
 			}
 		}
 	};
