@@ -138,6 +138,8 @@ void Hook::ShowMouse(bool state)
 {
 	if (state)
 	{
+		CPad::NewMouseControllerState.X = 0;
+		CPad::NewMouseControllerState.Y = 0;
 		patch::SetUChar(0x6194A0, 0xC3);
 		patch::Nop(0x53F417, 5); // don't call CPad__getMouseState
 		patch::SetRaw(0x53F41F, (void*)"\x33\xC0\x0F\x84", 4); // disable camera mouse movement
@@ -156,14 +158,13 @@ void Hook::ShowMouse(bool state)
 
 	if (mouse_visibility != show_mouse)
 	{
-		CPad::NewMouseControllerState.X = 0;
-		CPad::NewMouseControllerState.Y = 0;
-
 		// Broken in psdk
 		Call<0x541BD0>(); // CPad::ClearMouseHistory
 		Call<0x541DD0>(); // CPad::UpdatePads
 
 		ImGui::GetIO().MouseDrawCursor = state;
+		CPad::NewMouseControllerState.X = 0;
+		CPad::NewMouseControllerState.Y = 0;
 		mouse_visibility = show_mouse;
 	}
 }
