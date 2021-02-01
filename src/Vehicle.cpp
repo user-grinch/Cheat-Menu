@@ -106,6 +106,19 @@ Vehicle::Vehicle()
 				player->m_pVehicle->m_fHealth = 1000.0f;
 				CHud::SetHelpMessage("Vehicle fixed",false,false,false);
 			}
+
+			if (Ui::HotKeyPressed(Menu::hotkeys::veh_engine))
+			{
+				bool state = !veh->m_nVehicleFlags.bEngineBroken || veh->m_nVehicleFlags.bEngineOn;
+
+				if (state)
+					CHud::SetHelpMessage("Vehicle engine off",false,false,false);
+				else
+					CHud::SetHelpMessage("Vehicle engine on",false,false,false);
+
+				veh->m_nVehicleFlags.bEngineBroken = state;
+				veh->m_nVehicleFlags.bEngineOn = !state;
+			}
 			
 			if (veh_nodmg)
 			{

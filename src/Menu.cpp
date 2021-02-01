@@ -25,9 +25,9 @@ HotKeyData Menu::hotkeys::flip_veh{};
 HotKeyData Menu::hotkeys::fix_veh{};
 HotKeyData Menu::hotkeys::god_mode{};
 HotKeyData Menu::hotkeys::menu_open{};
-
 HotKeyData Menu::hotkeys::quick_ss{};
 HotKeyData Menu::hotkeys::quick_tp{};
+HotKeyData Menu::hotkeys::veh_engine{};
 
 bool Menu::commands::show_menu = false;
 char Menu::commands::input_buffer[INPUT_BUFFER_SIZE] = "";
@@ -75,6 +75,9 @@ Menu::Menu()
 
 		hotkeys::god_mode.key1 = config.GetValue("hotkey.god_mode.key1", VK_NONE);
 		hotkeys::god_mode.key2 = config.GetValue("hotkey.god_mode.key2", VK_NONE);
+
+		hotkeys::veh_engine.key1 = config.GetValue("hotkey.veh_engine.key1", VK_NONE);
+		hotkeys::veh_engine.key2 = config.GetValue("hotkey.veh_engine.key2", VK_NONE);
 	};
 }
 
@@ -385,6 +388,12 @@ void Menu::Main()
 			{
 				config.SetValue("hotkey.god_mode.key1", hotkeys::god_mode.key1);
 				config.SetValue("hotkey.god_mode.key2", hotkeys::god_mode.key2);
+			}
+
+			if (Ui::HotKey("Toggle veh engine", hotkeys::veh_engine))
+			{
+				config.SetValue("hotkey.veh_engine.key1", hotkeys::veh_engine.key1);
+				config.SetValue("hotkey.veh_engine.key2", hotkeys::veh_engine.key2);
 			}
 
 			ImGui::Dummy(ImVec2(0, 10));

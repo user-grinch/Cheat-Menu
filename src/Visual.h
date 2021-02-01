@@ -24,7 +24,9 @@ public:
 template<typename T>
 void Visual::TimecycSlider(const char* label, T* data, int min, int max)
 {
-	int a = *data;
+	int val = 23 * GetCurrentHourTimeId() + CWeather::OldWeatherType;
+	int a = data[val];
+	
 	if (ImGui::SliderInt(label, &a, min, max))
-		*data = a;
+		data[val] = (T)a;
 }

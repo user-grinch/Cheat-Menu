@@ -4,6 +4,8 @@
 #include "Util.h"
 #include "Game.h"
 #include "CHudColours.h"
+#include "TimeCycle.h"
+
 
 bool Visual::lock_weather = false;
 int Visual::weather_type_backup = 0;
@@ -48,10 +50,10 @@ Visual::~Visual()
 {
 }
 
-
+// Thanks to GuruGuru
 int Visual::GetCurrentHourTimeId()
 {
-	uchar hour = CClock::ms_nGameClockHours;
+	int hour = CClock::ms_nGameClockHours;
 
 	if (timecyc_hour == 24)
 		return hour;
@@ -61,8 +63,8 @@ int Visual::GetCurrentHourTimeId()
 
 	if (hour == 6) return 2;
 
-	if (7 >= hour && hour < 12) return 2;
-	if (12 >= hour && hour < 19)  return 4;
+	if (7 <= hour && hour < 12) return 3;
+	if (12 <= hour && hour < 19)  return 4;
 
 	if (hour == 19)  return 5; 
 	if (hour == 20 || hour == 21) return 6;
@@ -144,37 +146,37 @@ void Visual::GenerateTimecycFile()
 
 			int val = 23 * j + i;
 
-			file << "\t" << +CTimeCycle::m_nAmbientRed[val] << " " << +CTimeCycle::m_nAmbientGreen[val] << " " << +CTimeCycle::m_nAmbientBlue[val] << " \t\t"
+			file << "\t" << +m_nAmbientRed[val] << " " << +m_nAmbientGreen[val] << " " << +m_nAmbientBlue[val] << " \t\t"
 
-				<< "\t" << +CTimeCycle::m_nAmbientRed_Obj[val] << " " << +CTimeCycle::m_nAmbientGreen_Obj[val] << " " << +CTimeCycle::m_nAmbientBlue_Obj[val] << " \t\t"
+				<< "\t" << +m_nAmbientRed_Obj[val] << " " << +m_nAmbientGreen_Obj[val] << " " << +m_nAmbientBlue_Obj[val] << " \t\t"
 
 				<< "\t255 255 255\t\t" // unused
 
-				<< "\t" << +CTimeCycle::m_nSkyTopRed[val] << " " << +CTimeCycle::m_nSkyTopGreen[val] << " " << +CTimeCycle::m_nSkyTopBlue[val] << " \t\t"
+				<< "\t" << +m_nSkyTopRed[val] << " " << +m_nSkyTopGreen[val] << " " << +m_nSkyTopBlue[val] << " \t\t"
 
-				<< "\t" << +CTimeCycle::m_nSkyBottomRed[val] << " " << +CTimeCycle::m_nSkyBottomGreen[val] << " " << +CTimeCycle::m_nSkyBottomBlue[val] << " \t\t"
+				<< "\t" << +m_nSkyBottomRed[val] << " " << +m_nSkyBottomGreen[val] << " " << +m_nSkyBottomBlue[val] << " \t\t"
 
-				<< "\t" << +CTimeCycle::m_nSunCoreRed[val] << " " << +CTimeCycle::m_nSunCoreGreen[val] << " " << +CTimeCycle::m_nSunCoreBlue[val] << " \t\t"
+				<< "\t" << +m_nSunCoreRed[val] << " " << +m_nSunCoreGreen[val] << " " << +m_nSunCoreBlue[val] << " \t\t"
 
-				<< "\t" << +CTimeCycle::m_nSunCoronaRed[val] << " " << +CTimeCycle::m_nSunCoronaGreen[val] << " " << +CTimeCycle::m_nSunCoronaBlue[val] << " \t\t"
+				<< "\t" << +m_nSunCoronaRed[val] << " " << +m_nSunCoronaGreen[val] << " " << +m_nSunCoronaBlue[val] << " \t\t"
 
-				<< "\t" << (+CTimeCycle::m_fSunSize[val] - 0.5f) / 10.0f << " " << (+CTimeCycle::m_fSpriteSize[val] - 0.5f) / 10.0f << " " << (+CTimeCycle::m_fSpriteBrightness[val] - 0.5f) / 10.0f << " \t\t"
+				<< "\t" << (+m_fSunSize[val] - 0.5f) / 10.0f << " " << (+m_fSpriteSize[val] - 0.5f) / 10.0f << " " << (+m_fSpriteBrightness[val] - 0.5f) / 10.0f << " \t\t"
 
-				<< "\t" << +CTimeCycle::m_nShadowStrength[val] << " " << +CTimeCycle::m_nLightShadowStrength[val] << " " << +CTimeCycle::m_nPoleShadowStrength[val] << " \t\t"
+				<< "\t" << +m_nShadowStrength[val] << " " << +m_nLightShadowStrength[val] << " " << +m_nPoleShadowStrength[val] << " \t\t"
 
-				<< "\t" << +CTimeCycle::m_fFarClip[val] << " " << +CTimeCycle::m_fFogStart[val] << " " << (+CTimeCycle::m_fLightsOnGroundBrightness[val] - 0.5) / 10.0f << " \t\t"
+				<< "\t" << +m_fFarClip[val] << " " << +m_fFogStart[val] << " " << (+m_fLightsOnGroundBrightness[val] - 0.5) / 10.0f << " \t\t"
 
-				<< "\t" << +CTimeCycle::m_nLowCloudsRed[val] << " " << +CTimeCycle::m_nLowCloudsGreen[val] << " " << +CTimeCycle::m_nLowCloudsBlue[val] << " \t\t"
+				<< "\t" << +m_nLowCloudsRed[val] << " " << +m_nLowCloudsGreen[val] << " " << +m_nLowCloudsBlue[val] << " \t\t"
 
-				<< "\t" << +CTimeCycle::m_nFluffyCloudsBottomRed[val] << " " << +CTimeCycle::m_nFluffyCloudsBottomGreen[val] << " " << +CTimeCycle::m_nFluffyCloudsBottomBlue[val] << " \t\t"
+				<< "\t" << +m_nFluffyCloudsBottomRed[val] << " " << +m_nFluffyCloudsBottomGreen[val] << " " << +m_nFluffyCloudsBottomBlue[val] << " \t\t"
 
-				<< "\t" << +CTimeCycle::m_fWaterRed[val] << " " << +CTimeCycle::m_fWaterGreen[val] << " " << +CTimeCycle::m_fWaterBlue[val] << " " << +CTimeCycle::m_fWaterAlpha[val] << " \t\t"
+				<< "\t" << +m_fWaterRed[val] << " " << +m_fWaterGreen[val] << " " << +m_fWaterBlue[val] << " " << +m_fWaterAlpha[val] << " \t\t"
 
-				<< "\t" << +CTimeCycle::m_fPostFx1Alpha[val] << " " << +CTimeCycle::m_fPostFx1Red[val] << " " << +CTimeCycle::m_fPostFx1Green[val] << " " << +CTimeCycle::m_fPostFx1Blue[val] << " \t\t"
+				<< "\t" << +m_fPostFx1Alpha[val] << " " << +m_fPostFx1Red[val] << " " << +m_fPostFx1Green[val] << " " << +m_fPostFx1Blue[val] << " \t\t"
 
-				<< "\t" << +CTimeCycle::m_fPostFx2Alpha[val] << " " << +CTimeCycle::m_fPostFx2Red[val] << " " << +CTimeCycle::m_fPostFx2Green[val] << " " << +CTimeCycle::m_fPostFx2Blue[val] << " \t\t"
+				<< "\t" << +m_fPostFx2Alpha[val] << " " << +m_fPostFx2Red[val] << " " << +m_fPostFx2Green[val] << " " << +m_fPostFx2Blue[val] << " \t\t"
 
-				<< "\t" << +CTimeCycle::m_fCloudAlpha[val] << " " << +CTimeCycle::m_nHighLightMinIntensity[val] << " " << +CTimeCycle::m_nWaterFogAlpha[val] << " " << +CTimeCycle::m_nDirectionalMult[val] / 100.0 << " \t\t" << std::endl;
+				<< "\t" << +m_fCloudAlpha[val] << " " << +m_nHighLightMinIntensity[val] << " " << +m_nWaterFogAlpha[val] << " " << +m_nDirectionalMult[val] / 100.0 << " \t\t" << std::endl;
 		}
 	}
 }
@@ -341,20 +343,20 @@ void Visual::Main()
 					ImGui::BeginChild("TimecycColors");
 					ImGui::Spacing();
 
-					TimeCycColorEdit3("Ambient", CTimeCycle::m_nAmbientRed, CTimeCycle::m_nAmbientGreen, CTimeCycle::m_nAmbientBlue);
-					TimeCycColorEdit3("Ambient obj", CTimeCycle::m_nAmbientRed_Obj, CTimeCycle::m_nAmbientGreen_Obj, CTimeCycle::m_nAmbientBlue_Obj);
-					TimeCycColorEdit3("Fluffy clouds", CTimeCycle::m_nFluffyCloudsBottomRed , CTimeCycle::m_nFluffyCloudsBottomGreen, CTimeCycle::m_nFluffyCloudsBottomBlue);
-					TimeCycColorEdit3("Low clouds", CTimeCycle::m_nLowCloudsRed, CTimeCycle::m_nLowCloudsGreen, CTimeCycle::m_nLowCloudsBlue);
+					TimeCycColorEdit3("Ambient", m_nAmbientRed, m_nAmbientGreen, m_nAmbientBlue);
+					TimeCycColorEdit3("Ambient obj", m_nAmbientRed_Obj, m_nAmbientGreen_Obj, m_nAmbientBlue_Obj);
+					TimeCycColorEdit3("Fluffy clouds", m_nFluffyCloudsBottomRed , m_nFluffyCloudsBottomGreen, m_nFluffyCloudsBottomBlue);
+					TimeCycColorEdit3("Low clouds", m_nLowCloudsRed, m_nLowCloudsGreen, m_nLowCloudsBlue);
 					
-					TimeCycColorEdit4("Postfx 1", CTimeCycle::m_fPostFx1Red, CTimeCycle::m_fPostFx1Green, CTimeCycle::m_fPostFx1Blue, CTimeCycle::m_fPostFx1Alpha);
-					TimeCycColorEdit4("Postfx 2", CTimeCycle::m_fPostFx2Red, CTimeCycle::m_fPostFx2Green, CTimeCycle::m_fPostFx2Blue, CTimeCycle::m_fPostFx1Alpha);
+					TimeCycColorEdit4("Postfx 1", m_fPostFx1Red, m_fPostFx1Green, m_fPostFx1Blue, m_fPostFx1Alpha);
+					TimeCycColorEdit4("Postfx 2", m_fPostFx2Red, m_fPostFx2Green, m_fPostFx2Blue, m_fPostFx1Alpha);
 					
-					TimeCycColorEdit3("Sky bottom", CTimeCycle::m_nSkyBottomRed, CTimeCycle::m_nSkyBottomGreen, CTimeCycle::m_nSkyBottomBlue);
-					TimeCycColorEdit3("Sun core", CTimeCycle::m_nSunCoreRed, CTimeCycle::m_nSunCoreGreen, CTimeCycle::m_nSunCoreBlue);
-					TimeCycColorEdit3("Sun corona", CTimeCycle::m_nSunCoronaRed, CTimeCycle::m_nSunCoronaGreen, CTimeCycle::m_nSunCoronaBlue);
-					TimeCycColorEdit3("Sky top", CTimeCycle::m_nSkyTopRed, CTimeCycle::m_nSkyTopGreen, CTimeCycle::m_nSkyTopBlue);
+					TimeCycColorEdit3("Sky bottom", m_nSkyBottomRed, m_nSkyBottomGreen, m_nSkyBottomBlue);
+					TimeCycColorEdit3("Sun core", m_nSunCoreRed, m_nSunCoreGreen, m_nSunCoreBlue);
+					TimeCycColorEdit3("Sun corona", m_nSunCoronaRed, m_nSunCoronaGreen, m_nSunCoronaBlue);
+					TimeCycColorEdit3("Sky top", m_nSkyTopRed, m_nSkyTopGreen, m_nSkyTopBlue);
 
-					TimeCycColorEdit4("Water", CTimeCycle::m_fWaterRed, CTimeCycle::m_fWaterGreen, CTimeCycle::m_fWaterBlue, CTimeCycle::m_fWaterAlpha);
+					TimeCycColorEdit4("Water", m_fWaterRed, m_fWaterGreen, m_fWaterBlue, m_fWaterAlpha);
 
 					ImGui::EndChild();
 					ImGui::EndTabItem();
@@ -362,21 +364,20 @@ void Visual::Main()
 				if (ImGui::BeginTabItem("Misc"))
 				{
 					ImGui::BeginChild("TimecycMisc");
-
 					ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 2);
-					TimecycSlider("Cloud alpha", CTimeCycle::m_fCloudAlpha, 0, 255);
-					TimecycSlider("Directional mult", CTimeCycle::m_nDirectionalMult , 0, 255);
-					TimecycSlider("Far clip", CTimeCycle::m_fFarClip, 0, 2000);
-					TimecycSlider("Fog start", CTimeCycle::m_fFogStart, 0, 2000);
-					TimecycSlider("High light min intensity", CTimeCycle::m_nHighLightMinIntensity, 0, 255);
-					TimecycSlider("Light on ground brightness", CTimeCycle::m_fLightsOnGroundBrightness, 0, 255);
-					TimecycSlider("Light shadow strength", CTimeCycle::m_nLightShadowStrength, 0, 255);
-					TimecycSlider("Pole shadow strength", CTimeCycle::m_nPoleShadowStrength, 0, 255);
-					TimecycSlider("Shadow strength", CTimeCycle::m_nShadowStrength, 0, 255);
-					TimecycSlider("Sprite brightness", CTimeCycle::m_fSpriteBrightness, -127, 127);
-					TimecycSlider("Sprite size", CTimeCycle::m_fSpriteSize, -127, 127);
-					TimecycSlider("Sun size", CTimeCycle::m_fSunSize, -127, 127);
-					TimecycSlider("Water fog alpha", CTimeCycle::m_nWaterFogAlpha, 0, 255);
+					TimecycSlider("Cloud alpha", m_fCloudAlpha, 0, 255);
+					TimecycSlider("Directional mult", m_nDirectionalMult , 0, 255);
+					TimecycSlider("Far clip", m_fFarClip, 0, 2000);
+					TimecycSlider("Fog start", m_fFogStart, 0, 2000);
+					TimecycSlider("High light min intensity", m_nHighLightMinIntensity, 0, 255);
+					TimecycSlider("Light on ground brightness", m_fLightsOnGroundBrightness, 0, 255);
+					TimecycSlider("Light shadow strength", m_nLightShadowStrength, 0, 255);
+					TimecycSlider("Pole shadow strength", m_nPoleShadowStrength, 0, 255);
+					TimecycSlider("Shadow strength", m_nShadowStrength, 0, 255);
+					TimecycSlider("Sprite brightness", m_fSpriteBrightness, 0, 127);
+					TimecycSlider("Sprite size", m_fSpriteSize, 0, 127);
+					TimecycSlider("Sun size", m_fSunSize, 0, 127);
+					TimecycSlider("Water fog alpha", m_nWaterFogAlpha, 0, 255);
 					ImGui::PopItemWidth();
 
 					ImGui::Spacing();

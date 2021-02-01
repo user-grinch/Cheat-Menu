@@ -223,6 +223,7 @@ void Player::Main()
 	ImGui::SameLine();
 	if (ImGui::Button("Suicide", ImVec2(Ui::GetSize(2))))
 		player->m_fHealth = 0.0;
+		
 	ImGui::Spacing();
 
 	if (ImGui::BeginTabBar("Player", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
