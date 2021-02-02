@@ -576,7 +576,7 @@ void Ui::RadioButtonAddress(const char* label, std::vector<NamedMemory> &named_m
 			state = false;
 	}
 
-	if (ImGui::RadioButton("None", state))
+	if (ImGui::RadioButton((std::string("None##")  + label).c_str(), state))
 	{
 		for (size_t i = 0; i < named_mem.size(); i++)
 			patch::Set<bool>(named_mem[i].addr, false);
