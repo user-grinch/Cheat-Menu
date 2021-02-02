@@ -368,7 +368,7 @@ void Visual::Main()
 					TimecycSlider("Cloud alpha", m_fCloudAlpha, 0, 255);
 					TimecycSlider("Directional mult", m_nDirectionalMult , 0, 255);
 					TimecycSlider("Far clip", m_fFarClip, 0, 2000);
-					TimecycSlider("Fog start", m_fFogStart, 0, 2000);
+					TimecycSlider("Fog start", m_fFogStart, 0, 1500);
 					TimecycSlider("High light min intensity", m_nHighLightMinIntensity, 0, 255);
 					TimecycSlider("Light on ground brightness", m_fLightsOnGroundBrightness, 0, 255);
 					TimecycSlider("Light shadow strength", m_nLightShadowStrength, 0, 255);

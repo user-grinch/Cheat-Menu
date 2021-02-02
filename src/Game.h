@@ -29,6 +29,15 @@ public:
 		static float mouseX, mouseY, tmouseX, tmouseY;
 	};
 
+	struct hard_mode
+	{
+		static bool state;
+		static float prev_health;
+		static float prev_max_health;
+		static float prev_armour;
+		static float prev_stamina;
+	};
+
 	static bool disable_cheats;
 	static bool disable_replay;
 	static bool forbidden_area_wl;

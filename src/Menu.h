@@ -29,6 +29,8 @@ public:
 		static HotKeyData quick_ss;
 		static HotKeyData quick_tp;
 		static HotKeyData veh_engine;
+		static HotKeyData veh_instant_start;
+		static HotKeyData veh_instant_stop;
 	};
 	struct commands
 	{

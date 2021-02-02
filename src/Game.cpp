@@ -1,6 +1,6 @@
 #include "pch.h"
-#include "Game.h"
 #include "Menu.h"
+#include "Game.h"
 #include "Ui.h"
 #include "Util.h"
 #include "CIplStore.h"
@@ -32,6 +32,12 @@ float Game::freecam::mouseX = 0;
 float Game::freecam::mouseY = 0;
 int Game::freecam::hped = -1;
 CPed *Game::freecam::ped = nullptr;
+
+bool Game::hard_mode::state = false;
+float Game::hard_mode::prev_armour = 0.0f;
+float Game::hard_mode::prev_health = 0.0f;
+float Game::hard_mode::prev_max_health = 0.0f;
+float Game::hard_mode::prev_stamina = 0.0f;
 
 bool Game::disable_cheats = false;
 bool Game::disable_replay = false;
@@ -105,6 +111,16 @@ Game::Game()
 				CHud::SetHelpMessage("Screenshot taken", false, false, false);
 				ss_shotcut_timer = timer;
 			}
+		}
+
+		if (hard_mode::state)
+		{
+			if (player->m_fHealth > 50.0f)
+				player->m_fHealth = 50.0f;
+
+			player->m_fArmour = 0.0f;
+			CStats::SetStatValue(STAT_MAX_HEALTH, 350.0f);
+			CStats::SetStatValue(STAT_STAMINA, 0.0f);
 		}
 
 		if (solid_water)
@@ -353,10 +369,33 @@ of LS without completing missions"))
 
 			Ui::CheckboxAddress("Free pay n spray", 0x96C009);
 
-			ImGui::NextColumn();
-
 			if (ImGui::Checkbox("Freeze misson timer", &freeze_mission_timer))
 				Command<Commands::FREEZE_ONSCREEN_TIMER>(freeze_mission_timer);
+
+			ImGui::NextColumn();
+
+			if (Ui::CheckboxWithHint("Hard mode", &hard_mode::state, "Makes the game more challanging to play. "
+"Lowers\narmour, health, stamina etc."))
+			{
+				CPlayerPed *player = FindPlayerPed();
+
+				if (hard_mode::state)
+				{
+					hard_mode::prev_armour = player->m_fArmour;
+					hard_mode::prev_health = player->m_fHealth;
+					hard_mode::prev_max_health = CStats::GetStatValue(STAT_MAX_HEALTH);
+					hard_mode::prev_stamina = CStats::GetStatValue(STAT_STAMINA);
+					player->m_fHealth = 50.0f;
+				}
+				else
+				{
+					player->m_fArmour = hard_mode::prev_armour;
+					CStats::SetStatValue(STAT_STAMINA,hard_mode::prev_stamina);
+					CStats::SetStatValue(STAT_MAX_HEALTH, hard_mode::prev_max_health);
+					player->m_fHealth = hard_mode::prev_health;
+					CWeaponInfo::LoadWeaponData();
+				}
+			}
 
 			if (Ui::CheckboxWithHint("Keep stuff", &keep_stuff, "Keep stuff after arrest/death"))
 			{

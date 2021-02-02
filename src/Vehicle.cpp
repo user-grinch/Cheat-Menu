@@ -119,6 +119,12 @@ Vehicle::Vehicle()
 				veh->m_nVehicleFlags.bEngineBroken = state;
 				veh->m_nVehicleFlags.bEngineOn = !state;
 			}
+
+			if (Ui::HotKeyPressed(Menu::hotkeys::veh_instant_start))
+				Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, 40.0f);
+
+			if (Ui::HotKeyPressed(Menu::hotkeys::veh_instant_stop))
+				Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, 0);
 			
 			if (veh_nodmg)
 			{
