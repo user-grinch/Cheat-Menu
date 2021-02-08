@@ -422,13 +422,14 @@ void Player::Main()
 				if (ImGui::BeginTabItem("Custom skins"))
 				{
 					ImGui::Spacing();
-					Ui::FilterWithHint("Search", filter, std::string("Total skins: " + std::to_string(custom_skins::store_vec.size())).c_str());
-					Ui::ShowTooltip("Place your dff & txd files inside 'modloader/Custom Skins'");
-					ImGui::Spacing();
-					ImGui::TextWrapped("Note: Your txd & dff names can't exceed 8 characters. Don't change names while the game is running.");
-					ImGui::Spacing();
+					
 					if (modloader_installed)
-					{
+					{	
+						Ui::FilterWithHint("Search", filter, std::string("Total skins: " + std::to_string(custom_skins::store_vec.size())).c_str());
+						Ui::ShowTooltip("Place your dff & txd files inside 'modloader/Custom Skins'");
+						ImGui::Spacing();
+						ImGui::TextWrapped("Note: Your txd & dff names can't exceed 8 characters. Don't change names while the game is running.");
+						ImGui::Spacing();
 						for (std::string name : custom_skins::store_vec)
 						{
 							if (custom_skins::filter.PassFilter(name.c_str()))

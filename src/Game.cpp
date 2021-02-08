@@ -31,6 +31,7 @@ float Game::freecam::tmouseY = 0;
 float Game::freecam::mouseX = 0;
 float Game::freecam::mouseY = 0;
 int Game::freecam::hped = -1;
+float Game::freecam::fov = -1;
 CPed *Game::freecam::ped = nullptr;
 
 bool Game::hard_mode::state = false;
@@ -83,6 +84,7 @@ Game::Game()
 	{
 		json.LoadData(search_categories, selected_item);
 		stat::json.LoadData(stat::search_categories, stat::selected_item);
+		freecam::fov = TheCamera.FindCamFOV();
 
 		// Generate enabled cheats vector
 		for (auto element : random_cheats::name_json.data.items())
@@ -243,7 +245,11 @@ void Game::FreeCam()
 		freecam::init_done = true;
 		player_pos.z -= 20;
 		freecam::ped->SetPosn(player_pos);
+
+		TheCamera.LerpFOV(TheCamera.FindCamFOV(),freecam::fov,1000,true);
+		Command<Commands::CAMERA_PERSIST_FOV>(true);
 	}
+
 	CVector pos = freecam::ped->GetPosition();
 
 	Command<Commands::GET_PC_MOUSE_MOVEMENT>(&freecam::mouseX, &freecam::mouseY);
@@ -301,6 +307,24 @@ void Game::FreeCam()
 		pos.y += delta_speed * sin(angle * 3.14159f/180.0f);
 	}
 
+	if ( CPad::NewMouseControllerState.wheelUp)
+	{
+		if (freecam::fov > 10.0f)
+			freecam::fov -= 2.0f * delta_speed;
+
+		TheCamera.LerpFOV(TheCamera.FindCamFOV(),freecam::fov,250,true);
+		Command<Commands::CAMERA_PERSIST_FOV>(true);
+	}
+
+	if ( CPad::NewMouseControllerState.wheelDown)
+	{
+		if (freecam::fov < 115.0f)
+			freecam::fov += 2.0f * delta_speed;
+		
+		TheCamera.LerpFOV(TheCamera.FindCamFOV(),freecam::fov,250,true);
+		Command<Commands::CAMERA_PERSIST_FOV>(true);
+	}
+
 	freecam::ped->SetHeading(freecam::tmouseX);
 	Command<Commands::ATTACH_CAMERA_TO_CHAR>(freecam::hped,0.0,0.0,20.0,90.0,180,freecam::tmouseY,0.0,2);
 	freecam::ped->SetPosn(pos);
@@ -317,7 +341,7 @@ void Game::ClearFreecamStuff()
 
 	Command<Commands::DELETE_CHAR>(freecam::hped);
 	freecam::ped = nullptr;
-
+	Command<Commands::CAMERA_PERSIST_FOV>(false);
 	Command<Commands::RESTORE_CAMERA_JUMPCUT>();
 }
 
@@ -438,15 +462,19 @@ of LS without completing missions"))
 			if (ImGui::CollapsingHeader("Free cam"))
 			{
 				if (Ui::CheckboxWithHint("Enable", &freecam::enable, "Forward: I\tBackward: K\
-\nLeft: J\t\t  Right: L\n\nSlower: RCtrl\tFaster: RShift"))
+\nLeft: J\t\t  Right: L\n\nSlower: RCtrl\tFaster: RShift\n\nZoom: Mouse wheel"))
 				{
 					if (!freecam::enable)
 						ClearFreecamStuff();
 				}
 				ImGui::Spacing();
-
-				ImGui::SliderFloat("Movement Speed", &freecam::speed, 0.0, 0.5);
-
+					
+				if (ImGui::SliderFloat("Field of view", &freecam::fov, 5.0f, 120.0f))
+				{
+					TheCamera.LerpFOV(TheCamera.FindCamFOV(),freecam::fov,250.0f,true);
+					Command<Commands::CAMERA_PERSIST_FOV>(true);
+				}
+				ImGui::SliderFloat("Movement Speed", &freecam::speed, 0.0f, 0.5f);
 				ImGui::Spacing();
 				ImGui::TextWrapped("Press Enter to teleport player to camera location");
 				ImGui::Spacing();

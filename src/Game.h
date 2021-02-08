@@ -23,6 +23,7 @@ public:
 	{
 		static bool enable;
 		static float speed;
+		static float fov;
 		static bool init_done;
 		static CPed *ped;
 		static int hped;
