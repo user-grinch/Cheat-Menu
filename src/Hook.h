@@ -20,7 +20,7 @@ private:
 	static HRESULT CALLBACK PresentDx9Handler(IDirect3DDevice9 *pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion);
 	static HRESULT CALLBACK PresentDx11Handler(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
 	static HRESULT CALLBACK Reset(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters);
-	static LRESULT CALLBACK InputProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	static LRESULT CALLBACK WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static void ShowMouse(bool state);
 
 protected:

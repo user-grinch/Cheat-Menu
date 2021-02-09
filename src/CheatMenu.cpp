@@ -86,7 +86,11 @@ CheatMenu::CheatMenu()
 
 	Events::drawMenuBackgroundEvent += [this]
 	{
-		Hook::show_mouse = false;
+		if (Hook::show_mouse)
+		{
+			config.WriteToDisk();
+			Hook::show_mouse = false;
+		}
 	};
 
 	Events::shutdownRwEvent += []
