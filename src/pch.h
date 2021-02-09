@@ -51,12 +51,12 @@
 #include "eVehicleClass.h"
 #include "extensions/Paths.h"
 
-#include "vendor/fla/IDaccess.h"
-#include "vendor/imgui/imgui.h"
-#include "vendor/imgui/imgui_internal.h"
-#include "vendor/imgui/imgui_impl_dx9.h"
-#include "vendor/imgui/imgui_impl_dx11.h"
-#include "vendor/imgui/imgui_impl_win32.h"
+#include "fla/IDaccess.h"
+#include "imgui/imgui.h"
+#include "imgui/imgui_internal.h"
+#include "imgui/imgui_impl_dx9.h"
+#include "imgui/imgui_impl_dx11.h"
+#include "imgui/imgui_impl_win32.h"
 
 #include "Events.h"
 #include "Json.h"

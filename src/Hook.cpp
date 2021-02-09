@@ -1,6 +1,6 @@
 #include "Hook.h"
-#include "vendor/kiero/kiero.h"
-#include "vendor/kiero/minhook/MinHook.h"
+#include "kiero/kiero.h"
+#include "kiero/minhook/MinHook.h"
 
 WNDPROC Hook::oWndProc = NULL;
 f_Present11 Hook::oPresent11 = NULL;
@@ -22,7 +22,7 @@ LRESULT Hook::WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		Call<0x541BD0>(); // CPad::ClearMouseHistory
 
 		if (uMsg == WM_MOUSEWHEEL)
-			return 1;
+			CallWindowProc(oWndProc, hWnd, uMsg, 1.0, lParam);
 	}
 	else
 		patch::SetRaw(0x4EB9F4, (void*)"\xE8\x67\xFC\xFF\xFF", 5); // enable radio scroll

@@ -1,11 +1,11 @@
 ################################################################################
-# Build Vendor.lib
+# Build Depend.lib
 # All the external libraries that shouldn't need to be compiled often
 ################################################################################
 cmake_minimum_required(VERSION 3.0)
-project(Vendor)
+project(Depend)
 
-set(vendor_files
+set(depend_files
     "fla/Main.h"
     "fla/Main.cpp"
     "fla/IDaccess.h"
@@ -41,7 +41,7 @@ set(vendor_files
     "kiero/minhook/trampoline.c"
 )
 
-add_library(${PROJECT_NAME} STATIC ${vendor_files})
+add_library(${PROJECT_NAME} STATIC ${depend_files})
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE
     "$<$<CONFIG:Release>:"
@@ -105,7 +105,7 @@ set_target_properties(${PROJECT_NAME} PROPERTIES
 )
 
 target_link_directories(${PROJECT_NAME} PUBLIC
-    ${CMAKE_SOURCE_DIR}"/src/vendor/kiero/minhook/lib/"
+    ${CMAKE_SOURCE_DIR}"/deps/kiero/minhook/lib/"
 )
 
 target_link_libraries(${PROJECT_NAME} PUBLIC 

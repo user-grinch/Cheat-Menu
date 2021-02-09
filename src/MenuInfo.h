@@ -1,5 +1,5 @@
 #pragma once
 #define MENU_NAME "Cheat Menu"
 #define MENU_VERSION "2.6-beta"
-#define BUILD_NUMBER "20210204"
+#define BUILD_NUMBER "20210210"
 #define MENU_TITLE MENU_NAME " v" MENU_VERSION "(" BUILD_NUMBER ")"

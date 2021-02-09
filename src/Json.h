@@ -1,5 +1,5 @@
 #pragma once
-#include "vendor\json.hpp"
+#include "json.hpp"
 
 class CJson
 {

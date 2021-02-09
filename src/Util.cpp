@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Util.h"
-#include "vendor/imgui/stb_image.h"
+#include "imgui/stb_image.h"
 
 void Util::ClearCharTasksVehCheck(CPed* ped)
 {
