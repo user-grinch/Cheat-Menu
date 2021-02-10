@@ -790,6 +790,7 @@ bool Ui::HotKey(const char* label, HotKeyData& key_data)
 	if (active)
 	{
 		ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ButtonActive]);
+		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::GetStyle().Colors[ImGuiCol_ButtonActive]);
 
 		for (int key = 3; key != 135; ++key)
 		{
@@ -820,19 +821,18 @@ bool Ui::HotKey(const char* label, HotKeyData& key_data)
 
 	if (key_data.key1 != key_data.key2)
 		text += (" + " + key_names[key_data.key2-1]);
+	
+	if (ImGui::Button((text + std::string("##") + std::string(label)).c_str(), ImVec2(ImGui::GetWindowContentRegionWidth() / 3.5, ImGui::GetFrameHeight())))
+		if (!active)
+			current_hotkey = label;
 
-	if (ImGui::Button((text + std::string("##") + std::string(label)).c_str(), ImVec2(ImGui::GetWindowContentRegionWidth() / 3, ImGui::GetFrameHeight())))
+	if (active && (ImGui::IsMouseClicked(ImGuiMouseButton_Left) || ImGui::IsItemClicked(ImGuiMouseButton_Left)))
 	{
-		if (active)
-		{
-			current_hotkey = "";
-			state = true;
-		}
-		else
-			current_hotkey = label;;
+		current_hotkey = "";
+		state = true;
 	}
 
-	if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(1)) // right click
+	if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
 	{
 		key_data.key1 = VK_NONE;
 		key_data.key2 = VK_NONE;
@@ -843,10 +843,7 @@ bool Ui::HotKey(const char* label, HotKeyData& key_data)
 	ImGui::Text(label);
 
 	if (active)
-		ImGui::PopStyleColor();
-
-	if (!(ImGui::IsWindowFocused() || ImGui::IsItemVisible()))
-		current_hotkey = "";
+		ImGui::PopStyleColor(2);
 	
 	return state;
 }

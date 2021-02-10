@@ -48,8 +48,6 @@ public:
 	static bool solid_water;
 	static bool ss_shortcut;
 	static bool sync_time;
-
-	static uint ss_shotcut_timer;
 	static uint sync_time_timer;
 	static uint solid_water_object;
 

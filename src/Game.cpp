@@ -50,7 +50,6 @@ bool Game::solid_water = false;
 bool Game::ss_shortcut = false;
 bool Game::sync_time = false;
 
-uint Game::ss_shotcut_timer = 0;
 uint Game::sync_time_timer = 0;
 
 uint Game::solid_water_object = 0;
@@ -107,11 +106,10 @@ Game::Game()
 
 		if (ss_shortcut)
 		{
-			if (Ui::HotKeyPressed(Menu::hotkeys::quick_ss) && timer - ss_shotcut_timer > 1000)
+			if (Ui::HotKeyPressed(Menu::hotkeys::quick_ss))
 			{
 				Command<Commands::TAKE_PHOTO>();
 				CHud::SetHelpMessage("Screenshot taken", false, false, false);
-				ss_shotcut_timer = timer;
 			}
 		}
 
@@ -262,7 +260,7 @@ void Game::FreeCam()
 	if (freecam::tmouseY < -150)
 		freecam::tmouseY = -150;
 
-	if (KeyPressed(VK_RETURN))
+	if (Ui::HotKeyPressed(Menu::hotkeys::free_cam_tp_player))
 	{
 		CPlayerPed *player = FindPlayerPed(-1);
 		CVector pos = freecam::ped->GetPosition();

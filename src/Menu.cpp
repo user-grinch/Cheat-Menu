@@ -23,6 +23,7 @@ HotKeyData Menu::hotkeys::freecam{};
 HotKeyData Menu::hotkeys::command_window{};
 HotKeyData Menu::hotkeys::flip_veh{};
 HotKeyData Menu::hotkeys::fix_veh{};
+HotKeyData Menu::hotkeys::free_cam_tp_player{VK_RETURN,VK_RETURN};
 HotKeyData Menu::hotkeys::god_mode{};
 HotKeyData Menu::hotkeys::menu_open{};
 HotKeyData Menu::hotkeys::quick_ss{};
@@ -341,7 +342,9 @@ void Menu::Main()
 		if (ImGui::BeginTabItem("Hotkeys"))
 		{
 			ImGui::Spacing();
-			ImGui::TextWrapped("Right clicking will set hotkey to none. Some are set to none by default. Choose keys for them if you want to use them.");
+			ImGui::Text("Usage");
+			Ui::ShowTooltip("Left-click selects hotkey.\nLeft clicking outside deselects."
+"\nRight click disables hotkey.");
 			ImGui::Spacing();
 			ImGui::BeginChild("Hotkeys");
 			if (Ui::HotKey("Open/ close cheat menu", hotkeys::menu_open))

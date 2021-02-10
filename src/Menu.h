@@ -24,6 +24,7 @@ public:
 		static HotKeyData command_window;
 		static HotKeyData fix_veh;
 		static HotKeyData flip_veh;
+		static HotKeyData free_cam_tp_player;
 		static HotKeyData god_mode;
 		static HotKeyData menu_open;
 		static HotKeyData quick_ss;
