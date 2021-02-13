@@ -396,8 +396,8 @@ of LS without completing missions"))
 
 			ImGui::NextColumn();
 
-			if (Ui::CheckboxWithHint("Hard mode", &hard_mode::state, "Makes the game more challanging to play. "
-"Lowers\narmour, health, stamina etc."))
+			if (Ui::CheckboxWithHint("Hard mode", &hard_mode::state, "Makes the game more challanging to play. \n\
+Lowers armour, health, stamina etc."))
 			{
 				CPlayerPed *player = FindPlayerPed();
 

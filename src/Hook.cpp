@@ -19,10 +19,10 @@ LRESULT Hook::WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	if (Hook::show_mouse)
 	{
 		patch::Nop(0x4EB9F4, 5); //  disable radio scroll
-		Call<0x541BD0>(); // CPad::ClearMouseHistory
+		CPad::ClearMouseHistory();
 
 		if (uMsg == WM_MOUSEWHEEL)
-			CallWindowProc(oWndProc, hWnd, uMsg, 1.0, lParam);
+			return 1;
 	}
 	else
 		patch::SetRaw(0x4EB9F4, (void*)"\xE8\x67\xFC\xFF\xFF", 5); // enable radio scroll
@@ -165,9 +165,8 @@ void Hook::ShowMouse(bool state)
 
 	if (mouse_visibility != show_mouse)
 	{
-		// Broken in psdk
-		Call<0x541BD0>(); // CPad::ClearMouseHistory
-		Call<0x541DD0>(); // CPad::UpdatePads
+		CPad::ClearMouseHistory();
+		CPad::UpdatePads();
 
 		ImGui::GetIO().MouseDrawCursor = state;
 		CPad::NewMouseControllerState.X = 0;
