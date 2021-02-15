@@ -826,7 +826,7 @@ bool Ui::HotKey(const char* label, HotKeyData& key_data)
 		if (!active)
 			current_hotkey = label;
 
-	if (active && (ImGui::IsMouseClicked(ImGuiMouseButton_Left) || ImGui::IsItemClicked(ImGuiMouseButton_Left)))
+	if (active && (ImGui::IsMouseClicked(ImGuiMouseButton_Left) || ImGui::IsItemClicked(ImGuiMouseButton_Right)))
 	{
 		current_hotkey = "";
 		state = true;

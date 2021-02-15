@@ -1,16 +1,31 @@
 #include "plugin.h"
+#include "CHud.h"
 
 using namespace plugin;
+
+void DoStuff();
 
 class Test
 {
 public:
+    
     Test()
     {   
-        Events::initGameEvent += [] 
-        {
-            patch::PutRetn0(0x4B35A4);
-        };
+        Events::processScriptsEvent += DoStuff;
+    }
+    ~Test()
+    {   
+        Events::processScriptsEvent -= DoStuff;
     }
 } test;
+
+void DoStuff()
+{
+    CHud::SetMessage((char*)"Test");
+
+    if (KeyPressed(VK_TAB))
+    {
+        test.~Test();
+    }
+}
 

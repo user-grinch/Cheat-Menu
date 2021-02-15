@@ -207,6 +207,7 @@ void SetPlayerMission(std::string& rootkey, std::string& name, std::string& id)
 	int interior = 0;
 
 	Command<0x09E8>(hplayer,&interior);
+	
 	if ( Util::IsOnMission() && interior == 0)
 	{
 		player->SetWantedLevel(0);

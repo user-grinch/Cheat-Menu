@@ -71,15 +71,16 @@ Teleport::Teleport()
 
 			CEntity* player_entity = FindPlayerEntity(-1);
 			STeleport::pos.z = CWorld::FindGroundZFor3DCoord(Teleport::STeleport::pos.x, Teleport::STeleport::pos.y, STeleport::pos.z + 100.0f, 0, &player_entity) + 1.0f;
+			CVehicle *pVeh = player->m_pVehicle;
 
-			if (player->m_pVehicle)
-				player->m_pVehicle->Teleport(STeleport::pos, false);
+			if (pVeh && player->m_nPedFlags.bInVehicle)
+				pVeh->Teleport(STeleport::pos, false);
 			else
 				player->Teleport(STeleport::pos, false);
 
 			STeleport::_bool = false;
 			Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(player), false);
-			Command<Commands::SET_CAMERA_BEHIND_PLAYER>();
+			Command<Commands::RESTORE_CAMERA_JUMPCUT>();
 			TheCamera.Fade(0,1);
 		}
 		
@@ -124,8 +125,8 @@ void Teleport::TeleportPlayer(bool get_marker, CVector* pos, short interior_id)
 	CStreaming::LoadScene(&Teleport::STeleport::pos);
 	CStreaming::LoadSceneCollision(&Teleport::STeleport::pos);
 	CStreaming::LoadAllRequestedModels(false);
-
-	if (pVeh)
+	
+	if (pVeh && player->m_nPedFlags.bInVehicle)
 	{
 		pVeh->Teleport(CVector(pos->x, pos->y, pos->z), false);
 
@@ -137,7 +138,7 @@ void Teleport::TeleportPlayer(bool get_marker, CVector* pos, short interior_id)
 		pVeh->m_nAreaCode = interior_id;
 	}
 	else
-		player->Teleport(CVector(pos->x, pos->y, pos->z), false);
+		player->Teleport(STeleport::pos, false);
 
 	player->m_nAreaCode = interior_id;
 	Command<Commands::SET_AREA_VISIBLE>(interior_id);
