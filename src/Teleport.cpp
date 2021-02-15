@@ -128,7 +128,7 @@ void Teleport::TeleportPlayer(bool get_marker, CVector* pos, short interior_id)
 	
 	if (pVeh && player->m_nPedFlags.bInVehicle)
 	{
-		pVeh->Teleport(CVector(pos->x, pos->y, pos->z), false);
+		pVeh->Teleport(STeleport::pos, false);
 
 		if (pVeh->m_nVehicleClass == VEHICLE_BIKE)
 			reinterpret_cast<CBike*>(pVeh)->PlaceOnRoadProperly();

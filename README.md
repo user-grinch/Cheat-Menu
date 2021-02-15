@@ -36,15 +36,15 @@ You'll need to install Visual Studio 2019 (v142), [DirectX9 SDK](https://www.mic
 4. [Plugin SDK](https://github.com/DK22Pac/plugin-sdk)
 
 ## Images
-![1](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/teleport.gif)
-![2](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/player.gif)
-![3](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/ped.gif)
-![4](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/animation.gif)
-![5](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/vehicle.gif)
-![6](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/weapon.gif)
-![7](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/game.gif)
-![8](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/visual.gif)
-![9](https://raw.githubusercontent.com/user-grinch/user-grinch.github.io/master/assets/img/mods/cheat-menu/menu.gif)
+![1](https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/teleport.gif)
+![2](https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/player.gif)
+![3](https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/ped.gif)
+![4](https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/animation.gif)
+![5](https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/vehicle.gif)
+![6](https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/weapon.gif)
+![7](https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/game.gif)
+![8](https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/visual.gif)
+![9](https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/menu.gif)
 
 ## Docs 
 

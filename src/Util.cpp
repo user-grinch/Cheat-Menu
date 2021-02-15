@@ -8,7 +8,7 @@ void Util::ClearCharTasksVehCheck(CPed* ped)
 	uint hveh = NULL;
 	bool veh_engine = true;
 
-	if (Command<Commands::IS_CHAR_IN_ANY_CAR>(hped))
+	if (ped->m_nPedFlags.bInVehicle)
 	{
 		hveh = CPools::GetVehicleRef(ped->m_pVehicle);
 		veh_engine = ped->m_pVehicle->m_nVehicleFlags.bEngineOn;

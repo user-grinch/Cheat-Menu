@@ -446,7 +446,7 @@ void Vehicle::SpawnVehicle(std::string &smodel)
 		CVector pos = player->GetPosition();
 		int speed = 0;
 
-		if (Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer) && spawner::spawn_inside)
+		if (player->m_nPedFlags.bInVehicle && spawner::spawn_inside)
 		{
 			int hveh = 0;
 			Command<Commands::GET_CAR_CHAR_IS_USING>(hplayer, &hveh);
@@ -651,7 +651,7 @@ void Vehicle::Main()
 
 	if (ImGui::Button("Flip vehicle", ImVec2(Ui::GetSize(3))))
 	{
-		if (Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer))
+		if (player->m_nPedFlags.bInVehicle)
 		{
 			int hveh = CPools::GetVehicleRef(player->m_pVehicle);
 			float roll;
