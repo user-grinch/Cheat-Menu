@@ -36,42 +36,63 @@ You'll need to install Visual Studio 2019 (v142), [DirectX9 SDK](https://www.mic
 4. [Plugin SDK](https://github.com/DK22Pac/plugin-sdk)
 
 ## Images
-![1](https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/teleport.gif)
-![2](https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/player.gif)
-![3](https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/ped.gif)
-![4](https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/animation.gif)
-![5](https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/vehicle.gif)
-![6](https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/weapon.gif)
-![7](https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/game.gif)
-![8](https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/visual.gif)
-![9](https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/menu.gif)
+<details>
+  <summary>Show Images</summary>
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/teleport.gif">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/player.gif">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/ped.gif">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/animation.gif">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/vehicle.gif">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/weapon.gif">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/game.gif">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/visual.gif">
+</details>
 
-## Docs 
+## How to add ___ to CheatMenu
 
-### Adding custom peds/skin images - jpg
+*Be careful about editing 'json' files, especially commas! Check [here](https://en.wikipedia.org/wiki/JSON)*
 
-Ped/skin images are loaded from 'CheatMenu\peds\' directory. The image name should contain the ped model id. Names for custom peds have to be added inside 'CheatMenu\json\ped.json' file.
+### Clothes
+Haven't found any tutorials for this yet. But CheatMenu loads cloth entries from *CheatMenu\clothes\\(CategoryName)\* directory in **jpg** format.<br/>
+**Name format: body_part$model_name$texture_name**.<br/>
+*After adding clothes in the game adding them like this should work?*
 
-### Add custom player skins #2
+### Player Skins (Recommended)
+*If you just want more player skins without much hassel use this*
 
-You can also add player skins by using a different method. Place your skin txd & dff files inside 'modloader\Custom Skins\' folder. Note, [Modloader](https://gtaforums.com/topic/669520-mod-loader/) is required & names can't exceed 8 characters. 
+1. For this you need [modloader](https://github.com/thelink2012/modloader/releases/tag/v0.3.7) installed.
+2. Get your skin **dff** & **txd** file and put them inside *modloader\Custom Skins\* directory.
+3. Rename your **dff** & **txd** filenames into 8 characters. Having more than 8 characters will crash your game.
+4. Important thing to remember is that you can't rename these files while the game is running! If you do, your game will crash.
 
-### Adding custom vehicle images - jpg
+### Peds + Player Skins
+*If you want to add both peds & skin then follow this*
+1. Add peds to your game following a tutorial.
+2. Then create a image of your ped in **jpg** format and put it in *CheatMenu\peds\\(CategoryName)\* directory.
+3. The image name should be the model name of the ped.
+4. Open this file *CheatMenu\json\ped.json* and add an entry for your ped there. 
+   **Format:  "PedModel" : "PedName"**
+   
+### Vehicles
+1. Add vehicles to your game following [this](https://www.mixmods.com.br/2015/12/tutorial-adicionar-carros-sem-substituir.html) tutorial first. (Use translator)
+2. Then create an image of your vehicle in **jpg** format and put it in *CheatMenu\vehicles\images\\(CategoryName)\* directory.
+3. The image name should be the model id of the vehicle.
+*Now your vehicle should show up in the menu.*
 
-Vehicle images are loaded from 'CheatMenu\vehicles\images\' directory. The image name should contain the vehicle model id. You don't need to add custom vehicle names in v2.0-beta & above.
+### Vehicle Tunes
+1. Add tunes to your game following a [tutorial](https://gtaforums.com/topic/481926-tutorial-how-to-add-tuning-parts/).
+2. Then create a image of your tune part in **jpg** format and put it in *CheatMenu\vehicles\components\\(CategoryName)\* directory.
+*If you did everything correctly this should work?*
 
-### Adding custom vehicle component images - jpg
+### Vehicle Paintjobs
+1. Put your paintjob images in **png** format in *CheatMenu\vehicles\paintjobs\\(CategoryName)\* directory. Don't rename to png, [convert it](http://www.pcfreetime.com/formatfactory/index.php?language=en)
+2. You can use any random name for those images.
+*Now check if it shows up in the menu*
 
-Vehicle component images are loaded from 'CheatMenu\vehicles\component\' directory. The image name should contain the component model id.
-
-### Adding custom vehicle paint jobs images - png
-
-Paintjob images are loaded from 'CheatMenu\vehicles\paintjobs\' directory. Image names can be any string and their name will show up on the menu.
-
-### Adding custom weapons images - jpg
-
-Weapon images are loaded from 'CheatMenu\weapons\' directory. The image name should contain the weapon model id. Names for custom weapons have to be added inside 'CheatMenu\json\weapon.json' file.
-
-### Adding custom clothes - jpg
-
-Cloth images are loaded from 'CheatMenu\clothes\' directory. The image name should in this format 'body_part$model_name$texture_name'
+### Weapons
+1. Add weapons to your game following [this](https://www.mixmods.com.br/2016/05/tutorial-adicionar-armas-sem-substituir.html) tutorial first. (Use translator)
+2. Then create an image of your vehicle in **jpg** format and put it *CheatMenu\weapons\\(CategoryName)* directory.
+3. The image name should be the weapon id (not model!) of the weapon.
+4. Open this file *CheatMenu\json\weapon.json* and add an entry for your weapon there. 
+   **Format:  "WeaponID" : "WeaponName"**
+*Now your weapon should show up in the menu.*
