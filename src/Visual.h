@@ -22,11 +22,12 @@ public:
 };
 
 template<typename T>
-void Visual::TimecycSlider(const char* label, T* data, int min, int max)
+void Visual::TimecycSlider(const char* label, T* ptr, int min, int max)
 {
 	int val = 23 * GetCurrentHourTimeId() + CWeather::OldWeatherType;
-	int a = data[val];
-	
+	T *arr = (T*)patch::GetPointer(int(ptr));
+	int a = arr[val];
+
 	if (ImGui::SliderInt(label, &a, min, max))
-		data[val] = (T)a;
+		arr[val] = (T)a;
 }

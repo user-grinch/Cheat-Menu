@@ -130,12 +130,14 @@ Game::Game()
 			float water_height = 0;
 			Command<Commands::GET_WATER_HEIGHT_AT_COORDS>(pos.x, pos.y, false, &water_height);
 
-			if (!Command<Commands::IS_CHAR_IN_ANY_BOAT>(hplayer) && water_height != -1000.0f && pos.z > (water_height+1))
+			if (!Command<Commands::IS_CHAR_IN_ANY_BOAT>(hplayer) && water_height != -1000.0f && pos.z > (water_height))
 			{
 				if (solid_water_object == 0)
 				{
 					Command<Commands::CREATE_OBJECT>(3095, pos.x, pos.y, water_height, &solid_water_object);
-					Command<Commands::SET_OBJECT_VISIBLE>(solid_water_object, false);
+					Command<Commands::SET_OBJECT_VISIBLE>(solid_water_object,false);
+					if (pos.z < (water_height+1))
+						player->SetPosn(pos.x,pos.y,water_height+1);
 				}
 				else
 					Command<Commands::SET_OBJECT_COORDINATES>(solid_water_object, pos.x, pos.y, water_height);
@@ -427,7 +429,7 @@ Lowers armour, health, stamina etc."))
 			}
 			Ui::CheckboxWithHint("Screenshot shortcut", &ss_shortcut, (("Take screenshot using ") + Ui::GetHotKeyNameString(Menu::hotkeys::quick_ss)
 			+ "\nSaved inside 'GTA San Andreas User Files\\Gallery'").c_str());
-			if (Ui::CheckboxWithHint("Solid water", &solid_water, "Player can walk on water"))
+			if (Ui::CheckboxWithHint("Solid water", &solid_water, "Player can walk on water\nTurn this off if you want to swim."))
 			{
 				if (!solid_water && solid_water_object != 0)
 				{

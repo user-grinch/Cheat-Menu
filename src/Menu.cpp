@@ -246,7 +246,7 @@ void Menu::ProcessCommands()
 			ss >> temp;
 			pos.z = std::stof(temp);
 
-			Teleport::TeleportPlayer(false, &pos, 0);
+			Teleport::TeleportPlayer(false, pos, 0);
 		}
 		catch (...) {
 			CHud::SetHelpMessage("Invalid location", false, false, false);

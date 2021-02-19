@@ -78,16 +78,20 @@ bool Visual::TimeCycColorEdit3(const char* label, uchar *r, uchar *g, uchar *b, 
 	bool rtn = false;
 	int val = 23 * GetCurrentHourTimeId() + CWeather::OldWeatherType;
 
-	float col[3]{ r[val] / 255.0f, g[val] / 255.0f, b[val] / 255.0f };
+	uchar *red = (uchar*)patch::GetPointer(int(r));
+	uchar *green = (uchar*)patch::GetPointer(int(g));
+	uchar *blue = (uchar*)patch::GetPointer(int(b));
 
+	float col[3]{red[val]/255.0f,green[val]/255.0f,blue[val]/255.0f};
+			
 	if (ImGui::ColorEdit3(label, col, flags))
 	{
-		r[val] = col[0] * 255;
-		g[val] = col[1] * 255;
-		b[val] = col[2] * 255;
+		red[val] = col[0] * 255;
+		green[val] = col[1] * 255;
+		blue[val] = col[2] * 255;
 		rtn = true;
 	}
-
+	
 	return rtn;
 }
 
@@ -95,15 +99,20 @@ bool Visual::TimeCycColorEdit4(const char* label, uchar *r, uchar *g, uchar *b, 
 {
 	bool rtn = false;
 	int val = 23 * GetCurrentHourTimeId() + CWeather::OldWeatherType;
+	
+	uchar *red = (uchar*)patch::GetPointer(int(r));
+	uchar *green = (uchar*)patch::GetPointer(int(g));
+	uchar *blue = (uchar*)patch::GetPointer(int(b));
+	uchar *alpha = (uchar*)patch::GetPointer(int(a));
 
-	float col[4]{ r[val] / 255.0f, g[val] / 255.0f, b[val] / 255.0f, a[val] / 255.0f };
-
+	float col[4]{red[val]/255.0f,green[val]/255.0f,blue[val]/255.0f,alpha[val]/255.0f};
+			
 	if (ImGui::ColorEdit4(label, col, flags))
 	{
-		r[val] = col[0] * 255;
-		g[val] = col[1] * 255;
-		b[val] = col[2] * 255;
-		a[val] = col[3] * 255;
+		red[val] = col[0] * 255;
+		green[val] = col[1] * 255;
+		blue[val] = col[2] * 255;
+		alpha[val] = col[3] * 255;
 		rtn = true;
 	}
 
@@ -280,7 +289,7 @@ void Visual::Main()
 			ImGui::EndTabItem();
 		}
 
-		if (ImGui::BeginTabItem("Timecyc"))
+		if ( timecyc_hour == 8 ? ImGui::BeginTabItem("Timecyc") : ImGui::BeginTabItem("Timecyc 24h"))
 		{
 			ImGui::Spacing();
 			if (ImGui::Button("Generate timecyc file", Ui::GetSize(2)))

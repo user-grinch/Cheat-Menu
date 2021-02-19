@@ -525,7 +525,7 @@ void Vehicle::SpawnVehicle(std::string &smodel)
 			int hveh = 0;
 			if (spawner::spawn_inside)
 			{
-				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 3.0f, &hveh);
+				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 4.0f, &hveh);
 				veh = CPools::GetVehicle(hveh);
 				veh->SetHeading(player->GetHeading());
 				Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);

@@ -31,11 +31,10 @@ private:
 
 protected:
 	Teleport();
-	virtual ~Teleport();
 public:
 
 	static void Main();
-	static void TeleportPlayer(bool get_marker = false, CVector* pos = new CVector(0,0,0), short interior_id = 0);
+	static void TeleportPlayer(bool get_marker = false, CVector pos = CVector(0,0,0), short interior_id = 0);
 	static void TeleportToLocation(std::string& rootkey, std::string& loc_name, std::string& loc);
 	static void RemoveTeleportEntry(std::string& rootkey, std::string& key, std::string& val);
 

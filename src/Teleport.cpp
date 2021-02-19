@@ -96,7 +96,7 @@ Teleport::Teleport()
 	};
 }
 
-void Teleport::TeleportPlayer(bool get_marker, CVector* pos, short interior_id)
+void Teleport::TeleportPlayer(bool get_marker, CVector pos, short interior_id)
 {
 	CPlayerPed *player = FindPlayerPed();
 	CVehicle *pVeh = player->m_pVehicle;
@@ -112,10 +112,10 @@ void Teleport::TeleportPlayer(bool get_marker, CVector* pos, short interior_id)
 			return;
 		}
 		CEntity* player_entity = FindPlayerEntity(-1);
-		pos = &(target_blip.m_vPosition);
-		pos->z = CWorld::FindGroundZFor3DCoord(pos->x, pos->y, 1000, 0, &player_entity) + 50.f;
+		pos = target_blip.m_vPosition;
+		pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, 0, &player_entity) + 50.f;
 
-		Teleport::STeleport::pos = *pos;
+		Teleport::STeleport::pos = pos;
 		Teleport::STeleport::timer = CTimer::m_snTimeInMilliseconds;
 		Teleport::STeleport::_bool = true;
 		TheCamera.Fade(0,0);
@@ -138,7 +138,7 @@ void Teleport::TeleportPlayer(bool get_marker, CVector* pos, short interior_id)
 		pVeh->m_nAreaCode = interior_id;
 	}
 	else
-		player->Teleport(STeleport::pos, false);
+		player->Teleport(pos, false);
 
 	player->m_nAreaCode = interior_id;
 	Command<Commands::SET_AREA_VISIBLE>(interior_id);
@@ -164,7 +164,7 @@ void Teleport::TeleportToLocation(std::string& rootkey, std::string& loc_name,st
 		std::getline(ss, temp, ',');
 		pos.z = std::stof(temp);
 
-		Teleport::TeleportPlayer(false, &pos, static_cast<short>(interior));
+		Teleport::TeleportPlayer(false, pos, static_cast<short>(interior));
 	}
 	catch (...) {
 		CHud::SetHelpMessage("Invalid location", false, false, false);
@@ -231,7 +231,7 @@ void Teleport::Main()
 						getline(ss, temp, ',');
 						pos.z = std::stof(temp) + 1.0f;
 
-						Teleport::TeleportPlayer(false,&pos);
+						Teleport::TeleportPlayer(false,pos);
 					}
 					catch (...) {
 						CHud::SetHelpMessage("Invalid coordinate", false, false, false);
@@ -275,8 +275,3 @@ void Teleport::Main()
 		ImGui::EndTabBar();
 	}
 }
-
-Teleport::~Teleport()
-{
-};
-
