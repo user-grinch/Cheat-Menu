@@ -46,7 +46,7 @@ void CheatMenu::ProcessWindow()
 CheatMenu::CheatMenu()
 {
 	ApplyImGuiStyle();
-	Hook::window_func = std::bind(&ProcessWindow);
+	Hook::window_callback = std::bind(&ProcessWindow);
 
 	Events::initRwEvent += []()
 	{	
@@ -113,16 +113,12 @@ void CheatMenu::ApplyImGuiStyle()
 	style->GrabRounding = 1;
 	style->WindowRounding = 1;
 	style->ChildRounding = 1;
-	style->ScrollbarSize = 12;
 	style->ScrollbarRounding = 1;
 	style->GrabRounding = 1;
 	style->FrameRounding = 0;
 	style->TabRounding = 1.0;
-	style->IndentSpacing = 20;
 	style->AntiAliasedLines = true;
 	style->AntiAliasedFill = true;
-	style->ItemSpacing = ImVec2(8, 4);
-	style->FramePadding = ImVec2(5, 3);
 	style->Alpha = 1;
 
 	style->FrameBorderSize = 0;

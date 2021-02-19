@@ -10,7 +10,7 @@ f_Reset Hook::oReset9 = NULL;
 bool Hook::mouse_visibility = false;
 bool Hook::show_mouse = false;
 
-std::function<void()> Hook::window_func = NULL;
+std::function<void()> Hook::window_callback = NULL;
 
 LRESULT Hook::WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -51,11 +51,11 @@ void Hook::Present(void *ptr)
 	{
 		Hook::ShowMouse(show_mouse);
 
-		// Change font size if the game resolution changes
-		if (Globals::screen_size.x != screen::GetScreenWidth()
-			&& Globals::screen_size.y != screen::GetScreenHeight())
+		// handle window scaling here
+		ImVec2 size(screen::GetScreenWidth(),screen::GetScreenHeight());
+		if (Globals::screen_size.x != size.x && Globals::screen_size.y != size.y)
 		{
-			int font_size = int(screen::GetScreenHeight() / 54.85); // manually tested
+			int font_size = int(size.y / 54.85f); // manually tested
 
 			io.FontDefault = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/trebucbd.ttf", font_size);
 			io.Fonts->Build();
@@ -65,7 +65,23 @@ void Hook::Present(void *ptr)
 			else
 				ImGui_ImplDX11_InvalidateDeviceObjects();
 
-			Globals::screen_size = ImVec2(screen::GetScreenWidth(), screen::GetScreenHeight());
+			if (Globals::screen_size.x != -1 && Globals::screen_size.y != -1)
+			{
+				Globals::menu_size.x += (size.x-Globals::screen_size.x) / 4.0f;
+				Globals::menu_size.y += (size.y-Globals::screen_size.y) / 1.2f;
+			}
+
+			ImGuiStyle* style = &ImGui::GetStyle();
+			float scale_x = size.x / 1366.0f;
+			float scale_y = size.y / 768.0f;
+
+			style->FramePadding = ImVec2(5 * scale_x, 3 * scale_y);
+			style->ItemSpacing = ImVec2(8 * scale_x, 4 * scale_y);
+			style->ScrollbarSize = 12 * scale_x;
+			style->IndentSpacing = 20 * scale_x;
+			style->ItemInnerSpacing  = ImVec2(4 * scale_x,4 * scale_y);
+
+			Globals::screen_size = size;
 		}
 
 		ImGui_ImplWin32_NewFrame();
@@ -76,8 +92,8 @@ void Hook::Present(void *ptr)
 
 		ImGui::NewFrame();
 
-		if (window_func != NULL)
-			window_func();
+		if (window_callback != NULL)
+			window_callback();
 
 		ImGui::EndFrame();
 		ImGui::Render();

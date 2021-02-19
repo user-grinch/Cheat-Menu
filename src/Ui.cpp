@@ -465,6 +465,10 @@ void Ui::DrawImages(std::vector<std::unique_ptr<TextureStructure>> &img_vec, ImV
 	std::function<std::string(std::string&)> get_name_func, std::function<bool(std::string&)> verify_func)
 {
 
+	// scale image size
+	image_size.x *= screen::GetScreenWidth() / 1366.0f;
+	image_size.y *= screen::GetScreenHeight() / 768.0f;
+	
 	int images_in_row = static_cast<int>(ImGui::GetWindowContentRegionWidth() / image_size.x);
 	image_size.x = ImGui::GetWindowContentRegionWidth() / images_in_row - int(ImGuiStyleVar_ItemSpacing)*0.65f;
 
@@ -536,7 +540,7 @@ void Ui::DrawImages(std::vector<std::unique_ptr<TextureStructure>> &img_vec, ImV
 			}
 
 			if (images_count % images_in_row != 0)
-				ImGui::SameLine(0.0, 4.0);
+				ImGui::SameLine(0.0, ImGui::GetStyle().ItemInnerSpacing.x);
 
 			images_count++;
 		}
@@ -826,16 +830,22 @@ bool Ui::HotKey(const char* label, HotKeyData& key_data)
 		if (!active)
 			current_hotkey = label;
 
-	if (active && (ImGui::IsMouseClicked(ImGuiMouseButton_Left) || ImGui::IsItemClicked(ImGuiMouseButton_Right)))
+	if (active && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 	{
 		current_hotkey = "";
 		state = true;
 	}
 
-	if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
 	{
-		key_data.key1 = VK_NONE;
-		key_data.key2 = VK_NONE;
+		if (ImGui::IsItemHovered())
+		{
+			key_data.key1 = VK_NONE;
+			key_data.key2 = VK_NONE;
+		}
+		else
+			current_hotkey = "";
+		
 		state = true;
 	}
 	

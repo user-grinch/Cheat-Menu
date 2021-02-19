@@ -992,7 +992,7 @@ void Vehicle::Main()
 
 			ImGui::EndTabItem();
 		}
-		if (player && player->m_pVehicle)
+		if (player->m_pVehicle && player->m_nPedFlags.bInVehicle)
 		{
 			CVehicle *veh = FindPlayerPed()->m_pVehicle;
 			int hveh = CPools::GetVehicleRef(veh);
