@@ -55,7 +55,6 @@ You'll need to install Visual Studio 2019 (v142), [DirectX9 SDK](https://www.mic
 ### Clothes
 Haven't found any tutorials for this yet. But CheatMenu loads cloth entries from *CheatMenu\clothes\\(CategoryName)\* directory in **jpg** format.<br/>
 **Name format: body_part$model_name$texture_name**.<br/>
-*After adding clothes in the game adding them like this should work?*
 
 ### Player Skins (Recommended)
 *If you just want more player skins without much hassel use this*
@@ -67,32 +66,29 @@ Haven't found any tutorials for this yet. But CheatMenu loads cloth entries from
 
 ### Peds + Player Skins
 *If you want to add both peds & skin then follow this*
+
 1. Add peds to your game following a tutorial.
 2. Then create a image of your ped in **jpg** format and put it in *CheatMenu\peds\\(CategoryName)\* directory.
 3. The image name should be the model name of the ped.
-4. Open this file *CheatMenu\json\ped.json* and add an entry for your ped there. 
+4. Open this file *CheatMenu\json\ped.json* and add an entry for your ped there. <br/>
    **Format:  "PedModel" : "PedName"**
    
 ### Vehicles
 1. Add vehicles to your game following [this](https://www.mixmods.com.br/2015/12/tutorial-adicionar-carros-sem-substituir.html) tutorial first. (Use translator)
 2. Then create an image of your vehicle in **jpg** format and put it in *CheatMenu\vehicles\images\\(CategoryName)\* directory.
 3. The image name should be the model id of the vehicle.
-*Now your vehicle should show up in the menu.*
 
 ### Vehicle Tunes
 1. Add tunes to your game following a [tutorial](https://gtaforums.com/topic/481926-tutorial-how-to-add-tuning-parts/).
 2. Then create a image of your tune part in **jpg** format and put it in *CheatMenu\vehicles\components\\(CategoryName)\* directory.
-*If you did everything correctly this should work?*
 
 ### Vehicle Paintjobs
 1. Put your paintjob images in **png** format in *CheatMenu\vehicles\paintjobs\\(CategoryName)\* directory. Don't rename to png, [convert it](http://www.pcfreetime.com/formatfactory/index.php?language=en)
 2. You can use any random name for those images.
-*Now check if it shows up in the menu*
 
 ### Weapons
 1. Add weapons to your game following [this](https://www.mixmods.com.br/2016/05/tutorial-adicionar-armas-sem-substituir.html) tutorial first. (Use translator)
 2. Then create an image of your vehicle in **jpg** format and put it *CheatMenu\weapons\\(CategoryName)* directory.
 3. The image name should be the weapon id (not model!) of the weapon.
-4. Open this file *CheatMenu\json\weapon.json* and add an entry for your weapon there. 
+4. Open this file *CheatMenu\json\weapon.json* and add an entry for your weapon there.<br/>
    **Format:  "WeaponID" : "WeaponName"**
-*Now your weapon should show up in the menu.*
