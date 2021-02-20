@@ -546,10 +546,10 @@ Lowers armour, health, stamina etc."))
 
 			if (!mission_warning_shown)
 			{
-				ImGui::TextWrapped("Mission selector might cause unintended changes to your game. \
+				ImGui::TextWrapped("Mission loader might cause unintended changes to your game. \
 It's recommanded not to save your game after using this. Use it at your own risk!");
 				ImGui::Spacing();
-				if (ImGui::Button("Show mission selector", ImVec2(Ui::GetSize())))\
+				if (ImGui::Button("Show mission loader", ImVec2(Ui::GetSize())))\
 					mission_warning_shown = true;
 			}
 			else

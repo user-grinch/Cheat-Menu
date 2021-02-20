@@ -53,7 +53,7 @@ SOFTWARE.
 #endif
 
 #if KIERO_INCLUDE_VULKAN
-# include <vulkan/vulkan.h>
+#include <vulkan/vulkan.h>
 #endif
 
 #if KIERO_USE_MINHOOK
@@ -547,7 +547,7 @@ kiero::Status::Enum kiero::init(RenderType::Enum _renderType)
 
 				g_methodsTable = (uint150_t*)::calloc(size, sizeof(uint150_t));
 
-				for (int i = 0; i < size; i++)
+				for (unsigned int i = 0; i < size; i++)
 				{
 					g_methodsTable[i] = (uint150_t)::GetProcAddress(libVulkan, methodsNames[i]);
 				}

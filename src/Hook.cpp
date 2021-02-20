@@ -1,6 +1,7 @@
 #include "Hook.h"
 #include "kiero/kiero.h"
 #include "kiero/minhook/MinHook.h"
+// #include "vulkan/vulkan.h"
 
 WNDPROC Hook::oWndProc = NULL;
 f_Present11 Hook::oPresent11 = NULL;
@@ -128,6 +129,8 @@ void Hook::Present(void *ptr)
 			reinterpret_cast<ID3D11Device*>(Globals::device)->GetImmediateContext(&context);
 
 			ImGui_ImplDX11_Init(reinterpret_cast<ID3D11Device*>(Globals::device), context);
+
+			//ImGui_ImplVulkan_Init()
 		}
 
 		ImGui_ImplWin32_EnableDpiAwareness();
@@ -151,6 +154,15 @@ HRESULT Hook::PresentDx11Handler(IDXGISwapChain* pSwapChain, UINT SyncInterval, 
 	Present(pSwapChain);
 	return oPresent11(pSwapChain, SyncInterval, Flags);
 }
+
+// typedef void(*func_vkCmdDrawIndexed_t) (VkCommandBuffer commandBuffer, uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance);
+// func_vkCmdDrawIndexed_t ovkCmdDrawIndexed;
+
+// void hvkCmdDraw(VkCommandBuffer commandBuffer, uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance)
+// {
+
+// 	ovkCmdDrawIndexed(commandBuffer, vertexCount, instanceCount, firstVertex, firstInstance);
+// }
 
 // Thanks imring
 void Hook::ShowMouse(bool state)
@@ -210,6 +222,13 @@ Hook::Hook()
 				Globals::renderer = Render_DirectX11;
 				kiero::bind(8, (void**)&oPresent11, PresentDx11Handler);
 			}
+
+			// if (kiero::init(kiero::RenderType::Vulkan) == kiero::Status::Success)
+			// {
+			// 	Globals::renderer = Render_Vulkan;
+			// 	flog << "Vulkan detected!" << std::endl;
+			// 	kiero::bind(105, (void**)&hvkCmdDraw, PresentDx11Handler);
+			// }
 		}
 	};
 }

@@ -21,6 +21,8 @@ set(depend_files
     "imgui/imgui_impl_dx9.h"
     "imgui/imgui_impl_dx11.cpp"
     "imgui/imgui_impl_dx11.h"
+    # "imgui/imgui_impl_vulkan.cpp"
+    # "imgui/imgui_impl_vulkan.h"
     "imgui/imgui_impl_win32.cpp"
     "imgui/imgui_impl_win32.h"
     "imgui/imgui_internal.h"
@@ -53,12 +55,6 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE
     "_CRT_SECURE_NO_WARNINGS;"
     "_CRT_NON_CONFORMING_SWPRINTFS;"
     "GTASA;"
-    "GTAGAME_NAME=\"San Andreas\";"
-    "GTAGAME_ABBR=\"SA\";"
-    "GTAGAME_ABBRLOW=\"sa\";"
-    "GTAGAME_PROTAGONISTNAME=\"CJ\";"
-    "GTAGAME_CITYNAME=\"San Andreas\";"
-    "_LA_SUPPORT;"
     "_DX9_SDK_INSTALLED;"
     "PLUGIN_SGV_10US;"
     "_MBCS"
@@ -71,6 +67,8 @@ include_directories(
     "$ENV{PLUGIN_SDK_DIR}/shared"
     "$ENV{PLUGIN_SDK_DIR}/shared/game"
     "$ENV{DIRECTX9_SDK_DIR}/include"
+    # "${VULKAN_SDK_DIR}/Include"
+    # "${VULKAN_SDK_DIR}/lib32"
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE
