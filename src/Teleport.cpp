@@ -122,13 +122,13 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, short interior_id)
 		Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(player), true);
 	}
 
-	CStreaming::LoadScene(&Teleport::STeleport::pos);
-	CStreaming::LoadSceneCollision(&Teleport::STeleport::pos);
+	CStreaming::LoadScene(&pos);
+	CStreaming::LoadSceneCollision(&pos);
 	CStreaming::LoadAllRequestedModels(false);
 	
 	if (pVeh && player->m_nPedFlags.bInVehicle)
 	{
-		pVeh->Teleport(STeleport::pos, false);
+		pVeh->Teleport(pos, false);
 
 		if (pVeh->m_nVehicleClass == VEHICLE_BIKE)
 			reinterpret_cast<CBike*>(pVeh)->PlaceOnRoadProperly();
