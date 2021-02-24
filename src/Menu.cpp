@@ -23,7 +23,7 @@ HotKeyData Menu::hotkeys::freecam{};
 HotKeyData Menu::hotkeys::command_window{};
 HotKeyData Menu::hotkeys::flip_veh{};
 HotKeyData Menu::hotkeys::fix_veh{};
-HotKeyData Menu::hotkeys::free_cam_tp_player{VK_RETURN,VK_RETURN};
+HotKeyData Menu::hotkeys::free_cam_tp_player{ VK_RETURN,VK_RETURN };
 HotKeyData Menu::hotkeys::god_mode{};
 HotKeyData Menu::hotkeys::menu_open{};
 HotKeyData Menu::hotkeys::quick_ss{};
@@ -37,67 +37,60 @@ char Menu::commands::input_buffer[INPUT_BUFFER_SIZE] = "";
 
 Menu::Menu()
 {
-	Events::initGameEvent += []
-	{
-		// improve these later, use struct
-		// Load config data
-		overlay::coord = config.GetValue("overlay.coord", false);
-		overlay::fps = config.GetValue("overlay.fps", false);
-		overlay::loc_name = config.GetValue("overlay.loc_name", false);
-		overlay::transparent = config.GetValue("overlay.transparent", false);
-		overlay::veh_health = config.GetValue("overlay.veh_health", false);
-		overlay::veh_speed = config.GetValue("overlay.veh_speed", false);
-		overlay::selected_pos = config.GetValue("overlay.selected_pos", 4);
-		overlay::posX = config.GetValue("overlay.posX", 0);
-		overlay::posY = config.GetValue("overlay.posY", 0);
+	// TODO: use structs
+	// Load config data
+	overlay::coord = config.GetValue("overlay.coord", false);
+	overlay::fps = config.GetValue("overlay.fps", false);
+	overlay::loc_name = config.GetValue("overlay.loc_name", false);
+	overlay::transparent = config.GetValue("overlay.transparent", false);
+	overlay::veh_health = config.GetValue("overlay.veh_health", false);
+	overlay::veh_speed = config.GetValue("overlay.veh_speed", false);
+	overlay::selected_pos = config.GetValue("overlay.selected_pos", 4);
+	overlay::posX = config.GetValue("overlay.posX", 0);
+	overlay::posY = config.GetValue("overlay.posY", 0);
 
-		// Hotkeys
-		hotkeys::aim_skin_changer.key1 = config.GetValue("hotkey.aim_skin_changer.key1", VK_RETURN);
-		hotkeys::aim_skin_changer.key2 = config.GetValue("hotkey.aim_skin_changer.key2", VK_RETURN);
+	// Hotkeys
+	hotkeys::aim_skin_changer.key1 = config.GetValue("hotkey.aim_skin_changer.key1", VK_RETURN);
+	hotkeys::aim_skin_changer.key2 = config.GetValue("hotkey.aim_skin_changer.key2", VK_RETURN);
 
-		hotkeys::freecam.key1 = config.GetValue("hotkey.freecam.key1", VK_F6);
-		hotkeys::freecam.key2 = config.GetValue("hotkey.freecam.key2", VK_F6);
+	hotkeys::freecam.key1 = config.GetValue("hotkey.freecam.key1", VK_F6);
+	hotkeys::freecam.key2 = config.GetValue("hotkey.freecam.key2", VK_F6);
 
-		hotkeys::quick_ss.key1 = config.GetValue("hotkey.quick_screenshot.key1", VK_F5);
-		hotkeys::quick_ss.key2 = config.GetValue("hotkey.quick_screenshot.key2", VK_F5);
+	hotkeys::quick_ss.key1 = config.GetValue("hotkey.quick_screenshot.key1", VK_F5);
+	hotkeys::quick_ss.key2 = config.GetValue("hotkey.quick_screenshot.key2", VK_F5);
 
-		hotkeys::quick_tp.key1 = config.GetValue("hotkey.quick_tp.key1", VK_KEY_X);
-		hotkeys::quick_tp.key2 = config.GetValue("hotkey.quick_tp.key2", VK_KEY_Y);
+	hotkeys::quick_tp.key1 = config.GetValue("hotkey.quick_tp.key1", VK_KEY_X);
+	hotkeys::quick_tp.key2 = config.GetValue("hotkey.quick_tp.key2", VK_KEY_Y);
 
-		hotkeys::menu_open.key1 = config.GetValue("hotkey.menu_open.key1", VK_LCONTROL);
-		hotkeys::menu_open.key2 = config.GetValue("hotkey.menu_open.key2", VK_KEY_M);
+	hotkeys::menu_open.key1 = config.GetValue("hotkey.menu_open.key1", VK_LCONTROL);
+	hotkeys::menu_open.key2 = config.GetValue("hotkey.menu_open.key2", VK_KEY_M);
 
-		hotkeys::command_window.key1 = config.GetValue("hotkey.command_window.key1", VK_LMENU);
-		hotkeys::command_window.key2 = config.GetValue("hotkey.command_window.key2", VK_KEY_C);
+	hotkeys::command_window.key1 = config.GetValue("hotkey.command_window.key1", VK_LMENU);
+	hotkeys::command_window.key2 = config.GetValue("hotkey.command_window.key2", VK_KEY_C);
 
-		hotkeys::flip_veh.key1 = config.GetValue("hotkey.flip_veh.key1", VK_NONE);
-		hotkeys::flip_veh.key2 = config.GetValue("hotkey.flip_veh.key2", VK_NONE);
+	hotkeys::flip_veh.key1 = config.GetValue("hotkey.flip_veh.key1", VK_NONE);
+	hotkeys::flip_veh.key2 = config.GetValue("hotkey.flip_veh.key2", VK_NONE);
 
-		hotkeys::fix_veh.key1 = config.GetValue("hotkey.fix_veh.key1", VK_NONE);
-		hotkeys::fix_veh.key2 = config.GetValue("hotkey.fix_veh.key2", VK_NONE);
+	hotkeys::fix_veh.key1 = config.GetValue("hotkey.fix_veh.key1", VK_NONE);
+	hotkeys::fix_veh.key2 = config.GetValue("hotkey.fix_veh.key2", VK_NONE);
 
-		hotkeys::god_mode.key1 = config.GetValue("hotkey.god_mode.key1", VK_NONE);
-		hotkeys::god_mode.key2 = config.GetValue("hotkey.god_mode.key2", VK_NONE);
+	hotkeys::god_mode.key1 = config.GetValue("hotkey.god_mode.key1", VK_NONE);
+	hotkeys::god_mode.key2 = config.GetValue("hotkey.god_mode.key2", VK_NONE);
 
-		hotkeys::veh_engine.key1 = config.GetValue("hotkey.veh_engine.key1", VK_NONE);
-		hotkeys::veh_engine.key2 = config.GetValue("hotkey.veh_engine.key2", VK_NONE);
+	hotkeys::veh_engine.key1 = config.GetValue("hotkey.veh_engine.key1", VK_NONE);
+	hotkeys::veh_engine.key2 = config.GetValue("hotkey.veh_engine.key2", VK_NONE);
 
-		hotkeys::veh_instant_start.key1 = config.GetValue("hotkey.veh_instant_start.key1", VK_NONE);
-		hotkeys::veh_instant_start.key2 = config.GetValue("hotkey.veh_instant_start.key2", VK_NONE);
+	hotkeys::veh_instant_start.key1 = config.GetValue("hotkey.veh_instant_start.key1", VK_NONE);
+	hotkeys::veh_instant_start.key2 = config.GetValue("hotkey.veh_instant_start.key2", VK_NONE);
 
-		hotkeys::veh_instant_stop.key1 = config.GetValue("hotkey.veh_instant_stop.key1", VK_NONE);
-		hotkeys::veh_instant_stop.key2 = config.GetValue("hotkey.veh_instant_stop.key2", VK_NONE);
-	};
-}
-
-Menu::~Menu()
-{
+	hotkeys::veh_instant_stop.key1 = config.GetValue("hotkey.veh_instant_stop.key1", VK_NONE);
+	hotkeys::veh_instant_stop.key2 = config.GetValue("hotkey.veh_instant_stop.key2", VK_NONE);
 }
 
 void Menu::ProcessOverlay()
 {
-	CPlayerPed *player = FindPlayerPed();
-	bool show_menu = overlay::coord || overlay::fps || overlay::loc_name || 
+	CPlayerPed* player = FindPlayerPed();
+	bool show_menu = overlay::coord || overlay::fps || overlay::loc_name ||
 		((overlay::veh_health || overlay::veh_speed) && player->m_pVehicle && player->m_pVehicle->IsDriver(player));
 
 	int corner = overlay::selected_pos - 1;
@@ -126,13 +119,13 @@ void Menu::ProcessOverlay()
 
 	if (show_menu && ImGui::Begin("Overlay", NULL, window_flags))
 	{
-		CPlayerPed *player = FindPlayerPed();
-		
+		CPlayerPed* player = FindPlayerPed();
+
 		if (overlay::coord)
 		{
 			CVector pos = player->GetPosition();
 
-			std::string text = "Coord: " + std::to_string(int(pos.x)) + ", " + std::to_string(int(pos.y)) + ", " 
+			std::string text = "Coord: " + std::to_string(int(pos.x)) + ", " + std::to_string(int(pos.y)) + ", "
 				+ std::to_string(int(pos.z));
 
 			ImGui::Text(text.c_str());
@@ -151,7 +144,7 @@ void Menu::ProcessOverlay()
 
 			if (overlay::veh_speed)
 			{
-				int speed = player->m_pVehicle->m_vecMoveSpeed.Magnitude()*50; // 02E3 - GET_CAR_SPEED
+				int speed = player->m_pVehicle->m_vecMoveSpeed.Magnitude() * 50; // 02E3 - GET_CAR_SPEED
 				ImGui::Text((std::string("Veh Speed: ") + std::to_string(speed)).c_str());
 			}
 		}
@@ -164,35 +157,35 @@ void Menu::ProcessOverlay()
 	}
 }
 
-void Menu::ProcessShortcutsWindow()
+void Menu::DrawShortcutsWindow()
 {
-		int resX = int(screen::GetScreenWidth());
-		int resY = int(screen::GetScreenHeight());
+	int resX = int(screen::GetScreenWidth());
+	int resY = int(screen::GetScreenHeight());
 
-		ImGui::SetNextWindowPos(ImVec2(0, resY - 40), ImGuiCond_Always);
-		ImGui::SetNextWindowSize(ImVec2(resX, 40));
+	ImGui::SetNextWindowPos(ImVec2(0, resY - 40), ImGuiCond_Always);
+	ImGui::SetNextWindowSize(ImVec2(resX, 40));
 
-		ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration + ImGuiWindowFlags_AlwaysAutoResize + ImGuiWindowFlags_NoSavedSettings
-			+ ImGuiWindowFlags_NoMove;
+	ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration + ImGuiWindowFlags_AlwaysAutoResize + ImGuiWindowFlags_NoSavedSettings
+		+ ImGuiWindowFlags_NoMove;
 
-		if (ImGui::Begin("Shortcuts window", NULL, flags))
+	if (ImGui::Begin("Shortcuts window", NULL, flags))
+	{
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetStyle().FramePadding.x, resY / 130));
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(3, 3));
+
+		ImGui::SetNextItemWidth(resX);
+		ImGui::SetKeyboardFocusHere(-1);
+
+		if (ImGui::InputTextWithHint("##TEXTFIELD", "Enter command", commands::input_buffer, INPUT_BUFFER_SIZE, ImGuiInputTextFlags_EnterReturnsTrue))
 		{
-			ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetStyle().FramePadding.x, resY / 130));
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(3, 3));
-			
-			ImGui::SetNextItemWidth(resX);
-			ImGui::SetKeyboardFocusHere(-1);
-
-			if (ImGui::InputTextWithHint("##TEXTFIELD", "Enter command", commands::input_buffer, INPUT_BUFFER_SIZE, ImGuiInputTextFlags_EnterReturnsTrue))
-			{
-				ProcessCommands();
-				commands::show_menu = false;
-				strcpy(commands::input_buffer,"");
-			}
-			
-			ImGui::PopStyleVar(2);
-			ImGui::End();
+			ProcessCommands();
+			commands::show_menu = false;
+			strcpy(commands::input_buffer, "");
 		}
+
+		ImGui::PopStyleVar(2);
+		ImGui::End();
+	}
 }
 
 void Menu::ProcessCommands()
@@ -217,7 +210,7 @@ void Menu::ProcessCommands()
 
 	if (command == "time")
 	{
-		try 
+		try
 		{
 			std::string temp;
 			ss >> temp;
@@ -254,7 +247,7 @@ void Menu::ProcessCommands()
 	}
 
 	if (command == "wep")
-	{ 
+	{
 		std::string wep_name;
 		ss >> wep_name;
 
@@ -278,14 +271,14 @@ void Menu::ProcessCommands()
 			else
 				CHud::SetHelpMessage("Invalid command", false, false, false);
 		}
-		
+
 		return;
 	}
 	if (command == "veh")
-	{ 
+	{
 		std::string veh_name;
 		ss >> veh_name;
-		
+
 		int model = Vehicle::GetModelFromName(veh_name.c_str());
 		if (model != 0)
 		{
@@ -300,7 +293,7 @@ void Menu::ProcessCommands()
 	}
 }
 
-void Menu::Main()
+void Menu::Draw()
 {
 	if (ImGui::BeginTabBar("Menu", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
 	{
@@ -336,7 +329,7 @@ void Menu::Main()
 				config.SetValue("overlay.veh_speed", overlay::veh_speed);
 
 			ImGui::Columns(1);
-			
+
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem("Hotkeys"))
@@ -358,7 +351,7 @@ void Menu::Main()
 				config.SetValue("hotkey.command_window.key2", hotkeys::command_window.key2);
 			}
 
-			ImGui::Dummy(ImVec2(0,10));
+			ImGui::Dummy(ImVec2(0, 10));
 
 			if (Ui::HotKey("Activate aim skin changer", hotkeys::aim_skin_changer))
 			{
@@ -381,7 +374,7 @@ void Menu::Main()
 				config.SetValue("hotkey.quick_tp.key2", hotkeys::quick_tp.key2);
 			}
 
-			ImGui::Dummy(ImVec2(0,10));
+			ImGui::Dummy(ImVec2(0, 10));
 
 			if (Ui::HotKey("Fix current vehicle", hotkeys::fix_veh))
 			{
@@ -475,7 +468,7 @@ void Menu::Main()
 
 			if (ImGui::Button("GitHub repo", ImVec2(Ui::GetSize(2))))
 				ShellExecute(NULL, "open", GITHUB_LINK, NULL, NULL, SW_SHOWNORMAL);
-					
+
 			ImGui::Spacing();
 
 			if (ImGui::BeginChild("AboutChild"))
@@ -490,14 +483,14 @@ void Menu::Main()
 				ImGui::Text((std::string("Build: ") + BUILD_NUMBER).c_str());
 
 				ImGui::Columns(1);
-						
+
 				ImGui::Dummy(ImVec2(0, 10));
 				ImGui::TextWrapped("If you find bugs or have suggestions, let me know on discord.");
 				ImGui::Dummy(ImVec2(0, 10));
 				ImGui::TextWrapped("Thanks to Junior-Djjr");
 				ImGui::Dummy(ImVec2(0, 10));
 				Ui::CenterdText("Copyright GPLv3 2019-2021 Grinch_");
-				
+
 				ImGui::EndChild();
 			}
 

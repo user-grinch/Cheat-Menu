@@ -7,6 +7,7 @@ ImGuiTextFilter Weapon::filter = "";
 std::string Weapon::selected_item = "All";
 std::vector<std::string> Weapon::search_categories;
 std::vector<std::unique_ptr<TextureStructure>> Weapon::weapon_vec;
+bool Weapon::images_loaded = false;
 
 CJson Weapon::weapon_json = CJson("weapon");
 bool Weapon::auto_aim = false;
@@ -40,13 +41,14 @@ int Weapon::gang_weapons[10][3] =
 
 Weapon::Weapon()
 {
-	Events::initGameEvent += []
-	{
-		Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\weapons\\"), ".jpg", Weapon::search_categories, Weapon::weapon_vec);
-	};
-
 	Events::processScriptsEvent += []
 	{
+		if (!images_loaded)
+		{
+			Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\weapons\\"), ".jpg", Weapon::search_categories, Weapon::weapon_vec);
+			images_loaded = true;
+		}
+		
 		CPlayerPed *player = FindPlayerPed();
 		if (auto_aim)
 		{
@@ -134,7 +136,7 @@ void Weapon::GiveWeaponToPlayer(std::string& weapon_type)
 	} 
 }
 
-void Weapon::Main()
+void Weapon::Draw()
 {
 	CPlayerPed *player = FindPlayerPed();
 	uint hplayer = CPools::GetPedRef(player);

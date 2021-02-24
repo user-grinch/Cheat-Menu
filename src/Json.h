@@ -10,7 +10,7 @@ public:
 	nlohmann::json data;
 
 	/*
-		Returns a value from json structure hierarchy using '.' 
+		Returns a value from json structure hierarchy using '.'
 		Example: "Menu.Window.X"
 	*/
 	// specialize since typeid(std::string) doesn't work
@@ -22,11 +22,11 @@ public:
 			std::stringstream ss(key);
 			std::string line;
 
-			nlohmann::json *json = &data;
+			nlohmann::json* json = &data;
 
 			while (getline(ss, line, '.'))
 				json = &((*json)[line]);
-			
+
 			// json library bugs with bool, using int instead
 			if (typeid(T) == typeid(bool))
 			{
@@ -39,7 +39,7 @@ public:
 			return default_val;
 		}
 	}
-	
+
 	template<>
 	std::string GetValue(std::string&& key, std::string&& default_val)
 	{
@@ -47,7 +47,7 @@ public:
 			std::stringstream ss(key);
 			std::string line;
 
-			nlohmann::json *json = &data;
+			nlohmann::json* json = &data;
 
 			while (getline(ss, line, '.'))
 				json = &((*json)[line]);
@@ -60,7 +60,7 @@ public:
 	}
 
 	/*
-		Allows to save values in json hierarchy using '.' 
+		Allows to save values in json hierarchy using '.'
 		Example: "Menu.Window.X"
 	*/
 
@@ -70,7 +70,7 @@ public:
 		std::stringstream ss(key);
 		std::string line;
 
-		nlohmann::json *json = &data;
+		nlohmann::json* json = &data;
 
 		while (getline(ss, line, '.'))
 			json = &((*json)[line]);
@@ -88,7 +88,7 @@ public:
 		std::stringstream ss(key);
 		std::string line;
 
-		nlohmann::json *json = &data;
+		nlohmann::json* json = &data;
 
 		while (getline(ss, line, '.'))
 			json = &((*json)[line]);
@@ -96,7 +96,7 @@ public:
 		*json = val;
 	}
 	/*
-		Loads the section names into a category vector. 
+		Loads the section names into a category vector.
 		Used to create drop down category menus
 	*/
 	void LoadData(std::vector<std::string>& vec, std::string& selected);

@@ -206,5 +206,5 @@ static std::string key_names[]
 	"LCtrl",
 	"RCtrl",
 	"LMenu",
-	"RMenu"	
+	"RMenu"
 };

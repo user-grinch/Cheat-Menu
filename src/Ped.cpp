@@ -7,6 +7,7 @@ ImGuiTextFilter Ped::filter = "";
 std::string Ped::selected_item = "All";
 std::vector<std::string> Ped::search_categories;
 std::vector<std::unique_ptr<TextureStructure>> Ped::peds_vec;
+bool Ped::images_loaded = false;
 
 CJson Ped::ped_json = CJson("ped");
 CJson Ped::pedspecial_json = CJson("ped special");
@@ -25,18 +26,21 @@ bool Ped::spawn_ped::dont_move = false;
 bool Ped::spawn_ped::ped_bleed = false;
 int Ped::spawn_ped::weapon_id = 0;
 
-std::vector<std::string> Ped::spawn_ped::ped_type = {"Civ male","Civ female","Cop","Ballas","Grove Street Families","Los Santos Vagos",
+std::vector<std::string> Ped::spawn_ped::ped_type = { "Civ male","Civ female","Cop","Ballas","Grove Street Families","Los Santos Vagos",
 											"San Fierro Rifa","Da Nang Boys","Mafia","Mountain Cloud Triads","Varrio Los Aztecas",
-											"Gang 9","Medic","Dealer","Criminal","Fireman","Prostitute"};
+											"Gang 9","Medic","Dealer","Criminal","Fireman","Prostitute" };
 Ped::Ped()
 {
-	Events::initGameEvent += []
-	{
-		Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\peds\\"), ".jpg", search_categories, peds_vec);
+	if (GetModuleHandle("ExGangWars.asi"))
+		exgangwars_installed = true;
 
-		if (LoadLibraryW(L"ExGangWars.asi"))
-			exgangwars_installed = true;
-		
+	Events::processScriptsEvent += []
+	{
+		if (!images_loaded)
+		{
+			Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\peds\\"), ".jpg", search_categories, peds_vec);
+			images_loaded = true;
+		}
 	};
 }
 
@@ -59,11 +63,11 @@ void Ped::SpawnPed(std::string& model)
 
 	if (Ped::ped_json.data.contains(model))
 	{
-		CPlayerPed *player = FindPlayerPed();
+		CPlayerPed* player = FindPlayerPed();
 		CVector pos = player->GetPosition();
 		pos.y += 1;
 
-		CPed *ped;
+		CPed* ped;
 		int hplayer;
 
 		if (Ped::pedspecial_json.data.contains(model))
@@ -81,12 +85,12 @@ void Ped::SpawnPed(std::string& model)
 			CStreaming::SetSpecialCharIsDeletable(291);
 		}
 		else
-		{	
+		{
 			int imodel = std::stoi(model);
 			CStreaming::RequestModel(imodel, eStreamingFlags::PRIORITY_REQUEST);
 			CStreaming::LoadAllRequestedModels(false);
 
-			Command <Commands::CREATE_CHAR>(spawn_ped::selected_ped_type + 4,imodel,pos.x,pos.y,pos.z+1,&hplayer);
+			Command <Commands::CREATE_CHAR>(spawn_ped::selected_ped_type + 4, imodel, pos.x, pos.y, pos.z + 1, &hplayer);
 			CStreaming::SetModelIsDeletable(imodel);
 		}
 
@@ -101,7 +105,7 @@ void Ped::SpawnPed(std::string& model)
 		ped->m_nPedFlags.bPedIsBleeding = spawn_ped::ped_bleed;
 		ped->m_nWeaponAccuracy = spawn_ped::accuracy;
 		ped->m_fHealth = spawn_ped::health;
-		
+
 		if (spawn_ped::weapon_id != 0)
 		{
 			int model = 0;
@@ -113,7 +117,7 @@ void Ped::SpawnPed(std::string& model)
 	}
 }
 
-void Ped::Main()
+void Ped::Draw()
 {
 	if (ImGui::BeginTabBar("Ped", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
 	{
@@ -154,9 +158,9 @@ void Ped::Main()
 						CGangWars::StartDefensiveGangWar();
 					else
 						CGangWars::StartOffensiveGangWar();
-					
+
 					CGangWars::bGangWarsActive = true;
-				}	
+				}
 				ImGui::SameLine();
 				if (ImGui::Button("End gang war", ImVec2(Ui::GetSize(2))))
 					CGangWars::EndGangWar(true);
@@ -170,9 +174,9 @@ void Ped::Main()
 				{
 					CVector pos = FindPlayerPed()->GetPosition();
 					CZone szone = CZone();
-					CZone *pZone = &szone;
+					CZone* pZone = &szone;
 
-					CZoneExtraInfo *zone_info = CTheZones::GetZoneInfo(&pos, &pZone);
+					CZoneExtraInfo* zone_info = CTheZones::GetZoneInfo(&pos, &pZone);
 					int density = zone_info->m_nGangDensity[i];
 
 					if (ImGui::SliderInt(Ped::gang_names[i].c_str(), &density, 0, 127))
@@ -201,7 +205,7 @@ void Ped::Main()
 
 			if (ImGui::CollapsingHeader("Recruit anyone"))
 			{
-				static std::vector<Ui::NamedMemory> select_weapon{ {"9mm", 0x96917C}, { "AK47", 0x96917D }, { "Rockets", 0x96917E }};
+				static std::vector<Ui::NamedMemory> select_weapon{ {"9mm", 0x96917C}, { "AK47", 0x96917D }, { "Rockets", 0x96917E } };
 				Ui::RadioButtonAddress("Select weapon", select_weapon);
 				ImGui::Spacing();
 				ImGui::Separator();
@@ -210,12 +214,12 @@ void Ped::Main()
 			{
 				ImGui::InputInt("Radius", &ped_remove_radius);
 				ImGui::Spacing();
-				if (ImGui::Button("Remove peds",Ui::GetSize(1)))
+				if (ImGui::Button("Remove peds", Ui::GetSize(1)))
 				{
-					CPlayerPed *player = FindPlayerPed();
-					for (CPed *ped : CPools::ms_pPedPool)
+					CPlayerPed* player = FindPlayerPed();
+					for (CPed* ped : CPools::ms_pPedPool)
 					{
-						if (DistanceBetweenPoints(ped->GetPosition(),player->GetPosition()) < ped_remove_radius
+						if (DistanceBetweenPoints(ped->GetPosition(), player->GetPosition()) < ped_remove_radius
 						&& ped->m_pVehicle == nullptr && ped != player)
 							Command<Commands::DELETE_CHAR>(CPools::GetPedRef(ped));
 					}

@@ -4,12 +4,12 @@
 #include "Ui.h"
 
 unsortedMap CheatMenu::header{
-	{ "Teleport", &Teleport::Main },{ "Player", &Player::Main },{ "Ped", &Ped::Main },
-	{ "Animation", &Animation::Main },{ "Vehicle", &Vehicle::Main },{ "Weapon", &Weapon::Main },
-	{ "Game", &Game::Main },{ "Visual", &Visual::Main },{ "Menu", &Menu::Main }
+	{ "Teleport", &Teleport::Draw },{ "Player", &Player::Draw },{ "Ped", &Ped::Draw },
+	{ "Animation", &Animation::Draw },{ "Vehicle", &Vehicle::Draw },{ "Weapon", &Weapon::Draw },
+	{ "Game", &Game::Draw },{ "Visual", &Visual::Draw },{ "Menu", &Menu::Draw }
 };
 
-void CheatMenu::ProcessMenu()
+void CheatMenu::DrawMenu()
 {
 	ImGui::SetNextWindowSize(Globals::menu_size);
 	if (ImGui::Begin(MENU_TITLE, &Globals::show_menu, ImGuiWindowFlags_NoCollapse))
@@ -32,32 +32,32 @@ void CheatMenu::ProcessWindow()
 {
 	ImGuiIO& io = ImGui::GetIO();
 
-	if (!FrontEndMenuManager.m_bMenuActive && (Globals::show_menu || Menu::commands::show_menu))
-	{
-		if (Globals::show_menu)
-			ProcessMenu();
-		else 
-			Menu::ProcessShortcutsWindow();
-	}
+	if (FrontEndMenuManager.m_bMenuActive)
+		Hook::show_mouse = false;
+	else
+		if (Globals::show_menu || Menu::commands::show_menu)
+		{
+			if (Globals::show_menu)
+				DrawMenu();
+			else
+				Menu::DrawShortcutsWindow();
+		}
 
 	Menu::ProcessOverlay();
 }
 
 CheatMenu::CheatMenu()
 {
-	ApplyImGuiStyle();
+	ApplyStyle();
 	Hook::window_callback = std::bind(&ProcessWindow);
 
-	Events::initRwEvent += []()
-	{	
-		// Load menu settings
-		Globals::header_id = config.GetValue("window.id",std::string(""));
-		Globals::menu_size.x = config.GetValue("window.sizeX", screen::GetScreenWidth() / 4.0f);
-		Globals::menu_size.y = config.GetValue("window.sizeY", screen::GetScreenHeight() / 1.2f);
-		srand(CTimer::m_snTimeInMilliseconds);
-	};
+	// Load menu settings
+	Globals::header_id = config.GetValue("window.id", std::string(""));
+	Globals::menu_size.x = config.GetValue("window.sizeX", screen::GetScreenWidth() / 4.0f);
+	Globals::menu_size.y = config.GetValue("window.sizeY", screen::GetScreenHeight() / 1.2f);
+	srand(CTimer::m_snTimeInMilliseconds);
 
-	Events::processScriptsEvent += [this]
+	Events::processScriptsEvent += []
 	{
 		if (Globals::init_done && !FrontEndMenuManager.m_bMenuActive)
 		{
@@ -69,7 +69,7 @@ CheatMenu::CheatMenu()
 				if (Menu::commands::show_menu)
 				{
 					Menu::ProcessCommands();
-					strcpy(commands::input_buffer,"");
+					strcpy(commands::input_buffer, "");
 				}
 				Menu::commands::show_menu = !Menu::commands::show_menu;
 			}
@@ -78,32 +78,14 @@ CheatMenu::CheatMenu()
 			{
 				if (Hook::show_mouse) // Only write when the menu closes
 					config.WriteToDisk();
-					
+
 				Hook::show_mouse = Globals::show_menu;
 			}
 		}
 	};
-
-	Events::drawMenuBackgroundEvent += [this]
-	{
-		if (Hook::show_mouse)
-		{
-			config.WriteToDisk();
-			Hook::show_mouse = false;
-		}
-	};
-
-	Events::shutdownRwEvent += []
-	{
-		flog << "Log Finished." << std::endl;
-	};
 }
 
-CheatMenu::~CheatMenu()
-{
-}
-
-void CheatMenu::ApplyImGuiStyle()
+void CheatMenu::ApplyStyle()
 {
 	ImGuiStyle* style = &ImGui::GetStyle();
 	ImVec4* colors = style->Colors;
@@ -175,4 +157,50 @@ void CheatMenu::ApplyImGuiStyle()
 	colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
 	colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
 	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
+}
+
+void MenuThread(void* param)
+{
+	// Wait till the game is initiallized
+	Events::initGameEvent.after += []()
+	{
+		Globals::game_init = true;
+	};
+
+	while (!Globals::game_init)
+		Sleep(500);
+
+	if (GetModuleHandle("SAMP.dll"))
+	{
+		MessageBox(RsGlobal.ps->window, "SAMP detected. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
+		return;
+	}
+
+	// SP fixes some mouse issues
+	if (!GetModuleHandle("SilentPatchSA.asi"))
+	{
+		MessageBox(RsGlobal.ps->window, "SilentPatch isn't installed. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
+		return;
+	}
+
+	flog << "Starting...\nVersion: " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: " GITHUB_LINK "\n\n" << std::endl;
+	CFastman92limitAdjuster::Init();
+	CheatMenu cheatmenu;
+
+	while (true)
+		Sleep(5000);
+}
+
+BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
+{
+	if (nReason == DLL_PROCESS_ATTACH)
+	{
+		uint gameVersion = GetGameVersion();
+		if (gameVersion == GAME_10US_HOODLUM || gameVersion == GAME_10US_COMPACT)
+			CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)&MenuThread, NULL, NULL, NULL);
+		else
+			MessageBox(HWND_DESKTOP, "Unknown game version. GTA SA v1.0 US is required.", "CheatMenu", MB_ICONERROR);
+	}
+
+	return TRUE;
 }

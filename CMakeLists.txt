@@ -10,7 +10,6 @@ set(GTA_SA_DIR F:/GTASanAndreas)
 # Can ignore the below paths if you got them in system paths
 set(PLUGIN_SDK_DIR $ENV{PLUGIN_SDK_DIR})
 set(DIRECTX9_SDK_DIR $ENV{DIRECTX9_SDK_DIR})
-set(VULKAN_SDK_DIR $ENV{VK_SDK_PATH})
 ################################################################################
 
 ################################################################################
@@ -94,7 +93,6 @@ include_directories(
     "${PLUGIN_SDK_DIR}/shared"
     "${PLUGIN_SDK_DIR}/shared/game"
     "${DIRECTX9_SDK_DIR}/include"
-    # "${VULKAN_SDK_DIR}/Include"
     "deps"
 )
 
@@ -182,7 +180,6 @@ Depend
 target_link_directories(${PROJECT_NAME} PUBLIC
     "${PLUGIN_SDK_DIR}/output/lib/"
     "${DIRECTX9_SDK_DIR}/lib/x86/"
-    # "${VULKAN_SDK_DIR}/lib32"
     "$<$<CONFIG:Release>:"
         "deps/Release/"
     ">"

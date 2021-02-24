@@ -40,10 +40,9 @@ public:
 	};
 
 	Menu();
-	~Menu();
-	static void Main();
+	static void Draw();
 	static void ProcessOverlay();
-	static void ProcessShortcutsWindow();
+	static void DrawShortcutsWindow();
 	static void ProcessCommands();
 
 };

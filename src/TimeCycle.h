@@ -1,47 +1,47 @@
 #include "plugin.h"
 
 uchar* m_nDirectionalMult = (uchar*)0x55F7C7;		 //m_nDirectionalMult[184]
-			
+
 uchar* m_nWaterFogAlpha = (uchar*)0x55F7B8;			 //m_nWaterFogAlpha[184]
-			
+
 uchar* m_nHighLightMinIntensity = (uchar*)0x55F7A9;  //m_nHighLightMinIntensity[184]
-			
+
 uchar* m_fCloudAlpha = (uchar*)0x55F793;             //m_fCloudAlpha[184]
-			
+
 uchar* m_fPostFx2Alpha = (uchar*)0x55F77D;           //m_fPostFx2Alpha[184]
-			
+
 uchar* m_fPostFx2Blue = (uchar*)0x55F767;            //m_fPostFx2Blue[184]
-			
+
 uchar* m_fPostFx2Green = (uchar*)0x55F751;           //m_fPostFx2Green[184]
-			
+
 uchar* m_fPostFx2Red = (uchar*)0x55F73B;             //m_fPostFx2Red[184]
-				
+
 uchar* m_fPostFx1Alpha = (uchar*)0x55F725;           //m_fPostFx1Alpha[184]
-				
+
 uchar* m_fPostFx1Blue = (uchar*)0x55F70F;            //m_fPostFx1Blue[184]
-			
+
 uchar* m_fPostFx1Green = (uchar*)0x55F6FC;           //m_fPostFx1Green[184]
-			
+
 uchar* m_fPostFx1Red = (uchar*)0x55F6E9;             //m_fPostFx1Red[184]
-			
+
 uchar* m_fWaterAlpha = (uchar*)0x55F6D6;             //m_fWaterAlpha[184]
-			
+
 uchar* m_fWaterBlue = (uchar*)0x55F6C3;              //m_fWaterBlue[184]
-				
+
 uchar* m_fWaterGreen = (uchar*)0x55F6B0;             //m_fWaterGreen[184]
-				
+
 uchar* m_fWaterRed = (uchar*)0x55F69C;               //m_fWaterRed[184]
-				 
+
 uchar* m_nFluffyCloudsBottomBlue = (uchar*)0x55F690; //m_nFluffyCloudsBottomBlue[184]
-				
+
 uchar* m_nFluffyCloudsBottomGreen = (uchar*)0x55F683;//m_nFluffyCloudsBottomGreen[184]
-				 
+
 uchar* m_nFluffyCloudsBottomRed = (uchar*)0x55F677;  //m_nFluffyCloudsBottomRed[184]
-				
+
 uchar* m_nLowCloudsBlue = (uchar*)0x55F66B;          //m_nLowCloudsBlue[184]
-			
+
 uchar* m_nLowCloudsGreen = (uchar*)0x55F65F;         //m_nLowCloudsGreen[184]
-				
+
 uchar* m_nLowCloudsRed = (uchar*)0x55F653;           //m_nLowCloudsRed[184]
 
 uchar* m_fLightsOnGroundBrightness = (uchar*)0x55F640;//m_fLightsOnGroundBrightness[184]

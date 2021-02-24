@@ -56,7 +56,6 @@
 #include "imgui/imgui_internal.h"
 #include "imgui/imgui_impl_dx9.h"
 #include "imgui/imgui_impl_dx11.h"
-// #include "imgui/imgui_impl_vulkan.h"
 #include "imgui/imgui_impl_win32.h"
 
 #include "Events.h"
@@ -86,6 +85,7 @@ struct Globals
 	static ImVec2 screen_size;
 	static bool show_menu;
 	static bool init_done;
+	static bool game_init;
 	static Renderer renderer;
 	static void* device;
 };
@@ -94,7 +94,7 @@ struct TextureStructure
 {
 	std::string file_name;
 	std::string category_name;
-	void *texture = nullptr;
+	void* texture = nullptr;
 };
 
 struct HotKeyData

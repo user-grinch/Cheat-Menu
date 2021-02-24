@@ -25,7 +25,7 @@ public:
 		static float speed;
 		static float fov;
 		static bool init_done;
-		static CPed *ped;
+		static CPed* ped;
 		static int hped;
 		static float mouseX, mouseY, tmouseX, tmouseY;
 	};
@@ -60,8 +60,7 @@ public:
 	};
 
 	Game();
-	~Game();
-	static void Main();
+	static void Draw();
 	static void FreeCam();
 	static void ClearFreecamStuff();
 };

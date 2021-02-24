@@ -32,7 +32,7 @@ float Game::freecam::mouseX = 0;
 float Game::freecam::mouseY = 0;
 int Game::freecam::hped = -1;
 float Game::freecam::fov = -1;
-CPed *Game::freecam::ped = nullptr;
+CPed* Game::freecam::ped = nullptr;
 
 bool Game::hard_mode::state = false;
 float Game::hard_mode::prev_armour = 0.0f;
@@ -60,18 +60,18 @@ static bool mission_warning_shown = false;
 
 // Thanks to aap
 void RealTimeClock(void)
-{	
+{
 	static int lastday;
 	time_t tmp = time(NULL);
-	struct tm *now = localtime(&tmp);
-	
-	if(now->tm_yday != lastday)
+	struct tm* now = localtime(&tmp);
+
+	if (now->tm_yday != lastday)
 		CStats::SetStatValue(0x86, CStats::GetStatValue(0x86) + 1.0f);
 
 	lastday = now->tm_yday;
-	CClock::ms_nGameClockMonth = now->tm_mon+1;
+	CClock::ms_nGameClockMonth = now->tm_mon + 1;
 	CClock::ms_nGameClockDays = now->tm_mday;
-	CClock::CurrentDay = now->tm_wday+1;
+	CClock::CurrentDay = now->tm_wday + 1;
 	CClock::ms_nGameClockHours = now->tm_hour;
 	CClock::ms_nGameClockMinutes = now->tm_min;
 	CClock::ms_nGameClockSeconds = now->tm_sec;
@@ -79,29 +79,26 @@ void RealTimeClock(void)
 
 Game::Game()
 {
-	Events::initGameEvent += []
-	{
-		json.LoadData(search_categories, selected_item);
-		stat::json.LoadData(stat::search_categories, stat::selected_item);
-		freecam::fov = TheCamera.FindCamFOV();
+	json.LoadData(search_categories, selected_item);
+	stat::json.LoadData(stat::search_categories, stat::selected_item);
+	freecam::fov = TheCamera.FindCamFOV();
 
-		// Generate enabled cheats vector
-		for (auto element : random_cheats::name_json.data.items())
-		{
-			/*
-			[
-				cheat_id = [ cheat_name, state (true/false) ]
-			]
-			*/
-			random_cheats::enabled_cheats[std::stoi(element.key())][0] = element.value().get<std::string>();
-			random_cheats::enabled_cheats[std::stoi(element.key())][1] = "true";
-		}	
-	};
+	// Generate enabled cheats vector
+	for (auto element : random_cheats::name_json.data.items())
+	{
+		/*
+		[
+			cheat_id = [ cheat_name, state (true/false) ]
+		]
+		*/
+		random_cheats::enabled_cheats[std::stoi(element.key())][0] = element.value().get<std::string>();
+		random_cheats::enabled_cheats[std::stoi(element.key())][1] = "true";
+	}
 
 	Events::processScriptsEvent += []
 	{
 		uint timer = CTimer::m_snTimeInMilliseconds;
-		static CPlayerPed *player = FindPlayerPed();
+		static CPlayerPed* player = FindPlayerPed();
 		static int hplayer = CPools::GetPedRef(player);
 
 		if (ss_shortcut)
@@ -135,9 +132,9 @@ Game::Game()
 				if (solid_water_object == 0)
 				{
 					Command<Commands::CREATE_OBJECT>(3095, pos.x, pos.y, water_height, &solid_water_object);
-					Command<Commands::SET_OBJECT_VISIBLE>(solid_water_object,false);
-					if (pos.z < (water_height+1))
-						player->SetPosn(pos.x,pos.y,water_height+1);
+					Command<Commands::SET_OBJECT_VISIBLE>(solid_water_object, false);
+					if (pos.z < (water_height + 1))
+						player->SetPosn(pos.x, pos.y, water_height + 1);
 				}
 				else
 					Command<Commands::SET_OBJECT_COORDINATES>(solid_water_object, pos.x, pos.y, water_height);
@@ -155,19 +152,19 @@ Game::Game()
 		// improve this later
 		if (sync_time && timer - sync_time_timer > 50)
 		{
-			std::time_t t = std::time(0); 
+			std::time_t t = std::time(0);
 			std::tm* now = std::localtime(&t);
 
 			CClock::ms_nGameClockHours = now->tm_hour;
 			CClock::ms_nGameClockMinutes = now->tm_min;
-			
+
 			sync_time_timer = timer;
 		}
 
-		if (random_cheats::enable 
-		&& (timer - random_cheats::timer) >  (uint(random_cheats::enable_wait_time)*1000))
+		if (random_cheats::enable
+		&& (timer - random_cheats::timer) > (uint(random_cheats::enable_wait_time) * 1000))
 		{
-			int id = Random(0,91);
+			int id = Random(0, 91);
 
 			for (int i = 0; i < 92; i++)
 			{
@@ -183,7 +180,7 @@ Game::Game()
 				}
 			}
 		}
-		
+
 		if (Ui::HotKeyPressed(Menu::hotkeys::freecam))
 		{
 			if (freecam::enable)
@@ -198,25 +195,21 @@ Game::Game()
 	};
 }
 
-Game::~Game()
-{
-}
-
 void SetPlayerMission(std::string& rootkey, std::string& name, std::string& id)
 {
-	CPlayerPed *player = FindPlayerPed();
+	CPlayerPed* player = FindPlayerPed();
 	uint hplayer = CPools::GetPedRef(player);
 	int interior = 0;
 
-	Command<0x09E8>(hplayer,&interior);
-	
-	if ( Util::IsOnMission() && interior == 0)
+	Command<0x09E8>(hplayer, &interior);
+
+	if (Util::IsOnMission() && interior == 0)
 	{
 		player->SetWantedLevel(0);
 		Command<Commands::LOAD_AND_LAUNCH_MISSION_INTERNAL>(std::stoi(id));
 	}
 	else CHud::SetHelpMessage("Can't start mission now", false, false, false);
-		
+
 }
 
 void Game::FreeCam()
@@ -225,18 +218,18 @@ void Game::FreeCam()
 
 	if (!freecam::init_done)
 	{
-		CPlayerPed *player = FindPlayerPed(-1);
+		CPlayerPed* player = FindPlayerPed(-1);
 		Command<Commands::SET_EVERYONE_IGNORE_PLAYER>(0, true);
 		CHud::bScriptDontDisplayRadar = true;
 		CHud::m_Wants_To_Draw_Hud = false;
 		CVector player_pos = player->GetPosition();
 		CPad::GetPad(0)->DisablePlayerControls = true;
 
-		Command<Commands::CREATE_RANDOM_CHAR>(player_pos.x,player_pos.y,player_pos.z, &freecam::hped);
+		Command<Commands::CREATE_RANDOM_CHAR>(player_pos.x, player_pos.y, player_pos.z, &freecam::hped);
 		freecam::ped = CPools::GetPed(freecam::hped);
 		freecam::ped->m_bIsVisible = false;
-		
-		Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(freecam::hped,true);
+
+		Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(freecam::hped, true);
 		Command<Commands::SET_CHAR_COLLISION>(freecam::hped, false);
 		Command<Commands::SET_LOAD_COLLISION_FOR_CHAR_FLAG>(freecam::hped, false);
 
@@ -247,16 +240,16 @@ void Game::FreeCam()
 		player_pos.z -= 20;
 		freecam::ped->SetPosn(player_pos);
 
-		TheCamera.LerpFOV(TheCamera.FindCamFOV(),freecam::fov,1000,true);
+		TheCamera.LerpFOV(TheCamera.FindCamFOV(), freecam::fov, 1000, true);
 		Command<Commands::CAMERA_PERSIST_FOV>(true);
 	}
 
 	CVector pos = freecam::ped->GetPosition();
 
 	Command<Commands::GET_PC_MOUSE_MOVEMENT>(&freecam::mouseX, &freecam::mouseY);
-	freecam::tmouseX = freecam::tmouseX - freecam::mouseX/250;
-	freecam::tmouseY = freecam::tmouseY + freecam::mouseY/3;
-	
+	freecam::tmouseX = freecam::tmouseX - freecam::mouseX / 250;
+	freecam::tmouseY = freecam::tmouseY + freecam::mouseY / 3;
+
 	if (freecam::tmouseY > 150)
 		freecam::tmouseY = 150;
 
@@ -265,18 +258,18 @@ void Game::FreeCam()
 
 	if (Ui::HotKeyPressed(Menu::hotkeys::free_cam_tp_player))
 	{
-		CPlayerPed *player = FindPlayerPed(-1);
+		CPlayerPed* player = FindPlayerPed(-1);
 		CVector pos = freecam::ped->GetPosition();
 		CEntity* player_entity = FindPlayerEntity(-1);
 		pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, 0, &player_entity) + 0.5f;
-		Command<Commands::SET_CHAR_COORDINATES>(CPools::GetPedRef(player),pos.x,pos.y,pos.z);
+		Command<Commands::SET_CHAR_COORDINATES>(CPools::GetPedRef(player), pos.x, pos.y, pos.z);
 
 		// disble them again cause they get enabled
 		CHud::bScriptDontDisplayRadar = true;
 		CHud::m_Wants_To_Draw_Hud = false;
-		CHud::SetHelpMessage((char*)"Player telported",false,false,false);
+		CHud::SetHelpMessage((char*)"Player telported", false, false, false);
 	}
-	
+
 	if (KeyPressed(VK_RCONTROL))
 		delta_speed /= 2;
 
@@ -289,10 +282,10 @@ void Game::FreeCam()
 			delta_speed *= -1;
 
 		float angle;
-		Command<Commands::GET_CHAR_HEADING>(freecam::hped,&angle);
-		pos.x += delta_speed * cos(angle * 3.14159f/180.0f);
-		pos.y += delta_speed * sin(angle * 3.14159f/180.0f);
-		pos.z += delta_speed* 2 * sin(freecam::tmouseY/3* 3.14159f/180.0f);
+		Command<Commands::GET_CHAR_HEADING>(freecam::hped, &angle);
+		pos.x += delta_speed * cos(angle * 3.14159f / 180.0f);
+		pos.y += delta_speed * sin(angle * 3.14159f / 180.0f);
+		pos.z += delta_speed * 2 * sin(freecam::tmouseY / 3 * 3.14159f / 180.0f);
 	}
 
 	if (KeyPressed(VK_KEY_J) || KeyPressed(VK_KEY_L))
@@ -301,33 +294,33 @@ void Game::FreeCam()
 			delta_speed *= -1;
 
 		float angle;
-		Command<Commands::GET_CHAR_HEADING>(freecam::hped,&angle);
+		Command<Commands::GET_CHAR_HEADING>(freecam::hped, &angle);
 		angle -= 90;
-		
-		pos.x += delta_speed * cos(angle * 3.14159f/180.0f);
-		pos.y += delta_speed * sin(angle * 3.14159f/180.0f);
+
+		pos.x += delta_speed * cos(angle * 3.14159f / 180.0f);
+		pos.y += delta_speed * sin(angle * 3.14159f / 180.0f);
 	}
 
-	if ( CPad::NewMouseControllerState.wheelUp)
+	if (CPad::NewMouseControllerState.wheelUp)
 	{
 		if (freecam::fov > 10.0f)
 			freecam::fov -= 2.0f * delta_speed;
 
-		TheCamera.LerpFOV(TheCamera.FindCamFOV(),freecam::fov,250,true);
+		TheCamera.LerpFOV(TheCamera.FindCamFOV(), freecam::fov, 250, true);
 		Command<Commands::CAMERA_PERSIST_FOV>(true);
 	}
 
-	if ( CPad::NewMouseControllerState.wheelDown)
+	if (CPad::NewMouseControllerState.wheelDown)
 	{
 		if (freecam::fov < 115.0f)
 			freecam::fov += 2.0f * delta_speed;
-		
-		TheCamera.LerpFOV(TheCamera.FindCamFOV(),freecam::fov,250,true);
+
+		TheCamera.LerpFOV(TheCamera.FindCamFOV(), freecam::fov, 250, true);
 		Command<Commands::CAMERA_PERSIST_FOV>(true);
 	}
 
 	freecam::ped->SetHeading(freecam::tmouseX);
-	Command<Commands::ATTACH_CAMERA_TO_CHAR>(freecam::hped,0.0,0.0,20.0,90.0,180,freecam::tmouseY,0.0,2);
+	Command<Commands::ATTACH_CAMERA_TO_CHAR>(freecam::hped, 0.0, 0.0, 20.0, 90.0, 180, freecam::tmouseY, 0.0, 2);
 	freecam::ped->SetPosn(pos);
 	CIplStore::AddIplsNeededAtPosn(pos);
 }
@@ -346,10 +339,10 @@ void Game::ClearFreecamStuff()
 	Command<Commands::RESTORE_CAMERA_JUMPCUT>();
 }
 
-void Game::Main()
+void Game::Draw()
 {
 	ImGui::Spacing();
-	static CPlayerPed *player = FindPlayerPed();
+	static CPlayerPed* player = FindPlayerPed();
 	static int hplayer = CPools::GetPedRef(player);
 
 	if (ImGui::BeginTabBar("Game", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
@@ -402,7 +395,7 @@ of LS without completing missions"))
 			if (Ui::CheckboxWithHint("Hard mode", &hard_mode::state, "Makes the game more challanging to play. \n\
 Lowers armour, health, stamina etc."))
 			{
-				CPlayerPed *player = FindPlayerPed();
+				CPlayerPed* player = FindPlayerPed();
 
 				if (hard_mode::state)
 				{
@@ -415,7 +408,7 @@ Lowers armour, health, stamina etc."))
 				else
 				{
 					player->m_fArmour = hard_mode::prev_armour;
-					CStats::SetStatValue(STAT_STAMINA,hard_mode::prev_stamina);
+					CStats::SetStatValue(STAT_STAMINA, hard_mode::prev_stamina);
 					CStats::SetStatValue(STAT_MAX_HEALTH, hard_mode::prev_max_health);
 					player->m_fHealth = hard_mode::prev_health;
 					CWeaponInfo::LoadWeaponData();
@@ -428,7 +421,7 @@ Lowers armour, health, stamina etc."))
 				Command<Commands::SWITCH_DEATH_PENALTIES>(keep_stuff);
 			}
 			Ui::CheckboxWithHint("Screenshot shortcut", &ss_shortcut, (("Take screenshot using ") + Ui::GetHotKeyNameString(Menu::hotkeys::quick_ss)
-			+ "\nSaved inside 'GTA San Andreas User Files\\Gallery'").c_str());
+				+ "\nSaved inside 'GTA San Andreas User Files\\Gallery'").c_str());
 			if (Ui::CheckboxWithHint("Solid water", &solid_water, "Player can walk on water\nTurn this off if you want to swim."))
 			{
 				if (!solid_water && solid_water_object != 0)
@@ -452,9 +445,9 @@ Lowers armour, health, stamina etc."))
 		{
 			if (ImGui::CollapsingHeader("Current day"))
 			{
-				int day = CClock::CurrentDay-1;
+				int day = CClock::CurrentDay - 1;
 				if (Ui::ListBox("Select day", day_names, day))
-					CClock::CurrentDay = day+1;
+					CClock::CurrentDay = day + 1;
 				ImGui::Spacing();
 				ImGui::Separator();
 			}
@@ -469,10 +462,10 @@ Lowers armour, health, stamina etc."))
 						ClearFreecamStuff();
 				}
 				ImGui::Spacing();
-					
+
 				if (ImGui::SliderFloat("Field of view", &freecam::fov, 5.0f, 120.0f))
 				{
-					TheCamera.LerpFOV(TheCamera.FindCamFOV(),freecam::fov,250.0f,true);
+					TheCamera.LerpFOV(TheCamera.FindCamFOV(), freecam::fov, 250.0f, true);
 					Command<Commands::CAMERA_PERSIST_FOV>(true);
 				}
 				ImGui::SliderFloat("Movement Speed", &freecam::speed, 0.0f, 0.5f);
@@ -481,7 +474,7 @@ Lowers armour, health, stamina etc."))
 				ImGui::Spacing();
 				ImGui::Separator();
 			}
-			Ui::EditReference("Game speed", CTimer::ms_fTimeScale,1, 1, 10);
+			Ui::EditReference("Game speed", CTimer::ms_fTimeScale, 1, 1, 10);
 			Ui::EditFloat("Gravity", 0x863984, -1.0f, 0.008f, 1.0f);
 
 			if (ImGui::CollapsingHeader("Set time"))
@@ -507,13 +500,13 @@ Lowers armour, health, stamina etc."))
 				ImGui::Separator();
 			}
 
-			static std::vector<Ui::NamedMemory> themes { { "Beach", 0x969159 }, { "Country" ,0x96917D }, { "Fun house" ,0x969176 }, { "Ninja" ,0x96915C }};
+			static std::vector<Ui::NamedMemory> themes{ { "Beach", 0x969159 }, { "Country" ,0x96917D }, { "Fun house" ,0x969176 }, { "Ninja" ,0x96915C } };
 			Ui::EditRadioButtonAddress("Themes", themes);
-			
+
 			if (ImGui::CollapsingHeader("Weather"))
 			{
 				typedef void func(void);
-				if (ImGui::Button("Foggy",Ui::GetSize(3)))
+				if (ImGui::Button("Foggy", Ui::GetSize(3)))
 					((func*)0x438F80)();
 
 				ImGui::SameLine();
@@ -570,7 +563,7 @@ It's recommanded not to save your game after using this. Use it at your own risk
 		{
 			// similat to Ui::DrawJSON()
 			ImGui::Spacing();
-			
+
 			ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() / 2 - 5);
 			Ui::ListBoxStr("##Categories", stat::search_categories, stat::selected_item);
 			ImGui::SameLine();

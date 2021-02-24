@@ -21,8 +21,6 @@ set(depend_files
     "imgui/imgui_impl_dx9.h"
     "imgui/imgui_impl_dx11.cpp"
     "imgui/imgui_impl_dx11.h"
-    # "imgui/imgui_impl_vulkan.cpp"
-    # "imgui/imgui_impl_vulkan.h"
     "imgui/imgui_impl_win32.cpp"
     "imgui/imgui_impl_win32.h"
     "imgui/imgui_internal.h"
@@ -67,8 +65,6 @@ include_directories(
     "$ENV{PLUGIN_SDK_DIR}/shared"
     "$ENV{PLUGIN_SDK_DIR}/shared/game"
     "$ENV{DIRECTX9_SDK_DIR}/include"
-    # "${VULKAN_SDK_DIR}/Include"
-    # "${VULKAN_SDK_DIR}/lib32"
 )
 
 target_compile_options(${PROJECT_NAME} PRIVATE

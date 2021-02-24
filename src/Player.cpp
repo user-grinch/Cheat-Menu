@@ -15,6 +15,7 @@ ImGuiTextFilter Player::filter = "";
 std::vector<std::string> Player::search_categories;
 std::vector<std::unique_ptr<TextureStructure>> Player::clothes_vec;
 std::string Player::selected_item = "All";
+bool Player::images_loaded = false;
 
 std::string Player::custom_skins::dir = paths::GetGameDirPathA() + std::string("\\modloader\\Custom Skins\\");
 std::vector<std::string> Player::custom_skins::store_vec;
@@ -24,50 +25,52 @@ bool Player::modloader_installed = false;
 
 static void PlayerModelBrokenFix()
 {
-	CPlayerPed *player = FindPlayerPed();
+	CPlayerPed* player = FindPlayerPed();
 
 	if (player->m_nModelIndex == 0)
-		Call<0x5A81E0>(0, player->m_pPlayerData->m_pPedClothesDesc,0xBC1C78,false);
+		Call<0x5A81E0>(0, player->m_pPlayerData->m_pPedClothesDesc, 0xBC1C78, false);
 }
 
 Player::Player()
 {
-	Events::initGameEvent += []
+	//	Fix player model being broken after rebuild
+	patch::RedirectCall(0x5A834D, &PlayerModelBrokenFix);
+
+	aim_skin_changer = config.GetValue("aim_skin_changer", false);
+
+	// Custom skins setup
+	if (GetModuleHandle("modloader.asi"))
 	{
-		//	Fix player model being broken after rebuild
-		patch::RedirectCall(0x5A834D,&PlayerModelBrokenFix);
-
-		aim_skin_changer = config.GetValue("aim_skin_changer", false);
-		Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\clothes\\"), ".jpg", search_categories, clothes_vec);
-
-		// Custom skins setup
-		if (LoadLibraryW(L"modloader.asi"))
+		if (fs::is_directory(custom_skins::dir))
 		{
-			if (fs::is_directory(custom_skins::dir))
+			for (auto& p : fs::recursive_directory_iterator(custom_skins::dir))
 			{
-				for (auto &p : fs::recursive_directory_iterator(custom_skins::dir))
+				if (p.path().extension() == ".dff")
 				{
-					if (p.path().extension() == ".dff")
-					{
-						std::string file_name = p.path().stem().string();
+					std::string file_name = p.path().stem().string();
 
-						if (file_name.size() < 9)
-							custom_skins::store_vec.push_back(file_name);
-						else
-							flog << "Custom Skin '" << file_name << "' longer than 8 characters" << std::endl;
-					}
+					if (file_name.size() < 9)
+						custom_skins::store_vec.push_back(file_name);
+					else
+						flog << "WARN: Custom Skin longer than 8 characters " << file_name << std::endl;
 				}
 			}
-			else fs::create_directory(custom_skins::dir);
-
-			modloader_installed = true;
 		}
-	};
+		else fs::create_directory(custom_skins::dir);
+
+		modloader_installed = true;
+	}
 
 	Events::processScriptsEvent += []
 	{
 		uint timer = CTimer::m_snTimeInMilliseconds;
 		static CPlayerPed* player = FindPlayerPed();
+
+		if (!images_loaded)
+		{
+			Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\clothes\\"), ".jpg", search_categories, clothes_vec);
+			images_loaded = true;
+		}
 
 		if (keep_position::state)
 		{
@@ -79,7 +82,7 @@ Player::Player()
 			{
 				CVector cur_pos = player->GetPosition();
 
-				if (keep_position::pos.x != 0 && keep_position::pos.x != cur_pos.x 
+				if (keep_position::pos.x != 0 && keep_position::pos.x != cur_pos.x
 				 && keep_position::pos.y != 0 && keep_position::pos.y != cur_pos.y)
 				{
 					player->Teleport(keep_position::pos, false);
@@ -97,10 +100,10 @@ Player::Player()
 			player->m_nPhysicalFlags.bFireProof = 1;
 			player->m_nPhysicalFlags.bMeeleProof = 1;
 		}
-		
+
 		if (aim_skin_changer && Ui::HotKeyPressed(Menu::hotkeys::aim_skin_changer))
 		{
-			CPed *target_ped = player->m_pPlayerTargettedPed;
+			CPed* target_ped = player->m_pPlayerTargettedPed;
 			if (target_ped)
 			{
 				player->SetModelIndex(target_ped->m_nModelIndex);
@@ -112,8 +115,8 @@ Player::Player()
 		{
 			if (god_mode)
 			{
-				CHud::SetHelpMessage("God mode disabled",false,false,false);
-				
+				CHud::SetHelpMessage("God mode disabled", false, false, false);
+
 				patch::Set<bool>(0x96916D, god_mode, false);
 				player->m_nPhysicalFlags.bBulletProof = false;
 				player->m_nPhysicalFlags.bCollisionProof = false;
@@ -124,19 +127,14 @@ Player::Player()
 			}
 			else
 			{
-				CHud::SetHelpMessage("God mode enabled",false,false,false);
+				CHud::SetHelpMessage("God mode enabled", false, false, false);
 				god_mode = true;
 			}
 		}
 	};
 }
 
-
-Player::~Player()
-{
-}
-
-void Player::ChangePlayerCloth(std::string &name)
+void Player::ChangePlayerCloth(std::string& name)
 {
 	std::stringstream ss(name);
 	std::string temp;
@@ -150,7 +148,7 @@ void Player::ChangePlayerCloth(std::string &name)
 	getline(ss, temp, '$');
 	std::string texture9 = temp.c_str();
 
-	CPlayerPed *player = FindPlayerPed();
+	CPlayerPed* player = FindPlayerPed();
 
 	if (texture9 == "cutoffchinosblue")
 	{
@@ -178,7 +176,7 @@ void Player::ChangePlayerModel(std::string& model)
 	bool custom_skin = std::find(custom_skins::store_vec.begin(), custom_skins::store_vec.end(), model) != custom_skins::store_vec.end();
 	if (Ped::ped_json.data.contains(model) || custom_skin)
 	{
-		CPlayerPed *player = FindPlayerPed();
+		CPlayerPed* player = FindPlayerPed();
 		if (Ped::pedspecial_json.data.contains(model) || custom_skin)
 		{
 			std::string name;
@@ -198,7 +196,7 @@ void Player::ChangePlayerModel(std::string& model)
 		{
 			int imodel = std::stoi(model);
 
-			CStreaming::RequestModel(imodel,eStreamingFlags::PRIORITY_REQUEST);
+			CStreaming::RequestModel(imodel, eStreamingFlags::PRIORITY_REQUEST);
 			CStreaming::LoadAllRequestedModels(false);
 			player->SetModelIndex(imodel);
 			CStreaming::SetModelIsDeletable(imodel);
@@ -206,7 +204,7 @@ void Player::ChangePlayerModel(std::string& model)
 	}
 }
 
-void Player::Main()
+void Player::Draw()
 {
 	static CPlayerPed* player = FindPlayerPed();
 	static int hplayer = CPools::GetPedRef(player);
@@ -223,7 +221,7 @@ void Player::Main()
 	ImGui::SameLine();
 	if (ImGui::Button("Suicide", ImVec2(Ui::GetSize(2))))
 		player->m_fHealth = 0.0;
-		
+
 	ImGui::Spacing();
 
 	if (ImGui::BeginTabBar("Player", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
@@ -252,7 +250,7 @@ void Player::Main()
 			Ui::CheckboxAddress("Infinite run", 0xB7CEE4);
 			if (Ui::CheckboxBitFlag("Invisible player", player->m_nPedFlags.bDontRender))
 				player->m_nPedFlags.bDontRender = (player->m_nPedFlags.bDontRender == 1) ? 0 : 1;
-			
+
 			ImGui::NextColumn();
 
 			Ui::CheckboxWithHint("Keep position", &keep_position::state, "Teleport to the position you died from");
@@ -263,10 +261,10 @@ void Player::Main()
 			Ui::CheckboxAddress("Mega punch", 0x969173);
 			Ui::CheckboxAddress("Never get hungry", 0x969174);
 
-			bool never_wanted = patch::Get<bool>(0x969171, false);	
+			bool never_wanted = patch::Get<bool>(0x969171, false);
 			if (Ui::CheckboxWithHint("Never wanted", &never_wanted))
 				CCheat::NotWantedCheat();
-			
+
 			ImGui::Columns(1);
 
 			ImGui::EndChild();
@@ -317,7 +315,7 @@ void Player::Main()
 			Ui::EditStat("Fat", STAT_FAT);
 			Ui::EditReference("Health", player->m_fHealth, 0, 100, static_cast<int>(player->m_fMaxHealth));
 			Ui::EditStat("Lung capacity", STAT_LUNG_CAPACITY);
-			Ui::EditStat("Max health", STAT_MAX_HEALTH,0,569,1450);
+			Ui::EditStat("Max health", STAT_MAX_HEALTH, 0, 569, 1450);
 			Ui::EditAddress<int>("Money", 0xB7CE50, -99999999, 0, 99999999);
 			Ui::EditStat("Muscle", STAT_MUSCLE);
 			Ui::EditStat("Respect", STAT_RESPECT);
@@ -332,14 +330,14 @@ void Player::Main()
 				ImGui::NextColumn();
 				ImGui::Text("Def: 0");
 				ImGui::NextColumn();
-				ImGui::Text("Max: %d",max_wl);
+				ImGui::Text("Max: %d", max_wl);
 				ImGui::Columns(1);
 
 				ImGui::Spacing();
 
 				if (ImGui::InputInt("Set value##Wanted level", &val))
 					player->CheatWantedLevel(val);
-					
+
 				ImGui::Spacing();
 				if (ImGui::Button("Minimum##Wanted level", Ui::GetSize(3)))
 					player->CheatWantedLevel(0);
@@ -365,7 +363,7 @@ void Player::Main()
 		if (ImGui::BeginTabItem("Appearance"))
 		{
 			ImGui::Spacing();
-			if (Ui::CheckboxWithHint("Aim skin changer", &aim_skin_changer,(("Activate using Aim ped + ") + Ui::GetHotKeyNameString(Menu::hotkeys::aim_skin_changer)).c_str()))
+			if (Ui::CheckboxWithHint("Aim skin changer", &aim_skin_changer, (("Activate using Aim ped + ") + Ui::GetHotKeyNameString(Menu::hotkeys::aim_skin_changer)).c_str()))
 				config.SetValue("aim_skin_changer", aim_skin_changer);
 
 			if (ImGui::BeginTabBar("AppearanceTabBar"))
@@ -378,7 +376,7 @@ void Player::Main()
 					{
 						if (ImGui::Button("Remove clothes", ImVec2(Ui::GetSize())))
 						{
-							CPlayerPed *player = FindPlayerPed();
+							CPlayerPed* player = FindPlayerPed();
 
 							int temp = 0;
 							for (uint i = 0; i < 18; i++)
@@ -389,7 +387,7 @@ void Player::Main()
 						ImGui::Spacing();
 
 						Ui::DrawImages(clothes_vec, ImVec2(70, 100), search_categories, selected_item, filter, ChangePlayerCloth, nullptr,
-							[](std::string str) 
+							[](std::string str)
 						{
 							std::stringstream ss(str);
 							std::string temp;
@@ -422,9 +420,9 @@ void Player::Main()
 				if (ImGui::BeginTabItem("Custom skins"))
 				{
 					ImGui::Spacing();
-					
+
 					if (modloader_installed)
-					{	
+					{
 						Ui::FilterWithHint("Search", filter, std::string("Total skins: " + std::to_string(custom_skins::store_vec.size())).c_str());
 						Ui::ShowTooltip("Place your dff & txd files inside 'modloader/Custom Skins'");
 						ImGui::Spacing();
@@ -434,7 +432,7 @@ void Player::Main()
 						{
 							if (custom_skins::filter.PassFilter(name.c_str()))
 							{
-								if (ImGui::MenuItem(name.c_str())) 
+								if (ImGui::MenuItem(name.c_str()))
 								{
 									ChangePlayerModel(name);
 								}

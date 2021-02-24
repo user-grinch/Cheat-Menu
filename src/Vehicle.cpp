@@ -42,6 +42,7 @@ ImGuiTextFilter Vehicle::tune::filter = "";
 std::vector<std::string> Vehicle::tune::search_categories;
 std::vector<std::unique_ptr<TextureStructure>> Vehicle::tune::image_vec;
 std::string Vehicle::tune::selected_item = "All";
+bool Vehicle::images_loaded = false;
 
 float Vehicle::neon::color_picker[3]{ 0,0,0 };
 bool Vehicle::neon::rainbow = false;
@@ -57,7 +58,7 @@ static std::vector<std::string>(handling_flag_names) = // 32 flags
 	"1G_BOOST","2G_BOOST","NPC_ANTI_ROLL","NPC_NEUTRAL_HANDL","NO_HANDBRAKE","STEER_REARWHEELS","HB_REARWHEEL_STEER","ALT_STEER_OPT",
 	"WHEEL_F_NARROW2","WHEEL_F_NARROW","WHEEL_F_WIDE","WHEEL_F_WIDE2","WHEEL_R_NARROW2","WHEEL_R_NARROW","WHEEL_R_WIDE","WHEEL_R_WIDE2",
 	"HYDRAULIC_GEOM","HYDRAULIC_INST","HYDRAULIC_NONE","NOS_INST","OFFROAD_ABILITY","OFFROAD_ABILITY2","HALOGEN_LIGHTS","PROC_REARWHEEL_1ST",
-	"USE_MAXSP_LIMIT","LOW_RIDER","STREET_RACER","SWINGING_CHASSIS","Unused 1","Unused 2","Unused 3","Unused 4" 
+	"USE_MAXSP_LIMIT","LOW_RIDER","STREET_RACER","SWINGING_CHASSIS","Unused 1","Unused 2","Unused 3","Unused 4"
 };
 
 static std::vector<std::string>(model_flag_names) = // 32 flags
@@ -70,27 +71,28 @@ static std::vector<std::string>(model_flag_names) = // 32 flags
 
 Vehicle::Vehicle()
 {
-	Events::initGameEvent += []
-	{
-		Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\vehicles\\images\\"), ".jpg", spawner::search_categories, spawner::image_vec);
-		Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\vehicles\\components\\"), ".jpg", tune::search_categories, tune::image_vec);
-		Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\vehicles\\paintjobs\\"), ".png", texture9::search_categories, texture9::image_vec);
-
-		ParseVehiclesIDE();
-		ParseCarcolsDAT();
-	};
+	ParseVehiclesIDE();
+	ParseCarcolsDAT();
 
 	Events::processScriptsEvent += [this]
 	{
-		uint timer = CTimer::m_snTimeInMilliseconds;
+		if (!images_loaded)
+		{
+			Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\vehicles\\images\\"), ".jpg", spawner::search_categories, spawner::image_vec);
+			Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\vehicles\\components\\"), ".jpg", tune::search_categories, tune::image_vec);
+			Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\vehicles\\paintjobs\\"), ".png", texture9::search_categories, texture9::image_vec);
 
-		CPlayerPed *player = FindPlayerPed();
-		CVehicle *veh = player->m_pVehicle;
+			images_loaded = true;
+		}
+
+		uint timer = CTimer::m_snTimeInMilliseconds;
+		CPlayerPed* player = FindPlayerPed();
+		CVehicle* veh = player->m_pVehicle;
 
 		if (player && veh)
 		{
 			int hveh = CPools::GetVehicleRef(veh);
-			
+
 			if (Ui::HotKeyPressed(Menu::hotkeys::flip_veh))
 			{
 				float roll;
@@ -104,7 +106,7 @@ Vehicle::Vehicle()
 			{
 				player->m_pVehicle->Fix();
 				player->m_pVehicle->m_fHealth = 1000.0f;
-				CHud::SetHelpMessage("Vehicle fixed",false,false,false);
+				CHud::SetHelpMessage("Vehicle fixed", false, false, false);
 			}
 
 			if (Ui::HotKeyPressed(Menu::hotkeys::veh_engine))
@@ -112,9 +114,9 @@ Vehicle::Vehicle()
 				bool state = !veh->m_nVehicleFlags.bEngineBroken || veh->m_nVehicleFlags.bEngineOn;
 
 				if (state)
-					CHud::SetHelpMessage("Vehicle engine off",false,false,false);
+					CHud::SetHelpMessage("Vehicle engine off", false, false, false);
 				else
-					CHud::SetHelpMessage("Vehicle engine on",false,false,false);
+					CHud::SetHelpMessage("Vehicle engine on", false, false, false);
 
 				veh->m_nVehicleFlags.bEngineBroken = state;
 				veh->m_nVehicleFlags.bEngineOn = !state;
@@ -125,7 +127,7 @@ Vehicle::Vehicle()
 
 			if (Ui::HotKeyPressed(Menu::hotkeys::veh_instant_stop))
 				Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, 0);
-			
+
 			if (veh_nodmg)
 			{
 				veh->m_nPhysicalFlags.bBulletProof = true;
@@ -133,10 +135,10 @@ Vehicle::Vehicle()
 				veh->m_nPhysicalFlags.bFireProof = true;
 				veh->m_nPhysicalFlags.bCollisionProof = true;
 				veh->m_nPhysicalFlags.bMeeleProof = true;
-				veh->m_nVehicleFlags.bCanBeDamaged = true;				
+				veh->m_nVehicleFlags.bCanBeDamaged = true;
 			}
 
-			player->m_nPedFlags.CantBeKnockedOffBike  = dont_fall_bike ? 1 : 2;
+			player->m_nPedFlags.CantBeKnockedOffBike = dont_fall_bike ? 1 : 2;
 			Command<Commands::SET_CAR_HEAVY>(hveh, veh_heavy);
 			Command<Commands::SET_CAR_WATERTIGHT>(hveh, veh_watertight);
 
@@ -179,34 +181,34 @@ Vehicle::Vehicle()
 		// Traffic neons
 		if (neon::traffic && timer - neon::traffic_timer > 1000)
 		{
-			for (CVehicle *veh : CPools::ms_pVehiclePool)
+			for (CVehicle* veh : CPools::ms_pVehiclePool)
 			{
 				int chance = 0;
 
 				if (veh->m_nVehicleClass == CLASS_NORMAL) // Normal
-					chance = Random(1,20);
+					chance = Random(1, 20);
 
 				if (veh->m_nVehicleClass == CLASS_RICHFAMILY) // Rich family
-					chance = Random(1,4);
+					chance = Random(1, 4);
 
 				if (veh->m_nVehicleClass == CLASS_EXECUTIVE) // Executive
-					chance = Random(1,3);
+					chance = Random(1, 3);
 
 				if (chance == 1 && !IsNeonInstalled(veh) && veh->m_pDriver != player)
-					InstallNeon(veh, Random(0,255), Random(0,255), Random(0,255));
+					InstallNeon(veh, Random(0, 255), Random(0, 255), Random(0, 255));
 			}
 			neon::traffic_timer = timer;
 		}
-		
+
 		if (bike_fly && veh && veh->IsDriver(player))
 		{
 			if (veh->m_nVehicleSubClass == VEHICLE_BIKE || veh->m_nVehicleSubClass == VEHICLE_BMX)
 			{
-					if (sqrt( veh->m_vecMoveSpeed.x * veh->m_vecMoveSpeed.x
-							+ veh->m_vecMoveSpeed.y * veh->m_vecMoveSpeed.y
-							+ veh->m_vecMoveSpeed.z * veh->m_vecMoveSpeed.z
-							) > 0.0
-					&& CTimer::ms_fTimeStep > 0.0)
+				if (sqrt(veh->m_vecMoveSpeed.x * veh->m_vecMoveSpeed.x
+					+ veh->m_vecMoveSpeed.y * veh->m_vecMoveSpeed.y
+					+ veh->m_vecMoveSpeed.z * veh->m_vecMoveSpeed.z
+				) > 0.0
+				&& CTimer::ms_fTimeStep > 0.0)
 				{
 					veh->FlyingControl(3, -9999.9902f, -9999.9902f, -9999.9902f, -9999.9902f);
 				}
@@ -218,11 +220,11 @@ Vehicle::Vehicle()
 void Vehicle::AddComponent(const std::string& component, const bool display_message)
 {
 	try {
-		CPlayerPed *player = FindPlayerPed();
+		CPlayerPed* player = FindPlayerPed();
 		int icomp = std::stoi(component);
 		int hveh = CPools::GetVehicleRef(player->m_pVehicle);
 
-		CStreaming::RequestModel(icomp,eStreamingFlags::PRIORITY_REQUEST);
+		CStreaming::RequestModel(icomp, eStreamingFlags::PRIORITY_REQUEST);
 		CStreaming::LoadAllRequestedModels(true);
 		player->m_pVehicle->AddVehicleUpgrade(icomp);
 		CStreaming::SetModelIsDeletable(icomp);
@@ -240,7 +242,7 @@ void Vehicle::AddComponent(const std::string& component, const bool display_mess
 void Vehicle::RemoveComponent(const std::string& component, const bool display_message)
 {
 	try {
-		CPlayerPed *player = FindPlayerPed();
+		CPlayerPed* player = FindPlayerPed();
 		int icomp = std::stoi(component);
 		int hveh = CPools::GetVehicleRef(player->m_pVehicle);
 
@@ -267,23 +269,23 @@ int Vehicle::GetRandomTrainIdForModel(int model)
 
 	switch (model)
 	{
-	case 449:
-		_start = 0;
-		_end = 1;
-		break;
-	case 537:
-		_start = 2;
-		_end = 7;
-		break;
-	case 538:
-		_start = 8;
-		_end = 10;
-		break;
-	default:
-		CHud::SetHelpMessage("Invalid train model", false, false, false);
-		return -1;
+		case 449:
+			_start = 0;
+			_end = 1;
+			break;
+		case 537:
+			_start = 2;
+			_end = 7;
+			break;
+		case 538:
+			_start = 8;
+			_end = 10;
+			break;
+		default:
+			CHud::SetHelpMessage("Invalid train model", false, false, false);
+			return -1;
 	}
-	int id = Random(_start,_end);
+	int id = Random(_start, _end);
 	return train_ids[id];
 }
 
@@ -311,7 +313,7 @@ void Vehicle::ParseVehiclesIDE()
 				getline(ss, temp, ',');
 
 				int model = std::stoi(temp);
-				
+
 				// modelname, txd, type, handlingId
 				getline(ss, temp, ',');
 				getline(ss, temp, ',');
@@ -406,11 +408,11 @@ void Vehicle::ParseCarcolsDAT()
 
 				getline(ss, temp, ',');
 				std::string name = temp;
-				while (getline(ss, temp, ',')) 
+				while (getline(ss, temp, ','))
 				{
 					try
 					{
-						std::for_each(name.begin(), name.end(), [](char & c) {
+						std::for_each(name.begin(), name.end(), [](char& c) {
 							c = ::toupper(c);
 						});
 
@@ -431,16 +433,16 @@ void Vehicle::ParseCarcolsDAT()
 	else flog << "Vehicle.ide file not found";
 }
 
-void Vehicle::SpawnVehicle(std::string &smodel)
+void Vehicle::SpawnVehicle(std::string& smodel)
 {
-	CPlayerPed *player = FindPlayerPed();
+	CPlayerPed* player = FindPlayerPed();
 	int hplayer = CPools::GetPedRef(player);
 
 	int imodel = std::stoi(smodel);
-	CVehicle *veh = nullptr;
+	CVehicle* veh = nullptr;
 
 	int interior = player->m_nAreaCode;
-	
+
 	if (Command<Commands::IS_MODEL_AVAILABLE>(imodel))
 	{
 		CVector pos = player->GetPosition();
@@ -450,7 +452,7 @@ void Vehicle::SpawnVehicle(std::string &smodel)
 		{
 			int hveh = 0;
 			Command<Commands::GET_CAR_CHAR_IS_USING>(hplayer, &hveh);
-			CVehicle *pveh = CPools::GetVehicle(hveh);
+			CVehicle* pveh = CPools::GetVehicle(hveh);
 			pos = pveh->GetPosition();
 
 			Command<Commands::GET_CAR_SPEED>(hveh, &speed);
@@ -466,10 +468,10 @@ void Vehicle::SpawnVehicle(std::string &smodel)
 		if (interior == 0)
 			if (spawner::spawn_in_air && (CModelInfo::IsHeliModel(imodel) || CModelInfo::IsPlaneModel(imodel)))
 				pos.z = 400;
-		else
-			pos.z -= 5;
+			else
+				pos.z -= 5;
 
-		
+
 		if (CModelInfo::IsTrainModel(imodel))
 		{
 			int train_id = GetRandomTrainIdForModel(imodel);
@@ -489,11 +491,11 @@ void Vehicle::SpawnVehicle(std::string &smodel)
 
 			CStreaming::LoadAllRequestedModels(false);
 
-			CTrain *train = nullptr;
-			CTrain *carraige = nullptr;
-			int track = Random(0,1);
-			int node = CTrain::FindClosestTrackNode(pos,&track);
-			CTrain::CreateMissionTrain(pos,(Random(0,1)) == 1 ? true : false,train_id,&train,&carraige,node,track,false);
+			CTrain* train = nullptr;
+			CTrain* carraige = nullptr;
+			int track = Random(0, 1);
+			int node = CTrain::FindClosestTrackNode(pos, &track);
+			CTrain::CreateMissionTrain(pos, (Random(0, 1)) == 1 ? true : false, train_id, &train, &carraige, node, track, false);
 
 			veh = (CVehicle*)train;
 			hveh = CPools::GetVehicleRef(veh);
@@ -532,12 +534,12 @@ void Vehicle::SpawnVehicle(std::string &smodel)
 				Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, speed);
 			}
 			else
-			{	
+			{
 				player->TransformFromObjectSpace(pos, CVector(0, 10, 0));
 
 				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 3.0f, &hveh);
 				veh = CPools::GetVehicle(hveh);
-				veh->SetHeading(player->GetHeading()+55.0f);
+				veh->SetHeading(player->GetHeading() + 55.0f);
 			}
 			veh->m_nDoorLock = CARLOCK_UNLOCKED;
 			veh->m_nAreaCode = interior;
@@ -550,7 +552,7 @@ void Vehicle::SpawnVehicle(std::string &smodel)
 
 std::string Vehicle::GetNameFromModel(int model)
 {
-	CBaseModelInfo *info = CModelInfo::GetModelInfo(model);
+	CBaseModelInfo* info = CModelInfo::GetModelInfo(model);
 
 	return (const char*)info + 0x32;
 }
@@ -558,7 +560,7 @@ std::string Vehicle::GetNameFromModel(int model)
 int Vehicle::GetModelFromName(const char* name)
 {
 	int model = 0;
-	CBaseModelInfo* model_info = CModelInfo::GetModelInfo((char*)name,&model);
+	CBaseModelInfo* model_info = CModelInfo::GetModelInfo((char*)name, &model);
 
 	if (model > 0 && model < 1000000 && GetNameFromModel(model) != "")
 		return model;
@@ -573,7 +575,7 @@ Vehicle::~Vehicle()
 
 void Vehicle::GenerateHandlingDataFile(int phandling)
 {
-	FILE *fp = fopen("handling.txt", "w");
+	FILE* fp = fopen("handling.txt", "w");
 
 	std::string handlingId = vehicle_ide[FindPlayerPed()->m_pVehicle->m_nModelIndex];
 	float fMass = patch::Get<float>(phandling + 0x4);
@@ -604,7 +606,7 @@ void Vehicle::GenerateHandlingDataFile(int phandling)
 	float fCollisionDamageMultiplier = patch::Get<float>(phandling + 0xC8) * 0.338;
 	int nMonetaryValue = patch::Get<int>(phandling + 0xD8);
 
-	int MaxVelocity = patch::Get<float>(phandling + 0x84); 
+	int MaxVelocity = patch::Get<float>(phandling + 0x84);
 	MaxVelocity = MaxVelocity * 206 + (MaxVelocity - 0.918668) * 1501;
 
 	int modelFlags = patch::Get<int>(phandling + 0xCC);
@@ -626,10 +628,10 @@ void Vehicle::GenerateHandlingDataFile(int phandling)
 }
 
 
-void Vehicle::Main()
+void Vehicle::Draw()
 {
 	ImGui::Spacing();
-	static CPlayerPed *player = FindPlayerPed();
+	static CPlayerPed* player = FindPlayerPed();
 	static int hplayer = CPools::GetPedRef(player);
 
 	if (ImGui::Button("Blow up cars", ImVec2(Ui::GetSize(3))))
@@ -667,9 +669,9 @@ void Vehicle::Main()
 
 	if (ImGui::BeginTabBar("Vehicle", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
 	{
-		CVehicle *pVeh = player->m_pVehicle;
+		CVehicle* pVeh = player->m_pVehicle;
 		bool is_driver = pVeh && player->m_pVehicle->IsDriver(player);
-		
+
 		ImGui::Spacing();
 
 		if (ImGui::BeginTabItem("Checkboxes"))
@@ -699,7 +701,7 @@ void Vehicle::Main()
 				}
 			}
 			Ui::CheckboxAddress("Decreased traffic", 0x96917A);
-			
+
 			ImGui::NextColumn();
 
 			Ui::CheckboxWithHint("Don't fall off bike", &dont_fall_bike);
@@ -747,7 +749,7 @@ void Vehicle::Main()
 				{
 					pVeh->m_nVehicleFlags.bEngineBroken = !state;
 					pVeh->m_nVehicleFlags.bEngineOn = state;
-				}	
+				}
 				state = pVeh->m_nPhysicalFlags.bExplosionProof;
 				if (Ui::CheckboxWithHint("Explosion proof", &state, nullptr, veh_nodmg))
 					pVeh->m_nPhysicalFlags.bExplosionProof = state;
@@ -755,7 +757,7 @@ void Vehicle::Main()
 				state = pVeh->m_nPhysicalFlags.bFireProof;
 				if (Ui::CheckboxWithHint("Fire proof", &state, nullptr, veh_nodmg))
 					pVeh->m_nPhysicalFlags.bFireProof = state;
-					
+
 				ImGui::NextColumn();
 
 				state = pVeh->m_nVehicleFlags.bVehicleCanBeTargettedByHS;
@@ -787,14 +789,14 @@ void Vehicle::Main()
 				if (Ui::CheckboxWithHint("Petrol tank blow", &state, "Vehicle will blow up if petrol tank is shot"))
 					pVeh->m_nVehicleFlags.bPetrolTankIsWeakPoint = state;
 
-				state = pVeh->m_nVehicleFlags.bSirenOrAlarm; 
+				state = pVeh->m_nVehicleFlags.bSirenOrAlarm;
 				if (Ui::CheckboxWithHint("Siren", &state))
 					pVeh->m_nVehicleFlags.bSirenOrAlarm = state;
 
 				state = pVeh->m_nVehicleFlags.bTakeLessDamage;
 				if (Ui::CheckboxWithHint("Take less dmg", &state, nullptr))
 					pVeh->m_nVehicleFlags.bTakeLessDamage = state;
-				
+
 				ImGui::Columns(1);
 			}
 
@@ -808,9 +810,9 @@ void Vehicle::Main()
 			Ui::EditFloat("Density multiplier", 0x8A5B20, 0, 1, 10);
 			if (ImGui::CollapsingHeader("Enter nearest vehicle as"))
 			{
-				CPlayerPed *player = FindPlayerPed();
+				CPlayerPed* player = FindPlayerPed();
 				int hplayer = CPools::GetPedRef(player);
-				CVehicle *veh = Util::GetClosestVehicle();
+				CVehicle* veh = Util::GetClosestVehicle();
 
 				if (veh)
 				{
@@ -832,7 +834,7 @@ void Vehicle::Main()
 					{
 						if (i % 2 != 1)
 							ImGui::SameLine();
-							
+
 						if (ImGui::Button((std::string("Passenger ") + std::to_string(i + 1)).c_str(), ImVec2(Ui::GetSize(2))))
 							Command<Commands::WARP_CHAR_INTO_CAR_AS_PASSENGER>(hplayer, veh, i);
 					}
@@ -847,12 +849,12 @@ void Vehicle::Main()
 			{
 				ImGui::InputInt("Radius", &veh_remove_radius);
 				ImGui::Spacing();
-				if (ImGui::Button("Remove vehicles",Ui::GetSize(1)))
+				if (ImGui::Button("Remove vehicles", Ui::GetSize(1)))
 				{
-					CPlayerPed *player = FindPlayerPed();
-					for (CVehicle *veh : CPools::ms_pVehiclePool)
+					CPlayerPed* player = FindPlayerPed();
+					for (CVehicle* veh : CPools::ms_pVehiclePool)
 					{
-						if (DistanceBetweenPoints(veh->GetPosition(),player->GetPosition()) < veh_remove_radius
+						if (DistanceBetweenPoints(veh->GetPosition(), player->GetPosition()) < veh_remove_radius
 						&& player->m_pVehicle != veh)
 							Command<Commands::DELETE_CAR>(CPools::GetVehicleRef(veh));
 					}
@@ -874,7 +876,7 @@ void Vehicle::Main()
 
 			if (player && player->m_pVehicle)
 			{
-				CVehicle *veh = player->m_pVehicle;
+				CVehicle* veh = player->m_pVehicle;
 				int hveh = CPools::GetVehicleRef(veh);
 
 				Ui::EditFloat("Dirt level", (int)veh + 0x4B0, 0, 7.5, 15);
@@ -899,20 +901,20 @@ void Vehicle::Main()
 						{
 							switch (door_menu_button)
 							{
-							case 0:
-								Command<Commands::DAMAGE_CAR_DOOR>(hveh, i);
-								break;
-							case 1:
-								Command<Commands::FIX_CAR_DOOR>(hveh, i);
-								break;
-							case 2:
-								Command<Commands::OPEN_CAR_DOOR>(hveh, i);
-								break;
-							case 3:
-								Command<Commands::POP_CAR_DOOR>(hveh, i);
-								break;
-							default:
-								break;
+								case 0:
+									Command<Commands::DAMAGE_CAR_DOOR>(hveh, i);
+									break;
+								case 1:
+									Command<Commands::FIX_CAR_DOOR>(hveh, i);
+									break;
+								case 2:
+									Command<Commands::OPEN_CAR_DOOR>(hveh, i);
+									break;
+								case 3:
+									Command<Commands::POP_CAR_DOOR>(hveh, i);
+									break;
+								default:
+									break;
 							}
 						}
 					}
@@ -923,20 +925,20 @@ void Vehicle::Main()
 						{
 							switch (door_menu_button)
 							{
-							case 0:
-								Command<Commands::DAMAGE_CAR_DOOR>(hveh, i);
-								break;
-							case 1:
-								Command<Commands::FIX_CAR_DOOR>(hveh, i);
-								break;
-							case 2:
-								Command<Commands::OPEN_CAR_DOOR>(hveh, i);
-								break;
-							case 3:
-								Command<Commands::POP_CAR_DOOR>(hveh, i);
-								break;
-							default:
-								break;
+								case 0:
+									Command<Commands::DAMAGE_CAR_DOOR>(hveh, i);
+									break;
+								case 1:
+									Command<Commands::FIX_CAR_DOOR>(hveh, i);
+									break;
+								case 2:
+									Command<Commands::OPEN_CAR_DOOR>(hveh, i);
+									break;
+								case 3:
+									Command<Commands::POP_CAR_DOOR>(hveh, i);
+									break;
+								default:
+									break;
 							}
 						}
 
@@ -978,7 +980,7 @@ void Vehicle::Main()
 			ImGui::NextColumn();
 			Ui::CheckboxWithHint("Spawn aircraft in air", &spawner::spawn_in_air);
 			ImGui::Columns(1);
-			
+
 
 			ImGui::Spacing();
 			ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() - 2.5);
@@ -994,7 +996,7 @@ void Vehicle::Main()
 		}
 		if (player->m_pVehicle && player->m_nPedFlags.bInVehicle)
 		{
-			CVehicle *veh = FindPlayerPed()->m_pVehicle;
+			CVehicle* veh = FindPlayerPed()->m_pVehicle;
 			int hveh = CPools::GetVehicleRef(veh);
 			if (ImGui::BeginTabItem("Color"))
 			{
@@ -1036,15 +1038,15 @@ void Vehicle::Main()
 
 				ImVec2 size = Ui::GetSize();
 				int btns_in_row = ImGui::GetWindowContentRegionWidth() / (size.y * 2);
-				int btn_size = (ImGui::GetWindowContentRegionWidth() - int(ImGuiStyleVar_ItemSpacing)*(btns_in_row - 0.6*btns_in_row)) / btns_in_row;
+				int btn_size = (ImGui::GetWindowContentRegionWidth() - int(ImGuiStyleVar_ItemSpacing) * (btns_in_row - 0.6 * btns_in_row)) / btns_in_row;
 
 				ImGui::BeginChild("Colorss");
 
 				if (color::show_all)
 					for (int color_id = 0; color_id < count; ++color_id)
 					{
-						if (Ui::ColorButton(color_id, carcols_color_values[color_id], ImVec2(btn_size,btn_size)))
-							*(uint8_replacement *)(int(veh) + 0x433  + color::radio_btn) = color_id;
+						if (Ui::ColorButton(color_id, carcols_color_values[color_id], ImVec2(btn_size, btn_size)))
+							*(uint8_replacement*)(int(veh) + 0x433 + color::radio_btn) = color_id;
 
 						if ((color_id + 1) % btns_in_row != 0)
 							ImGui::SameLine(0.0, 4.0);
@@ -1060,13 +1062,13 @@ void Vehicle::Main()
 							for (int color_id : entry.second)
 							{
 								if (Ui::ColorButton(color_id, carcols_color_values[color_id], ImVec2(btn_size, btn_size)))
-									*(uint8_replacement *)(int(veh) + 0x433  + color::radio_btn) = color_id;
+									*(uint8_replacement*)(int(veh) + 0x433 + color::radio_btn) = color_id;
 
 								if (count % btns_in_row != 0)
 									ImGui::SameLine(0.0, 4.0);
 								++count;
 							}
-							
+
 							break;
 						}
 					}
@@ -1086,17 +1088,17 @@ void Vehicle::Main()
 
 				ImGui::Spacing();
 				ImGui::Columns(2, NULL, false);
-				
+
 				bool pulsing = IsPulsingEnabled(veh);
 				if (Ui::CheckboxWithHint("Pulsing neons", &pulsing))
-					SetPulsing(veh,pulsing);
+					SetPulsing(veh, pulsing);
 
 				Ui::CheckboxWithHint("Rainbow neons", &neon::rainbow, "Rainbow effect to neon lights");
 				ImGui::NextColumn();
 				Ui::CheckboxWithHint("Traffic neons", &neon::traffic, "Adds neon lights to traffic vehicles.\n\
 Only some vehicles will have them.");
 				ImGui::Columns(1);
-				
+
 				ImGui::Spacing();
 
 				if (ImGui::ColorEdit3("Color picker", neon::color_picker))
@@ -1108,7 +1110,7 @@ Only some vehicles will have them.");
 				int count = (int)carcols_color_values.size();
 				ImVec2 size = Ui::GetSize();
 				int btns_in_row = ImGui::GetWindowContentRegionWidth() / (size.y * 2);
-				int btn_size = (ImGui::GetWindowContentRegionWidth() - int(ImGuiStyleVar_ItemSpacing)*(btns_in_row - 0.6*btns_in_row)) / btns_in_row;
+				int btn_size = (ImGui::GetWindowContentRegionWidth() - int(ImGuiStyleVar_ItemSpacing) * (btns_in_row - 0.6 * btns_in_row)) / btns_in_row;
 
 				ImGui::BeginChild("Neonss");
 
@@ -1116,8 +1118,8 @@ Only some vehicles will have them.");
 				{
 					if (Ui::ColorButton(color_id, carcols_color_values[color_id], ImVec2(btn_size, btn_size)))
 					{
-						std::vector<float> &color = carcols_color_values[color_id];
-						InstallNeon(veh, color[0]*255, color[1]*255, color[2]*255);
+						std::vector<float>& color = carcols_color_values[color_id];
+						InstallNeon(veh, color[0] * 255, color[1] * 255, color[2] * 255);
 					}
 
 					if ((color_id + 1) % btns_in_row != 0)
@@ -1154,39 +1156,39 @@ Only some vehicles will have them.");
 						if (curpjob > maxpjob)
 							curpjob = -1;
 						if (curpjob < -1)
-							curpjob = maxpjob-1;
+							curpjob = maxpjob - 1;
 
 						Command<Commands::GIVE_VEHICLE_PAINTJOB>(hveh, curpjob);
 					}
 
 					ImGui::Spacing();
 				}
-				
+
 				ImGui::Spacing();
 				ImGui::SameLine();
 				ImGui::Checkbox("Material filter", &color::material_filter);
 				ImGui::Spacing();
 				Ui::DrawImages(texture9::image_vec, ImVec2(100, 80), texture9::search_categories, texture9::selected_item, texture9::filter,
-					[](std::string& str) 
+					[](std::string& str)
 					{
 						Paint::SetNodeTexture(FindPlayerPed()->m_pVehicle, Paint::veh_nodes::selected, str, color::material_filter);
 					},
 					nullptr,
-					[](std::string& str) {return str; 
-				});
+						[](std::string& str) {return str;
+					});
 
 				ImGui::EndTabItem();
 			}
 			if (ImGui::BeginTabItem("Tune"))
 			{
 				ImGui::Spacing();
-				Ui::DrawImages(tune::image_vec, ImVec2(100, 80), tune::search_categories, tune::selected_item, tune::filter, 
+				Ui::DrawImages(tune::image_vec, ImVec2(100, 80), tune::search_categories, tune::selected_item, tune::filter,
 					[](std::string& str) {AddComponent(str);},
 					[](std::string& str) {RemoveComponent(str); },
-					[](std::string& str){return str;},
+					[](std::string& str) {return str;},
 					[](std::string& str)
 					{
-						return ((bool(*)(int,CVehicle*))0x49B010)(std::stoi(str), player->m_pVehicle);
+						return ((bool(*)(int, CVehicle*))0x49B010)(std::stoi(str), player->m_pVehicle);
 					}
 				);
 
@@ -1195,9 +1197,9 @@ Only some vehicles will have them.");
 			if (ImGui::BeginTabItem("Handling"))
 			{
 				ImGui::Spacing();
-				
-				CBaseModelInfo *info = CModelInfo::GetModelInfo(player->m_pVehicle->m_nModelIndex);
-				int phandling = patch::Get<WORD>((int)info+0x4A,false);
+
+				CBaseModelInfo* info = CModelInfo::GetModelInfo(player->m_pVehicle->m_nModelIndex);
+				int phandling = patch::Get<WORD>((int)info + 0x4A, false);
 				phandling *= 0xE0;
 				phandling += 0xC2B9DC;
 
@@ -1221,32 +1223,32 @@ Only some vehicles will have them.");
 					ShellExecute(NULL, "open", "https://projectcerbera.com/gta/sa/tutorials/handling", NULL, NULL, SW_SHOWNORMAL);
 
 				ImGui::Spacing();
-				
+
 				ImGui::BeginChild("HandlingChild");
 
-				static std::vector<Ui::NamedValue> abs{{ "On", 1 }, { "Off", 0 }};
+				static std::vector<Ui::NamedValue> abs{ { "On", 1 }, { "Off", 0 } };
 				Ui::EditRadioButtonAddressEx("Abs", phandling + 0x9C, abs);
 
 				Ui::EditFloat("Anti dive multiplier", phandling + 0xC4, 0.0f, 0.0f, 1.0f);
 				Ui::EditFloat("Brake bias", phandling + 0x98, 0.0f, 0.0f, 1.0f);
 				Ui::EditFloat("Brake deceleration", phandling + 0x94, 0.0f, 0.0f, 20.0f, 2500.0f);
-				Ui::EditFloat("Centre of mass X", phandling + 0x14,-10.0f,-10.0f, 10.0f);
-				Ui::EditFloat("Centre of mass Y", phandling + 0x18,-10.0f,-10.0f, 10.0f);
-				Ui::EditFloat("Centre of mass Z", phandling + 0x1C,-10.0f,-10.0f, 10.0f);
+				Ui::EditFloat("Centre of mass X", phandling + 0x14, -10.0f, -10.0f, 10.0f);
+				Ui::EditFloat("Centre of mass Y", phandling + 0x18, -10.0f, -10.0f, 10.0f);
+				Ui::EditFloat("Centre of mass Z", phandling + 0x1C, -10.0f, -10.0f, 10.0f);
 				Ui::EditFloat("Collision damage multiplier", phandling + 0xC8, 0.0f, 0.0f, 1.0f, 0.3381f);
 				Ui::EditFloat("Damping level", phandling + 0xB0, -10.0f, -10.0f, 10.0f); // test later
 				Ui::EditFloat("Drag mult", phandling + 0x10, 0.0f, 0.0f, 30.0f);
 
-				static std::vector<Ui::NamedValue> drive_type{ { "Front wheel drive", 70 }, { "Rear wheel drive", 82 }, { "Four wheel drive", 52 }};
+				static std::vector<Ui::NamedValue> drive_type{ { "Front wheel drive", 70 }, { "Rear wheel drive", 82 }, { "Four wheel drive", 52 } };
 				Ui::EditRadioButtonAddressEx("Drive type", phandling + 0x74, drive_type);
 
 				Ui::EditFloat("Engine acceleration", phandling + 0x7C, 0.0f, 0.0f, 49.0f, 12500.0f);
 				Ui::EditFloat("Engine inertia", phandling + 0x80, 0.0f, 0.0f, 400.0f);
 
-				static std::vector<Ui::NamedValue> engine_type{ { "Petrol", 80 }, { "Diseal", 68 }, { "Electric", 69 }};
+				static std::vector<Ui::NamedValue> engine_type{ { "Petrol", 80 }, { "Diseal", 68 }, { "Electric", 69 } };
 				Ui::EditRadioButtonAddressEx("Engine type", phandling + 0x75, engine_type);
 
-				std::vector<Ui::NamedValue> front_lights{ { "Long", 0 }, { "Small", 1 }, { "Big", 2 }, { "Tall", 3 }};
+				std::vector<Ui::NamedValue> front_lights{ { "Long", 0 }, { "Small", 1 }, { "Big", 2 }, { "Tall", 3 } };
 				Ui::EditRadioButtonAddressEx("Front lights", phandling + 0xDC, front_lights);
 
 				Ui::EditFloat("Force level", phandling + 0xAC, -10.0f, -10.0f, 10.0f); // test later
@@ -1265,7 +1267,7 @@ Only some vehicles will have them.");
 				Ui::EditAddress<BYTE>("Number of gears", phandling + 0x76, 1, 1, 10);
 				Ui::EditAddress<BYTE>("Percent submerged", phandling + 0x20, 10, 10, 120);
 
-				static std::vector<Ui::NamedValue> rear_lights{ { "Long", 0 }, { "Small", 1 }, { "Big", 2 }, { "Tall", 3 }};
+				static std::vector<Ui::NamedValue> rear_lights{ { "Long", 0 }, { "Small", 1 }, { "Big", 2 }, { "Tall", 3 } };
 				Ui::EditRadioButtonAddressEx("Rear lights", phandling + 0xDD, rear_lights);
 
 				Ui::EditFloat("Seat offset distance", phandling + 0xD4, 0.0f, 0.0f, 1.0f);
@@ -1279,7 +1281,7 @@ Only some vehicles will have them.");
 				Ui::EditAddress<BYTE>("Vehicle anim group", phandling + 0xDE, 0, 0, 20);
 
 				ImGui::EndChild();
-					
+
 				ImGui::EndTabItem();
 			}
 		}

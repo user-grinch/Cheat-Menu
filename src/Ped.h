@@ -9,6 +9,7 @@ private:
 	static std::string selected_item;
 	static std::vector<std::string> search_categories;
 	static std::vector<std::unique_ptr<TextureStructure>> peds_vec;
+	static bool images_loaded;
 
 	static CJson ped_json;
 	static CJson pedspecial_json;
@@ -34,7 +35,7 @@ private:
 public:
 	Ped();
 	~Ped();
-	static void Main();
+	static void Draw();
 	static void SpawnPed(std::string& model);
 };
 

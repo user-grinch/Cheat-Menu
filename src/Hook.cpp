@@ -6,7 +6,7 @@
 WNDPROC Hook::oWndProc = NULL;
 f_Present11 Hook::oPresent11 = NULL;
 f_Present9 Hook::oPresent9 = NULL;
-f_Reset Hook::oReset9 = NULL; 
+f_Reset Hook::oReset9 = NULL;
 
 bool Hook::mouse_visibility = false;
 bool Hook::show_mouse = false;
@@ -31,20 +31,20 @@ LRESULT Hook::WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	if (ImGui::GetIO().WantTextInput)
 	{
 		Call<0x53F1E0>(); // CPad::ClearKeyboardHistory
-	 	return 1;
+		return 1;
 	}
-	
+
 	return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
 }
 
-HRESULT Hook::Reset(IDirect3DDevice9 * pDevice, D3DPRESENT_PARAMETERS * pPresentationParameters)
+HRESULT Hook::Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters)
 {
 	ImGui_ImplDX9_InvalidateDeviceObjects();
 
 	return oReset9(pDevice, pPresentationParameters);
 }
 
-void Hook::Present(void *ptr)
+void Hook::Present(void* ptr)
 {
 	ImGuiIO& io = ImGui::GetIO();
 
@@ -53,7 +53,7 @@ void Hook::Present(void *ptr)
 		Hook::ShowMouse(show_mouse);
 
 		// handle window scaling here
-		ImVec2 size(screen::GetScreenWidth(),screen::GetScreenHeight());
+		ImVec2 size(screen::GetScreenWidth(), screen::GetScreenHeight());
 		if (Globals::screen_size.x != size.x && Globals::screen_size.y != size.y)
 		{
 			int font_size = int(size.y / 54.85f); // manually tested
@@ -68,8 +68,8 @@ void Hook::Present(void *ptr)
 
 			if (Globals::screen_size.x != -1 && Globals::screen_size.y != -1)
 			{
-				Globals::menu_size.x += (size.x-Globals::screen_size.x) / 4.0f;
-				Globals::menu_size.y += (size.y-Globals::screen_size.y) / 1.2f;
+				Globals::menu_size.x += (size.x - Globals::screen_size.x) / 4.0f;
+				Globals::menu_size.y += (size.y - Globals::screen_size.y) / 1.2f;
 			}
 
 			ImGuiStyle* style = &ImGui::GetStyle();
@@ -80,7 +80,7 @@ void Hook::Present(void *ptr)
 			style->ItemSpacing = ImVec2(8 * scale_x, 4 * scale_y);
 			style->ScrollbarSize = 12 * scale_x;
 			style->IndentSpacing = 20 * scale_x;
-			style->ItemInnerSpacing  = ImVec2(4 * scale_x,4 * scale_y);
+			style->ItemInnerSpacing = ImVec2(4 * scale_x, 4 * scale_y);
 
 			Globals::screen_size = size;
 		}
@@ -112,9 +112,9 @@ void Hook::Present(void *ptr)
 		ImGuiStyle& style = ImGui::GetStyle();
 
 		ImGui_ImplWin32_Init(RsGlobal.ps->window);
-		
+
 		// shift trigger fix
-		patch::Nop(0x00531155,5);
+		patch::Nop(0x00531155, 5);
 
 		if (Globals::renderer == Render_DirectX9)
 		{
@@ -143,7 +143,7 @@ void Hook::Present(void *ptr)
 	}
 }
 
-HRESULT Hook::PresentDx9Handler(IDirect3DDevice9 *pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion)
+HRESULT Hook::PresentDx9Handler(IDirect3DDevice9* pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion)
 {
 	Present(pDevice);
 	return oPresent9(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);;
@@ -183,11 +183,10 @@ void Hook::ShowMouse(bool state)
 	{
 		if (mouse_visibility != show_mouse)
 		{
-			patch::SetRaw(0x541DF5, (void*)"\xE8\x46\xF3\xFE\xFF", 5); // call CControllerConfigManager::AffectPadFromKeyBoard
+			patch::SetUChar(0x6194A0, 0xE9); // jmp setup
 			patch::SetUChar(0x746ED0, 0xA1);
 			patch::SetRaw(0x53F41F, (void*)"\x85\xC0\x0F\x8C", 4); // xor eax, eax -> test eax, eax , enable camera mouse movement
 															// jz loc_53F526 -> jl loc_53F526
-			patch::SetUChar(0x6194A0, 0xE9); // jmp setup
 		}
 	}
 
@@ -196,7 +195,9 @@ void Hook::ShowMouse(bool state)
 		CPad::ClearMouseHistory();
 		CPad::UpdatePads();
 
+		// TODO: Replace this with windows cursor
 		ImGui::GetIO().MouseDrawCursor = state;
+
 		CPad::NewMouseControllerState.X = 0;
 		CPad::NewMouseControllerState.Y = 0;
 		mouse_visibility = show_mouse;
@@ -206,31 +207,22 @@ void Hook::ShowMouse(bool state)
 Hook::Hook()
 {
 	ImGui::CreateContext();
-	Events::initRwEvent += []()
-	{
-		if (kiero::init(kiero::RenderType::D3D9) == kiero::Status::Success)
-		{
-			Globals::renderer = Render_DirectX9;
-			kiero::bind(16, (void**)&oReset9, Reset);
-			kiero::bind(17, (void**)&oPresent9, PresentDx9Handler);
-		}
-		else
-		{
-			// gtaRenderHook
-			if (kiero::init(kiero::RenderType::D3D11) == kiero::Status::Success)
-			{
-				Globals::renderer = Render_DirectX11;
-				kiero::bind(8, (void**)&oPresent11, PresentDx11Handler);
-			}
 
-			// if (kiero::init(kiero::RenderType::Vulkan) == kiero::Status::Success)
-			// {
-			// 	Globals::renderer = Render_Vulkan;
-			// 	flog << "Vulkan detected!" << std::endl;
-			// 	kiero::bind(105, (void**)&hvkCmdDraw, PresentDx11Handler);
-			// }
+	if (kiero::init(kiero::RenderType::D3D9) == kiero::Status::Success)
+	{
+		Globals::renderer = Render_DirectX9;
+		kiero::bind(16, (void**)&oReset9, Reset);
+		kiero::bind(17, (void**)&oPresent9, PresentDx9Handler);
+	}
+	else
+	{
+		// gtaRenderHook
+		if (kiero::init(kiero::RenderType::D3D11) == kiero::Status::Success)
+		{
+			Globals::renderer = Render_DirectX11;
+			kiero::bind(8, (void**)&oPresent11, PresentDx11Handler);
 		}
-	};
+	}
 }
 
 Hook::~Hook()

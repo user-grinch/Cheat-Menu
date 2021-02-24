@@ -56,12 +56,7 @@ void Teleport::FetchRadarSpriteData()
 Teleport::Teleport()
 {
 	json.LoadData(search_categories, selected_item);
-
-	Events::initGameEvent += []
-	{
-		// Load config data
-		quick_teleport = config.GetValue("quick_teleport", false);
-	};
+	quick_teleport = config.GetValue("quick_teleport", false);
 
 	Events::processScriptsEvent += []
 	{
@@ -182,7 +177,7 @@ void Teleport::RemoveTeleportEntry(std::string& category, std::string& key, std:
 	else CHud::SetHelpMessage("You can only remove custom location", false, false, false);
 }
 
-void Teleport::Main()
+void Teleport::Draw()
 {
 	if (ImGui::BeginTabBar("Teleport",ImGuiTabBarFlags_NoTooltip+ImGuiTabBarFlags_FittingPolicyScroll))
 	{

@@ -14,6 +14,7 @@ private:
 	static std::string selected_item;
 	static std::vector<std::string> search_categories;
 	static std::vector<std::unique_ptr<TextureStructure>> clothes_vec;
+	static bool images_loaded;
 
 	struct custom_skins
 	{
@@ -27,7 +28,6 @@ public:
 	static void ChangePlayerCloth(std::string& model);
 	static void ChangePlayerModel(std::string& model);
 	Player();
-	~Player();
-	static void Main();
+	static void Draw();
 };
 

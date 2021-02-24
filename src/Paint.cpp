@@ -36,19 +36,16 @@ std::map<std::string, std::shared_ptr<RwTexture>> Paint::textures;
 
 Paint::Paint()
 {
-	Events::initGameEvent += []
+	for (auto& p : fs::recursive_directory_iterator(PLUGIN_PATH((char*)"\\CheatMenu\\vehicles\\paintjobs\\")))
 	{
-		for (auto &p : fs::recursive_directory_iterator(PLUGIN_PATH((char*)"\\CheatMenu\\vehicles\\paintjobs\\")))
+		if (p.path().extension() == ".png")
 		{
-			if (p.path().extension() == ".png")
-			{
-				std::string file_name = p.path().stem().string();
-				textures[file_name]= std::make_shared<RwTexture>(*(Util::LoadTextureFromPngFile(p.path())));
-			}
+			std::string file_name = p.path().stem().string();
+			textures[file_name] = std::make_shared<RwTexture>(*(Util::LoadTextureFromPngFile(p.path())));
 		}
-	};
-	
-	Events::vehicleRenderEvent.before += [](CVehicle* veh) 
+	}
+
+	Events::vehicleRenderEvent.before += [](CVehicle* veh)
 	{
 		VehData& data = vehdata.Get(veh);
 
@@ -104,16 +101,11 @@ Paint::Paint()
 	};
 }
 
-Paint::~Paint()
-{
-}
-
-
 void Paint::VehData::setMaterialColor(RpMaterial* material, RpGeometry* geometry, RwRGBA color, bool filter_mat)
 {
 	auto& matProps = materialProperties[material];
-	
-	if ( !filter_mat 
+
+	if (!filter_mat
 		|| (material->color.red == 0x3C && material->color.green == 0xFF && material->color.blue == 0x00)
 		|| (material->color.red == 0xFF && material->color.green == 0x00 && material->color.blue == 0xAF))
 	{
@@ -140,7 +132,7 @@ void Paint::VehData::resetMaterialColor(RpMaterial* material)
 {
 	auto& matProps = materialProperties[material];
 	matProps._recolor = false;
-	matProps._color = {0, 0, 0, 0};
+	matProps._color = { 0, 0, 0, 0 };
 }
 
 void Paint::VehData::resetMaterialTexture(RpMaterial* material)
@@ -150,15 +142,15 @@ void Paint::VehData::resetMaterialTexture(RpMaterial* material)
 	matProps._texture.reset();
 }
 
-void Paint::NodeWrapperRecursive(RwFrame *frame, CVehicle* pVeh, std::function<void(RwFrame*)> func)
+void Paint::NodeWrapperRecursive(RwFrame* frame, CVehicle* pVeh, std::function<void(RwFrame*)> func)
 {
 	if (frame)
 	{
 		func(frame);
 
-		if (RwFrame * newFrame = frame->child)
+		if (RwFrame* newFrame = frame->child)
 			NodeWrapperRecursive(newFrame, pVeh, func);
-		if (RwFrame * newFrame = frame->next)
+		if (RwFrame* newFrame = frame->next)
 			NodeWrapperRecursive(newFrame, pVeh, func);
 	}
 	return;
@@ -166,9 +158,9 @@ void Paint::NodeWrapperRecursive(RwFrame *frame, CVehicle* pVeh, std::function<v
 
 void Paint::UpdateNodeListRecursive(CVehicle* pVeh)
 {
-	RwFrame *frame = (RwFrame *)pVeh->m_pRwClump->object.parent;
+	RwFrame* frame = (RwFrame*)pVeh->m_pRwClump->object.parent;
 
-	NodeWrapperRecursive(frame, pVeh, [](RwFrame *frame)
+	NodeWrapperRecursive(frame, pVeh, [](RwFrame* frame)
 	{
 		const std::string name = GetFrameNodeName(frame);
 
@@ -179,9 +171,9 @@ void Paint::UpdateNodeListRecursive(CVehicle* pVeh)
 
 void Paint::SetNodeColor(CVehicle* pVeh, std::string node_name, CRGBA color, bool filter_mat)
 {
-	RwFrame *frame = (RwFrame *)pVeh->m_pRwClump->object.parent;
+	RwFrame* frame = (RwFrame*)pVeh->m_pRwClump->object.parent;
 
-	NodeWrapperRecursive(frame, pVeh, [&](RwFrame *frame)
+	NodeWrapperRecursive(frame, pVeh, [&](RwFrame* frame)
 	{
 		const std::string name = GetFrameNodeName(frame);
 
@@ -199,7 +191,7 @@ void Paint::SetNodeColor(CVehicle* pVeh, std::string node_name, CRGBA color, boo
 			RwFrameForAllObjects(frame, [](RwObject* object, void* data) -> RwObject* {
 				if (object->type == rpATOMIC)
 				{
-					RpAtomic *atomic = reinterpret_cast<RpAtomic*>(object);
+					RpAtomic* atomic = reinterpret_cast<RpAtomic*>(object);
 
 					ST* st = reinterpret_cast<ST*>(data);
 					CRGBA* color = &st->_color;
@@ -219,8 +211,8 @@ void Paint::SetNodeColor(CVehicle* pVeh, std::string node_name, CRGBA color, boo
 
 void Paint::SetNodeTexture(CVehicle* pVeh, std::string node_name, std::string texturename, bool filter_mat)
 {
-	RwFrame *frame = (RwFrame *)pVeh->m_pRwClump->object.parent;
-	NodeWrapperRecursive(frame, pVeh, [&](RwFrame *frame)
+	RwFrame* frame = (RwFrame*)pVeh->m_pRwClump->object.parent;
+	NodeWrapperRecursive(frame, pVeh, [&](RwFrame* frame)
 	{
 		const std::string name = GetFrameNodeName(frame);
 
@@ -241,7 +233,7 @@ void Paint::SetNodeTexture(CVehicle* pVeh, std::string node_name, std::string te
 
 				if (object->type == rpATOMIC)
 				{
-					RpAtomic *atomic = reinterpret_cast<RpAtomic*>(object);
+					RpAtomic* atomic = reinterpret_cast<RpAtomic*>(object);
 
 					ST* st = reinterpret_cast<ST*>(data);
 					VehData& data = vehdata.Get(FindPlayerPed()->m_pVehicle);
@@ -255,11 +247,11 @@ void Paint::SetNodeTexture(CVehicle* pVeh, std::string node_name, std::string te
 	});
 }
 
-void Paint::ResetNodeColor(CVehicle *pVeh, std::string node_name)
+void Paint::ResetNodeColor(CVehicle* pVeh, std::string node_name)
 {
-	RwFrame *frame = (RwFrame *)pVeh->m_pRwClump->object.parent;
+	RwFrame* frame = (RwFrame*)pVeh->m_pRwClump->object.parent;
 
-	NodeWrapperRecursive(frame, pVeh, [&](RwFrame *frame)
+	NodeWrapperRecursive(frame, pVeh, [&](RwFrame* frame)
 	{
 		const std::string name = GetFrameNodeName(frame);
 
@@ -268,7 +260,7 @@ void Paint::ResetNodeColor(CVehicle *pVeh, std::string node_name)
 			RwFrameForAllObjects(frame, [](RwObject* object, void* data) -> RwObject* {
 				if (object->type == rpATOMIC)
 				{
-					RpAtomic *atomic = reinterpret_cast<RpAtomic*>(object);
+					RpAtomic* atomic = reinterpret_cast<RpAtomic*>(object);
 					VehData& data = vehdata.Get(FindPlayerPed()->m_pVehicle);
 
 					for (int i = 0; i < atomic->geometry->matList.numMaterials; ++i)
@@ -280,11 +272,11 @@ void Paint::ResetNodeColor(CVehicle *pVeh, std::string node_name)
 	});
 }
 
-void Paint::ResetNodeTexture(CVehicle *pVeh, std::string node_name)
+void Paint::ResetNodeTexture(CVehicle* pVeh, std::string node_name)
 {
-	RwFrame *frame = (RwFrame *)pVeh->m_pRwClump->object.parent;
+	RwFrame* frame = (RwFrame*)pVeh->m_pRwClump->object.parent;
 
-	NodeWrapperRecursive(frame, pVeh, [&](RwFrame *frame)
+	NodeWrapperRecursive(frame, pVeh, [&](RwFrame* frame)
 	{
 		const std::string name = GetFrameNodeName(frame);
 
@@ -294,7 +286,7 @@ void Paint::ResetNodeTexture(CVehicle *pVeh, std::string node_name)
 
 				if (object->type == rpATOMIC)
 				{
-					RpAtomic *atomic = reinterpret_cast<RpAtomic*>(object);
+					RpAtomic* atomic = reinterpret_cast<RpAtomic*>(object);
 
 					VehData& data = vehdata.Get(FindPlayerPed()->m_pVehicle);
 

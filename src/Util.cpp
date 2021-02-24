@@ -23,10 +23,10 @@ void Util::ClearCharTasksVehCheck(CPed* ped)
 	}
 }
 
-void Util::LoadTexturesInDirRecursive(const char *path, const char *file_ext,std::vector<std::string>& category_vec, std::vector<std::unique_ptr<TextureStructure>> &store_vec)
+void Util::LoadTexturesInDirRecursive(const char* path, const char* file_ext, std::vector<std::string>& category_vec, std::vector<std::unique_ptr<TextureStructure>>& store_vec)
 {
 	std::string folder = "";
-	for (auto &p : fs::recursive_directory_iterator(path))
+	for (auto& p : fs::recursive_directory_iterator(path))
 	{
 		if (p.path().extension() == file_ext)
 		{
@@ -41,7 +41,6 @@ void Util::LoadTexturesInDirRecursive(const char *path, const char *file_ext,std
 					hr = S_OK;
 			}
 
-
 			if (hr == S_OK)
 			{
 				store_vec.back().get()->file_name = p.path().stem().string();
@@ -49,7 +48,7 @@ void Util::LoadTexturesInDirRecursive(const char *path, const char *file_ext,std
 			}
 			else
 			{
-				flog << "Couldn't load image " << p.path().stem().string() << std::endl;
+				flog << "WARN: Failed to load " << p.path().stem().string() << std::endl;
 				store_vec.pop_back();
 			}
 		}
@@ -83,7 +82,7 @@ bool Util::LoadTextureFromFileDx11(const char* filename, ID3D11ShaderResourceVie
 	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	desc.CPUAccessFlags = 0;
 
-	ID3D11Texture2D *pTexture = NULL;
+	ID3D11Texture2D* pTexture = NULL;
 	D3D11_SUBRESOURCE_DATA subResource;
 	subResource.pSysMem = image_data;
 	subResource.SysMemPitch = desc.Width * 4;
@@ -111,7 +110,7 @@ bool Util::IsOnMission()
 	return FindPlayerPed()->CanPlayerStartMission() && !*(patch::Get<char*>(0x5D5380, false) + CTheScripts::OnAMissionFlag);
 }
 
-std::string Util::GetLocationName(CVector *pos)
+std::string Util::GetLocationName(CVector* pos)
 {
 	int hplayer = CPools::GetPedRef(FindPlayerPed());
 	int interior = 0;
@@ -123,18 +122,18 @@ std::string Util::GetLocationName(CVector *pos)
 
 	switch (city)
 	{
-	case 0:
-		town = "CS";
-		break;
-	case 1:
-		town = "LS";
-		break;
-	case 2:
-		town = "SF";
-		break;
-	case 3:
-		town = "LV";
-		break;
+		case 0:
+			town = "CS";
+			break;
+		case 1:
+			town = "LS";
+			break;
+		case 2:
+			town = "SF";
+			break;
+		case 3:
+			town = "LV";
+			break;
 	}
 
 	if (interior == 0)
@@ -151,9 +150,9 @@ int Util::GetLargestGangInZone()
 	for (int i = 0; i != 10; ++i)
 	{
 		CVector pos = FindPlayerPed()->GetPosition();
-		CZone *zone = new CZone();
-		
-		CZoneExtraInfo *zone_info = CTheZones::GetZoneInfo(&pos, &zone);
+		CZone* zone = new CZone();
+
+		CZoneExtraInfo* zone_info = CTheZones::GetZoneInfo(&pos, &zone);
 		int density = zone_info->m_nGangDensity[i];
 
 		if (density > max_density)
@@ -171,11 +170,11 @@ int Util::GetLargestGangInZone()
 // https://github.com/cleolibrary/CLEO4/blob/916d400f4a731ba1dd0ff16e52bdb056f42b7038/source/CCustomOpcodeSystem.cpp#L1671
 CVehicle* Util::GetClosestVehicle()
 {
-	CPlayerPed *player = FindPlayerPed();
-	CPedIntelligence *pedintel;
+	CPlayerPed* player = FindPlayerPed();
+	CPedIntelligence* pedintel;
 	if (player && (pedintel = player->m_pIntelligence))
 	{
-		CVehicle *veh = nullptr;
+		CVehicle* veh = nullptr;
 		for (int i = 0; i < 16; i++)
 		{
 			veh = (CVehicle*)pedintel->m_vehicleScanner.m_apEntities[i];
@@ -191,11 +190,11 @@ CVehicle* Util::GetClosestVehicle()
 
 CPed* Util::GetClosestPed()
 {
-	CPlayerPed *player = FindPlayerPed();
-	CPedIntelligence * pedintel;
+	CPlayerPed* player = FindPlayerPed();
+	CPedIntelligence* pedintel;
 	if (player && (pedintel = player->m_pIntelligence))
 	{
-		CPed *ped = nullptr;
+		CPed* ped = nullptr;
 
 		for (int i = 0; i < 16; i++)
 		{
@@ -210,9 +209,9 @@ CPed* Util::GetClosestPed()
 	return nullptr;
 }
 
-void Util::RainbowValues(int &r, int&g, int &b, float speed)
+void Util::RainbowValues(int& r, int& g, int& b, float speed)
 {
-	int timer = CTimer::m_snTimeInMilliseconds/150;
+	int timer = CTimer::m_snTimeInMilliseconds / 150;
 	r = sin(timer * speed) * 127 + 128;
 	g = sin(timer * speed + 2) * 127 + 128;
 	b = sin(timer * speed + 4) * 127 + 128;

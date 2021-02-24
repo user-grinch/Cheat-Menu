@@ -18,7 +18,7 @@ protected:
 	~Animation() {};
 
 public:
-	static void Main();
+	static void Draw();
 	static void PlayAnimation(std::string& rootkey, std::string& anim, std::string& ifp);
 	static void RemoveAnimation(std::string& rootkey, std::string& anim, std::string& ifp);
 };

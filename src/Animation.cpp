@@ -17,8 +17,8 @@ CJson Animation::json = CJson("animation");
 std::vector<std::string> fighting_vec{ "Default","Boxing","Kung fu","Kick Boxing","Punch Kick" };
 int fighting_selected = 0;
 
-std::vector<std::string> walking_vec{ "default", "man", "shuffle", "oldman", "gang1", "gang2", 
-"oldfatman", "fatman", "jogger", "drunkman", "blindman", "swat", "woman", "shopping", "busywoman", 
+std::vector<std::string> walking_vec{ "default", "man", "shuffle", "oldman", "gang1", "gang2",
+"oldfatman", "fatman", "jogger", "drunkman", "blindman", "swat", "woman", "shopping", "busywoman",
 "sexywoman", "pro", "oldwoman", "fatwoman", "jogwoman", "oldfatwoman", "skate" };
 
 std::string walking_selected = "default";
@@ -28,7 +28,7 @@ Animation::Animation()
 	json.LoadData(search_categories, selected_item);
 }
 
-void Animation::Main()
+void Animation::Draw()
 {
 	if (ImGui::BeginTabBar("Animation", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
 	{
@@ -70,7 +70,7 @@ void Animation::Main()
 			if (Ui::ListBox("Fighting", fighting_vec, fighting_selected))
 			{
 				Command<Commands::GIVE_MELEE_ATTACK_TO_CHAR>(hplayer, fighting_selected + 4, 6);
-				CHud::SetHelpMessage("Fighting anim set",false,false,false);
+				CHud::SetHelpMessage("Fighting anim set", false, false, false);
 			}
 			if (Ui::ListBoxStr("Walking", walking_vec, walking_selected))
 			{
@@ -90,7 +90,7 @@ void Animation::Main()
 					Command<Commands::LOAD_ALL_MODELS_NOW>();
 					Command<Commands::SET_ANIM_GROUP_FOR_CHAR>(hplayer, cwalking_selected);
 					Command<Commands::REMOVE_ANIMATION>(cwalking_selected);
-				}	
+				}
 				CHud::SetHelpMessage("Walking anim set", false, false, false);
 			}
 			ImGui::EndTabItem();
@@ -127,7 +127,7 @@ void Animation::PlayAnimation(std::string& ifp, std::string& anim, std::string& 
 		Command<Commands::TASK_PLAY_ANIM_SECONDARY>(hplayer, anim.c_str(), ifp.c_str(), 4.0, loop, 0, 0, 0, -1);
 	else
 		Command<Commands::TASK_PLAY_ANIM>(hplayer, anim.c_str(), ifp.c_str(), 4.0, loop, 0, 0, 0, -1);
-		
+
 	if (ifp != "PED")
 		Command<Commands::REMOVE_ANIMATION>(ifp.c_str());
 }
@@ -140,7 +140,8 @@ void Animation::RemoveAnimation(std::string& ifp, std::string& anim, std::string
 		json.data["Custom"].erase(anim);
 		json.WriteToDisk();
 		CHud::SetHelpMessage("Animation removed", false, false, false);
-	}else CHud::SetHelpMessage("You can only remove custom anims", false, false, false);
+	}	
+else CHud::SetHelpMessage("You can only remove custom anims", false, false, false);
 
 }
 

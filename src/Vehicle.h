@@ -38,7 +38,7 @@ private:
 		static uint traffic_timer;
 	};
 
-	struct spawner 
+	struct spawner
 	{
 		static ImGuiTextFilter filter;
 		static std::string selected_item;
@@ -56,6 +56,7 @@ private:
 		static std::vector<std::string> search_categories;
 		static std::vector<std::unique_ptr<TextureStructure>> image_vec;
 	};
+	static bool images_loaded;
 
 	struct tune
 	{
@@ -75,13 +76,13 @@ public:
 	static void RemoveComponent(const std::string& component, const bool display_message = true);
 	static std::string GetNameFromModel(int model);
 	static int GetModelFromName(const char* name);
-	static void SpawnVehicle(std::string &name);
+	static void SpawnVehicle(std::string& name);
 	static int GetRandomTrainIdForModel(int model);
 	static void ParseVehiclesIDE();
 	static void ParseCarcolsDAT();
 	static void GenerateHandlingDataFile(int phandling);
 	Vehicle();
 	~Vehicle();
-	static void Main();
+	static void Draw();
 };
 

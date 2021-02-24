@@ -28,15 +28,12 @@ static bool init_patches = false;
 
 Visual::Visual()
 {
-	Events::initGameEvent += []
-	{
-		if (LoadLibraryW(L"timecycle24.asi"))
-			timecyc_hour = 24;
-	};
+	if (GetModuleHandle("timecycle24.asi"))
+		timecyc_hour = 24;
 
 	Events::processScriptsEvent += []
 	{
-		// Improve this later
+		// TODO: Needs improvement
 		if (lock_weather)
 		{
 			CWeather::OldWeatherType = weather_type_backup;
@@ -190,7 +187,7 @@ void Visual::GenerateTimecycFile()
 	}
 }
 
-void Visual::Main()
+void Visual::Draw()
 {
 	if (ImGui::BeginTabBar("Visual", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
 	{
@@ -271,7 +268,7 @@ void Visual::Main()
 
 			Ui::ColorPickerAddress("Armour bar", *(int*)0x5890FC, ImVec4(180,25,29,255));
 			Ui::ColorPickerAddress("Health bar", *(int*)0x589331, ImVec4(180,25,29,255));
-			Ui::ColorPickerAddress("Main menu title border color", 0xBAB240, ImVec4(0,0,0,255));
+			Ui::ColorPickerAddress("Draw menu title border color", 0xBAB240, ImVec4(0,0,0,255));
 			Ui::ColorPickerAddress("Money color", 0xBAB230, ImVec4(54,104,44,255));	
 			static std::vector<Ui::NamedValue> font_outline{{ "No outline", 0 }, { "Thin outline" ,1 }, { "Default outline" ,2 }};
 			Ui::EditRadioButtonAddressEx("Money font outline", 0x58F58D, font_outline);

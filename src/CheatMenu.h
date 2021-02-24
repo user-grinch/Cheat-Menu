@@ -22,51 +22,11 @@ class CheatMenu : Hook, Animation, Game, Menu, Ped, Player, Teleport, Vehicle, V
 {
 private:
 	static unsortedMap header;
-	static void ProcessMenu();
+	static void DrawMenu();
 	static void ProcessWindow();
-	static void ApplyImGuiStyle();
+	static void ApplyStyle();
 
 public:
 	CheatMenu();
-	~CheatMenu();
 };
-
-class Launcher
-{
-public:
-	Launcher()
-	{
-		Events::initRwEvent += []()
-		{
-			bool launch = true;
-			uint gameVersion = GetGameVersion();
-			if (gameVersion != GAME_10US_HOODLUM && gameVersion != GAME_10US_COMPACT) {
-				MessageBox(HWND_DESKTOP, "CheatMenu requires v1.0 US of the game.", "CheatMenu", MB_ICONERROR);
-				launch = false;
-			}
-
-			if (IsPluginInstalled("SAMP.dll")) {
-				MessageBox(HWND_DESKTOP, "SAMP detected. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
-				launch = false;
-			}
-
-			/*
-				Mouse is extremely buggy without SilentPatch
-				Should have a better fix for this but everyone should have 
-				SilentPatch installed so mehh...
-			*/
-			if (!IsPluginInstalled("SilentPatchSA.asi")) {
-				MessageBox(HWND_DESKTOP, "SilentPatch isn't installed. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
-				launch = false;
-			}
-
-			if (launch)
-			{
-				flog << "Loading CheatMenu" << std::endl;
-				CFastman92limitAdjuster::Init();
-				static CheatMenu cheatmenu;
-			}
-		};
-	}
-} launcher;
 

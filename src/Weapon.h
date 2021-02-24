@@ -7,9 +7,10 @@ private:
 	static std::string selected_item;
 	static std::vector<std::string> search_categories;
 	static std::vector<std::unique_ptr<TextureStructure>> weapon_vec;
-
-	static CJson weapon_json;
+	static bool images_loaded;
 	
+	static CJson weapon_json;
+
 	static bool auto_aim;
 	static bool fast_reload;
 	static bool huge_damage;
@@ -32,7 +33,7 @@ public:
 	Weapon();
 	~Weapon();
 
-	static void Main();
+	static void Draw();
 	static void GiveWeaponToPlayer(std::string& weapon_type);
 	static void SetGangWeapon(std::string& weapon_type);
 };
