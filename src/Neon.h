@@ -33,5 +33,6 @@ public:
 	static bool IsPulsingEnabled(CVehicle* veh);
 	static void SetPulsing(CVehicle* veh, bool state);
 	static void RemoveNeon(CVehicle* veh);
+	static void RenderEvent(CVehicle* veh);
 };
 

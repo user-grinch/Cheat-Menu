@@ -41,9 +41,8 @@ public:
 
 	Menu();
 	static void Draw();
-	static void ProcessOverlay();
+	static void DrawOverlay();
 	static void DrawShortcutsWindow();
 	static void ProcessCommands();
-
 };
 

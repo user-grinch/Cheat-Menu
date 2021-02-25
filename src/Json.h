@@ -106,7 +106,6 @@ public:
 	*/
 	void WriteToDisk();
 	CJson(const char* text);
-	~CJson();
 };
 
 

@@ -234,7 +234,7 @@ void Vehicle::AddComponent(const std::string& component, const bool display_mess
 	}
 	catch (...)
 	{
-		flog << "Failed to add " << component << " to vehicle." << std::endl;
+		flog << "Failed to component to vehicle " << component << std::endl;
 	}
 }
 
@@ -253,7 +253,7 @@ void Vehicle::RemoveComponent(const std::string& component, const bool display_m
 	}
 	catch (...)
 	{
-		flog << "Failed to remove " << component << " from vehicle." << std::endl;
+		flog << "Failed to remove component from vehicle " << component << std::endl;
 	}
 }
 
@@ -326,7 +326,7 @@ void Vehicle::ParseVehiclesIDE()
 			}
 			catch (...)
 			{
-				flog << "Error occured while parsing line, " << line << std::endl;
+				flog << "Error while parsing line, " << line << std::endl;
 			}
 		}
 
@@ -397,7 +397,7 @@ void Vehicle::ParseCarcolsDAT()
 				}
 				catch (...)
 				{
-					flog << "Error occured while parsing car line, " << line << std::endl;
+					flog << "Error while parsing car line, " << line << std::endl;
 				}
 			}
 
@@ -422,7 +422,7 @@ void Vehicle::ParseCarcolsDAT()
 					}
 					catch (...)
 					{
-						flog << "Error occured while parsing car line, " << line << std::endl;
+						flog << "Error while parsing car line, " << line << std::endl;
 					}
 				}
 			}
@@ -430,7 +430,7 @@ void Vehicle::ParseCarcolsDAT()
 
 		file.close();
 	}
-	else flog << "Vehicle.ide file not found";
+	else flog << "Error locating Vehicle.ide";
 }
 
 void Vehicle::SpawnVehicle(std::string& smodel)

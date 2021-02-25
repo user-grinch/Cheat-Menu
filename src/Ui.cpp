@@ -76,7 +76,7 @@ void Ui::CenterdText(const std::string& text)
 	ImGui::Text(text.c_str());
 }
 
-void Ui::DrawHeaders(unsortedMap& data)
+void Ui::DrawHeaders(CallbackTable& data)
 {
 
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));

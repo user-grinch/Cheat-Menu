@@ -15,7 +15,7 @@ CJson::CJson(const char* name)
 		}
 		catch (...)
 		{
-			flog << "Error occured trying to read " << file_path << std::endl;
+			flog << "Error trying to read " << file_path << std::endl;
 			data = "{}"_json;
 		}
 	}
@@ -37,9 +37,4 @@ void CJson::LoadData(std::vector<std::string>& vec, std::string& selected) // Te
 {
 	for (auto element : data.items())
 		vec.push_back(element.key());
-}
-
-CJson::~CJson()
-{
-	// Saving here won't work on crash
 }

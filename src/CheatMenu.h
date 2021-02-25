@@ -21,12 +21,14 @@
 class CheatMenu : Hook, Animation, Game, Menu, Ped, Player, Teleport, Vehicle, Visual, Weapon
 {
 private:
-	static unsortedMap header;
-	static void DrawMenu();
-	static void ProcessWindow();
+	static CallbackTable header;
+
 	static void ApplyStyle();
+	static void DrawWindow();
+	static void ProcessEvent();
 
 public:
 	CheatMenu();
+	~CheatMenu();
 };
 

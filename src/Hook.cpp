@@ -1,7 +1,6 @@
 #include "Hook.h"
 #include "kiero/kiero.h"
 #include "kiero/minhook/MinHook.h"
-// #include "vulkan/vulkan.h"
 
 WNDPROC Hook::oWndProc = NULL;
 f_Present11 Hook::oPresent11 = NULL;
@@ -46,10 +45,13 @@ HRESULT Hook::Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentat
 
 void Hook::Present(void* ptr)
 {
+	if (!ImGui::GetCurrentContext())
+		return;
+
 	ImGuiIO& io = ImGui::GetIO();
 
 	if (Globals::init_done)
-	{
+	{	
 		Hook::ShowMouse(show_mouse);
 
 		// handle window scaling here
@@ -129,8 +131,6 @@ void Hook::Present(void* ptr)
 			reinterpret_cast<ID3D11Device*>(Globals::device)->GetImmediateContext(&context);
 
 			ImGui_ImplDX11_Init(reinterpret_cast<ID3D11Device*>(Globals::device), context);
-
-			//ImGui_ImplVulkan_Init()
 		}
 
 		ImGui_ImplWin32_EnableDpiAwareness();
@@ -146,7 +146,7 @@ void Hook::Present(void* ptr)
 HRESULT Hook::PresentDx9Handler(IDirect3DDevice9* pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion)
 {
 	Present(pDevice);
-	return oPresent9(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);;
+	return oPresent9(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
 }
 
 HRESULT Hook::PresentDx11Handler(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
@@ -154,15 +154,6 @@ HRESULT Hook::PresentDx11Handler(IDXGISwapChain* pSwapChain, UINT SyncInterval, 
 	Present(pSwapChain);
 	return oPresent11(pSwapChain, SyncInterval, Flags);
 }
-
-// typedef void(*func_vkCmdDrawIndexed_t) (VkCommandBuffer commandBuffer, uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance);
-// func_vkCmdDrawIndexed_t ovkCmdDrawIndexed;
-
-// void hvkCmdDraw(VkCommandBuffer commandBuffer, uint32_t vertexCount, uint32_t instanceCount, uint32_t firstVertex, uint32_t firstInstance)
-// {
-
-// 	ovkCmdDrawIndexed(commandBuffer, vertexCount, instanceCount, firstVertex, firstInstance);
-// }
 
 // Thanks imring
 void Hook::ShowMouse(bool state)
@@ -173,7 +164,7 @@ void Hook::ShowMouse(bool state)
 		CPad::NewMouseControllerState.Y = 0;
 		patch::SetUChar(0x6194A0, 0xC3);
 
-		// Since Windowed mode by ThirteenAG hooks this too 
+		// Don't nop this, WindowedMode uses it
 		// patch::Nop(0x53F417, 5); // don't call CPad__getMouseState
 		patch::SetUChar(0x746ED0, 0xC3);
 
@@ -208,25 +199,26 @@ Hook::Hook()
 {
 	ImGui::CreateContext();
 
-	if (kiero::init(kiero::RenderType::D3D9) == kiero::Status::Success)
+	// gtaRenderHook
+	if (kiero::init(kiero::RenderType::D3D11) == kiero::Status::Success)
 	{
-		Globals::renderer = Render_DirectX9;
-		kiero::bind(16, (void**)&oReset9, Reset);
-		kiero::bind(17, (void**)&oPresent9, PresentDx9Handler);
+		Globals::renderer = Render_DirectX11;
+		kiero::bind(8, (void**)&oPresent11, PresentDx11Handler);
 	}
 	else
 	{
-		// gtaRenderHook
-		if (kiero::init(kiero::RenderType::D3D11) == kiero::Status::Success)
+		if (kiero::init(kiero::RenderType::D3D9) == kiero::Status::Success)
 		{
-			Globals::renderer = Render_DirectX11;
-			kiero::bind(8, (void**)&oPresent11, PresentDx11Handler);
+			Globals::renderer = Render_DirectX9;
+			kiero::bind(16, (void**)&oReset9, Reset);
+			kiero::bind(17, (void**)&oPresent9, PresentDx9Handler);
 		}
 	}
 }
 
 Hook::~Hook()
 {
+	SetWindowLongPtr(RsGlobal.ps->window, GWL_WNDPROC, (LRESULT)oWndProc);
 	ImGui_ImplDX9_Shutdown();
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();

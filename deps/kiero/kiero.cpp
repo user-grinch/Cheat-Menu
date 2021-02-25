@@ -1,8 +1,9 @@
-/* Slightly modified version of https://github.com/Rebzzel/kiero
+/* Modified version of https://github.com/Rebzzel/kiero
 
 MIT License
 
 Copyright(c) 2014 - 2020 Rebzzel
+Copyright(c) 2021 Grinch_
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files(the "Software"), to deal

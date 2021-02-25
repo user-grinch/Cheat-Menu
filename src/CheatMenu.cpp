@@ -3,32 +3,13 @@
 #include "MenuInfo.h"
 #include "Ui.h"
 
-unsortedMap CheatMenu::header{
+CallbackTable CheatMenu::header{
 	{ "Teleport", &Teleport::Draw },{ "Player", &Player::Draw },{ "Ped", &Ped::Draw },
 	{ "Animation", &Animation::Draw },{ "Vehicle", &Vehicle::Draw },{ "Weapon", &Weapon::Draw },
 	{ "Game", &Game::Draw },{ "Visual", &Visual::Draw },{ "Menu", &Menu::Draw }
 };
 
-void CheatMenu::DrawMenu()
-{
-	ImGui::SetNextWindowSize(Globals::menu_size);
-	if (ImGui::Begin(MENU_TITLE, &Globals::show_menu, ImGuiWindowFlags_NoCollapse))
-	{
-		ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(250, 350));
-		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetWindowWidth() / 85, ImGui::GetWindowHeight() / 200));
-
-		Ui::DrawHeaders(header);
-
-		Globals::menu_size = ImGui::GetWindowSize();
-		config.SetValue("window.sizeX", Globals::menu_size.x);
-		config.SetValue("window.sizeY", Globals::menu_size.y);
-
-		ImGui::PopStyleVar(2);
-		ImGui::End();
-	}
-}
-
-void CheatMenu::ProcessWindow()
+void CheatMenu::DrawWindow()
 {
 	ImGuiIO& io = ImGui::GetIO();
 
@@ -38,18 +19,61 @@ void CheatMenu::ProcessWindow()
 		if (Globals::show_menu || Menu::commands::show_menu)
 		{
 			if (Globals::show_menu)
-				DrawMenu();
+			{
+				ImGui::SetNextWindowSize(Globals::menu_size);
+				if (ImGui::Begin(MENU_TITLE, &Globals::show_menu, ImGuiWindowFlags_NoCollapse))
+				{
+					ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(250, 350));
+					ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetWindowWidth() / 85, ImGui::GetWindowHeight() / 200));
+
+					Ui::DrawHeaders(header);
+
+					Globals::menu_size = ImGui::GetWindowSize();
+					config.SetValue("window.sizeX", Globals::menu_size.x);
+					config.SetValue("window.sizeY", Globals::menu_size.y);
+
+					ImGui::PopStyleVar(2);
+					ImGui::End();
+				}
+			}
 			else
 				Menu::DrawShortcutsWindow();
 		}
 
-	Menu::ProcessOverlay();
+	Menu::DrawOverlay();
+}
+
+void CheatMenu::ProcessEvent()
+{
+	if (Globals::init_done && !FrontEndMenuManager.m_bMenuActive)
+	{
+		if (Ui::HotKeyPressed(hotkeys::menu_open))
+			Globals::show_menu = !Globals::show_menu;
+
+		if (Ui::HotKeyPressed(hotkeys::command_window))
+		{
+			if (Menu::commands::show_menu)
+			{
+				Menu::ProcessCommands();
+				strcpy(commands::input_buffer, "");
+			}
+			Menu::commands::show_menu = !Menu::commands::show_menu;
+		}
+
+		if (Hook::show_mouse != Globals::show_menu)
+		{
+			if (Hook::show_mouse) // Only write when the menu closes
+				config.WriteToDisk();
+
+			Hook::show_mouse = Globals::show_menu;
+		}
+	}
 }
 
 CheatMenu::CheatMenu()
 {
 	ApplyStyle();
-	Hook::window_callback = std::bind(&ProcessWindow);
+	Hook::window_callback = std::bind(&DrawWindow);
 
 	// Load menu settings
 	Globals::header_id = config.GetValue("window.id", std::string(""));
@@ -57,32 +81,12 @@ CheatMenu::CheatMenu()
 	Globals::menu_size.y = config.GetValue("window.sizeY", screen::GetScreenHeight() / 1.2f);
 	srand(CTimer::m_snTimeInMilliseconds);
 
-	Events::processScriptsEvent += []
-	{
-		if (Globals::init_done && !FrontEndMenuManager.m_bMenuActive)
-		{
-			if (Ui::HotKeyPressed(hotkeys::menu_open))
-				Globals::show_menu = !Globals::show_menu;
+	Events::processScriptsEvent += ProcessEvent;
+}
 
-			if (Ui::HotKeyPressed(hotkeys::command_window))
-			{
-				if (Menu::commands::show_menu)
-				{
-					Menu::ProcessCommands();
-					strcpy(commands::input_buffer, "");
-				}
-				Menu::commands::show_menu = !Menu::commands::show_menu;
-			}
-
-			if (Hook::show_mouse != Globals::show_menu)
-			{
-				if (Hook::show_mouse) // Only write when the menu closes
-					config.WriteToDisk();
-
-				Hook::show_mouse = Globals::show_menu;
-			}
-		}
-	};
+CheatMenu::~CheatMenu()
+{
+	Events::processScriptsEvent -= ProcessEvent;
 }
 
 void CheatMenu::ApplyStyle()
@@ -159,16 +163,20 @@ void CheatMenu::ApplyStyle()
 	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
 }
 
+void HasGameInit()
+{
+	Globals::game_init = true;
+}
+
 void MenuThread(void* param)
 {
-	// Wait till the game is initiallized
-	Events::initGameEvent.after += []()
-	{
-		Globals::game_init = true;
-	};
+	// Wait till the game is initialized
+	Events::initGameEvent.after += HasGameInit;
 
 	while (!Globals::game_init)
-		Sleep(500);
+		Sleep(1000);
+
+	Events::initGameEvent.after -= HasGameInit;
 
 	if (GetModuleHandle("SAMP.dll"))
 	{
@@ -185,10 +193,25 @@ void MenuThread(void* param)
 
 	flog << "Starting...\nVersion: " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: " GITHUB_LINK "\n\n" << std::endl;
 	CFastman92limitAdjuster::Init();
-	CheatMenu cheatmenu;
+	CheatMenu *menu = new CheatMenu;
 
 	while (true)
-		Sleep(5000);
+	{
+		Sleep(50);
+
+		if (KeyPressed(VK_TAB))
+			break;
+	}
+
+	delete menu;
+	Sleep(100);
+
+	// reset mouse patches
+	patch::SetUChar(0x6194A0, 0xE9);
+	patch::SetUChar(0x746ED0, 0xA1);
+	patch::SetRaw(0x53F41F, (void*)"\x85\xC0\x0F\x8C", 4); 
+	
+	FreeLibraryAndExitThread(NULL,0);
 }
 
 BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)

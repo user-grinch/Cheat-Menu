@@ -5,48 +5,52 @@
 VehicleExtendedData<Neon::NeonData> Neon::VehNeon;
 RwTexture* Neon::neon_texture = nullptr;
 
+
+void Neon::RenderEvent(CVehicle *pVeh)
+{
+	NeonData* data = &VehNeon.Get(pVeh);
+	if (data->neon_installed && !pVeh->IsUpsideDown())
+	{
+		CVector Pos = CModelInfo::GetModelInfo(pVeh->m_nModelIndex)->m_pColModel->m_boundBox.m_vecMin;
+		CVector center = pVeh->TransformFromObjectSpace(CVector(0.0f, 0.0f, 0.0f));
+		CVector up = pVeh->TransformFromObjectSpace(CVector(0.0f, -Pos.y - data->val, 0.0f)) - center;
+		CVector right = pVeh->TransformFromObjectSpace(CVector(Pos.x + data->val, 0.0f, 0.0f)) - center;
+		CShadows::StoreShadowToBeRendered(5, neon_texture, &center, up.x, up.y, right.x, right.y, 180, data->color.r, data->color.g, data->color.b, 2.0f, false, 1.0f, 0, true);
+
+		if (CTimer::m_snTimeInMilliseconds - data->timer > 150)
+		{
+			data->timer = CTimer::m_snTimeInMilliseconds;
+
+			if (data->pulsing)
+			{
+				if (data->val < 0.0f)
+					data->increment = true;
+
+				if (data->val > 0.3f)
+					data->increment = false;
+
+				if (data->increment)
+					data->val += 0.1f;
+				else
+					data->val -= 0.1f;
+			}
+		}
+	}
+}
+
 Neon::Neon()
 {
 	neon_texture = Util::LoadTextureFromPngFile(PLUGIN_PATH((char*)"CheatMenu\\vehicles\\neon_mask.png"));
 	if (!neon_texture)
-		flog << "WARN: Failed to load neon mask" << std::endl;
+		flog << "Failed to load neon mask" << std::endl;
 
-	Events::vehicleRenderEvent += [](CVehicle* pVeh)
-	{
-		NeonData* data = &VehNeon.Get(pVeh);
-		if (data->neon_installed && !pVeh->IsUpsideDown())
-		{
-			CVector Pos = CModelInfo::GetModelInfo(pVeh->m_nModelIndex)->m_pColModel->m_boundBox.m_vecMin;
-			CVector center = pVeh->TransformFromObjectSpace(CVector(0.0f, 0.0f, 0.0f));
-			CVector up = pVeh->TransformFromObjectSpace(CVector(0.0f, -Pos.y - data->val, 0.0f)) - center;
-			CVector right = pVeh->TransformFromObjectSpace(CVector(Pos.x + data->val, 0.0f, 0.0f)) - center;
-			CShadows::StoreShadowToBeRendered(5, neon_texture, &center, up.x, up.y, right.x, right.y, 180, data->color.r, data->color.g, data->color.b, 2.0f, false, 1.0f, 0, true);
-
-			if (CTimer::m_snTimeInMilliseconds - data->timer > 150)
-			{
-				data->timer = CTimer::m_snTimeInMilliseconds;
-
-				if (data->pulsing)
-				{
-					if (data->val < 0.0f)
-						data->increment = true;
-
-					if (data->val > 0.3f)
-						data->increment = false;
-
-					if (data->increment)
-						data->val += 0.1f;
-					else
-						data->val -= 0.1f;
-				}
-			}
-		}
-	};
+	Events::vehicleRenderEvent += RenderEvent;
 }
 
 Neon::~Neon()
 {
-	delete neon_texture;
+	Events::vehicleRenderEvent -= RenderEvent;
+	RwTextureDestroy(neon_texture);
 }
 
 bool Neon::IsNeonInstalled(CVehicle* pVeh)

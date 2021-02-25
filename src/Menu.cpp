@@ -87,7 +87,7 @@ Menu::Menu()
 	hotkeys::veh_instant_stop.key2 = config.GetValue("hotkey.veh_instant_stop.key2", VK_NONE);
 }
 
-void Menu::ProcessOverlay()
+void Menu::DrawOverlay()
 {
 	CPlayerPed* player = FindPlayerPed();
 	bool show_menu = overlay::coord || overlay::fps || overlay::loc_name ||

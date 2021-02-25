@@ -63,19 +63,15 @@
 #include "VKeys.h"
 
 // Globals
-typedef std::vector<std::pair<std::string, void(*)(void)>> unsortedMap;
+typedef std::vector<std::pair<std::string, void(*)()>> CallbackTable;
 using namespace plugin;
 namespace fs = std::filesystem;
 
 enum Renderer
 {
 	Render_DirectX9,
-	Render_DirectX10,
 	Render_DirectX11,
-	Render_DirectX12,
-	Render_OpenGL,
-	Render_Unknown,
-	Render_Vulkan,
+	Render_Unknown
 };
 
 struct Globals

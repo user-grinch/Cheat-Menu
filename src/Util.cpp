@@ -48,7 +48,7 @@ void Util::LoadTexturesInDirRecursive(const char* path, const char* file_ext, st
 			}
 			else
 			{
-				flog << "WARN: Failed to load " << p.path().stem().string() << std::endl;
+				flog << "Failed to load " << p.path().stem().string() << std::endl;
 				store_vec.pop_back();
 			}
 		}

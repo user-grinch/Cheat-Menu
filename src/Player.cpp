@@ -52,7 +52,7 @@ Player::Player()
 					if (file_name.size() < 9)
 						custom_skins::store_vec.push_back(file_name);
 					else
-						flog << "WARN: Custom Skin longer than 8 characters " << file_name << std::endl;
+						flog << "Custom Skin longer than 8 characters " << file_name << std::endl;
 				}
 			}
 		}
