@@ -2,9 +2,8 @@
 #include "Neon.h"
 #include "Util.h"
 
-VehicleExtendedData<Neon::NeonData> Neon::VehNeon;
+VehExtender<Neon::NeonData> Neon::VehNeon;
 RwTexture* Neon::neon_texture = nullptr;
-
 
 void Neon::RenderEvent(CVehicle *pVeh)
 {
@@ -48,7 +47,7 @@ Neon::Neon()
 }
 
 Neon::~Neon()
-{
+{	
 	Events::vehicleRenderEvent -= RenderEvent;
 	RwTextureDestroy(neon_texture);
 }

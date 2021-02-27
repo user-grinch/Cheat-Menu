@@ -17,6 +17,7 @@ set(DIRECTX9_SDK_DIR $ENV{DIRECTX9_SDK_DIR})
 ################################################################################
 add_subdirectory(deps)
 add_subdirectory(tests)
+add_subdirectory(tools)
 
 ################################################################################
 # Source groups

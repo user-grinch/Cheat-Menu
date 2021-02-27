@@ -171,12 +171,12 @@ void HasGameInit()
 void MenuThread(void* param)
 {
 	// Wait till the game is initialized
-	Events::initGameEvent.after += HasGameInit;
+	Events::processScriptsEvent += HasGameInit;
 
 	while (!Globals::game_init)
 		Sleep(1000);
 
-	Events::initGameEvent.after -= HasGameInit;
+	Events::processScriptsEvent -= HasGameInit;
 
 	if (GetModuleHandle("SAMP.dll"))
 	{
@@ -191,27 +191,28 @@ void MenuThread(void* param)
 		return;
 	}
 
-	flog << "Starting...\nVersion: " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: " GITHUB_LINK "\n\n" << std::endl;
+	flog << "Starting...\nVersion: " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: " GITHUB_LINK "\n" << std::endl;
 	CFastman92limitAdjuster::Init();
 	CheatMenu *menu = new CheatMenu;
 
 	while (true)
 	{
-		Sleep(50);
-
-		if (KeyPressed(VK_TAB))
+		Sleep(100);
+		if (KeyPressed(VK_LSHIFT) && KeyPressed(VK_BACK))
 			break;
 	}
 
 	delete menu;
 	Sleep(100);
+	CHud::SetHelpMessage("CheatMenu unloaded",false,false,false);
+	flog << "Unloaded" << std::endl;
 
 	// reset mouse patches
 	patch::SetUChar(0x6194A0, 0xE9);
 	patch::SetUChar(0x746ED0, 0xA1);
 	patch::SetRaw(0x53F41F, (void*)"\x85\xC0\x0F\x8C", 4); 
 	
-	FreeLibraryAndExitThread(NULL,0);
+	FreeLibraryAndExitThread(GetModuleHandle("CheatMenu.asi"),0);
 }
 
 BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)

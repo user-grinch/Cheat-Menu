@@ -22,7 +22,11 @@ CJson::CJson(const char* name)
 	else
 	{
 		data = "{}"_json;
-		flog << "File doesn't exist " << file_path << std::endl;
+
+		if (file_path.find("config"))
+			flog << "Creating config.json file" << std::endl;
+		else
+			flog << "Failed to locate file " << file_path << std::endl;
 	}
 }
 

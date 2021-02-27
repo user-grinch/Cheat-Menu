@@ -30,7 +30,7 @@
 
 std::vector<std::string> Paint::veh_nodes::names_vec{ "Default" };
 std::string Paint::veh_nodes::selected = "Default";
-VehicleExtendedData<Paint::VehData> Paint::vehdata;
+VehExtender<Paint::VehData> Paint::vehdata;
 
 std::map<std::string, std::shared_ptr<RwTexture>> Paint::textures;
 

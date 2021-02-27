@@ -23,7 +23,7 @@ private:
 		}
 	};
 
-	static VehicleExtendedData<NeonData> VehNeon;
+	static VehExtender<NeonData> VehNeon;
 
 public:
 	Neon();
