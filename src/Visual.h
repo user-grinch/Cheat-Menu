@@ -2,12 +2,17 @@
 class Visual
 {
 private:
-	static bool lock_weather;
-	static int weather_type_backup;
+	inline static bool lock_weather = false;
+	inline static int weather_type_backup = 0;
 
 	// Timecyc
-	static std::vector<std::string> weather_names;
-	static int timecyc_hour;
+	inline static int timecyc_hour = 8;
+	inline static std::vector<std::string> weather_names
+	{
+		"EXTRASUNNY LA","SUNNY LA","EXTRASUNNY SMOG LA","SUNNY SMOG LA","CLOUDY LA","SUNNY SF","EXTRASUNNY SF","CLOUDY SF","RAINY SF","FOGGY SF",
+		"SUNNY VEGAS","EXTRASUNNY VEGAS","CLOUDY VEGAS","EXTRASUNNY COUNTRYSIDE","SUNNY COUNTRYSIDE","CLOUDY COUNTRYSIDE","RAINY COUNTRYSIDE",
+		"EXTRASUNNY DESERT","SUNNY DESERT","SANDSTORM DESERT","UNDERWATER","EXTRACOLOURS 1","EXTRACOLOURS 2"
+	};
 
 	static void GenerateTimecycFile();
 	static int GetCurrentHourTimeId();

@@ -73,15 +73,15 @@ private:
 		void resetMaterialTexture(RpMaterial* material);
 	};
 
-	static VehExtender<VehData> vehdata;
+	inline static VehExtender<VehData> vehdata;
 
 protected:
 
-	static std::map<std::string, std::shared_ptr<RwTexture>> textures;
+	inline static std::map<std::string, std::shared_ptr<RwTexture>> textures;
 	struct veh_nodes
 	{
-		static std::vector<std::string> names_vec;
-		static std::string selected;
+		inline static std::vector<std::string> names_vec{ "Default" };
+		inline static std::string selected = "Default";
 	};
 
 	Paint();

@@ -5,7 +5,8 @@ class Ui
 {
 
 private:
-	static std::string current_hotkey;
+	inline static std::string current_hotkey = "";
+
 public:
 	struct NamedMemory {
 		std::string name;
@@ -30,6 +31,9 @@ public:
 		std::function<void(std::string&)> function;
 		std::string value;
 	};
+	inline static JsonPopUpData json_popup;
+	inline static ImgPopUpData img_popup;
+
 	static void CenterdText(const std::string& text);
 	static bool ColorButton(int color_id, std::vector<float>& color, ImVec2 size);
 	static bool CheckboxAddress(const char* label, const int addr = NULL, const char* hint = nullptr);

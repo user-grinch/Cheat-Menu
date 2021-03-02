@@ -10,11 +10,11 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 class Hook
 {
 private:
-	static WNDPROC oWndProc;
-	static f_Present11 oPresent11;
-	static f_Present9 oPresent9;
-	static f_Reset oReset9;
-	static bool mouse_visibility;
+	inline static WNDPROC oWndProc = NULL;
+	inline static f_Present11 oPresent11 = NULL;
+	inline static f_Present9 oPresent9 = NULL;
+	inline static f_Reset oReset9 = NULL;
+	inline static bool mouse_visibility = false;
 
 	static void CALLBACK Present(void* ptr);
 	static HRESULT CALLBACK PresentDx9Handler(IDirect3DDevice9* pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion);
@@ -24,8 +24,8 @@ private:
 	static void ShowMouse(bool state);
 
 protected:
-	static bool show_mouse;
-	static std::function<void()> window_callback;
+	inline static bool show_mouse = false;
+	inline static std::function<void()> window_callback = NULL;
 	Hook();
 	~Hook();
 };

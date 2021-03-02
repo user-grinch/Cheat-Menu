@@ -3,26 +3,6 @@
 #include "Ui.h"
 #include "Util.h"
 
-bool Animation::loop = false;
-bool Animation::secondary = false;
-char Animation::ifp_buffer[INPUT_BUFFER_SIZE] = "";
-char Animation::anim_buffer[INPUT_BUFFER_SIZE] = "";
-
-ImGuiTextFilter Animation::filter = "";
-std::vector<std::string> Animation::search_categories;
-std::string Animation::selected_item = "All";
-
-CJson Animation::json = CJson("animation");
-
-std::vector<std::string> fighting_vec{ "Default","Boxing","Kung fu","Kick Boxing","Punch Kick" };
-int fighting_selected = 0;
-
-std::vector<std::string> walking_vec{ "default", "man", "shuffle", "oldman", "gang1", "gang2",
-"oldfatman", "fatman", "jogger", "drunkman", "blindman", "swat", "woman", "shopping", "busywoman",
-"sexywoman", "pro", "oldwoman", "fatwoman", "jogwoman", "oldfatwoman", "skate" };
-
-std::string walking_selected = "default";
-
 Animation::Animation()
 {
 	json.LoadData(search_categories, selected_item);

@@ -5,25 +5,7 @@
 #include "Ui.h"
 #include "Util.h"
 
-bool Player::keep_position::state = false;
-CVector Player::keep_position::pos = CVector();
-bool Player::god_mode = false;
-int Player::body = 0;
-bool Player::aim_skin_changer = false;
-
-ImGuiTextFilter Player::filter = "";
-std::vector<std::string> Player::search_categories;
-std::vector<std::unique_ptr<TextureStructure>> Player::clothes_vec;
-std::string Player::selected_item = "All";
-bool Player::images_loaded = false;
-
-std::string Player::custom_skins::dir = paths::GetGameDirPathA() + std::string("\\modloader\\Custom Skins\\");
-std::vector<std::string> Player::custom_skins::store_vec;
-ImGuiTextFilter Player::custom_skins::filter = "";
-
-bool Player::modloader_installed = false;
-
-static void PlayerModelBrokenFix()
+inline static void PlayerModelBrokenFix()
 {
 	CPlayerPed* player = FindPlayerPed();
 

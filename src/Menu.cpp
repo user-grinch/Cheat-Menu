@@ -7,34 +7,6 @@
 #include "Ui.h"
 #include "Util.h"
 
-bool Menu::overlay::coord = false;
-bool Menu::overlay::fps = false;
-bool Menu::overlay::loc_name = false;
-bool Menu::overlay::transparent = false;
-bool Menu::overlay::veh_health = false;
-bool Menu::overlay::veh_speed = false;
-std::vector<std::string> Menu::overlay::pos_names{ "Custom", "Top left", "Top right", "Bottom left", "Bottom right" };
-int Menu::overlay::selected_pos = 4;
-float Menu::overlay::posX = NULL;
-float Menu::overlay::posY = NULL;
-
-HotKeyData Menu::hotkeys::aim_skin_changer{};
-HotKeyData Menu::hotkeys::freecam{};
-HotKeyData Menu::hotkeys::command_window{};
-HotKeyData Menu::hotkeys::flip_veh{};
-HotKeyData Menu::hotkeys::fix_veh{};
-HotKeyData Menu::hotkeys::free_cam_tp_player{ VK_RETURN,VK_RETURN };
-HotKeyData Menu::hotkeys::god_mode{};
-HotKeyData Menu::hotkeys::menu_open{};
-HotKeyData Menu::hotkeys::quick_ss{};
-HotKeyData Menu::hotkeys::quick_tp{};
-HotKeyData Menu::hotkeys::veh_engine{};
-HotKeyData Menu::hotkeys::veh_instant_start{};
-HotKeyData Menu::hotkeys::veh_instant_stop{};
-
-bool Menu::commands::show_menu = false;
-char Menu::commands::input_buffer[INPUT_BUFFER_SIZE] = "";
-
 Menu::Menu()
 {
 	// TODO: use structs

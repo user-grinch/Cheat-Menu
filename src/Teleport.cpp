@@ -7,23 +7,6 @@
 // FlA
 tRadarTrace* CRadar::ms_RadarTrace = reinterpret_cast<tRadarTrace *>(patch::GetPointer(0x5838B0 + 2));
 
-bool Teleport::insert_coord = false;
-bool Teleport::quick_teleport = false;
-char Teleport::input_buffer[INPUT_BUFFER_SIZE] = "";
-char Teleport::location_buffer[INPUT_BUFFER_SIZE] = "";
-
-CVector Teleport::STeleport::pos{ -1, -1, -1 };
-bool Teleport::STeleport::_bool = false;
-uint Teleport::STeleport::timer = 0;
-ImGuiTextFilter Teleport::filter = "";
-std::vector<std::string> Teleport::search_categories;
-std::string Teleport::selected_item = "All";
-
-uint quick_teleport_timer = 0;
-
-CJson Teleport::json = CJson("teleport");
-CJson Teleport::sprite_name_json = CJson("radar sprite");
-
 void Teleport::FetchRadarSpriteData()
 {
 	uint cur_timer = CTimer::m_snTimeInMilliseconds;

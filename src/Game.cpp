@@ -5,61 +5,8 @@
 #include "Util.h"
 #include "CIplStore.h"
 
-ImGuiTextFilter Game::filter = "";
-std::vector<std::string> Game::search_categories;
-std::string Game::selected_item = "All";
-std::vector<std::string> Game::day_names{ "Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday" };
-char Game::save_game_name[22] = "";
-
-CJson Game::json = CJson("mission");
-
-CJson Game::stat::json = CJson("stat");
-std::vector<std::string>  Game::stat::search_categories;
-std::string Game::stat::selected_item = "All";
-ImGuiTextFilter Game::stat::filter = "";
-
-bool Game::random_cheats::enable = false;
-int Game::random_cheats::enable_wait_time = 10;
-uint Game::random_cheats::timer = 0;
-std::string Game::random_cheats::enabled_cheats[92][2];
-
-bool Game::freecam::init_done = false;
-bool Game::freecam::enable = false;
-float Game::freecam::speed = 0.08f;
-float Game::freecam::tmouseX = 0;
-float Game::freecam::tmouseY = 0;
-float Game::freecam::mouseX = 0;
-float Game::freecam::mouseY = 0;
-int Game::freecam::hped = -1;
-float Game::freecam::fov = -1;
-CPed* Game::freecam::ped = nullptr;
-
-bool Game::hard_mode::state = false;
-float Game::hard_mode::prev_armour = 0.0f;
-float Game::hard_mode::prev_health = 0.0f;
-float Game::hard_mode::prev_max_health = 0.0f;
-float Game::hard_mode::prev_stamina = 0.0f;
-
-bool Game::disable_cheats = false;
-bool Game::disable_replay = false;
-bool Game::forbidden_area_wl = true;
-bool Game::freeze_mission_timer = false;
-bool Game::freeze_time = false;
-bool Game::keep_stuff = false;
-bool Game::solid_water = false;
-bool Game::ss_shortcut = false;
-bool Game::sync_time = false;
-
-uint Game::sync_time_timer = 0;
-
-uint Game::solid_water_object = 0;
-
-CJson Game::random_cheats::name_json = CJson("cheat name");
-
-static bool mission_warning_shown = false;
-
 // Thanks to aap
-void RealTimeClock(void)
+void Game::RealTimeClock()
 {
 	static int lastday;
 	time_t tmp = time(NULL);

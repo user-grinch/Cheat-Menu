@@ -6,26 +6,6 @@
 #include "CHudColours.h"
 #include "TimeCycle.h"
 
-
-bool Visual::lock_weather = false;
-int Visual::weather_type_backup = 0;
-int Visual::timecyc_hour = 8;
-
-std::vector<std::string> Visual::weather_names{
-"EXTRASUNNY LA","SUNNY LA","EXTRASUNNY SMOG LA","SUNNY SMOG LA","CLOUDY LA","SUNNY SF","EXTRASUNNY SF","CLOUDY SF","RAINY SF","FOGGY SF",
-"SUNNY VEGAS","EXTRASUNNY VEGAS","CLOUDY VEGAS","EXTRASUNNY COUNTRYSIDE","SUNNY COUNTRYSIDE","CLOUDY COUNTRYSIDE","RAINY COUNTRYSIDE",
-"EXTRASUNNY DESERT","SUNNY DESERT","SANDSTORM DESERT","UNDERWATER","EXTRACOLOURS 1","EXTRACOLOURS 2"
-};
-
-// Let's just use our own variables
-static float radar_posX;
-static float radar_posY;
-static float radar_width = 76.0f;
-static float radar_height = 104.0f;
-static CHudColour health_bar;
-//static CHudColour armour_bar;
-static bool init_patches = false;
-
 Visual::Visual()
 {
 	if (GetModuleHandle("timecycle24.asi"))
@@ -226,17 +206,17 @@ void Visual::Draw()
 		}
 		if (ImGui::BeginTabItem("Menus"))
 		{
+			static bool init_patches = false;
+			static float radar_posX = *(float*)*(int*)0x5834D4;
+			static float radar_posY = *(float*)*(int*)0x583500;
+			static float radar_width = *(float*)*(int*)0x5834C2;
+			static float radar_height = *(float*)*(int*)0x5834F6;
+			static CHudColour health_bar = HudColour.m_aColours[0];
 
 			if (!init_patches)
 			{
 				// read those values from game
 				health_bar = HudColour.m_aColours[0];
-				//armour_bar = HudColour.m_aColours[4];
-
-				radar_posX = *(float*)*(int*)0x5834D4;
-				radar_posY = *(float*)*(int*)0x583500;
-				radar_height = *(float*)*(int*)0x5834F6;
-				radar_width = *(float*)*(int*)0x5834C2;
 				
 				// patch radar stuff oof
 				patch::SetPointer(0x5834D4, &radar_posX);
@@ -262,7 +242,6 @@ void Visual::Draw()
 				patch::SetPointer(0x58A99D, &radar_width);
  
 				patch::SetPointer(0x589331, &health_bar);
-				//patch::SetPointer(0x5890FC,&armour_bar);
 				init_patches = true;
 			}
 

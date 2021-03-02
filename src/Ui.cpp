@@ -1,11 +1,6 @@
 #include "pch.h"
 #include "Ui.h"
 
-std::string Ui::current_hotkey = "";
-
-static Ui::JsonPopUpData json_popup;
-static Ui::ImgPopUpData img_popup;
-
 bool Ui::ListBox(const char* label, std::vector<std::string>& all_items, int& selected)
 {
 	bool rtn = false;

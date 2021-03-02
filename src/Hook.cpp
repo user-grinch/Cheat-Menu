@@ -2,16 +2,6 @@
 #include "kiero/kiero.h"
 #include "kiero/minhook/MinHook.h"
 
-WNDPROC Hook::oWndProc = NULL;
-f_Present11 Hook::oPresent11 = NULL;
-f_Present9 Hook::oPresent9 = NULL;
-f_Reset Hook::oReset9 = NULL;
-
-bool Hook::mouse_visibility = false;
-bool Hook::show_mouse = false;
-
-std::function<void()> Hook::window_callback = NULL;
-
 LRESULT Hook::WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);

@@ -2,9 +2,6 @@
 #include "Neon.h"
 #include "Util.h"
 
-VehExtender<Neon::NeonData> Neon::VehNeon;
-RwTexture* Neon::neon_texture = nullptr;
-
 void Neon::RenderEvent(CVehicle *pVeh)
 {
 	NeonData* data = &VehNeon.Get(pVeh);

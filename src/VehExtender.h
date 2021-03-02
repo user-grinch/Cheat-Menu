@@ -5,25 +5,43 @@
 #pragma once
 #include <vector>
 #include "CVehicle.h"
+#include "Events.h"
 
 template <class T>
 class VehExtender
 {
-public:
-    VehExtender(){};
-    VehExtender(const VehExtender&) = delete;
-    
-    T& Get(CVehicle *veh)
-    {
-        static std::vector<std::pair<CVehicle*,T>> data;
+private:
+    inline static std::vector<std::pair<CVehicle*,T>> data;
 
+public:
+    static void RemoveVehEntry(CVehicle *pVeh)
+    {
         for (auto it = data.begin(); it < data.end(); ++it)
         {
-            if (it->first == veh)
+            if (it->first == pVeh)
+                data.erase(it);
+        }
+    }
+
+    VehExtender()
+    {
+        plugin::Events::vehicleCtorEvent.after += RemoveVehEntry;
+    }
+    ~VehExtender()
+    {
+        plugin::Events::vehicleCtorEvent.after -= RemoveVehEntry;
+    }
+    VehExtender(const VehExtender&) = delete;
+    
+    T& Get(CVehicle *pVeh)
+    {
+        for (auto it = data.begin(); it < data.end(); ++it)
+        {
+            if (it->first == pVeh)
                 return it->second;
         }
 
-        data.push_back({veh, T(veh)});
+        data.push_back({pVeh, T(pVeh)});
         return data.back().second;
     }
 };

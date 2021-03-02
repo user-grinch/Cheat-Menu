@@ -3,12 +3,6 @@
 #include "MenuInfo.h"
 #include "Ui.h"
 
-CallbackTable CheatMenu::header{
-	{ "Teleport", &Teleport::Draw },{ "Player", &Player::Draw },{ "Ped", &Ped::Draw },
-	{ "Animation", &Animation::Draw },{ "Vehicle", &Vehicle::Draw },{ "Weapon", &Weapon::Draw },
-	{ "Game", &Game::Draw },{ "Visual", &Visual::Draw },{ "Menu", &Menu::Draw }
-};
-
 void CheatMenu::DrawWindow()
 {
 	ImGuiIO& io = ImGui::GetIO();

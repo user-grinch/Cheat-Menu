@@ -5,29 +5,37 @@
 class Ped
 {
 private:
-	static ImGuiTextFilter filter;
-	static std::string selected_item;
-	static std::vector<std::string> search_categories;
-	static std::vector<std::unique_ptr<TextureStructure>> peds_vec;
-	static bool images_loaded;
+	inline static ImGuiTextFilter filter = "";
+	inline static std::string selected_item = "All";
+	inline static std::vector<std::string> search_categories;
+	inline static std::vector<std::unique_ptr<TextureStructure>> peds_vec;
+	inline static bool images_loaded = false;
 
-	static CJson ped_json;
-	static CJson pedspecial_json;
+	inline static CJson ped_json = CJson("ped");
+	inline static CJson pedspecial_json = CJson("ped special");
 
-	static std::vector<std::string> gang_names;
-	static bool exgangwars_installed;
-
-	static int ped_remove_radius;
+	inline static std::vector<std::string> gang_names = 
+	{
+		"Ballas", "Grove street families", "Los santos vagos", "San fierro rifa",
+		"Da nang boys", "Mafia", "Mountain cloud triad", "Varrio los aztecas", "Gang9", "Gang10" 
+	};
+	inline static bool exgangwars_installed = false;
+	inline static int ped_remove_radius = 5;
 
 	struct spawn_ped {
-		static std::vector<CPed*> list;
-		static int accuracy;
-		static int health;
-		static bool dont_move;
-		static bool ped_bleed;
-		static std::vector<std::string> ped_type;
-		static int selected_ped_type;
-		static int weapon_id;
+		inline static std::vector<CPed*> list;
+		inline static int accuracy = 50;
+		inline static int health = 100;
+		inline static bool dont_move = false;
+		inline static bool ped_bleed = false;
+		inline static std::vector<std::string> ped_type = 
+		{ 
+			"Civ male","Civ female","Cop","Ballas","Grove Street Families","Los Santos Vagos",
+			"San Fierro Rifa","Da Nang Boys","Mafia","Mountain Cloud Triads","Varrio Los Aztecas",
+			"Gang 9","Medic","Dealer","Criminal","Fireman","Prostitute" 
+		};
+		inline static int selected_ped_type;
+		inline static int weapon_id = 0;
 	};
 
 	friend class Player;

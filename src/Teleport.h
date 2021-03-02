@@ -5,23 +5,24 @@
 class Teleport
 {
 private:
-	static bool insert_coord;
-	static bool quick_teleport;
-	static char input_buffer[INPUT_BUFFER_SIZE];
-	static CJson json;
-	static ImGuiTextFilter filter;
-	static std::vector<std::string> search_categories;
-	static std::string selected_item;
-	static char location_buffer[INPUT_BUFFER_SIZE];
-
+	inline static bool insert_coord = false;
+	inline static bool quick_teleport = false;
+	inline static char input_buffer[INPUT_BUFFER_SIZE] = "";
+	inline static CJson json = CJson("teleport");
+	inline static ImGuiTextFilter filter = "";
+	inline static std::vector<std::string> search_categories;
+	inline static std::string selected_item = "All";
+	inline static char location_buffer[INPUT_BUFFER_SIZE] = "";
+	inline static uint quick_teleport_timer = 0;
+	
 	struct STeleport
 	{
-		static bool _bool;
-		static CVector pos;
-		static uint timer;
+		inline static bool _bool = false;
+		inline static CVector pos = { -1, -1, -1 };
+		inline static uint timer = 0;
 	};
 
-	static CJson sprite_name_json;
+	inline static CJson sprite_name_json = CJson("radar sprite");
 
 	/*
 		Generates radar sprite coordinates on the fly.

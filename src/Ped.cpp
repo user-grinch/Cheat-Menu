@@ -3,32 +3,6 @@
 #include "Ui.h"
 #include "Util.h"
 
-ImGuiTextFilter Ped::filter = "";
-std::string Ped::selected_item = "All";
-std::vector<std::string> Ped::search_categories;
-std::vector<std::unique_ptr<TextureStructure>> Ped::peds_vec;
-bool Ped::images_loaded = false;
-
-CJson Ped::ped_json = CJson("ped");
-CJson Ped::pedspecial_json = CJson("ped special");
-
-std::vector<std::string> Ped::gang_names = { "Ballas", "Grove street families", "Los santos vagos", "San fierro rifa",
-"Da nang boys", "Mafia", "Mountain cloud triad", "Varrio los aztecas", "Gang9", "Gang10" };
-
-bool Ped::exgangwars_installed = false;
-int Ped::ped_remove_radius = 5;
-
-std::vector<CPed*> Ped::spawn_ped::list;
-int Ped::spawn_ped::accuracy = 50;
-int Ped::spawn_ped::health = 100;
-int Ped::spawn_ped::selected_ped_type = 0;
-bool Ped::spawn_ped::dont_move = false;
-bool Ped::spawn_ped::ped_bleed = false;
-int Ped::spawn_ped::weapon_id = 0;
-
-std::vector<std::string> Ped::spawn_ped::ped_type = { "Civ male","Civ female","Cop","Ballas","Grove Street Families","Los Santos Vagos",
-											"San Fierro Rifa","Da Nang Boys","Mafia","Mountain Cloud Triads","Varrio Los Aztecas",
-											"Gang 9","Medic","Dealer","Criminal","Fireman","Prostitute" };
 Ped::Ped()
 {
 	if (GetModuleHandle("ExGangWars.asi"))

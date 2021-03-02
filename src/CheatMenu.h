@@ -21,7 +21,12 @@
 class CheatMenu : Hook, Animation, Game, Menu, Ped, Player, Teleport, Vehicle, Visual, Weapon
 {
 private:
-	static CallbackTable header;
+	inline static CallbackTable header
+	{
+		{ "Teleport", &Teleport::Draw },{ "Player", &Player::Draw },{ "Ped", &Ped::Draw },
+		{ "Animation", &Animation::Draw },{ "Vehicle", &Vehicle::Draw },{ "Weapon", &Weapon::Draw },
+		{ "Game", &Game::Draw },{ "Visual", &Visual::Draw },{ "Menu", &Menu::Draw }
+	};
 
 	static void ApplyStyle();
 	static void DrawWindow();

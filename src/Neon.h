@@ -3,8 +3,6 @@
 class Neon
 {
 private:
-	static RwTexture* neon_texture;
-
 	class NeonData {
 	public:
 		CRGBA color;
@@ -22,8 +20,9 @@ private:
 			increment = true;
 		}
 	};
-
-	static VehExtender<NeonData> VehNeon;
+	
+	inline static RwTexture* neon_texture = nullptr;
+	inline static VehExtender<NeonData> VehNeon;
 
 public:
 	Neon();

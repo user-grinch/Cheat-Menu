@@ -2,42 +2,7 @@
 #include "Weapon.h"
 #include "Ui.h"
 #include "Util.h"
-
-ImGuiTextFilter Weapon::filter = "";
-std::string Weapon::selected_item = "All";
-std::vector<std::string> Weapon::search_categories;
-std::vector<std::unique_ptr<TextureStructure>> Weapon::weapon_vec;
-bool Weapon::images_loaded = false;
-
-CJson Weapon::weapon_json = CJson("weapon");
-bool Weapon::auto_aim = false;
-bool Weapon::fast_reload = false;
-bool Weapon::huge_damage = false;
-bool Weapon::long_range = false;
-bool Weapon::rapid_fire = false;
-bool Weapon::dual_weild = false;
-bool Weapon::move_aim = false;
-bool Weapon::move_fire = false;
-
-uchar Weapon::cur_weapon_slot = -1;
-int Weapon::ammo_count = 99999;
-
-int Weapon::selected_gang = 0;
-int Weapon::selected_weapon_count = 0;
-
-int Weapon::gang_weapons[10][3] =
-{
-	{WEAPON_PISTOL, WEAPON_MICRO_UZI, WEAPON_UNARMED },		// Ballas
-	{WEAPON_PISTOL, WEAPON_UNARMED, WEAPON_UNARMED},		// Grove
-	{WEAPON_PISTOL, WEAPON_UNARMED, WEAPON_UNARMED},		// Vagos
-	{WEAPON_UNARMED, WEAPON_UNARMED, WEAPON_UNARMED},		// SF Rifa
-	{WEAPON_PISTOL, WEAPON_MICRO_UZI, WEAPON_UNARMED},		// Da Nang Boys
-	{WEAPON_DESERT_EAGLE , WEAPON_UNARMED, WEAPON_UNARMED},	// Mafia
-	{WEAPON_PISTOL, WEAPON_AK47, WEAPON_UNARMED},			// Triads
-	{WEAPON_PISTOL, WEAPON_MICRO_UZI, WEAPON_UNARMED},		// VLA
-	{WEAPON_UNARMED, WEAPON_UNARMED, WEAPON_UNARMED},		// Gang 9
-	{WEAPON_UNARMED, WEAPON_UNARMED, WEAPON_UNARMED},		// Gang 10
-};
+#include "Ped.h"
 
 Weapon::Weapon()
 {

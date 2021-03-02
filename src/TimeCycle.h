@@ -1,5 +1,3 @@
-#include "plugin.h"
-
 uchar* m_nDirectionalMult = (uchar*)0x55F7C7;		 //m_nDirectionalMult[184]
 
 uchar* m_nWaterFogAlpha = (uchar*)0x55F7B8;			 //m_nWaterFogAlpha[184]

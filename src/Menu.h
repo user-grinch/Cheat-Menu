@@ -5,38 +5,38 @@ class Menu
 private:
 	struct overlay
 	{
-		static bool coord;
-		static bool fps;
-		static bool loc_name;
-		static bool transparent;
-		static bool veh_health;
-		static bool veh_speed;
-		static std::vector<std::string> pos_names;
-		static int selected_pos;
-		static float posX;
-		static float posY;
+		inline static bool coord = false;
+		inline static bool fps = false;
+		inline static bool loc_name = false;
+		inline static bool transparent = false;
+		inline static bool veh_health = false;
+		inline static bool veh_speed = false;
+		inline static std::vector<std::string> pos_names = { "Custom", "Top left", "Top right", "Bottom left", "Bottom right" };
+		inline static int selected_pos = 4; // TODO: Create Enum
+		inline static float posX = 0.0f;
+		inline static float posY = 0.0f;
 	};
 public:
 	struct hotkeys
 	{
-		static HotKeyData aim_skin_changer;
-		static HotKeyData freecam;
-		static HotKeyData command_window;
-		static HotKeyData fix_veh;
-		static HotKeyData flip_veh;
-		static HotKeyData free_cam_tp_player;
-		static HotKeyData god_mode;
-		static HotKeyData menu_open;
-		static HotKeyData quick_ss;
-		static HotKeyData quick_tp;
-		static HotKeyData veh_engine;
-		static HotKeyData veh_instant_start;
-		static HotKeyData veh_instant_stop;
+		inline static HotKeyData aim_skin_changer;
+		inline static HotKeyData freecam;
+		inline static HotKeyData command_window;
+		inline static HotKeyData fix_veh;
+		inline static HotKeyData flip_veh;
+		inline static HotKeyData free_cam_tp_player{VK_RETURN,VK_RETURN};
+		inline static HotKeyData god_mode;
+		inline static HotKeyData menu_open;
+		inline static HotKeyData quick_ss;
+		inline static HotKeyData quick_tp;
+		inline static HotKeyData veh_engine;
+		inline static HotKeyData veh_instant_start;
+		inline static HotKeyData veh_instant_stop;
 	};
 	struct commands
 	{
-		static bool show_menu;
-		static char input_buffer[INPUT_BUFFER_SIZE];
+		inline static bool show_menu = false;
+		inline static char input_buffer[INPUT_BUFFER_SIZE] = "";
 	};
 
 	Menu();

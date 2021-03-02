@@ -58,7 +58,7 @@
 #include "imgui/imgui_impl_dx11.h"
 #include "imgui/imgui_impl_win32.h"
 
-#include "Events.h"
+#include "MoreEvents.h"
 #include "Json.h"
 #include "VKeys.h"
 #include "VehExtender.h"
@@ -77,15 +77,18 @@ enum Renderer
 
 struct Globals
 {
-	static std::string header_id;
-	static ImVec2 menu_size;
-	static ImVec2 screen_size;
-	static bool show_menu;
-	static bool init_done;
-	static bool game_init;
-	static Renderer renderer;
-	static void* device;
+	inline static std::string header_id = "";
+	inline static ImVec2 menu_size = ImVec2(screen::GetScreenWidth() / 4, screen::GetScreenHeight() / 1.2);
+	inline static ImVec2 screen_size = ImVec2(-1, -1);
+	inline static bool show_menu = false;
+	inline static bool init_done = false;
+	inline static bool game_init = false;
+	inline static Renderer renderer = Render_Unknown;
+	inline static void* device = nullptr;
 };
+
+inline static std::ofstream flog = std::ofstream("CheatMenu.log");
+inline static CJson config = CJson("config");
 
 struct TextureStructure
 {
@@ -100,6 +103,3 @@ struct HotKeyData
 	int key2;
 	bool is_down = false;
 };
-
-extern CJson config;
-extern std::ofstream flog;
