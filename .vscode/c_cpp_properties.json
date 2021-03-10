@@ -11,6 +11,7 @@
                 "${PLUGIN_SDK_DIR}/shared/game"
             ],
             "defines": [
+                "CONSOLE=std::cout",
                 "GTASA",
                 "_DEBUG",
                 "UNICODE",

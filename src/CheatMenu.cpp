@@ -2,6 +2,7 @@
 #include "CheatMenu.h"
 #include "MenuInfo.h"
 #include "Ui.h"
+#include "Updater.h"
 
 void CheatMenu::DrawWindow()
 {
@@ -184,7 +185,7 @@ void MenuThread(void* param)
 		MessageBox(RsGlobal.ps->window, "SilentPatch isn't installed. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
 		return;
 	}
-
+	
 	flog << "Starting...\nVersion: " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: " GITHUB_LINK "\n" << std::endl;
 	CFastman92limitAdjuster::Init();
 	CheatMenu *menu = new CheatMenu;
@@ -194,6 +195,12 @@ void MenuThread(void* param)
 		Sleep(100);
 		if (KeyPressed(VK_LSHIFT) && KeyPressed(VK_BACK))
 			break;
+		
+		if (Updater::state == UPDATER_CHECKING)
+		{
+			Updater::CheckForUpdates();
+			Updater::state = UPDATER_IDLE;
+		}
 	}
 
 	delete menu;
@@ -212,7 +219,7 @@ void MenuThread(void* param)
 BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
 {
 	if (nReason == DLL_PROCESS_ATTACH)
-	{
+	{	
 		uint gameVersion = GetGameVersion();
 		if (gameVersion == GAME_10US_HOODLUM || gameVersion == GAME_10US_COMPACT)
 			CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)&MenuThread, NULL, NULL, NULL);

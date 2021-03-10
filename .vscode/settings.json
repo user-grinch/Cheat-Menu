@@ -76,7 +76,10 @@
         "thread": "cpp",
         "trampoline.h": "c",
         "minhook.h": "c",
-        "*.rh": "cpp"
+        "*.rh": "cpp",
+        "bit": "cpp",
+        "stop_token": "cpp",
+        "iostream": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "C_Cpp.intelliSenseEngineFallback": "Enabled"

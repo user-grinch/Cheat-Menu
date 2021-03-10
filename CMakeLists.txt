@@ -52,6 +52,8 @@ set(src_files
     "src/Teleport.h"
     "src/Ui.cpp"
     "src/Ui.h"
+    "src/Updater.h"
+    "src/Updater.cpp"
     "src/Util.cpp"
     "src/Util.h"
     "src/Vehicle.cpp"
@@ -175,6 +177,7 @@ d3dx9
 d3d11
 d3dx11
 XInput9_1_0
+urlmon
 Depend
 )
 

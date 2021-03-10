@@ -16,6 +16,7 @@
 #include <fstream>
 #include <functional>
 #include <memory>
+#include <iostream>
 #include <sstream>
 #include <vector>
 #include <windows.h>
@@ -87,8 +88,8 @@ struct Globals
 	inline static void* device = nullptr;
 };
 
-inline static std::ofstream flog = std::ofstream("CheatMenu.log");
-inline static CJson config = CJson("config");
+extern std::ofstream flog;
+extern CJson config;
 
 struct TextureStructure
 {

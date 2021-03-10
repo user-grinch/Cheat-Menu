@@ -1,31 +1,10 @@
-#include "plugin.h"
-#include "CHud.h"
+#include <windows.h>
 
-using namespace plugin;
-
-void DoStuff();
-
-class Test
+BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
 {
-public:
-    
-    Test()
-    {   
-        Events::processScriptsEvent += DoStuff;
-    }
-    ~Test()
-    {   
-        Events::processScriptsEvent -= DoStuff;
-    }
-} test;
+	if (nReason == DLL_PROCESS_ATTACH)
+		MessageBox(NULL, "SilentPatch isn't installed. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
+	
 
-void DoStuff()
-{
-    CHud::SetMessage((char*)"Test");
-
-    if (KeyPressed(VK_TAB))
-    {
-        test.~Test();
-    }
+	return TRUE;
 }
-

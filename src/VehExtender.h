@@ -11,25 +11,28 @@ template <class T>
 class VehExtender
 {
 private:
-    inline static std::vector<std::pair<CVehicle*,T>> data;
+    inline static std::vector<std::pair<CVehicle*,T>> data{};
 
 public:
     static void RemoveVehEntry(CVehicle *pVeh)
     {
-        for (auto it = data.begin(); it < data.end(); ++it)
+        for (auto it = data.begin(); it != data.end(); it++)
         {
             if (it->first == pVeh)
+            {
                 data.erase(it);
+                break;
+            }
         }
     }
 
     VehExtender()
     {
-        plugin::Events::vehicleCtorEvent.after += RemoveVehEntry;
+        plugin::Events::vehicleDtorEvent.before += RemoveVehEntry;
     }
     ~VehExtender()
     {
-        plugin::Events::vehicleCtorEvent.after -= RemoveVehEntry;
+        plugin::Events::vehicleDtorEvent.before -= RemoveVehEntry;
     }
     VehExtender(const VehExtender&) = delete;
     

@@ -6,6 +6,7 @@
 #include "Vehicle.h"
 #include "Ui.h"
 #include "Util.h"
+#include "Updater.h"
 
 Menu::Menu()
 {
@@ -433,12 +434,20 @@ void Menu::Draw()
 		{
 			ImGui::Spacing();
 
-			if (ImGui::Button("Discord server", ImVec2(Ui::GetSize(2))))
+			if (ImGui::Button("Check update", ImVec2(Ui::GetSize(3))))
+			{	
+				if (Updater::state == UPDATER_IDLE)
+					Updater::state = UPDATER_CHECKING;
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Discord server", ImVec2(Ui::GetSize(3))))
 				ShellExecute(NULL, "open", DISCORD_INVITE, NULL, NULL, SW_SHOWNORMAL);
 
 			ImGui::SameLine();
 
-			if (ImGui::Button("GitHub repo", ImVec2(Ui::GetSize(2))))
+			if (ImGui::Button("GitHub repo", ImVec2(Ui::GetSize(3))))
 				ShellExecute(NULL, "open", GITHUB_LINK, NULL, NULL, SW_SHOWNORMAL);
 
 			ImGui::Spacing();
@@ -451,7 +460,7 @@ void Menu::Draw()
 				ImGui::Text((std::string("Version: ") + MENU_VERSION).c_str());
 
 				ImGui::NextColumn();
-				ImGui::Text(std::string("Imgui: " + std::string(ImGui::GetVersion())).c_str());
+				ImGui::Text(std::string("ImGui: " + std::string(ImGui::GetVersion())).c_str());
 				ImGui::Text((std::string("Build: ") + BUILD_NUMBER).c_str());
 
 				ImGui::Columns(1);
