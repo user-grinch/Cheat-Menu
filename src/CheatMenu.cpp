@@ -21,6 +21,33 @@ void CheatMenu::DrawWindow()
 					ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(250, 350));
 					ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetWindowWidth() / 85, ImGui::GetWindowHeight() / 200));
 
+					if (Updater::state == UPDATER_UPDATE_FOUND)
+					{
+						ImGui::Button("New version is available",Ui::GetSize());
+
+						if (ImGui::Button("Changelog",Ui::GetSize(3)))
+							ShellExecute(NULL, "open", 
+							std::string("https://github.com/user-grinch/Cheat-Menu/releases/tag/" + 
+							Updater::latest_version).c_str(), NULL, NULL, SW_SHOWNORMAL);
+							
+						ImGui::SameLine();
+						if (ImGui::Button("Download",Ui::GetSize(3)))
+							Updater::state = UPDATER_DOWNLOADING;
+
+						ImGui::SameLine();
+						if (ImGui::Button("Hide",Ui::GetSize(3)))
+							Updater::state = UPDATER_IDLE;
+					}
+
+					if (Updater::state == UPDATER_DOWNLOADING)
+						ImGui::Button("Downloading update...",Ui::GetSize());
+
+					if (Updater::state == UPDATER_DOWNLOADED)
+					{
+						if (ImGui::Button("Update downloaded. Click to install.",Ui::GetSize()))
+							Updater::state = UPDATER_IDLE;
+					}
+						
 					Ui::DrawHeaders(header);
 
 					Globals::menu_size = ImGui::GetWindowSize();
@@ -197,10 +224,10 @@ void MenuThread(void* param)
 			break;
 		
 		if (Updater::state == UPDATER_CHECKING)
-		{
 			Updater::CheckForUpdates();
-			Updater::state = UPDATER_IDLE;
-		}
+		
+		if (Updater::state == UPDATER_DOWNLOADING)
+			Updater::DownloadUpdate();
 	}
 
 	delete menu;
