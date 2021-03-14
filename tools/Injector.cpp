@@ -42,7 +42,7 @@ int main()
         procId = GetProcId(procName);
         Sleep(30);
     }
-
+   
     HANDLE hProc = OpenProcess(PROCESS_ALL_ACCESS, 0, procId);
 
     if (hProc && hProc != INVALID_HANDLE_VALUE)

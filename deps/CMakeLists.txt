@@ -39,6 +39,9 @@ set(depend_files
     "kiero/minhook/trampoline.c"
     "kiero/minhook/hde/hde32.c"
     "kiero/minhook/trampoline.c"
+    "zip/miniz.h"
+    "zip/zip.h"
+    "zip/zip.c"
 )
 
 add_library(${PROJECT_NAME} STATIC ${depend_files})

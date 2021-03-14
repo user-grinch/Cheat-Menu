@@ -45,7 +45,7 @@ void CheatMenu::DrawWindow()
 					if (Updater::state == UPDATER_DOWNLOADED)
 					{
 						if (ImGui::Button("Update downloaded. Click to install.",Ui::GetSize()))
-							Updater::state = UPDATER_IDLE;
+							Updater::state = UPDATER_INSTALLING;
 					}
 						
 					Ui::DrawHeaders(header);
@@ -224,23 +224,36 @@ void MenuThread(void* param)
 			break;
 		
 		if (Updater::state == UPDATER_CHECKING)
-			Updater::CheckForUpdates();
+			Updater::CheckForUpdate();
 		
 		if (Updater::state == UPDATER_DOWNLOADING)
 			Updater::DownloadUpdate();
+
+		if (Updater::state == UPDATER_INSTALLING)
+		{
+			Updater::InstallUpdate();
+			break;
+		}
 	}
 
 	delete menu;
-	Sleep(100);
-	CHud::SetHelpMessage("CheatMenu unloaded",false,false,false);
-	flog << "Unloaded" << std::endl;
 
 	// reset mouse patches
 	patch::SetUChar(0x6194A0, 0xE9);
 	patch::SetUChar(0x746ED0, 0xA1);
 	patch::SetRaw(0x53F41F, (void*)"\x85\xC0\x0F\x8C", 4); 
-	
-	FreeLibraryAndExitThread(GetModuleHandle("CheatMenu.asi"),0);
+
+	if (Updater::state == UPDATER_INSTALLING)
+	{
+   		CHud::SetHelpMessage("Install complete, restarting menu!",false,false,false);
+		Updater::FinishUpdate();
+	}
+	else
+	{
+		CHud::SetHelpMessage("CheatMenu unloaded",false,false,false);
+		FreeLibraryAndExitThread(GetModuleHandle("CheatMenu.asi"),0);
+		FreeLibraryAndExitThread(GetModuleHandle("CheatMenuNew.asi"),0);
+	}
 }
 
 BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)

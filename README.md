@@ -17,8 +17,6 @@ Cheat menu for Grand Theft Auto SanAndreas which allows a large set of modificat
 
 Get stable binaries from [here](https://github.com/user-grinch/Cheat-Menu/releases). Beta binaries are available at the discord server.
 
-A portuguese translation of the menu is [here](https://github.com/Dowglass/Cheat-Menu)
-
 ## Installation
 
 1. Install [DirectX9](https://www.microsoft.com/en-us/download/details.aspx?id=35) &  [Visual C++ Redistributable 2019 x86](hhttps://aka.ms/vs/16/release/vc_redist.x86.exe) if not already installed.
@@ -34,6 +32,7 @@ You'll need to install Visual Studio 2019 (v142), [DirectX9 SDK](https://www.mic
 2. [Kiero](https://github.com/Rebzzel/kiero)
 3. [MinHook](https://github.com/TsudaKageyu/minhook)
 4. [Plugin SDK](https://github.com/DK22Pac/plugin-sdk)
+5. [Zip](https://github.com/kuba--/zip)
 
 ## Images
 <details>
