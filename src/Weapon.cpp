@@ -63,6 +63,7 @@ Weapon::Weapon()
 
 Weapon::~Weapon()
 {
+	Util::ReleaseTextures(Weapon::weapon_vec);
 }
 
 void Weapon::SetGangWeapon(std::string& weapon_type)

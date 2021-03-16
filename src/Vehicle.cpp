@@ -152,6 +152,13 @@ Vehicle::Vehicle()
 	};
 }
 
+Vehicle::~Vehicle()
+{
+	Util::ReleaseTextures(spawner::image_vec);
+	Util::ReleaseTextures(tune::image_vec);
+	Util::ReleaseTextures(texture9::image_vec);
+}
+
 void Vehicle::AddComponent(const std::string& component, const bool display_message)
 {
 	try {
@@ -502,11 +509,6 @@ int Vehicle::GetModelFromName(const char* name)
 	else
 		return 0;
 }
-
-Vehicle::~Vehicle()
-{
-}
-
 
 void Vehicle::GenerateHandlingDataFile(int phandling)
 {

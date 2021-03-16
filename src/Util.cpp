@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "Util.h"
-#include "imgui/stb_image.h"
+#include "../deps/imgui/stb_image.h"
 
 void Util::ClearCharTasksVehCheck(CPed* ped)
 {
@@ -23,6 +23,20 @@ void Util::ClearCharTasksVehCheck(CPed* ped)
 	}
 }
 
+void Util::ReleaseTextures(std::vector<std::unique_ptr<TextureStructure>> &store_vec)
+{	
+	// for (auto &it : store_vec)
+	// {
+	// 	if (Globals::renderer == Render_DirectX9)
+	// 	{
+	// 		reinterpret_cast<IDirect3DTexture9*>(it->texture)->Release();
+	// 		it->texture = nullptr;
+	// 	}
+	// 	else
+	// 		reinterpret_cast<ID3D11ShaderResourceView*>(it->texture)->Release();
+	// }
+}
+
 void Util::LoadTexturesInDirRecursive(const char* path, const char* file_ext, std::vector<std::string>& category_vec, std::vector<std::unique_ptr<TextureStructure>>& store_vec)
 {
 	std::string folder = "";
@@ -32,10 +46,10 @@ void Util::LoadTexturesInDirRecursive(const char* path, const char* file_ext, st
 		{
 			store_vec.push_back(std::make_unique<TextureStructure>());
 			HRESULT hr = -1;
+
 			if (Globals::renderer == Render_DirectX9)
 				hr = D3DXCreateTextureFromFileA(GetD3DDevice(), p.path().string().c_str(), reinterpret_cast<PDIRECT3DTEXTURE9*>(&store_vec.back().get()->texture));
-
-			if (Globals::renderer == Render_DirectX11)
+			else
 			{
 				if (LoadTextureFromFileDx11(p.path().string().c_str(), reinterpret_cast<ID3D11ShaderResourceView**>(&store_vec.back().get()->texture)))
 					hr = S_OK;
@@ -236,11 +250,4 @@ RwTexture* Util::LoadTextureFromPngFile(fs::path path)
 	RwTexture* texture = CreateRwTextureFromRwImage(image);
 	path.stem().string().copy(texture->name, sizeof(texture->name) - 1);
 	return texture;
-}
-
-void Util::UnloadTexture(RwTexture* texture)
-{
-	if (!texture)
-		return;
-	RwTextureDestroy(texture);
 }

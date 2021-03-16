@@ -116,6 +116,11 @@ Player::Player()
 	};
 }
 
+Player::~Player()
+{
+	Util::ReleaseTextures(clothes_vec);
+}
+
 void Player::ChangePlayerCloth(std::string& name)
 {
 	std::stringstream ss(name);

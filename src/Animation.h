@@ -22,7 +22,6 @@ private:
 
 protected:
 	Animation();
-	~Animation() {};
 
 public:
 	static void Draw();

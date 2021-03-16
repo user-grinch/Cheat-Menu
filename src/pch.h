@@ -52,12 +52,12 @@
 #include "eVehicleClass.h"
 #include "extensions/Paths.h"
 
-#include "fla/IDaccess.h"
-#include "imgui/imgui.h"
-#include "imgui/imgui_internal.h"
-#include "imgui/imgui_impl_dx9.h"
-#include "imgui/imgui_impl_dx11.h"
-#include "imgui/imgui_impl_win32.h"
+#include "../deps/fla/IDaccess.h"
+#include "../deps/imgui/imgui.h"
+#include "../deps/imgui/imgui_internal.h"
+#include "../deps/imgui/imgui_impl_dx9.h"
+#include "../deps/imgui/imgui_impl_dx11.h"
+#include "../deps/imgui/imgui_impl_win32.h"
 
 #include "MoreEvents.h"
 #include "Json.h"
@@ -84,6 +84,7 @@ struct Globals
 	inline static bool show_menu = false;
 	inline static bool init_done = false;
 	inline static bool game_init = false;
+	inline static bool menu_closing = false;
 	inline static Renderer renderer = Render_Unknown;
 	inline static void* device = nullptr;
 };

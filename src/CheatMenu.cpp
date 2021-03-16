@@ -22,33 +22,9 @@ void CheatMenu::DrawWindow()
 					ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetWindowWidth() / 85, ImGui::GetWindowHeight() / 200));
 
 					if (Updater::state == UPDATER_UPDATE_FOUND)
-					{
-						ImGui::Button("New version is available",Ui::GetSize());
-
-						if (ImGui::Button("Changelog",Ui::GetSize(3)))
-							ShellExecute(NULL, "open", 
-							std::string("https://github.com/user-grinch/Cheat-Menu/releases/tag/" + 
-							Updater::latest_version).c_str(), NULL, NULL, SW_SHOWNORMAL);
-							
-						ImGui::SameLine();
-						if (ImGui::Button("Download",Ui::GetSize(3)))
-							Updater::state = UPDATER_DOWNLOADING;
-
-						ImGui::SameLine();
-						if (ImGui::Button("Hide",Ui::GetSize(3)))
-							Updater::state = UPDATER_IDLE;
-					}
-
-					if (Updater::state == UPDATER_DOWNLOADING)
-						ImGui::Button("Downloading update...",Ui::GetSize());
-
-					if (Updater::state == UPDATER_DOWNLOADED)
-					{
-						if (ImGui::Button("Update downloaded. Click to install.",Ui::GetSize()))
-							Updater::state = UPDATER_INSTALLING;
-					}
-						
-					Ui::DrawHeaders(header);
+						Updater::ShowUpdateScreen();
+					else
+						Ui::DrawHeaders(header);
 
 					Globals::menu_size = ImGui::GetWindowSize();
 					config.SetValue("window.sizeX", Globals::menu_size.x);
@@ -216,44 +192,47 @@ void MenuThread(void* param)
 	flog << "Starting...\nVersion: " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: " GITHUB_LINK "\n" << std::endl;
 	CFastman92limitAdjuster::Init();
 	CheatMenu *menu = new CheatMenu;
-
+	Updater::CheckForUpdate();
+	
 	while (true)
 	{
-		Sleep(100);
-		if (KeyPressed(VK_LSHIFT) && KeyPressed(VK_BACK))
-			break;
+		Sleep(5000);
+		// if (KeyPressed(VK_LSHIFT) && KeyPressed(VK_BACK))
+		// 	break;
 		
 		if (Updater::state == UPDATER_CHECKING)
 			Updater::CheckForUpdate();
 		
-		if (Updater::state == UPDATER_DOWNLOADING)
-			Updater::DownloadUpdate();
+		// if (Updater::state == UPDATER_DOWNLOADING)
+		// 	Updater::DownloadUpdate();
 
-		if (Updater::state == UPDATER_INSTALLING)
-		{
-			Updater::InstallUpdate();
-			break;
-		}
+		// if (Updater::state == UPDATER_INSTALLING)
+		// {
+		// 	Updater::InstallUpdate();
+		// 	break;
+		// }
 	}
 
-	delete menu;
+	// Globals::menu_closing = true;
+	// Sleep(500);
+	// delete menu;
 
-	// reset mouse patches
-	patch::SetUChar(0x6194A0, 0xE9);
-	patch::SetUChar(0x746ED0, 0xA1);
-	patch::SetRaw(0x53F41F, (void*)"\x85\xC0\x0F\x8C", 4); 
+	// // reset mouse patches
+	// patch::SetUChar(0x6194A0, 0xE9);
+	// patch::SetUChar(0x746ED0, 0xA1);
+	// patch::SetRaw(0x53F41F, (void*)"\x85\xC0\x0F\x8C", 4); 
 
-	if (Updater::state == UPDATER_INSTALLING)
-	{
-   		CHud::SetHelpMessage("Install complete, restarting menu!",false,false,false);
-		Updater::FinishUpdate();
-	}
-	else
-	{
-		CHud::SetHelpMessage("CheatMenu unloaded",false,false,false);
-		FreeLibraryAndExitThread(GetModuleHandle("CheatMenu.asi"),0);
-		FreeLibraryAndExitThread(GetModuleHandle("CheatMenuNew.asi"),0);
-	}
+	// if (Updater::state == UPDATER_INSTALLING)
+	// {
+   	// 	CHud::SetHelpMessage("Install complete, restarting menu!",false,false,false);
+	// 	Updater::FinishUpdate();
+	// }
+	// else
+	// {
+	// 	CHud::SetHelpMessage("CheatMenu unloaded",false,false,false);
+	// 	FreeLibraryAndExitThread(GetModuleHandle("CheatMenu.asi"),0);
+	// 	FreeLibraryAndExitThread(GetModuleHandle("CheatMenuNew.asi"),0);
+	// }
 }
 
 BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)

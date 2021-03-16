@@ -35,7 +35,7 @@ HRESULT Hook::Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentat
 
 void Hook::Present(void* ptr)
 {
-	if (!ImGui::GetCurrentContext())
+	if (!ImGui::GetCurrentContext() || Globals::menu_closing)
 		return;
 
 	ImGuiIO& io = ImGui::GetIO();

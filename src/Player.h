@@ -26,6 +26,7 @@ private:
 
 public:
 	Player();
+	~Player();
 	static void ChangePlayerCloth(std::string& model);
 	static void ChangePlayerModel(std::string& model);
 	static void Draw();

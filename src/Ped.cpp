@@ -20,6 +20,7 @@ Ped::Ped()
 
 Ped::~Ped()
 {
+	Util::ReleaseTextures(peds_vec);
 	for (CPed* ped : spawn_ped::list)
 	{
 		CWorld::Remove(ped);

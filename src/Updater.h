@@ -15,9 +15,10 @@ class Updater
 public:
    inline static UPDATER_STATE state = UPDATER_IDLE;
    inline static std::string latest_version = "";
-   // TODO: fix memory leak
+   
    static void CheckForUpdate();
-   static void DownloadUpdate();
-   static void InstallUpdate();
-   static void FinishUpdate();
+   // static void DownloadUpdate();
+   // static void InstallUpdate();
+   // static void FinishUpdate();
+   static void ShowUpdateScreen();
 };

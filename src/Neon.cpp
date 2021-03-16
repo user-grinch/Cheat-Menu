@@ -46,7 +46,12 @@ Neon::Neon()
 Neon::~Neon()
 {	
 	Events::vehicleRenderEvent -= RenderEvent;
-	RwTextureDestroy(neon_texture);
+
+	if (neon_texture)
+	{
+		RwTextureDestroy(neon_texture);
+		neon_texture = nullptr;
+	}
 }
 
 bool Neon::IsNeonInstalled(CVehicle* pVeh)
