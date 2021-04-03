@@ -28,9 +28,12 @@ Visual::~Visual()
 }
 
 // Thanks to GuruGuru
-int Visual::GetCurrentHourTimeId()
-{
-	int hour = CClock::ms_nGameClockHours;
+int Visual::GetCurrentHourTimeId(int hour)
+{	
+	if (hour == -1)
+	{
+		hour = CClock::ms_nGameClockHours;
+	}
 
 	if (timecyc_hour == 24)
 		return hour;
@@ -95,6 +98,12 @@ bool Visual::TimeCycColorEdit4(const char* label, uchar *r, uchar *g, uchar *b, 
 
 	return rtn;
 }
+template<typename T>
+inline int GetTCVal(T *addr, int index)
+{
+	T *arr = (T*)patch::GetPointer(int(addr));
+	return int(arr[index]);
+}
 
 void Visual::GenerateTimecycFile()
 {
@@ -132,37 +141,37 @@ void Visual::GenerateTimecycFile()
 
 			int val = 23 * j + i;
 
-			file << "\t" << +m_nAmbientRed[val] << " " << +m_nAmbientGreen[val] << " " << +m_nAmbientBlue[val] << " \t\t"
+			file << "\t" << GetTCVal(m_nAmbientRed,val) << " " << GetTCVal(m_nAmbientGreen,val) << " " << GetTCVal(m_nAmbientBlue,val) << " \t\t"
 
-				<< "\t" << +m_nAmbientRed_Obj[val] << " " << +m_nAmbientGreen_Obj[val] << " " << +m_nAmbientBlue_Obj[val] << " \t\t"
+				<< "\t" << GetTCVal(m_nAmbientRed_Obj,val) << " " << GetTCVal(m_nAmbientGreen_Obj,val) << " " << GetTCVal(m_nAmbientBlue_Obj,val) << " \t\t"
 
 				<< "\t255 255 255\t\t" // unused
 
-				<< "\t" << +m_nSkyTopRed[val] << " " << +m_nSkyTopGreen[val] << " " << +m_nSkyTopBlue[val] << " \t\t"
+				<< "\t" << GetTCVal(m_nSkyTopRed,val) << " " << GetTCVal(m_nSkyTopGreen,val) << " " << GetTCVal(m_nSkyTopBlue,val) << " \t\t"
 
-				<< "\t" << +m_nSkyBottomRed[val] << " " << +m_nSkyBottomGreen[val] << " " << +m_nSkyBottomBlue[val] << " \t\t"
+				<< "\t" << GetTCVal(m_nSkyBottomRed,val) << " " << GetTCVal(m_nSkyBottomGreen,val) << " " << GetTCVal(m_nSkyBottomBlue,val) << " \t\t"
 
-				<< "\t" << +m_nSunCoreRed[val] << " " << +m_nSunCoreGreen[val] << " " << +m_nSunCoreBlue[val] << " \t\t"
+				<< "\t" << GetTCVal(m_nSunCoreRed,val) << " " << GetTCVal(m_nSunCoreGreen,val) << " " << GetTCVal(m_nSunCoreBlue,val) << " \t\t"
 
-				<< "\t" << +m_nSunCoronaRed[val] << " " << +m_nSunCoronaGreen[val] << " " << +m_nSunCoronaBlue[val] << " \t\t"
+				<< "\t" << GetTCVal(m_nSunCoronaRed,val) << " " << GetTCVal(m_nSunCoronaGreen,val) << " " << GetTCVal(m_nSunCoronaBlue,val) << " \t\t"
 
-				<< "\t" << (+m_fSunSize[val] - 0.5f) / 10.0f << " " << (+m_fSpriteSize[val] - 0.5f) / 10.0f << " " << (+m_fSpriteBrightness[val] - 0.5f) / 10.0f << " \t\t"
+				<< "\t" << (GetTCVal(m_fSunSize,val) - 0.5f) / 10.0f << " " << (GetTCVal(m_fSpriteSize,val) - 0.5f) / 10.0f << " " << (GetTCVal(m_fSpriteBrightness,val) - 0.5f) / 10.0f << " \t\t"
 
-				<< "\t" << +m_nShadowStrength[val] << " " << +m_nLightShadowStrength[val] << " " << +m_nPoleShadowStrength[val] << " \t\t"
+				<< "\t" << GetTCVal(m_nShadowStrength,val) << " " << GetTCVal(m_nLightShadowStrength,val) << " " << GetTCVal(m_nPoleShadowStrength,val) << " \t\t"
 
-				<< "\t" << +m_fFarClip[val] << " " << +m_fFogStart[val] << " " << (+m_fLightsOnGroundBrightness[val] - 0.5) / 10.0f << " \t\t"
+				<< "\t" << GetTCVal(m_fFarClip,val) << " " << GetTCVal(m_fFogStart,val) << " " << (GetTCVal(m_fLightsOnGroundBrightness,val) - 0.5) / 10.0f << " \t\t"
 
-				<< "\t" << +m_nLowCloudsRed[val] << " " << +m_nLowCloudsGreen[val] << " " << +m_nLowCloudsBlue[val] << " \t\t"
+				<< "\t" << GetTCVal(m_nLowCloudsRed,val) << " " << GetTCVal(m_nLowCloudsGreen,val) << " " << GetTCVal(m_nLowCloudsBlue,val) << " \t\t"
 
-				<< "\t" << +m_nFluffyCloudsBottomRed[val] << " " << +m_nFluffyCloudsBottomGreen[val] << " " << +m_nFluffyCloudsBottomBlue[val] << " \t\t"
+				<< "\t" << GetTCVal(m_nFluffyCloudsBottomRed,val) << " " <<GetTCVal(m_nFluffyCloudsBottomGreen,val) << " " << GetTCVal(m_nFluffyCloudsBottomBlue,val) << " \t\t"
 
-				<< "\t" << +m_fWaterRed[val] << " " << +m_fWaterGreen[val] << " " << +m_fWaterBlue[val] << " " << +m_fWaterAlpha[val] << " \t\t"
+				<< "\t" << GetTCVal(m_fWaterRed,val) << " " << GetTCVal(m_fWaterGreen,val) << " " << GetTCVal(m_fWaterBlue,val) << " " << GetTCVal(m_fWaterAlpha,val) << " \t\t"
 
-				<< "\t" << +m_fPostFx1Alpha[val] << " " << +m_fPostFx1Red[val] << " " << +m_fPostFx1Green[val] << " " << +m_fPostFx1Blue[val] << " \t\t"
+				<< "\t" << GetTCVal(m_fPostFx1Alpha,val) << " " << GetTCVal(m_fPostFx1Red,val) << " " << GetTCVal(m_fPostFx1Green,val) << " " << GetTCVal(m_fPostFx1Blue,val) << " \t\t"
 
-				<< "\t" << +m_fPostFx2Alpha[val] << " " << +m_fPostFx2Red[val] << " " << +m_fPostFx2Green[val] << " " << +m_fPostFx2Blue[val] << " \t\t"
+				<< "\t" << GetTCVal(m_fPostFx2Alpha,val) << " " << GetTCVal(m_fPostFx2Red,val) << " " << GetTCVal(m_fPostFx2Green,val) << " " << GetTCVal(m_fPostFx2Blue,val) << " \t\t"
 
-				<< "\t" << +m_fCloudAlpha[val] << " " << +m_nHighLightMinIntensity[val] << " " << +m_nWaterFogAlpha[val] << " " << +m_nDirectionalMult[val] / 100.0 << " \t\t" << std::endl;
+				<< "\t" << GetTCVal(m_fCloudAlpha,val) << " " << GetTCVal(m_nHighLightMinIntensity,val) << " " << GetTCVal(m_nWaterFogAlpha,val) << " " << GetTCVal(m_nDirectionalMult,val) / 100.0 << " \t\t" << std::endl;
 		}
 	}
 }

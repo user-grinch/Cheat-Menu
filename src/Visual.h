@@ -15,7 +15,7 @@ private:
 	};
 
 	static void GenerateTimecycFile();
-	static int GetCurrentHourTimeId();
+	static int GetCurrentHourTimeId(int hour = -1);
 	static bool TimeCycColorEdit3(const char* label, uchar* r, uchar* g, uchar* b, ImGuiColorEditFlags flags = 0);
 	static bool TimeCycColorEdit4(const char* label, uchar* r, uchar* g, uchar* b, uchar* a, ImGuiColorEditFlags flags = 0);
 	template<typename T>
