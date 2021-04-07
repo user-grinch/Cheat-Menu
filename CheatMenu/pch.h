@@ -83,7 +83,6 @@ struct Globals
 	inline static ImVec2 screen_size = ImVec2(-1, -1);
 	inline static bool show_menu = false;
 	inline static bool init_done = false;
-	inline static bool game_init = false;
 	inline static bool menu_closing = false;
 	inline static Renderer renderer = Render_Unknown;
 	inline static void* device = nullptr;

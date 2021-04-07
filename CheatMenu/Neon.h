@@ -1,4 +1,5 @@
 #pragma once
+#include "extender\VehicleExtender.h"
 
 class Neon
 {
@@ -21,6 +22,7 @@ private:
 		}
 	};
 	
+	inline static bool mask_loaded = false;
 	inline static RwTexture* neon_texture = nullptr;
 	inline static VehExtender<NeonData> VehNeon;
 

@@ -73,6 +73,7 @@ private:
 		void resetMaterialTexture(RpMaterial* material);
 	};
 
+	inline static bool images_loaded = false;
 	inline static VehExtender<VehData> vehdata;
 
 protected:

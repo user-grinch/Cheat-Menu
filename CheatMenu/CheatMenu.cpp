@@ -161,20 +161,10 @@ void CheatMenu::ApplyStyle()
 	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
 }
 
-void HasGameInit()
-{
-	Globals::game_init = true;
-}
-
 void MenuThread(void* param)
 {
 	// Wait till the game is initialized
-	Events::processScriptsEvent += HasGameInit;
-
-	while (!Globals::game_init)
-		Sleep(1000);
-
-	Events::processScriptsEvent -= HasGameInit;
+	Sleep(3000);
 
 	if (GetModuleHandle("SAMP.dll"))
 	{

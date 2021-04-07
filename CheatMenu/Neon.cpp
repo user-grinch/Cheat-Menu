@@ -36,10 +36,18 @@ void Neon::RenderEvent(CVehicle *pVeh)
 
 Neon::Neon()
 {
-	neon_texture = Util::LoadTextureFromPngFile(PLUGIN_PATH((char*)"CheatMenu\\vehicles\\neon_mask.png"));
-	if (!neon_texture)
-		flog << "Failed to load neon mask" << std::endl;
+	Events::processScriptsEvent += [this]
+	{
+		if (!mask_loaded)
+		{
+			neon_texture = Util::LoadTextureFromPngFile(PLUGIN_PATH((char*)"CheatMenu\\vehicles\\neon_mask.png"));
+			if (!neon_texture)
+				flog << "Failed to load neon mask" << std::endl;
 
+			mask_loaded = true;
+		}
+	};
+	
 	Events::vehicleRenderEvent += RenderEvent;
 }
 

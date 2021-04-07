@@ -6,3 +6,5 @@ build/
 CheatMenu/json/versioninfo.json
 /Release
 /CheatMenu/.obj/GTASA/Release
+/Debug
+/CheatMenu/.obj/GTASA/Debug

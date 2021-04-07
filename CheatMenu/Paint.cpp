@@ -86,14 +86,21 @@ void Paint::ResetAfterRenderEvent(CVehicle* pVeh)
 
 Paint::Paint()
 {
-	for (auto& p : fs::recursive_directory_iterator(PLUGIN_PATH((char*)"\\CheatMenu\\vehicles\\paintjobs\\")))
+	Events::processScriptsEvent += [this]
 	{
-		if (p.path().extension() == ".png")
+		if (!images_loaded)
 		{
-			std::string file_name = p.path().stem().string();
-			textures[file_name] = std::make_shared<RwTexture>(*(Util::LoadTextureFromPngFile(p.path())));
+			for (auto& p : fs::recursive_directory_iterator(PLUGIN_PATH((char*)"\\CheatMenu\\vehicles\\paintjobs\\")))
+			{
+				if (p.path().extension() == ".png")
+				{
+					std::string file_name = p.path().stem().string();
+					textures[file_name] = std::make_shared<RwTexture>(*(Util::LoadTextureFromPngFile(p.path())));
+				}
+			}
+			images_loaded = true;
 		}
-	}
+	};
 
 	Events::vehicleRenderEvent.before += RenderEvent;
 	Events::vehicleResetAfterRender += ResetAfterRenderEvent;

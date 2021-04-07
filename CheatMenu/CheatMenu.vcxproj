@@ -99,25 +99,82 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Animation.cpp" />
-    <ClCompile Include="CheatMenu.cpp" />
-    <ClCompile Include="Game.cpp" />
-    <ClCompile Include="Hook.cpp" />
-    <ClCompile Include="Json.cpp" />
-    <ClCompile Include="Menu.cpp" />
-    <ClCompile Include="MoreEvents.cpp" />
-    <ClCompile Include="Neon.cpp" />
-    <ClCompile Include="Paint.cpp" />
-    <ClCompile Include="pch.cpp" />
-    <ClCompile Include="Ped.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="Teleport.cpp" />
-    <ClCompile Include="Ui.cpp" />
-    <ClCompile Include="Updater.cpp" />
-    <ClCompile Include="Util.cpp" />
-    <ClCompile Include="Vehicle.cpp" />
-    <ClCompile Include="Visual.cpp" />
-    <ClCompile Include="Weapon.cpp" />
+    <ClCompile Include="Animation.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="CheatMenu.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Game.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Hook.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Json.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Menu.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="MoreEvents.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Neon.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Paint.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Ped.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Teleport.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Ui.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Updater.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Util.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Vehicle.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Visual.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Weapon.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='GTASA Release|Win32'">pch.h</PrecompiledHeaderFile>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animation.h" />

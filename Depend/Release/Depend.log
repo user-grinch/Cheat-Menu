@@ -26,6 +26,5 @@ C:\Users\Grinch_\source\repos\CheatMenu\Depend\zip\zip.c(1329,34): warning C4244
 C:\Users\Grinch_\source\repos\CheatMenu\Depend\zip\zip.c(1332,17): warning C4244: '-=': conversion from 'mz_uint64' to 'mz_uint32', possible loss of data
 C:\Users\Grinch_\source\repos\CheatMenu\Depend\zip\zip.c(1336,49): warning C4244: '=': conversion from 'mz_uint64' to 'size_t', possible loss of data
 d3d11.lib(d3d11.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in d3d9.lib(d3d9.dll); second definition ignored
-XInput9_1_0.lib(XINPUT9_1_0.dll) : warning LNK4006: _DllMain@12 already defined in MSVCRT.LIB(dll_dllmain_stub.obj); second definition ignored
 XInput9_1_0.lib(XINPUT9_1_0.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in d3d9.lib(d3d9.dll); second definition ignored
   Depend.vcxproj -> C:\Users\Grinch_\source\repos\CheatMenu\Release\Depend.lib
