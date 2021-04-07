@@ -4,3 +4,5 @@ build/
 .gitignore
 .vscode/BROWSE.VC.DB
 CheatMenu/json/versioninfo.json
+/Release
+/CheatMenu/.obj/GTASA/Release
