@@ -193,9 +193,9 @@ void Player::ChangePlayerModel(std::string& model)
 
 void Player::Draw()
 {
-	static CPlayerPed* player = FindPlayerPed();
-	static int hplayer = CPools::GetPedRef(player);
-	static CPad* pad = player->GetPadFromPlayer();
+	CPlayerPed* player = FindPlayerPed();
+	int hplayer = CPools::GetPedRef(player);
+	CPad* pad = player->GetPadFromPlayer();
 
 	if (ImGui::Button("Copy coordinates", ImVec2(Ui::GetSize(2))))
 	{

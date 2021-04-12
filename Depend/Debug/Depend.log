@@ -1,4 +1,7 @@
-﻿  imgui.cpp
+﻿  IDaccess.cpp
+  Library.cpp
+  Main.cpp
+  imgui.cpp
   imgui_demo.cpp
   imgui_draw.cpp
   imgui_impl_dx11.cpp
@@ -6,7 +9,24 @@
   imgui_impl_win32.cpp
   imgui_tables.cpp
   imgui_widgets.cpp
+  kiero.cpp
+  Generating Code...
+  buffer.c
+  hde32.c
+  hook.c
+  trampoline.c
+  zip.c
+C:\Work\Cheat-Menu\Depend\zip\miniz.h(6104,45): warning C4244: 'return': conversion from 'mz_uint64' to 'mz_uint', possible loss of data
+C:\Work\Cheat-Menu\Depend\zip\zip.c(1252,32): warning C4244: 'function': conversion from 'const mz_uint64' to 'size_t', possible loss of data
+C:\Work\Cheat-Menu\Depend\zip\zip.c(1260,33): warning C4244: 'function': conversion from 'const mz_uint64' to 'size_t', possible loss of data
+C:\Work\Cheat-Menu\Depend\zip\zip.c(1270,55): warning C4244: 'function': conversion from 'const mz_int64' to 'size_t', possible loss of data
+C:\Work\Cheat-Menu\Depend\zip\zip.c(1320,52): warning C4244: 'function': conversion from 'mz_uint64' to 'size_t', possible loss of data
+C:\Work\Cheat-Menu\Depend\zip\zip.c(1321,33): warning C4244: 'function': conversion from 'mz_uint64' to 'size_t', possible loss of data
+C:\Work\Cheat-Menu\Depend\zip\zip.c(1324,17): warning C4244: '-=': conversion from 'mz_uint64' to 'mz_uint32', possible loss of data
+C:\Work\Cheat-Menu\Depend\zip\zip.c(1329,34): warning C4244: 'function': conversion from 'mz_uint64' to 'size_t', possible loss of data
+C:\Work\Cheat-Menu\Depend\zip\zip.c(1332,17): warning C4244: '-=': conversion from 'mz_uint64' to 'mz_uint32', possible loss of data
+C:\Work\Cheat-Menu\Depend\zip\zip.c(1336,49): warning C4244: '=': conversion from 'mz_uint64' to 'size_t', possible loss of data
   Generating Code...
 d3d11.lib(d3d11.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in d3d9.lib(d3d9.dll); second definition ignored
 XInput9_1_0.lib(XINPUT9_1_0.dll) : warning LNK4006: __NULL_IMPORT_DESCRIPTOR already defined in d3d9.lib(d3d9.dll); second definition ignored
-  Depend.vcxproj -> C:\Users\Grinch_\source\repos\CheatMenu\Debug\Depend.lib
+  Depend.vcxproj -> C:\Work\Cheat-Menu\Debug\Depend.lib
