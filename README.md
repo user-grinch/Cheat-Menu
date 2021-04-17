@@ -22,7 +22,7 @@ Get stable binaries from [here](https://github.com/user-grinch/Cheat-Menu/releas
 1. Install [DirectX9](https://www.microsoft.com/en-us/download/details.aspx?id=35) &  [Visual C++ Redistributable 2019 x86](hhttps://aka.ms/vs/16/release/vc_redist.x86.exe) if not already installed.
 2. If your game version isn't v1.0 then you'll need to [downgrade](https://gtaforums.com/topic/927016-san-andreas-downgrader/).
 3. Install [asi loader](https://www.gtagarage.com/mods/show.php?id=21709) & [silent patch](https://gtaforums.com/topic/669045-silentpatch/)
-4. Download CheatMenu and extract everything in game directory (replace if necessary).
+4. Download **CheatMenu.7z** and extract everything in game directory (replace if necessary).
 
 ## Building
 You'll need to install Visual Studio 2019 (v142), [DirectX9 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=6812) & [Plugin SDK](https://github.com/DK22Pac/plugin-sdk).
