@@ -30,10 +30,10 @@ HRESULT Hook::Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentat
 {
 	ImGui_ImplDX9_InvalidateDeviceObjects();
 
-	return oReset9(pDevice, pPresentationParameters);
+	return oReset(pDevice, pPresentationParameters);
 }
 
-void Hook::Present(void* ptr)
+void Hook::RenderFrame(void* ptr)
 {
 	if (!ImGui::GetCurrentContext() || Globals::menu_closing)
 		return;
@@ -127,21 +127,22 @@ void Hook::Present(void* ptr)
 
 		io.IniFilename = NULL;
 		io.LogFilename = NULL;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad && ImGuiConfigFlags_NavEnableKeyboard;
 
 		style.WindowTitleAlign = ImVec2(0.5, 0.5);
 		oWndProc = (WNDPROC)SetWindowLongPtr(RsGlobal.ps->window, GWL_WNDPROC, (LRESULT)WndProc);
 	}
 }
 
-HRESULT Hook::PresentDx9Handler(IDirect3DDevice9* pDevice, RECT* pSourceRect, RECT* pDestRect, HWND hDestWindowOverride, RGNDATA* pDirtyRegion)
+HRESULT Hook::Dx9Handler(IDirect3DDevice9* pDevice)
 {
-	Present(pDevice);
-	return oPresent9(pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
+	RenderFrame(pDevice);
+	return oEndScene(pDevice);
 }
 
-HRESULT Hook::PresentDx11Handler(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
+HRESULT Hook::Dx11Handler(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
-	Present(pSwapChain);
+	RenderFrame(pSwapChain);
 	return oPresent11(pSwapChain, SyncInterval, Flags);
 }
 
@@ -193,15 +194,15 @@ Hook::Hook()
 	if (kiero::init(kiero::RenderType::D3D11) == kiero::Status::Success)
 	{
 		Globals::renderer = Render_DirectX11;
-		kiero::bind(8, (void**)&oPresent11, PresentDx11Handler);
+		kiero::bind(8, (void**)&oPresent11, Dx11Handler);
 	}
 	else
 	{
 		if (kiero::init(kiero::RenderType::D3D9) == kiero::Status::Success)
 		{
 			Globals::renderer = Render_DirectX9;
-			kiero::bind(16, (void**)&oReset9, Reset);
-			kiero::bind(17, (void**)&oPresent9, PresentDx9Handler);
+			kiero::bind(16, (void**)&oReset, Reset);
+			kiero::bind(42, (void**)&oEndScene, Dx9Handler);
 		}
 	}
 }
