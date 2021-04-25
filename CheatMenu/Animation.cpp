@@ -6,6 +6,49 @@
 Animation::Animation()
 {
 	json.LoadData(search_categories, selected_item);
+	Cutscene::json.LoadData(Cutscene::categories, Cutscene::selected);
+
+	Events::processScriptsEvent += []
+	{
+		if (Cutscene::running)
+		{
+			if (Command<Commands::HAS_CUTSCENE_FINISHED>())
+			{
+				Command<Commands::CLEAR_CUTSCENE>();
+				Cutscene::running = false;
+				Cutscene::scene_name = "";
+				CPlayerPed* player = FindPlayerPed();
+				player->m_nAreaCode = Cutscene::interior;
+				Command<Commands::SET_AREA_VISIBLE>(player->m_nAreaCode);
+				Cutscene::interior = 0;
+				TheCamera.Fade(0, 1);
+			}
+		}
+		else
+		{
+			if (Cutscene::scene_name != "" && Command<Commands::HAS_CUTSCENE_LOADED>())
+			{
+				Command<Commands::START_CUTSCENE>();
+				Cutscene::running = true;
+			}
+		}
+	};
+}
+
+void Animation::PlayCutscene(std::string& rootkey, std::string& cutscene_str, std::string& interior)
+{
+	if (Util::IsOnCutscene())
+	{
+		CHud::SetHelpMessage("Another cutscene is running", false, false, false);
+		return;
+	}
+
+	Cutscene::scene_name = cutscene_str;
+	Command<Commands::LOAD_CUTSCENE>(cutscene_str.c_str());
+	CPlayerPed *player =FindPlayerPed();
+	Cutscene::interior = player->m_nAreaCode;
+	player->m_nAreaCode = std::stoi(interior); 
+	Command<Commands::SET_AREA_VISIBLE>(player->m_nAreaCode);
 }
 
 void Animation::Draw()
@@ -85,6 +128,33 @@ void Animation::Draw()
 			{
 				json.data["Custom"][anim_buffer] = ("0, " + std::string(ifp_buffer));
 				json.WriteToDisk();
+			}
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem("Cutscene"))
+		{
+			ImGui::Spacing();
+			if (ImGui::Button("Stop cutscene", Ui::GetSize()))
+			{
+				if (Cutscene::running)
+				{
+					Command<Commands::CLEAR_CUTSCENE>();
+					Cutscene::running = false;
+					Cutscene::scene_name = "";
+					CPlayerPed* player = FindPlayerPed();
+					player->m_nAreaCode = Cutscene::interior;
+					Command<Commands::SET_AREA_VISIBLE>(player->m_nAreaCode);
+					Cutscene::interior = 0;
+					TheCamera.Fade(0, 1);
+				}
+			}
+			ImGui::Spacing();
+
+			if (ImGui::BeginChild("Cutscene Child"))
+			{
+				ImGui::Spacing();
+				Ui::DrawJSON(Cutscene::json, Cutscene::categories, Cutscene::selected, Cutscene::filter, &PlayCutscene, nullptr);
+				ImGui::EndChild();
 			}
 			ImGui::EndTabItem();
 		}

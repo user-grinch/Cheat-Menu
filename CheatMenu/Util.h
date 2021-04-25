@@ -12,6 +12,7 @@ public:
 	static int GetLargestGangInZone();
 	static void LoadTexturesInDirRecursive(const char * path, const char * file_ext, std::vector<std::string>& category_vec, std::vector<std::unique_ptr<TextureStructure>> &store_vec);
 	static void ReleaseTextures(std::vector<std::unique_ptr<TextureStructure>> &store_vec);
+	static bool IsOnCutscene();
 	static bool IsOnMission();
 	static std::string GetLocationName(CVector *pos);
 	static void RainbowValues(int &r, int&g, int &b, float speed);

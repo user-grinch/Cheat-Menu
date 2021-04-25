@@ -289,8 +289,8 @@ void Game::ClearFreecamStuff()
 void Game::Draw()
 {
 	ImGui::Spacing();
-	static CPlayerPed* player = FindPlayerPed();
-	static int hplayer = CPools::GetPedRef(player);
+	CPlayerPed* player = FindPlayerPed();
+	int hplayer = CPools::GetPedRef(player);
 
 	if (ImGui::BeginTabBar("Game", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
 	{

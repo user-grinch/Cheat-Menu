@@ -10,6 +10,18 @@ private:
 	inline static std::vector<std::string> search_categories;
 	inline static std::string selected_item = "All";
 
+	struct Cutscene
+	{
+		inline static CJson json = CJson("cutscene");
+		inline static ImGuiTextFilter filter = "";
+		inline static std::vector<std::string> categories;
+		inline static std::string selected = "All";
+		inline static std::string scene_name = "";
+		inline static int interior = 0;
+		inline static bool running = false;
+	};
+	
+
 	inline static char anim_buffer[INPUT_BUFFER_SIZE] = "";
 	inline static char ifp_buffer[INPUT_BUFFER_SIZE] = "";
 
@@ -26,6 +38,7 @@ protected:
 public:
 	static void Draw();
 	static void PlayAnimation(std::string& rootkey, std::string& anim, std::string& ifp);
+	static void PlayCutscene(std::string& rootkey, std::string& cutscene_str, std::string& interior);
 	static void RemoveAnimation(std::string& rootkey, std::string& anim, std::string& ifp);
 };
 

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Util.h"
 #include "../Depend/imgui/stb_image.h"
+#include <CCutsceneMgr.h>
 
 void Util::ClearCharTasksVehCheck(CPed* ped)
 {
@@ -122,6 +123,11 @@ bool Util::LoadTextureFromFileDx11(const char* filename, ID3D11ShaderResourceVie
 bool Util::IsOnMission()
 {
 	return FindPlayerPed()->CanPlayerStartMission() && !*(patch::Get<char*>(0x5D5380, false) + CTheScripts::OnAMissionFlag);
+}
+
+bool Util::IsOnCutscene()
+{
+	return CCutsceneMgr::ms_running;
 }
 
 std::string Util::GetLocationName(CVector* pos)
