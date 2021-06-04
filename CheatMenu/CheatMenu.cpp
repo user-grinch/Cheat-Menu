@@ -163,8 +163,16 @@ void CheatMenu::ApplyStyle()
 
 void MenuThread(void* param)
 {
+	static bool game_init = false;
+
 	// Wait till the game is initialized
-	Sleep(3000);
+	Events::processScriptsEvent += []
+	{
+		game_init = true;
+	};
+
+	while (!game_init)
+		Sleep(1000);
 
 	if (GetModuleHandle("SAMP.dll"))
 	{
