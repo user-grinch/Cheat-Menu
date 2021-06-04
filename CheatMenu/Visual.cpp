@@ -216,18 +216,30 @@ void Visual::Draw()
 		if (ImGui::BeginTabItem("Menus"))
 		{
 			static bool init_patches = false;
+			static float clock_posX = *(float*)*(int*)0x58EC16;
+			static float clock_posY = *(float*)*(int*)0x58EC04;
 			static float radar_posX = *(float*)*(int*)0x5834D4;
 			static float radar_posY = *(float*)*(int*)0x583500;
 			static float radar_width = *(float*)*(int*)0x5834C2;
 			static float radar_height = *(float*)*(int*)0x5834F6;
+			static CHudColour armour_bar = HudColour.m_aColours[4];
+			static CHudColour clock_bar = HudColour.m_aColours[4];
 			static CHudColour health_bar = HudColour.m_aColours[0];
+			static CHudColour breath_bar = HudColour.m_aColours[3];
+			static CHudColour wanted_bar = HudColour.m_aColours[6];
+			static float money_posX = *(float*)*(int*)0x58F5FC;
+			static float breath_posX = *(float*)*(int*)0x58F11F;
+			static float breath_posY = *(float*)*(int*)0x58F100;
+			static float weapon_icon_posX = *(float*)*(int*)0x58F927;
+			static float weapon_icon_posY = *(float*)*(int*)0x58F913;
+			static float weapon_ammo_posX = *(float*)*(int*)0x58FA02;
+			static float weapon_ammo_posY = *(float*)*(int*)0x58F9E6;
+			static float wanted_posX = *(float*)*(int*)0x58DD0F;
 
 			if (!init_patches)
 			{
-				// read those values from game
-				health_bar = HudColour.m_aColours[0];
-				
-				// patch radar stuff oof
+				patch::SetPointer(0x58EC16, &clock_posX);
+				patch::SetPointer(0x58EC04, &clock_posY);
 				patch::SetPointer(0x5834D4, &radar_posX);
 				patch::SetPointer(0x583500, &radar_posY);
 				patch::SetPointer(0x5834F6, &radar_height);
@@ -250,26 +262,65 @@ void Visual::Draw()
 				patch::SetPointer(0x58A9D5, &radar_height);
 				patch::SetPointer(0x58A99D, &radar_width);
  
+				patch::SetPointer(0x5890FC, &armour_bar);
+				patch::SetChar(0x5890F5, 0);
 				patch::SetPointer(0x589331, &health_bar);
+				patch::SetPointer(0x5891EB, &breath_bar);
+				patch::SetChar(0x5891E4, 0);
+				patch::SetPointer(0x58EBD1, &clock_bar);
+				patch::SetChar(0x58EBCA, 0);
+				
+				patch::SetPointer(0x58F5FC, &money_posX);
+				patch::SetPointer(0x58F11F, &breath_posX);
+				patch::SetPointer(0x58F100, &breath_posY);
+				patch::SetPointer(0x58DD0F, &wanted_posX);
+				patch::SetPointer(0x58F927, &weapon_icon_posX);
+				patch::SetPointer(0x58F913, &weapon_icon_posY);
+				patch::SetPointer(0x58FA02, &weapon_ammo_posX);
+				patch::SetPointer(0x58F9E6, &weapon_ammo_posY);
+				
 				init_patches = true;
 			}
+			
+			if (ImGui::BeginChild("VisualsChild"))
+			{
+				Ui::ColorPickerAddress("Armourbar color", *(int*)0x5890FC, ImVec4(180, 25, 29, 255));
+				Ui::EditAddress<float>("Armourbar posX ", 0x866B78, -999, 94, 999);
+				Ui::EditAddress<float>("Armourbar posY ", 0x862D38, -999, 48, 999);
+				Ui::ColorPickerAddress("Breathbar color", *(int*)0x5891EB, ImVec4(172, 203, 241, 255));
+				Ui::EditAddress<float>("Breathbar posX ", *(int*)0x58F11F, -999, 94, 999);
+				Ui::EditAddress<float>("Breathbar posY ", *(int*)0x58F100, -999, 62, 999);
+				Ui::ColorPickerAddress("Clock color", *(int*)0x58EBD1, ImVec4(180, 25, 29, 255));
+				Ui::EditAddress<float>("Clock posX ", *(int*)0x58EC16, -999, 32, 999);
+				Ui::EditAddress<float>("Clock posY ", *(int*)0x58EC04, -999, 22, 999);
+				Ui::ColorPickerAddress("Healthbar color", *(int*)0x589331, ImVec4(180, 25, 29, 255));
+				Ui::EditAddress<float>("Healthbar posX ", 0x86535C, -999, 141, 999);
+				Ui::EditAddress<float>("Healthbar posY ", 0x866CA8, -999, 77, 999);
+				Ui::ColorPickerAddress("Draw menu title border color", 0xBAB240, ImVec4(0, 0, 0, 255));
+				Ui::ColorPickerAddress("Money color", 0xBAB230, ImVec4(54, 104, 44, 255));
+				Ui::EditAddress<float>("Money posX ", *(int*)0x58F5FC, -999, 32, 999);
+				Ui::EditAddress<float>("Money posY ", 0x866C88, -999, 89, 999);
+				static std::vector<Ui::NamedValue> font_outline{ { "No outline", 0 }, { "Thin outline" ,1 }, { "Default outline" ,2 } };
+				Ui::EditRadioButtonAddressEx("Money font outline", 0x58F58D, font_outline);
+				static std::vector<Ui::NamedValue> style{ { "Style 1", 1 }, { "Style 2" ,2 }, { "Default style" ,3 } };
+				Ui::EditRadioButtonAddressEx("Money font style", 0x58F57F, style);
+				Ui::EditAddress<float>("Radar Height", *(int*)0x5834F6, 0, 76, 999);
+				Ui::EditAddress<float>("Radar Width", *(int*)0x5834C2, 0, 94, 999);
+				Ui::EditAddress<float>("Radar posX", *(int*)0x5834D4, -999, 40, 999);
+				Ui::EditAddress<float>("Radar posY", *(int*)0x583500, -999, 104, 999);
+				Ui::EditAddress<int>("Radar zoom", 0xA444A3, 0, 0, 170);
+				Ui::ColorPickerAddress("Radio station color", 0xBAB24C, ImVec4(150, 150, 150, 255));
+				static std::vector<Ui::NamedValue> star_border{ { "No border", 0 }, { "Default" ,1 }, { "Bold border" ,2 } };
+				Ui::EditRadioButtonAddressEx("Wanted star border", 0x58DD41, star_border);
+				Ui::EditAddress<float>("Wanted posX ", *(int*)0x58DD0F, -999, 29, 999);
+				Ui::EditAddress<float>("Wanted posY ", *(int*)0x58DDFC, -999, 114, 999);
+				Ui::EditAddress<float>("Weapon ammo posX ", *(int*)0x58FA02, -999, 32, 999);
+				Ui::EditAddress<float>("Weapon ammo posY ", *(int*)0x58F9E6, -999, 43, 999);
+				Ui::EditAddress<float>("Weapon icon posX ", *(int*)0x58F927, -999, 32, 999);
+				Ui::EditAddress<float>("Weapon icon posY ", *(int*)0x58F913, -999, 20, 999);
 
-			Ui::ColorPickerAddress("Armour bar", *(int*)0x5890FC, ImVec4(180,25,29,255));
-			Ui::ColorPickerAddress("Health bar", *(int*)0x589331, ImVec4(180,25,29,255));
-			Ui::ColorPickerAddress("Draw menu title border color", 0xBAB240, ImVec4(0,0,0,255));
-			Ui::ColorPickerAddress("Money color", 0xBAB230, ImVec4(54,104,44,255));	
-			static std::vector<Ui::NamedValue> font_outline{{ "No outline", 0 }, { "Thin outline" ,1 }, { "Default outline" ,2 }};
-			Ui::EditRadioButtonAddressEx("Money font outline", 0x58F58D, font_outline);
-			static std::vector<Ui::NamedValue> style{ { "Style 1", 1 }, { "Style 2" ,2 }, { "Default style" ,3 }};
-			Ui::EditRadioButtonAddressEx("Money font style", 0x58F57F, style);
-			Ui::EditAddress<float>("Radar Height", *(int*)0x5834F6, 0, 76, 999);
-			Ui::EditAddress<float>("Radar Width", *(int*)0x5834C2, 0, 94, 999);
-			Ui::EditAddress<float>("Radar X position", *(int*)0x5834D4, -999, 40, 999);
-			Ui::EditAddress<float>("Radar Y position", *(int*)0x583500, -999, 104, 999);
-			Ui::EditAddress<int>("Radar zoom", 0xA444A3, 0, 0, 170);
-			Ui::ColorPickerAddress("Radio station color", 0xBAB24C, ImVec4(150,150,150,255));
-			static std::vector<Ui::NamedValue> star_border{ { "No border", 0 }, { "Default" ,1 }, { "Bold border" ,2 }};
-			Ui::EditRadioButtonAddressEx("Wanted star border", 0x58DD41, star_border);
+				ImGui::EndChild();
+			}
 
 			ImGui::EndTabItem();
 		}
