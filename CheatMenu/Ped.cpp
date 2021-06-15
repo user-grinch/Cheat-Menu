@@ -253,7 +253,7 @@ void Ped::Draw()
 					Ui::ListBox("Ped type", spawn_ped::ped_type, spawn_ped::selected_ped_type);
 
 					ImGui::Spacing();
-					ImGui::Text((std::string("Selected weapon: ") + Weapon::weapon_json.data[std::to_string(spawn_ped::weapon_id)].get<std::string>()).c_str());
+					ImGui::Text("Selected weapon: %s", Weapon::weapon_json.data[std::to_string(spawn_ped::weapon_id)].get<std::string>());
 					ImGui::Spacing();
 					Ui::DrawImages(Weapon::weapon_vec, ImVec2(65, 65), Weapon::search_categories, Weapon::selected_item, Weapon::filter,
 						[](std::string str) { spawn_ped::weapon_id = std::stoi(str); },

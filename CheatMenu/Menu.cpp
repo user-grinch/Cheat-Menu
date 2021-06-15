@@ -487,11 +487,11 @@ void Menu::Draw()
 				ImGui::Columns(2, NULL, false);
 				ImGui::Text("Author: Grinch_");
 
-				ImGui::Text((std::string("Version: ") + MENU_VERSION).c_str());
+				ImGui::Text("Version: %s",MENU_VERSION);
 
 				ImGui::NextColumn();
-				ImGui::Text(std::string("ImGui: " + std::string(ImGui::GetVersion())).c_str());
-				ImGui::Text((std::string("Build: ") + BUILD_NUMBER).c_str());
+				ImGui::Text("ImGui: %s", ImGui::GetVersion());
+				ImGui::Text("Build: %s", BUILD_NUMBER);
 
 				ImGui::Columns(1);
 

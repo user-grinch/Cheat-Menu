@@ -198,7 +198,7 @@ void Weapon::Draw()
 			ImGui::Columns(1);
 
 			ImGui::Spacing();
-			ImGui::Text((std::string("Current weapon: ") + weapon_json.data[std::to_string(gang_weapons[selected_gang][selected_weapon_count])].get<std::string>()).c_str());
+			ImGui::Text("Current weapon: %s", weapon_json.data[std::to_string(gang_weapons[selected_gang][selected_weapon_count])].get<std::string>());
 			ImGui::Spacing();
 			Ui::DrawImages(weapon_vec, ImVec2(65, 65), search_categories, selected_item, filter, SetGangWeapon, nullptr,
 				[](std::string str) {return weapon_json.data[str].get<std::string>(); },

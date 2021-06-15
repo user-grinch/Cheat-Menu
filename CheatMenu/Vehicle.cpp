@@ -759,7 +759,7 @@ void Vehicle::Draw()
 
 					ImGui::Text(GetNameFromModel(veh->m_nModelIndex).c_str());
 					ImGui::NextColumn();
-					ImGui::Text((std::string("Total seats: ") + std::to_string(seats + 1)).c_str());
+					ImGui::Text("Total seats: %d", (seats + 1));
 					ImGui::Columns(1);
 
 					ImGui::Spacing();

@@ -405,11 +405,11 @@ void Ui::EditStat(const char* label, const int stat_id, const int min, const int
 		int val = static_cast<int>(CStats::GetStatValue(stat_id));
 
 		ImGui::Columns(3, 0, false);
-		ImGui::Text(("Min: " + std::to_string(min)).c_str());
+		ImGui::Text("Min: %d", min);
 		ImGui::NextColumn();
-		ImGui::Text(("Def: " + std::to_string(def)).c_str());
+		ImGui::Text("Def: %d", def);
 		ImGui::NextColumn();
-		ImGui::Text(("Max: " + std::to_string(max)).c_str());
+		ImGui::Text("Max: %d", max);
 		ImGui::Columns(1);
 
 		ImGui::Spacing();
@@ -723,16 +723,16 @@ void Ui::EditFloat(const char* label, const int address, const float min, const 
 
 		ImGui::Columns(items, 0, false);
 
-		ImGui::Text(("Min: " + std::to_string(min)).c_str());
+		ImGui::Text("Min: %f", min);
 
 		if (items == 3)
 		{
 			ImGui::NextColumn();
-			ImGui::Text(("Def: " + std::to_string(def)).c_str());
+			ImGui::Text("Def: %f", def);
 		}
 
 		ImGui::NextColumn();
-		ImGui::Text(("Max: " + std::to_string(max)).c_str());
+		ImGui::Text("Max: %f", max);
 		ImGui::Columns(1);
 
 		ImGui::Spacing();
