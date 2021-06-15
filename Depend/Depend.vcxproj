@@ -43,8 +43,6 @@
     <ClInclude Include="kiero\minhook\hde\table32.h" />
     <ClInclude Include="kiero\minhook\MinHook.h" />
     <ClInclude Include="kiero\minhook\trampoline.h" />
-    <ClInclude Include="zip\miniz.h" />
-    <ClInclude Include="zip\zip.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="fla\IDaccess.cpp">
@@ -95,9 +93,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="kiero\minhook\trampoline.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="zip\zip.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
   </ItemGroup>

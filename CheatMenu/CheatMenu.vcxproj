@@ -74,7 +74,7 @@
       <GenerateDebugInformation>No</GenerateDebugInformation>
       <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
       <AdditionalLibraryDirectories>$(PLUGIN_SDK_DIR)\output\lib\;$(SolutionDir)\Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>urlmon.lib;plugin.lib;d3d9.lib;d3dx9.lib;d3d11.lib;d3dx11.lib;XInput9_1_0.lib;Depend.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Pdh.lib;urlmon.lib;plugin.lib;d3d9.lib;d3dx9.lib;d3d11.lib;d3dx11.lib;XInput9_1_0.lib;Depend.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
@@ -94,7 +94,7 @@
       <GenerateDebugInformation>Debug</GenerateDebugInformation>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
       <AdditionalLibraryDirectories>$(SolutionDir)\Debug\;$(PLUGIN_SDK_DIR)\output\lib\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>urlmon.lib;plugin_d.lib;d3d9.lib;d3dx9.lib;Depend.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Pdh.lib;urlmon.lib;plugin_d.lib;d3d9.lib;d3dx9.lib;Depend.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
@@ -195,7 +195,6 @@
     <ClInclude Include="Ui.h" />
     <ClInclude Include="Updater.h" />
     <ClInclude Include="Util.h" />
-    <ClInclude Include="VehExtender.h" />
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="Visual.h" />
     <ClInclude Include="VKeys.h" />

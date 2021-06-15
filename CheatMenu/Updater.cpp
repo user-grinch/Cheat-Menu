@@ -2,7 +2,6 @@
 #include "Updater.h"
 #include "Ui.h"
 #include "MenuInfo.h"
-#include "..\Depend\zip\zip.h"
 
 void Updater::CheckForUpdate()
 {
@@ -32,63 +31,6 @@ void Updater::CheckForUpdate()
     }
 }
 
-// void Updater::DownloadUpdate()
-// {
-//     std::string link = "https://github.com/user-grinch/Cheat-Menu/releases/download/" + latest_version + "/CheatMenu.zip";
-//     char* path = PLUGIN_PATH((char*)"update.zip");
-//     HRESULT res = S_OK;//URLDownloadToFile(NULL, link.c_str(), path, 0, NULL);
-
-//     if (res == E_OUTOFMEMORY || res == INET_E_DOWNLOAD_FAILURE)
-//     {
-//         CHud::SetHelpMessage("Failed download update",false,false,false);
-//         state = UPDATER_IDLE;
-//         return;
-//     }  
-//     CHud::SetHelpMessage("Update downloaded successfully.",false,false,false);
-//     state = UPDATER_DOWNLOADED;
-// }
-
-// void Updater::InstallUpdate()
-// {   
-//     CHud::SetHelpMessage("Update in progress. Do not pause/close the game.",false,false,false);
-//     Sleep(100);
-//     // delete the old menu
-// 	std::remove(PLUGIN_PATH((char*)"CheatMenu.asi.old"));
-//     std::string new_name = PLUGIN_PATH((char*)"CheatMenu.asi.old");
-//     std::string old_name = PLUGIN_PATH((char*)"CheatMenu.asi");
-//     std::rename(old_name.c_str(),new_name.c_str());
-//     fs::remove_all(PLUGIN_PATH((char*)"CheatMenu"));
-
-//     std::string dir = PLUGIN_PATH((char*)"");
-//     std::string file = PLUGIN_PATH((char*)"update.zip");
-//     zip_extract(file.c_str(),dir.c_str(),NULL,NULL);
-// }
-
-// static bool menu_loaded = false;
-// static void LoadUpdatedMenu()
-// {
-//     std::string new_name = PLUGIN_PATH((char*)"CheatMenuNew.asi");
-//     LoadLibrary(new_name.c_str());
-// 	menu_loaded = true;
-// }
-
-// void Updater::FinishUpdate()
-// {
-//     // kinda hacky, can't update twice on same instance ( should be unlikely anyways?)
-//     std::string new_name = PLUGIN_PATH((char*)"CheatMenuNew.asi");
-//     std::string old_name = PLUGIN_PATH((char*)"CheatMenu.asi");
-//     std::rename(old_name.c_str(),new_name.c_str());
-    
-//     Events::processScriptsEvent += LoadUpdatedMenu;
-
-//     while (!menu_loaded)
-// 		Sleep(1000);
-
-// 	Events::processScriptsEvent -= LoadUpdatedMenu;
-    
-//     std::rename(new_name.c_str(),old_name.c_str());
-// }
-
 void Updater::ShowUpdateScreen()
 {
     ImGui::Dummy(ImVec2(0,20));
@@ -111,13 +53,4 @@ void Updater::ShowUpdateScreen()
     if (ImGui::Button("Download page",Ui::GetSize(2)))
         ShellExecute(NULL, "open", std::string("https://github.com/user-grinch/Cheat-Menu/releases/tag/" + 
         Updater::latest_version).c_str(), NULL, NULL, SW_SHOWNORMAL);
-    
-    // if (Updater::state == UPDATER_DOWNLOADING)
-    // 	ImGui::Button("Downloading update...",Ui::GetSize());
-
-    // if (Updater::state == UPDATER_DOWNLOADED)
-    // {
-    // 	if (ImGui::Button("Update downloaded. Click to install.",Ui::GetSize()))
-    // 		Updater::state = UPDATER_INSTALLING;
-    // }
 }

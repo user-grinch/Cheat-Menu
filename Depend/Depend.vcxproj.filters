@@ -24,8 +24,6 @@
     <ClInclude Include="kiero\minhook\MinHook.h" />
     <ClInclude Include="kiero\minhook\trampoline.h" />
     <ClInclude Include="kiero\kiero.h" />
-    <ClInclude Include="zip\miniz.h" />
-    <ClInclude Include="zip\zip.h" />
     <ClInclude Include="json.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -45,6 +43,5 @@
     <ClCompile Include="kiero\minhook\hook.c" />
     <ClCompile Include="kiero\minhook\trampoline.c" />
     <ClCompile Include="kiero\kiero.cpp" />
-    <ClCompile Include="zip\zip.c" />
   </ItemGroup>
 </Project>

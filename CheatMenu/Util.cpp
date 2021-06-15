@@ -2,6 +2,7 @@
 #include "Util.h"
 #include "../Depend/imgui/stb_image.h"
 #include <CCutsceneMgr.h>
+#include "psapi.h"
 
 void Util::ClearCharTasksVehCheck(CPed* ped)
 {
@@ -256,4 +257,20 @@ RwTexture* Util::LoadTextureFromPngFile(fs::path path)
 	RwTexture* texture = CreateRwTextureFromRwImage(image);
 	path.stem().string().copy(texture->name, sizeof(texture->name) - 1);
 	return texture;
+}
+
+void Util::GetCPUUsageInit()
+{
+	PdhOpenQuery(NULL, NULL, &cpuQuery);
+	PdhAddEnglishCounter(cpuQuery, "\\Processor(_Total)\\% Processor Time", NULL, &cpuTotal);
+	PdhCollectQueryData(cpuQuery);
+}
+
+double Util::GetCurrentCPUUsage()
+{
+	PDH_FMT_COUNTERVALUE counterVal;
+
+	PdhCollectQueryData(cpuQuery);
+	PdhGetFormattedCounterValue(cpuTotal, PDH_FMT_DOUBLE, NULL, &counterVal);
+	return counterVal.doubleValue;
 }

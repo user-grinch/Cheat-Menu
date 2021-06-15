@@ -12,15 +12,17 @@ Menu::Menu()
 {
 	// TODO: use structs
 	// Load config data
-	overlay::coord = config.GetValue("overlay.coord", false);
-	overlay::fps = config.GetValue("overlay.fps", false);
-	overlay::loc_name = config.GetValue("overlay.loc_name", false);
-	overlay::transparent = config.GetValue("overlay.transparent", false);
-	overlay::veh_health = config.GetValue("overlay.veh_health", false);
-	overlay::veh_speed = config.GetValue("overlay.veh_speed", false);
-	overlay::selected_pos = config.GetValue("overlay.selected_pos", 4);
-	overlay::posX = config.GetValue("overlay.posX", 0);
-	overlay::posY = config.GetValue("overlay.posY", 0);
+	overlay::bCoord = config.GetValue("overlay.bCoord", false);
+	overlay::bCpuUsage = config.GetValue("overlay.bCpuUsage", false);
+	overlay::bFPS = config.GetValue("overlay.bFPS", false);
+	overlay::bLocName = config.GetValue("overlay.bLocName", false);
+	overlay::bTransparent = config.GetValue("overlay.bTransparent", false);
+	overlay::bMemUsage = config.GetValue("overlay.bMemUsage", false);
+	overlay::bVehHealth = config.GetValue("overlay.bVehHealth", false);
+	overlay::bVehSpeed = config.GetValue("overlay.bVehSpeed", false);
+	overlay::mSelectedPos = config.GetValue("overlay.mSelectedPos", 4);
+	overlay::fPosX = config.GetValue("overlay.fPosX", 0);
+	overlay::fPosY = config.GetValue("overlay.fPosY", 0);
 
 	// Hotkeys
 	hotkeys::aim_skin_changer.key1 = config.GetValue("hotkey.aim_skin_changer.key1", VK_RETURN);
@@ -58,15 +60,22 @@ Menu::Menu()
 
 	hotkeys::veh_instant_stop.key1 = config.GetValue("hotkey.veh_instant_stop.key1", VK_NONE);
 	hotkeys::veh_instant_stop.key2 = config.GetValue("hotkey.veh_instant_stop.key2", VK_NONE);
+
+	Util::GetCPUUsageInit();
+	MEMORYSTATUSEX memInfo;
+	memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+	GlobalMemoryStatusEx(&memInfo);
+
+	overlay::mTotalRam = int(memInfo.ullTotalPhys * 1e-6); // Bytes -> MegaBytes
 }
 
 void Menu::DrawOverlay()
 {
 	CPlayerPed* player = FindPlayerPed();
-	bool show_menu = overlay::coord || overlay::fps || overlay::loc_name ||
-		((overlay::veh_health || overlay::veh_speed) && player->m_pVehicle && player->m_pVehicle->IsDriver(player));
+	bool show_menu = overlay::bCoord || overlay::bFPS || overlay::bLocName ||
+		((overlay::bVehHealth || overlay::bVehSpeed) && player->m_pVehicle && player->m_pVehicle->IsDriver(player));
 
-	int corner = overlay::selected_pos - 1;
+	int corner = overlay::mSelectedPos - 1;
 	const float offset = 10.0f;
 	ImGuiIO& io = ImGui::GetIO();
 	ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
@@ -80,51 +89,66 @@ void Menu::DrawOverlay()
 	}
 	else
 	{
-		if (overlay::posX != NULL && overlay::posY != NULL)
+		if (overlay::fPosX != NULL && overlay::fPosY != NULL)
 		{
-			config.SetValue("overlay.posX", overlay::posX);
-			config.SetValue("overlay.posY", overlay::posY);
-			ImGui::SetNextWindowPos(ImVec2(overlay::posX, overlay::posY), ImGuiCond_Once);
+			config.SetValue("overlay.fPosX", overlay::fPosX);
+			config.SetValue("overlay.fPosY", overlay::fPosY);
+			ImGui::SetNextWindowPos(ImVec2(overlay::fPosX, overlay::fPosY), ImGuiCond_Once);
 		}
 	}
 
-	ImGui::SetNextWindowBgAlpha(overlay::transparent ? 0.0f : 0.5f);
+	ImGui::SetNextWindowBgAlpha(overlay::bTransparent ? 0.0f : 0.5f);
 
 	if (show_menu && ImGui::Begin("Overlay", NULL, window_flags))
 	{
 		CPlayerPed* player = FindPlayerPed();
+		CVector pos = player->GetPosition();
+		size_t game_ms = CTimer::m_snTimeInMilliseconds;
 
-		if (overlay::coord)
+		if (game_ms - overlay::mLastInterval > overlay::mInterval)
 		{
-			CVector pos = player->GetPosition();
+			overlay::fCpuUsage = (float)Util::GetCurrentCPUUsage();
 
-			std::string text = "Coord: " + std::to_string(int(pos.x)) + ", " + std::to_string(int(pos.y)) + ", "
-				+ std::to_string(int(pos.z));
+			MEMORYSTATUSEX memInfo;
+			memInfo.dwLength = sizeof(MEMORYSTATUSEX);
+			GlobalMemoryStatusEx(&memInfo);
+			int mUsedRam = int((memInfo.ullTotalPhys - memInfo.ullAvailPhys) * 1e-6);
+			overlay::fMemUsage = 100.0f * (float(mUsedRam) / float(overlay::mTotalRam));
+			overlay::mFPS = (size_t)CTimer::game_FPS;
 
-			ImGui::Text(text.c_str());
+			overlay::mLastInterval = game_ms;
 		}
 
-		if (overlay::fps)
-			ImGui::Text((std::string("Frames: ") + std::to_string(int(io.Framerate))).c_str());
+		if (overlay::bCoord)
+			ImGui::Text("Coord: %.2f, %.2f, %.2f", pos.x, pos.y, pos.z);
 
-		if (overlay::loc_name)
-			ImGui::Text((std::string("Location: ") + Util::GetLocationName(&player->GetPosition())).c_str());
+		if (overlay::bCpuUsage)
+			ImGui::Text("CPU usage: %.2f%%", overlay::fCpuUsage);
+
+		if (overlay::bFPS)
+			ImGui::Text("Frames: %d", overlay::mFPS);
+
+		if (overlay::bLocName)
+			ImGui::Text("Location: %s", Util::GetLocationName(&pos).c_str());
+
+		if (overlay::bMemUsage)
+			ImGui::Text("RAM usage: %.2f%%", overlay::fMemUsage);
 
 		if (player->m_pVehicle && player->m_pVehicle->IsDriver(player))
 		{
-			if (overlay::veh_health)
-				ImGui::Text((std::string("Veh Health: ") + std::to_string(int(player->m_pVehicle->m_fHealth))).c_str());
+			if (overlay::bVehHealth)
+				ImGui::Text("Veh Health: %.f", player->m_pVehicle->m_fHealth);
 
-			if (overlay::veh_speed)
+			if (overlay::bVehSpeed)
 			{
 				int speed = player->m_pVehicle->m_vecMoveSpeed.Magnitude() * 50; // 02E3 - GET_CAR_SPEED
-				ImGui::Text((std::string("Veh Speed: ") + std::to_string(speed)).c_str());
+				ImGui::Text("Veh Speed: %d", speed);
 			}
 		}
 
-		ImVec2 pos = ImGui::GetWindowPos();
-		overlay::posX = pos.x;
-		overlay::posY = pos.y;
+		ImVec2 windowPos = ImGui::GetWindowPos();
+		overlay::fPosX = windowPos.x;
+		overlay::fPosY = windowPos.y;
 
 		ImGui::End();
 	}
@@ -275,31 +299,37 @@ void Menu::Draw()
 			ImGui::Spacing();
 			ImGui::Spacing();
 			ImGui::SameLine();
-			if (Ui::ListBox("Overlay", overlay::pos_names, overlay::selected_pos))
-				config.SetValue("overlay.selected_pos", overlay::selected_pos);
+			if (Ui::ListBox("Overlay", overlay::posNames, overlay::mSelectedPos))
+				config.SetValue("overlay.mSelectedPos", overlay::mSelectedPos);
 
 			ImGui::Spacing();
 
 			ImGui::Columns(2, NULL, false);
-			if (ImGui::Checkbox("No background", &overlay::transparent))
-				config.SetValue("overlay.transparent", overlay::transparent);
+			if (ImGui::Checkbox("No background", &overlay::bTransparent))
+				config.SetValue("overlay.bTransparent", overlay::bTransparent);
 
-			if (ImGui::Checkbox("Show coordinates", &overlay::coord))
-				config.SetValue("overlay.coord", overlay::coord);
+			if (ImGui::Checkbox("Show coordinates", &overlay::bCoord))
+				config.SetValue("overlay.bCoord", overlay::bCoord);
 
-			if (ImGui::Checkbox("Show FPS", &overlay::fps))
-				config.SetValue("overlay.fps", overlay::fps);
+			if (ImGui::Checkbox("Show CPU usage", &overlay::bCpuUsage))
+				config.SetValue("overlay.bCpuUsage", overlay::bCpuUsage);
+
+			if (ImGui::Checkbox("Show FPS", &overlay::bFPS))
+				config.SetValue("overlay.bFPS", overlay::bFPS);
 
 			ImGui::NextColumn();
 
-			if (ImGui::Checkbox("Show location", &overlay::loc_name))
-				config.SetValue("overlay.loc_name", overlay::loc_name);
+			if (ImGui::Checkbox("Show location", &overlay::bLocName))
+				config.SetValue("overlay.bLocName", overlay::bLocName);
 
-			if (ImGui::Checkbox("Show veh health", &overlay::veh_health))
-				config.SetValue("overlay.veh_health", overlay::veh_health);
+			if (ImGui::Checkbox("Show RAM usage", &overlay::bMemUsage))
+				config.SetValue("overlay.bMemUsage", overlay::bMemUsage);
 
-			if (ImGui::Checkbox("Show veh speed", &overlay::veh_speed))
-				config.SetValue("overlay.veh_speed", overlay::veh_speed);
+			if (ImGui::Checkbox("Show veh health", &overlay::bVehHealth))
+				config.SetValue("overlay.bVehHealth", overlay::bVehHealth);
+
+			if (ImGui::Checkbox("Show veh speed", &overlay::bVehSpeed))
+				config.SetValue("overlay.bVehSpeed", overlay::bVehSpeed);
 
 			ImGui::Columns(1);
 

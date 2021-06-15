@@ -32,7 +32,6 @@ You'll need to install Visual Studio 2019 (v142), [DirectX9 SDK](https://www.mic
 2. [Kiero](https://github.com/Rebzzel/kiero)
 3. [MinHook](https://github.com/TsudaKageyu/minhook)
 4. [Plugin SDK](https://github.com/DK22Pac/plugin-sdk)
-5. [Zip](https://github.com/kuba--/zip)
 
 ## Images
 <details>

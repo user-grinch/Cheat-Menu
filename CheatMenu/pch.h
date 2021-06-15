@@ -62,7 +62,6 @@
 #include "MoreEvents.h"
 #include "Json.h"
 #include "VKeys.h"
-#include "VehExtender.h"
 
 // Globals
 typedef std::vector<std::pair<std::string, void(*)()>> CallbackTable;

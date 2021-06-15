@@ -6381,7 +6381,7 @@ typedef struct
    stbi_uc *out;                 // output buffer (always 4 components)
    stbi_uc *background;          // The current "background" as far as a gif is concerned
    stbi_uc *history;
-   int flags, bgindex, ratio, transparent, eflags;
+   int flags, bgindex, ratio, bTransparent, eflags;
    stbi_uc  pal[256][4];
    stbi_uc lpal[256][4];
    stbi__gif_lzw codes[8192];
@@ -6439,7 +6439,7 @@ static int stbi__gif_header(stbi__context *s, stbi__gif *g, int *comp, int is_in
    g->flags = stbi__get8(s);
    g->bgindex = stbi__get8(s);
    g->ratio = stbi__get8(s);
-   g->transparent = -1;
+   g->bTransparent = -1;
 
    if (g->w > STBI_MAX_DIMENSIONS) return stbi__err("too large","Very large image (corrupt?)");
    if (g->h > STBI_MAX_DIMENSIONS) return stbi__err("too large","Very large image (corrupt?)");
@@ -6697,7 +6697,7 @@ static stbi_uc *stbi__gif_load_next(stbi__context *s, stbi__gif *g, int *comp, i
             }
 
             if (g->lflags & 0x80) {
-               stbi__gif_parse_colortable(s,g->lpal, 2 << (g->lflags & 7), g->eflags & 0x01 ? g->transparent : -1);
+               stbi__gif_parse_colortable(s,g->lpal, 2 << (g->lflags & 7), g->eflags & 0x01 ? g->bTransparent : -1);
                g->color_table = (stbi_uc *) g->lpal;
             } else if (g->flags & 0x80) {
                g->color_table = (stbi_uc *) g->pal;
@@ -6733,18 +6733,18 @@ static stbi_uc *stbi__gif_load_next(stbi__context *s, stbi__gif *g, int *comp, i
                   g->delay = 10 * stbi__get16le(s); // delay - 1/100th of a second, saving as 1/1000ths.
 
                   // unset old transparent
-                  if (g->transparent >= 0) {
-                     g->pal[g->transparent][3] = 255;
+                  if (g->bTransparent >= 0) {
+                     g->pal[g->bTransparent][3] = 255;
                   }
                   if (g->eflags & 0x01) {
-                     g->transparent = stbi__get8(s);
-                     if (g->transparent >= 0) {
-                        g->pal[g->transparent][3] = 0;
+                     g->bTransparent = stbi__get8(s);
+                     if (g->bTransparent >= 0) {
+                        g->pal[g->bTransparent][3] = 0;
                      }
                   } else {
                      // don't need transparent
                      stbi__skip(s, 1);
-                     g->transparent = -1;
+                     g->bTransparent = -1;
                   }
                } else {
                   stbi__skip(s, len);

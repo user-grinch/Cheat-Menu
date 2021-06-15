@@ -74,7 +74,7 @@ private:
 	};
 
 	inline static bool images_loaded = false;
-	inline static VehExtender<VehData> vehdata;
+	inline static VehicleExtendedData<VehData> vehdata;
 
 protected:
 

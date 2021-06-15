@@ -122,7 +122,7 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, short interior_id)
 	Command<Commands::SET_AREA_VISIBLE>(interior_id);
 }
 
-void Teleport::TeleportToLocation(std::string& rootkey, std::string& loc_name,std::string& loc)
+void Teleport::TeleportToLocation(std::string& rootkey, std::string& bLocName,std::string& loc)
 {
 	try {
 		int interior = 0;
@@ -193,7 +193,7 @@ void Teleport::Draw()
 				
 				ImGui::Spacing();
 				
-				if (ImGui::Button("Teleport to coord", Ui::GetSize(2)))
+				if (ImGui::Button("Teleport to bCoord", Ui::GetSize(2)))
 				{
 					std::stringstream ss(input_buffer);
 					std::string temp;

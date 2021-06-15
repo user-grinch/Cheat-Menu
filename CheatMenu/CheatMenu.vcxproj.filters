@@ -40,7 +40,6 @@
     <ClInclude Include="Ui.h" />
     <ClInclude Include="Updater.h" />
     <ClInclude Include="Util.h" />
-    <ClInclude Include="VehExtender.h" />
     <ClInclude Include="Vehicle.h" />
     <ClInclude Include="Visual.h" />
     <ClInclude Include="VKeys.h" />

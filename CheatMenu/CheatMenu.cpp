@@ -11,6 +11,7 @@ void CheatMenu::DrawWindow()
 	if (FrontEndMenuManager.m_bMenuActive)
 		Hook::show_mouse = false;
 	else
+	{
 		if (Globals::show_menu || Menu::commands::show_menu)
 		{
 			if (Globals::show_menu)
@@ -37,35 +38,9 @@ void CheatMenu::DrawWindow()
 			else
 				Menu::DrawShortcutsWindow();
 		}
+	}
 
 	Menu::DrawOverlay();
-}
-
-void CheatMenu::ProcessEvent()
-{
-	if (Globals::init_done && !FrontEndMenuManager.m_bMenuActive)
-	{
-		if (Ui::HotKeyPressed(hotkeys::menu_open))
-			Globals::show_menu = !Globals::show_menu;
-
-		if (Ui::HotKeyPressed(hotkeys::command_window))
-		{
-			if (Menu::commands::show_menu)
-			{
-				Menu::ProcessCommands();
-				strcpy(commands::input_buffer, "");
-			}
-			Menu::commands::show_menu = !Menu::commands::show_menu;
-		}
-
-		if (Hook::show_mouse != Globals::show_menu)
-		{
-			if (Hook::show_mouse) // Only write when the menu closes
-				config.WriteToDisk();
-
-			Hook::show_mouse = Globals::show_menu;
-		}
-	}
 }
 
 CheatMenu::CheatMenu()
@@ -79,12 +54,32 @@ CheatMenu::CheatMenu()
 	Globals::menu_size.y = config.GetValue("window.sizeY", screen::GetScreenHeight() / 1.2f);
 	srand(CTimer::m_snTimeInMilliseconds);
 
-	Events::processScriptsEvent += ProcessEvent;
-}
+	Events::processScriptsEvent += []()
+	{
+		if (Globals::init_done && !FrontEndMenuManager.m_bMenuActive)
+		{
+			if (Ui::HotKeyPressed(hotkeys::menu_open))
+				Globals::show_menu = !Globals::show_menu;
 
-CheatMenu::~CheatMenu()
-{
-	Events::processScriptsEvent -= ProcessEvent;
+			if (Ui::HotKeyPressed(hotkeys::command_window))
+			{
+				if (Menu::commands::show_menu)
+				{
+					Menu::ProcessCommands();
+					strcpy(commands::input_buffer, "");
+				}
+				Menu::commands::show_menu = !Menu::commands::show_menu;
+			}
+
+			if (Hook::show_mouse != Globals::show_menu)
+			{
+				if (Hook::show_mouse) // Only write when the menu closes
+					config.WriteToDisk();
+
+				Hook::show_mouse = Globals::show_menu;
+			}
+		}
+	};
 }
 
 void CheatMenu::ApplyStyle()
@@ -166,7 +161,7 @@ void MenuThread(void* param)
 	static bool game_init = false;
 
 	// Wait till the game is initialized
-	Events::processScriptsEvent += []
+	Events::initGameEvent += []
 	{
 		game_init = true;
 	};
@@ -195,42 +190,10 @@ void MenuThread(void* param)
 	while (true)
 	{
 		Sleep(5000);
-		// if (KeyPressed(VK_LSHIFT) && KeyPressed(VK_BACK))
-		// 	break;
 		
 		if (Updater::state == UPDATER_CHECKING)
 			Updater::CheckForUpdate();
-		
-		// if (Updater::state == UPDATER_DOWNLOADING)
-		// 	Updater::DownloadUpdate();
-
-		// if (Updater::state == UPDATER_INSTALLING)
-		// {
-		// 	Updater::InstallUpdate();
-		// 	break;
-		// }
 	}
-
-	// Globals::menu_closing = true;
-	// Sleep(500);
-	// delete menu;
-
-	// // reset mouse patches
-	// patch::SetUChar(0x6194A0, 0xE9);
-	// patch::SetUChar(0x746ED0, 0xA1);
-	// patch::SetRaw(0x53F41F, (void*)"\x85\xC0\x0F\x8C", 4); 
-
-	// if (Updater::state == UPDATER_INSTALLING)
-	// {
-   	// 	CHud::SetHelpMessage("Install complete, restarting menu!",false,false,false);
-	// 	Updater::FinishUpdate();
-	// }
-	// else
-	// {
-	// 	CHud::SetHelpMessage("CheatMenu unloaded",false,false,false);
-	// 	FreeLibraryAndExitThread(GetModuleHandle("CheatMenu.asi"),0);
-	// 	FreeLibraryAndExitThread(GetModuleHandle("CheatMenuNew.asi"),0);
-	// }
 }
 
 BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)

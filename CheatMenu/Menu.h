@@ -5,16 +5,24 @@ class Menu
 private:
 	struct overlay
 	{
-		inline static bool coord = false;
-		inline static bool fps = false;
-		inline static bool loc_name = false;
-		inline static bool transparent = false;
-		inline static bool veh_health = false;
-		inline static bool veh_speed = false;
-		inline static std::vector<std::string> pos_names = { "Custom", "Top left", "Top right", "Bottom left", "Bottom right" };
-		inline static int selected_pos = 4; // TODO: Create Enum
-		inline static float posX = 0.0f;
-		inline static float posY = 0.0f;
+		inline static bool bCoord = false;
+		inline static bool bFPS = false;
+		inline static int mFPS = 0;
+		inline static bool bLocName = false;
+		inline static bool bTransparent = false;
+		inline static bool bVehHealth = false;
+		inline static bool bVehSpeed = false;
+		inline static bool bCpuUsage = false;
+		inline static float fCpuUsage = 0.0f;
+		inline static bool bMemUsage = false;
+		inline static float fMemUsage = 0.0f;
+		inline static std::vector<std::string> posNames = { "Custom", "Top left", "Top right", "Bottom left", "Bottom right" };
+		inline static int mSelectedPos = 4; // TODO: Create Enum
+		inline static float fPosX = 0.0f;
+		inline static float fPosY = 0.0f;
+		inline static size_t mInterval = 1000;
+		inline static size_t mLastInterval = 0;
+		inline static int mTotalRam = 0;
 	};
 public:
 	struct hotkeys

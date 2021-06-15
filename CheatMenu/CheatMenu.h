@@ -30,10 +30,8 @@ private:
 
 	static void ApplyStyle();
 	static void DrawWindow();
-	static void ProcessEvent();
 
 public:
 	CheatMenu();
-	~CheatMenu();
 };
 
