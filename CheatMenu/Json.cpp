@@ -3,6 +3,9 @@
 
 CJson::CJson(const char* name)
 {
+	if (name == "")
+		return;
+
 	file_path = PLUGIN_PATH((char*)"/CheatMenu/json/") + std::string(name) + ".json";
 
 	if (fs::exists(file_path))

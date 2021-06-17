@@ -26,7 +26,7 @@ void Game::RealTimeClock()
 
 Game::Game()
 {
-	json.LoadData(search_categories, selected_item);
+	mission_data.json.LoadData(mission_data.categories, mission_data.selected);
 	stat::json.LoadData(stat::search_categories, stat::selected_item);
 	freecam::fov = TheCamera.FindCamFOV();
 
@@ -502,7 +502,7 @@ It's recommanded not to save your game after using this. Use it at your own risk
 
 				ImGui::Spacing();
 
-				Ui::DrawJSON(json, search_categories, selected_item, filter, SetPlayerMission, nullptr);
+				Ui::DrawJSON(mission_data.json, mission_data.categories, mission_data.selected, mission_data.filter, SetPlayerMission, nullptr);
 			}
 			ImGui::EndTabItem();
 		}

@@ -41,31 +41,15 @@ private:
 
 	struct spawner
 	{
-		inline static ImGuiTextFilter filter = "";
-		inline static std::string selected_item = "All";
-		inline static std::vector<std::string> search_categories;
-		inline static std::vector<std::unique_ptr<TextureStructure>> image_vec;
+		inline static SearchData veh_data;
 		inline static bool spawn_inside = true;
 		inline static bool spawn_in_air = true;
 		inline static char license_text[9] = "";
 	};
 
-	struct texture9
-	{
-		inline static ImGuiTextFilter filter = "";
-		inline static std::string selected_item = "All";
-		inline static std::vector<std::string> search_categories;
-		inline static std::vector<std::unique_ptr<TextureStructure>> image_vec;
-	};
+	inline static SearchData texture_data;
+	inline static SearchData tune_data;
 	inline static bool images_loaded = false;
-
-	struct tune
-	{
-		inline static ImGuiTextFilter filter = "";
-		inline static std::string selected_item = "All";
-		inline static std::vector<std::string> search_categories;
-		inline static std::vector<std::unique_ptr<TextureStructure>> image_vec;
-	};
 
 	struct unlimited_nitro
 	{

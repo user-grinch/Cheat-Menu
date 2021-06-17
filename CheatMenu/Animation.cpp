@@ -5,8 +5,8 @@
 
 Animation::Animation()
 {
-	json.LoadData(search_categories, selected_item);
-	Cutscene::json.LoadData(Cutscene::categories, Cutscene::selected);
+	anim_data.json.LoadData(anim_data.categories, anim_data.selected);
+	Cutscene::data.json.LoadData(Cutscene::data.categories, Cutscene::data.selected);
 
 	Events::processScriptsEvent += []
 	{
@@ -81,7 +81,7 @@ void Animation::Draw()
 			if (ImGui::BeginChild("Anims Child"))
 			{
 				ImGui::Spacing();
-				Ui::DrawJSON(json, search_categories, selected_item, filter, &PlayAnimation, &RemoveAnimation);
+				Ui::DrawJSON(anim_data.json, anim_data.categories, anim_data.selected, anim_data.filter, &PlayAnimation, &RemoveAnimation);
 				ImGui::EndChild();
 			}
 			ImGui::EndTabItem();
@@ -126,8 +126,8 @@ void Animation::Draw()
 			ImGui::Spacing();
 			if (ImGui::Button("Add animation", Ui::GetSize()))
 			{
-				json.data["Custom"][anim_buffer] = ("0, " + std::string(ifp_buffer));
-				json.WriteToDisk();
+				anim_data.json.data["Custom"][anim_buffer] = ("0, " + std::string(ifp_buffer));
+				anim_data.json.WriteToDisk();
 			}
 			ImGui::EndTabItem();
 		}
@@ -153,7 +153,7 @@ void Animation::Draw()
 			if (ImGui::BeginChild("Cutscene Child"))
 			{
 				ImGui::Spacing();
-				Ui::DrawJSON(Cutscene::json, Cutscene::categories, Cutscene::selected, Cutscene::filter, &PlayCutscene, nullptr);
+				Ui::DrawJSON(Cutscene::data.json, Cutscene::data.categories, Cutscene::data.selected, Cutscene::data.filter, &PlayCutscene, nullptr);
 				ImGui::EndChild();
 			}
 			ImGui::EndTabItem();
@@ -186,8 +186,8 @@ void Animation::RemoveAnimation(std::string& ifp, std::string& anim, std::string
 {
 	if (ifp == "Custom")
 	{
-		json.data["Custom"].erase(anim);
-		json.WriteToDisk();
+		anim_data.json.data["Custom"].erase(anim);
+		anim_data.json.WriteToDisk();
 		CHud::SetHelpMessage("Animation removed", false, false, false);
 	}	
 	else 

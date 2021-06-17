@@ -8,10 +8,7 @@ private:
 	inline static bool insert_coord = false;
 	inline static bool quick_teleport = false;
 	inline static char input_buffer[INPUT_BUFFER_SIZE] = "";
-	inline static CJson json = CJson("teleport");
-	inline static ImGuiTextFilter filter = "";
-	inline static std::vector<std::string> search_categories;
-	inline static std::string selected_item = "All";
+	inline static SearchData tp_data{ "teleport" };
 	inline static char location_buffer[INPUT_BUFFER_SIZE] = "";
 	inline static uint quick_teleport_timer = 0;
 	

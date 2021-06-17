@@ -12,7 +12,7 @@ Ped::Ped()
 	{
 		if (!images_loaded)
 		{
-			Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\peds\\"), ".jpg", search_categories, peds_vec);
+			Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\peds\\"), ".jpg", ped_data.categories, ped_data.images);
 			images_loaded = true;
 		}
 	};
@@ -20,7 +20,7 @@ Ped::Ped()
 
 Ped::~Ped()
 {
-	Util::ReleaseTextures(peds_vec);
+	Util::ReleaseTextures(ped_data.images);
 	for (CPed* ped : spawn_ped::list)
 	{
 		CWorld::Remove(ped);
@@ -36,7 +36,7 @@ void Ped::SpawnPed(std::string& model)
 		return;
 	}
 
-	if (Ped::ped_json.data.contains(model))
+	if (Ped::ped_data.json.data.contains(model))
 	{
 		CPlayerPed* player = FindPlayerPed();
 		CVector pos = player->GetPosition();
@@ -226,8 +226,8 @@ void Ped::Draw()
 				{
 					ImGui::Spacing();
 
-					Ui::DrawImages(peds_vec, ImVec2(65, 110), search_categories, selected_item, filter, SpawnPed, nullptr,
-						[](std::string str) {return ped_json.data[str].get<std::string>(); });
+					Ui::DrawImages(ped_data.images, ImVec2(65, 110), ped_data.categories, ped_data.selected, ped_data.filter, SpawnPed, nullptr,
+						[](std::string str) {return ped_data.json.data[str].get<std::string>(); });
 					ImGui::EndTabItem();
 				}
 				if (ImGui::BeginTabItem("Config"))
@@ -253,12 +253,12 @@ void Ped::Draw()
 					Ui::ListBox("Ped type", spawn_ped::ped_type, spawn_ped::selected_ped_type);
 
 					ImGui::Spacing();
-					ImGui::Text("Selected weapon: %s", Weapon::weapon_json.data[std::to_string(spawn_ped::weapon_id)].get<std::string>());
+					ImGui::Text("Selected weapon: %s", Weapon::weapon_data.json.data[std::to_string(spawn_ped::weapon_id)].get<std::string>());
 					ImGui::Spacing();
-					Ui::DrawImages(Weapon::weapon_vec, ImVec2(65, 65), Weapon::search_categories, Weapon::selected_item, Weapon::filter,
+					Ui::DrawImages(Weapon::weapon_data.images, ImVec2(65, 65), Weapon::weapon_data.categories, Weapon::weapon_data.selected, Weapon::weapon_data.filter,
 						[](std::string str) { spawn_ped::weapon_id = std::stoi(str); },
 						nullptr,
-						[](std::string str) {return Weapon::weapon_json.data[str].get<std::string>(); },
+						[](std::string str) {return Weapon::weapon_data.json.data[str].get<std::string>(); },
 						[](std::string str) {return str != "-1"; /*Jetpack*/ }
 					);
 

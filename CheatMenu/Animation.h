@@ -5,23 +5,16 @@ private:
 	inline static bool loop = false;
 	inline static bool secondary = false;
 
-	inline static CJson json = CJson("animation");
-	inline static ImGuiTextFilter filter = "";
-	inline static std::vector<std::string> search_categories;
-	inline static std::string selected_item = "All";
+	inline static SearchData anim_data{"animation"};
 
 	struct Cutscene
 	{
-		inline static CJson json = CJson("cutscene");
-		inline static ImGuiTextFilter filter = "";
-		inline static std::vector<std::string> categories;
-		inline static std::string selected = "All";
+		inline static SearchData data{ "cutscene" };
 		inline static std::string scene_name = "";
 		inline static int interior = 0;
 		inline static bool running = false;
 	};
 	
-
 	inline static char anim_buffer[INPUT_BUFFER_SIZE] = "";
 	inline static char ifp_buffer[INPUT_BUFFER_SIZE] = "";
 

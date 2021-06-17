@@ -103,3 +103,13 @@ struct HotKeyData
 	int key2;
 	bool is_down = false;
 };
+
+
+struct SearchData
+{
+	CJson json;
+	ImGuiTextFilter filter = "";
+	std::vector<std::string> categories;
+	std::string selected = "All";
+	std::vector<std::unique_ptr<TextureStructure>> images;
+};

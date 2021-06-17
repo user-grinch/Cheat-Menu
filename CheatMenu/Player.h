@@ -10,10 +10,7 @@ private:
 	inline static bool god_mode = false;
 	inline static int body = 0;
 	inline static bool aim_skin_changer = false;
-	inline static ImGuiTextFilter filter = "";
-	inline static std::string selected_item = "All";
-	inline static std::vector<std::string> search_categories;
-	inline static std::vector<std::unique_ptr<TextureStructure>> clothes_vec;
+	inline static SearchData cloth_data;
 	inline static bool images_loaded = false;
 
 	struct custom_skins

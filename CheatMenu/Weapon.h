@@ -3,14 +3,9 @@
 class Weapon
 {
 public:
-	inline static ImGuiTextFilter filter = "";
-	inline static std::string selected_item = "All";
-	inline static std::vector<std::string> search_categories;
-	inline static std::vector<std::unique_ptr<TextureStructure>> weapon_vec;
+	inline static SearchData weapon_data{ "weapon" };
 	inline static bool images_loaded = false;
 	
-	inline static CJson weapon_json = CJson("weapon");
-
 	inline static bool auto_aim = false;
 	inline static bool fast_reload = false;
 	inline static bool huge_damage = false;

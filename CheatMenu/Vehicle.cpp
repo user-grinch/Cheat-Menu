@@ -12,9 +12,9 @@ Vehicle::Vehicle()
 	{
 		if (!images_loaded)
 		{
-			Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\vehicles\\images\\"), ".jpg", spawner::search_categories, spawner::image_vec);
-			Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\vehicles\\components\\"), ".jpg", tune::search_categories, tune::image_vec);
-			Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\vehicles\\paintjobs\\"), ".png", texture9::search_categories, texture9::image_vec);
+			Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\vehicles\\images\\"), ".jpg", spawner::veh_data.categories, spawner::veh_data.images);
+			Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\vehicles\\components\\"), ".jpg", tune_data.categories, tune_data.images);
+			Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\vehicles\\paintjobs\\"), ".png", texture_data.categories, texture_data.images);
 
 			images_loaded = true;
 		}
@@ -153,9 +153,9 @@ Vehicle::Vehicle()
 
 Vehicle::~Vehicle()
 {
-	Util::ReleaseTextures(spawner::image_vec);
-	Util::ReleaseTextures(tune::image_vec);
-	Util::ReleaseTextures(texture9::image_vec);
+	Util::ReleaseTextures(spawner::veh_data.images);
+	Util::ReleaseTextures(tune_data.images);
+	Util::ReleaseTextures(texture_data.images);
 }
 
 void Vehicle::AddComponent(const std::string& component, const bool display_message)
@@ -922,7 +922,7 @@ void Vehicle::Draw()
 			ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() - 2.5);
 			ImGui::InputTextWithHint("##LicenseText", "License plate text", spawner::license_text, 9);
 
-			Ui::DrawImages(spawner::image_vec, ImVec2(100, 75), spawner::search_categories, spawner::selected_item, spawner::filter, SpawnVehicle, nullptr,
+			Ui::DrawImages(spawner::veh_data.images, ImVec2(100, 75), spawner::veh_data.categories, spawner::veh_data.selected, spawner::veh_data.filter, SpawnVehicle, nullptr,
 				[](std::string str)
 			{
 				return GetNameFromModel(std::stoi(str));
@@ -1104,7 +1104,7 @@ Only some vehicles will have them.");
 				ImGui::SameLine();
 				ImGui::Checkbox("Material filter", &color::material_filter);
 				ImGui::Spacing();
-				Ui::DrawImages(texture9::image_vec, ImVec2(100, 80), texture9::search_categories, texture9::selected_item, texture9::filter,
+				Ui::DrawImages(texture_data.images, ImVec2(100, 80), texture_data.categories, texture_data.selected, texture_data.filter,
 					[](std::string& str)
 					{
 						Paint::SetNodeTexture(FindPlayerPed()->m_pVehicle, Paint::veh_nodes::selected, str, color::material_filter);
@@ -1118,7 +1118,7 @@ Only some vehicles will have them.");
 			if (ImGui::BeginTabItem("Tune"))
 			{
 				ImGui::Spacing();
-				Ui::DrawImages(tune::image_vec, ImVec2(100, 80), tune::search_categories, tune::selected_item, tune::filter,
+				Ui::DrawImages(tune_data.images, ImVec2(100, 80), tune_data.categories, tune_data.selected, tune_data.filter,
 					[](std::string& str) {AddComponent(str);},
 					[](std::string& str) {RemoveComponent(str); },
 					[](std::string& str) {return str;},

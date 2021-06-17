@@ -105,7 +105,7 @@ public:
 		Saves json data to disk
 	*/
 	void WriteToDisk();
-	CJson(const char* text);
+	CJson(const char* text = "");
 };
 
 

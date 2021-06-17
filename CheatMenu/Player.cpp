@@ -50,7 +50,7 @@ Player::Player()
 
 		if (!images_loaded)
 		{
-			Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\clothes\\"), ".jpg", search_categories, clothes_vec);
+			Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\clothes\\"), ".jpg", cloth_data.categories, cloth_data.images);
 			images_loaded = true;
 		}
 
@@ -118,7 +118,7 @@ Player::Player()
 
 Player::~Player()
 {
-	Util::ReleaseTextures(clothes_vec);
+	Util::ReleaseTextures(cloth_data.images);
 }
 
 void Player::ChangePlayerCloth(std::string& name)
@@ -161,7 +161,7 @@ void Player::ChangePlayerCloth(std::string& name)
 void Player::ChangePlayerModel(std::string& model)
 {
 	bool custom_skin = std::find(custom_skins::store_vec.begin(), custom_skins::store_vec.end(), model) != custom_skins::store_vec.end();
-	if (Ped::ped_json.data.contains(model) || custom_skin)
+	if (Ped::ped_data.json.data.contains(model) || custom_skin)
 	{
 		CPlayerPed* player = FindPlayerPed();
 		if (Ped::pedspecial_json.data.contains(model) || custom_skin)
@@ -373,7 +373,7 @@ void Player::Draw()
 						}
 						ImGui::Spacing();
 
-						Ui::DrawImages(clothes_vec, ImVec2(70, 100), search_categories, selected_item, filter, ChangePlayerCloth, nullptr,
+						Ui::DrawImages(cloth_data.images, ImVec2(70, 100), cloth_data.categories, cloth_data.selected, cloth_data.filter, ChangePlayerCloth, nullptr,
 							[](std::string str)
 						{
 							std::stringstream ss(str);
@@ -400,8 +400,8 @@ void Player::Draw()
 				}
 				if (ImGui::BeginTabItem("Ped skins"))
 				{
-					Ui::DrawImages(Ped::peds_vec, ImVec2(65, 110), Ped::search_categories, Ped::selected_item, Ped::filter, ChangePlayerModel, nullptr,
-						[](std::string str) {return Ped::ped_json.data[str].get<std::string>(); });
+					Ui::DrawImages(Ped::ped_data.images, ImVec2(65, 110), Ped::ped_data.categories, Ped::ped_data.selected, Ped::ped_data.filter, ChangePlayerModel, nullptr,
+						[](std::string str) {return Ped::ped_data.json.data[str].get<std::string>(); });
 					ImGui::EndTabItem();
 				}
 				if (ImGui::BeginTabItem("Custom skins"))
@@ -410,7 +410,7 @@ void Player::Draw()
 
 					if (modloader_installed)
 					{
-						Ui::FilterWithHint("Search", filter, std::string("Total skins: " + std::to_string(custom_skins::store_vec.size())).c_str());
+						Ui::FilterWithHint("Search", cloth_data.filter, std::string("Total skins: " + std::to_string(custom_skins::store_vec.size())).c_str());
 						Ui::ShowTooltip("Place your dff & txd files inside 'modloader/Custom Skins'");
 						ImGui::Spacing();
 						ImGui::TextWrapped("Note: Your txd & dff names can't exceed 8 characters. Don't change names while the game is running.");
@@ -428,7 +428,16 @@ void Player::Draw()
 					}
 					else
 					{
-						ImGui::TextWrapped("Modloader is not installed. Please install modloader.");
+						ImGui::TextWrapped("Custom skin allows to change player skins without replacing any existing game ped skins.\n\
+Steps to enable 'Custom Skins',\n\n\
+1. Download & install modloader\n\
+2. Create a folder inside 'modloader' folder with the name 'Custom Skins'\n\
+3. Download ped skins online ( .dff & .txd files) and put them inside.\n\
+4. Restart your game.\n\n\n\
+Limitations:\n\
+1. Your .dff & .txd file names must not exceed 8 characters.\n\
+2. Do not rename them while the game is running\n\
+\nDoing so will crash your game.");
 						ImGui::Spacing();
 						if (ImGui::Button("Download Modloader", ImVec2(Ui::GetSize(1))))
 							ShellExecute(NULL, "open", "https://gtaforums.com/topic/669520-mod-loader/", NULL, NULL, SW_SHOWNORMAL);

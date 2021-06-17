@@ -5,14 +5,9 @@
 class Ped
 {
 private:
-	inline static ImGuiTextFilter filter = "";
-	inline static std::string selected_item = "All";
-	inline static std::vector<std::string> search_categories;
-	inline static std::vector<std::unique_ptr<TextureStructure>> peds_vec;
-	inline static bool images_loaded = false;
-
-	inline static CJson ped_json = CJson("ped");
+	inline static SearchData ped_data{ "ped" };
 	inline static CJson pedspecial_json = CJson("ped special");
+	inline static bool images_loaded = false;
 
 	inline static std::vector<std::string> gang_names = 
 	{
@@ -22,7 +17,8 @@ private:
 	inline static bool exgangwars_installed = false;
 	inline static int ped_remove_radius = 5;
 
-	struct spawn_ped {
+	struct spawn_ped 
+	{
 		inline static std::vector<CPed*> list;
 		inline static int accuracy = 50;
 		inline static int health = 100;

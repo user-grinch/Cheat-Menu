@@ -10,7 +10,7 @@ Weapon::Weapon()
 	{
 		if (!images_loaded)
 		{
-			Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\weapons\\"), ".jpg", Weapon::search_categories, Weapon::weapon_vec);
+			Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\weapons\\"), ".jpg", Weapon::weapon_data.categories, Weapon::weapon_data.images);
 			images_loaded = true;
 		}
 		
@@ -63,7 +63,7 @@ Weapon::Weapon()
 
 Weapon::~Weapon()
 {
-	Util::ReleaseTextures(Weapon::weapon_vec);
+	Util::ReleaseTextures(Weapon::weapon_data.images);
 }
 
 void Weapon::SetGangWeapon(std::string& weapon_type)
@@ -198,10 +198,10 @@ void Weapon::Draw()
 			ImGui::Columns(1);
 
 			ImGui::Spacing();
-			ImGui::Text("Current weapon: %s", weapon_json.data[std::to_string(gang_weapons[selected_gang][selected_weapon_count])].get<std::string>());
+			ImGui::Text("Current weapon: %s", weapon_data.json.data[std::to_string(gang_weapons[selected_gang][selected_weapon_count])].get<std::string>().c_str());
 			ImGui::Spacing();
-			Ui::DrawImages(weapon_vec, ImVec2(65, 65), search_categories, selected_item, filter, SetGangWeapon, nullptr,
-				[](std::string str) {return weapon_json.data[str].get<std::string>(); },
+			Ui::DrawImages(weapon_data.images, ImVec2(65, 65), weapon_data.categories, weapon_data.selected, weapon_data.filter, SetGangWeapon, nullptr,
+				[](std::string str) {return weapon_data.json.data[str].get<std::string>(); },
 				[](std::string str) {return str != "-1"; /*Jetpack*/ }
 			);
 			ImGui::EndTabItem();
@@ -214,8 +214,8 @@ void Weapon::Draw()
 				ammo_count = (ammo_count < 0) ? 0 : ammo_count;
 				ammo_count = (ammo_count > 99999) ? 99999 : ammo_count;
 			}
-			Ui::DrawImages(weapon_vec, ImVec2(65, 65), search_categories, selected_item, filter, GiveWeaponToPlayer, nullptr,
-				[](std::string str) {return weapon_json.data[str].get<std::string>(); },
+			Ui::DrawImages(weapon_data.images, ImVec2(65, 65), weapon_data.categories, weapon_data.selected, weapon_data.filter, GiveWeaponToPlayer, nullptr,
+				[](std::string str) {return weapon_data.json.data[str].get<std::string>(); },
 				[](std::string str) {return str != "0"; /*Unarmed*/ }
 			);
 			ImGui::EndTabItem();

@@ -16,7 +16,7 @@ void Teleport::FetchRadarSpriteData()
 	if (cur_timer - timer < 5000)
 		return;
 
-	json.data.erase("Radar");
+	tp_data.json.data.erase("Radar");
 
 	// 175 is the max number of sprites, FLA can increase this limit, might need to update this
 	for (int i = 0; i != 175; ++i)	
@@ -26,7 +26,7 @@ void Teleport::FetchRadarSpriteData()
 		std::string sprite_name = sprite_name_json.data[std::to_string(sprite)].get<std::string>();
 		std::string key_name = sprite_name + ", " + Util::GetLocationName(&pos);
 
-		json.data["Radar"][key_name] = "0, " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z);
+		tp_data.json.data["Radar"][key_name] = "0, " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z);
 
 		/*
 			"Radar" : {
@@ -38,7 +38,7 @@ void Teleport::FetchRadarSpriteData()
 
 Teleport::Teleport()
 {
-	json.LoadData(search_categories, selected_item);
+	tp_data.json.LoadData(tp_data.categories, tp_data.selected);
 	quick_teleport = config.GetValue("quick_teleport", false);
 
 	Events::processScriptsEvent += []
@@ -153,9 +153,9 @@ void Teleport::RemoveTeleportEntry(std::string& category, std::string& key, std:
 {
 	if (category == "Custom")
 	{
-		json.data["Custom"].erase(key);
+		tp_data.json.data["Custom"].erase(key);
 		CHud::SetHelpMessage("Location removed", false, false, false);
-		json.WriteToDisk();
+		tp_data.json.WriteToDisk();
 	}
 	else CHud::SetHelpMessage("You can only remove custom location", false, false, false);
 }
@@ -228,7 +228,7 @@ void Teleport::Draw()
 		{
 			FetchRadarSpriteData();
 			ImGui::Spacing();
-			Ui::DrawJSON(json, search_categories, selected_item, filter, &TeleportToLocation, &RemoveTeleportEntry);
+			Ui::DrawJSON(tp_data.json, tp_data.categories, tp_data.selected, tp_data.filter, &TeleportToLocation, &RemoveTeleportEntry);
 			ImGui::EndTabItem();
 		}
 
@@ -240,13 +240,13 @@ void Teleport::Draw()
 			ImGui::Spacing();
 			if (ImGui::Button("Add location", Ui::GetSize()))
 			{
-				json.data["Custom"][location_buffer] = ("0, " + std::string(input_buffer));
+				tp_data.json.data["Custom"][location_buffer] = ("0, " + std::string(input_buffer));
 
 				// Clear the Radar coordinates
-				json.data.erase("Radar");
-				json.data["Radar"] = {};
+				tp_data.json.data.erase("Radar");
+				tp_data.json.data["Radar"] = {};
 
-				json.WriteToDisk();
+				tp_data.json.WriteToDisk();
 			}
 			ImGui::EndTabItem();
 		}

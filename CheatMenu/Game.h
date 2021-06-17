@@ -2,10 +2,7 @@
 class Game
 {
 public:
-	inline static CJson json = CJson("mission");
-	inline static ImGuiTextFilter filter = "";
-	inline static std::vector<std::string> search_categories;
-	inline static std::string selected_item = "All";
+	inline static SearchData mission_data{ "mission" };
 	inline static std::vector<std::string> day_names = { "Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday" };
 
 	inline static char save_game_name[22] = "";
