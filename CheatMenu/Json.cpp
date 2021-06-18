@@ -6,42 +6,42 @@ CJson::CJson(const char* name)
 	if (name == "")
 		return;
 
-	file_path = PLUGIN_PATH((char*)"/CheatMenu/json/") + std::string(name) + ".json";
+	m_FilePath = PLUGIN_PATH((char*)"/CheatMenu/json/") + std::string(name) + ".json";
 
-	if (fs::exists(file_path))
+	if (fs::exists(m_FilePath))
 	{
 		try
 		{
-			std::ifstream file(file_path);
-			file >> data;
+			std::ifstream file(m_FilePath);
+			file >> m_Data;
 			file.close();
 		}
 		catch (...)
 		{
-			flog << "Error trying to read " << file_path << std::endl;
-			data = "{}"_json;
+			flog << "Error trying to read " << m_FilePath << std::endl;
+			m_Data = "{}"_json;
 		}
 	}
 	else
 	{
-		data = "{}"_json;
+		m_Data = "{}"_json;
 
-		if (file_path.find("config"))
+		if (m_FilePath.find("config"))
 			flog << "Creating config.json file" << std::endl;
 		else
-			flog << "Failed to locate file " << file_path << std::endl;
+			flog << "Failed to locate file " << m_FilePath << std::endl;
 	}
 }
 
 void CJson::WriteToDisk()
 {
-	std::ofstream file(file_path);
-	file << data.dump(4, ' ', false, nlohmann::json::error_handler_t::replace) << std::endl;
+	std::ofstream file(m_FilePath);
+	file << m_Data.dump(4, ' ', false, nlohmann::json::error_handler_t::replace) << std::endl;
 	file.close();
 }
 
 void CJson::LoadData(std::vector<std::string>& vec, std::string& selected) // Test
 {
-	for (auto element : data.items())
+	for (auto element : m_Data.items())
 		vec.push_back(element.key());
 }

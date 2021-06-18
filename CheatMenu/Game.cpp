@@ -6,10 +6,10 @@
 #include "CIplStore.h"
 
 // Thanks to aap
-void Game::RealTimeClock()
+void CGame::RealTimeClock()
 {
 	static int lastday;
-	time_t tmp = time(NULL);
+	time_t tmp = time(nullptr);
 	struct tm* now = localtime(&tmp);
 
 	if (now->tm_yday != lastday)
@@ -24,92 +24,92 @@ void Game::RealTimeClock()
 	CClock::ms_nGameClockSeconds = now->tm_sec;
 }
 
-Game::Game()
+CGame::CGame()
 {
-	mission_data.json.LoadData(mission_data.categories, mission_data.selected);
-	stat::json.LoadData(stat::search_categories, stat::selected_item);
-	freecam::fov = TheCamera.FindCamFOV();
+	m_MissionData.m_Json.LoadData(m_MissionData.m_Categories, m_MissionData.m_Selected);
+	m_StatData.m_Json.LoadData(m_StatData.m_Categories, m_StatData.m_Selected);
+	m_Freecam.m_fFOV = TheCamera.FindCamFOV();
 
 	// Generate enabled cheats vector
-	for (auto element : random_cheats::name_json.data.items())
+	for (auto element : m_RandomCheats.m_Json.m_Data.items())
 	{
 		/*
 		[
 			cheat_id = [ cheat_name, state (true/false) ]
 		]
 		*/
-		random_cheats::enabled_cheats[std::stoi(element.key())][0] = element.value().get<std::string>();
-		random_cheats::enabled_cheats[std::stoi(element.key())][1] = "true";
+		m_RandomCheats.m_EnabledCheats[std::stoi(element.key())][0] = element.value().get<std::string>();
+		m_RandomCheats.m_EnabledCheats[std::stoi(element.key())][1] = "true";
 	}
 
 	Events::processScriptsEvent += []
 	{
 		uint timer = CTimer::m_snTimeInMilliseconds;
-		static CPlayerPed* player = FindPlayerPed();
-		static int hplayer = CPools::GetPedRef(player);
+		CPlayerPed* pPlayer = FindPlayerPed();
+		int hplayer = CPools::GetPedRef(pPlayer);
 
-		if (ss_shortcut)
+		if (m_bScreenShot)
 		{
-			if (Ui::HotKeyPressed(Menu::hotkeys::quick_ss))
+			if (Ui::HotKeyPressed(Menu::m_HotKeys.quickSceenShot))
 			{
 				Command<Commands::TAKE_PHOTO>();
 				CHud::SetHelpMessage("Screenshot taken", false, false, false);
 			}
 		}
 
-		if (hard_mode::state)
+		if (m_HardMode.m_bEnabled)
 		{
-			if (player->m_fHealth > 50.0f)
-				player->m_fHealth = 50.0f;
+			if (pPlayer->m_fHealth > 50.0f)
+				pPlayer->m_fHealth = 50.0f;
 
-			player->m_fArmour = 0.0f;
+			pPlayer->m_fArmour = 0.0f;
 			CStats::SetStatValue(STAT_MAX_HEALTH, 350.0f);
 			CStats::SetStatValue(STAT_STAMINA, 0.0f);
 		}
 
-		if (solid_water)
+		if (m_bSolidWater)
 		{
-			CVector pos = player->GetPosition();
+			CVector pos = pPlayer->GetPosition();
 
-			float water_height = 0;
-			Command<Commands::GET_WATER_HEIGHT_AT_COORDS>(pos.x, pos.y, false, &water_height);
+			float waterHeight = 0;
+			Command<Commands::GET_WATER_HEIGHT_AT_COORDS>(pos.x, pos.y, false, &waterHeight);
 
-			if (!Command<Commands::IS_CHAR_IN_ANY_BOAT>(hplayer) && water_height != -1000.0f && pos.z > (water_height))
+			if (!Command<Commands::IS_CHAR_IN_ANY_BOAT>(hplayer) && waterHeight != -1000.0f && pos.z > (waterHeight))
 			{
-				if (solid_water_object == 0)
+				if (m_nSolidWaterObj == 0)
 				{
-					Command<Commands::CREATE_OBJECT>(3095, pos.x, pos.y, water_height, &solid_water_object);
-					Command<Commands::SET_OBJECT_VISIBLE>(solid_water_object, false);
-					if (pos.z < (water_height + 1))
-						player->SetPosn(pos.x, pos.y, water_height + 1);
+					Command<Commands::CREATE_OBJECT>(3095, pos.x, pos.y, waterHeight, &m_nSolidWaterObj);
+					Command<Commands::SET_OBJECT_VISIBLE>(m_nSolidWaterObj, false);
+					if (pos.z < (waterHeight + 1))
+						pPlayer->SetPosn(pos.x, pos.y, waterHeight + 1);
 				}
 				else
-					Command<Commands::SET_OBJECT_COORDINATES>(solid_water_object, pos.x, pos.y, water_height);
+					Command<Commands::SET_OBJECT_COORDINATES>(m_nSolidWaterObj, pos.x, pos.y, waterHeight);
 			}
 			else
 			{
-				if (solid_water_object != 0)
+				if (m_nSolidWaterObj != 0)
 				{
-					Command<Commands::DELETE_OBJECT>(solid_water_object);
-					solid_water_object = 0;
+					Command<Commands::DELETE_OBJECT>(m_nSolidWaterObj);
+					m_nSolidWaterObj = 0;
 				}
 			}
 		}
 
 		// improve this later
-		if (sync_time && timer - sync_time_timer > 50)
+		if (m_bSyncTime && timer - m_nSyncTimer > 50)
 		{
-			std::time_t t = std::time(0);
+			std::time_t t = std::time(nullptr);
 			std::tm* now = std::localtime(&t);
 
 			CClock::ms_nGameClockHours = now->tm_hour;
 			CClock::ms_nGameClockMinutes = now->tm_min;
 
-			sync_time_timer = timer;
+			m_nSyncTimer = timer;
 		}
 
-		if (random_cheats::enable
-		&& (timer - random_cheats::timer) > (uint(random_cheats::enable_wait_time) * 1000))
+		if (m_RandomCheats.m_bEnabled
+			&& (timer - m_RandomCheats.m_nTimer) > (static_cast<uint>(m_RandomCheats.m_nInterval) * 1000))
 		{
 			int id = Random(0, 91);
 
@@ -117,27 +117,27 @@ Game::Game()
 			{
 				if (i == id)
 				{
-					if (random_cheats::enabled_cheats[i][1] == "true")
+					if (m_RandomCheats.m_EnabledCheats[i][1] == "true")
 					{
 						((void(*)(int))0x00438370)(id); // cheatEnableLegimate(int CheatID)
-						CHud::SetHelpMessage(random_cheats::enabled_cheats[i][0].c_str(), false, false, false);
-						random_cheats::timer = timer;
+						CHud::SetHelpMessage(m_RandomCheats.m_EnabledCheats[i][0].c_str(), false, false, false);
+						m_RandomCheats.m_nTimer = timer;
 					}
 					break;
 				}
 			}
 		}
 
-		if (Ui::HotKeyPressed(Menu::hotkeys::freecam))
+		if (Ui::HotKeyPressed(Menu::m_HotKeys.freeCam))
 		{
-			if (freecam::enable)
+			if (m_Freecam.m_bEnabled)
 			{
-				freecam::enable = false;
+				m_Freecam.m_bEnabled = false;
 				ClearFreecamStuff();
 			}
-			else freecam::enable = true;
+			else m_Freecam.m_bEnabled = true;
 		}
-		if (freecam::enable)
+		if (m_Freecam.m_bEnabled)
 			FreeCam();
 	};
 }
@@ -156,14 +156,14 @@ void SetPlayerMission(std::string& rootkey, std::string& name, std::string& id)
 		Command<Commands::LOAD_AND_LAUNCH_MISSION_INTERNAL>(std::stoi(id));
 	}
 	else CHud::SetHelpMessage("Can't start mission now", false, false, false);
-
 }
 
-void Game::FreeCam()
+void CGame::FreeCam()
 {
-	int delta_speed = freecam::speed * (CTimer::m_snTimeInMillisecondsNonClipped - CTimer::m_snPreviousTimeInMillisecondsNonClipped);
+	int deltaSpeed = m_Freecam.m_fSpeed * (CTimer::m_snTimeInMillisecondsNonClipped -
+		CTimer::m_snPreviousTimeInMillisecondsNonClipped);
 
-	if (!freecam::init_done)
+	if (!m_Freecam.m_bInitDone)
 	{
 		CPlayerPed* player = FindPlayerPed(-1);
 		Command<Commands::SET_EVERYONE_IGNORE_PLAYER>(0, true);
@@ -172,135 +172,135 @@ void Game::FreeCam()
 		CVector player_pos = player->GetPosition();
 		CPad::GetPad(0)->DisablePlayerControls = true;
 
-		Command<Commands::CREATE_RANDOM_CHAR>(player_pos.x, player_pos.y, player_pos.z, &freecam::hped);
-		freecam::ped = CPools::GetPed(freecam::hped);
-		freecam::ped->m_bIsVisible = false;
+		Command<Commands::CREATE_RANDOM_CHAR>(player_pos.x, player_pos.y, player_pos.z, &m_Freecam.m_nPed);
+		m_Freecam.m_pPed = CPools::GetPed(m_Freecam.m_nPed);
+		m_Freecam.m_pPed->m_bIsVisible = false;
 
-		Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(freecam::hped, true);
-		Command<Commands::SET_CHAR_COLLISION>(freecam::hped, false);
-		Command<Commands::SET_LOAD_COLLISION_FOR_CHAR_FLAG>(freecam::hped, false);
+		Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(m_Freecam.m_nPed, true);
+		Command<Commands::SET_CHAR_COLLISION>(m_Freecam.m_nPed, false);
+		Command<Commands::SET_LOAD_COLLISION_FOR_CHAR_FLAG>(m_Freecam.m_nPed, false);
 
-		freecam::tmouseX = player->GetHeading() + 89.6f;
-		freecam::tmouseY = 0;
+		m_Freecam.m_fTotalMouse.x = player->GetHeading() + 89.6f;
+		m_Freecam.m_fTotalMouse.y = 0;
 
-		freecam::init_done = true;
+		m_Freecam.m_bInitDone = true;
 		player_pos.z -= 20;
-		freecam::ped->SetPosn(player_pos);
+		m_Freecam.m_pPed->SetPosn(player_pos);
 
-		TheCamera.LerpFOV(TheCamera.FindCamFOV(), freecam::fov, 1000, true);
+		TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_Freecam.m_fFOV, 1000, true);
 		Command<Commands::CAMERA_PERSIST_FOV>(true);
 	}
 
-	CVector pos = freecam::ped->GetPosition();
+	CVector pos = m_Freecam.m_pPed->GetPosition();
 
-	Command<Commands::GET_PC_MOUSE_MOVEMENT>(&freecam::mouseX, &freecam::mouseY);
-	freecam::tmouseX = freecam::tmouseX - freecam::mouseX / 250;
-	freecam::tmouseY = freecam::tmouseY + freecam::mouseY / 3;
+	Command<Commands::GET_PC_MOUSE_MOVEMENT>(&m_Freecam.m_fMouse.x, &m_Freecam.m_fMouse.y);
+	m_Freecam.m_fTotalMouse.x = m_Freecam.m_fTotalMouse.x - m_Freecam.m_fMouse.x / 250;
+	m_Freecam.m_fTotalMouse.y = m_Freecam.m_fTotalMouse.y + m_Freecam.m_fMouse.y / 3;
 
-	if (freecam::tmouseY > 150)
-		freecam::tmouseY = 150;
+	if (m_Freecam.m_fTotalMouse.x > 150)
+		m_Freecam.m_fTotalMouse.y = 150;
 
-	if (freecam::tmouseY < -150)
-		freecam::tmouseY = -150;
+	if (m_Freecam.m_fTotalMouse.y < -150)
+		m_Freecam.m_fTotalMouse.y = -150;
 
-	if (Ui::HotKeyPressed(Menu::hotkeys::free_cam_tp_player))
+	if (Ui::HotKeyPressed(Menu::m_HotKeys.freeCamTeleportPlayer))
 	{
 		CPlayerPed* player = FindPlayerPed(-1);
-		CVector pos = freecam::ped->GetPosition();
+		CVector pos = m_Freecam.m_pPed->GetPosition();
 		CEntity* player_entity = FindPlayerEntity(-1);
-		pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, 0, &player_entity) + 0.5f;
+		pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, nullptr, &player_entity) + 0.5f;
 		Command<Commands::SET_CHAR_COORDINATES>(CPools::GetPedRef(player), pos.x, pos.y, pos.z);
 
 		// disble them again cause they get enabled
 		CHud::bScriptDontDisplayRadar = true;
 		CHud::m_Wants_To_Draw_Hud = false;
-		CHud::SetHelpMessage((char*)"Player telported", false, false, false);
+		CHud::SetHelpMessage("Player telported", false, false, false);
 	}
 
 	if (KeyPressed(VK_RCONTROL))
-		delta_speed /= 2;
+		deltaSpeed /= 2;
 
 	if (KeyPressed(VK_RSHIFT))
-		delta_speed *= 2;
+		deltaSpeed *= 2;
 
 	if (KeyPressed(VK_KEY_I) || KeyPressed(VK_KEY_K))
 	{
 		if (KeyPressed(VK_KEY_K))
-			delta_speed *= -1;
+			deltaSpeed *= -1;
 
 		float angle;
-		Command<Commands::GET_CHAR_HEADING>(freecam::hped, &angle);
-		pos.x += delta_speed * cos(angle * 3.14159f / 180.0f);
-		pos.y += delta_speed * sin(angle * 3.14159f / 180.0f);
-		pos.z += delta_speed * 2 * sin(freecam::tmouseY / 3 * 3.14159f / 180.0f);
+		Command<Commands::GET_CHAR_HEADING>(m_Freecam.m_nPed, &angle);
+		pos.x += deltaSpeed * cos(angle * 3.14159f / 180.0f);
+		pos.y += deltaSpeed * sin(angle * 3.14159f / 180.0f);
+		pos.z += deltaSpeed * 2 * sin(m_Freecam.m_fTotalMouse.y / 3 * 3.14159f / 180.0f);
 	}
 
 	if (KeyPressed(VK_KEY_J) || KeyPressed(VK_KEY_L))
 	{
 		if (KeyPressed(VK_KEY_J))
-			delta_speed *= -1;
+			deltaSpeed *= -1;
 
 		float angle;
-		Command<Commands::GET_CHAR_HEADING>(freecam::hped, &angle);
+		Command<Commands::GET_CHAR_HEADING>(m_Freecam.m_nPed, &angle);
 		angle -= 90;
 
-		pos.x += delta_speed * cos(angle * 3.14159f / 180.0f);
-		pos.y += delta_speed * sin(angle * 3.14159f / 180.0f);
+		pos.x += deltaSpeed * cos(angle * 3.14159f / 180.0f);
+		pos.y += deltaSpeed * sin(angle * 3.14159f / 180.0f);
 	}
 
 	if (CPad::NewMouseControllerState.wheelUp)
 	{
-		if (freecam::fov > 10.0f)
-			freecam::fov -= 2.0f * delta_speed;
+		if (m_Freecam.m_fFOV > 10.0f)
+			m_Freecam.m_fFOV -= 2.0f * deltaSpeed;
 
-		TheCamera.LerpFOV(TheCamera.FindCamFOV(), freecam::fov, 250, true);
+		TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_Freecam.m_fFOV, 250, true);
 		Command<Commands::CAMERA_PERSIST_FOV>(true);
 	}
 
 	if (CPad::NewMouseControllerState.wheelDown)
 	{
-		if (freecam::fov < 115.0f)
-			freecam::fov += 2.0f * delta_speed;
+		if (m_Freecam.m_fFOV < 115.0f)
+			m_Freecam.m_fFOV += 2.0f * deltaSpeed;
 
-		TheCamera.LerpFOV(TheCamera.FindCamFOV(), freecam::fov, 250, true);
+		TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_Freecam.m_fFOV, 250, true);
 		Command<Commands::CAMERA_PERSIST_FOV>(true);
 	}
 
-	freecam::ped->SetHeading(freecam::tmouseX);
-	Command<Commands::ATTACH_CAMERA_TO_CHAR>(freecam::hped, 0.0, 0.0, 20.0, 90.0, 180, freecam::tmouseY, 0.0, 2);
-	freecam::ped->SetPosn(pos);
+	m_Freecam.m_pPed->SetHeading(m_Freecam.m_fTotalMouse.x);
+	Command<Commands::ATTACH_CAMERA_TO_CHAR>(m_Freecam.m_nPed, 0.0, 0.0, 20.0, 90.0, 180, m_Freecam.m_fTotalMouse.y, 0.0, 2);
+	m_Freecam.m_pPed->SetPosn(pos);
 	CIplStore::AddIplsNeededAtPosn(pos);
 }
 
-void Game::ClearFreecamStuff()
+void CGame::ClearFreecamStuff()
 {
-	freecam::init_done = false;
+	m_Freecam.m_bInitDone = false;
 	Command<Commands::SET_EVERYONE_IGNORE_PLAYER>(0, false);
 	CHud::bScriptDontDisplayRadar = false;
 	CHud::m_Wants_To_Draw_Hud = true;
 	CPad::GetPad(0)->DisablePlayerControls = false;
 
-	Command<Commands::DELETE_CHAR>(freecam::hped);
-	freecam::ped = nullptr;
+	Command<Commands::DELETE_CHAR>(m_Freecam.m_nPed);
+	m_Freecam.m_pPed = nullptr;
 	Command<Commands::CAMERA_PERSIST_FOV>(false);
 	Command<Commands::RESTORE_CAMERA_JUMPCUT>();
 }
 
-void Game::Draw()
+void CGame::Draw()
 {
 	ImGui::Spacing();
-	CPlayerPed* player = FindPlayerPed();
-	int hplayer = CPools::GetPedRef(player);
+	CPlayerPed* pPlayer = FindPlayerPed();
+	int hplayer = CPools::GetPedRef(pPlayer);
 
 	if (ImGui::BeginTabBar("Game", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
 	{
 		if (ImGui::BeginTabItem("Checkboxes"))
 		{
 			ImGui::Spacing();
-			ImGui::Columns(2, 0, false);
-			if (ImGui::Checkbox("Disable cheats", &disable_cheats))
+			ImGui::Columns(2, nullptr, false);
+			if (ImGui::Checkbox("Disable cheats", &m_bDisableCheats))
 			{
-				if (disable_cheats)
+				if (m_bDisableCheats)
 				{
 					patch::Set<BYTE>(0x4384D0, 0xE9, false);
 					patch::SetInt(0x4384D1, 0xD0, false);
@@ -313,9 +313,9 @@ void Game::Draw()
 					patch::SetInt(0x4384D5, 0xCC, false);
 				}
 			}
-			if (ImGui::Checkbox("Disable F1 & F3 replay", &disable_replay))
+			if (ImGui::Checkbox("Disable F1 & F3 replay", &m_bDisableReplay))
 			{
-				if (disable_replay)
+				if (m_bDisableReplay)
 					patch::SetInt(0x460500, 0xC3, false);
 				else
 					patch::SetInt(0x460500, 0xBD844BB, false);
@@ -323,10 +323,10 @@ void Game::Draw()
 
 			Ui::CheckboxAddress("Faster clock", 0x96913B);
 
-			if (Ui::CheckboxWithHint("Forbidden area wl", &forbidden_area_wl, "Wanted levels that appears outside \
+			if (Ui::CheckboxWithHint("Forbidden area wl", &m_bForbiddenArea, "Wanted levels that appears outside \
 of LS without completing missions"))
 			{
-				if (forbidden_area_wl)
+				if (m_bForbiddenArea)
 					patch::Set<BYTE>(0x441770, 0x83, false);
 				else
 					patch::Set<BYTE>(0x441770, 0xC3, false);
@@ -334,52 +334,54 @@ of LS without completing missions"))
 
 			Ui::CheckboxAddress("Free pay n spray", 0x96C009);
 
-			if (ImGui::Checkbox("Freeze misson timer", &freeze_mission_timer))
-				Command<Commands::FREEZE_ONSCREEN_TIMER>(freeze_mission_timer);
+			if (ImGui::Checkbox("Freeze misson timer", &m_bMissionTimer))
+				Command<Commands::FREEZE_ONSCREEN_TIMER>(m_bMissionTimer);
 
 			ImGui::NextColumn();
 
-			if (Ui::CheckboxWithHint("Hard mode", &hard_mode::state, "Makes the game more challanging to play. \n\
+			if (Ui::CheckboxWithHint("Hard mode", &m_HardMode.m_bEnabled, "Makes the game more challanging to play. \n\
 Lowers armour, health, stamina etc."))
 			{
 				CPlayerPed* player = FindPlayerPed();
 
-				if (hard_mode::state)
+				if (m_HardMode.m_bEnabled)
 				{
-					hard_mode::prev_armour = player->m_fArmour;
-					hard_mode::prev_health = player->m_fHealth;
-					hard_mode::prev_max_health = CStats::GetStatValue(STAT_MAX_HEALTH);
-					hard_mode::prev_stamina = CStats::GetStatValue(STAT_STAMINA);
+					m_HardMode.m_fBacArmour = player->m_fArmour;
+					m_HardMode.m_fBacHealth = player->m_fHealth;
+					m_HardMode.m_fBacMaxHealth = CStats::GetStatValue(STAT_MAX_HEALTH);
+					m_HardMode.m_fBacStamina = CStats::GetStatValue(STAT_STAMINA);
 					player->m_fHealth = 50.0f;
 				}
 				else
 				{
-					player->m_fArmour = hard_mode::prev_armour;
-					CStats::SetStatValue(STAT_STAMINA, hard_mode::prev_stamina);
-					CStats::SetStatValue(STAT_MAX_HEALTH, hard_mode::prev_max_health);
-					player->m_fHealth = hard_mode::prev_health;
+					player->m_fArmour = m_HardMode.m_fBacArmour;
+					CStats::SetStatValue(STAT_STAMINA, m_HardMode.m_fBacStamina);
+					CStats::SetStatValue(STAT_MAX_HEALTH, m_HardMode.m_fBacMaxHealth);
+					player->m_fHealth = m_HardMode.m_fBacHealth;
 					CWeaponInfo::LoadWeaponData();
 				}
 			}
 
-			if (Ui::CheckboxWithHint("Keep stuff", &keep_stuff, "Keep stuff after arrest/death"))
+			if (Ui::CheckboxWithHint("Keep stuff", &m_bKeepStuff, "Keep stuff after arrest/death"))
 			{
-				Command<Commands::SWITCH_ARREST_PENALTIES>(keep_stuff);
-				Command<Commands::SWITCH_DEATH_PENALTIES>(keep_stuff);
+				Command<Commands::SWITCH_ARREST_PENALTIES>(m_bKeepStuff);
+				Command<Commands::SWITCH_DEATH_PENALTIES>(m_bKeepStuff);
 			}
-			Ui::CheckboxWithHint("Screenshot shortcut", &ss_shortcut, (("Take screenshot using ") + Ui::GetHotKeyNameString(Menu::hotkeys::quick_ss)
-				+ "\nSaved inside 'GTA San Andreas User Files\\Gallery'").c_str());
-			if (Ui::CheckboxWithHint("Solid water", &solid_water, "Player can walk on water\nTurn this off if you want to swim."))
+			Ui::CheckboxWithHint("Screenshot shortcut", &m_bScreenShot,
+			                     (("Take screenshot using ") + Ui::GetHotKeyNameString(Menu::m_HotKeys.quickSceenShot)
+				                     + "\nSaved inside 'GTA San Andreas User Files\\Gallery'").c_str());
+			if (Ui::CheckboxWithHint("Solid water", &m_bSolidWater,
+			                         "Player can walk on water\nTurn this off if you want to swim."))
 			{
-				if (!solid_water && solid_water_object != 0)
+				if (!m_bSolidWater && m_nSolidWaterObj != 0)
 				{
-					Command<Commands::DELETE_OBJECT>(solid_water_object);
-					solid_water_object = 0;
+					Command<Commands::DELETE_OBJECT>(m_nSolidWaterObj);
+					m_nSolidWaterObj = 0;
 				}
 			}
-			if (ImGui::Checkbox("Sync system time", &sync_time))
+			if (ImGui::Checkbox("Sync system time", &m_bSyncTime))
 			{
-				if (sync_time)
+				if (m_bSyncTime)
 					patch::RedirectCall(0x53BFBD, &RealTimeClock);
 				else
 					patch::RedirectCall(0x53BFBD, &CClock::Update);
@@ -393,7 +395,7 @@ Lowers armour, health, stamina etc."))
 			if (ImGui::CollapsingHeader("Current day"))
 			{
 				int day = CClock::CurrentDay - 1;
-				if (Ui::ListBox("Select day", day_names, day))
+				if (Ui::ListBox("Select day", m_DayNames, day))
 					CClock::CurrentDay = day + 1;
 				ImGui::Spacing();
 				ImGui::Separator();
@@ -402,20 +404,20 @@ Lowers armour, health, stamina etc."))
 			Ui::EditReference("FPS limit", RsGlobal.frameLimit, 1, 30, 60);
 			if (ImGui::CollapsingHeader("Free cam"))
 			{
-				if (Ui::CheckboxWithHint("Enable", &freecam::enable, "Forward: I\tBackward: K\
+				if (Ui::CheckboxWithHint("Enable", &m_Freecam.m_bEnabled, "Forward: I\tBackward: K\
 \nLeft: J\t\t  Right: L\n\nSlower: RCtrl\tFaster: RShift\n\nZoom: Mouse wheel"))
 				{
-					if (!freecam::enable)
+					if (!m_Freecam.m_bEnabled)
 						ClearFreecamStuff();
 				}
 				ImGui::Spacing();
 
-				if (ImGui::SliderFloat("Field of view", &freecam::fov, 5.0f, 120.0f))
+				if (ImGui::SliderFloat("Field of view", &m_Freecam.m_fFOV, 5.0f, 120.0f))
 				{
-					TheCamera.LerpFOV(TheCamera.FindCamFOV(), freecam::fov, 250.0f, true);
+					TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_Freecam.m_fFOV, 250.0f, true);
 					Command<Commands::CAMERA_PERSIST_FOV>(true);
 				}
-				ImGui::SliderFloat("Movement Speed", &freecam::speed, 0.0f, 0.5f);
+				ImGui::SliderFloat("Movement Speed", &m_Freecam.m_fSpeed, 0.0f, 0.5f);
 				ImGui::Spacing();
 				ImGui::TextWrapped("Press Enter to teleport player to camera location");
 				ImGui::Spacing();
@@ -447,12 +449,14 @@ Lowers armour, health, stamina etc."))
 				ImGui::Separator();
 			}
 
-			static std::vector<Ui::NamedMemory> themes{ { "Beach", 0x969159 }, { "Country" ,0x96917D }, { "Fun house" ,0x969176 }, { "Ninja" ,0x96915C } };
+			static std::vector<Ui::NamedMemory> themes{
+				{"Beach", 0x969159}, {"Country", 0x96917D}, {"Fun house", 0x969176}, {"Ninja", 0x96915C}
+			};
 			Ui::EditRadioButtonAddress("Themes", themes);
 
 			if (ImGui::CollapsingHeader("Weather"))
 			{
-				typedef void func(void);
+				using func = void(void);
 				if (ImGui::Button("Foggy", Ui::GetSize(3)))
 					((func*)0x438F80)();
 
@@ -484,13 +488,13 @@ Lowers armour, health, stamina etc."))
 		{
 			ImGui::Spacing();
 
-			if (!mission_warning_shown)
+			if (!m_bMissionLoaderWarningShown)
 			{
 				ImGui::TextWrapped("Mission loader might cause unintended changes to your game. \
 It's recommanded not to save your game after using this. Use it at your own risk!");
 				ImGui::Spacing();
-				if (ImGui::Button("Show mission loader", ImVec2(Ui::GetSize())))\
-					mission_warning_shown = true;
+				if (ImGui::Button("Show mission loader", ImVec2(Ui::GetSize())))
+					m_bMissionLoaderWarningShown = true;
 			}
 			else
 			{
@@ -502,7 +506,8 @@ It's recommanded not to save your game after using this. Use it at your own risk
 
 				ImGui::Spacing();
 
-				Ui::DrawJSON(mission_data.json, mission_data.categories, mission_data.selected, mission_data.filter, SetPlayerMission, nullptr);
+				Ui::DrawJSON(m_MissionData.m_Json, m_MissionData.m_Categories, m_MissionData.m_Selected, m_MissionData.m_Filter,
+				             SetPlayerMission, nullptr);
 			}
 			ImGui::EndTabItem();
 		}
@@ -512,22 +517,22 @@ It's recommanded not to save your game after using this. Use it at your own risk
 			ImGui::Spacing();
 
 			ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() / 2 - 5);
-			Ui::ListBoxStr("##Categories", stat::search_categories, stat::selected_item);
+			Ui::ListBoxStr("##Categories", m_StatData.m_Categories, m_StatData.m_Selected);
 			ImGui::SameLine();
-			Ui::FilterWithHint("##Filter", stat::filter, "Search");
+			Ui::FilterWithHint("##Filter", m_StatData.m_Filter, "Search");
 			ImGui::PopItemWidth();
 
 			ImGui::Spacing();
 
 			ImGui::BeginChild("STATCHILD");
-			for (auto root : stat::json.data.items())
+			for (auto root : m_StatData.m_Json.m_Data.items())
 			{
-				if (root.key() == stat::selected_item || stat::selected_item == "All")
+				if (root.key() == m_StatData.m_Selected || m_StatData.m_Selected == "All")
 				{
 					for (auto _data : root.value().items())
 					{
-						std::string name = _data.value().get<std::string>();
-						if (stat::filter.PassFilter(name.c_str()))
+						auto name = _data.value().get<std::string>();
+						if (m_StatData.m_Filter.PassFilter(name.c_str()))
 							Ui::EditStat(name.c_str(), std::stoi(_data.key()));
 					}
 				}
@@ -538,12 +543,12 @@ It's recommanded not to save your game after using this. Use it at your own risk
 		if (ImGui::BeginTabItem("Random cheats"))
 		{
 			ImGui::Spacing();
-			ImGui::Checkbox("Enable", &random_cheats::enable);
+			ImGui::Checkbox("Enable", &m_RandomCheats.m_bEnabled);
 			ImGui::Spacing();
 
 			ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 2);
 
-			ImGui::SliderInt("Activate cheat timer", &random_cheats::enable_wait_time, 5, 60);
+			ImGui::SliderInt("Activate cheat timer", &m_RandomCheats.m_nInterval, 5, 60);
 			Ui::ShowTooltip("Wait time after a cheat is activated.");
 
 			ImGui::PopItemWidth();
@@ -552,11 +557,11 @@ It's recommanded not to save your game after using this. Use it at your own risk
 			ImGui::Separator();
 			if (ImGui::BeginChild("Cheats list"))
 			{
-				for (auto element : random_cheats::enabled_cheats)
+				for (auto element : m_RandomCheats.m_EnabledCheats)
 				{
 					bool selected = (element[1] == "true") ? true : false;
 
-					if (ImGui::MenuItem(element[0].c_str(), 0, selected))
+					if (ImGui::MenuItem(element[0].c_str(), nullptr, selected))
 						element[1] = selected ? "false" : "true";
 				}
 				ImGui::EndChild();

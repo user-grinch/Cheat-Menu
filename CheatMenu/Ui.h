@@ -3,17 +3,18 @@
 
 class Ui
 {
-
 private:
-	inline static std::string current_hotkey = "";
+	inline static std::string m_CurrentHotkey;
 
 public:
-	struct NamedMemory {
+	struct NamedMemory
+	{
 		std::string name;
 		int addr;
 	};
 
-	struct NamedValue {
+	struct NamedValue
+	{
 		std::string name;
 		int value;
 	};
@@ -22,7 +23,7 @@ public:
 	{
 		std::function<void(std::string&, std::string&, std::string&)> function;
 		std::string key;
-		std::string root_key;
+		std::string rootKey;
 		std::string value;
 	};
 
@@ -31,35 +32,42 @@ public:
 		std::function<void(std::string&)> function;
 		std::string value;
 	};
-	inline static JsonPopUpData json_popup;
-	inline static ImgPopUpData img_popup;
+
+	inline static JsonPopUpData jsonPopup;
+	inline static ImgPopUpData imgPopup;
 
 	static void CenterdText(const std::string& text);
 	static bool ColorButton(int color_id, std::vector<float>& color, ImVec2 size);
-	static bool CheckboxAddress(const char* label, const int addr = NULL, const char* hint = nullptr);
-	static bool CheckboxAddressEx(const char* label, const int addr = NULL, int enabled_val = 1, int disabled_val = 0, const char* hint = nullptr);
+	static bool CheckboxAddress(const char* label, int addr = NULL, const char* hint = nullptr);
+	static bool CheckboxAddressEx(const char* label, int addr = NULL, int enabled_val = 1, int disabled_val = 0,
+	                              const char* hint = nullptr);
 	static bool CheckboxAddressVar(const char* label, bool val, int addr, const char* hint = nullptr);
-	static bool CheckboxAddressVarEx(const char* label, bool val, int addr, int enabled_val, int disabled_val, const char* hint = nullptr);
+	static bool CheckboxAddressVarEx(const char* label, bool val, int addr, int enabled_val, int disabled_val,
+	                                 const char* hint = nullptr);
 	static bool CheckboxBitFlag(const char* label, uint flag, const char* hint = nullptr);
-	static bool CheckboxWithHint(const char* label, bool* state, const char* hint = nullptr, const bool is_disabled = false);
+	static bool CheckboxWithHint(const char* label, bool* state, const char* hint = nullptr, bool is_disabled = false);
 	static void DrawHeaders(CallbackTable& data);
 
-	static void DrawJSON(CJson& json, std::vector<std::string>& combo_items, std::string& selected_item, ImGuiTextFilter& filter,
-		std::function<void(std::string&, std::string&, std::string&)> func_left_click, std::function<void(std::string&, std::string&, std::string&)> func_right_click);
-	static void DrawImages(std::vector<std::unique_ptr<TextureStructure>>& img_vec, ImVec2 image_size,
-		std::vector<std::string>& category_vec, std::string& selected_item, ImGuiTextFilter& filter,
-		std::function<void(std::string&)> on_left_click, std::function<void(std::string&)> on_right_click,
-		std::function<std::string(std::string&)> get_name_func, std::function<bool(std::string&)> verify_func = nullptr);
+	static void DrawJSON(CJson& json, std::vector<std::string>& combo_items, std::string& selected_item,
+	                     ImGuiTextFilter& filter,
+	                     std::function<void(std::string&, std::string&, std::string&)> func_left_click,
+	                     std::function<void(std::string&, std::string&, std::string&)> func_right_click);
+	static void DrawImages(std::vector<std::unique_ptr<STextureStructure>>& img_vec, ImVec2 image_size,
+	                       std::vector<std::string>& category_vec, std::string& selected_item, ImGuiTextFilter& filter,
+	                       std::function<void(std::string&)> on_left_click,
+	                       std::function<void(std::string&)> on_right_click,
+	                       std::function<std::string(std::string&)> get_name_func,
+	                       std::function<bool(std::string&)> verify_func = nullptr);
 
 	template <typename T>
-	static void EditAddress(const char* label, const int address, const int min = 0, const int def = 0, const int max = 100);
-	static void EditBits(const char* label, const int address, const std::vector<std::string>& names);
-	static void EditFloat(const char* label, const int address, const float min, const float def, const float max, const float mul = 1);
+	static void EditAddress(const char* label, int address, int min = 0, int def = 0, int max = 100);
+	static void EditBits(const char* label, int address, const std::vector<std::string>& names);
+	static void EditFloat(const char* label, int address, float min, float def, float max, float mul = 1);
 	template <typename T>
-	static void EditReference(const char* label, T& address, const int min = 0, const int def = 0, const int max = 100);
+	static void EditReference(const char* label, T& address, int min = 0, int def = 0, int max = 100);
 	static void EditRadioButtonAddress(const char* label, std::vector<NamedMemory>& named_mem);
 	static void EditRadioButtonAddressEx(const char* label, int addr, std::vector<NamedValue>& named_val);
-	static void EditStat(const char* label, const int stat_id, const int min = 0, const int def = 0, const int max = 1000);
+	static void EditStat(const char* label, int stat_id, int min = 0, int def = 0, int max = 1000);
 
 	static void FilterWithHint(const char* label, ImGuiTextFilter& filter, const char* hint);
 
@@ -84,14 +92,14 @@ void Ui::EditAddress(const char* label, const int address, const int min, const 
 {
 	if (ImGui::CollapsingHeader(label))
 	{
-		int val = patch::Get<T>(address, false);;
+		int val = patch::Get<T>(address, false);
 
 		int items = 3;
 
 		if (min == def)
 			items = 2;
 
-		ImGui::Columns(items, 0, false);
+		ImGui::Columns(items, nullptr, false);
 		ImGui::Text(("Min: " + std::to_string(min)).c_str());
 
 		if (items == 3)
@@ -117,20 +125,20 @@ void Ui::EditAddress(const char* label, const int address, const int min, const 
 		if (val > max)
 			val = max;
 
-		if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), Ui::GetSize(items)))
+		if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), GetSize(items)))
 			patch::Set<T>(address, min, false);
 
 		if (items == 3)
 		{
 			ImGui::SameLine();
 
-			if (ImGui::Button(("Default##" + std::string(label)).c_str(), Ui::GetSize(3)))
+			if (ImGui::Button(("Default##" + std::string(label)).c_str(), GetSize(3)))
 				patch::Set<T>(address, def, false);
 		}
 
 		ImGui::SameLine();
 
-		if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), Ui::GetSize(items)))
+		if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), GetSize(items)))
 			patch::Set<T>(address, max, false);
 
 		ImGui::Spacing();
@@ -145,7 +153,7 @@ void Ui::EditReference(const char* label, T& address, const int min, const int d
 	{
 		int val = static_cast<int>(address);
 
-		ImGui::Columns(3, 0, false);
+		ImGui::Columns(3, nullptr, false);
 		ImGui::Text(("Min: " + std::to_string(min)).c_str());
 		ImGui::NextColumn();
 		ImGui::Text(("Def: " + std::to_string(def)).c_str());
@@ -160,17 +168,17 @@ void Ui::EditReference(const char* label, T& address, const int min, const int d
 
 		ImGui::Spacing();
 
-		if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), Ui::GetSize(3)))
+		if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), GetSize(3)))
 			address = static_cast<float>(min);
 
 		ImGui::SameLine();
 
-		if (ImGui::Button(("Default##" + std::string(label)).c_str(), Ui::GetSize(3)))
+		if (ImGui::Button(("Default##" + std::string(label)).c_str(), GetSize(3)))
 			address = static_cast<float>(def);
 
 		ImGui::SameLine();
 
-		if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), Ui::GetSize(3)))
+		if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), GetSize(3)))
 			address = static_cast<float>(max);
 
 		ImGui::Spacing();

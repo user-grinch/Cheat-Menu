@@ -6,7 +6,7 @@ LRESULT Hook::WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 
-	if (Hook::show_mouse)
+	if (m_bShowMouse)
 	{
 		patch::Nop(0x4EB9F4, 5); //  disable radio scroll
 		CPad::ClearMouseHistory();
@@ -35,20 +35,20 @@ HRESULT Hook::Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentat
 
 void Hook::RenderFrame(void* ptr)
 {
-	if (!ImGui::GetCurrentContext() || Globals::menu_closing)
+	if (!ImGui::GetCurrentContext())
 		return;
 
 	ImGuiIO& io = ImGui::GetIO();
 
-	if (Globals::init_done)
-	{	
-		Hook::ShowMouse(show_mouse);
+	if (Globals::m_bInit)
+	{
+		ShowMouse(m_bShowMouse);
 
 		// handle window scaling here
 		ImVec2 size(screen::GetScreenWidth(), screen::GetScreenHeight());
-		if (Globals::screen_size.x != size.x && Globals::screen_size.y != size.y)
+		if (Globals::m_fScreenSize.x != size.x && Globals::m_fScreenSize.y != size.y)
 		{
-			int font_size = int(size.y / 54.85f); // manually tested
+			int font_size = static_cast<int>(size.y / 54.85f); // manually tested
 
 			io.FontDefault = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/trebucbd.ttf", font_size);
 			io.Fonts->Build();
@@ -58,10 +58,10 @@ void Hook::RenderFrame(void* ptr)
 			else
 				ImGui_ImplDX11_InvalidateDeviceObjects();
 
-			if (Globals::screen_size.x != -1 && Globals::screen_size.y != -1)
+			if (Globals::m_fScreenSize.x != -1 && Globals::m_fScreenSize.y != -1)
 			{
-				Globals::menu_size.x += (size.x - Globals::screen_size.x) / 4.0f;
-				Globals::menu_size.y += (size.y - Globals::screen_size.y) / 1.2f;
+				Globals::m_fMenuSize.x += (size.x - Globals::m_fScreenSize.x) / 4.0f;
+				Globals::m_fMenuSize.y += (size.y - Globals::m_fScreenSize.y) / 1.2f;
 			}
 
 			ImGuiStyle* style = &ImGui::GetStyle();
@@ -74,7 +74,7 @@ void Hook::RenderFrame(void* ptr)
 			style->IndentSpacing = 20 * scale_x;
 			style->ItemInnerSpacing = ImVec2(4 * scale_x, 4 * scale_y);
 
-			Globals::screen_size = size;
+			Globals::m_fScreenSize = size;
 		}
 
 		ImGui_ImplWin32_NewFrame();
@@ -85,7 +85,7 @@ void Hook::RenderFrame(void* ptr)
 
 		ImGui::NewFrame();
 
-		if (window_callback != NULL)
+		if (window_callback != nullptr)
 			window_callback();
 
 		ImGui::EndFrame();
@@ -98,7 +98,7 @@ void Hook::RenderFrame(void* ptr)
 	}
 	else
 	{
-		Globals::init_done = true;
+		Globals::m_bInit = true;
 		ImGui::CreateContext();
 
 		ImGuiStyle& style = ImGui::GetStyle();
@@ -116,7 +116,7 @@ void Hook::RenderFrame(void* ptr)
 		else
 		{
 			// for dx11 device ptr is swapchain
-			reinterpret_cast<IDXGISwapChain*>(ptr)->GetDevice(__uuidof(ID3D11Device), (void**)&Globals::device);
+			reinterpret_cast<IDXGISwapChain*>(ptr)->GetDevice(__uuidof(ID3D11Device), &Globals::device);
 			ID3D11DeviceContext* context;
 			reinterpret_cast<ID3D11Device*>(Globals::device)->GetImmediateContext(&context);
 
@@ -125,8 +125,8 @@ void Hook::RenderFrame(void* ptr)
 
 		ImGui_ImplWin32_EnableDpiAwareness();
 
-		io.IniFilename = NULL;
-		io.LogFilename = NULL;
+		io.IniFilename = nullptr;
+		io.LogFilename = nullptr;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad && ImGuiConfigFlags_NavEnableKeyboard;
 
 		style.WindowTitleAlign = ImVec2(0.5, 0.5);
@@ -163,16 +163,17 @@ void Hook::ShowMouse(bool state)
 	}
 	else
 	{
-		if (mouse_visibility != show_mouse)
+		if (m_bMouseVisibility != m_bShowMouse)
 		{
 			patch::SetUChar(0x6194A0, 0xE9); // jmp setup
 			patch::SetUChar(0x746ED0, 0xA1);
-			patch::SetRaw(0x53F41F, (void*)"\x85\xC0\x0F\x8C", 4); // xor eax, eax -> test eax, eax , enable camera mouse movement
-															// jz loc_53F526 -> jl loc_53F526
+			patch::SetRaw(0x53F41F, (void*)"\x85\xC0\x0F\x8C", 4);
+			// xor eax, eax -> test eax, eax , enable camera mouse movement
+			// jz loc_53F526 -> jl loc_53F526
 		}
 	}
 
-	if (mouse_visibility != show_mouse)
+	if (m_bMouseVisibility != m_bShowMouse)
 	{
 		CPad::ClearMouseHistory();
 		CPad::UpdatePads();
@@ -182,7 +183,7 @@ void Hook::ShowMouse(bool state)
 
 		CPad::NewMouseControllerState.X = 0;
 		CPad::NewMouseControllerState.Y = 0;
-		mouse_visibility = show_mouse;
+		m_bMouseVisibility = m_bShowMouse;
 	}
 }
 
@@ -191,14 +192,14 @@ Hook::Hook()
 	ImGui::CreateContext();
 
 	// gtaRenderHook
-	if (kiero::init(kiero::RenderType::D3D11) == kiero::Status::Success)
+	if (init(kiero::RenderType::D3D11) == kiero::Status::Success)
 	{
 		Globals::renderer = Render_DirectX11;
 		kiero::bind(8, (void**)&oPresent11, Dx11Handler);
 	}
 	else
 	{
-		if (kiero::init(kiero::RenderType::D3D9) == kiero::Status::Success)
+		if (init(kiero::RenderType::D3D9) == kiero::Status::Success)
 		{
 			Globals::renderer = Render_DirectX9;
 			kiero::bind(16, (void**)&oReset, Reset);

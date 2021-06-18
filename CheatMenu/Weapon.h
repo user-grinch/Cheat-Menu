@@ -3,35 +3,32 @@
 class Weapon
 {
 public:
-	inline static SearchData weapon_data{ "weapon" };
-	inline static bool images_loaded = false;
-	
-	inline static bool auto_aim = false;
-	inline static bool fast_reload = false;
-	inline static bool huge_damage = false;
-	inline static bool long_range = false;
-	inline static bool rapid_fire = false;
-	inline static bool dual_weild = false;
-	inline static bool move_aim = false;
-	inline static bool move_fire = false;
-
-	inline static int ammo_count = 99999;
-	inline static uchar cur_weapon_slot = -1;
-
-	inline static int selected_gang = 0;
-	inline static int selected_weapon_count = 0;
-	inline static int gang_weapons[10][3] = 
+	inline static SSearchData m_WeaponData{"weapon"};
+	inline static bool m_bImagesLoaded;
+	inline static bool m_bAutoAim;
+	inline static bool m_bFastReload;
+	inline static bool m_bHugeDamage;
+	inline static bool m_bLongRange;
+	inline static bool m_bRapidFire;
+	inline static bool m_bDualWeild;
+	inline static bool m_bMoveAim;
+	inline static bool m_bMoveFire;
+	inline static int m_nAmmoCount = 99999;
+	inline static uchar m_nCurrentWeaponSlot = -1;
+	inline static int m_nSelectedGang;
+	inline static int m_nSelectedWeapon;
+	inline static int m_nGangWeaponList[10][3] =
 	{
-		{WEAPON_PISTOL, WEAPON_MICRO_UZI, WEAPON_UNARMED },		// Ballas
-		{WEAPON_PISTOL, WEAPON_UNARMED, WEAPON_UNARMED},		// Grove
-		{WEAPON_PISTOL, WEAPON_UNARMED, WEAPON_UNARMED},		// Vagos
-		{WEAPON_UNARMED, WEAPON_UNARMED, WEAPON_UNARMED},		// SF Rifa
-		{WEAPON_PISTOL, WEAPON_MICRO_UZI, WEAPON_UNARMED},		// Da Nang Boys
-		{WEAPON_DESERT_EAGLE , WEAPON_UNARMED, WEAPON_UNARMED},	// Mafia
-		{WEAPON_PISTOL, WEAPON_AK47, WEAPON_UNARMED},			// Triads
-		{WEAPON_PISTOL, WEAPON_MICRO_UZI, WEAPON_UNARMED},		// VLA
-		{WEAPON_UNARMED, WEAPON_UNARMED, WEAPON_UNARMED},		// Gang 9
-		{WEAPON_UNARMED, WEAPON_UNARMED, WEAPON_UNARMED},		// Gang 10
+		{WEAPON_PISTOL, WEAPON_MICRO_UZI, WEAPON_UNARMED}, // Ballas
+		{WEAPON_PISTOL, WEAPON_UNARMED, WEAPON_UNARMED}, // Grove
+		{WEAPON_PISTOL, WEAPON_UNARMED, WEAPON_UNARMED}, // Vagos
+		{WEAPON_UNARMED, WEAPON_UNARMED, WEAPON_UNARMED}, // SF Rifa
+		{WEAPON_PISTOL, WEAPON_MICRO_UZI, WEAPON_UNARMED}, // Da Nang Boys
+		{WEAPON_DESERT_EAGLE, WEAPON_UNARMED, WEAPON_UNARMED}, // Mafia
+		{WEAPON_PISTOL, WEAPON_AK47, WEAPON_UNARMED}, // Triads
+		{WEAPON_PISTOL, WEAPON_MICRO_UZI, WEAPON_UNARMED}, // VLA
+		{WEAPON_UNARMED, WEAPON_UNARMED, WEAPON_UNARMED}, // Gang 9
+		{WEAPON_UNARMED, WEAPON_UNARMED, WEAPON_UNARMED}, // Gang 10
 	};
 
 	Weapon();
@@ -41,4 +38,3 @@ public:
 	static void GiveWeaponToPlayer(std::string& weapon_type);
 	static void SetGangWeapon(std::string& weapon_type);
 };
-

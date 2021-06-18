@@ -6,22 +6,23 @@
 Ped::Ped()
 {
 	if (GetModuleHandle("ExGangWars.asi"))
-		exgangwars_installed = true;
+		m_bExGangWarsInstalled = true;
 
 	Events::processScriptsEvent += []
 	{
-		if (!images_loaded)
+		if (!m_bImagesLoaded)
 		{
-			Util::LoadTexturesInDirRecursive(PLUGIN_PATH((char*)"CheatMenu\\peds\\"), ".jpg", ped_data.categories, ped_data.images);
-			images_loaded = true;
+			Util::LoadTexturesInDirRecursive(
+				PLUGIN_PATH((char*)"CheatMenu\\peds\\"), ".jpg", m_PedData.m_Categories, m_PedData.m_ImagesList);
+			m_bImagesLoaded = true;
 		}
 	};
 }
 
 Ped::~Ped()
 {
-	Util::ReleaseTextures(ped_data.images);
-	for (CPed* ped : spawn_ped::list)
+	Util::ReleaseTextures(m_PedData.m_ImagesList);
+	for (CPed* ped : m_SpawnPed.m_List)
 	{
 		CWorld::Remove(ped);
 		ped->Remove();
@@ -30,13 +31,13 @@ Ped::~Ped()
 
 void Ped::SpawnPed(std::string& model)
 {
-	if (spawn_ped::list.size() == SPAWN_PED_LIMIT)
+	if (m_SpawnPed.m_List.size() == SPAWN_PED_LIMIT)
 	{
 		CHud::SetHelpMessage("Max limit reached", false, false, false);
 		return;
 	}
 
-	if (Ped::ped_data.json.data.contains(model))
+	if (m_PedData.m_Json.m_Data.contains(model))
 	{
 		CPlayerPed* player = FindPlayerPed();
 		CVector pos = player->GetPosition();
@@ -45,49 +46,49 @@ void Ped::SpawnPed(std::string& model)
 		CPed* ped;
 		int hplayer;
 
-		if (Ped::pedspecial_json.data.contains(model))
+		if (m_SpecialPedJson.m_Data.contains(model))
 		{
 			std::string name;
-			if (Ped::pedspecial_json.data.contains(model))
-				name = Ped::pedspecial_json.data[model].get<std::string>().c_str();
+			if (m_SpecialPedJson.m_Data.contains(model))
+				name = m_SpecialPedJson.m_Data[model].get<std::string>().c_str();
 			else
 				name = model;
 
 			CStreaming::RequestSpecialChar(1, name.c_str(), PRIORITY_REQUEST);
 			CStreaming::LoadAllRequestedModels(true);
 
-			Command <Commands::CREATE_CHAR>(spawn_ped::selected_ped_type + 4, 291, pos.x, pos.y, pos.z + 1, &hplayer);
+			Command<Commands::CREATE_CHAR>(m_SpawnPed.m_nSelectedPedType + 4, 291, pos.x, pos.y, pos.z + 1, &hplayer);
 			CStreaming::SetSpecialCharIsDeletable(291);
 		}
 		else
 		{
-			int imodel = std::stoi(model);
-			CStreaming::RequestModel(imodel, eStreamingFlags::PRIORITY_REQUEST);
+			int iModel = std::stoi(model);
+			CStreaming::RequestModel(iModel, eStreamingFlags::PRIORITY_REQUEST);
 			CStreaming::LoadAllRequestedModels(false);
 
-			Command <Commands::CREATE_CHAR>(spawn_ped::selected_ped_type + 4, imodel, pos.x, pos.y, pos.z + 1, &hplayer);
-			CStreaming::SetModelIsDeletable(imodel);
+			Command<Commands::CREATE_CHAR>(m_SpawnPed.m_nSelectedPedType + 4, iModel, pos.x, pos.y, pos.z + 1, &hplayer);
+			CStreaming::SetModelIsDeletable(iModel);
 		}
 
 		ped = CPools::GetPed(hplayer);
 
-		if (spawn_ped::dont_move)
-			spawn_ped::list.push_back(ped);
+		if (m_SpawnPed.m_bPedMove)
+			m_SpawnPed.m_List.push_back(ped);
 		else
 		{
 			Command<Commands::MARK_CHAR_AS_NO_LONGER_NEEDED>(hplayer);
 		}
-		ped->m_nPedFlags.bPedIsBleeding = spawn_ped::ped_bleed;
-		ped->m_nWeaponAccuracy = spawn_ped::accuracy;
-		ped->m_fHealth = spawn_ped::health;
+		ped->m_nPedFlags.bPedIsBleeding = m_SpawnPed.m_bPedBleed;
+		ped->m_nWeaponAccuracy = m_SpawnPed.m_nAccuracy;
+		ped->m_fHealth = m_SpawnPed.m_nPedHealth;
 
-		if (spawn_ped::weapon_id != 0)
+		if (m_SpawnPed.m_nWeaponId != 0)
 		{
 			int model = 0;
-			Command<Commands::GET_WEAPONTYPE_MODEL>(spawn_ped::weapon_id, &model);
+			Command<Commands::GET_WEAPONTYPE_MODEL>(m_SpawnPed.m_nWeaponId, &model);
 			CStreaming::RequestModel(model, PRIORITY_REQUEST);
 			CStreaming::LoadAllRequestedModels(false);
-			Command<Commands::GIVE_WEAPON_TO_CHAR>(hplayer, spawn_ped::weapon_id, 999);
+			Command<Commands::GIVE_WEAPON_TO_CHAR>(hplayer, m_SpawnPed.m_nWeaponId, 999);
 		}
 	}
 }
@@ -151,12 +152,12 @@ void Ped::Draw()
 					CZone szone = CZone();
 					CZone* pZone = &szone;
 
-					CZoneExtraInfo* zone_info = CTheZones::GetZoneInfo(&pos, &pZone);
-					int density = zone_info->m_nGangDensity[i];
+					CZoneExtraInfo* zoneInfo = CTheZones::GetZoneInfo(&pos, &pZone);
+					int density = zoneInfo->m_nGangDensity[i];
 
-					if (ImGui::SliderInt(Ped::gang_names[i].c_str(), &density, 0, 127))
+					if (ImGui::SliderInt(m_GangNames[i].c_str(), &density, 0, 127))
 					{
-						zone_info->m_nGangDensity[i] = static_cast<char>(density);
+						zoneInfo->m_nGangDensity[i] = static_cast<char>(density);
 						Command<Commands::CLEAR_SPECIFIC_ZONES_TO_TRIGGER_GANG_WAR>();
 						CGangWars::bGangWarsActive = true;
 					}
@@ -164,12 +165,13 @@ void Ped::Draw()
 				ImGui::PopItemWidth();
 				ImGui::Spacing();
 
-				if (!exgangwars_installed)
+				if (!m_bExGangWarsInstalled)
 				{
 					ImGui::TextWrapped("You'll need ExGangWars plugin to display some turf colors");
 					ImGui::Spacing();
 					if (ImGui::Button("Download ExGangWars", Ui::GetSize(1)))
-						ShellExecute(NULL, "open", "https://gtaforums.com/topic/682194-extended-gang-wars/", NULL, NULL, SW_SHOWNORMAL);
+						ShellExecute(NULL, "open", "https://gtaforums.com/topic/682194-extended-gang-wars/", NULL, NULL,
+						             SW_SHOWNORMAL);
 				}
 
 				ImGui::Spacing();
@@ -180,22 +182,24 @@ void Ped::Draw()
 
 			if (ImGui::CollapsingHeader("Recruit anyone"))
 			{
-				static std::vector<Ui::NamedMemory> select_weapon{ {"9mm", 0x96917C}, { "AK47", 0x96917D }, { "Rockets", 0x96917E } };
-				Ui::RadioButtonAddress("Select weapon", select_weapon);
+				static std::vector<Ui::NamedMemory> selectWeapon{
+					{"9mm", 0x96917C}, {"AK47", 0x96917D}, {"Rockets", 0x96917E}
+				};
+				Ui::RadioButtonAddress("Select weapon", selectWeapon);
 				ImGui::Spacing();
 				ImGui::Separator();
 			}
 			if (ImGui::CollapsingHeader("Remove peds in radius"))
 			{
-				ImGui::InputInt("Radius", &ped_remove_radius);
+				ImGui::InputInt("Radius", &m_nPedRemoveRadius);
 				ImGui::Spacing();
 				if (ImGui::Button("Remove peds", Ui::GetSize(1)))
 				{
 					CPlayerPed* player = FindPlayerPed();
 					for (CPed* ped : CPools::ms_pPedPool)
 					{
-						if (DistanceBetweenPoints(ped->GetPosition(), player->GetPosition()) < ped_remove_radius
-						&& ped->m_pVehicle == nullptr && ped != player)
+						if (DistanceBetweenPoints(ped->GetPosition(), player->GetPosition()) < m_nPedRemoveRadius
+							&& ped->m_pVehicle == nullptr && ped != player)
 							Command<Commands::DELETE_CHAR>(CPools::GetPedRef(ped));
 					}
 				}
@@ -210,12 +214,12 @@ void Ped::Draw()
 			ImGui::Spacing();
 			if (ImGui::Button("Remove frozen peds", Ui::GetSize(1)))
 			{
-				for (CPed* ped : spawn_ped::list)
+				for (CPed* ped : m_SpawnPed.m_List)
 				{
 					CWorld::Remove(ped);
 					ped->Remove();
 				}
-				spawn_ped::list.clear();
+				m_SpawnPed.m_List.clear();
 			}
 			ImGui::Spacing();
 			if (ImGui::BeginTabBar("SpawnPedBar"))
@@ -226,8 +230,9 @@ void Ped::Draw()
 				{
 					ImGui::Spacing();
 
-					Ui::DrawImages(ped_data.images, ImVec2(65, 110), ped_data.categories, ped_data.selected, ped_data.filter, SpawnPed, nullptr,
-						[](std::string str) {return ped_data.json.data[str].get<std::string>(); });
+					Ui::DrawImages(m_PedData.m_ImagesList, ImVec2(65, 110), m_PedData.m_Categories, m_PedData.m_Selected,
+					               m_PedData.m_Filter, SpawnPed, nullptr,
+					               [](std::string str) { return m_PedData.m_Json.m_Data[str].get<std::string>(); });
 					ImGui::EndTabItem();
 				}
 				if (ImGui::BeginTabItem("Config"))
@@ -235,31 +240,36 @@ void Ped::Draw()
 					ImGui::Spacing();
 					ImGui::BeginChild("PedCOnfig");
 					ImGui::Columns(2, 0, false);
-					Ui::CheckboxWithHint("Don't move", &spawn_ped::dont_move);
+					Ui::CheckboxWithHint("Don't move", &m_SpawnPed.m_bPedMove);
 					ImGui::NextColumn();
-					Ui::CheckboxWithHint("Ped bleed", &spawn_ped::ped_bleed);
+					Ui::CheckboxWithHint("Ped bleed", &m_SpawnPed.m_bPedBleed);
 					ImGui::Columns(1);
 
 					ImGui::Spacing();
-					ImGui::SliderInt("Accuracy", &spawn_ped::accuracy, 0.0, 100.0);
-					if (ImGui::InputInt("Health", &spawn_ped::health))
+					ImGui::SliderInt("Accuracy", &m_SpawnPed.m_nAccuracy, 0.0, 100.0);
+					if (ImGui::InputInt("Health", &m_SpawnPed.m_nPedHealth))
 					{
-						if (spawn_ped::health > 1000)
-							spawn_ped::health = 1000;
+						if (m_SpawnPed.m_nPedHealth > 1000)
+							m_SpawnPed.m_nPedHealth = 1000;
 
-						if (spawn_ped::health < 0)
-							spawn_ped::health = 0;
+						if (m_SpawnPed.m_nPedHealth < 0)
+							m_SpawnPed.m_nPedHealth = 0;
 					}
-					Ui::ListBox("Ped type", spawn_ped::ped_type, spawn_ped::selected_ped_type);
+					Ui::ListBox("Ped type", m_SpawnPed.m_PedTypeList, m_SpawnPed.m_nSelectedPedType);
 
 					ImGui::Spacing();
-					ImGui::Text("Selected weapon: %s", Weapon::weapon_data.json.data[std::to_string(spawn_ped::weapon_id)].get<std::string>());
+					ImGui::Text("Selected weapon: %s",
+					            Weapon::m_WeaponData.m_Json.m_Data[std::to_string(m_SpawnPed.m_nWeaponId)].get<std::string>());
 					ImGui::Spacing();
-					Ui::DrawImages(Weapon::weapon_data.images, ImVec2(65, 65), Weapon::weapon_data.categories, Weapon::weapon_data.selected, Weapon::weapon_data.filter,
-						[](std::string str) { spawn_ped::weapon_id = std::stoi(str); },
-						nullptr,
-						[](std::string str) {return Weapon::weapon_data.json.data[str].get<std::string>(); },
-						[](std::string str) {return str != "-1"; /*Jetpack*/ }
+					Ui::DrawImages(Weapon::m_WeaponData.m_ImagesList, ImVec2(65, 65), Weapon::m_WeaponData.m_Categories,
+					               Weapon::m_WeaponData.m_Selected, Weapon::m_WeaponData.m_Filter,
+					               [](std::string str) { m_SpawnPed.m_nWeaponId = std::stoi(str); },
+					               nullptr,
+					               [](std::string str)
+					               {
+						               return Weapon::m_WeaponData.m_Json.m_Data[str].get<std::string>();
+					               },
+					               [](std::string str) { return str != "-1"; /*Jetpack*/ }
 					);
 
 					ImGui::Spacing();
@@ -273,4 +283,3 @@ void Ped::Draw()
 		ImGui::EndTabBar();
 	}
 }
-

@@ -64,7 +64,7 @@
 #include "VKeys.h"
 
 // Globals
-typedef std::vector<std::pair<std::string, void(*)()>> CallbackTable;
+using CallbackTable = std::vector<std::pair<std::string, void(*)()>>;
 using namespace plugin;
 namespace fs = std::filesystem;
 
@@ -77,39 +77,37 @@ enum Renderer
 
 struct Globals
 {
-	inline static std::string header_id = "";
-	inline static ImVec2 menu_size = ImVec2(screen::GetScreenWidth() / 4, screen::GetScreenHeight() / 1.2);
-	inline static ImVec2 screen_size = ImVec2(-1, -1);
-	inline static bool show_menu = false;
-	inline static bool init_done = false;
-	inline static bool menu_closing = false;
+	inline static std::string m_HeaderId;
+	inline static ImVec2 m_fMenuSize = ImVec2(screen::GetScreenWidth() / 4, screen::GetScreenHeight() / 1.2);
+	inline static ImVec2 m_fScreenSize = ImVec2(-1, -1);
+	inline static bool m_bShowMenu;
+	inline static bool m_bInit;
 	inline static Renderer renderer = Render_Unknown;
-	inline static void* device = nullptr;
+	inline static void* device;
 };
 
 extern std::ofstream flog;
 extern CJson config;
 
-struct TextureStructure
+struct STextureStructure
 {
-	std::string file_name;
-	std::string category_name;
-	void* texture = nullptr;
+	std::string m_FileName;
+	std::string m_CategoryName;
+	void* m_pTexture;
 };
 
 struct HotKeyData
 {
-	int key1;
-	int key2;
-	bool is_down = false;
+	int m_key1;
+	int m_key2;
+	bool m_bPressed;
 };
 
-
-struct SearchData
+struct SSearchData
 {
-	CJson json;
-	ImGuiTextFilter filter = "";
-	std::vector<std::string> categories;
-	std::string selected = "All";
-	std::vector<std::unique_ptr<TextureStructure>> images;
+	CJson m_Json;
+	ImGuiTextFilter m_Filter = "";
+	std::vector<std::string> m_Categories;
+	std::string m_Selected = "All";
+	std::vector<std::unique_ptr<STextureStructure>> m_ImagesList;
 };

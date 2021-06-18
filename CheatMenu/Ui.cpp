@@ -73,7 +73,6 @@ void Ui::CenterdText(const std::string& text)
 
 void Ui::DrawHeaders(CallbackTable& data)
 {
-
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 
 	short i = 1;
@@ -84,7 +83,7 @@ void Ui::DrawHeaders(CallbackTable& data)
 	{
 		const char* btn_text = it->first.c_str();
 
-		if (btn_text == Globals::header_id)
+		if (btn_text == Globals::m_HeaderId)
 		{
 			colors[ImGuiCol_Button] = colors[ImGuiCol_ButtonActive];
 			func = it->second;
@@ -93,8 +92,8 @@ void Ui::DrawHeaders(CallbackTable& data)
 
 		if (ImGui::Button(btn_text, GetSize(3, false)))
 		{
-			Globals::header_id = btn_text;
-			config.SetValue("window.id", Globals::header_id);
+			Globals::m_HeaderId = btn_text;
+			config.SetValue("window.id", Globals::m_HeaderId);
 			func = it->second;
 		}
 
@@ -107,35 +106,35 @@ void Ui::DrawHeaders(CallbackTable& data)
 	ImGui::PopStyleVar();
 	ImGui::Dummy(ImVec2(0, 10));
 
-	if (Globals::header_id == "")
+	if (Globals::m_HeaderId == "")
 	{
 		// Show Welcome page
 		ImGui::NewLine();
 
-		Ui::CenterdText("Welcome to Cheat Menu");
-		Ui::CenterdText("Author: Grinch_");
+		CenterdText("Welcome to Cheat Menu");
+		CenterdText("Author: Grinch_");
 
 		ImGui::NewLine();
 		ImGui::TextWrapped("Please ensure you have the latest version from GitHub.");
 		ImGui::NewLine();
-		if (ImGui::Button("Discord server", ImVec2(Ui::GetSize(2))))
-			ShellExecute(NULL, "open", DISCORD_INVITE, NULL, NULL, SW_SHOWNORMAL);
+		if (ImGui::Button("Discord server", ImVec2(GetSize(2))))
+			ShellExecute(nullptr, "open", DISCORD_INVITE, nullptr, nullptr, SW_SHOWNORMAL);
 
 		ImGui::SameLine();
 
-		if (ImGui::Button("GitHub repo", ImVec2(Ui::GetSize(2))))
-			ShellExecute(NULL, "open", GITHUB_LINK, NULL, NULL, SW_SHOWNORMAL);
+		if (ImGui::Button("GitHub repo", ImVec2(GetSize(2))))
+			ShellExecute(nullptr, "open", GITHUB_LINK, nullptr, nullptr, SW_SHOWNORMAL);
 
 		ImGui::NewLine();
 		ImGui::TextWrapped("If you find bugs or have suggestions, you can let me know on discord :)");
 		ImGui::NewLine();
-		Ui::CenterdText("Copyright GPLv3 2019-2021");
+		CenterdText("Copyright GPLv3 2019-2021");
 	}
 	else
 	{
 		if (func != nullptr && ImGui::BeginChild("TABSBAR"))
 		{
-			((void(*)(void))func)();
+			static_cast<void(*)()>(func)();
 			ImGui::EndChild();
 		}
 	}
@@ -159,7 +158,7 @@ bool Ui::CheckboxWithHint(const char* label, bool* v, const char* hint, bool is_
 	// set things up
 	bool pressed = false;
 	const ImGuiStyle& style = ImGui::GetStyle();
-	const ImVec2 text_size = ImGui::CalcTextSize(label, NULL, true);
+	const ImVec2 text_size = ImGui::CalcTextSize(label, nullptr, true);
 	float square_sz = ImGui::GetFrameHeight();
 	ImDrawList* drawlist = ImGui::GetWindowDrawList();
 	ImU32 color = ImGui::GetColorU32(ImGuiCol_FrameBg);
@@ -183,17 +182,18 @@ bool Ui::CheckboxWithHint(const char* label, bool* v, const char* hint, bool is_
 	ImVec2 max = ImGui::GetItemRectMax();
 	drawlist->AddRectFilled(min, max, color);
 
-	int pad = int(square_sz / 6.0);
+	int pad = static_cast<int>(square_sz / 6.0);
 	pad = (pad < 1) ? 1 : pad;
 
 	if (*v)
-	{   // draw the checkmark
+	{
+		// draw the checkmark
 		float sz = (square_sz - pad * 2.0);
 		float thickness = sz / 5.0;
 		thickness = (thickness < 1.0) ? 1.0 : thickness;
 		sz = sz - thickness * 0.5;
 
-		ImVec2 pos = ImVec2(min.x + pad, min.y + pad);
+		auto pos = ImVec2(min.x + pad, min.y + pad);
 		pos.x = pos.x + thickness * 0.25;
 		pos.y = pos.y + thickness * 0.25;
 
@@ -209,7 +209,7 @@ bool Ui::CheckboxWithHint(const char* label, bool* v, const char* hint, bool is_
 
 	// draw label
 	ImGui::SameLine(0, style.ItemInnerSpacing.x);
-	if (ImGui::InvisibleButton(label, ImVec2(ImGui::CalcTextSize(label, NULL, true).x, square_sz)) && !is_disabled)
+	if (ImGui::InvisibleButton(label, ImVec2(ImGui::CalcTextSize(label, nullptr, true).x, square_sz)) && !is_disabled)
 	{
 		pressed = true;
 		*v = !*v;
@@ -221,9 +221,10 @@ bool Ui::CheckboxWithHint(const char* label, bool* v, const char* hint, bool is_
 	if (hint != nullptr)
 	{
 		ImGui::SameLine(0, style.ItemInnerSpacing.x);
-		ImGui::InvisibleButton("?", ImGui::CalcTextSize("?", NULL, true));
+		ImGui::InvisibleButton("?", ImGui::CalcTextSize("?", nullptr, true));
 		min = ImGui::GetItemRectMin();
-		drawlist->AddText(ImVec2(min.x, min.y + style.ItemInnerSpacing.y), ImGui::GetColorU32(ImGuiCol_TextDisabled), "?");
+		drawlist->AddText(ImVec2(min.x, min.y + style.ItemInnerSpacing.y), ImGui::GetColorU32(ImGuiCol_TextDisabled),
+		                  "?");
 
 		if (ImGui::IsItemHovered() && !is_disabled)
 		{
@@ -290,7 +291,8 @@ bool Ui::CheckboxAddressVar(const char* label, bool val, int addr, const char* h
 	return rtn;
 }
 
-bool Ui::CheckboxAddressVarEx(const char* label, bool val, int addr, int enabled_val, int disabled_val, const char* hint)
+bool Ui::CheckboxAddressVarEx(const char* label, bool val, int addr, int enabled_val, int disabled_val,
+                              const char* hint)
 {
 	bool rtn = false;
 	bool state = val;
@@ -320,7 +322,10 @@ bool Ui::CheckboxBitFlag(const char* label, uint flag, const char* hint)
 	return rtn;
 }
 
-void Ui::DrawJSON(CJson& json, std::vector<std::string>& combo_items, std::string& selected_item, ImGuiTextFilter& filter, std::function<void(std::string&, std::string&, std::string&)> func_left_click, std::function<void(std::string&, std::string&, std::string&)> func_right_click)
+void Ui::DrawJSON(CJson& json, std::vector<std::string>& combo_items, std::string& selected_item,
+                  ImGuiTextFilter& filter,
+                  std::function<void(std::string&, std::string&, std::string&)> func_left_click,
+                  std::function<void(std::string&, std::string&, std::string&)> func_right_click)
 {
 	ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() / 2 - 5);
 	ListBoxStr("##Categories", combo_items, selected_item);
@@ -343,17 +348,16 @@ void Ui::DrawJSON(CJson& json, std::vector<std::string>& combo_items, std::strin
 	ImGui::Spacing();
 
 	if (ImGui::IsMouseClicked(1))
-		json_popup.function = nullptr;
+		jsonPopup.function = nullptr;
 
 
 	ImGui::BeginChild(1);
-	for (auto root : json.data.items())
+	for (auto root : json.m_Data.items())
 	{
 		if (root.key() == selected_item || selected_item == "All")
 		{
 			for (auto _data : root.value().items())
 			{
-
 				std::string name = _data.key();
 				if (filter.PassFilter(name.c_str()))
 				{
@@ -368,28 +372,28 @@ void Ui::DrawJSON(CJson& json, std::vector<std::string>& combo_items, std::strin
 
 					if (ImGui::IsItemClicked(1) && func_right_click != nullptr)
 					{
-						json_popup.function = func_right_click;
-						json_popup.root_key = root.key();
-						json_popup.key = name;
-						json_popup.value = _data.value();
+						jsonPopup.function = func_right_click;
+						jsonPopup.rootKey = root.key();
+						jsonPopup.key = name;
+						jsonPopup.value = _data.value();
 					}
 				}
 			}
 		}
 	}
 
-	if (json_popup.function != nullptr)
+	if (jsonPopup.function != nullptr)
 	{
 		if (ImGui::BeginPopupContextWindow())
 		{
-			ImGui::Text(json_popup.key.c_str());
+			ImGui::Text(jsonPopup.key.c_str());
 			ImGui::Separator();
 			if (ImGui::MenuItem("Remove"))
-				json_popup.function(json_popup.root_key, json_popup.key, json_popup.value);
+				jsonPopup.function(jsonPopup.rootKey, jsonPopup.key, jsonPopup.value);
 
 
 			if (ImGui::MenuItem("Close"))
-				json_popup.function = nullptr;
+				jsonPopup.function = nullptr;
 
 			ImGui::EndPopup();
 		}
@@ -404,7 +408,7 @@ void Ui::EditStat(const char* label, const int stat_id, const int min, const int
 	{
 		int val = static_cast<int>(CStats::GetStatValue(stat_id));
 
-		ImGui::Columns(3, 0, false);
+		ImGui::Columns(3, nullptr, false);
 		ImGui::Text("Min: %d", min);
 		ImGui::NextColumn();
 		ImGui::Text("Def: %d", def);
@@ -419,17 +423,17 @@ void Ui::EditStat(const char* label, const int stat_id, const int min, const int
 
 		ImGui::Spacing();
 
-		if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), Ui::GetSize(3)))
+		if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), GetSize(3)))
 			CStats::SetStatValue(stat_id, static_cast<float>(min));
 
 		ImGui::SameLine();
 
-		if (ImGui::Button(("Default##" + std::string(label)).c_str(), Ui::GetSize(3)))
+		if (ImGui::Button(("Default##" + std::string(label)).c_str(), GetSize(3)))
 			CStats::SetStatValue(stat_id, static_cast<float>(def));
 
 		ImGui::SameLine();
 
-		if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), Ui::GetSize(3)))
+		if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), GetSize(3)))
 			CStats::SetStatValue(stat_id, static_cast<float>(max));
 
 		ImGui::Spacing();
@@ -454,25 +458,26 @@ void Ui::FilterWithHint(const char* label, ImGuiTextFilter& filter, const char* 
 }
 
 // clean up the code someday
-void Ui::DrawImages(std::vector<std::unique_ptr<TextureStructure>>& img_vec, ImVec2 image_size,
-	std::vector<std::string>& category_vec, std::string& selected_item, ImGuiTextFilter& filter,
-	std::function<void(std::string&)> on_left_click, std::function<void(std::string&)> on_right_click,
-	std::function<std::string(std::string&)> get_name_func, std::function<bool(std::string&)> verify_func)
+void Ui::DrawImages(std::vector<std::unique_ptr<STextureStructure>>& img_vec, ImVec2 image_size,
+                    std::vector<std::string>& category_vec, std::string& selected_item, ImGuiTextFilter& filter,
+                    std::function<void(std::string&)> on_left_click, std::function<void(std::string&)> on_right_click,
+                    std::function<std::string(std::string&)> get_name_func,
+                    std::function<bool(std::string&)> verify_func)
 {
-
 	// scale image size
 	image_size.x *= screen::GetScreenWidth() / 1366.0f;
 	image_size.y *= screen::GetScreenHeight() / 768.0f;
 
 	int images_in_row = static_cast<int>(ImGui::GetWindowContentRegionWidth() / image_size.x);
-	image_size.x = ImGui::GetWindowContentRegionWidth() / images_in_row - int(ImGuiStyleVar_ItemSpacing) * 0.65f;
+	image_size.x = ImGui::GetWindowContentRegionWidth() / images_in_row - static_cast<int>(ImGuiStyleVar_ItemSpacing) *
+		0.65f;
 
 	int images_count = 1;
 
 	ImGui::Spacing();
 
 	if (ImGui::IsMouseClicked(1))
-		img_popup.function = nullptr;
+		imgPopup.function = nullptr;
 
 	ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() / 2 - 5);
 	ListBoxStr("##Categories", category_vec, selected_item);
@@ -484,21 +489,22 @@ void Ui::DrawImages(std::vector<std::unique_ptr<TextureStructure>>& img_vec, ImV
 	ImGui::BeginChild("DrawImages");
 	for (uint i = 0; i < img_vec.size(); i++)
 	{
-		std::string text = img_vec[i]->file_name;
+		std::string text = img_vec[i]->m_FileName;
 		std::string model_name = get_name_func(text);
 
 		if (filter.PassFilter(model_name.c_str())
-			&& (img_vec[i]->category_name == selected_item || selected_item == "All")
+			&& (img_vec[i]->m_CategoryName == selected_item || selected_item == "All")
 			&& (verify_func == nullptr || verify_func(text))
-			)
+		)
 		{
-			if (ImGui::ImageButton(img_vec[i]->texture, image_size, ImVec2(0, 0), ImVec2(1, 1), 1, ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 1)))
+			if (ImGui::ImageButton(img_vec[i]->m_pTexture, image_size, ImVec2(0, 0), ImVec2(1, 1), 1, ImVec4(1, 1, 1, 1),
+			                       ImVec4(1, 1, 1, 1)))
 				on_left_click(text);
 
 			if (ImGui::IsItemClicked(1) && on_right_click != nullptr)
 			{
-				img_popup.function = on_right_click;
-				img_popup.value = model_name;
+				imgPopup.function = on_right_click;
+				imgPopup.value = model_name;
 			}
 
 			if (ImGui::IsItemHovered())
@@ -514,7 +520,8 @@ void Ui::DrawImages(std::vector<std::unique_ptr<TextureStructure>>& img_vec, ImV
 				if (text_size.x < image_size.x)
 				{
 					float offsetX = (ImGui::GetItemRectSize().x - text_size.x) / 2;
-					drawlist->AddText(ImVec2(btn_min.x + offsetX, btn_min.y + 10), ImGui::GetColorU32(ImGuiCol_Text), model_name.c_str());
+					drawlist->AddText(ImVec2(btn_min.x + offsetX, btn_min.y + 10), ImGui::GetColorU32(ImGuiCol_Text),
+					                  model_name.c_str());
 				}
 				else
 				{
@@ -527,10 +534,10 @@ void Ui::DrawImages(std::vector<std::unique_ptr<TextureStructure>>& img_vec, ImV
 					{
 						text_size = ImGui::CalcTextSize(buff.c_str());
 						float offsetX = (ImGui::GetItemRectSize().x - text_size.x) / 2;
-						drawlist->AddText(ImVec2(btn_min.x + offsetX, btn_min.y + 10 * count), ImGui::GetColorU32(ImGuiCol_Text), buff.c_str());
+						drawlist->AddText(ImVec2(btn_min.x + offsetX, btn_min.y + 10 * count),
+						                  ImGui::GetColorU32(ImGuiCol_Text), buff.c_str());
 						++count;
 					}
-
 				}
 			}
 
@@ -541,18 +548,18 @@ void Ui::DrawImages(std::vector<std::unique_ptr<TextureStructure>>& img_vec, ImV
 		}
 	}
 
-	if (img_popup.function != nullptr)
+	if (imgPopup.function != nullptr)
 	{
 		if (ImGui::BeginPopupContextWindow())
 		{
-			ImGui::Text(img_popup.value.c_str());
+			ImGui::Text(imgPopup.value.c_str());
 			ImGui::Separator();
 			if (ImGui::MenuItem("Remove"))
-				img_popup.function(img_popup.value);
+				imgPopup.function(imgPopup.value);
 
 
 			if (ImGui::MenuItem("Close"))
-				img_popup.function = nullptr;
+				imgPopup.function = nullptr;
 
 			ImGui::EndPopup();
 		}
@@ -565,7 +572,7 @@ void Ui::RadioButtonAddress(const char* label, std::vector<NamedMemory>& named_m
 	size_t btn_in_column = named_mem.size() / 2 - 1;
 
 	ImGui::Text(label);
-	ImGui::Columns(2, 0, false);
+	ImGui::Columns(2, nullptr, false);
 
 	bool state = true;
 
@@ -604,7 +611,7 @@ void Ui::RadioButtonAddressEx(const char* label, int addr, std::vector<NamedValu
 	size_t btn_in_column = named_val.size() / 2;
 
 	ImGui::Text(label);
-	ImGui::Columns(2, 0, false);
+	ImGui::Columns(2, nullptr, false);
 
 	int mem_val = 0;
 	patch::GetRaw(addr, &mem_val, 1, false);
@@ -671,7 +678,7 @@ void Ui::ColorPickerAddress(const char* label, int base_addr, ImVec4&& default_c
 		}
 		ImGui::Spacing();
 
-		if (ImGui::Button("Reset to default", Ui::GetSize()))
+		if (ImGui::Button("Reset to default", GetSize()))
 		{
 			patch::Set<BYTE>(base_addr, default_color.x, false);
 			patch::Set<BYTE>(base_addr + 1, default_color.y, false);
@@ -686,16 +693,16 @@ void Ui::ColorPickerAddress(const char* label, int base_addr, ImVec4&& default_c
 
 void Ui::EditBits(const char* label, const int address, const std::vector<std::string>& names)
 {
-	int* mem_val = (int*)address;
+	auto mem_val = (int*)address;
 
 	if (ImGui::CollapsingHeader(label))
 	{
-		ImGui::Columns(2, NULL, false);
+		ImGui::Columns(2, nullptr, false);
 
 		for (int i = 0; i < 32; ++i)
 		{
 			int mask = 1 << i;
-			bool state = static_cast<bool>(*mem_val & mask);
+			bool state = *mem_val & mask;
 
 			if (ImGui::Checkbox(names[i].c_str(), &state))
 				*mem_val ^= mask;
@@ -710,7 +717,8 @@ void Ui::EditBits(const char* label, const int address, const std::vector<std::s
 	}
 }
 
-void Ui::EditFloat(const char* label, const int address, const float min, const float def, const float max, const float mul)
+void Ui::EditFloat(const char* label, const int address, const float min, const float def, const float max,
+                   const float mul)
 {
 	if (ImGui::CollapsingHeader(label))
 	{
@@ -721,7 +729,7 @@ void Ui::EditFloat(const char* label, const int address, const float min, const 
 		if (min == def)
 			items = 2;
 
-		ImGui::Columns(items, 0, false);
+		ImGui::Columns(items, nullptr, false);
 
 		ImGui::Text("Min: %f", min);
 
@@ -760,20 +768,20 @@ void Ui::EditFloat(const char* label, const int address, const float min, const 
 
 		ImGui::Spacing();
 
-		if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), Ui::GetSize(items)))
+		if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), GetSize(items)))
 			patch::Set<float>(address, min / mul, false);
 
 		if (items == 3)
 		{
 			ImGui::SameLine();
 
-			if (ImGui::Button(("Default##" + std::string(label)).c_str(), Ui::GetSize(items)))
+			if (ImGui::Button(("Default##" + std::string(label)).c_str(), GetSize(items)))
 				patch::Set<float>(address, def / mul, false);
 		}
 
 		ImGui::SameLine();
 
-		if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), Ui::GetSize(items)))
+		if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), GetSize(items)))
 			patch::Set<float>(address, max / mul, false);
 
 		ImGui::Spacing();
@@ -783,7 +791,7 @@ void Ui::EditFloat(const char* label, const int address, const float min, const 
 
 bool Ui::HotKey(const char* label, HotKeyData& key_data)
 {
-	bool active = current_hotkey == label;
+	bool active = m_CurrentHotkey == label;
 	bool state = false;
 
 	if (active)
@@ -795,7 +803,7 @@ bool Ui::HotKey(const char* label, HotKeyData& key_data)
 		{
 			if (KeyPressed(key))
 			{
-				key_data.key1 = key;
+				key_data.m_key1 = key;
 				break;
 			}
 		}
@@ -804,7 +812,7 @@ bool Ui::HotKey(const char* label, HotKeyData& key_data)
 		{
 			if (KeyPressed(key))
 			{
-				key_data.key2 = key;
+				key_data.m_key2 = key;
 				break;
 			}
 		}
@@ -813,21 +821,22 @@ bool Ui::HotKey(const char* label, HotKeyData& key_data)
 
 	std::string text;
 
-	if (key_data.key1 != VK_NONE)
-		text = key_names[key_data.key1 - 1];
+	if (key_data.m_key1 != VK_NONE)
+		text = key_names[key_data.m_key1 - 1];
 	else
 		text = "None";
 
-	if (key_data.key1 != key_data.key2)
-		text += (" + " + key_names[key_data.key2 - 1]);
+	if (key_data.m_key1 != key_data.m_key2)
+		text += (" + " + key_names[key_data.m_key2 - 1]);
 
-	if (ImGui::Button((text + std::string("##") + std::string(label)).c_str(), ImVec2(ImGui::GetWindowContentRegionWidth() / 3.5, ImGui::GetFrameHeight())))
+	if (ImGui::Button((text + std::string("##") + std::string(label)).c_str(),
+	                  ImVec2(ImGui::GetWindowContentRegionWidth() / 3.5, ImGui::GetFrameHeight())))
 		if (!active)
-			current_hotkey = label;
+			m_CurrentHotkey = label;
 
 	if (active && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 	{
-		current_hotkey = "";
+		m_CurrentHotkey = "";
 		state = true;
 	}
 
@@ -835,11 +844,11 @@ bool Ui::HotKey(const char* label, HotKeyData& key_data)
 	{
 		if (ImGui::IsItemHovered())
 		{
-			key_data.key1 = VK_NONE;
-			key_data.key2 = VK_NONE;
+			key_data.m_key1 = VK_NONE;
+			key_data.m_key2 = VK_NONE;
 		}
 		else
-			current_hotkey = "";
+			m_CurrentHotkey = "";
 
 		state = true;
 	}
@@ -855,14 +864,14 @@ bool Ui::HotKey(const char* label, HotKeyData& key_data)
 
 bool Ui::HotKeyPressed(HotKeyData& hotkey)
 {
-	if (KeyPressed(hotkey.key1) && KeyPressed(hotkey.key2))
-		hotkey.is_down = true;
+	if (KeyPressed(hotkey.m_key1) && KeyPressed(hotkey.m_key2))
+		hotkey.m_bPressed = true;
 	else
 	{
-		if (hotkey.is_down)
+		if (hotkey.m_bPressed)
 		{
-			hotkey.is_down = false;
-			return current_hotkey == "";
+			hotkey.m_bPressed = false;
+			return m_CurrentHotkey == "";
 		}
 	}
 	return false;
@@ -872,13 +881,13 @@ std::string Ui::GetHotKeyNameString(HotKeyData& hotkey)
 {
 	std::string text;
 
-	if (hotkey.key1 != VK_NONE)
-		text = key_names[hotkey.key1 - 1];
+	if (hotkey.m_key1 != VK_NONE)
+		text = key_names[hotkey.m_key1 - 1];
 	else
 		text = "None";
 
-	if (hotkey.key1 != hotkey.key2)
-		text += (" + " + key_names[hotkey.key2 - 1]);
+	if (hotkey.m_key1 != hotkey.m_key2)
+		text += (" + " + key_names[hotkey.m_key2 - 1]);
 
 	return text;
 }
@@ -894,7 +903,8 @@ bool Ui::ColorButton(int color_id, std::vector<float>& color, ImVec2 size)
 	if (ImGui::IsItemHovered())
 	{
 		ImDrawList* drawlist = ImGui::GetWindowDrawList();
-		drawlist->AddRectFilled(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(), ImGui::GetColorU32(ImGuiCol_ModalWindowDimBg));
+		drawlist->AddRectFilled(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(),
+		                        ImGui::GetColorU32(ImGuiCol_ModalWindowDimBg));
 	}
 
 	return rtn;

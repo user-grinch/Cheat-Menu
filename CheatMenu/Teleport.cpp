@@ -5,7 +5,7 @@
 #include "Util.h"
 
 // FlA
-tRadarTrace* CRadar::ms_RadarTrace = reinterpret_cast<tRadarTrace *>(patch::GetPointer(0x5838B0 + 2));
+tRadarTrace* CRadar::ms_RadarTrace = reinterpret_cast<tRadarTrace*>(patch::GetPointer(0x5838B0 + 2));
 
 void Teleport::FetchRadarSpriteData()
 {
@@ -16,17 +16,18 @@ void Teleport::FetchRadarSpriteData()
 	if (cur_timer - timer < 5000)
 		return;
 
-	tp_data.json.data.erase("Radar");
+	tp_data.m_Json.m_Data.erase("Radar");
 
 	// 175 is the max number of sprites, FLA can increase this limit, might need to update this
-	for (int i = 0; i != 175; ++i)	
+	for (int i = 0; i != 175; ++i)
 	{
 		CVector pos = CRadar::ms_RadarTrace[i].m_vPosition;
 		uchar sprite = CRadar::ms_RadarTrace[i].m_nBlipSprite;
-		std::string sprite_name = sprite_name_json.data[std::to_string(sprite)].get<std::string>();
+		auto sprite_name = m_SpriteJson.m_Data[std::to_string(sprite)].get<std::string>();
 		std::string key_name = sprite_name + ", " + Util::GetLocationName(&pos);
 
-		tp_data.json.data["Radar"][key_name] = "0, " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z);
+		tp_data.m_Json.m_Data["Radar"][key_name] = "0, " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " +
+			std::to_string(pos.z);
 
 		/*
 			"Radar" : {
@@ -38,36 +39,37 @@ void Teleport::FetchRadarSpriteData()
 
 Teleport::Teleport()
 {
-	tp_data.json.LoadData(tp_data.categories, tp_data.selected);
-	quick_teleport = config.GetValue("quick_teleport", false);
+	tp_data.m_Json.LoadData(tp_data.m_Categories, tp_data.m_Selected);
+	m_bQuickTeleport = config.GetValue("quick_teleport", false);
 
 	Events::processScriptsEvent += []
 	{
-		if ((STeleport::_bool == true) && ((CTimer::m_snTimeInMilliseconds - STeleport::timer) > 500))
+		if ((m_Teleport.m_bEnabled == true) && ((CTimer::m_snTimeInMilliseconds - m_Teleport.m_nTimer) > 500))
 		{
-			CPlayerPed *player = FindPlayerPed();
+			CPlayerPed* player = FindPlayerPed();
 
 			CEntity* player_entity = FindPlayerEntity(-1);
-			STeleport::pos.z = CWorld::FindGroundZFor3DCoord(Teleport::STeleport::pos.x, Teleport::STeleport::pos.y, STeleport::pos.z + 100.0f, 0, &player_entity) + 1.0f;
-			CVehicle *pVeh = player->m_pVehicle;
+			m_Teleport.m_fPos.z = CWorld::FindGroundZFor3DCoord(m_Teleport.m_fPos.x, m_Teleport.m_fPos.y,
+			                                                 m_Teleport.m_fPos.z + 100.0f, nullptr, &player_entity) + 1.0f;
+			CVehicle* pVeh = player->m_pVehicle;
 
 			if (pVeh && player->m_nPedFlags.bInVehicle)
-				pVeh->Teleport(STeleport::pos, false);
+				pVeh->Teleport(m_Teleport.m_fPos, false);
 			else
-				player->Teleport(STeleport::pos, false);
+				player->Teleport(m_Teleport.m_fPos, false);
 
-			STeleport::_bool = false;
+			m_Teleport.m_bEnabled = false;
 			Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(player), false);
 			Command<Commands::RESTORE_CAMERA_JUMPCUT>();
-			TheCamera.Fade(0,1);
+			TheCamera.Fade(0, 1);
 		}
-		
-		if (quick_teleport)
+
+		if (m_bQuickTeleport)
 		{
-			if (Ui::HotKeyPressed(Menu::hotkeys::quick_tp)
-				&& ((CTimer::m_snTimeInMilliseconds - quick_teleport_timer) > 500))
+			if (Ui::HotKeyPressed(Menu::m_HotKeys.quickTeleport)
+				&& ((CTimer::m_snTimeInMilliseconds - m_nQuickTeleportTimer) > 500))
 			{
-				quick_teleport_timer = CTimer::m_snTimeInMilliseconds;
+				m_nQuickTeleportTimer = CTimer::m_snTimeInMilliseconds;
 				TeleportPlayer(true);
 			}
 		}
@@ -76,35 +78,34 @@ Teleport::Teleport()
 
 void Teleport::TeleportPlayer(bool get_marker, CVector pos, short interior_id)
 {
-	CPlayerPed *player = FindPlayerPed();
-	CVehicle *pVeh = player->m_pVehicle;
+	CPlayerPed* pPlayer = FindPlayerPed();
+	CVehicle* pVeh = pPlayer->m_pVehicle;
 
 	if (get_marker)
 	{
-		auto target_blip = CRadar::ms_RadarTrace[LOWORD(FrontEndMenuManager.m_nTargetBlipIndex)];
+		tRadarTrace targetBlip = CRadar::ms_RadarTrace[LOWORD(FrontEndMenuManager.m_nTargetBlipIndex)];
 
-
-		if (target_blip.m_nBlipSprite != RADAR_SPRITE_WAYPOINT)
+		if (targetBlip.m_nBlipSprite != RADAR_SPRITE_WAYPOINT)
 		{
 			CHud::SetHelpMessage("No blip found", false, false, false);
 			return;
 		}
-		CEntity* player_entity = FindPlayerEntity(-1);
-		pos = target_blip.m_vPosition;
-		pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, 0, &player_entity) + 50.f;
+		CEntity* pPlayerEntity = FindPlayerEntity(-1);
+		pos = targetBlip.m_vPosition;
+		pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, nullptr, &pPlayerEntity) + 50.f;
 
-		Teleport::STeleport::pos = pos;
-		Teleport::STeleport::timer = CTimer::m_snTimeInMilliseconds;
-		Teleport::STeleport::_bool = true;
-		TheCamera.Fade(0,0);
-		Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(player), true);
+		m_Teleport.m_fPos = pos;
+		m_Teleport.m_nTimer = CTimer::m_snTimeInMilliseconds;
+		m_Teleport.m_bEnabled = true;
+		TheCamera.Fade(0, 0);
+		Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(pPlayer), true);
 	}
 
 	CStreaming::LoadScene(&pos);
 	CStreaming::LoadSceneCollision(&pos);
 	CStreaming::LoadAllRequestedModels(false);
-	
-	if (pVeh && player->m_nPedFlags.bInVehicle)
+
+	if (pVeh && pPlayer->m_nPedFlags.bInVehicle)
 	{
 		pVeh->Teleport(pos, false);
 
@@ -112,19 +113,20 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, short interior_id)
 			reinterpret_cast<CBike*>(pVeh)->PlaceOnRoadProperly();
 		else if (pVeh->m_nVehicleClass != VEHICLE_BOAT)
 			reinterpret_cast<CAutomobile*>(pVeh)->PlaceOnRoadProperly();
-			
+
 		pVeh->m_nAreaCode = interior_id;
 	}
 	else
-		player->Teleport(pos, false);
+		pPlayer->Teleport(pos, false);
 
-	player->m_nAreaCode = interior_id;
+	pPlayer->m_nAreaCode = interior_id;
 	Command<Commands::SET_AREA_VISIBLE>(interior_id);
 }
 
-void Teleport::TeleportToLocation(std::string& rootkey, std::string& bLocName,std::string& loc)
+void Teleport::TeleportToLocation(std::string& rootkey, std::string& bLocName, std::string& loc)
 {
-	try {
+	try
+	{
 		int interior = 0;
 		CVector pos;
 		std::stringstream ss(loc);
@@ -142,9 +144,10 @@ void Teleport::TeleportToLocation(std::string& rootkey, std::string& bLocName,st
 		std::getline(ss, temp, ',');
 		pos.z = std::stof(temp);
 
-		Teleport::TeleportPlayer(false, pos, static_cast<short>(interior));
+		TeleportPlayer(false, pos, static_cast<short>(interior));
 	}
-	catch (...) {
+	catch (...)
+	{
 		CHud::SetHelpMessage("Invalid location", false, false, false);
 	}
 }
@@ -153,16 +156,16 @@ void Teleport::RemoveTeleportEntry(std::string& category, std::string& key, std:
 {
 	if (category == "Custom")
 	{
-		tp_data.json.data["Custom"].erase(key);
+		tp_data.m_Json.m_Data["Custom"].erase(key);
 		CHud::SetHelpMessage("Location removed", false, false, false);
-		tp_data.json.WriteToDisk();
+		tp_data.m_Json.WriteToDisk();
 	}
 	else CHud::SetHelpMessage("You can only remove custom location", false, false, false);
 }
 
 void Teleport::Draw()
 {
-	if (ImGui::BeginTabBar("Teleport",ImGuiTabBarFlags_NoTooltip+ImGuiTabBarFlags_FittingPolicyScroll))
+	if (ImGui::BeginTabBar("Teleport", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
 	{
 		ImGui::Spacing();
 		if (ImGui::BeginTabItem("Teleport"))
@@ -170,36 +173,40 @@ void Teleport::Draw()
 			ImGui::Spacing();
 			if (ImGui::BeginChild("Teleport Child"))
 			{
-				ImGui::Columns(2, 0, false);
-				ImGui::Checkbox("Insert coordinates", &insert_coord);
+				ImGui::Columns(2, nullptr, false);
+				ImGui::Checkbox("Insert coordinates", &m_bInsertCoord);
 				ImGui::NextColumn();
-				if (Ui::CheckboxWithHint("Quick teleport", &quick_teleport,
-					(std::string("Teleport to marker using ") + Ui::GetHotKeyNameString(Menu::hotkeys::quick_tp)).c_str()))
+				if (Ui::CheckboxWithHint("Quick teleport", &m_bQuickTeleport,
+				                         (std::string("Teleport to marker using ") + Ui::GetHotKeyNameString(
+					                         Menu::m_HotKeys.quickTeleport)).c_str()))
 				{
-					config.SetValue("quick_teleport", quick_teleport);
+					config.SetValue("quick_teleport", m_bQuickTeleport);
 				}
 
 				ImGui::Columns(1);
 				ImGui::Spacing();
 
-				if (insert_coord)
+				if (m_bInsertCoord)
 				{
 					CVector pos = FindPlayerPed()->GetPosition();
 
-					strcpy(input_buffer,(std::to_string(int(pos.x)) + ", " + std::to_string(int(pos.y)) + ", " + std::to_string(int(pos.z))).c_str());
+					strcpy(m_nInputBuffer,
+					       (std::to_string(static_cast<int>(pos.x)) + ", " + std::to_string(static_cast<int>(pos.y)) +
+						       ", " + std::to_string(static_cast<int>(pos.z))).c_str());
 				}
 
-				ImGui::InputTextWithHint("Coordinates", "x, y, z", input_buffer, IM_ARRAYSIZE(input_buffer));
-				
+				ImGui::InputTextWithHint("Coordinates", "x, y, z", m_nInputBuffer, IM_ARRAYSIZE(m_nInputBuffer));
+
 				ImGui::Spacing();
-				
+
 				if (ImGui::Button("Teleport to bCoord", Ui::GetSize(2)))
 				{
-					std::stringstream ss(input_buffer);
+					std::stringstream ss(m_nInputBuffer);
 					std::string temp;
-					CVector pos(0,0,0);
+					CVector pos(0, 0, 0);
 
-					try {
+					try
+					{
 						getline(ss, temp, ',');
 						pos.x = std::stof(temp);
 
@@ -209,15 +216,16 @@ void Teleport::Draw()
 						getline(ss, temp, ',');
 						pos.z = std::stof(temp) + 1.0f;
 
-						Teleport::TeleportPlayer(false,pos);
+						TeleportPlayer(false, pos);
 					}
-					catch (...) {
+					catch (...)
+					{
 						CHud::SetHelpMessage("Invalid coordinate", false, false, false);
 					}
 				}
 				ImGui::SameLine();
 				if (ImGui::Button("Teleport to marker", Ui::GetSize(2)))
-					Teleport::TeleportPlayer(true);
+					TeleportPlayer(true);
 
 				ImGui::EndChild();
 			}
@@ -228,25 +236,26 @@ void Teleport::Draw()
 		{
 			FetchRadarSpriteData();
 			ImGui::Spacing();
-			Ui::DrawJSON(tp_data.json, tp_data.categories, tp_data.selected, tp_data.filter, &TeleportToLocation, &RemoveTeleportEntry);
+			Ui::DrawJSON(tp_data.m_Json, tp_data.m_Categories, tp_data.m_Selected, tp_data.m_Filter, &TeleportToLocation,
+			             &RemoveTeleportEntry);
 			ImGui::EndTabItem();
 		}
 
 		if (ImGui::BeginTabItem("Custom"))
 		{
 			ImGui::Spacing();
-			ImGui::InputTextWithHint("Location", "Groove Street", location_buffer, IM_ARRAYSIZE(input_buffer));
-			ImGui::InputTextWithHint("Coordinates", "x, y, z", input_buffer, IM_ARRAYSIZE(input_buffer));
+			ImGui::InputTextWithHint("Location", "Groove Street", m_nLocationBuffer, IM_ARRAYSIZE(m_nInputBuffer));
+			ImGui::InputTextWithHint("Coordinates", "x, y, z", m_nInputBuffer, IM_ARRAYSIZE(m_nInputBuffer));
 			ImGui::Spacing();
 			if (ImGui::Button("Add location", Ui::GetSize()))
 			{
-				tp_data.json.data["Custom"][location_buffer] = ("0, " + std::string(input_buffer));
+				tp_data.m_Json.m_Data["Custom"][m_nLocationBuffer] = ("0, " + std::string(m_nInputBuffer));
 
 				// Clear the Radar coordinates
-				tp_data.json.data.erase("Radar");
-				tp_data.json.data["Radar"] = {};
+				tp_data.m_Json.m_Data.erase("Radar");
+				tp_data.m_Json.m_Data["Radar"] = {};
 
-				tp_data.json.WriteToDisk();
+				tp_data.m_Json.WriteToDisk();
 			}
 			ImGui::EndTabItem();
 		}

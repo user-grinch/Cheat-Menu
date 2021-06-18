@@ -2,33 +2,34 @@
 #include "Neon.h"
 #include "Util.h"
 
-void Neon::RenderEvent(CVehicle *pVeh)
+void Neon::RenderEvent(CVehicle* pVeh)
 {
-	NeonData* data = &VehNeon.Get(pVeh);
-	if (data->neon_installed && !pVeh->IsUpsideDown())
+	NeonData* data = &m_VehNeon.Get(pVeh);
+	if (data->m_bNeonInstalled && !pVeh->IsUpsideDown())
 	{
 		CVector Pos = CModelInfo::GetModelInfo(pVeh->m_nModelIndex)->m_pColModel->m_boundBox.m_vecMin;
 		CVector center = pVeh->TransformFromObjectSpace(CVector(0.0f, 0.0f, 0.0f));
-		CVector up = pVeh->TransformFromObjectSpace(CVector(0.0f, -Pos.y - data->val, 0.0f)) - center;
-		CVector right = pVeh->TransformFromObjectSpace(CVector(Pos.x + data->val, 0.0f, 0.0f)) - center;
-		CShadows::StoreShadowToBeRendered(5, neon_texture, &center, up.x, up.y, right.x, right.y, 180, data->color.r, data->color.g, data->color.b, 2.0f, false, 1.0f, 0, true);
+		CVector up = pVeh->TransformFromObjectSpace(CVector(0.0f, -Pos.y - data->m_fVal, 0.0f)) - center;
+		CVector right = pVeh->TransformFromObjectSpace(CVector(Pos.x + data->m_fVal, 0.0f, 0.0f)) - center;
+		CShadows::StoreShadowToBeRendered(5, m_pNeonTexture, &center, up.x, up.y, right.x, right.y, 180, data->m_Color.r,
+		                                  data->m_Color.g, data->m_Color.b, 2.0f, false, 1.0f, 0, true);
 
-		if (CTimer::m_snTimeInMilliseconds - data->timer > 150)
+		if (CTimer::m_snTimeInMilliseconds - data->m_nTimer > 150)
 		{
-			data->timer = CTimer::m_snTimeInMilliseconds;
+			data->m_nTimer = CTimer::m_snTimeInMilliseconds;
 
-			if (data->pulsing)
+			if (data->m_bPulsing)
 			{
-				if (data->val < 0.0f)
-					data->increment = true;
+				if (data->m_fVal < 0.0f)
+					data->m_bIncrement = true;
 
-				if (data->val > 0.3f)
-					data->increment = false;
+				if (data->m_fVal > 0.3f)
+					data->m_bIncrement = false;
 
-				if (data->increment)
-					data->val += 0.1f;
+				if (data->m_bIncrement)
+					data->m_fVal += 0.1f;
 				else
-					data->val -= 0.1f;
+					data->m_fVal -= 0.1f;
 			}
 		}
 	}
@@ -38,58 +39,58 @@ Neon::Neon()
 {
 	Events::processScriptsEvent += [this]
 	{
-		if (!mask_loaded)
+		if (!m_bMaskLoaded)
 		{
-			neon_texture = Util::LoadTextureFromPngFile(PLUGIN_PATH((char*)"CheatMenu\\vehicles\\neon_mask.png"));
-			if (!neon_texture)
+			m_pNeonTexture = Util::LoadTextureFromPngFile(PLUGIN_PATH((char*)"CheatMenu\\vehicles\\neon_mask.png"));
+			if (!m_pNeonTexture)
 				flog << "Failed to load neon mask" << std::endl;
 
-			mask_loaded = true;
+			m_bMaskLoaded = true;
 		}
 	};
-	
+
 	Events::vehicleRenderEvent += RenderEvent;
 }
 
 Neon::~Neon()
-{	
+{
 	Events::vehicleRenderEvent -= RenderEvent;
 
-	if (neon_texture)
+	if (m_pNeonTexture)
 	{
-		RwTextureDestroy(neon_texture);
-		neon_texture = nullptr;
+		RwTextureDestroy(m_pNeonTexture);
+		m_pNeonTexture = nullptr;
 	}
 }
 
 bool Neon::IsNeonInstalled(CVehicle* pVeh)
 {
-	return VehNeon.Get(pVeh).neon_installed;
+	return m_VehNeon.Get(pVeh).m_bNeonInstalled;
 }
 
 bool Neon::IsPulsingEnabled(CVehicle* pVeh)
 {
-	return VehNeon.Get(pVeh).pulsing;
+	return m_VehNeon.Get(pVeh).m_bPulsing;
 }
 
 void Neon::SetPulsing(CVehicle* pVeh, bool state)
 {
-	VehNeon.Get(pVeh).pulsing = state;
+	m_VehNeon.Get(pVeh).m_bPulsing = state;
 }
 
 void Neon::InstallNeon(CVehicle* pVeh, int red, int green, int blue)
 {
-	CRGBA& color = VehNeon.Get(pVeh).color;
+	CRGBA& color = m_VehNeon.Get(pVeh).m_Color;
 
 	color.r = red;
 	color.g = green;
 	color.b = blue;
 	color.a = 255;
 
-	VehNeon.Get(pVeh).neon_installed = true;
+	m_VehNeon.Get(pVeh).m_bNeonInstalled = true;
 }
 
 void Neon::RemoveNeon(CVehicle* pVeh)
 {
-	VehNeon.Get(pVeh).neon_installed = false;
+	m_VehNeon.Get(pVeh).m_bNeonInstalled = false;
 }

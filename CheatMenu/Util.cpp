@@ -25,8 +25,8 @@ void Util::ClearCharTasksVehCheck(CPed* ped)
 	}
 }
 
-void Util::ReleaseTextures(std::vector<std::unique_ptr<TextureStructure>> &store_vec)
-{	
+void Util::ReleaseTextures(std::vector<std::unique_ptr<STextureStructure>>& store_vec)
+{
 	// for (auto &it : store_vec)
 	// {
 	// 	if (Globals::renderer == Render_DirectX9)
@@ -39,28 +39,32 @@ void Util::ReleaseTextures(std::vector<std::unique_ptr<TextureStructure>> &store
 	// }
 }
 
-void Util::LoadTexturesInDirRecursive(const char* path, const char* file_ext, std::vector<std::string>& category_vec, std::vector<std::unique_ptr<TextureStructure>>& store_vec)
+void Util::LoadTexturesInDirRecursive(const char* path, const char* file_ext, std::vector<std::string>& category_vec,
+                                      std::vector<std::unique_ptr<STextureStructure>>& store_vec)
 {
 	std::string folder = "";
 	for (auto& p : fs::recursive_directory_iterator(path))
 	{
 		if (p.path().extension() == file_ext)
 		{
-			store_vec.push_back(std::make_unique<TextureStructure>());
+			store_vec.push_back(std::make_unique<STextureStructure>());
 			HRESULT hr = -1;
 
 			if (Globals::renderer == Render_DirectX9)
-				hr = D3DXCreateTextureFromFileA(GetD3DDevice(), p.path().string().c_str(), reinterpret_cast<PDIRECT3DTEXTURE9*>(&store_vec.back().get()->texture));
+				hr = D3DXCreateTextureFromFileA(GetD3DDevice(), p.path().string().c_str(),
+				                                reinterpret_cast<PDIRECT3DTEXTURE9*>(&store_vec.back().get()->m_pTexture));
 			else
 			{
-				if (LoadTextureFromFileDx11(p.path().string().c_str(), reinterpret_cast<ID3D11ShaderResourceView**>(&store_vec.back().get()->texture)))
+				if (LoadTextureFromFileDx11(p.path().string().c_str(),
+				                            reinterpret_cast<ID3D11ShaderResourceView**>(&store_vec.back().get()->
+					                            m_pTexture)))
 					hr = S_OK;
 			}
 
 			if (hr == S_OK)
 			{
-				store_vec.back().get()->file_name = p.path().stem().string();
-				store_vec.back().get()->category_name = folder;
+				store_vec.back().get()->m_FileName = p.path().stem().string();
+				store_vec.back().get()->m_CategoryName = folder;
 			}
 			else
 			{
@@ -81,8 +85,8 @@ bool Util::LoadTextureFromFileDx11(const char* filename, ID3D11ShaderResourceVie
 	// Load from disk into a raw RGBA buffer
 	int image_width = 0;
 	int image_height = 0;
-	unsigned char* image_data = stbi_load(filename, &image_width, &image_height, NULL, 4);
-	if (image_data == NULL)
+	unsigned char* image_data = stbi_load(filename, &image_width, &image_height, nullptr, 4);
+	if (image_data == nullptr)
 		return false;
 
 	// Create texture
@@ -98,7 +102,7 @@ bool Util::LoadTextureFromFileDx11(const char* filename, ID3D11ShaderResourceVie
 	desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 	desc.CPUAccessFlags = 0;
 
-	ID3D11Texture2D* pTexture = NULL;
+	ID3D11Texture2D* pTexture = nullptr;
 	D3D11_SUBRESOURCE_DATA subResource;
 	subResource.pSysMem = image_data;
 	subResource.SysMemPitch = desc.Width * 4;
@@ -123,7 +127,8 @@ bool Util::LoadTextureFromFileDx11(const char* filename, ID3D11ShaderResourceVie
 
 bool Util::IsOnMission()
 {
-	return FindPlayerPed()->CanPlayerStartMission() && !*(patch::Get<char*>(0x5D5380, false) + CTheScripts::OnAMissionFlag);
+	return FindPlayerPed()->CanPlayerStartMission() && !*(patch::Get<char*>(0x5D5380, false) +
+		CTheScripts::OnAMissionFlag);
 }
 
 bool Util::IsOnCutscene()
@@ -143,25 +148,23 @@ std::string Util::GetLocationName(CVector* pos)
 
 	switch (city)
 	{
-		case 0:
-			town = "CS";
-			break;
-		case 1:
-			town = "LS";
-			break;
-		case 2:
-			town = "SF";
-			break;
-		case 3:
-			town = "LV";
-			break;
+	case 0:
+		town = "CS";
+		break;
+	case 1:
+		town = "LS";
+		break;
+	case 2:
+		town = "SF";
+		break;
+	case 3:
+		town = "LV";
+		break;
 	}
 
 	if (interior == 0)
 		return CTheZones::FindSmallestZoneForPosition(*pos, true)->GetTranslatedName() + std::string(", ") + town;
-	else
-		return std::string("Interior ") + std::to_string(interior) + ", " + town;
-
+	return std::string("Interior ") + std::to_string(interior) + ", " + town;
 }
 
 int Util::GetLargestGangInZone()
@@ -171,7 +174,7 @@ int Util::GetLargestGangInZone()
 	for (int i = 0; i != 10; ++i)
 	{
 		CVector pos = FindPlayerPed()->GetPosition();
-		CZone* zone = new CZone();
+		auto zone = new CZone();
 
 		CZoneExtraInfo* zone_info = CTheZones::GetZoneInfo(&pos, &zone);
 		int density = zone_info->m_nGangDensity[i];
@@ -198,7 +201,7 @@ CVehicle* Util::GetClosestVehicle()
 		CVehicle* veh = nullptr;
 		for (int i = 0; i < 16; i++)
 		{
-			veh = (CVehicle*)pedintel->m_vehicleScanner.m_apEntities[i];
+			veh = static_cast<CVehicle*>(pedintel->m_vehicleScanner.m_apEntities[i]);
 			if (veh && !veh->m_nVehicleFlags.bFadeOut)
 				break;
 			veh = nullptr;
@@ -219,7 +222,7 @@ CPed* Util::GetClosestPed()
 
 		for (int i = 0; i < 16; i++)
 		{
-			ped = (CPed*)pedintel->m_pedScanner.m_apEntities[i];
+			ped = static_cast<CPed*>(pedintel->m_pedScanner.m_apEntities[i]);
 			if (ped && ped != player && (ped->m_nCreatedBy & 0xFF) == 1 && !ped->m_nPedFlags.bFadeOut)
 				break;
 			ped = nullptr;
@@ -261,7 +264,7 @@ RwTexture* Util::LoadTextureFromPngFile(fs::path path)
 
 void Util::GetCPUUsageInit()
 {
-	PdhOpenQuery(NULL, NULL, &cpuQuery);
+	PdhOpenQuery(nullptr, NULL, &cpuQuery);
 	PdhAddEnglishCounter(cpuQuery, "\\Processor(_Total)\\% Processor Time", NULL, &cpuTotal);
 	PdhCollectQueryData(cpuQuery);
 }
@@ -271,6 +274,6 @@ double Util::GetCurrentCPUUsage()
 	PDH_FMT_COUNTERVALUE counterVal;
 
 	PdhCollectQueryData(cpuQuery);
-	PdhGetFormattedCounterValue(cpuTotal, PDH_FMT_DOUBLE, NULL, &counterVal);
+	PdhGetFormattedCounterValue(cpuTotal, PDH_FMT_DOUBLE, nullptr, &counterVal);
 	return counterVal.doubleValue;
 }

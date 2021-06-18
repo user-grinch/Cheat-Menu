@@ -1,30 +1,31 @@
 #pragma once
-#include "extender\VehicleExtender.h"
+#include "extender/VehicleExtender.h"
 
 class Neon
 {
 private:
-	class NeonData {
+	class NeonData
+	{
 	public:
-		CRGBA color;
-		bool neon_installed;
-		float val;
-		uint timer;
-		bool increment;
-		bool pulsing;
+		CRGBA m_Color;
+		bool m_bNeonInstalled;
+		float m_fVal;
+		uint m_nTimer;
+		bool m_bIncrement;
+		bool m_bPulsing;
 
 		NeonData(CVehicle* pVeh)
 		{
-			neon_installed = false;
-			val = 0.0;
-			timer = 0;
-			increment = true;
+			m_bNeonInstalled = false;
+			m_fVal = 0.0;
+			m_nTimer = 0;
+			m_bIncrement = true;
 		}
 	};
-	
-	inline static bool mask_loaded = false;
-	inline static RwTexture* neon_texture = nullptr;
-	inline static VehicleExtendedData<NeonData> VehNeon;
+
+	inline static bool m_bMaskLoaded = false;
+	inline static RwTexture* m_pNeonTexture = nullptr;
+	inline static VehicleExtendedData<NeonData> m_VehNeon;
 
 public:
 	Neon();
@@ -36,4 +37,3 @@ public:
 	static void RemoveNeon(CVehicle* veh);
 	static void RenderEvent(CVehicle* veh);
 };
-

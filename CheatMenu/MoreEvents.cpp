@@ -1,10 +1,7 @@
 #include "pch.h"
 #include "Events.h"
 
-namespace plugin
+namespace plugin::Events
 {
-	namespace Events
-	{
-		decltype(vehicleResetAfterRender) vehicleResetAfterRender;
-	}
+	decltype(vehicleResetAfterRender) vehicleResetAfterRender;
 }

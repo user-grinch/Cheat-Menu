@@ -3,7 +3,17 @@
 class Menu
 {
 private:
-	struct overlay
+
+	enum DISPLAY_POS
+	{
+		CUSTOM,
+		TOP_LEFT,
+		TOP_RIGHT,
+		BOTTOM_LEFT,
+		BOTTOM_RIGHT
+	};
+
+	static struct
 	{
 		inline static bool bCoord = false;
 		inline static bool bFPS = false;
@@ -16,36 +26,40 @@ private:
 		inline static float fCpuUsage = 0.0f;
 		inline static bool bMemUsage = false;
 		inline static float fMemUsage = 0.0f;
-		inline static std::vector<std::string> posNames = { "Custom", "Top left", "Top right", "Bottom left", "Bottom right" };
-		inline static int mSelectedPos = 4; // TODO: Create Enum
+		inline static std::vector<std::string> posNames = {
+			"Custom", "Top left", "Top right", "Bottom left", "Bottom right"
+		};
+		inline static DISPLAY_POS mSelectedPos = DISPLAY_POS::BOTTOM_RIGHT;
 		inline static float fPosX = 0.0f;
 		inline static float fPosY = 0.0f;
 		inline static size_t mInterval = 1000;
 		inline static size_t mLastInterval = 0;
 		inline static int mTotalRam = 0;
-	};
+	} m_Overlay;
+
 public:
-	struct hotkeys
+	static struct
 	{
-		inline static HotKeyData aim_skin_changer;
-		inline static HotKeyData freecam;
-		inline static HotKeyData command_window;
-		inline static HotKeyData fix_veh;
-		inline static HotKeyData flip_veh;
-		inline static HotKeyData free_cam_tp_player{VK_RETURN,VK_RETURN};
-		inline static HotKeyData god_mode;
-		inline static HotKeyData menu_open;
-		inline static HotKeyData quick_ss;
-		inline static HotKeyData quick_tp;
-		inline static HotKeyData veh_engine;
-		inline static HotKeyData veh_instant_start;
-		inline static HotKeyData veh_instant_stop;
-	};
-	struct commands
+		inline static HotKeyData aimSkinChanger;
+		inline static HotKeyData freeCam;
+		inline static HotKeyData commandWindow;
+		inline static HotKeyData fixVeh;
+		inline static HotKeyData flipVeh;
+		inline static HotKeyData freeCamTeleportPlayer{VK_RETURN,VK_RETURN};
+		inline static HotKeyData godMode;
+		inline static HotKeyData menuOpen;
+		inline static HotKeyData quickSceenShot;
+		inline static HotKeyData quickTeleport;
+		inline static HotKeyData vehEngine;
+		inline static HotKeyData vehInstantStart;
+		inline static HotKeyData vehInstantStop;
+	} m_HotKeys;
+
+	static struct
 	{
-		inline static bool show_menu = false;
-		inline static char input_buffer[INPUT_BUFFER_SIZE] = "";
-	};
+		inline static bool m_bShowMenu = false;
+		inline static char m_nInputBuffer[INPUT_BUFFER_SIZE] = "";
+	} m_Commands;
 
 	Menu();
 	static void Draw();
@@ -53,4 +67,3 @@ public:
 	static void DrawShortcutsWindow();
 	static void ProcessCommands();
 };
-

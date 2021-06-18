@@ -30,7 +30,7 @@
 
 void Paint::RenderEvent(CVehicle* pVeh)
 {
-	VehData& data = vehdata.Get(pVeh);
+	VehData& data = m_VehData.Get(pVeh);
 
 	// reset custom color if color id changed
 	if (pVeh->m_nPrimaryColor != data.primary_color
@@ -70,7 +70,7 @@ void Paint::RenderEvent(CVehicle* pVeh)
 
 void Paint::ResetAfterRenderEvent(CVehicle* pVeh)
 {
-	for (auto& it : vehdata.Get(pVeh).materialProperties)
+	for (auto& it : m_VehData.Get(pVeh).materialProperties)
 	{
 		if (it.second._recolor)
 		{
@@ -88,17 +88,17 @@ Paint::Paint()
 {
 	Events::processScriptsEvent += [this]
 	{
-		if (!images_loaded)
+		if (!m_bImagesLoaded)
 		{
 			for (auto& p : fs::recursive_directory_iterator(PLUGIN_PATH((char*)"\\CheatMenu\\vehicles\\paintjobs\\")))
 			{
 				if (p.path().extension() == ".png")
 				{
 					std::string file_name = p.path().stem().string();
-					textures[file_name] = std::make_shared<RwTexture>(*(Util::LoadTextureFromPngFile(p.path())));
+					m_Textures[file_name] = std::make_shared<RwTexture>(*(Util::LoadTextureFromPngFile(p.path())));
 				}
 			}
-			images_loaded = true;
+			m_bImagesLoaded = true;
 		}
 	};
 
@@ -143,7 +143,7 @@ void Paint::VehData::resetMaterialColor(RpMaterial* material)
 {
 	auto& matProps = materialProperties[material];
 	matProps._recolor = false;
-	matProps._color = { 0, 0, 0, 0 };
+	matProps._color = {0, 0, 0, 0};
 }
 
 void Paint::VehData::resetMaterialTexture(RpMaterial* material)
@@ -199,7 +199,8 @@ void Paint::SetNodeColor(CVehicle* pVeh, std::string node_name, CRGBA color, boo
 
 		if (node_name == "Default" || node_name == name)
 		{
-			RwFrameForAllObjects(frame, [](RwObject* object, void* data) -> RwObject* {
+			RwFrameForAllObjects(frame, [](RwObject* object, void* data) -> RwObject*
+			{
 				if (object->type == rpATOMIC)
 				{
 					RpAtomic* atomic = reinterpret_cast<RpAtomic*>(object);
@@ -208,10 +209,11 @@ void Paint::SetNodeColor(CVehicle* pVeh, std::string node_name, CRGBA color, boo
 					CRGBA* color = &st->_color;
 					bool filter_mat = st->_filter;
 
-					VehData& data = vehdata.Get(FindPlayerPed()->m_pVehicle);
+					VehData& data = m_VehData.Get(FindPlayerPed()->m_pVehicle);
 
 					for (int i = 0; i < atomic->geometry->matList.numMaterials; ++i)
-						data.setMaterialColor(atomic->geometry->matList.materials[i], atomic->geometry, { color->r,color->g,color->b, 255 }, filter_mat);
+						data.setMaterialColor(atomic->geometry->matList.materials[i], atomic->geometry,
+						                      {color->r, color->g, color->b, 255}, filter_mat);
 				}
 				return object;
 			}, &st);
@@ -234,23 +236,24 @@ void Paint::SetNodeTexture(CVehicle* pVeh, std::string node_name, std::string te
 			bool _filter;
 		} st;
 
-		st._textures = textures;
+		st._textures = m_Textures;
 		st._texturename = texturename;
 		st._filter = filter_mat;
 
 		if (node_name == "Default" || node_name == name)
 		{
-			RwFrameForAllObjects(frame, [](RwObject* object, void* data) -> RwObject* {
-
+			RwFrameForAllObjects(frame, [](RwObject* object, void* data) -> RwObject*
+			{
 				if (object->type == rpATOMIC)
 				{
 					RpAtomic* atomic = reinterpret_cast<RpAtomic*>(object);
 
 					ST* st = reinterpret_cast<ST*>(data);
-					VehData& data = vehdata.Get(FindPlayerPed()->m_pVehicle);
+					VehData& data = m_VehData.Get(FindPlayerPed()->m_pVehicle);
 
 					for (int i = 0; i < atomic->geometry->matList.numMaterials; ++i)
-						data.setMaterialTexture(atomic->geometry->matList.materials[i], st->_textures[st->_texturename], st->_filter);
+						data.setMaterialTexture(atomic->geometry->matList.materials[i], st->_textures[st->_texturename],
+						                        st->_filter);
 				}
 				return object;
 			}, &st);
@@ -268,11 +271,12 @@ void Paint::ResetNodeColor(CVehicle* pVeh, std::string node_name)
 
 		if (node_name == "Default" || node_name == name)
 		{
-			RwFrameForAllObjects(frame, [](RwObject* object, void* data) -> RwObject* {
+			RwFrameForAllObjects(frame, [](RwObject* object, void* data) -> RwObject*
+			{
 				if (object->type == rpATOMIC)
 				{
 					RpAtomic* atomic = reinterpret_cast<RpAtomic*>(object);
-					VehData& data = vehdata.Get(FindPlayerPed()->m_pVehicle);
+					VehData& data = m_VehData.Get(FindPlayerPed()->m_pVehicle);
 
 					for (int i = 0; i < atomic->geometry->matList.numMaterials; ++i)
 						data.resetMaterialColor(atomic->geometry->matList.materials[i]);
@@ -293,13 +297,13 @@ void Paint::ResetNodeTexture(CVehicle* pVeh, std::string node_name)
 
 		if (node_name == "Default" || node_name == name)
 		{
-			RwFrameForAllObjects(frame, [](RwObject* object, void* data) -> RwObject* {
-
+			RwFrameForAllObjects(frame, [](RwObject* object, void* data) -> RwObject*
+			{
 				if (object->type == rpATOMIC)
 				{
 					RpAtomic* atomic = reinterpret_cast<RpAtomic*>(object);
 
-					VehData& data = vehdata.Get(FindPlayerPed()->m_pVehicle);
+					VehData& data = m_VehData.Get(FindPlayerPed()->m_pVehicle);
 
 					for (int i = 0; i < atomic->geometry->matList.numMaterials; ++i)
 						data.resetMaterialTexture(atomic->geometry->matList.materials[i]);

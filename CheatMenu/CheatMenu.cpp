@@ -9,74 +9,75 @@ void CheatMenu::DrawWindow()
 	ImGuiIO& io = ImGui::GetIO();
 
 	if (FrontEndMenuManager.m_bMenuActive)
-		Hook::show_mouse = false;
+		m_bShowMouse = false;
 	else
 	{
-		if (Globals::show_menu || Menu::commands::show_menu)
+		if (Globals::m_bShowMenu || m_Commands.m_bShowMenu)
 		{
-			if (Globals::show_menu)
+			if (Globals::m_bShowMenu)
 			{
-				ImGui::SetNextWindowSize(Globals::menu_size);
-				if (ImGui::Begin(MENU_TITLE, &Globals::show_menu, ImGuiWindowFlags_NoCollapse))
+				ImGui::SetNextWindowSize(Globals::m_fMenuSize);
+				if (ImGui::Begin(MENU_TITLE, &Globals::m_bShowMenu, ImGuiWindowFlags_NoCollapse))
 				{
 					ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(250, 350));
-					ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetWindowWidth() / 85, ImGui::GetWindowHeight() / 200));
+					ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
+					                    ImVec2(ImGui::GetWindowWidth() / 85, ImGui::GetWindowHeight() / 200));
 
-					if (Updater::state == UPDATER_UPDATE_FOUND)
+					if (Updater::m_State == UPDATER_UPDATE_FOUND)
 						Updater::ShowUpdateScreen();
 					else
 						Ui::DrawHeaders(header);
 
-					Globals::menu_size = ImGui::GetWindowSize();
-					config.SetValue("window.sizeX", Globals::menu_size.x);
-					config.SetValue("window.sizeY", Globals::menu_size.y);
+					Globals::m_fMenuSize = ImGui::GetWindowSize();
+					config.SetValue("window.sizeX", Globals::m_fMenuSize.x);
+					config.SetValue("window.sizeY", Globals::m_fMenuSize.y);
 
 					ImGui::PopStyleVar(2);
 					ImGui::End();
 				}
 			}
 			else
-				Menu::DrawShortcutsWindow();
+				DrawShortcutsWindow();
 		}
 	}
 
-	Menu::DrawOverlay();
+	DrawOverlay();
 }
 
 CheatMenu::CheatMenu()
 {
 	ApplyStyle();
-	Hook::window_callback = std::bind(&DrawWindow);
+	window_callback = std::bind(&DrawWindow);
 
 	// Load menu settings
-	Globals::header_id = config.GetValue("window.id", std::string(""));
-	Globals::menu_size.x = config.GetValue("window.sizeX", screen::GetScreenWidth() / 4.0f);
-	Globals::menu_size.y = config.GetValue("window.sizeY", screen::GetScreenHeight() / 1.2f);
+	Globals::m_HeaderId = config.GetValue("window.id", std::string(""));
+	Globals::m_fMenuSize.x = config.GetValue("window.sizeX", screen::GetScreenWidth() / 4.0f);
+	Globals::m_fMenuSize.y = config.GetValue("window.sizeY", screen::GetScreenHeight() / 1.2f);
 	srand(CTimer::m_snTimeInMilliseconds);
 
 	Events::processScriptsEvent += []()
 	{
-		if (Globals::init_done && !FrontEndMenuManager.m_bMenuActive)
+		if (Globals::m_bInit && !FrontEndMenuManager.m_bMenuActive)
 		{
-			if (Ui::HotKeyPressed(hotkeys::menu_open))
-				Globals::show_menu = !Globals::show_menu;
+			if (Ui::HotKeyPressed(m_HotKeys.menuOpen))
+				Globals::m_bShowMenu = !Globals::m_bShowMenu;
 
-			if (Ui::HotKeyPressed(hotkeys::command_window))
+			if (Ui::HotKeyPressed(m_HotKeys.commandWindow))
 			{
-				if (Menu::commands::show_menu)
+				if (m_Commands.m_bShowMenu)
 				{
-					Menu::ProcessCommands();
-					strcpy(commands::input_buffer, "");
+					ProcessCommands();
+					strcpy(m_Commands.m_nInputBuffer, "");
 				}
-				Menu::commands::show_menu = !Menu::commands::show_menu;
+				m_Commands.m_bShowMenu = !m_Commands.m_bShowMenu;
 			}
 
-			if (Hook::show_mouse != Globals::show_menu)
+			if (m_bShowMouse != Globals::m_bShowMenu)
 			{
-				if (Hook::show_mouse) // Only write when the menu closes
+				if (m_bShowMouse) // Only write when the menu closes
 					config.WriteToDisk();
 
-				Hook::show_mouse = Globals::show_menu;
+				m_bShowMouse = Globals::m_bShowMenu;
 			}
 		}
 	};
@@ -181,17 +182,18 @@ void MenuThread(void* param)
 		MessageBox(RsGlobal.ps->window, "SilentPatch isn't installed. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
 		return;
 	}
-	
-	flog << "Starting...\nVersion: " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: " GITHUB_LINK "\n" << std::endl;
+
+	flog << "Starting...\nVersion: " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: "
+		GITHUB_LINK "\n" << std::endl;
 	CFastman92limitAdjuster::Init();
-	CheatMenu *menu = new CheatMenu;
+	auto menu = new CheatMenu;
 	Updater::CheckForUpdate();
-	
+
 	while (true)
 	{
 		Sleep(5000);
-		
-		if (Updater::state == UPDATER_CHECKING)
+
+		if (Updater::m_State == UPDATER_CHECKING)
 			Updater::CheckForUpdate();
 	}
 }
@@ -199,10 +201,10 @@ void MenuThread(void* param)
 BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
 {
 	if (nReason == DLL_PROCESS_ATTACH)
-	{	
+	{
 		uint gameVersion = GetGameVersion();
 		if (gameVersion == GAME_10US_HOODLUM || gameVersion == GAME_10US_COMPACT)
-			CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)&MenuThread, NULL, NULL, NULL);
+			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&MenuThread, nullptr, NULL, nullptr);
 		else
 			MessageBox(HWND_DESKTOP, "Unknown game version. GTA SA v1.0 US is required.", "CheatMenu", MB_ICONERROR);
 	}

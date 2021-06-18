@@ -1,69 +1,57 @@
 #pragma once
-class Game
+class CGame
 {
 public:
-	inline static SearchData mission_data{ "mission" };
-	inline static std::vector<std::string> day_names = { "Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday" };
-
-	inline static char save_game_name[22] = "";
-
-	struct random_cheats
+	inline static SSearchData m_MissionData{"mission"};
+	inline static std::vector<std::string> m_DayNames = 
 	{
-		inline static bool enable = false;
-		inline static int enable_wait_time = 10;
-		inline static CJson name_json =  CJson("cheat name");
-		inline static uint timer = 0;
-		inline static std::string enabled_cheats[92][2];
+		"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
 	};
-
-	struct freecam
+	static struct
 	{
-		inline static bool enable = false;
-		inline static float speed = 0.08f;
-		inline static float fov = -1;
-		inline static bool init_done = false;
-		inline static CPed* ped = nullptr;
-		inline static int hped = -1;
-		inline static float mouseX = 0.0f; 
-		inline static float mouseY = 0.0f;
-		inline static float tmouseX = 0.0f;
-		inline static float tmouseY = 0.0f;
-	};
-
-	struct hard_mode
+		inline static bool m_bEnabled;
+		inline static std::string m_EnabledCheats[92][2];
+		inline static int m_nInterval = 10;
+		inline static CJson m_Json = CJson("cheat name");
+		inline static uint m_nTimer;
+	} m_RandomCheats;
+	static struct 
 	{
-		inline static bool state = false;
-		inline static float prev_health = 0.0f;
-		inline static float prev_max_health = 0.0f;
-		inline static float prev_armour = 0.0f;
-		inline static float prev_stamina = 0.0f;
-	};
-
-	inline static bool disable_cheats = false;
-	inline static bool disable_replay = false;
-	inline static bool forbidden_area_wl = true;
-	inline static bool freeze_mission_timer = false;
-	inline static bool freeze_time = false;
-	inline static bool keep_stuff = false;
-	inline static bool solid_water = false;
-	inline static bool ss_shortcut = false;
-	inline static bool sync_time = false;
-	inline static uint sync_time_timer = 0;
-	inline static uint solid_water_object = 0;
-	inline static bool mission_warning_shown = false;
-
-	struct stat
+		inline static bool m_bEnabled;
+		inline static float m_fSpeed = 0.08f;
+		inline static float m_fFOV = -1;
+		inline static bool m_bInitDone;
+		inline static CPed* m_pPed;
+		inline static int m_nPed = -1;
+		inline static CVector m_fMouse;
+		inline static CVector m_fTotalMouse;
+	} m_Freecam;
+	static struct 
 	{
-		inline static CJson json = CJson("stat");
-		inline static ImGuiTextFilter filter = "";
-		inline static std::vector<std::string> search_categories;
-		inline static std::string selected_item = "All";
-	};
+		inline static bool m_bEnabled;
+		inline static float m_fBacHealth = 0.0f;
+		inline static float m_fBacMaxHealth = 0.0f;
+		inline static float m_fBacArmour = 0.0f;
+		inline static float m_fBacStamina = 0.0f;
+	} m_HardMode;
+	inline static bool m_bDisableCheats;
+	inline static bool m_bDisableReplay;
+	inline static bool m_bForbiddenArea = true;
+	inline static bool m_bMissionTimer;
+	inline static bool m_bFreezeTime;
+	inline static bool m_bKeepStuff;
+	inline static bool m_bSolidWater;
+	inline static bool m_bScreenShot;
+	inline static bool m_bSyncTime;
+	inline static uint m_nSyncTimer;
+	inline static uint m_nSolidWaterObj;
+	inline static bool m_bMissionLoaderWarningShown;
 
-	Game();
+	inline static SSearchData m_StatData{ "stat" };
+
+	CGame();
 	static void Draw();
 	static void FreeCam();
 	static void ClearFreecamStuff();
 	static void RealTimeClock();
 };
-

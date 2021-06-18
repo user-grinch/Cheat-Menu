@@ -27,22 +27,20 @@
 
 class Paint
 {
-
 private:
-
 	// store vehicle specific data
 	struct VehData
 	{
 		struct MaterialProperties
 		{
 			MaterialProperties() :
-				_color{ 0, 0, 0, 0 },
+				_color{0, 0, 0, 0},
 				_recolor(false),
 				_retexture(false),
-				_originalColor{ 0, 0, 0, 0 },
+				_geometry(nullptr),
+				_originalColor{0, 0, 0, 0},
 				_originalTexture(nullptr),
-				_originalGeometryFlags(0),
-				_geometry(nullptr)
+				_originalGeometryFlags(0)
 			{
 			}
 
@@ -73,15 +71,15 @@ private:
 		void resetMaterialTexture(RpMaterial* material);
 	};
 
-	inline static bool images_loaded = false;
-	inline static VehicleExtendedData<VehData> vehdata;
+	inline static bool m_bImagesLoaded = false;
+	inline static VehicleExtendedData<VehData> m_VehData;
 
 protected:
+	inline static std::map<std::string, std::shared_ptr<RwTexture>> m_Textures;
 
-	inline static std::map<std::string, std::shared_ptr<RwTexture>> textures;
 	struct veh_nodes
 	{
-		inline static std::vector<std::string> names_vec{ "Default" };
+		inline static std::vector<std::string> names_vec{"Default"};
 		inline static std::string selected = "Default";
 	};
 
@@ -96,4 +94,3 @@ protected:
 	static void RenderEvent(CVehicle* pVeh);
 	static void ResetAfterRenderEvent(CVehicle* pVeh);
 };
-

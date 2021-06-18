@@ -1,37 +1,36 @@
 #pragma once
-class Animation
+class CAnimation
 {
 private:
-	inline static bool loop = false;
-	inline static bool secondary = false;
-
-	inline static SearchData anim_data{"animation"};
-
-	struct Cutscene
+	inline static char m_nAnimBuffer[INPUT_BUFFER_SIZE] = "";
+	inline static SSearchData m_AnimData{ "animation" };
+	static struct
 	{
-		inline static SearchData data{ "cutscene" };
-		inline static std::string scene_name = "";
-		inline static int interior = 0;
-		inline static bool running = false;
-	};
-	
-	inline static char anim_buffer[INPUT_BUFFER_SIZE] = "";
-	inline static char ifp_buffer[INPUT_BUFFER_SIZE] = "";
+		inline static SSearchData m_Data{ "cutscene" };
+		inline static std::string m_SceneName = "";
+		inline static int m_nInterior = 0;
+		inline static bool m_bRunning = false;
+	} m_Cutscene;
+	inline static int m_nFightingStyle = 0;
+	inline static char m_nIfpBuffer[INPUT_BUFFER_SIZE] = "";
+	inline static bool m_Loop = false;
+	inline static bool m_bSecondary = false;
+	inline static std::string m_nWalkingStyle = "default";
 
-	inline static std::vector<std::string> fighting_vec{ "Default","Boxing","Kung fu","Kick Boxing","Punch Kick" };
-	inline static int fighting_selected = 0;
-	inline static std::vector<std::string> walking_vec{ "default", "man", "shuffle", "oldman", "gang1", "gang2",
-	"oldfatman", "fatman", "jogger", "drunkman", "blindman", "swat", "woman", "shopping", "busywoman",
-	"sexywoman", "pro", "oldwoman", "fatwoman", "jogwoman", "oldfatwoman", "skate" };
-	inline static std::string walking_selected = "default";
+	inline static std::vector<std::string> m_FightingStyleList = {"Default", "Boxing", "Kung fu", "Kick Boxing", "Punch Kick"};
+	inline static std::vector<std::string> m_WalkingStyleList = 
+	{
+		"default", "man", "shuffle", "oldman", "gang1", "gang2", "oldfatman",
+		"fatman", "jogger", "drunkman", "blindman", "swat", "woman", "shopping", "busywoman",
+		"sexywoman", "pro", "oldwoman", "fatwoman", "jogwoman", "oldfatwoman", "skate"
+	};
 
 protected:
-	Animation();
+	CAnimation();
 
 public:
 	static void Draw();
-	static void PlayAnimation(std::string& rootkey, std::string& anim, std::string& ifp);
-	static void PlayCutscene(std::string& rootkey, std::string& cutscene_str, std::string& interior);
-	static void RemoveAnimation(std::string& rootkey, std::string& anim, std::string& ifp);
+	static void PlayAnimation(std::string& rootKey, std::string& anim, std::string& ifp);
+	static void PlayCutscene(std::string& rootKey, std::string& cutsceneId, std::string& interior);
+	static void RemoveAnimation(std::string& rootKey, std::string& anim, std::string& ifp);
 };
-

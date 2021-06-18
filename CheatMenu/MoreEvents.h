@@ -1,9 +1,7 @@
 #pragma once
 
-namespace plugin
+namespace plugin::Events
 {
-	namespace Events
-	{
-		extern ThiscallEvent<AddressList<0x55332A, H_CALL>, PRIORITY_BEFORE, ArgPickN<CVehicle*, 0>, void(CVehicle*)> vehicleResetAfterRender;
-	}
+	extern ThiscallEvent<AddressList<0x55332A, H_CALL>, PRIORITY_BEFORE, ArgPickN<CVehicle*, 0>, void(CVehicle*)>
+	vehicleResetAfterRender;
 }

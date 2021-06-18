@@ -2,24 +2,23 @@
 class Player
 {
 private:
-	struct keep_position
+	inline static bool m_bGodMode;
+	inline static int m_nUiBodyState;
+	inline static bool m_bAimSkinChanger;
+	inline static SSearchData m_ClothData;
+	inline static bool m_bImagesLoaded;
+	inline static bool m_bModloaderInstalled;
+	static struct
 	{
-		inline static bool state = false;
-		inline static CVector pos;
-	};
-	inline static bool god_mode = false;
-	inline static int body = 0;
-	inline static bool aim_skin_changer = false;
-	inline static SearchData cloth_data;
-	inline static bool images_loaded = false;
-
-	struct custom_skins
+		inline static bool m_bEnabled = false;
+		inline static CVector m_fPos;
+	} m_KeepPosition;
+	static struct
 	{
-		inline static std::string dir = paths::GetGameDirPathA() + std::string("\\modloader\\Custom Skins\\");;
-		inline static ImGuiTextFilter filter = "";
-		inline static std::vector<std::string> store_vec;
-	};
-	inline static bool modloader_installed = false;
+		inline static std::string m_Path = paths::GetGameDirPathA() + std::string("\\modloader\\Custom Skins\\");;
+		inline static ImGuiTextFilter m_Filter;
+		inline static std::vector<std::string> m_List;
+	} m_CustomSkins;
 
 public:
 	Player();
@@ -28,4 +27,3 @@ public:
 	static void ChangePlayerModel(std::string& model);
 	static void Draw();
 };
-

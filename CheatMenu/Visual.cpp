@@ -9,33 +9,28 @@
 Visual::Visual()
 {
 	if (GetModuleHandle("timecycle24.asi"))
-		timecyc_hour = 24;
+		m_nTimecycHour = 24;
 
 	Events::processScriptsEvent += []
 	{
 		// TODO: Needs improvement
-		if (lock_weather)
+		if (m_bLockWeather)
 		{
-			CWeather::OldWeatherType = weather_type_backup;
-			CWeather::NewWeatherType = weather_type_backup;
+			CWeather::OldWeatherType = m_nBacWeatherType;
+			CWeather::NewWeatherType = m_nBacWeatherType;
 		}
 	};
 }
 
-
-Visual::~Visual()
-{
-}
-
 // Thanks to GuruGuru
 int Visual::GetCurrentHourTimeId(int hour)
-{	
+{
 	if (hour == -1)
 	{
 		hour = CClock::ms_nGameClockHours;
 	}
 
-	if (timecyc_hour == 24)
+	if (m_nTimecycHour == 24)
 		return hour;
 
 	if (hour < 5) return 0;
@@ -44,26 +39,26 @@ int Visual::GetCurrentHourTimeId(int hour)
 	if (hour == 6) return 2;
 
 	if (7 <= hour && hour < 12) return 3;
-	if (12 <= hour && hour < 19)  return 4;
+	if (12 <= hour && hour < 19) return 4;
 
-	if (hour == 19)  return 5; 
+	if (hour == 19) return 5;
 	if (hour == 20 || hour == 21) return 6;
 	if (hour == 22 || hour == 23) return 7;
 
-	return NULL; 
+	return NULL;
 }
 
-bool Visual::TimeCycColorEdit3(const char* label, uchar *r, uchar *g, uchar *b, ImGuiColorEditFlags flags)
+bool Visual::TimeCycColorEdit3(const char* label, uchar* r, uchar* g, uchar* b, ImGuiColorEditFlags flags)
 {
 	bool rtn = false;
 	int val = 23 * GetCurrentHourTimeId() + CWeather::OldWeatherType;
 
-	uchar *red = (uchar*)patch::GetPointer(int(r));
-	uchar *green = (uchar*)patch::GetPointer(int(g));
-	uchar *blue = (uchar*)patch::GetPointer(int(b));
+	auto red = static_cast<uchar*>(patch::GetPointer(int(r)));
+	auto green = static_cast<uchar*>(patch::GetPointer(int(g)));
+	auto blue = static_cast<uchar*>(patch::GetPointer(int(b)));
 
-	float col[3]{red[val]/255.0f,green[val]/255.0f,blue[val]/255.0f};
-			
+	float col[3]{red[val] / 255.0f, green[val] / 255.0f, blue[val] / 255.0f};
+
 	if (ImGui::ColorEdit3(label, col, flags))
 	{
 		red[val] = col[0] * 255;
@@ -71,22 +66,22 @@ bool Visual::TimeCycColorEdit3(const char* label, uchar *r, uchar *g, uchar *b, 
 		blue[val] = col[2] * 255;
 		rtn = true;
 	}
-	
+
 	return rtn;
 }
 
-bool Visual::TimeCycColorEdit4(const char* label, uchar *r, uchar *g, uchar *b, uchar *a, ImGuiColorEditFlags flags)
+bool Visual::TimeCycColorEdit4(const char* label, uchar* r, uchar* g, uchar* b, uchar* a, ImGuiColorEditFlags flags)
 {
 	bool rtn = false;
 	int val = 23 * GetCurrentHourTimeId() + CWeather::OldWeatherType;
-	
-	uchar *red = (uchar*)patch::GetPointer(int(r));
-	uchar *green = (uchar*)patch::GetPointer(int(g));
-	uchar *blue = (uchar*)patch::GetPointer(int(b));
-	uchar *alpha = (uchar*)patch::GetPointer(int(a));
 
-	float col[4]{red[val]/255.0f,green[val]/255.0f,blue[val]/255.0f,alpha[val]/255.0f};
-			
+	auto red = static_cast<uchar*>(patch::GetPointer(int(r)));
+	auto green = static_cast<uchar*>(patch::GetPointer(int(g)));
+	auto blue = static_cast<uchar*>(patch::GetPointer(int(b)));
+	auto alpha = static_cast<uchar*>(patch::GetPointer(int(a)));
+
+	float col[4]{red[val] / 255.0f, green[val] / 255.0f, blue[val] / 255.0f, alpha[val] / 255.0f};
+
 	if (ImGui::ColorEdit4(label, col, flags))
 	{
 		red[val] = col[0] * 255;
@@ -98,29 +93,31 @@ bool Visual::TimeCycColorEdit4(const char* label, uchar *r, uchar *g, uchar *b, 
 
 	return rtn;
 }
-template<typename T>
-inline int GetTCVal(T *addr, int index)
+
+template <typename T>
+int GetTCVal(T* addr, int index)
 {
-	T *arr = (T*)patch::GetPointer(int(addr));
-	return int(arr[index]);
+	T* arr = static_cast<T*>(patch::GetPointer(int(addr)));
+	return static_cast<int>(arr[index]);
 }
 
 void Visual::GenerateTimecycFile()
 {
 	std::ofstream file;
-	if (timecyc_hour == 24)
+	if (m_nTimecycHour == 24)
 		file = std::ofstream("timecyc_24h.dat");
 	else
 		file = std::ofstream("timecyc.dat");
 
-	for (uint i = 0; i < weather_names.size(); ++i)
+	for (uint i = 0; i < m_WeatherNames.size(); ++i)
 	{
-		file << "\n\n//////////// " << weather_names[i] << "\n";
-		file << "//\tAmb\t\t\t\t\tAmb Obj \t\t\t\tDir \t\t\t\t\tSky top\t\t\t\tSky bot\t\t\t\tSunCore\t\t\t\t\tSunCorona\t\t\tSunSz\tSprSz\tSprBght\t\tShdw\tLightShd\tPoleShd\t\tFarClp\t\tFogSt\tLightOnGround\tLowCloudsRGB\tBottomCloudRGB\t\tWaterRGBA\t\t\t\tARGB1\t\t\t\t\tARGB2\t\t\tCloudAlpha\t\tIntensityLimit\t\tWaterFogAlpha\tDirMult \n\n";
+		file << "\n\n//////////// " << m_WeatherNames[i] << "\n";
+		file <<
+			"//\tAmb\t\t\t\t\tAmb Obj \t\t\t\tDir \t\t\t\t\tSky top\t\t\t\tSky bot\t\t\t\tSunCore\t\t\t\t\tSunCorona\t\t\tSunSz\tSprSz\tSprBght\t\tShdw\tLightShd\tPoleShd\t\tFarClp\t\tFogSt\tLightOnGround\tLowCloudsRGB\tBottomCloudRGB\t\tWaterRGBA\t\t\t\tARGB1\t\t\t\t\tARGB2\t\t\tCloudAlpha\t\tIntensityLimit\t\tWaterFogAlpha\tDirMult \n\n";
 
-		for (int j = 0; j < timecyc_hour; ++j)
+		for (int j = 0; j < m_nTimecycHour; ++j)
 		{
-			if (timecyc_hour == 24)
+			if (m_nTimecycHour == 24)
 			{
 				if (j >= 12)
 					file << "// " << j << " PM\n";
@@ -129,49 +126,65 @@ void Visual::GenerateTimecycFile()
 			}
 			else
 			{
-				if (j == 0)  file << "// Midnight\n";
-				if (j == 1)  file << "// 5 AM\n";
-				if (j == 2)  file << "// 6 AM\n";
-				if (j == 3)  file << "// 7 AM\n";
-				if (j == 4)  file << "// Midday\n";
-				if (j == 5)  file << "// 7 PM\n";
-				if (j == 6)  file << "// 8 PM\n";
-				if (j == 7)  file << "// 10 PM\n";
+				if (j == 0) file << "// Midnight\n";
+				if (j == 1) file << "// 5 AM\n";
+				if (j == 2) file << "// 6 AM\n";
+				if (j == 3) file << "// 7 AM\n";
+				if (j == 4) file << "// Midday\n";
+				if (j == 5) file << "// 7 PM\n";
+				if (j == 6) file << "// 8 PM\n";
+				if (j == 7) file << "// 10 PM\n";
 			}
 
 			int val = 23 * j + i;
 
-			file << "\t" << GetTCVal(m_nAmbientRed,val) << " " << GetTCVal(m_nAmbientGreen,val) << " " << GetTCVal(m_nAmbientBlue,val) << " \t\t"
+			file << "\t" << GetTCVal(m_nAmbientRed, val) << " " << GetTCVal(m_nAmbientGreen, val) << " " << GetTCVal(
+					m_nAmbientBlue, val) << " \t\t"
 
-				<< "\t" << GetTCVal(m_nAmbientRed_Obj,val) << " " << GetTCVal(m_nAmbientGreen_Obj,val) << " " << GetTCVal(m_nAmbientBlue_Obj,val) << " \t\t"
+				<< "\t" << GetTCVal(m_nAmbientRed_Obj, val) << " " << GetTCVal(m_nAmbientGreen_Obj, val) << " " <<
+				GetTCVal(m_nAmbientBlue_Obj, val) << " \t\t"
 
 				<< "\t255 255 255\t\t" // unused
 
-				<< "\t" << GetTCVal(m_nSkyTopRed,val) << " " << GetTCVal(m_nSkyTopGreen,val) << " " << GetTCVal(m_nSkyTopBlue,val) << " \t\t"
+				<< "\t" << GetTCVal(m_nSkyTopRed, val) << " " << GetTCVal(m_nSkyTopGreen, val) << " " << GetTCVal(
+					m_nSkyTopBlue, val) << " \t\t"
 
-				<< "\t" << GetTCVal(m_nSkyBottomRed,val) << " " << GetTCVal(m_nSkyBottomGreen,val) << " " << GetTCVal(m_nSkyBottomBlue,val) << " \t\t"
+				<< "\t" << GetTCVal(m_nSkyBottomRed, val) << " " << GetTCVal(m_nSkyBottomGreen, val) << " " << GetTCVal(
+					m_nSkyBottomBlue, val) << " \t\t"
 
-				<< "\t" << GetTCVal(m_nSunCoreRed,val) << " " << GetTCVal(m_nSunCoreGreen,val) << " " << GetTCVal(m_nSunCoreBlue,val) << " \t\t"
+				<< "\t" << GetTCVal(m_nSunCoreRed, val) << " " << GetTCVal(m_nSunCoreGreen, val) << " " << GetTCVal(
+					m_nSunCoreBlue, val) << " \t\t"
 
-				<< "\t" << GetTCVal(m_nSunCoronaRed,val) << " " << GetTCVal(m_nSunCoronaGreen,val) << " " << GetTCVal(m_nSunCoronaBlue,val) << " \t\t"
+				<< "\t" << GetTCVal(m_nSunCoronaRed, val) << " " << GetTCVal(m_nSunCoronaGreen, val) << " " << GetTCVal(
+					m_nSunCoronaBlue, val) << " \t\t"
 
-				<< "\t" << (GetTCVal(m_fSunSize,val) - 0.5f) / 10.0f << " " << (GetTCVal(m_fSpriteSize,val) - 0.5f) / 10.0f << " " << (GetTCVal(m_fSpriteBrightness,val) - 0.5f) / 10.0f << " \t\t"
+				<< "\t" << (GetTCVal(m_fSunSize, val) - 0.5f) / 10.0f << " " << (GetTCVal(m_fSpriteSize, val) - 0.5f) /
+				10.0f << " " << (GetTCVal(m_fSpriteBrightness, val) - 0.5f) / 10.0f << " \t\t"
 
-				<< "\t" << GetTCVal(m_nShadowStrength,val) << " " << GetTCVal(m_nLightShadowStrength,val) << " " << GetTCVal(m_nPoleShadowStrength,val) << " \t\t"
+				<< "\t" << GetTCVal(m_nShadowStrength, val) << " " << GetTCVal(m_nLightShadowStrength, val) << " " <<
+				GetTCVal(m_nPoleShadowStrength, val) << " \t\t"
 
-				<< "\t" << GetTCVal(m_fFarClip,val) << " " << GetTCVal(m_fFogStart,val) << " " << (GetTCVal(m_fLightsOnGroundBrightness,val) - 0.5) / 10.0f << " \t\t"
+				<< "\t" << GetTCVal(m_fFarClip, val) << " " << GetTCVal(m_fFogStart, val) << " " << (GetTCVal(
+					m_fLightsOnGroundBrightness, val) - 0.5) / 10.0f << " \t\t"
 
-				<< "\t" << GetTCVal(m_nLowCloudsRed,val) << " " << GetTCVal(m_nLowCloudsGreen,val) << " " << GetTCVal(m_nLowCloudsBlue,val) << " \t\t"
+				<< "\t" << GetTCVal(m_nLowCloudsRed, val) << " " << GetTCVal(m_nLowCloudsGreen, val) << " " << GetTCVal(
+					m_nLowCloudsBlue, val) << " \t\t"
 
-				<< "\t" << GetTCVal(m_nFluffyCloudsBottomRed,val) << " " <<GetTCVal(m_nFluffyCloudsBottomGreen,val) << " " << GetTCVal(m_nFluffyCloudsBottomBlue,val) << " \t\t"
+				<< "\t" << GetTCVal(m_nFluffyCloudsBottomRed, val) << " " << GetTCVal(m_nFluffyCloudsBottomGreen, val)
+				<< " " << GetTCVal(m_nFluffyCloudsBottomBlue, val) << " \t\t"
 
-				<< "\t" << GetTCVal(m_fWaterRed,val) << " " << GetTCVal(m_fWaterGreen,val) << " " << GetTCVal(m_fWaterBlue,val) << " " << GetTCVal(m_fWaterAlpha,val) << " \t\t"
+				<< "\t" << GetTCVal(m_fWaterRed, val) << " " << GetTCVal(m_fWaterGreen, val) << " " <<
+				GetTCVal(m_fWaterBlue, val) << " " << GetTCVal(m_fWaterAlpha, val) << " \t\t"
 
-				<< "\t" << GetTCVal(m_fPostFx1Alpha,val) << " " << GetTCVal(m_fPostFx1Red,val) << " " << GetTCVal(m_fPostFx1Green,val) << " " << GetTCVal(m_fPostFx1Blue,val) << " \t\t"
+				<< "\t" << GetTCVal(m_fPostFx1Alpha, val) << " " << GetTCVal(m_fPostFx1Red, val) << " " <<
+				GetTCVal(m_fPostFx1Green, val) << " " << GetTCVal(m_fPostFx1Blue, val) << " \t\t"
 
-				<< "\t" << GetTCVal(m_fPostFx2Alpha,val) << " " << GetTCVal(m_fPostFx2Red,val) << " " << GetTCVal(m_fPostFx2Green,val) << " " << GetTCVal(m_fPostFx2Blue,val) << " \t\t"
+				<< "\t" << GetTCVal(m_fPostFx2Alpha, val) << " " << GetTCVal(m_fPostFx2Red, val) << " " <<
+				GetTCVal(m_fPostFx2Green, val) << " " << GetTCVal(m_fPostFx2Blue, val) << " \t\t"
 
-				<< "\t" << GetTCVal(m_fCloudAlpha,val) << " " << GetTCVal(m_nHighLightMinIntensity,val) << " " << GetTCVal(m_nWaterFogAlpha,val) << " " << GetTCVal(m_nDirectionalMult,val) / 100.0 << " \t\t" << std::endl;
+				<< "\t" << GetTCVal(m_fCloudAlpha, val) << " " << GetTCVal(m_nHighLightMinIntensity, val) << " " <<
+				GetTCVal(m_nWaterFogAlpha, val) << " " << GetTCVal(m_nDirectionalMult, val) / 100.0 << " \t\t" <<
+				std::endl;
 		}
 	}
 }
@@ -183,7 +196,7 @@ void Visual::Draw()
 		if (ImGui::BeginTabItem("Checkboxes"))
 		{
 			ImGui::Spacing();
-			ImGui::Columns(2, 0, false);
+			ImGui::Columns(2, nullptr, false);
 			Ui::CheckboxAddress("Armour border", 0x589123);
 			Ui::CheckboxAddress("Armour percentage", 0x589125);
 			Ui::CheckboxAddress("Breath border", 0x589207);
@@ -204,8 +217,8 @@ void Visual::Draw()
 				Command<Commands::DISPLAY_RADAR>(!CHud::bScriptDontDisplayRadar);
 
 			Ui::CheckboxAddressEx("Hide wanted level", 0x58DD1B, 0x90, 1);
-			if (Ui::CheckboxWithHint("Lock weather", &lock_weather))
-				weather_type_backup = CWeather::OldWeatherType;
+			if (Ui::CheckboxWithHint("Lock weather", &m_bLockWeather))
+				m_nBacWeatherType = CWeather::OldWeatherType;
 
 			if (Ui::CheckboxWithHint("Show hud", &CHud::m_Wants_To_Draw_Hud))
 				Command<Commands::DISPLAY_HUD>(CHud::m_Wants_To_Draw_Hud);
@@ -244,7 +257,7 @@ void Visual::Draw()
 				patch::SetPointer(0x583500, &radar_posY);
 				patch::SetPointer(0x5834F6, &radar_height);
 				patch::SetPointer(0x5834C2, &radar_width);
- 
+
 				patch::SetPointer(0x58A79B, &radar_posX);
 				patch::SetPointer(0x58A7C7, &radar_posY);
 				patch::SetPointer(0x58A801, &radar_height);
@@ -261,7 +274,7 @@ void Visual::Draw()
 				patch::SetPointer(0x58A9C7, &radar_posY);
 				patch::SetPointer(0x58A9D5, &radar_height);
 				patch::SetPointer(0x58A99D, &radar_width);
- 
+
 				patch::SetPointer(0x5890FC, &armour_bar);
 				patch::SetChar(0x5890F5, 0);
 				patch::SetPointer(0x589331, &health_bar);
@@ -269,7 +282,7 @@ void Visual::Draw()
 				patch::SetChar(0x5891E4, 0);
 				patch::SetPointer(0x58EBD1, &clock_bar);
 				patch::SetChar(0x58EBCA, 0);
-				
+
 				patch::SetPointer(0x58F5FC, &money_posX);
 				patch::SetPointer(0x58F11F, &breath_posX);
 				patch::SetPointer(0x58F100, &breath_posY);
@@ -278,13 +291,14 @@ void Visual::Draw()
 				patch::SetPointer(0x58F913, &weapon_icon_posY);
 				patch::SetPointer(0x58FA02, &weapon_ammo_posX);
 				patch::SetPointer(0x58F9E6, &weapon_ammo_posY);
-				
+
 				init_patches = true;
 			}
-			
+
 			if (ImGui::BeginChild("VisualsChild"))
 			{
-				ImGui::TextWrapped("These options won't work if you got any mods that drastically changes the game hud. i.e. Mobile Hud, GTA 5 Hud etc.");
+				ImGui::TextWrapped(
+					"These options won't work if you got any mods that drastically changes the game hud. i.e. Mobile Hud, GTA 5 Hud etc.");
 				ImGui::Spacing();
 				Ui::ColorPickerAddress("Armourbar color", *(int*)0x5890FC, ImVec4(180, 25, 29, 255));
 				Ui::EditAddress<float>("Armourbar posX", 0x866B78, -999, 94, 999);
@@ -302,9 +316,11 @@ void Visual::Draw()
 				Ui::ColorPickerAddress("Money color", 0xBAB230, ImVec4(54, 104, 44, 255));
 				Ui::EditAddress<float>("Money posX", *(int*)0x58F5FC, -999, 32, 999);
 				Ui::EditAddress<float>("Money posY", 0x866C88, -999, 89, 999);
-				static std::vector<Ui::NamedValue> font_outline{ { "No outline", 0 }, { "Thin outline" ,1 }, { "Default outline" ,2 } };
+				static std::vector<Ui::NamedValue> font_outline{
+					{"No outline", 0}, {"Thin outline", 1}, {"Default outline", 2}
+				};
 				Ui::EditRadioButtonAddressEx("Money font outline", 0x58F58D, font_outline);
-				static std::vector<Ui::NamedValue> style{ { "Style 1", 1 }, { "Style 2" ,2 }, { "Default style" ,3 } };
+				static std::vector<Ui::NamedValue> style{{"Style 1", 1}, {"Style 2", 2}, {"Default style", 3}};
 				Ui::EditRadioButtonAddressEx("Money font style", 0x58F57F, style);
 				Ui::EditAddress<float>("Radar Height", *(int*)0x5834F6, 0, 76, 999);
 				Ui::EditAddress<float>("Radar Width", *(int*)0x5834C2, 0, 94, 999);
@@ -312,7 +328,7 @@ void Visual::Draw()
 				Ui::EditAddress<float>("Radar posY", *(int*)0x583500, -999, 104, 999);
 				Ui::EditAddress<int>("Radar zoom", 0xA444A3, 0, 0, 170);
 				Ui::ColorPickerAddress("Radio station color", 0xBAB24C, ImVec4(150, 150, 150, 255));
-				static std::vector<Ui::NamedValue> star_border{ { "No border", 0 }, { "Default" ,1 }, { "Bold border" ,2 } };
+				static std::vector<Ui::NamedValue> star_border{{"No border", 0}, {"Default", 1}, {"Bold border", 2}};
 				Ui::EditRadioButtonAddressEx("Wanted star border", 0x58DD41, star_border);
 				Ui::EditAddress<float>("Wanted posX", *(int*)0x58DD0F, -999, 29, 999);
 				Ui::EditAddress<float>("Wanted posY", *(int*)0x58DDFC, -999, 114, 999);
@@ -327,7 +343,7 @@ void Visual::Draw()
 			ImGui::EndTabItem();
 		}
 
-		if ( timecyc_hour == 8 ? ImGui::BeginTabItem("Timecyc") : ImGui::BeginTabItem("Timecyc 24h"))
+		if (m_nTimecycHour == 8 ? ImGui::BeginTabItem("Timecyc") : ImGui::BeginTabItem("Timecyc 24h"))
 		{
 			ImGui::Spacing();
 			if (ImGui::Button("Generate timecyc file", Ui::GetSize(2)))
@@ -344,38 +360,38 @@ void Visual::Draw()
 			ImGui::Spacing();
 
 			int weather = CWeather::OldWeatherType;
-			if (Ui::ListBox("Current weather", weather_names, weather))
+			if (Ui::ListBox("Current weather", m_WeatherNames, weather))
 				CWeather::OldWeatherType = weather;
 
 			weather = CWeather::NewWeatherType;
-			if (Ui::ListBox("Next weather", weather_names, weather))
+			if (Ui::ListBox("Next weather", m_WeatherNames, weather))
 				CWeather::NewWeatherType = weather;
 
 			ImGui::Spacing();
 			int hour = CClock::ms_nGameClockHours;
 			int minute = CClock::ms_nGameClockMinutes;
 
-			if (Game::sync_time)
+			if (CGame::m_bSyncTime)
 			{
 				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 			}
-			
-			if (ImGui::InputInt("Hour", &hour) & !Game::sync_time)
+
+			if (ImGui::InputInt("Hour", &hour) & !CGame::m_bSyncTime)
 			{
 				if (hour < 0) hour = 23;
 				if (hour > 23) hour = 0;
 				CClock::ms_nGameClockHours = hour;
 			}
 
-			if (ImGui::InputInt("Minute", &minute) & !Game::sync_time)
+			if (ImGui::InputInt("Minute", &minute) & !CGame::m_bSyncTime)
 			{
 				if (minute < 0) minute = 59;
 				if (minute > 59) minute = 0;
 				CClock::ms_nGameClockMinutes = minute;
 			}
 
-			if (Game::sync_time)
+			if (CGame::m_bSyncTime)
 			{
 				ImGui::PopStyleVar();
 				ImGui::PopItemFlag();
@@ -392,12 +408,13 @@ void Visual::Draw()
 
 					TimeCycColorEdit3("Ambient", m_nAmbientRed, m_nAmbientGreen, m_nAmbientBlue);
 					TimeCycColorEdit3("Ambient obj", m_nAmbientRed_Obj, m_nAmbientGreen_Obj, m_nAmbientBlue_Obj);
-					TimeCycColorEdit3("Fluffy clouds", m_nFluffyCloudsBottomRed , m_nFluffyCloudsBottomGreen, m_nFluffyCloudsBottomBlue);
+					TimeCycColorEdit3("Fluffy clouds", m_nFluffyCloudsBottomRed, m_nFluffyCloudsBottomGreen,
+					                  m_nFluffyCloudsBottomBlue);
 					TimeCycColorEdit3("Low clouds", m_nLowCloudsRed, m_nLowCloudsGreen, m_nLowCloudsBlue);
-					
+
 					TimeCycColorEdit4("Postfx 1", m_fPostFx1Red, m_fPostFx1Green, m_fPostFx1Blue, m_fPostFx1Alpha);
 					TimeCycColorEdit4("Postfx 2", m_fPostFx2Red, m_fPostFx2Green, m_fPostFx2Blue, m_fPostFx1Alpha);
-					
+
 					TimeCycColorEdit3("Sky bottom", m_nSkyBottomRed, m_nSkyBottomGreen, m_nSkyBottomBlue);
 					TimeCycColorEdit3("Sun core", m_nSunCoreRed, m_nSunCoreGreen, m_nSunCoreBlue);
 					TimeCycColorEdit3("Sun corona", m_nSunCoronaRed, m_nSunCoronaGreen, m_nSunCoronaBlue);
@@ -413,7 +430,7 @@ void Visual::Draw()
 					ImGui::BeginChild("TimecycMisc");
 					ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 2);
 					TimecycSlider("Cloud alpha", m_fCloudAlpha, 0, 255);
-					TimecycSlider("Directional mult", m_nDirectionalMult , 0, 255);
+					TimecycSlider("Directional mult", m_nDirectionalMult, 0, 255);
 					TimecycSlider("Far clip", m_fFarClip, 0, 2000);
 					TimecycSlider("Fog start", m_fFogStart, 0, 1500);
 					TimecycSlider("High light min intensity", m_nHighLightMinIntensity, 0, 255);
