@@ -12,7 +12,7 @@ void CheatMenu::DrawWindow()
 		m_bShowMouse = false;
 	else
 	{
-		if (Globals::m_bShowMenu || m_Commands.m_bShowMenu)
+		if (Globals::m_bShowMenu || m_Commands::m_bShowMenu)
 		{
 			if (Globals::m_bShowMenu)
 			{
@@ -59,17 +59,17 @@ CheatMenu::CheatMenu()
 	{
 		if (Globals::m_bInit && !FrontEndMenuManager.m_bMenuActive)
 		{
-			if (Ui::HotKeyPressed(m_HotKeys.menuOpen))
+			if (Ui::HotKeyPressed(Menu::m_HotKeys::menuOpen))
 				Globals::m_bShowMenu = !Globals::m_bShowMenu;
 
-			if (Ui::HotKeyPressed(m_HotKeys.commandWindow))
+			if (Ui::HotKeyPressed(Menu::m_HotKeys::commandWindow))
 			{
-				if (m_Commands.m_bShowMenu)
+				if (m_Commands::m_bShowMenu)
 				{
 					ProcessCommands();
-					strcpy(m_Commands.m_nInputBuffer, "");
+					strcpy(m_Commands::m_nInputBuffer, "");
 				}
-				m_Commands.m_bShowMenu = !m_Commands.m_bShowMenu;
+				m_Commands::m_bShowMenu = !m_Commands::m_bShowMenu;
 			}
 
 			if (m_bShowMouse != Globals::m_bShowMenu)

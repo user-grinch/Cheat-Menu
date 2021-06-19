@@ -10,7 +10,7 @@ private:
 	inline static bool m_bImagesLoaded;
 	inline static bool m_bExGangWarsInstalled;
 	inline static int m_nPedRemoveRadius = 5;
-	static struct
+	struct m_SpawnPed
 	{
 		inline static std::vector<CPed*> m_List;
 		inline static int m_nAccuracy = 50;
@@ -25,7 +25,7 @@ private:
 			"San Fierro Rifa", "Da Nang Boys", "Mafia", "Mountain Cloud Triads", "Varrio Los Aztecas",
 			"Gang 9", "Medic", "Dealer", "Criminal", "Fireman", "Prostitute"
 		};
-	} m_SpawnPed;
+	};
 	inline static std::vector<std::string> m_GangNames =
 	{
 		"Ballas", "Grove street families", "Los santos vagos", "San fierro rifa",

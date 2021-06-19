@@ -13,8 +13,8 @@ Vehicle::Vehicle()
 		if (!m_bImagesLoaded)
 		{
 			Util::LoadTexturesInDirRecursive(
-				PLUGIN_PATH((char*)"CheatMenu\\vehicles\\images\\"), ".jpg", m_Spawner.m_VehData.m_Categories,
-				m_Spawner.m_VehData.m_ImagesList);
+				PLUGIN_PATH((char*)"CheatMenu\\vehicles\\images\\"), ".jpg", m_Spawner::m_VehData.m_Categories,
+				m_Spawner::m_VehData.m_ImagesList);
 			Util::LoadTexturesInDirRecursive(
 				PLUGIN_PATH((char*)"CheatMenu\\vehicles\\components\\"), ".jpg", m_TuneData.m_Categories,
 				m_TuneData.m_ImagesList);
@@ -33,7 +33,7 @@ Vehicle::Vehicle()
 		{
 			int hveh = CPools::GetVehicleRef(veh);
 
-			if (Ui::HotKeyPressed(Menu::m_HotKeys.flipVeh))
+			if (Ui::HotKeyPressed(Menu::m_HotKeys::flipVeh))
 			{
 				float roll;
 				Command<Commands::GET_CAR_ROLL>(hveh, &roll);
@@ -42,14 +42,14 @@ Vehicle::Vehicle()
 				Command<Commands::SET_CAR_ROLL>(hveh, roll); // z rot fix
 			}
 
-			if (Ui::HotKeyPressed(Menu::m_HotKeys.fixVeh))
+			if (Ui::HotKeyPressed(Menu::m_HotKeys::fixVeh))
 			{
 				player->m_pVehicle->Fix();
 				player->m_pVehicle->m_fHealth = 1000.0f;
 				CHud::SetHelpMessage("Vehicle fixed", false, false, false);
 			}
 
-			if (Ui::HotKeyPressed(Menu::m_HotKeys.vehEngine))
+			if (Ui::HotKeyPressed(Menu::m_HotKeys::vehEngine))
 			{
 				bool state = !veh->m_nVehicleFlags.bEngineBroken || veh->m_nVehicleFlags.bEngineOn;
 
@@ -62,10 +62,10 @@ Vehicle::Vehicle()
 				veh->m_nVehicleFlags.bEngineOn = !state;
 			}
 
-			if (Ui::HotKeyPressed(Menu::m_HotKeys.vehInstantStart))
+			if (Ui::HotKeyPressed(Menu::m_HotKeys::vehInstantStart))
 				Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, 40.0f);
 
-			if (Ui::HotKeyPressed(Menu::m_HotKeys.vehInstantStop))
+			if (Ui::HotKeyPressed(Menu::m_HotKeys::vehInstantStop))
 				Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, 0);
 
 			if (m_bNoDamage)
@@ -82,25 +82,25 @@ Vehicle::Vehicle()
 			Command<Commands::SET_CAR_HEAVY>(hveh, m_bVehHeavy);
 			Command<Commands::SET_CAR_WATERTIGHT>(hveh, m_bVehWatertight);
 
-			if (m_UnlimitedNitro.m_bEnabled && player->m_pVehicle->m_nVehicleSubClass == VEHICLE_AUTOMOBILE)
+			if (m_UnlimitedNitro::m_bEnabled && player->m_pVehicle->m_nVehicleSubClass == VEHICLE_AUTOMOBILE)
 			{
 				patch::Set<BYTE>(0x969165, 0, true); // All cars have nitro
 				patch::Set<BYTE>(0x96918B, 0, true); // All taxis have nitro
 
 				if (KeyPressed(VK_LBUTTON))
 				{
-					if (!m_UnlimitedNitro.m_bCompAdded)
+					if (!m_UnlimitedNitro::m_bCompAdded)
 					{
 						AddComponent("1010", false);
-						m_UnlimitedNitro.m_bCompAdded = true;
+						m_UnlimitedNitro::m_bCompAdded = true;
 					}
 				}
 				else
 				{
-					if (m_UnlimitedNitro.m_bCompAdded)
+					if (m_UnlimitedNitro::m_bCompAdded)
 					{
 						RemoveComponent("1010", false);
-						m_UnlimitedNitro.m_bCompAdded = false;
+						m_UnlimitedNitro::m_bCompAdded = false;
 					}
 				}
 			}
@@ -108,18 +108,18 @@ Vehicle::Vehicle()
 			if (m_bLockSpeed)
 				Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, m_fLockSpeed);
 
-			if (m_Neon.m_bRainbowEffect && timer - m_Neon.m_nRainbowTimer > 50)
+			if (m_Neon::m_bRainbowEffect && timer - m_Neon::m_nRainbowTimer > 50)
 			{
 				int red, green, blue;
 
 				Util::RainbowValues(red, green, blue, 0.25);
 				InstallNeon(veh, red, green, blue);
-				m_Neon.m_nRainbowTimer = timer;
+				m_Neon::m_nRainbowTimer = timer;
 			}
 		}
 
 		// Traffic neons
-		if (m_Neon.m_bApplyOnTraffic && timer - m_Neon.m_bTrafficTimer > 1000)
+		if (m_Neon::m_bApplyOnTraffic && timer - m_Neon::m_bTrafficTimer > 1000)
 		{
 			for (CVehicle* veh : CPools::ms_pVehiclePool)
 			{
@@ -137,7 +137,7 @@ Vehicle::Vehicle()
 				if (chance == 1 && !IsNeonInstalled(veh) && veh->m_pDriver != player)
 					InstallNeon(veh, Random(0, 255), Random(0, 255), Random(0, 255));
 			}
-			m_Neon.m_bTrafficTimer = timer;
+			m_Neon::m_bTrafficTimer = timer;
 		}
 
 		if (m_bBikeFly && veh && veh->IsDriver(player))
@@ -159,7 +159,7 @@ Vehicle::Vehicle()
 
 Vehicle::~Vehicle()
 {
-	Util::ReleaseTextures(m_Spawner.m_VehData.m_ImagesList);
+	Util::ReleaseTextures(m_Spawner::m_VehData.m_ImagesList);
 	Util::ReleaseTextures(m_TuneData.m_ImagesList);
 	Util::ReleaseTextures(m_TextureData.m_ImagesList);
 }
@@ -399,7 +399,7 @@ void Vehicle::SpawnVehicle(std::string& smodel)
 		CVector pos = player->GetPosition();
 		int speed = 0;
 
-		if (player->m_nPedFlags.bInVehicle && m_Spawner.m_bSpawnInside)
+		if (player->m_nPedFlags.bInVehicle && m_Spawner::m_bSpawnInside)
 		{
 			int hveh = 0;
 			Command<Commands::GET_CAR_CHAR_IS_USING>(hplayer, &hveh);
@@ -417,7 +417,7 @@ void Vehicle::SpawnVehicle(std::string& smodel)
 		}
 
 		if (interior == 0)
-			if (m_Spawner.m_bSpawnInAir && (CModelInfo::IsHeliModel(imodel) || CModelInfo::IsPlaneModel(imodel)))
+			if (m_Spawner::m_bSpawnInAir && (CModelInfo::IsHeliModel(imodel) || CModelInfo::IsPlaneModel(imodel)))
 				pos.z = 400;
 			else
 				pos.z -= 5;
@@ -454,7 +454,7 @@ void Vehicle::SpawnVehicle(std::string& smodel)
 			if (veh->m_pDriver)
 				Command<Commands::DELETE_CHAR>(CPools::GetPedRef(veh->m_pDriver));
 
-			if (m_Spawner.m_bSpawnInside)
+			if (m_Spawner::m_bSpawnInside)
 			{
 				Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
 				Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, speed);
@@ -473,11 +473,11 @@ void Vehicle::SpawnVehicle(std::string& smodel)
 			CStreaming::RequestModel(imodel, PRIORITY_REQUEST);
 			CStreaming::LoadAllRequestedModels(false);
 
-			if (m_Spawner.m_nLicenseText[0] != '\0')
-				Command<Commands::CUSTOM_PLATE_FOR_NEXT_CAR>(imodel, m_Spawner.m_nLicenseText);
+			if (m_Spawner::m_nLicenseText[0] != '\0')
+				Command<Commands::CUSTOM_PLATE_FOR_NEXT_CAR>(imodel, m_Spawner::m_nLicenseText);
 
 			int hveh = 0;
-			if (m_Spawner.m_bSpawnInside)
+			if (m_Spawner::m_bSpawnInside)
 			{
 				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 4.0f, &hveh);
 				veh = CPools::GetVehicle(hveh);
@@ -664,7 +664,7 @@ void Vehicle::Draw()
 			Ui::CheckboxAddress("Green traffic lights", 0x96914E);
 			Ui::CheckboxAddress("Perfect handling", 0x96914C);
 			Ui::CheckboxAddress("Tank mode", 0x969164);
-			Ui::CheckboxWithHint("Unlimited nitro", &m_UnlimitedNitro.m_bEnabled, "Nitro will activate when left clicked\n\
+			Ui::CheckboxWithHint("Unlimited nitro", &m_UnlimitedNitro::m_bEnabled, "Nitro will activate when left clicked\n\
 \nEnabling this would disable\nAll cars have nitro\nAll taxis have nitro");
 			Ui::CheckboxWithHint("Watertight car", &m_bVehWatertight);
 			Ui::CheckboxAddress("Wheels only", 0x96914B);
@@ -806,11 +806,13 @@ void Vehicle::Draw()
 				if (ImGui::Button("Remove vehicles", Ui::GetSize(1)))
 				{
 					CPlayerPed* player = FindPlayerPed();
-					for (CVehicle* veh : CPools::ms_pVehiclePool)
+					for (CVehicle *pVeh : CPools::ms_pVehiclePool)
 					{
-						if (DistanceBetweenPoints(veh->GetPosition(), player->GetPosition()) < m_nVehRemoveRadius
-							&& player->m_pVehicle != veh)
-							Command<Commands::DELETE_CAR>(CPools::GetVehicleRef(veh));
+						if (DistanceBetweenPoints(pVeh->GetPosition(), player->GetPosition()) < m_nVehRemoveRadius
+							&& !(player->m_nPedFlags.bInVehicle && player->m_pVehicle == pVeh))
+						{
+							Command<Commands::DELETE_CAR>(CPools::GetVehicleRef(pVeh));
+						}
 					}
 				}
 				ImGui::Spacing();
@@ -932,18 +934,18 @@ void Vehicle::Draw()
 		{
 			ImGui::Spacing();
 			ImGui::Columns(2, 0, false);
-			Ui::CheckboxWithHint("Spawn inside", &m_Spawner.m_bSpawnInside, "Spawn inside vehicle as driver");
+			Ui::CheckboxWithHint("Spawn inside", &m_Spawner::m_bSpawnInside, "Spawn inside vehicle as driver");
 			ImGui::NextColumn();
-			Ui::CheckboxWithHint("Spawn aircraft in air", &m_Spawner.m_bSpawnInAir);
+			Ui::CheckboxWithHint("Spawn aircraft in air", &m_Spawner::m_bSpawnInAir);
 			ImGui::Columns(1);
 
 
 			ImGui::Spacing();
 			ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() - 2.5);
-			ImGui::InputTextWithHint("##LicenseText", "License plate text", m_Spawner.m_nLicenseText, 9);
+			ImGui::InputTextWithHint("##LicenseText", "License plate text", m_Spawner::m_nLicenseText, 9);
 
-			Ui::DrawImages(m_Spawner.m_VehData.m_ImagesList, ImVec2(100, 75), m_Spawner.m_VehData.m_Categories,
-			               m_Spawner.m_VehData.m_Selected, m_Spawner.m_VehData.m_Filter, SpawnVehicle, nullptr,
+			Ui::DrawImages(m_Spawner::m_VehData.m_ImagesList, ImVec2(100, 75), m_Spawner::m_VehData.m_Categories,
+			               m_Spawner::m_VehData.m_Selected, m_Spawner::m_VehData.m_Filter, SpawnVehicle, nullptr,
 			               [](std::string str)
 			               {
 				               return GetNameFromModel(std::stoi(str));
@@ -969,23 +971,23 @@ void Vehicle::Draw()
 
 				Ui::ListBoxStr("Component", Paint::veh_nodes::names_vec, Paint::veh_nodes::selected);
 
-				if (ImGui::ColorEdit3("Color picker", m_Color.m_fColorPicker))
+				if (ImGui::ColorEdit3("Color picker", m_Color::m_fColorPicker))
 				{
-					uchar r = m_Color.m_fColorPicker[0] * 255;
-					uchar g = m_Color.m_fColorPicker[1] * 255;
-					uchar b = m_Color.m_fColorPicker[2] * 255;
-					Paint::SetNodeColor(veh, Paint::veh_nodes::selected, {r, g, b, 255}, m_Color.m_bMatFilter);
+					uchar r = m_Color::m_fColorPicker[0] * 255;
+					uchar g = m_Color::m_fColorPicker[1] * 255;
+					uchar b = m_Color::m_fColorPicker[2] * 255;
+					Paint::SetNodeColor(veh, Paint::veh_nodes::selected, {r, g, b, 255}, m_Color::m_bMatFilter);
 				}
 
 				ImGui::Spacing();
 				ImGui::Columns(2, NULL, false);
-				ImGui::Checkbox("Material filter", &m_Color.m_bMatFilter);
-				ImGui::RadioButton("Primary", &m_Color.m_nRadioButton, 1);
-				ImGui::RadioButton("Secondary", &m_Color.m_nRadioButton, 2);
+				ImGui::Checkbox("Material filter", &m_Color::m_bMatFilter);
+				ImGui::RadioButton("Primary", &m_Color::m_nRadioButton, 1);
+				ImGui::RadioButton("Secondary", &m_Color::m_nRadioButton, 2);
 				ImGui::NextColumn();
-				ImGui::Checkbox("Show all", &m_Color.bShowAll);
-				ImGui::RadioButton("Tertiary", &m_Color.m_nRadioButton, 3);
-				ImGui::RadioButton("Quaternary", &m_Color.m_nRadioButton, 4);
+				ImGui::Checkbox("Show all", &m_Color::bShowAll);
+				ImGui::RadioButton("Tertiary", &m_Color::m_nRadioButton, 3);
+				ImGui::RadioButton("Quaternary", &m_Color::m_nRadioButton, 4);
 				ImGui::Spacing();
 				ImGui::Columns(1);
 				ImGui::Text("Select color preset:");
@@ -1000,11 +1002,11 @@ void Vehicle::Draw()
 
 				ImGui::BeginChild("Colorss");
 
-				if (m_Color.bShowAll)
+				if (m_Color::bShowAll)
 					for (int colorId = 0; colorId < count; ++colorId)
 					{
 						if (Ui::ColorButton(colorId, m_CarcolsColorData[colorId], ImVec2(btnSize, btnSize)))
-							*(uint8_replacement*)(int(veh) + 0x433 + m_Color.m_nRadioButton) = colorId;
+							*(uint8_replacement*)(int(veh) + 0x433 + m_Color::m_nRadioButton) = colorId;
 
 						if ((colorId + 1) % btnsInRow != 0)
 							ImGui::SameLine(0.0, 4.0);
@@ -1021,7 +1023,7 @@ void Vehicle::Draw()
 							{
 								if (Ui::ColorButton(colorId, m_CarcolsColorData[colorId],
 								                    ImVec2(btnSize, btnSize)))
-									*(uint8_replacement*)(int(veh) + 0x433 + m_Color.m_nRadioButton) = colorId;
+									*(uint8_replacement*)(int(veh) + 0x433 + m_Color::m_nRadioButton) = colorId;
 
 								if (count % btnsInRow != 0)
 									ImGui::SameLine(0.0, 4.0);
@@ -1052,17 +1054,17 @@ void Vehicle::Draw()
 				if (Ui::CheckboxWithHint("Pulsing neons", &pulsing))
 					SetPulsing(veh, pulsing);
 
-				Ui::CheckboxWithHint("Rainbow neons", &m_Neon.m_bRainbowEffect, "Rainbow effect to neon lights");
+				Ui::CheckboxWithHint("Rainbow neons", &m_Neon::m_bRainbowEffect, "Rainbow effect to neon lights");
 				ImGui::NextColumn();
-				Ui::CheckboxWithHint("Traffic neons", &m_Neon.m_bApplyOnTraffic, "Adds neon lights to traffic vehicles.\n\
+				Ui::CheckboxWithHint("Traffic neons", &m_Neon::m_bApplyOnTraffic, "Adds neon lights to traffic vehicles.\n\
 Only some vehicles will have them.");
 				ImGui::Columns(1);
 
 				ImGui::Spacing();
 
-				if (ImGui::ColorEdit3("Color picker", m_Neon.m_fColorPicker))
-					InstallNeon(veh, m_Neon.m_fColorPicker[0] * 255, m_Neon.m_fColorPicker[1] * 255,
-					            m_Neon.m_fColorPicker[2] * 255);
+				if (ImGui::ColorEdit3("Color picker", m_Neon::m_fColorPicker))
+					InstallNeon(veh, m_Neon::m_fColorPicker[0] * 255, m_Neon::m_fColorPicker[1] * 255,
+					            m_Neon::m_fColorPicker[2] * 255);
 
 				ImGui::Spacing();
 				ImGui::Text("Select neon preset:");
@@ -1127,14 +1129,14 @@ Only some vehicles will have them.");
 
 				ImGui::Spacing();
 				ImGui::SameLine();
-				ImGui::Checkbox("Material filter", &m_Color.m_bMatFilter);
+				ImGui::Checkbox("Material filter", &m_Color::m_bMatFilter);
 				ImGui::Spacing();
 				Ui::DrawImages(m_TextureData.m_ImagesList, ImVec2(100, 80), m_TextureData.m_Categories, m_TextureData.m_Selected,
 				               m_TextureData.m_Filter,
 				               [](std::string& str)
 				               {
 					               Paint::SetNodeTexture(FindPlayerPed()->m_pVehicle, Paint::veh_nodes::selected, str,
-					                                     m_Color.m_bMatFilter);
+					                                     m_Color::m_bMatFilter);
 				               },
 				               nullptr,
 				               [](std::string& str)

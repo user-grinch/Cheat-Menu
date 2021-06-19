@@ -1,22 +1,21 @@
 #pragma once
-class CAnimation
+class Animation
 {
 private:
-	inline static char m_nAnimBuffer[INPUT_BUFFER_SIZE] = "";
+	inline static char m_nAnimBuffer[INPUT_BUFFER_SIZE];
 	inline static SSearchData m_AnimData{ "animation" };
-	static struct
+	struct m_Cutscene
 	{
 		inline static SSearchData m_Data{ "cutscene" };
-		inline static std::string m_SceneName = "";
-		inline static int m_nInterior = 0;
-		inline static bool m_bRunning = false;
-	} m_Cutscene;
-	inline static int m_nFightingStyle = 0;
-	inline static char m_nIfpBuffer[INPUT_BUFFER_SIZE] = "";
-	inline static bool m_Loop = false;
-	inline static bool m_bSecondary = false;
+		inline static std::string m_SceneName;
+		inline static int m_nInterior;
+		inline static bool m_bRunning;
+	};
+	inline static int m_nFightingStyle;
+	inline static char m_nIfpBuffer[INPUT_BUFFER_SIZE];
+	inline static bool m_Loop;
+	inline static bool m_bSecondary;
 	inline static std::string m_nWalkingStyle = "default";
-
 	inline static std::vector<std::string> m_FightingStyleList = {"Default", "Boxing", "Kung fu", "Kick Boxing", "Punch Kick"};
 	inline static std::vector<std::string> m_WalkingStyleList = 
 	{
@@ -26,7 +25,7 @@ private:
 	};
 
 protected:
-	CAnimation();
+	Animation();
 
 public:
 	static void Draw();

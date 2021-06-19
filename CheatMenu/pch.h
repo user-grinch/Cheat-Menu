@@ -80,7 +80,7 @@ struct Globals
 	inline static std::string m_HeaderId;
 	inline static ImVec2 m_fMenuSize = ImVec2(screen::GetScreenWidth() / 4, screen::GetScreenHeight() / 1.2);
 	inline static ImVec2 m_fScreenSize = ImVec2(-1, -1);
-	inline static bool m_bShowMenu;
+	inline static bool m_bShowMenu = false;
 	inline static bool m_bInit;
 	inline static Renderer renderer = Render_Unknown;
 	inline static void* device;

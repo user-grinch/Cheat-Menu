@@ -1,5 +1,5 @@
 #pragma once
-class CGame
+class Game
 {
 public:
 	inline static SSearchData m_MissionData{"mission"};
@@ -7,15 +7,15 @@ public:
 	{
 		"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
 	};
-	static struct
+	struct m_RandomCheats
 	{
 		inline static bool m_bEnabled;
 		inline static std::string m_EnabledCheats[92][2];
 		inline static int m_nInterval = 10;
 		inline static CJson m_Json = CJson("cheat name");
 		inline static uint m_nTimer;
-	} m_RandomCheats;
-	static struct 
+	};
+	struct m_Freecam
 	{
 		inline static bool m_bEnabled;
 		inline static float m_fSpeed = 0.08f;
@@ -25,15 +25,15 @@ public:
 		inline static int m_nPed = -1;
 		inline static CVector m_fMouse;
 		inline static CVector m_fTotalMouse;
-	} m_Freecam;
-	static struct 
+	};
+	struct m_HardMode
 	{
 		inline static bool m_bEnabled;
 		inline static float m_fBacHealth = 0.0f;
 		inline static float m_fBacMaxHealth = 0.0f;
 		inline static float m_fBacArmour = 0.0f;
 		inline static float m_fBacStamina = 0.0f;
-	} m_HardMode;
+	};
 	inline static bool m_bDisableCheats;
 	inline static bool m_bDisableReplay;
 	inline static bool m_bForbiddenArea = true;
@@ -49,7 +49,7 @@ public:
 
 	inline static SSearchData m_StatData{ "stat" };
 
-	CGame();
+	Game();
 	static void Draw();
 	static void FreeCam();
 	static void ClearFreecamStuff();

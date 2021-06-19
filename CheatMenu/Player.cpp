@@ -23,22 +23,22 @@ Player::Player()
 	// Custom skins setup
 	if (GetModuleHandle("modloader.asi"))
 	{
-		if (fs::is_directory(m_CustomSkins.m_Path))
+		if (fs::is_directory(m_CustomSkins::m_Path))
 		{
-			for (auto& p : fs::recursive_directory_iterator(m_CustomSkins.m_Path))
+			for (auto& p : fs::recursive_directory_iterator(m_CustomSkins::m_Path))
 			{
 				if (p.path().extension() == ".dff")
 				{
 					std::string file_name = p.path().stem().string();
 
 					if (file_name.size() < 9)
-						m_CustomSkins.m_List.push_back(file_name);
+						m_CustomSkins::m_List.push_back(file_name);
 					else
 						flog << "Custom Skin longer than 8 characters " << file_name << std::endl;
 				}
 			}
 		}
-		else fs::create_directory(m_CustomSkins.m_Path);
+		else fs::create_directory(m_CustomSkins::m_Path);
 
 		m_bModloaderInstalled = true;
 	}
@@ -55,21 +55,21 @@ Player::Player()
 			m_bImagesLoaded = true;
 		}
 
-		if (m_KeepPosition.m_bEnabled)
+		if (m_KeepPosition::m_bEnabled)
 		{
 			if (!player->IsAlive())
 			{
-				m_KeepPosition.m_fPos = player->GetPosition();
+				m_KeepPosition::m_fPos = player->GetPosition();
 			}
 			else
 			{
 				CVector cur_pos = player->GetPosition();
 
-				if (m_KeepPosition.m_fPos.x != 0 && m_KeepPosition.m_fPos.x != cur_pos.x
-					&& m_KeepPosition.m_fPos.y != 0 && m_KeepPosition.m_fPos.y != cur_pos.y)
+				if (m_KeepPosition::m_fPos.x != 0 && m_KeepPosition::m_fPos.x != cur_pos.x
+					&& m_KeepPosition::m_fPos.y != 0 && m_KeepPosition::m_fPos.y != cur_pos.y)
 				{
-					player->Teleport(m_KeepPosition.m_fPos, false);
-					m_KeepPosition.m_fPos = CVector(0, 0, 0);
+					player->Teleport(m_KeepPosition::m_fPos, false);
+					m_KeepPosition::m_fPos = CVector(0, 0, 0);
 				}
 			}
 		}
@@ -84,7 +84,7 @@ Player::Player()
 			player->m_nPhysicalFlags.bMeeleProof = 1;
 		}
 
-		if (m_bAimSkinChanger && Ui::HotKeyPressed(Menu::m_HotKeys.aimSkinChanger))
+		if (m_bAimSkinChanger && Ui::HotKeyPressed(Menu::m_HotKeys::aimSkinChanger))
 		{
 			CPed* target_ped = player->m_pPlayerTargettedPed;
 			if (target_ped)
@@ -94,7 +94,7 @@ Player::Player()
 			}
 		}
 
-		if (Ui::HotKeyPressed(Menu::m_HotKeys.godMode))
+		if (Ui::HotKeyPressed(Menu::m_HotKeys::godMode))
 		{
 			if (m_bGodMode)
 			{
@@ -162,8 +162,8 @@ void Player::ChangePlayerCloth(std::string& name)
 
 void Player::ChangePlayerModel(std::string& model)
 {
-	bool custom_skin = std::find(m_CustomSkins.m_List.begin(), m_CustomSkins.m_List.end(), model) !=
-		m_CustomSkins.m_List.end();
+	bool custom_skin = std::find(m_CustomSkins::m_List.begin(), m_CustomSkins::m_List.end(), model) !=
+		m_CustomSkins::m_List.end();
 	if (Ped::m_PedData.m_Json.m_Data.contains(model) || custom_skin)
 	{
 		CPlayerPed* player = FindPlayerPed();
@@ -243,7 +243,7 @@ void Player::Draw()
 
 			ImGui::NextColumn();
 
-			Ui::CheckboxWithHint("Keep position", &m_KeepPosition.m_bEnabled, "Teleport to the position you died from");
+			Ui::CheckboxWithHint("Keep position", &m_KeepPosition::m_bEnabled, "Teleport to the position you died from");
 			if (Ui::CheckboxBitFlag("Lock control", pad->bPlayerSafe))
 				pad->bPlayerSafe = (pad->bPlayerSafe == 1) ? 0 : 1;
 
@@ -354,8 +354,8 @@ void Player::Draw()
 		{
 			ImGui::Spacing();
 			if (Ui::CheckboxWithHint("Aim skin changer", &m_bAimSkinChanger,
-			                         (("Activate using Aim ped + ") + Ui::GetHotKeyNameString(
-				                         Menu::m_HotKeys.aimSkinChanger)).c_str()))
+			                         (("Changes to the ped, player is targeting with a weapon.\nTo use aim a ped with a weapon and press ")
+										+ Ui::GetHotKeyNameString(Menu::m_HotKeys::aimSkinChanger)).c_str()))
 				config.SetValue("aim_skin_changer", m_bAimSkinChanger);
 
 			if (ImGui::BeginTabBar("AppearanceTabBar"))
@@ -418,16 +418,16 @@ void Player::Draw()
 					if (m_bModloaderInstalled)
 					{
 						Ui::FilterWithHint("Search", m_ClothData.m_Filter,
-						                   std::string("Total skins: " + std::to_string(m_CustomSkins.m_List.size()))
+						                   std::string("Total skins: " + std::to_string(m_CustomSkins::m_List.size()))
 						                   .c_str());
 						Ui::ShowTooltip("Place your dff & txd files inside 'modloader/Custom Skins'");
 						ImGui::Spacing();
 						ImGui::TextWrapped(
 							"Note: Your txd & dff names can't exceed 8 characters. Don't change names while the game is running.");
 						ImGui::Spacing();
-						for (std::string name : m_CustomSkins.m_List)
+						for (std::string name : m_CustomSkins::m_List)
 						{
-							if (m_CustomSkins.m_Filter.PassFilter(name.c_str()))
+							if (m_CustomSkins::m_Filter.PassFilter(name.c_str()))
 							{
 								if (ImGui::MenuItem(name.c_str()))
 								{

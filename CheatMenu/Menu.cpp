@@ -12,81 +12,81 @@ Menu::Menu()
 {
 	// TODO: use structs
 	// Load config data
-	m_Overlay.bCoord = config.GetValue("overlay.bCoord", false);
-	m_Overlay.bCpuUsage = config.GetValue("overlay.bCpuUsage", false);
-	m_Overlay.bFPS = config.GetValue("overlay.bFPS", false);
-	m_Overlay.bLocName = config.GetValue("overlay.bLocName", false);
-	m_Overlay.bTransparent = config.GetValue("overlay.bTransparent", false);
-	m_Overlay.bMemUsage = config.GetValue("overlay.bMemUsage", false);
-	m_Overlay.bVehHealth = config.GetValue("overlay.bVehHealth", false);
-	m_Overlay.bVehSpeed = config.GetValue("overlay.bVehSpeed", false);
-	m_Overlay.mSelectedPos = (DISPLAY_POS)config.GetValue("overlay.mSelectedPos", (int)DISPLAY_POS::BOTTOM_RIGHT);
-	m_Overlay.fPosX = config.GetValue("overlay.fPosX", 0);
-	m_Overlay.fPosY = config.GetValue("overlay.fPosY", 0);
+	m_Overlay::bCoord = config.GetValue("overlay.bCoord", false);
+	m_Overlay::bCpuUsage = config.GetValue("overlay.bCpuUsage", false);
+	m_Overlay::bFPS = config.GetValue("overlay.bFPS", false);
+	m_Overlay::bLocName = config.GetValue("overlay.bLocName", false);
+	m_Overlay::bTransparent = config.GetValue("overlay.bTransparent", false);
+	m_Overlay::bMemUsage = config.GetValue("overlay.bMemUsage", false);
+	m_Overlay::bVehHealth = config.GetValue("overlay.bVehHealth", false);
+	m_Overlay::bVehSpeed = config.GetValue("overlay.bVehSpeed", false);
+	m_Overlay::mSelectedPos = (DISPLAY_POS)config.GetValue("overlay.mSelectedPos", (int)DISPLAY_POS::BOTTOM_RIGHT);
+	m_Overlay::fPosX = config.GetValue("overlay.fPosX", 0);
+	m_Overlay::fPosY = config.GetValue("overlay.fPosY", 0);
 
 	// Hotkeys
-	m_HotKeys.aimSkinChanger.m_key1 = config.GetValue("hotkey.aim_skin_changer.key1", VK_RETURN);
-	m_HotKeys.aimSkinChanger.m_key2 = config.GetValue("hotkey.aim_skin_changer.key2", VK_RETURN);
+	m_HotKeys::aimSkinChanger.m_key1 = config.GetValue("hotkey.aim_skin_changer.key1", VK_RETURN);
+	m_HotKeys::aimSkinChanger.m_key2 = config.GetValue("hotkey.aim_skin_changer.key2", VK_RETURN);
 
-	m_HotKeys.freeCam.m_key1 = config.GetValue("hotkey.freecam.key1", VK_F6);
-	m_HotKeys.freeCam.m_key2 = config.GetValue("hotkey.freecam.key2", VK_F6);
+	m_HotKeys::freeCam.m_key1 = config.GetValue("hotkey.freecam.key1", VK_F6);
+	m_HotKeys::freeCam.m_key2 = config.GetValue("hotkey.freecam.key2", VK_F6);
 
-	m_HotKeys.quickSceenShot.m_key1 = config.GetValue("hotkey.quick_screenshot.key1", VK_F5);
-	m_HotKeys.quickSceenShot.m_key2 = config.GetValue("hotkey.quick_screenshot.key2", VK_F5);
+	m_HotKeys::quickSceenShot.m_key1 = config.GetValue("hotkey.quick_screenshot.key1", VK_F5);
+	m_HotKeys::quickSceenShot.m_key2 = config.GetValue("hotkey.quick_screenshot.key2", VK_F5);
 
-	m_HotKeys.quickTeleport.m_key1 = config.GetValue("hotkey.quick_tp.key1", VK_KEY_X);
-	m_HotKeys.quickTeleport.m_key2 = config.GetValue("hotkey.quick_tp.key2", VK_KEY_Y);
+	m_HotKeys::quickTeleport.m_key1 = config.GetValue("hotkey.quick_tp.key1", VK_KEY_X);
+	m_HotKeys::quickTeleport.m_key2 = config.GetValue("hotkey.quick_tp.key2", VK_KEY_Y);
 
-	m_HotKeys.menuOpen.m_key1 = config.GetValue("hotkey.menu_open.key1", VK_LCONTROL);
-	m_HotKeys.menuOpen.m_key2 = config.GetValue("hotkey.menu_open.key2", VK_KEY_M);
+	m_HotKeys::menuOpen.m_key1 = VK_LCONTROL; config.GetValue("hotkey.menu_open.key1", VK_LCONTROL);
+	m_HotKeys::menuOpen.m_key2 = VK_KEY_M; config.GetValue("hotkey.menu_open.key2", VK_KEY_M);
 
-	m_HotKeys.commandWindow.m_key1 = config.GetValue("hotkey.command_window.key1", VK_LMENU);
-	m_HotKeys.commandWindow.m_key2 = config.GetValue("hotkey.command_window.key2", VK_KEY_C);
+	m_HotKeys::commandWindow.m_key1 = config.GetValue("hotkey.command_window.key1", VK_LMENU);
+	m_HotKeys::commandWindow.m_key2 = config.GetValue("hotkey.command_window.key2", VK_KEY_C);
 
-	m_HotKeys.flipVeh.m_key1 = config.GetValue("hotkey.flip_veh.key1", VK_NONE);
-	m_HotKeys.flipVeh.m_key2 = config.GetValue("hotkey.flip_veh.key2", VK_NONE);
+	m_HotKeys::flipVeh.m_key1 = config.GetValue("hotkey.flip_veh.key1", VK_NONE);
+	m_HotKeys::flipVeh.m_key2 = config.GetValue("hotkey.flip_veh.key2", VK_NONE);
 
-	m_HotKeys.fixVeh.m_key1 = config.GetValue("hotkey.fix_veh.key1", VK_NONE);
-	m_HotKeys.fixVeh.m_key2 = config.GetValue("hotkey.fix_veh.key2", VK_NONE);
+	m_HotKeys::fixVeh.m_key1 = config.GetValue("hotkey.fix_veh.key1", VK_NONE);
+	m_HotKeys::fixVeh.m_key2 = config.GetValue("hotkey.fix_veh.key2", VK_NONE);
 
-	m_HotKeys.godMode.m_key1 = config.GetValue("hotkey.god_mode.key1", VK_NONE);
-	m_HotKeys.godMode.m_key2 = config.GetValue("hotkey.god_mode.key2", VK_NONE);
+	m_HotKeys::godMode.m_key1 = config.GetValue("hotkey.god_mode.key1", VK_NONE);
+	m_HotKeys::godMode.m_key2 = config.GetValue("hotkey.god_mode.key2", VK_NONE);
 
-	m_HotKeys.vehEngine.m_key1 = config.GetValue("hotkey.veh_engine.key1", VK_NONE);
-	m_HotKeys.vehEngine.m_key2 = config.GetValue("hotkey.veh_engine.key2", VK_NONE);
+	m_HotKeys::vehEngine.m_key1 = config.GetValue("hotkey.veh_engine.key1", VK_NONE);
+	m_HotKeys::vehEngine.m_key2 = config.GetValue("hotkey.veh_engine.key2", VK_NONE);
 
-	m_HotKeys.vehInstantStart.m_key1 = config.GetValue("hotkey.veh_instant_start.key1", VK_NONE);
-	m_HotKeys.vehInstantStart.m_key2 = config.GetValue("hotkey.veh_instant_start.key2", VK_NONE);
+	m_HotKeys::vehInstantStart.m_key1 = config.GetValue("hotkey.veh_instant_start.key1", VK_NONE);
+	m_HotKeys::vehInstantStart.m_key2 = config.GetValue("hotkey.veh_instant_start.key2", VK_NONE);
 
-	m_HotKeys.vehInstantStop.m_key1 = config.GetValue("hotkey.veh_instant_stop.key1", VK_NONE);
-	m_HotKeys.vehInstantStop.m_key2 = config.GetValue("hotkey.veh_instant_stop.key2", VK_NONE);
+	m_HotKeys::vehInstantStop.m_key1 = config.GetValue("hotkey.veh_instant_stop.key1", VK_NONE);
+	m_HotKeys::vehInstantStop.m_key2 = config.GetValue("hotkey.veh_instant_stop.key2", VK_NONE);
 
 	Util::GetCPUUsageInit();
 	MEMORYSTATUSEX memInfo;
 	memInfo.dwLength = sizeof(MEMORYSTATUSEX);
 	GlobalMemoryStatusEx(&memInfo);
 
-	m_Overlay.mTotalRam = static_cast<int>(memInfo.ullTotalPhys * 1e-6); // Bytes -> MegaBytes
+	m_Overlay::mTotalRam = static_cast<int>(memInfo.ullTotalPhys * 1e-6); // Bytes -> MegaBytes
 }
 
 void Menu::DrawOverlay()
 {
 	CPlayerPed* player = FindPlayerPed();
-	bool m_bShowMenu = m_Overlay.bCoord || m_Overlay.bFPS || m_Overlay.bLocName || m_Overlay.bCpuUsage || m_Overlay.bMemUsage ||
-		((m_Overlay.bVehHealth || m_Overlay.bVehSpeed) && player->m_pVehicle && player->m_pVehicle->IsDriver(player));
+	bool m_bShowMenu = m_Overlay::bCoord || m_Overlay::bFPS || m_Overlay::bLocName || m_Overlay::bCpuUsage || m_Overlay::bMemUsage ||
+		((m_Overlay::bVehHealth || m_Overlay::bVehSpeed) && player->m_pVehicle && player->m_pVehicle->IsDriver(player));
 
 	const float offset = 10.0f;
 	ImGuiIO& io = ImGui::GetIO();
 	ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize |
 		ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
 
-	if (m_Overlay.mSelectedPos == DISPLAY_POS::CUSTOM)
+	if (m_Overlay::mSelectedPos == DISPLAY_POS::CUSTOM)
 	{
-		if (m_Overlay.fPosX != NULL && m_Overlay.fPosY != NULL)
+		if (m_Overlay::fPosX != NULL && m_Overlay::fPosY != NULL)
 		{
-			config.SetValue("overlay.fPosX", m_Overlay.fPosX);
-			config.SetValue("overlay.fPosY", m_Overlay.fPosY);
-			ImGui::SetNextWindowPos(ImVec2(m_Overlay.fPosX, m_Overlay.fPosY), ImGuiCond_Once);
+			config.SetValue("overlay.fPosX", m_Overlay::fPosX);
+			config.SetValue("overlay.fPosY", m_Overlay::fPosY);
+			ImGui::SetNextWindowPos(ImVec2(m_Overlay::fPosX, m_Overlay::fPosY), ImGuiCond_Once);
 		}
 	}
 	else
@@ -94,25 +94,25 @@ void Menu::DrawOverlay()
 		window_flags |= ImGuiWindowFlags_NoMove;
 		ImVec2 pos, pivot;
 
-		if (m_Overlay.mSelectedPos == DISPLAY_POS::TOP_LEFT)
+		if (m_Overlay::mSelectedPos == DISPLAY_POS::TOP_LEFT)
 		{
 			pos = ImVec2(offset, offset);
 			pivot = ImVec2(0.0f, 0.0f);
 		}
 
-		if (m_Overlay.mSelectedPos == DISPLAY_POS::TOP_RIGHT)
+		if (m_Overlay::mSelectedPos == DISPLAY_POS::TOP_RIGHT)
 		{
 			pos = ImVec2(io.DisplaySize.x - offset, offset);
 			pivot = ImVec2(1.0f, 0.0f);
 		}
 
-		if (m_Overlay.mSelectedPos == DISPLAY_POS::BOTTOM_LEFT)
+		if (m_Overlay::mSelectedPos == DISPLAY_POS::BOTTOM_LEFT)
 		{
 			pos = ImVec2(offset, io.DisplaySize.y - offset);
 			pivot = ImVec2(0.0f, 1.0f);
 		}
 
-		if (m_Overlay.mSelectedPos == DISPLAY_POS::BOTTOM_RIGHT)
+		if (m_Overlay::mSelectedPos == DISPLAY_POS::BOTTOM_RIGHT)
 		{
 			pos = ImVec2(io.DisplaySize.x - offset, io.DisplaySize.y - offset);
 			pivot = ImVec2(1.0f, 1.0f);
@@ -121,7 +121,7 @@ void Menu::DrawOverlay()
 		ImGui::SetNextWindowPos(pos, ImGuiCond_Always, pivot);
 	}
 
-	ImGui::SetNextWindowBgAlpha(m_Overlay.bTransparent ? 0.0f : 0.5f);
+	ImGui::SetNextWindowBgAlpha(m_Overlay::bTransparent ? 0.0f : 0.5f);
 
 	if (m_bShowMenu && ImGui::Begin("Overlay", nullptr, window_flags))
 	{
@@ -129,47 +129,47 @@ void Menu::DrawOverlay()
 		CVector pos = player->GetPosition();
 		size_t game_ms = CTimer::m_snTimeInMilliseconds;
 
-		if (game_ms - m_Overlay.mLastInterval > m_Overlay.mInterval)
+		if (game_ms - m_Overlay::mLastInterval > m_Overlay::mInterval)
 		{
-			m_Overlay.fCpuUsage = static_cast<float>(Util::GetCurrentCPUUsage());
+			m_Overlay::fCpuUsage = static_cast<float>(Util::GetCurrentCPUUsage());
 
 			MEMORYSTATUSEX memInfo;
 			memInfo.dwLength = sizeof(MEMORYSTATUSEX);
 			GlobalMemoryStatusEx(&memInfo);
 			int mUsedRam = static_cast<int>((memInfo.ullTotalPhys - memInfo.ullAvailPhys) * 1e-6);
-			m_Overlay.fMemUsage = 100.0f * (static_cast<float>(mUsedRam) / static_cast<float>(m_Overlay.mTotalRam));
-			m_Overlay.mFPS = static_cast<size_t>(CTimer::game_FPS);
+			m_Overlay::fMemUsage = 100.0f * (static_cast<float>(mUsedRam) / static_cast<float>(m_Overlay::mTotalRam));
+			m_Overlay::mFPS = static_cast<size_t>(CTimer::game_FPS);
 
-			m_Overlay.mLastInterval = game_ms;
+			m_Overlay::mLastInterval = game_ms;
 		}
 
-		if (m_Overlay.bCoord)
+		if (m_Overlay::bCoord)
 			ImGui::Text("Coord: %.2f, %.2f, %.2f", pos.x, pos.y, pos.z);
 
-		if (m_Overlay.bCpuUsage)
-			ImGui::Text("CPU usage: %.2f%%", m_Overlay.fCpuUsage);
+		if (m_Overlay::bCpuUsage)
+			ImGui::Text("CPU usage: %.2f%%", m_Overlay::fCpuUsage);
 
-		if (m_Overlay.bFPS)
-			ImGui::Text("Frames: %d", m_Overlay.mFPS);
+		if (m_Overlay::bFPS)
+			ImGui::Text("Frames: %d", m_Overlay::mFPS);
 
-		if (m_Overlay.bLocName)
+		if (m_Overlay::bLocName)
 			ImGui::Text("Location: %s", Util::GetLocationName(&pos).c_str());
 
-		if (m_Overlay.bMemUsage)
-			ImGui::Text("RAM usage: %.2f%%", m_Overlay.fMemUsage);
+		if (m_Overlay::bMemUsage)
+			ImGui::Text("RAM usage: %.2f%%", m_Overlay::fMemUsage);
 
 		if (player->m_pVehicle && player->m_pVehicle->IsDriver(player))
 		{
-			if (m_Overlay.bVehHealth)
+			if (m_Overlay::bVehHealth)
 				ImGui::Text("Veh Health: %.f", player->m_pVehicle->m_fHealth);
 
-			if (m_Overlay.bVehSpeed)
+			if (m_Overlay::bVehSpeed)
 				ImGui::Text("Veh Speed: %d", int(player->m_pVehicle->m_vecMoveSpeed.Magnitude()) * 50); // 02E3 - GET_CAR_SPEED
 		}
 
 		ImVec2 windowPos = ImGui::GetWindowPos();
-		m_Overlay.fPosX = windowPos.x;
-		m_Overlay.fPosY = windowPos.y;
+		m_Overlay::fPosX = windowPos.x;
+		m_Overlay::fPosY = windowPos.y;
 
 		ImGui::End();
 	}
@@ -195,12 +195,12 @@ void Menu::DrawShortcutsWindow()
 		ImGui::SetNextItemWidth(resX);
 		ImGui::SetKeyboardFocusHere(-1);
 
-		if (ImGui::InputTextWithHint("##TEXTFIELD", "Enter command", m_Commands.m_nInputBuffer, INPUT_BUFFER_SIZE,
+		if (ImGui::InputTextWithHint("##TEXTFIELD", "Enter command", m_Commands::m_nInputBuffer, INPUT_BUFFER_SIZE,
 		                             ImGuiInputTextFlags_EnterReturnsTrue))
 		{
 			ProcessCommands();
-			m_Commands.m_bShowMenu = false;
-			strcpy(m_Commands.m_nInputBuffer, "");
+			m_Commands::m_bShowMenu = false;
+			strcpy(m_Commands::m_nInputBuffer, "");
 		}
 
 		ImGui::PopStyleVar(2);
@@ -210,7 +210,7 @@ void Menu::DrawShortcutsWindow()
 
 void Menu::ProcessCommands()
 {
-	std::stringstream ss(m_Commands.m_nInputBuffer);
+	std::stringstream ss(m_Commands::m_nInputBuffer);
 
 	std::string command;
 	ss >> command;
@@ -324,37 +324,37 @@ void Menu::Draw()
 			ImGui::Spacing();
 			ImGui::Spacing();
 			ImGui::SameLine();
-			if (Ui::ListBox("Overlay", m_Overlay.posNames, (int&)m_Overlay.mSelectedPos))
-				config.SetValue("overlay.mSelectedPos", m_Overlay.mSelectedPos);
+			if (Ui::ListBox("Overlay", m_Overlay::posNames, (int&)m_Overlay::mSelectedPos))
+				config.SetValue("overlay.mSelectedPos", m_Overlay::mSelectedPos);
 
 			ImGui::Spacing();
 
 			ImGui::Columns(2, nullptr, false);
-			if (ImGui::Checkbox("No background", &m_Overlay.bTransparent))
-				config.SetValue("overlay.bTransparent", m_Overlay.bTransparent);
+			if (ImGui::Checkbox("No background", &m_Overlay::bTransparent))
+				config.SetValue("overlay.bTransparent", m_Overlay::bTransparent);
 
-			if (ImGui::Checkbox("Show coordinates", &m_Overlay.bCoord))
-				config.SetValue("overlay.bCoord", m_Overlay.bCoord);
+			if (ImGui::Checkbox("Show coordinates", &m_Overlay::bCoord))
+				config.SetValue("overlay.bCoord", m_Overlay::bCoord);
 
-			if (ImGui::Checkbox("Show CPU usage", &m_Overlay.bCpuUsage))
-				config.SetValue("overlay.bCpuUsage", m_Overlay.bCpuUsage);
+			if (ImGui::Checkbox("Show CPU usage", &m_Overlay::bCpuUsage))
+				config.SetValue("overlay.bCpuUsage", m_Overlay::bCpuUsage);
 
-			if (ImGui::Checkbox("Show FPS", &m_Overlay.bFPS))
-				config.SetValue("overlay.bFPS", m_Overlay.bFPS);
+			if (ImGui::Checkbox("Show FPS", &m_Overlay::bFPS))
+				config.SetValue("overlay.bFPS", m_Overlay::bFPS);
 
 			ImGui::NextColumn();
 
-			if (ImGui::Checkbox("Show location", &m_Overlay.bLocName))
-				config.SetValue("overlay.bLocName", m_Overlay.bLocName);
+			if (ImGui::Checkbox("Show location", &m_Overlay::bLocName))
+				config.SetValue("overlay.bLocName", m_Overlay::bLocName);
 
-			if (ImGui::Checkbox("Show RAM usage", &m_Overlay.bMemUsage))
-				config.SetValue("overlay.bMemUsage", m_Overlay.bMemUsage);
+			if (ImGui::Checkbox("Show RAM usage", &m_Overlay::bMemUsage))
+				config.SetValue("overlay.bMemUsage", m_Overlay::bMemUsage);
 
-			if (ImGui::Checkbox("Show veh health", &m_Overlay.bVehHealth))
-				config.SetValue("overlay.bVehHealth", m_Overlay.bVehHealth);
+			if (ImGui::Checkbox("Show veh health", &m_Overlay::bVehHealth))
+				config.SetValue("overlay.bVehHealth", m_Overlay::bVehHealth);
 
-			if (ImGui::Checkbox("Show veh speed", &m_Overlay.bVehSpeed))
-				config.SetValue("overlay.bVehSpeed", m_Overlay.bVehSpeed);
+			if (ImGui::Checkbox("Show veh speed", &m_Overlay::bVehSpeed))
+				config.SetValue("overlay.bVehSpeed", m_Overlay::bVehSpeed);
 
 			ImGui::Columns(1);
 
@@ -368,76 +368,76 @@ void Menu::Draw()
 				"\nRight click disables hotkey.");
 			ImGui::Spacing();
 			ImGui::BeginChild("Hotkeys");
-			if (Ui::HotKey("Open/ close cheat menu", m_HotKeys.menuOpen))
+			if (Ui::HotKey("Open/ close cheat menu", m_HotKeys::menuOpen))
 			{
-				config.SetValue("hotkey.menu_open.key1", m_HotKeys.menuOpen.m_key1);
-				config.SetValue("hotkey.menu_open.key2", m_HotKeys.menuOpen.m_key2);
+				config.SetValue("hotkey.menu_open.key1", m_HotKeys::menuOpen.m_key1);
+				config.SetValue("hotkey.menu_open.key2", m_HotKeys::menuOpen.m_key2);
 			}
-			if (Ui::HotKey("Open/ close command window", m_HotKeys.commandWindow))
+			if (Ui::HotKey("Open/ close command window", m_HotKeys::commandWindow))
 			{
-				config.SetValue("hotkey.command_window.key1", m_HotKeys.commandWindow.m_key1);
-				config.SetValue("hotkey.command_window.key2", m_HotKeys.commandWindow.m_key2);
-			}
-
-			ImGui::Dummy(ImVec2(0, 10));
-
-			if (Ui::HotKey("Activate aim skin changer", m_HotKeys.aimSkinChanger))
-			{
-				config.SetValue("hotkey.aim_skin_changer.key1", m_HotKeys.aimSkinChanger.m_key1);
-				config.SetValue("hotkey.aim_skin_changer.key2", m_HotKeys.aimSkinChanger.m_key2);
-			}
-			if (Ui::HotKey("Freecam", m_HotKeys.freeCam))
-			{
-				config.SetValue("hotkey.freecam.key1", m_HotKeys.freeCam.m_key1);
-				config.SetValue("hotkey.freecam.key2", m_HotKeys.freeCam.m_key2);
-			}
-			if (Ui::HotKey("Take quick screenshot", m_HotKeys.quickSceenShot))
-			{
-				config.SetValue("hotkey.quick_screenshot.key1", m_HotKeys.quickSceenShot.m_key1);
-				config.SetValue("hotkey.quick_screenshot.key2", m_HotKeys.quickSceenShot.m_key2);
-			}
-			if (Ui::HotKey("Toggle quick teleport", m_HotKeys.quickTeleport))
-			{
-				config.SetValue("hotkey.quick_tp.key1", m_HotKeys.quickTeleport.m_key1);
-				config.SetValue("hotkey.quick_tp.key2", m_HotKeys.quickTeleport.m_key2);
+				config.SetValue("hotkey.command_window.key1", m_HotKeys::commandWindow.m_key1);
+				config.SetValue("hotkey.command_window.key2", m_HotKeys::commandWindow.m_key2);
 			}
 
 			ImGui::Dummy(ImVec2(0, 10));
 
-			if (Ui::HotKey("Fix current vehicle", m_HotKeys.fixVeh))
+			if (Ui::HotKey("Activate aim skin changer", m_HotKeys::aimSkinChanger))
 			{
-				config.SetValue("hotkey.fix_veh.key1", m_HotKeys.fixVeh.m_key1);
-				config.SetValue("hotkey.fix_veh.key2", m_HotKeys.fixVeh.m_key2);
+				config.SetValue("hotkey.aim_skin_changer.key1", m_HotKeys::aimSkinChanger.m_key1);
+				config.SetValue("hotkey.aim_skin_changer.key2", m_HotKeys::aimSkinChanger.m_key2);
+			}
+			if (Ui::HotKey("Freecam", m_HotKeys::freeCam))
+			{
+				config.SetValue("hotkey.freecam.key1", m_HotKeys::freeCam.m_key1);
+				config.SetValue("hotkey.freecam.key2", m_HotKeys::freeCam.m_key2);
+			}
+			if (Ui::HotKey("Take quick screenshot", m_HotKeys::quickSceenShot))
+			{
+				config.SetValue("hotkey.quick_screenshot.key1", m_HotKeys::quickSceenShot.m_key1);
+				config.SetValue("hotkey.quick_screenshot.key2", m_HotKeys::quickSceenShot.m_key2);
+			}
+			if (Ui::HotKey("Toggle quick teleport", m_HotKeys::quickTeleport))
+			{
+				config.SetValue("hotkey.quick_tp.key1", m_HotKeys::quickTeleport.m_key1);
+				config.SetValue("hotkey.quick_tp.key2", m_HotKeys::quickTeleport.m_key2);
 			}
 
-			if (Ui::HotKey("Flip current vehicle", m_HotKeys.flipVeh))
+			ImGui::Dummy(ImVec2(0, 10));
+
+			if (Ui::HotKey("Fix current vehicle", m_HotKeys::fixVeh))
 			{
-				config.SetValue("hotkey.flip_veh.key1", m_HotKeys.flipVeh.m_key1);
-				config.SetValue("hotkey.flip_veh.key2", m_HotKeys.flipVeh.m_key2);
+				config.SetValue("hotkey.fix_veh.key1", m_HotKeys::fixVeh.m_key1);
+				config.SetValue("hotkey.fix_veh.key2", m_HotKeys::fixVeh.m_key2);
 			}
 
-			if (Ui::HotKey("Toggle god mode", m_HotKeys.godMode))
+			if (Ui::HotKey("Flip current vehicle", m_HotKeys::flipVeh))
 			{
-				config.SetValue("hotkey.god_mode.key1", m_HotKeys.godMode.m_key1);
-				config.SetValue("hotkey.god_mode.key2", m_HotKeys.godMode.m_key2);
+				config.SetValue("hotkey.flip_veh.key1", m_HotKeys::flipVeh.m_key1);
+				config.SetValue("hotkey.flip_veh.key2", m_HotKeys::flipVeh.m_key2);
 			}
 
-			if (Ui::HotKey("Toggle veh engine", m_HotKeys.vehEngine))
+			if (Ui::HotKey("Toggle god mode", m_HotKeys::godMode))
 			{
-				config.SetValue("hotkey.veh_engine.key1", m_HotKeys.vehEngine.m_key1);
-				config.SetValue("hotkey.veh_engine.key2", m_HotKeys.vehEngine.m_key2);
+				config.SetValue("hotkey.god_mode.key1", m_HotKeys::godMode.m_key1);
+				config.SetValue("hotkey.god_mode.key2", m_HotKeys::godMode.m_key2);
 			}
 
-			if (Ui::HotKey("Vehicle instant start", m_HotKeys.vehInstantStart))
+			if (Ui::HotKey("Toggle veh engine", m_HotKeys::vehEngine))
 			{
-				config.SetValue("hotkey.veh_instant_start.key1", m_HotKeys.vehInstantStart.m_key1);
-				config.SetValue("hotkey.veh_instant_start.key2", m_HotKeys.vehInstantStart.m_key2);
+				config.SetValue("hotkey.veh_engine.key1", m_HotKeys::vehEngine.m_key1);
+				config.SetValue("hotkey.veh_engine.key2", m_HotKeys::vehEngine.m_key2);
 			}
 
-			if (Ui::HotKey("Vehicle instant stop", m_HotKeys.vehInstantStop))
+			if (Ui::HotKey("Vehicle instant start", m_HotKeys::vehInstantStart))
 			{
-				config.SetValue("hotkey.veh_instant_stop.key1", m_HotKeys.vehInstantStop.m_key1);
-				config.SetValue("hotkey.veh_instant_stop.key2", m_HotKeys.vehInstantStop.m_key2);
+				config.SetValue("hotkey.veh_instant_start.key1", m_HotKeys::vehInstantStart.m_key1);
+				config.SetValue("hotkey.veh_instant_start.key2", m_HotKeys::vehInstantStart.m_key2);
+			}
+
+			if (Ui::HotKey("Vehicle instant stop", m_HotKeys::vehInstantStop))
+			{
+				config.SetValue("hotkey.veh_instant_stop.key1", m_HotKeys::vehInstantStop.m_key1);
+				config.SetValue("hotkey.veh_instant_stop.key2", m_HotKeys::vehInstantStop.m_key2);
 			}
 
 			ImGui::Dummy(ImVec2(0, 10));
@@ -451,7 +451,7 @@ void Menu::Draw()
 			{
 				ImGui::TextWrapped(
 					std::string(
-						"Open or close command window using " + Ui::GetHotKeyNameString(m_HotKeys.commandWindow)).
+						"Open or close command window using " + Ui::GetHotKeyNameString(m_HotKeys::commandWindow)).
 					c_str());
 				ImGui::Spacing();
 				if (ImGui::CollapsingHeader("Set health"))

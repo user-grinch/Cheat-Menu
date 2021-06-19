@@ -13,7 +13,7 @@ private:
 		BOTTOM_RIGHT
 	};
 
-	static struct
+	struct m_Overlay
 	{
 		inline static bool bCoord = false;
 		inline static bool bFPS = false;
@@ -35,10 +35,10 @@ private:
 		inline static size_t mInterval = 1000;
 		inline static size_t mLastInterval = 0;
 		inline static int mTotalRam = 0;
-	} m_Overlay;
+	};
 
 public:
-	static struct
+	struct m_HotKeys
 	{
 		inline static HotKeyData aimSkinChanger;
 		inline static HotKeyData freeCam;
@@ -53,13 +53,13 @@ public:
 		inline static HotKeyData vehEngine;
 		inline static HotKeyData vehInstantStart;
 		inline static HotKeyData vehInstantStop;
-	} m_HotKeys;
+	};
 
-	static struct
+	struct m_Commands
 	{
 		inline static bool m_bShowMenu = false;
 		inline static char m_nInputBuffer[INPUT_BUFFER_SIZE] = "";
-	} m_Commands;
+	};
 
 	Menu();
 	static void Draw();

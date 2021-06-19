@@ -3,39 +3,39 @@
 #include "Ui.h"
 #include "Util.h"
 
-CAnimation::CAnimation()
+Animation::Animation()
 {
 	m_AnimData.m_Json.LoadData(m_AnimData.m_Categories, m_AnimData.m_Selected);
-	m_Cutscene.m_Data.m_Json.LoadData(m_Cutscene.m_Data.m_Categories, m_Cutscene.m_Data.m_Selected);
+	m_Cutscene::m_Data.m_Json.LoadData(m_Cutscene::m_Data.m_Categories, m_Cutscene::m_Data.m_Selected);
 
 	Events::processScriptsEvent += [this]
 	{
-		if (m_Cutscene.m_bRunning)
+		if (m_Cutscene::m_bRunning)
 		{
 			if (Command<Commands::HAS_CUTSCENE_FINISHED>())
 			{
 				Command<Commands::CLEAR_CUTSCENE>();
-				m_Cutscene.m_bRunning = false;
-				m_Cutscene.m_SceneName = "";
+				m_Cutscene::m_bRunning = false;
+				m_Cutscene::m_SceneName = "";
 				CPlayerPed* player = FindPlayerPed();
-				player->m_nAreaCode = m_Cutscene.m_nInterior;
+				player->m_nAreaCode = m_Cutscene::m_nInterior;
 				Command<Commands::SET_AREA_VISIBLE>(player->m_nAreaCode);
-				m_Cutscene.m_nInterior = 0;
+				m_Cutscene::m_nInterior = 0;
 				TheCamera.Fade(0, 1);
 			}
 		}
 		else
 		{
-			if (m_Cutscene.m_SceneName != "" && Command<Commands::HAS_CUTSCENE_LOADED>())
+			if (m_Cutscene::m_SceneName != "" && Command<Commands::HAS_CUTSCENE_LOADED>())
 			{
 				Command<Commands::START_CUTSCENE>();
-				m_Cutscene.m_bRunning = true;
+				m_Cutscene::m_bRunning = true;
 			}
 		}
 	};
 }
 
-void CAnimation::PlayCutscene(std::string& rootKey, std::string& cutsceneId, std::string& interior)
+void Animation::PlayCutscene(std::string& rootKey, std::string& cutsceneId, std::string& interior)
 {
 	if (Util::IsOnCutscene())
 	{
@@ -43,15 +43,15 @@ void CAnimation::PlayCutscene(std::string& rootKey, std::string& cutsceneId, std
 		return;
 	}
 
-	m_Cutscene.m_SceneName = cutsceneId;
+	m_Cutscene::m_SceneName = cutsceneId;
 	Command<Commands::LOAD_CUTSCENE>(cutsceneId.c_str());
 	CPlayerPed* pPlayer = FindPlayerPed();
-	m_Cutscene.m_nInterior = pPlayer->m_nAreaCode;
+	m_Cutscene::m_nInterior = pPlayer->m_nAreaCode;
 	pPlayer->m_nAreaCode = std::stoi(interior);
 	Command<Commands::SET_AREA_VISIBLE>(pPlayer->m_nAreaCode);
 }
 
-void CAnimation::Draw()
+void Animation::Draw()
 {
 	if (ImGui::BeginTabBar("Animation", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
 	{
@@ -73,8 +73,10 @@ void CAnimation::Draw()
 
 			ImGui::Columns(2, nullptr, false);
 			ImGui::Checkbox("Loop", &m_Loop);
+			Ui::ShowTooltip("Keep playing the animation on repeat");
 			ImGui::NextColumn();
 			ImGui::Checkbox("Secondary", &m_bSecondary);
+			Ui::ShowTooltip("Player can move while playing the animation");
 			ImGui::Columns(1);
 			ImGui::Spacing();
 
@@ -91,12 +93,12 @@ void CAnimation::Draw()
 		if (ImGui::BeginTabItem("Misc"))
 		{
 			ImGui::Spacing();
-			if (Ui::ListBox("Fighting", m_FightingStyleList, m_nFightingStyle))
+			if (Ui::ListBox("Fighting style", m_FightingStyleList, m_nFightingStyle))
 			{
 				Command<Commands::GIVE_MELEE_ATTACK_TO_CHAR>(hPlayer, m_nFightingStyle + 4, 6);
 				CHud::SetHelpMessage("Fighting anim set", false, false, false);
 			}
-			if (Ui::ListBoxStr("Walking", m_WalkingStyleList, m_nWalkingStyle))
+			if (Ui::ListBoxStr("Walking style", m_WalkingStyleList, m_nWalkingStyle))
 			{
 				if (m_nWalkingStyle == "default")
 				{
@@ -135,15 +137,15 @@ void CAnimation::Draw()
 			ImGui::Spacing();
 			if (ImGui::Button("Stop cutscene", Ui::GetSize()))
 			{
-				if (m_Cutscene.m_bRunning)
+				if (m_Cutscene::m_bRunning)
 				{
 					Command<Commands::CLEAR_CUTSCENE>();
-					m_Cutscene.m_bRunning = false;
-					m_Cutscene.m_SceneName = "";
+					m_Cutscene::m_bRunning = false;
+					m_Cutscene::m_SceneName = "";
 					CPlayerPed* player = FindPlayerPed();
-					player->m_nAreaCode = m_Cutscene.m_nInterior;
+					player->m_nAreaCode = m_Cutscene::m_nInterior;
 					Command<Commands::SET_AREA_VISIBLE>(player->m_nAreaCode);
-					m_Cutscene.m_nInterior = 0;
+					m_Cutscene::m_nInterior = 0;
 					TheCamera.Fade(0, 1);
 				}
 			}
@@ -152,8 +154,8 @@ void CAnimation::Draw()
 			if (ImGui::BeginChild("Cutscene Child"))
 			{
 				ImGui::Spacing();
-				Ui::DrawJSON(m_Cutscene.m_Data.m_Json, m_Cutscene.m_Data.m_Categories, m_Cutscene.m_Data.m_Selected,
-				             m_Cutscene.m_Data.m_Filter, &PlayCutscene, nullptr);
+				Ui::DrawJSON(m_Cutscene::m_Data.m_Json, m_Cutscene::m_Data.m_Categories, m_Cutscene::m_Data.m_Selected,
+				             m_Cutscene::m_Data.m_Filter, &PlayCutscene, nullptr);
 				ImGui::EndChild();
 			}
 			ImGui::EndTabItem();
@@ -162,7 +164,7 @@ void CAnimation::Draw()
 	}
 }
 
-void CAnimation::PlayAnimation(std::string& ifp, std::string& anim, std::string& ifpRepeat)
+void Animation::PlayAnimation(std::string& ifp, std::string& anim, std::string& ifpRepeat)
 {
 	int hplayer = CPools::GetPedRef(FindPlayerPed());
 
@@ -182,7 +184,7 @@ void CAnimation::PlayAnimation(std::string& ifp, std::string& anim, std::string&
 		Command<Commands::REMOVE_ANIMATION>(ifp.c_str());
 }
 
-void CAnimation::RemoveAnimation(std::string& ifp, std::string& anim, std::string& ifpRepeat)
+void Animation::RemoveAnimation(std::string& ifp, std::string& anim, std::string& ifpRepeat)
 {
 	if (ifp == "Custom")
 	{

@@ -19,36 +19,36 @@ private:
 	inline static std::map<int, std::string> m_VehicleIDE;
 	inline static std::vector<std::vector<float>> m_CarcolsColorData;
 	inline static std::map<std::string, std::vector<int>> m_CarcolsCarData;
-	static struct
+	struct m_Color
 	{
 		inline static bool m_bMatFilter = true;
 		inline static int m_nRadioButton = 1;
 		inline static bool bShowAll;
 		inline static float m_fColorPicker[3]{0, 0, 0};
-	} m_Color;
-	static struct
+	};
+	struct m_Neon
 	{
 		inline static float m_fColorPicker[3]{0, 0, 0};
 		inline static bool m_bRainbowEffect;
 		inline static uint m_nRainbowTimer;
 		inline static bool m_bApplyOnTraffic;
 		inline static uint m_bTrafficTimer;
-	} m_Neon;
-	static struct
+	};
+	struct m_Spawner
 	{
 		inline static SSearchData m_VehData;
 		inline static bool m_bSpawnInside = true;
 		inline static bool m_bSpawnInAir = true;
 		inline static char m_nLicenseText[9];
-	} m_Spawner;
+	};
 	inline static SSearchData m_TextureData;
 	inline static SSearchData m_TuneData;
 	inline static bool m_bImagesLoaded;
-	static struct
+	struct m_UnlimitedNitro
 	{
 		inline static bool m_bEnabled;
 		inline static bool m_bCompAdded;
-	} m_UnlimitedNitro;
+	};
 
 	inline static std::vector<std::string> (m_HandlingFlagNames) = // 32 flags
 	{

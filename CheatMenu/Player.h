@@ -8,17 +8,17 @@ private:
 	inline static SSearchData m_ClothData;
 	inline static bool m_bImagesLoaded;
 	inline static bool m_bModloaderInstalled;
-	static struct
+	struct m_KeepPosition
 	{
 		inline static bool m_bEnabled = false;
 		inline static CVector m_fPos;
-	} m_KeepPosition;
-	static struct
+	};
+	struct m_CustomSkins
 	{
 		inline static std::string m_Path = paths::GetGameDirPathA() + std::string("\\modloader\\Custom Skins\\");;
 		inline static ImGuiTextFilter m_Filter;
 		inline static std::vector<std::string> m_List;
-	} m_CustomSkins;
+	};
 
 public:
 	Player();

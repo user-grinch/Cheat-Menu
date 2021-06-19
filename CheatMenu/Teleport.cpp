@@ -44,21 +44,21 @@ Teleport::Teleport()
 
 	Events::processScriptsEvent += []
 	{
-		if ((m_Teleport.m_bEnabled == true) && ((CTimer::m_snTimeInMilliseconds - m_Teleport.m_nTimer) > 500))
+		if ((m_Teleport::m_bEnabled == true) && ((CTimer::m_snTimeInMilliseconds - m_Teleport::m_nTimer) > 500))
 		{
 			CPlayerPed* player = FindPlayerPed();
 
 			CEntity* player_entity = FindPlayerEntity(-1);
-			m_Teleport.m_fPos.z = CWorld::FindGroundZFor3DCoord(m_Teleport.m_fPos.x, m_Teleport.m_fPos.y,
-			                                                 m_Teleport.m_fPos.z + 100.0f, nullptr, &player_entity) + 1.0f;
+			m_Teleport::m_fPos.z = CWorld::FindGroundZFor3DCoord(m_Teleport::m_fPos.x, m_Teleport::m_fPos.y,
+			                                                 m_Teleport::m_fPos.z + 100.0f, nullptr, &player_entity) + 1.0f;
 			CVehicle* pVeh = player->m_pVehicle;
 
 			if (pVeh && player->m_nPedFlags.bInVehicle)
-				pVeh->Teleport(m_Teleport.m_fPos, false);
+				pVeh->Teleport(m_Teleport::m_fPos, false);
 			else
-				player->Teleport(m_Teleport.m_fPos, false);
+				player->Teleport(m_Teleport::m_fPos, false);
 
-			m_Teleport.m_bEnabled = false;
+			m_Teleport::m_bEnabled = false;
 			Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(player), false);
 			Command<Commands::RESTORE_CAMERA_JUMPCUT>();
 			TheCamera.Fade(0, 1);
@@ -66,7 +66,7 @@ Teleport::Teleport()
 
 		if (m_bQuickTeleport)
 		{
-			if (Ui::HotKeyPressed(Menu::m_HotKeys.quickTeleport)
+			if (Ui::HotKeyPressed(Menu::m_HotKeys::quickTeleport)
 				&& ((CTimer::m_snTimeInMilliseconds - m_nQuickTeleportTimer) > 500))
 			{
 				m_nQuickTeleportTimer = CTimer::m_snTimeInMilliseconds;
@@ -87,16 +87,16 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, short interior_id)
 
 		if (targetBlip.m_nBlipSprite != RADAR_SPRITE_WAYPOINT)
 		{
-			CHud::SetHelpMessage("No blip found", false, false, false);
+			CHud::SetHelpMessage("Target blip not found. You need to place it on the map first.", false, false, false);
 			return;
 		}
 		CEntity* pPlayerEntity = FindPlayerEntity(-1);
 		pos = targetBlip.m_vPosition;
 		pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, nullptr, &pPlayerEntity) + 50.f;
 
-		m_Teleport.m_fPos = pos;
-		m_Teleport.m_nTimer = CTimer::m_snTimeInMilliseconds;
-		m_Teleport.m_bEnabled = true;
+		m_Teleport::m_fPos = pos;
+		m_Teleport::m_nTimer = CTimer::m_snTimeInMilliseconds;
+		m_Teleport::m_bEnabled = true;
 		TheCamera.Fade(0, 0);
 		Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(pPlayer), true);
 	}
@@ -177,8 +177,8 @@ void Teleport::Draw()
 				ImGui::Checkbox("Insert coordinates", &m_bInsertCoord);
 				ImGui::NextColumn();
 				if (Ui::CheckboxWithHint("Quick teleport", &m_bQuickTeleport,
-				                         (std::string("Teleport to marker using ") + Ui::GetHotKeyNameString(
-					                         Menu::m_HotKeys.quickTeleport)).c_str()))
+				                         (std::string("Teleport to the location of your radar\ntarget blip using ") 
+											 + Ui::GetHotKeyNameString(Menu::m_HotKeys::quickTeleport)).c_str()))
 				{
 					config.SetValue("quick_teleport", m_bQuickTeleport);
 				}
@@ -199,7 +199,7 @@ void Teleport::Draw()
 
 				ImGui::Spacing();
 
-				if (ImGui::Button("Teleport to bCoord", Ui::GetSize(2)))
+				if (ImGui::Button("Teleport to Coord", Ui::GetSize(2)))
 				{
 					std::stringstream ss(m_nInputBuffer);
 					std::string temp;

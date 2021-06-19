@@ -12,12 +12,12 @@ private:
 	inline static char m_nLocationBuffer[INPUT_BUFFER_SIZE];
 	inline static uint m_nQuickTeleportTimer;
 	inline static CJson m_SpriteJson = CJson("radar sprite");
-	static struct
+	struct m_Teleport
 	{
 		inline static bool m_bEnabled;
 		inline static CVector m_fPos = {-1, -1, -1};
 		inline static uint m_nTimer;
-	} m_Teleport;
+	};
 
 
 	/*

@@ -1,4 +1,6 @@
 /*
+    Author: Grinch_
+	Copyright GPLv3 2019-2021
 	Required:
 		DirectX 9 SDK
 		Plugin SDK
@@ -18,14 +20,14 @@
 #include "Visual.h"
 #include "Weapon.h"
 
-class CheatMenu : Hook, CAnimation, CGame, Menu, Ped, Player, Teleport, Vehicle, Visual, Weapon
+class CheatMenu : Hook, Animation, Game, Menu, Ped, Player, Teleport, Vehicle, Visual, Weapon
 {
 private:
 	inline static CallbackTable header
 	{
 		{"Teleport", &Teleport::Draw}, {"Player", &Player::Draw}, {"Ped", &Ped::Draw},
-		{"Animation", &CAnimation::Draw}, {"Vehicle", &Vehicle::Draw}, {"Weapon", &Weapon::Draw},
-		{"Game", &CGame::Draw}, {"Visual", &Visual::Draw}, {"Menu", &Menu::Draw}
+		{"Animation", &Animation::Draw}, {"Vehicle", &Vehicle::Draw}, {"Weapon", &Weapon::Draw},
+		{"Game", &Game::Draw}, {"Visual", &Visual::Draw}, {"Menu", &Menu::Draw}
 	};
 
 	static void ApplyStyle();

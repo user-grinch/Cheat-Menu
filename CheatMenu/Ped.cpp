@@ -22,7 +22,7 @@ Ped::Ped()
 Ped::~Ped()
 {
 	Util::ReleaseTextures(m_PedData.m_ImagesList);
-	for (CPed* ped : m_SpawnPed.m_List)
+	for (CPed* ped : m_SpawnPed::m_List)
 	{
 		CWorld::Remove(ped);
 		ped->Remove();
@@ -31,7 +31,7 @@ Ped::~Ped()
 
 void Ped::SpawnPed(std::string& model)
 {
-	if (m_SpawnPed.m_List.size() == SPAWN_PED_LIMIT)
+	if (m_SpawnPed::m_List.size() == SPAWN_PED_LIMIT)
 	{
 		CHud::SetHelpMessage("Max limit reached", false, false, false);
 		return;
@@ -57,7 +57,7 @@ void Ped::SpawnPed(std::string& model)
 			CStreaming::RequestSpecialChar(1, name.c_str(), PRIORITY_REQUEST);
 			CStreaming::LoadAllRequestedModels(true);
 
-			Command<Commands::CREATE_CHAR>(m_SpawnPed.m_nSelectedPedType + 4, 291, pos.x, pos.y, pos.z + 1, &hplayer);
+			Command<Commands::CREATE_CHAR>(m_SpawnPed::m_nSelectedPedType + 4, 291, pos.x, pos.y, pos.z + 1, &hplayer);
 			CStreaming::SetSpecialCharIsDeletable(291);
 		}
 		else
@@ -66,29 +66,29 @@ void Ped::SpawnPed(std::string& model)
 			CStreaming::RequestModel(iModel, eStreamingFlags::PRIORITY_REQUEST);
 			CStreaming::LoadAllRequestedModels(false);
 
-			Command<Commands::CREATE_CHAR>(m_SpawnPed.m_nSelectedPedType + 4, iModel, pos.x, pos.y, pos.z + 1, &hplayer);
+			Command<Commands::CREATE_CHAR>(m_SpawnPed::m_nSelectedPedType + 4, iModel, pos.x, pos.y, pos.z + 1, &hplayer);
 			CStreaming::SetModelIsDeletable(iModel);
 		}
 
 		ped = CPools::GetPed(hplayer);
 
-		if (m_SpawnPed.m_bPedMove)
-			m_SpawnPed.m_List.push_back(ped);
+		if (m_SpawnPed::m_bPedMove)
+			m_SpawnPed::m_List.push_back(ped);
 		else
 		{
 			Command<Commands::MARK_CHAR_AS_NO_LONGER_NEEDED>(hplayer);
 		}
-		ped->m_nPedFlags.bPedIsBleeding = m_SpawnPed.m_bPedBleed;
-		ped->m_nWeaponAccuracy = m_SpawnPed.m_nAccuracy;
-		ped->m_fHealth = m_SpawnPed.m_nPedHealth;
+		ped->m_nPedFlags.bPedIsBleeding = m_SpawnPed::m_bPedBleed;
+		ped->m_nWeaponAccuracy = m_SpawnPed::m_nAccuracy;
+		ped->m_fHealth = m_SpawnPed::m_nPedHealth;
 
-		if (m_SpawnPed.m_nWeaponId != 0)
+		if (m_SpawnPed::m_nWeaponId != 0)
 		{
 			int model = 0;
-			Command<Commands::GET_WEAPONTYPE_MODEL>(m_SpawnPed.m_nWeaponId, &model);
+			Command<Commands::GET_WEAPONTYPE_MODEL>(m_SpawnPed::m_nWeaponId, &model);
 			CStreaming::RequestModel(model, PRIORITY_REQUEST);
 			CStreaming::LoadAllRequestedModels(false);
-			Command<Commands::GIVE_WEAPON_TO_CHAR>(hplayer, m_SpawnPed.m_nWeaponId, 999);
+			Command<Commands::GIVE_WEAPON_TO_CHAR>(hplayer, m_SpawnPed::m_nWeaponId, 999);
 		}
 	}
 }
@@ -214,12 +214,12 @@ void Ped::Draw()
 			ImGui::Spacing();
 			if (ImGui::Button("Remove frozen peds", Ui::GetSize(1)))
 			{
-				for (CPed* ped : m_SpawnPed.m_List)
+				for (CPed* ped : m_SpawnPed::m_List)
 				{
 					CWorld::Remove(ped);
 					ped->Remove();
 				}
-				m_SpawnPed.m_List.clear();
+				m_SpawnPed::m_List.clear();
 			}
 			ImGui::Spacing();
 			if (ImGui::BeginTabBar("SpawnPedBar"))
@@ -240,30 +240,30 @@ void Ped::Draw()
 					ImGui::Spacing();
 					ImGui::BeginChild("PedCOnfig");
 					ImGui::Columns(2, 0, false);
-					Ui::CheckboxWithHint("Don't move", &m_SpawnPed.m_bPedMove);
+					Ui::CheckboxWithHint("Don't move", &m_SpawnPed::m_bPedMove);
 					ImGui::NextColumn();
-					Ui::CheckboxWithHint("Ped bleed", &m_SpawnPed.m_bPedBleed);
+					Ui::CheckboxWithHint("Ped bleed", &m_SpawnPed::m_bPedBleed);
 					ImGui::Columns(1);
 
 					ImGui::Spacing();
-					ImGui::SliderInt("Accuracy", &m_SpawnPed.m_nAccuracy, 0.0, 100.0);
-					if (ImGui::InputInt("Health", &m_SpawnPed.m_nPedHealth))
+					ImGui::SliderInt("Accuracy", &m_SpawnPed::m_nAccuracy, 0.0, 100.0);
+					if (ImGui::InputInt("Health", &m_SpawnPed::m_nPedHealth))
 					{
-						if (m_SpawnPed.m_nPedHealth > 1000)
-							m_SpawnPed.m_nPedHealth = 1000;
+						if (m_SpawnPed::m_nPedHealth > 1000)
+							m_SpawnPed::m_nPedHealth = 1000;
 
-						if (m_SpawnPed.m_nPedHealth < 0)
-							m_SpawnPed.m_nPedHealth = 0;
+						if (m_SpawnPed::m_nPedHealth < 0)
+							m_SpawnPed::m_nPedHealth = 0;
 					}
-					Ui::ListBox("Ped type", m_SpawnPed.m_PedTypeList, m_SpawnPed.m_nSelectedPedType);
+					Ui::ListBox("Ped type", m_SpawnPed::m_PedTypeList, m_SpawnPed::m_nSelectedPedType);
 
 					ImGui::Spacing();
 					ImGui::Text("Selected weapon: %s",
-					            Weapon::m_WeaponData.m_Json.m_Data[std::to_string(m_SpawnPed.m_nWeaponId)].get<std::string>());
+					            Weapon::m_WeaponData.m_Json.m_Data[std::to_string(m_SpawnPed::m_nWeaponId)].get<std::string>());
 					ImGui::Spacing();
 					Ui::DrawImages(Weapon::m_WeaponData.m_ImagesList, ImVec2(65, 65), Weapon::m_WeaponData.m_Categories,
 					               Weapon::m_WeaponData.m_Selected, Weapon::m_WeaponData.m_Filter,
-					               [](std::string str) { m_SpawnPed.m_nWeaponId = std::stoi(str); },
+					               [](std::string str) { m_SpawnPed::m_nWeaponId = std::stoi(str); },
 					               nullptr,
 					               [](std::string str)
 					               {

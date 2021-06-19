@@ -371,27 +371,27 @@ void Visual::Draw()
 			int hour = CClock::ms_nGameClockHours;
 			int minute = CClock::ms_nGameClockMinutes;
 
-			if (CGame::m_bSyncTime)
+			if (Game::m_bSyncTime)
 			{
 				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
 				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
 			}
 
-			if (ImGui::InputInt("Hour", &hour) & !CGame::m_bSyncTime)
+			if (ImGui::InputInt("Hour", &hour) & !Game::m_bSyncTime)
 			{
 				if (hour < 0) hour = 23;
 				if (hour > 23) hour = 0;
 				CClock::ms_nGameClockHours = hour;
 			}
 
-			if (ImGui::InputInt("Minute", &minute) & !CGame::m_bSyncTime)
+			if (ImGui::InputInt("Minute", &minute) & !Game::m_bSyncTime)
 			{
 				if (minute < 0) minute = 59;
 				if (minute > 59) minute = 0;
 				CClock::ms_nGameClockMinutes = minute;
 			}
 
-			if (CGame::m_bSyncTime)
+			if (Game::m_bSyncTime)
 			{
 				ImGui::PopStyleVar();
 				ImGui::PopItemFlag();
