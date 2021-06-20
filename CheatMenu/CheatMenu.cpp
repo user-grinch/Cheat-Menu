@@ -159,27 +159,21 @@ void CheatMenu::ApplyStyle()
 
 void MenuThread(void* param)
 {
-	static bool game_init = false;
+	static bool bGameInit = false;
+	Hook::ApplyMouseFix();
 
 	// Wait till the game is initialized
 	Events::initGameEvent += []
 	{
-		game_init = true;
+		bGameInit = true;
 	};
 
-	while (!game_init)
+	while (!bGameInit)
 		Sleep(1000);
 
 	if (GetModuleHandle("SAMP.dll"))
 	{
 		MessageBox(RsGlobal.ps->window, "SAMP detected. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
-		return;
-	}
-
-	// SP fixes some mouse issues
-	if (!GetModuleHandle("SilentPatchSA.asi"))
-	{
-		MessageBox(RsGlobal.ps->window, "SilentPatch isn't installed. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
 		return;
 	}
 

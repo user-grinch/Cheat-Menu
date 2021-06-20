@@ -146,44 +146,19 @@ HRESULT Hook::Dx11Handler(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Fl
 	return oPresent11(pSwapChain, SyncInterval, Flags);
 }
 
-// Thanks imring
 void Hook::ShowMouse(bool state)
 {
-	if (state)
-	{
-		CPad::NewMouseControllerState.X = 0;
-		CPad::NewMouseControllerState.Y = 0;
-		patch::SetUChar(0x6194A0, 0xC3);
-
-		// Don't nop this, WindowedMode uses it
-		// patch::Nop(0x53F417, 5); // don't call CPad__getMouseState
-		patch::SetUChar(0x746ED0, 0xC3);
-
-		patch::SetRaw(0x53F41F, (void*)"\x33\xC0\x0F\x84", 4); // disable camera mouse movement
-	}
-	else
-	{
-		if (m_bMouseVisibility != m_bShowMouse)
-		{
-			patch::SetUChar(0x6194A0, 0xE9); // jmp setup
-			patch::SetUChar(0x746ED0, 0xA1);
-			patch::SetRaw(0x53F41F, (void*)"\x85\xC0\x0F\x8C", 4);
-			// xor eax, eax -> test eax, eax , enable camera mouse movement
-			// jz loc_53F526 -> jl loc_53F526
-		}
-	}
-
 	if (m_bMouseVisibility != m_bShowMouse)
 	{
 		CPad::ClearMouseHistory();
 		CPad::UpdatePads();
 
-		// TODO: Replace this with windows cursor
 		ImGui::GetIO().MouseDrawCursor = state;
 
 		CPad::NewMouseControllerState.X = 0;
 		CPad::NewMouseControllerState.Y = 0;
 		m_bMouseVisibility = m_bShowMouse;
+		Hook::ApplyMouseFix(); // Reapply the patches
 	}
 }
 
@@ -215,4 +190,87 @@ Hook::~Hook()
 	ImGui_ImplWin32_Shutdown();
 	ImGui::DestroyContext();
 	kiero::shutdown();
+}
+
+struct Mouse
+{
+	unsigned int x, y;
+	unsigned int wheelDelta;
+	char k1, k2, k3, k4, k5;
+};
+
+struct MouseInfo
+{
+	int x, y, wheelDelta;
+} mouseInfo;
+
+static BOOL __stdcall _SetCursorPos(int X, int Y)
+{
+	if (Hook::m_bShowMouse || GetActiveWindow() != RsGlobal.ps->window)
+		return 1;
+
+	mouseInfo.x = X;
+	mouseInfo.y = Y;
+
+	return SetCursorPos(X, Y);
+}
+
+int __cdecl _psMouseSetPos(RwV2d* pos)
+{
+	return _SetCursorPos(pos->x, pos->y);
+}
+
+static LRESULT __stdcall _DispatchMessage(MSG* lpMsg)
+{
+	if (lpMsg->message == WM_MOUSEWHEEL && !Hook::m_bShowMouse)
+	{
+		mouseInfo.wheelDelta += *(int*)(&lpMsg->wParam);
+	}
+
+	return DispatchMessageA(lpMsg);
+}
+
+static int _cdecl _GetMouseState(Mouse* pMouse)
+{
+	if (Hook::m_bShowMouse)
+		return -1;
+
+	struct tagPOINT Point;
+
+	pMouse->x = 0;
+	pMouse->y = 0;
+	pMouse->wheelDelta = mouseInfo.wheelDelta;
+	GetCursorPos(&Point);
+
+	if (mouseInfo.x >= 0)
+		pMouse->x = int(Point.x - mouseInfo.x);
+
+	if (mouseInfo.y >= 0)
+		pMouse->y = int(Point.y - mouseInfo.y);
+
+	mouseInfo.wheelDelta = 0;
+
+	pMouse->k1 = (GetAsyncKeyState(1) >> 8);
+	pMouse->k2 = (GetAsyncKeyState(2) >> 8);
+	pMouse->k3 = (GetAsyncKeyState(4) >> 8);
+	pMouse->k4 = (GetAsyncKeyState(5) >> 8);
+	pMouse->k5 = (GetAsyncKeyState(6) >> 8);
+	return 0;
+}
+
+void Hook::ApplyMouseFix()
+{
+	patch::ReplaceFunctionCall(0x53F417, _GetMouseState);
+
+	patch::Nop(0x57C59B, 1);
+	patch::ReplaceFunctionCall(0x57C59C, _SetCursorPos);
+	patch::Nop(0x81E5D4, 1);
+	patch::ReplaceFunctionCall(0x81E5D5, _SetCursorPos);
+	patch::RedirectJump(0x6194A0, _psMouseSetPos);
+
+	patch::Nop(0x748A7C, 1);
+	patch::ReplaceFunctionCall(0x748A7D, _DispatchMessage);
+
+	patch::SetChar(0x746A08, 32); // diMouseOffset
+	patch::SetChar(0x746A58, 32); // diDeviceoffset
 }

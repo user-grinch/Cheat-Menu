@@ -177,7 +177,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
     <Lib>
-      <AdditionalDependencies>d3d9.lib;d3d11.lib;XInput9_1_0.lib</AdditionalDependencies>
+      <AdditionalDependencies>d3d9.lib;d3d11.lib</AdditionalDependencies>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

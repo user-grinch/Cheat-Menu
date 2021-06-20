@@ -23,9 +23,11 @@ private:
 	static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static void ShowMouse(bool state);
 
-protected:
+public:
 	inline static bool m_bShowMouse = false;
 	inline static std::function<void()> window_callback = nullptr;
+	static void ApplyMouseFix();
+
 	Hook();
 	~Hook();
 };
