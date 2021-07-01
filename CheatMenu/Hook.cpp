@@ -215,11 +215,6 @@ static BOOL __stdcall _SetCursorPos(int X, int Y)
 	return SetCursorPos(X, Y);
 }
 
-int __cdecl _psMouseSetPos(RwV2d* pos)
-{
-	return _SetCursorPos(pos->x, pos->y);
-}
-
 static LRESULT __stdcall _DispatchMessage(MSG* lpMsg)
 {
 	if (lpMsg->message == WM_MOUSEWHEEL && !Hook::m_bShowMouse)
@@ -261,16 +256,14 @@ static int _cdecl _GetMouseState(Mouse* pMouse)
 void Hook::ApplyMouseFix()
 {
 	patch::ReplaceFunctionCall(0x53F417, _GetMouseState);
-
 	patch::Nop(0x57C59B, 1);
 	patch::ReplaceFunctionCall(0x57C59C, _SetCursorPos);
 	patch::Nop(0x81E5D4, 1);
 	patch::ReplaceFunctionCall(0x81E5D5, _SetCursorPos);
-	patch::RedirectJump(0x6194A0, _psMouseSetPos);
-
+	patch::Nop(0x74542D, 1);
+	patch::ReplaceFunctionCall(0x74542E, _SetCursorPos);
 	patch::Nop(0x748A7C, 1);
 	patch::ReplaceFunctionCall(0x748A7D, _DispatchMessage);
-
 	patch::SetChar(0x746A08, 32); // diMouseOffset
 	patch::SetChar(0x746A58, 32); // diDeviceoffset
 }

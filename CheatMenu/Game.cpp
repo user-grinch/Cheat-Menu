@@ -490,8 +490,12 @@ Lowers armour, health, stamina etc."))
 
 			if (!m_bMissionLoaderWarningShown)
 			{
-				ImGui::TextWrapped("Mission loader might cause unintended changes to your game. \
-It's recommanded not to save your game after using this. Use it at your own risk!");
+				ImGui::TextWrapped("Mission loader may cause,\n\
+1. Game crashes\n\
+2. Break save games\n\
+3. Break game progression\n\
+4. Random bugs & glitches\n\n\
+It's recommanded not to save after using the mission loader. Use it at your own risk!");
 				ImGui::Spacing();
 				if (ImGui::Button("Show mission loader", ImVec2(Ui::GetSize())))
 					m_bMissionLoaderWarningShown = true;
@@ -513,7 +517,7 @@ It's recommanded not to save your game after using this. Use it at your own risk
 		}
 		if (ImGui::BeginTabItem("Stats"))
 		{
-			// similat to Ui::DrawJSON()
+			// similar to Ui::DrawJSON()
 			ImGui::Spacing();
 
 			ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() / 2 - 5);
