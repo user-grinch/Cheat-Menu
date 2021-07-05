@@ -259,7 +259,7 @@ void Ped::Draw()
 
 					ImGui::Spacing();
 					ImGui::Text("Selected weapon: %s",
-					            Weapon::m_WeaponData.m_Json.m_Data[std::to_string(m_SpawnPed::m_nWeaponId)].get<std::string>());
+					            Weapon::m_WeaponData.m_Json.m_Data[std::to_string(m_SpawnPed::m_nWeaponId)].get<std::string>().c_str());
 					ImGui::Spacing();
 					Ui::DrawImages(Weapon::m_WeaponData.m_ImagesList, ImVec2(65, 65), Weapon::m_WeaponData.m_Categories,
 					               Weapon::m_WeaponData.m_Selected, Weapon::m_WeaponData.m_Filter,
