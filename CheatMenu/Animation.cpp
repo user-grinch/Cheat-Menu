@@ -56,7 +56,8 @@ void Animation::Draw()
 	if (ImGui::BeginTabBar("Animation", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
 	{
 		ImGui::Spacing();
-		int hPlayer = CPools::GetPedRef(FindPlayerPed());
+		CPlayerPed* pPlayer = FindPlayerPed();
+		int hPlayer = CPools::GetPedRef(pPlayer);
 
 		ImGui::Spacing();
 
@@ -102,14 +103,12 @@ void Animation::Draw()
 			{
 				if (m_nWalkingStyle == "default")
 				{
-					patch::Set<DWORD>(0x609A4E, 0x4D48689, false);
-					patch::Set<WORD>(0x609A52, 0, false);
+					patch::Set<DWORD>(0x609A4E, 0x4D48689);
+					patch::Set<WORD>(0x609A52, 0);
 				}
 				else
 				{
-					patch::Set<DWORD>(0x609A4E, -0x6F6F6F70, false);
-					patch::Nop(0x609A52, 2, false);
-
+					patch::Nop(0x609A4E, 6);
 					Command<Commands::REQUEST_ANIMATION>(m_nWalkingStyle.c_str());
 					Command<Commands::LOAD_ALL_MODELS_NOW>();
 					Command<Commands::SET_ANIM_GROUP_FOR_CHAR>(hPlayer, m_nWalkingStyle.c_str());
