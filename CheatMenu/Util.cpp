@@ -174,17 +174,15 @@ int Util::GetLargestGangInZone()
 	for (int i = 0; i != 10; ++i)
 	{
 		CVector pos = FindPlayerPed()->GetPosition();
-		auto zone = new CZone();
 
-		CZoneExtraInfo* zone_info = CTheZones::GetZoneInfo(&pos, &zone);
+		CZoneExtraInfo* zone_info = CTheZones::GetZoneInfo(&pos, nullptr);
 		int density = zone_info->m_nGangDensity[i];
-
+		
 		if (density > max_density)
 		{
 			max_density = density;
 			gang_id = i;
 		}
-		delete zone;
 	}
 
 	return gang_id;

@@ -159,6 +159,12 @@ void CheatMenu::ApplyStyle()
 
 void MenuThread(void* param)
 {
+	if (!fs::is_directory(PLUGIN_PATH((char*)"CheatMenu")))
+	{
+		flog << "CheatMenu folder not found. You need to put both \"CheatMenu.asi\" & \"CheatMenu\" folder in the same directory" << std::endl;
+		return;
+	}
+
 	static bool bGameInit = false;
 	Hook::ApplyMouseFix();
 
@@ -180,7 +186,7 @@ void MenuThread(void* param)
 	flog << "Starting...\nVersion: " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: "
 		GITHUB_LINK "\n" << std::endl;
 	CFastman92limitAdjuster::Init();
-	auto menu = new CheatMenu;
+	CheatMenu menu;
 	Updater::CheckForUpdate();
 
 	while (true)

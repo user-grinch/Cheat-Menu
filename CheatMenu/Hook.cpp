@@ -166,6 +166,7 @@ Hook::Hook()
 {
 	ImGui::CreateContext();
 
+	// Nvidia Overlay crash fix
 	if (init(kiero::RenderType::D3D9) == kiero::Status::Success)
 	{
 		Globals::renderer = Render_DirectX9;

@@ -64,6 +64,4 @@ void Updater::ShowUpdateScreen()
 	{
 		Updater::m_State = UPDATER_IDLE;
 	}
-
-		
 }
