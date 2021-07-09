@@ -8,6 +8,7 @@ Vehicle::Vehicle()
 {
 	ParseVehiclesIDE();
 	ParseCarcolsDAT();
+	
 	Events::processScriptsEvent += [this]
 	{
 		if (!m_bImagesLoaded)

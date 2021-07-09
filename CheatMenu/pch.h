@@ -93,7 +93,7 @@ struct STextureStructure
 {
 	std::string m_FileName;
 	std::string m_CategoryName;
-	void* m_pTexture;
+	void* m_pTexture = nullptr;
 };
 
 struct HotKeyData

@@ -15,7 +15,7 @@ private:
 	inline static f_EndScene oEndScene;
 	inline static f_Reset oReset;
 	inline static bool m_bMouseVisibility;
-
+	
 	static void CALLBACK RenderFrame(void* ptr);
 	static HRESULT CALLBACK Dx9Handler(IDirect3DDevice9* pDevice);
 	static HRESULT CALLBACK Dx11Handler(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);

@@ -166,19 +166,19 @@ Hook::Hook()
 {
 	ImGui::CreateContext();
 
-	// gtaRenderHook
-	if (init(kiero::RenderType::D3D11) == kiero::Status::Success)
+	if (init(kiero::RenderType::D3D9) == kiero::Status::Success)
 	{
-		Globals::renderer = Render_DirectX11;
-		kiero::bind(8, (void**)&oPresent11, Dx11Handler);
+		Globals::renderer = Render_DirectX9;
+		kiero::bind(16, (void**)&oReset, Reset);
+		kiero::bind(42, (void**)&oEndScene, Dx9Handler);
 	}
 	else
 	{
-		if (init(kiero::RenderType::D3D9) == kiero::Status::Success)
+		// gtaRenderHook
+		if (init(kiero::RenderType::D3D11) == kiero::Status::Success)
 		{
-			Globals::renderer = Render_DirectX9;
-			kiero::bind(16, (void**)&oReset, Reset);
-			kiero::bind(42, (void**)&oEndScene, Dx9Handler);
+			Globals::renderer = Render_DirectX11;
+			kiero::bind(8, (void**)&oPresent11, Dx11Handler);
 		}
 	}
 }
