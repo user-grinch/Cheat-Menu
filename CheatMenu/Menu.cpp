@@ -12,17 +12,17 @@ Menu::Menu()
 {
 	// TODO: use structs
 	// Load config data
-	m_Overlay::bCoord = config.GetValue("overlay.bCoord", false);
-	m_Overlay::bCpuUsage = config.GetValue("overlay.bCpuUsage", false);
-	m_Overlay::bFPS = config.GetValue("overlay.bFPS", false);
-	m_Overlay::bLocName = config.GetValue("overlay.bLocName", false);
-	m_Overlay::bTransparent = config.GetValue("overlay.bTransparent", false);
-	m_Overlay::bMemUsage = config.GetValue("overlay.bMemUsage", false);
-	m_Overlay::bVehHealth = config.GetValue("overlay.bVehHealth", false);
-	m_Overlay::bVehSpeed = config.GetValue("overlay.bVehSpeed", false);
-	m_Overlay::mSelectedPos = (DISPLAY_POS)config.GetValue("overlay.mSelectedPos", (int)DISPLAY_POS::BOTTOM_RIGHT);
-	m_Overlay::fPosX = config.GetValue("overlay.fPosX", 0);
-	m_Overlay::fPosY = config.GetValue("overlay.fPosY", 0);
+	m_Overlay::bCoord = config.GetValue("overlay.coord", false);
+	m_Overlay::bCpuUsage = config.GetValue("overlay.cpu_usage", false);
+	m_Overlay::bFPS = config.GetValue("overlay.fps", false);
+	m_Overlay::bLocName = config.GetValue("overlay.loc_name", false);
+	m_Overlay::bTransparent = config.GetValue("overlay.transparent", false);
+	m_Overlay::bMemUsage = config.GetValue("overlay.mem_usage", false);
+	m_Overlay::bVehHealth = config.GetValue("overlay.veh_health", false);
+	m_Overlay::bVehSpeed = config.GetValue("overlay.veh_speed", false);
+	m_Overlay::mSelectedPos = (DISPLAY_POS)config.GetValue("overlay.selected_pos", (int)DISPLAY_POS::BOTTOM_RIGHT);
+	m_Overlay::fPosX = config.GetValue("overlay.pox", 0);
+	m_Overlay::fPosY = config.GetValue("overlay.posy", 0);
 
 	// Hotkeys
 	m_HotKeys::aimSkinChanger.m_key1 = config.GetValue("hotkey.aim_skin_changer.key1", VK_RETURN);
@@ -164,7 +164,10 @@ void Menu::DrawOverlay()
 				ImGui::Text("Veh Health: %.f", player->m_pVehicle->m_fHealth);
 
 			if (m_Overlay::bVehSpeed)
-				ImGui::Text("Veh Speed: %d", int(player->m_pVehicle->m_vecMoveSpeed.Magnitude()) * 50); // 02E3 - GET_CAR_SPEED
+			{
+				int speed = player->m_pVehicle->m_vecMoveSpeed.Magnitude() * 50.0f;
+				ImGui::Text("Veh Speed: %d", speed); // 02E3 - GET_CAR_SPEED
+			}
 		}
 
 		ImVec2 windowPos = ImGui::GetWindowPos();
@@ -325,36 +328,36 @@ void Menu::Draw()
 			ImGui::Spacing();
 			ImGui::SameLine();
 			if (Ui::ListBox("Overlay", m_Overlay::posNames, (int&)m_Overlay::mSelectedPos))
-				config.SetValue("overlay.mSelectedPos", m_Overlay::mSelectedPos);
+				config.SetValue("overlay.selected_pos", m_Overlay::mSelectedPos);
 
 			ImGui::Spacing();
 
 			ImGui::Columns(2, nullptr, false);
 			if (ImGui::Checkbox("No background", &m_Overlay::bTransparent))
-				config.SetValue("overlay.bTransparent", m_Overlay::bTransparent);
+				config.SetValue("overlay.transparent", m_Overlay::bTransparent);
 
 			if (ImGui::Checkbox("Show coordinates", &m_Overlay::bCoord))
-				config.SetValue("overlay.bCoord", m_Overlay::bCoord);
+				config.SetValue("overlay.coord", m_Overlay::bCoord);
 
 			if (ImGui::Checkbox("Show CPU usage", &m_Overlay::bCpuUsage))
-				config.SetValue("overlay.bCpuUsage", m_Overlay::bCpuUsage);
+				config.SetValue("overlay.cpu_usage", m_Overlay::bCpuUsage);
 
 			if (ImGui::Checkbox("Show FPS", &m_Overlay::bFPS))
-				config.SetValue("overlay.bFPS", m_Overlay::bFPS);
+				config.SetValue("overlay.fps", m_Overlay::bFPS);
 
 			ImGui::NextColumn();
 
 			if (ImGui::Checkbox("Show location", &m_Overlay::bLocName))
-				config.SetValue("overlay.bLocName", m_Overlay::bLocName);
+				config.SetValue("overlay.loc_name", m_Overlay::bLocName);
 
 			if (ImGui::Checkbox("Show RAM usage", &m_Overlay::bMemUsage))
-				config.SetValue("overlay.bMemUsage", m_Overlay::bMemUsage);
+				config.SetValue("overlay.mem_usage", m_Overlay::bMemUsage);
 
 			if (ImGui::Checkbox("Show veh health", &m_Overlay::bVehHealth))
-				config.SetValue("overlay.bVehHealth", m_Overlay::bVehHealth);
+				config.SetValue("overlay.veh_health", m_Overlay::bVehHealth);
 
 			if (ImGui::Checkbox("Show veh speed", &m_Overlay::bVehSpeed))
-				config.SetValue("overlay.bVehSpeed", m_Overlay::bVehSpeed);
+				config.SetValue("overlay.veh_speed", m_Overlay::bVehSpeed);
 
 			ImGui::Columns(1);
 
