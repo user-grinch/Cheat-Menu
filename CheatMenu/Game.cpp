@@ -167,6 +167,8 @@ void Game::FreeCam()
 	{
 		CPlayerPed* player = FindPlayerPed(-1);
 		Command<Commands::SET_EVERYONE_IGNORE_PLAYER>(0, true);
+		m_Freecam::m_bHudState = CHud::m_Wants_To_Draw_Hud;
+		m_Freecam::m_bRadarState = CHud::bScriptDontDisplayRadar;
 		CHud::bScriptDontDisplayRadar = true;
 		CHud::m_Wants_To_Draw_Hud = false;
 		CVector player_pos = player->GetPosition();
@@ -276,8 +278,8 @@ void Game::ClearFreecamStuff()
 {
 	m_Freecam::m_bInitDone = false;
 	Command<Commands::SET_EVERYONE_IGNORE_PLAYER>(0, false);
-	CHud::bScriptDontDisplayRadar = false;
-	CHud::m_Wants_To_Draw_Hud = true;
+	CHud::bScriptDontDisplayRadar = m_Freecam::m_bRadarState;
+	CHud::m_Wants_To_Draw_Hud = m_Freecam::m_bHudState;
 	CPad::GetPad(0)->DisablePlayerControls = false;
 
 	Command<Commands::DELETE_CHAR>(m_Freecam::m_nPed);

@@ -84,8 +84,8 @@ void Menu::DrawOverlay()
 	{
 		if (m_Overlay::fPosX != NULL && m_Overlay::fPosY != NULL)
 		{
-			config.SetValue("overlay.fPosX", m_Overlay::fPosX);
-			config.SetValue("overlay.fPosY", m_Overlay::fPosY);
+			config.SetValue("overlay.posx", m_Overlay::fPosX);
+			config.SetValue("overlay.posy", m_Overlay::fPosY);
 			ImGui::SetNextWindowPos(ImVec2(m_Overlay::fPosX, m_Overlay::fPosY), ImGuiCond_Once);
 		}
 	}
