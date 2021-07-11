@@ -7,11 +7,20 @@
 void CheatMenu::DrawWindow()
 {
 	ImGuiIO& io = ImGui::GetIO();
+	static bool game_running = true;
 
 	if (FrontEndMenuManager.m_bMenuActive)
-		m_bShowMouse = false;
+	{
+		if (game_running)
+		{
+			config.WriteToDisk();
+			game_running = false;
+			m_bShowMouse = false;
+		}
+	}
 	else
 	{
+		game_running = true;
 		if (Globals::m_bShowMenu || m_Commands::m_bShowMenu)
 		{
 			if (Globals::m_bShowMenu)
@@ -75,7 +84,9 @@ CheatMenu::CheatMenu()
 			if (m_bShowMouse != Globals::m_bShowMenu)
 			{
 				if (m_bShowMouse) // Only write when the menu closes
+				{
 					config.WriteToDisk();
+				}
 
 				m_bShowMouse = Globals::m_bShowMenu;
 			}
@@ -187,7 +198,16 @@ void MenuThread(void* param)
 		GITHUB_LINK "\n" << std::endl;
 	CFastman92limitAdjuster::Init();
 	CheatMenu menu;
-	Updater::CheckForUpdate();
+
+	time_t     now = time(0);
+	struct tm  tstruct = *localtime(&now);
+	int last_check_date = config.GetValue("config.last_update_checked", 0);
+
+	if (last_check_date != tstruct.tm_mday)
+	{
+		Updater::CheckForUpdate();
+		config.SetValue("config.last_update_checked", tstruct.tm_mday);
+	}
 
 	while (true)
 	{

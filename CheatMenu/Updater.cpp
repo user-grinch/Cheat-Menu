@@ -2,6 +2,7 @@
 #include "Updater.h"
 #include "Ui.h"
 #include "MenuInfo.h"
+#include "Util.h"
 
 void Updater::CheckForUpdate()
 {

@@ -300,7 +300,7 @@ void Visual::Draw()
 				ImGui::TextWrapped(
 					"These options won't work if you got any mods that drastically changes the game hud. i.e. Mobile Hud, GTA 5 Hud etc.");
 				ImGui::Spacing();
-				Ui::ColorPickerAddress("Armourbar color", *(int*)0x5890FC, ImVec4(180, 25, 29, 255));
+				Ui::ColorPickerAddress("Armourbar color", *(int*)0x5890FC, ImVec4(225, 225, 225, 255));
 				Ui::EditAddress<float>("Armourbar posX", 0x866B78, -999, 94, 999);
 				Ui::EditAddress<float>("Armourbar posY", 0x862D38, -999, 48, 999);
 				Ui::ColorPickerAddress("Breathbar color", *(int*)0x5891EB, ImVec4(172, 203, 241, 255));

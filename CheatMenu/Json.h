@@ -5,6 +5,7 @@ class CJson
 {
 private:
 	std::string m_FilePath;
+
 public:
 	nlohmann::json m_Data;
 
