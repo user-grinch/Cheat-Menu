@@ -25,8 +25,8 @@ public:
 		inline static int m_nPed = -1;
 		inline static CVector m_fMouse;
 		inline static CVector m_fTotalMouse;
-		inline static bool m_bHudState;
-		inline static bool m_bRadarState;
+		inline static BYTE m_bHudState;
+		inline static BYTE m_bRadarState;
 	};
 	struct m_HardMode
 	{

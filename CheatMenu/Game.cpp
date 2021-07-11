@@ -135,10 +135,16 @@ Game::Game()
 				m_Freecam::m_bEnabled = false;
 				ClearFreecamStuff();
 			}
-			else m_Freecam::m_bEnabled = true;
+			else
+			{
+				m_Freecam::m_bEnabled = true;
+			}
 		}
+
 		if (m_Freecam::m_bEnabled)
+		{
 			FreeCam();
+		}
 	};
 }
 
@@ -167,10 +173,10 @@ void Game::FreeCam()
 	{
 		CPlayerPed* player = FindPlayerPed(-1);
 		Command<Commands::SET_EVERYONE_IGNORE_PLAYER>(0, true);
-		m_Freecam::m_bHudState = CHud::m_Wants_To_Draw_Hud;
-		m_Freecam::m_bRadarState = CHud::bScriptDontDisplayRadar;
-		CHud::bScriptDontDisplayRadar = true;
-		CHud::m_Wants_To_Draw_Hud = false;
+		m_Freecam::m_bHudState = patch::Get<BYTE>(0xBA6769); // hud
+		m_Freecam::m_bRadarState = patch::Get<BYTE>(0xBA676C); // radar
+		patch::Set<BYTE>(0xBA6769, 0); // hud
+		patch::Set<BYTE>(0xBA676C, 2); // radar
 		CVector player_pos = player->GetPosition();
 		CPad::GetPad(0)->DisablePlayerControls = true;
 
@@ -278,8 +284,8 @@ void Game::ClearFreecamStuff()
 {
 	m_Freecam::m_bInitDone = false;
 	Command<Commands::SET_EVERYONE_IGNORE_PLAYER>(0, false);
-	CHud::bScriptDontDisplayRadar = m_Freecam::m_bRadarState;
-	CHud::m_Wants_To_Draw_Hud = m_Freecam::m_bHudState;
+	patch::Set<BYTE>(0xBA6769, m_Freecam::m_bHudState); // hud
+	patch::Set<BYTE>(0xBA676C, m_Freecam::m_bRadarState); // radar
 	CPad::GetPad(0)->DisablePlayerControls = false;
 
 	Command<Commands::DELETE_CHAR>(m_Freecam::m_nPed);

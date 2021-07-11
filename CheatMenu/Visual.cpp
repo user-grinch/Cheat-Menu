@@ -213,15 +213,17 @@ void Visual::Draw()
 			if (Ui::CheckboxWithHint("Hide veh names", &CHud::bScriptDontDisplayVehicleName))
 				Command<Commands::DISPLAY_CAR_NAMES>(!CHud::bScriptDontDisplayVehicleName);
 
-			if (Ui::CheckboxWithHint("Hide radar", &CHud::bScriptDontDisplayRadar))
-				Command<Commands::DISPLAY_RADAR>(!CHud::bScriptDontDisplayRadar);
-
 			Ui::CheckboxAddressEx("Hide wanted level", 0x58DD1B, 0x90, 1);
 			if (Ui::CheckboxWithHint("Lock weather", &m_bLockWeather))
 				m_nBacWeatherType = CWeather::OldWeatherType;
 
-			if (Ui::CheckboxWithHint("Show hud", &CHud::m_Wants_To_Draw_Hud))
-				Command<Commands::DISPLAY_HUD>(CHud::m_Wants_To_Draw_Hud);
+			bool radar_state = (patch::Get<BYTE>(0xBA676C) != 2);
+			if (Ui::CheckboxWithHint("Show radar", &radar_state))
+			{
+				patch::Set<BYTE>(0xBA676C, radar_state == true ? 0 : 2);
+			}
+
+			Ui::CheckboxAddress("Show hud", 0xBA6769);
 
 			ImGui::Columns(1);
 			ImGui::EndTabItem();
