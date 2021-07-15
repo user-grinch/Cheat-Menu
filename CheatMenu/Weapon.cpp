@@ -146,9 +146,9 @@ void Weapon::Draw()
 			ImGui::BeginChild("CheckboxesChild");
 			ImGui::Columns(2, 0, false);
 
-			Ui::CheckboxWithHint("Auto aim", &m_bAutoAim, "Enables aim assist on keyboard\n\nQ = left    E = right");
-			if (Ui::CheckboxWithHint("Dual weild", &m_bDualWeild,
-			                         "Dual weild pistol, shawoff, uzi, tec9\n(Other weapons don't work)"))
+			Ui::CheckboxWithHint("Fast aim", &m_bAutoAim, "Enables aim assist on keyboard\n\nQ = left    E = right\n\nPress Q and E to switch targets.\nMoving mouse removes the target!");
+			if (Ui::CheckboxWithHint("Dual wield", &m_bDualWeild,
+			                         "Dual wield pistol, shawoff, uzi, tec9\n(Other weapons don't work)"))
 			{
 				if (!m_bDualWeild)
 					CWeaponInfo::LoadWeaponData();

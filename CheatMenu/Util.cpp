@@ -51,14 +51,18 @@ void Util::LoadTexturesInDirRecursive(const char* path, const char* file_ext, st
 			HRESULT hr = -1;
 
 			if (Globals::renderer == Render_DirectX9)
+			{
 				hr = D3DXCreateTextureFromFileA(GetD3DDevice(), p.path().string().c_str(),
-				                                reinterpret_cast<PDIRECT3DTEXTURE9*>(&store_vec.back().get()->m_pTexture));
+					reinterpret_cast<PDIRECT3DTEXTURE9*>(&store_vec.back().get()->m_pTexture));
+			}
 			else
 			{
 				if (LoadTextureFromFileDx11(p.path().string().c_str(),
-				                            reinterpret_cast<ID3D11ShaderResourceView**>(&store_vec.back().get()->
-					                            m_pTexture)))
+					reinterpret_cast<ID3D11ShaderResourceView**>(&store_vec.back().get()->
+						m_pTexture)))
+				{
 					hr = S_OK;
+				}
 			}
 
 			if (hr == S_OK)

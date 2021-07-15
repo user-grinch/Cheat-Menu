@@ -8,6 +8,8 @@ Vehicle::Vehicle()
 {
 	ParseVehiclesIDE();
 	ParseCarcolsDAT();
+
+
 	
 	Events::processScriptsEvent += [this]
 	{

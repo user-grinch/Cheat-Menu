@@ -180,7 +180,7 @@ void MenuThread(void* param)
 	Hook::ApplyMouseFix();
 
 	// Wait till the game is initialized
-	Events::initGameEvent += []
+	Events::initRwEvent += []
 	{
 		bGameInit = true;
 	};
