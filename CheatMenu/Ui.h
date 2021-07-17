@@ -52,12 +52,13 @@ public:
 	                     ImGuiTextFilter& filter,
 	                     std::function<void(std::string&, std::string&, std::string&)> func_left_click,
 	                     std::function<void(std::string&, std::string&, std::string&)> func_right_click);
-	static void DrawImages(std::vector<std::unique_ptr<STextureStructure>>& img_vec, ImVec2 image_size,
-	                       std::vector<std::string>& category_vec, std::string& selected_item, ImGuiTextFilter& filter,
-	                       std::function<void(std::string&)> on_left_click,
-	                       std::function<void(std::string&)> on_right_click,
-	                       std::function<std::string(std::string&)> get_name_func,
-	                       std::function<bool(std::string&)> verify_func = nullptr);
+	static void DrawImages(	std::vector<std::unique_ptr<STextureStructure>>& img_vec, ImVec2 image_size,
+							std::vector<std::string>& category_vec, std::string& selected_item, ImGuiTextFilter& filter,
+							std::function<void(std::string&)> on_left_click,
+							std::function<void(std::string&)> on_right_click,
+							std::function<std::string(std::string&)> get_name_func,
+							std::function<bool(std::string&)> verify_func = nullptr,
+							const char** custom_names = nullptr, size_t length = 0);
 
 	template <typename T>
 	static void EditAddress(const char* label, int address, int min = 0, int def = 0, int max = 100);
@@ -79,6 +80,7 @@ public:
 
 	static bool ListBox(const char* label, std::vector<std::string>& all_items, int& selected);
 	static bool ListBoxStr(const char* label, std::vector<std::string>& all_items, std::string& selected);
+	static bool ListBoxCustomNames(const char* label, std::vector<std::string>& all_items, std::string& selected, const char* custom_names[] = nullptr, size_t length = 0);
 
 	static void RadioButtonAddress(const char* label, std::vector<NamedMemory>& named_mem);
 	static void RadioButtonAddressEx(const char* label, int addr, std::vector<NamedValue>& named_val);

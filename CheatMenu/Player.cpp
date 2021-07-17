@@ -5,6 +5,29 @@
 #include "Ui.h"
 #include "Util.h"
 
+// hardcoded cloth category names
+const char* cloth_category[18] =
+{
+	"Shirts", // 0
+	"Heads", // 1
+	"Trousers", // 2
+	"Shoes", //3
+	"Tattoos left lower arm", // 4
+	"Tattoos left upper arm", // 5
+	"Tattoos right upper arm", // 6
+	"Tattoos right lower arm", // 7
+	"Tattoos back", // 8
+	"Tattoos left chest", // 9
+	"Tattoos right chest", // 10
+	"Tattoos stomach", // 11
+	"Tattoos lower back", // 12
+	"Necklaces", // 13
+	"Watches", // 13
+	"Glasses", // 15
+	"Hats", // 16
+	"Extras" // 17
+};
+
 inline static void PlayerModelBrokenFix()
 {
 	CPlayerPed* pPlayer = FindPlayerPed();
@@ -50,7 +73,7 @@ Player::Player()
 
 		if (!m_bImagesLoaded)
 		{
-			Util::LoadTextureDirectory(m_ClothData, PLUGIN_PATH((char*)"CheatMenu\\clothes.txd"));
+			Util::LoadTextureDirectory(m_ClothData, PLUGIN_PATH((char*)"CheatMenu\\clothes.txd"), true);
 			m_bImagesLoaded = true;
 		}
 
@@ -383,7 +406,7 @@ void Player::Draw()
 							               getline(ss, temp, '$');
 
 							               return temp;
-						               });
+						               }, nullptr, cloth_category, sizeof(cloth_category)/ sizeof(const char*));
 					}
 					else
 					{

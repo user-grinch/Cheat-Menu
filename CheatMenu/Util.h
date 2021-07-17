@@ -22,6 +22,6 @@ public:
 	static void GetCPUUsageInit();
 	static double GetCurrentCPUUsage();
 	static void* GetTextureFromRaster(RwTexture* pTexture);
-	static void LoadTextureDirectory(SSearchData& data, char* path);
+	static void LoadTextureDirectory(SSearchData& data, char* path, bool pass_full_name = false);
 	static RwTexture* LoadTextureFromMemory(char* data, unsigned int size);
 };

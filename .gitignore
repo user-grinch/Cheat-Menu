@@ -68,3 +68,5 @@ Depend/x64/Debug/Depend.tlog/CL.command.1.tlog
 Depend/x64/Debug/Depend.tlog/CL.read.1.tlog
 Depend/x64/Debug/Depend.tlog/CL.write.1.tlog
 Depend/x64/Debug/Depend.tlog/Depend.lastbuildstate
+CheatMenu/CheatMenu/json/versioninfo.json
+CheatMenu/CheatMenu/json/config.json

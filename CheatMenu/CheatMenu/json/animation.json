@@ -4,7 +4,6 @@
         "Stepsit_loop": "ATTRACTORS",
         "Stepsit_out": "ATTRACTORS"
     },
-    "All": {},
     "BAR": {
         "BARman_idle": "BAR",
         "Barcustom_get": "BAR",

@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Util.h"
-#include "../Depend/imgui/stb_image.h"
 #include <CCutsceneMgr.h>
 #include "psapi.h"
 #include "CFileLoader.h"
@@ -29,7 +28,7 @@ struct RwRasterEx : public RwRaster
 	RwD3D9Raster *renderResource;
 };
 
-void Util::LoadTextureDirectory(SSearchData& data, char *path)
+void Util::LoadTextureDirectory(SSearchData& data, char *path, bool pass_full_name)
 {
 	RwTexDictionary* pRwTexDictionary = &data.txd;
 
@@ -37,27 +36,54 @@ void Util::LoadTextureDirectory(SSearchData& data, char *path)
 
 	if (pRwTexDictionary) 
 	{
-		RwTexDictionaryForAllTextures(pRwTexDictionary, [](RwTexture* tex, void* data) 
+		// FIX ME
+		if (pass_full_name)
 		{
-			SSearchData* sdata = reinterpret_cast<SSearchData*>(data);
-			sdata->m_ImagesList.push_back(std::make_unique<STextureStructure>());
-			sdata->m_ImagesList.back().get()->m_pRwTexture = tex;
-			sdata->m_ImagesList.back().get()->m_pTexture = GetTextureFromRaster(tex);
-
-			std::stringstream ss(tex->name);
-			std::string str;
-			getline(ss, str, '$');
-			sdata->m_ImagesList.back().get()->m_CategoryName = str;
-			if (!std::count(sdata->m_Categories.begin(), sdata->m_Categories.end(), str))
+			RwTexDictionaryForAllTextures(pRwTexDictionary, [](RwTexture* tex, void* data)
 			{
-				sdata->m_Categories.push_back(str);
-			}
-			getline(ss, str);
-			sdata->m_ImagesList.back().get()->m_FileName = str;
+				SSearchData* sdata = reinterpret_cast<SSearchData*>(data);
+				sdata->m_ImagesList.push_back(std::make_unique<STextureStructure>());
+				sdata->m_ImagesList.back().get()->m_pRwTexture = tex;
+				sdata->m_ImagesList.back().get()->m_pTexture = GetTextureFromRaster(tex);
 
-			return tex;
+				std::stringstream ss(tex->name);
+				std::string str;
+				getline(ss, str, '$');
 
-		}, &data);
+				sdata->m_ImagesList.back().get()->m_CategoryName = str;
+				if (!std::count(sdata->m_Categories.begin(), sdata->m_Categories.end(), str))
+				{
+					sdata->m_Categories.push_back(str);
+				}
+				sdata->m_ImagesList.back().get()->m_FileName = tex->name;
+
+				return tex;
+			}, &data);
+		}
+		else
+		{
+			RwTexDictionaryForAllTextures(pRwTexDictionary, [](RwTexture* tex, void* data)
+			{
+				SSearchData* sdata = reinterpret_cast<SSearchData*>(data);
+				sdata->m_ImagesList.push_back(std::make_unique<STextureStructure>());
+				sdata->m_ImagesList.back().get()->m_pRwTexture = tex;
+				sdata->m_ImagesList.back().get()->m_pTexture = GetTextureFromRaster(tex);
+
+				std::stringstream ss(tex->name);
+				std::string str;
+				getline(ss, str, '$');
+
+				sdata->m_ImagesList.back().get()->m_CategoryName = str;
+				if (!std::count(sdata->m_Categories.begin(), sdata->m_Categories.end(), str))
+				{
+					sdata->m_Categories.push_back(str);
+				}
+				getline(ss, str);
+				sdata->m_ImagesList.back().get()->m_FileName = str;
+
+				return tex;
+			}, &data);
+		}
 	}
 }
 

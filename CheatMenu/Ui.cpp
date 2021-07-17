@@ -29,18 +29,42 @@ bool Ui::ListBoxStr(const char* label, std::vector<std::string>& all_items, std:
 	{
 		for (std::string current_item : all_items)
 		{
-			if (current_item != label)
+			if (ImGui::MenuItem(current_item.c_str()))
 			{
-				if (ImGui::MenuItem(current_item.c_str()))
-				{
-					selected = current_item;
-					rtn = true;
-				}
+				selected = current_item;
+				rtn = true;
 			}
 		}
 		ImGui::EndCombo();
 	}
 
+	return rtn;
+}
+
+bool Ui::ListBoxCustomNames(const char* label, std::vector<std::string>& all_items, std::string& selected, const char* custom_names[], size_t length)
+{
+	bool rtn = false;
+	std::string display_selected = (selected == "All") ? selected: custom_names[std::stoi(selected)];
+
+	if (ImGui::BeginCombo(label, display_selected.c_str()))
+	{
+		if (ImGui::MenuItem("All"))
+		{
+			selected = "All";
+			rtn = true;
+		}
+
+		for (size_t i = 0; i < length; ++i)
+		{
+			if (ImGui::MenuItem(custom_names[i]))
+			{
+				selected = std::to_string(i);
+				rtn = true;
+				break;
+			}
+		}
+		ImGui::EndCombo();
+	}
 	return rtn;
 }
 
@@ -323,9 +347,9 @@ bool Ui::CheckboxBitFlag(const char* label, uint flag, const char* hint)
 }
 
 void Ui::DrawJSON(CJson& json, std::vector<std::string>& combo_items, std::string& selected_item,
-                  ImGuiTextFilter& filter,
-                  std::function<void(std::string&, std::string&, std::string&)> func_left_click,
-                  std::function<void(std::string&, std::string&, std::string&)> func_right_click)
+                ImGuiTextFilter& filter,
+                std::function<void(std::string&, std::string&, std::string&)> func_left_click,
+                std::function<void(std::string&, std::string&, std::string&)> func_right_click)
 {
 	ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() / 2 - 5);
 	ListBoxStr("##Categories", combo_items, selected_item);
@@ -462,7 +486,7 @@ void Ui::DrawImages(std::vector<std::unique_ptr<STextureStructure>>& img_vec, Im
                     std::vector<std::string>& category_vec, std::string& selected_item, ImGuiTextFilter& filter,
                     std::function<void(std::string&)> on_left_click, std::function<void(std::string&)> on_right_click,
                     std::function<std::string(std::string&)> get_name_func,
-                    std::function<bool(std::string&)> verify_func)
+                    std::function<bool(std::string&)> verify_func, const char** custom_names, size_t length)
 {
 	// scale image size
 	image_size.x *= screen::GetScreenWidth() / 1366.0f;
@@ -480,7 +504,15 @@ void Ui::DrawImages(std::vector<std::unique_ptr<STextureStructure>>& img_vec, Im
 		imgPopup.function = nullptr;
 
 	ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() / 2 - 5);
-	ListBoxStr("##Categories", category_vec, selected_item);
+	if (custom_names)
+	{
+		ListBoxCustomNames("##Categories", category_vec, selected_item, custom_names, length);
+	}
+	else
+	{
+		ListBoxStr("##Categories", category_vec, selected_item);
+	}
+
 	ImGui::SameLine();
 	FilterWithHint("##Filter", filter, "Search");
 
