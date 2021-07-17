@@ -54,11 +54,11 @@ void Paint::RenderEvent(CVehicle* pVeh)
 		}
 		if (it.second._retexture)
 		{
-			auto tex = it.second._texture.lock();
+			auto tex = it.second._texture;
 			if (tex)
 			{
 				it.second._originalTexture = it.first->texture;
-				it.first->texture = tex.get();
+				it.first->texture = tex;
 			}
 			else
 			{
@@ -86,22 +86,14 @@ void Paint::ResetAfterRenderEvent(CVehicle* pVeh)
 
 Paint::Paint()
 {
-	Events::processScriptsEvent += [this]
+	Events::processScriptsEvent += [] 
 	{
 		if (!m_bImagesLoaded)
 		{
-			for (auto& p : fs::recursive_directory_iterator(PLUGIN_PATH((char*)"\\CheatMenu\\vehicles\\paintjobs\\")))
-			{
-				if (p.path().extension() == ".png")
-				{
-					std::string file_name = p.path().stem().string();
-					m_Textures[file_name] = std::make_shared<RwTexture>(*(Util::LoadTextureFromPngFile(p.path())));
-				}
-			}
+			Util::LoadTextureDirectory(m_TextureData, PLUGIN_PATH((char*)"CheatMenu\\textures.txd"));
 			m_bImagesLoaded = true;
 		}
 	};
-
 	Events::vehicleRenderEvent.before += RenderEvent;
 	Events::vehicleResetAfterRender += ResetAfterRenderEvent;
 }
@@ -126,7 +118,7 @@ void Paint::VehData::setMaterialColor(RpMaterial* material, RpGeometry* geometry
 	}
 }
 
-void Paint::VehData::setMaterialTexture(RpMaterial* material, std::shared_ptr<RwTexture> texture, bool filter_mat)
+void Paint::VehData::setMaterialTexture(RpMaterial* material, RwTexture* texture, bool filter_mat)
 {
 	auto& matProps = materialProperties[material];
 
@@ -150,7 +142,7 @@ void Paint::VehData::resetMaterialTexture(RpMaterial* material)
 {
 	auto& matProps = materialProperties[material];
 	matProps._retexture = false;
-	matProps._texture.reset();
+	matProps._texture = nullptr;
 }
 
 void Paint::NodeWrapperRecursive(RwFrame* frame, CVehicle* pVeh, std::function<void(RwFrame*)> func)
@@ -221,23 +213,31 @@ void Paint::SetNodeColor(CVehicle* pVeh, std::string node_name, CRGBA color, boo
 	});
 }
 
-
 void Paint::SetNodeTexture(CVehicle* pVeh, std::string node_name, std::string texturename, bool filter_mat)
 {
 	RwFrame* frame = (RwFrame*)pVeh->m_pRwClump->object.parent;
+	RwTexture* texture = nullptr;
+
+	for (auto const& tex : m_TextureData.m_ImagesList)
+	{
+		if (tex.get()->m_FileName == texturename)
+		{
+			texture = tex.get()->m_pRwTexture;
+			break;
+		}
+	}
+
 	NodeWrapperRecursive(frame, pVeh, [&](RwFrame* frame)
 	{
 		const std::string name = GetFrameNodeName(frame);
 
 		struct ST
 		{
-			std::string _texturename;
-			std::map<std::string, std::shared_ptr<RwTexture>> _textures;
+			RwTexture* _tex;
 			bool _filter;
 		} st;
 
-		st._textures = m_Textures;
-		st._texturename = texturename;
+		st._tex = texture;
 		st._filter = filter_mat;
 
 		if (node_name == "Default" || node_name == name)
@@ -252,8 +252,10 @@ void Paint::SetNodeTexture(CVehicle* pVeh, std::string node_name, std::string te
 					VehData& data = m_VehData.Get(FindPlayerPed()->m_pVehicle);
 
 					for (int i = 0; i < atomic->geometry->matList.numMaterials; ++i)
-						data.setMaterialTexture(atomic->geometry->matList.materials[i], st->_textures[st->_texturename],
-						                        st->_filter);
+					{
+						data.setMaterialTexture(atomic->geometry->matList.materials[i], st->_tex,
+							st->_filter);
+					}
 				}
 				return object;
 			}, &st);

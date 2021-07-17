@@ -45,7 +45,7 @@ private:
 			}
 
 			RwRGBA _color;
-			std::weak_ptr<RwTexture> _texture;
+			RwTexture* _texture;
 			bool _recolor;
 			bool _retexture;
 			RpGeometry* _geometry;
@@ -66,16 +66,15 @@ private:
 		}
 
 		void setMaterialColor(RpMaterial* material, RpGeometry* geometry, RwRGBA color, bool filter_mat = false);
-		void setMaterialTexture(RpMaterial* material, std::shared_ptr<RwTexture> texture9, bool filter_mat = false);
+		void setMaterialTexture(RpMaterial* material, RwTexture* texture, bool filter_mat = false);
 		void resetMaterialColor(RpMaterial* material);
 		void resetMaterialTexture(RpMaterial* material);
 	};
-
-	inline static bool m_bImagesLoaded = false;
+	inline static bool m_bImagesLoaded;
 	inline static VehicleExtendedData<VehData> m_VehData;
 
 protected:
-	inline static std::map<std::string, std::shared_ptr<RwTexture>> m_Textures;
+	inline static SSearchData m_TextureData;
 
 	struct veh_nodes
 	{

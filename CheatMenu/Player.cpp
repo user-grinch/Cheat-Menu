@@ -50,8 +50,7 @@ Player::Player()
 
 		if (!m_bImagesLoaded)
 		{
-			Util::LoadTexturesInDirRecursive(
-				PLUGIN_PATH((char*)"CheatMenu\\clothes\\"), ".jpg", m_ClothData.m_Categories, m_ClothData.m_ImagesList);
+			Util::LoadTextureDirectory(m_ClothData, PLUGIN_PATH((char*)"CheatMenu\\clothes.txd"));
 			m_bImagesLoaded = true;
 		}
 
@@ -115,11 +114,6 @@ Player::Player()
 			}
 		}
 	};
-}
-
-Player::~Player()
-{
-	Util::ReleaseTextures(m_ClothData.m_ImagesList);
 }
 
 void Player::ChangePlayerCloth(std::string& name)

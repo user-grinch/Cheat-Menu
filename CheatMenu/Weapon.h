@@ -32,7 +32,6 @@ public:
 	};
 
 	Weapon();
-	~Weapon();
 
 	static void Draw();
 	static void GiveWeaponToPlayer(std::string& weapon_type);

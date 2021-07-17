@@ -9,22 +9,12 @@ Vehicle::Vehicle()
 	ParseVehiclesIDE();
 	ParseCarcolsDAT();
 
-
-	
 	Events::processScriptsEvent += [this]
 	{
 		if (!m_bImagesLoaded)
 		{
-			Util::LoadTexturesInDirRecursive(
-				PLUGIN_PATH((char*)"CheatMenu\\vehicles\\images\\"), ".jpg", m_Spawner::m_VehData.m_Categories,
-				m_Spawner::m_VehData.m_ImagesList);
-			Util::LoadTexturesInDirRecursive(
-				PLUGIN_PATH((char*)"CheatMenu\\vehicles\\components\\"), ".jpg", m_TuneData.m_Categories,
-				m_TuneData.m_ImagesList);
-			Util::LoadTexturesInDirRecursive(
-				PLUGIN_PATH((char*)"CheatMenu\\vehicles\\paintjobs\\"), ".png", m_TextureData.m_Categories,
-				m_TextureData.m_ImagesList);
-
+			Util::LoadTextureDirectory(m_Spawner::m_VehData, PLUGIN_PATH((char*)"CheatMenu\\vehicles.txd"));
+			Util::LoadTextureDirectory(m_TuneData, PLUGIN_PATH((char*)"CheatMenu\\components.txd"));
 			m_bImagesLoaded = true;
 		}
 
@@ -162,9 +152,6 @@ Vehicle::Vehicle()
 
 Vehicle::~Vehicle()
 {
-	Util::ReleaseTextures(m_Spawner::m_VehData.m_ImagesList);
-	Util::ReleaseTextures(m_TuneData.m_ImagesList);
-	Util::ReleaseTextures(m_TextureData.m_ImagesList);
 }
 
 void Vehicle::AddComponent(const std::string& component, const bool display_message)

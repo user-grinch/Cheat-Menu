@@ -10,9 +10,7 @@ Weapon::Weapon()
 	{
 		if (!m_bImagesLoaded)
 		{
-			Util::LoadTexturesInDirRecursive(
-				PLUGIN_PATH((char*)"CheatMenu\\weapons\\"), ".jpg", Weapon::m_WeaponData.m_Categories,
-				Weapon::m_WeaponData.m_ImagesList);
+			Util::LoadTextureDirectory(m_WeaponData, PLUGIN_PATH((char*)"CheatMenu\\weapons.txd"));
 			m_bImagesLoaded = true;
 		}
 
@@ -63,11 +61,6 @@ Weapon::Weapon()
 	};
 }
 
-
-Weapon::~Weapon()
-{
-	Util::ReleaseTextures(Weapon::m_WeaponData.m_ImagesList);
-}
 
 void Weapon::SetGangWeapon(std::string& weapon_type)
 {
@@ -137,6 +130,7 @@ void Weapon::Draw()
 		Command<Commands::REMOVE_WEAPON_FROM_CHAR>(hplayer, player->m_aWeapons[player->m_nActiveWeaponSlot].m_nType);
 
 	ImGui::Spacing();
+	
 
 	if (ImGui::BeginTabBar("Ped", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
 	{

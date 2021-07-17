@@ -12,8 +12,7 @@ Ped::Ped()
 	{
 		if (!m_bImagesLoaded)
 		{
-			Util::LoadTexturesInDirRecursive(
-				PLUGIN_PATH((char*)"CheatMenu\\peds\\"), ".jpg", m_PedData.m_Categories, m_PedData.m_ImagesList);
+			Util::LoadTextureDirectory(m_PedData, PLUGIN_PATH((char*)"CheatMenu\\peds.txd"));
 			m_bImagesLoaded = true;
 		}
 	};
@@ -21,7 +20,6 @@ Ped::Ped()
 
 Ped::~Ped()
 {
-	Util::ReleaseTextures(m_PedData.m_ImagesList);
 	for (CPed* ped : m_SpawnPed::m_List)
 	{
 		CWorld::Remove(ped);

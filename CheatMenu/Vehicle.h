@@ -2,7 +2,7 @@
 #include "Neon.h"
 #include "Paint.h"
 
-class Vehicle : Paint, Neon
+class Vehicle : public Paint, public Neon
 {
 private:
 	inline static bool m_bBikeFly;
@@ -41,7 +41,6 @@ private:
 		inline static bool m_bSpawnInAir = true;
 		inline static char m_nLicenseText[9];
 	};
-	inline static SSearchData m_TextureData;
 	inline static SSearchData m_TuneData;
 	inline static bool m_bImagesLoaded;
 	struct m_UnlimitedNitro

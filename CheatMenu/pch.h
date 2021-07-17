@@ -89,13 +89,6 @@ struct Globals
 extern std::ofstream flog;
 extern CJson config;
 
-struct STextureStructure
-{
-	std::string m_FileName;
-	std::string m_CategoryName;
-	void* m_pTexture = nullptr;
-};
-
 struct HotKeyData
 {
 	int m_key1;
@@ -103,11 +96,20 @@ struct HotKeyData
 	bool m_bPressed;
 };
 
+struct STextureStructure
+{
+	std::string m_FileName;
+	std::string m_CategoryName;
+	RwTexture *m_pRwTexture = nullptr;
+	void* m_pTexture = nullptr;
+};
+
 struct SSearchData
 {
 	CJson m_Json;
+	RwTexDictionary txd;
 	ImGuiTextFilter m_Filter = "";
-	std::vector<std::string> m_Categories;
+	std::vector<std::string> m_Categories = {"All"};
 	std::string m_Selected = "All";
 	std::vector<std::unique_ptr<STextureStructure>> m_ImagesList;
 };
