@@ -3,7 +3,6 @@
 
 #define INPUT_BUFFER_SIZE 64
 #define SPAWN_PED_LIMIT 20
-#define STB_IMAGE_IMPLEMENTATION
 #define DISCORD_INVITE "https://discord.gg/ZzW7kmf"
 #define GITHUB_LINK "https://github.com/user-grinch/Cheat-Menu"
 
