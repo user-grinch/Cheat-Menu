@@ -247,17 +247,6 @@ void Util::RainbowValues(int& r, int& g, int& b, float speed)
 	b = sin(timer * speed + 4) * 127 + 128;
 }
 
-RwTexture* CreateRwTextureFromRwImage(RwImage* image)
-{
-	RwInt32 width, height, depth, flags;
-	RwImageFindRasterFormat(image, 4, &width, &height, &depth, &flags);
-	RwRaster* raster = RwRasterCreate(width, height, depth, flags);
-	RwRasterSetFromImage(raster, image);
-	RwImageDestroy(image);
-	RwTexture* texture = RwTextureCreate(raster);
-	return texture;
-}
-
 void Util::GetCPUUsageInit()
 {
 	PdhOpenQuery(nullptr, NULL, &cpuQuery);
