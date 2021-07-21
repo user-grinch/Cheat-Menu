@@ -24,9 +24,6 @@ workspace "CheatMenu"
    cppdialect "C++20"
    characterset "MBCS"
    staticruntime "On"
-   flags {
-       "LinkTimeOptimization"
-   }
 
 project "Depend"
     kind "StaticLib"
@@ -92,7 +89,7 @@ project "CheatMenu"
         }
 
     filter "configurations:Release"
-        -- optimize "On"
+        optimize "On"
         links { 
             "Depend",
             "d3d9",

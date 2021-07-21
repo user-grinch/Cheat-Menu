@@ -331,6 +331,7 @@ void Player::Draw()
 			{
 				int val = pPlayer->m_pPlayerData->m_pWanted->m_nWantedLevel;
 				int max_wl = pPlayer->m_pPlayerData->m_pWanted->MaximumWantedLevel;
+				max_wl = max_wl < 6 ? 6  : max_wl;
 
 				ImGui::Columns(3, 0, false);
 				ImGui::Text("Min: 0");

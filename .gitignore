@@ -1,5 +1,7 @@
 .vs/
 tools/.vs/
+tools/build/
+tools/obj/
 .vs/CheatMenu/v16/.suo
 .vs/CheatMenu/v16/Browse.VC.db
 .vs/CheatMenu/v16/Solution.VC.db
@@ -28,3 +30,7 @@ tools/.vs/
 tools/.vs/CheatMenu/v16/.suo
 tools/.vs/CheatMenu/v16/Browse.VC.db
 tools/.vs/CheatMenu/v16/Solution.VC.db
+tools/CheatMenu.sln
+tools/Depend.vcxproj
+tools/CheatMenu.vcxproj
+tools/Depend.vcxproj.filters
