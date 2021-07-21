@@ -1,4 +1,0 @@
-﻿  Library.cpp
-  kiero.cpp
-  Generating Code...
-C:\Work\Cheat-Menu\Depend\fla\Library\Library.cpp(11): error C4716: 'Library::GetSymbolAddress': must return a value

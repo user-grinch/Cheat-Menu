@@ -1,0 +1,33 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${PLUGIN_SDK_DIR}/*",
+                "${DIRECTX9_SDK_DIR}/Include/*",
+                "${PLUGIN_SDK_DIR}/plugin_sa/*",
+                "${PLUGIN_SDK_DIR}/plugin_sa/game_sa/*",
+                "${PLUGIN_SDK_DIR}/shared/*",
+                "${PLUGIN_SDK_DIR}/shared/game/*",
+                "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.19041.0\\ucrt\\*",
+                "C:\\Program Files (x86)\\Microsoft Visual Studio\\2019\\BuildTools\\VC\\Tools\\MSVC\\14.29.30037\\include\\*"
+            ],
+            "defines": [
+                "_DEBUG",
+                "IS_PLATFORM_WIN",
+                "_CRT_SECURE_NO_WARNINGS",
+                "_CRT_NON_CONFORMING_SWPRINTFS",
+                "GTASA",
+                "_DX9_SDK_INSTALLED",
+                "PLUGIN_SGV_10US"
+            ],
+            "windowsSdkVersion": "10.0.19041.0",
+            "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/VC/Tools/MSVC/14.29.30037/bin/Hostx64/x64/cl.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++20",
+            "intelliSenseMode": "windows-msvc-x86"
+        }
+    ],
+    "version": 4
+}
