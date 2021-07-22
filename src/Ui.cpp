@@ -1,4 +1,5 @@
 #include "pch.h"
+#include "Util.h"
 #include "Ui.h"
 
 bool Ui::ListBox(const char* label, std::vector<std::string>& all_items, int& selected)
@@ -529,7 +530,8 @@ void Ui::DrawImages(std::vector<std::unique_ptr<STextureStructure>>& img_vec, Im
 			&& (verify_func == nullptr || verify_func(text))
 		)
 		{
-			if (ImGui::ImageButton(img_vec[i]->m_pTexture, image_size, ImVec2(0, 0), ImVec2(1, 1), 1, ImVec4(1, 1, 1, 1),
+			IDirect3DTexture9* texture =  (IDirect3DTexture9*)Util::GetTextureFromRaster(img_vec[i]->m_pRwTexture);
+			if (ImGui::ImageButton(texture, image_size, ImVec2(0, 0), ImVec2(1, 1), 1, ImVec4(1, 1, 1, 1),
 			                       ImVec4(1, 1, 1, 1)))
 				on_left_click(text);
 

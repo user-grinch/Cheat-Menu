@@ -117,7 +117,9 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, short interior_id)
 		pVeh->m_nAreaCode = interior_id;
 	}
 	else
+	{
 		pPlayer->Teleport(pos, false);
+	}
 
 	pPlayer->m_nAreaCode = interior_id;
 	Command<Commands::SET_AREA_VISIBLE>(interior_id);

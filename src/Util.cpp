@@ -4,30 +4,6 @@
 #include "psapi.h"
 #include "CFileLoader.h"
 
-struct RwD3D9Raster
-{
-	union
-	{
-		IDirect3DTexture9* texture;
-		IDirect3DSurface9* surface;
-	};
-	unsigned char* palette;
-	unsigned char alpha;
-	unsigned char cubeTextureFlags; /* 0x01 IS_CUBEMAP_TEX */
-	unsigned char textureFlags; /* 0x10 IS_COMPRESSED */
-	unsigned char lockedLevel;
-	IDirect3DSurface9* lockedSurface;
-	D3DLOCKED_RECT lockedRect;
-	D3DFORMAT format;
-	IDirect3DSwapChain9* swapChain;
-	HWND* hwnd;
-};
-
-struct RwRasterEx : public RwRaster
-{
-	RwD3D9Raster *renderResource;
-};
-
 void Util::LoadTextureDirectory(SSearchData& data, char *path, bool pass_full_name)
 {
 	RwTexDictionary* pRwTexDictionary = &data.txd;
@@ -44,7 +20,6 @@ void Util::LoadTextureDirectory(SSearchData& data, char *path, bool pass_full_na
 				SSearchData* sdata = reinterpret_cast<SSearchData*>(data);
 				sdata->m_ImagesList.push_back(std::make_unique<STextureStructure>());
 				sdata->m_ImagesList.back().get()->m_pRwTexture = tex;
-				sdata->m_ImagesList.back().get()->m_pTexture = GetTextureFromRaster(tex);
 
 				std::stringstream ss(tex->name);
 				std::string str;
@@ -67,7 +42,6 @@ void Util::LoadTextureDirectory(SSearchData& data, char *path, bool pass_full_na
 				SSearchData* sdata = reinterpret_cast<SSearchData*>(data);
 				sdata->m_ImagesList.push_back(std::make_unique<STextureStructure>());
 				sdata->m_ImagesList.back().get()->m_pRwTexture = tex;
-				sdata->m_ImagesList.back().get()->m_pTexture = GetTextureFromRaster(tex);
 
 				std::stringstream ss(tex->name);
 				std::string str;

@@ -8,24 +8,24 @@
 // hardcoded cloth category names
 const char* cloth_category[18] =
 {
-	"Shirts", // 0
-	"Heads", // 1
-	"Trousers", // 2
-	"Shoes", //3
-	"Tattoos left lower arm", // 4
-	"Tattoos left upper arm", // 5
-	"Tattoos right upper arm", // 6
-	"Tattoos right lower arm", // 7
-	"Tattoos back", // 8
-	"Tattoos left chest", // 9
-	"Tattoos right chest", // 10
-	"Tattoos stomach", // 11
-	"Tattoos lower back", // 12
-	"Necklaces", // 13
-	"Watches", // 13
-	"Glasses", // 15
-	"Hats", // 16
-	"Extras" // 17
+	"Shirts", 
+	"Heads",
+	"Trousers", 
+	"Shoes", 
+	"Tattoos left lower arm", 
+	"Tattoos left upper arm", 
+	"Tattoos right upper arm", 
+	"Tattoos right lower arm", 
+	"Tattoos back", 
+	"Tattoos left chest", 
+	"Tattoos right chest",
+	"Tattoos stomach", 
+	"Tattoos lower back",
+	"Necklaces", 
+	"Watches", 
+	"Glasses", 
+	"Hats", 
+	"Extras"
 };
 
 inline static void PlayerModelBrokenFix()
@@ -273,6 +273,33 @@ void Player::Draw()
 				CCheat::NotWantedCheat();
 
 			ImGui::Columns(1);
+
+			ImGui::NewLine();
+			ImGui::TextWrapped("Player flags,");
+
+			ImGui::Columns(2, 0, false);
+
+			bool state = pPlayer->m_nPhysicalFlags.bBulletProof;
+			if (Ui::CheckboxWithHint("Bullet proof", &state, nullptr, m_bGodMode))
+				pPlayer->m_nPhysicalFlags.bBulletProof = state;
+
+			state = pPlayer->m_nPhysicalFlags.bCollisionProof;
+			if (Ui::CheckboxWithHint("Collision proof", &state, nullptr, m_bGodMode))
+				pPlayer->m_nPhysicalFlags.bCollisionProof = state;
+
+			state = pPlayer->m_nPhysicalFlags.bExplosionProof;
+			if (Ui::CheckboxWithHint("Explosion proof", &state, nullptr, m_bGodMode))
+				pPlayer->m_nPhysicalFlags.bExplosionProof = state;
+
+			ImGui::NextColumn();
+
+			state = pPlayer->m_nPhysicalFlags.bFireProof;
+			if (Ui::CheckboxWithHint("Fire proof", &state, nullptr, m_bGodMode))
+				pPlayer->m_nPhysicalFlags.bFireProof = state;
+
+			state = pPlayer->m_nPhysicalFlags.bMeeleProof;
+			if (Ui::CheckboxWithHint("Meele proof", &state, nullptr, m_bGodMode))
+				pPlayer->m_nPhysicalFlags.bMeeleProof = state;
 
 			ImGui::EndChild();
 			ImGui::EndTabItem();
