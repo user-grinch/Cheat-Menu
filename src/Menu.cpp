@@ -73,7 +73,7 @@ void Menu::DrawOverlay()
 {
 	CPlayerPed* player = FindPlayerPed();
 	bool m_bShowMenu = m_Overlay::bCoord || m_Overlay::bFPS || m_Overlay::bLocName || m_Overlay::bCpuUsage || m_Overlay::bMemUsage ||
-		((m_Overlay::bVehHealth || m_Overlay::bVehSpeed) && player->m_pVehicle && player->m_pVehicle->IsDriver(player));
+		((m_Overlay::bVehHealth || m_Overlay::bVehSpeed) && player && player->m_pVehicle && player->m_pVehicle->IsDriver(player));
 
 	const float offset = 10.0f;
 	ImGuiIO& io = ImGui::GetIO();
@@ -125,8 +125,12 @@ void Menu::DrawOverlay()
 
 	if (m_bShowMenu && ImGui::Begin("Overlay", nullptr, window_flags))
 	{
-		CPlayerPed* player = FindPlayerPed();
-		CVector pos = player->GetPosition();
+		CVector pos;
+		if (player)
+		{
+			pos = player->GetPosition();
+		}
+
 		size_t game_ms = CTimer::m_snTimeInMilliseconds;
 
 		if (game_ms - m_Overlay::mLastInterval > m_Overlay::mInterval)
@@ -158,15 +162,15 @@ void Menu::DrawOverlay()
 		if (m_Overlay::bMemUsage)
 			ImGui::Text("RAM usage: %.2f%%", m_Overlay::fMemUsage);
 
-		if (player->m_pVehicle && player->m_pVehicle->IsDriver(player))
+		if (player && player->m_pVehicle && player->m_pVehicle->IsDriver(player))
 		{
 			if (m_Overlay::bVehHealth)
 				ImGui::Text("Veh Health: %.f", player->m_pVehicle->m_fHealth);
 
 			if (m_Overlay::bVehSpeed)
 			{
-				int speed = player->m_pVehicle->m_vecMoveSpeed.Magnitude() * 50.0f;
-				ImGui::Text("Veh Speed: %d", speed); // 02E3 - GET_CAR_SPEED
+				int speed = player->m_pVehicle->m_vecMoveSpeed.Magnitude() * 50.0f; // 02E3 - GET_CAR_SPEED
+				ImGui::Text("Veh Speed: %d", speed); 
 			}
 		}
 
