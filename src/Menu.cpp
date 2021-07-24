@@ -125,7 +125,7 @@ void Menu::DrawOverlay()
 
 	if (m_bShowMenu && ImGui::Begin("Overlay", nullptr, window_flags))
 	{
-		CVector pos;
+		CVector pos{0,0,0};
 		if (player)
 		{
 			pos = player->GetPosition();

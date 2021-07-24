@@ -63,7 +63,7 @@ public:
 	template <typename T>
 	static void EditAddress(const char* label, int address, int min = 0, int def = 0, int max = 100);
 	static void EditBits(const char* label, int address, const std::vector<std::string>& names);
-	static void EditFloat(const char* label, int address, float min, float def, float max, float mul = 1);
+	static void EditFloat(const char* label, int address, float min, float def, float max, float mul = 1, float change = 1.0f);
 	template <typename T>
 	static void EditReference(const char* label, T& address, int min = 0, int def = 0, int max = 100);
 	static void EditRadioButtonAddress(const char* label, std::vector<NamedMemory>& named_mem);

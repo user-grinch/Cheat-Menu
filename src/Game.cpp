@@ -433,7 +433,7 @@ Lowers armour, health, stamina etc."))
 				ImGui::Separator();
 			}
 			Ui::EditReference("Game speed", CTimer::ms_fTimeScale, 1, 1, 10);
-			Ui::EditFloat("Gravity", 0x863984, -1.0f, 0.008f, 1.0f);
+			Ui::EditFloat("Gravity", 0x863984, -1.0f, 0.008f, 1.0f, 1.0f, 0.01f);
 
 			if (ImGui::CollapsingHeader("Set time"))
 			{

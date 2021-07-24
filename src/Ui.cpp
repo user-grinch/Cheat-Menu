@@ -752,7 +752,7 @@ void Ui::EditBits(const char* label, const int address, const std::vector<std::s
 }
 
 void Ui::EditFloat(const char* label, const int address, const float min, const float def, const float max,
-                   const float mul)
+                   const float mul, const float change)
 {
 	if (ImGui::CollapsingHeader(label))
 	{
@@ -785,15 +785,15 @@ void Ui::EditFloat(const char* label, const int address, const float min, const 
 			patch::SetFloat(address, val / mul, false);
 
 		ImGui::SameLine(0.0, 4.0);
-		if (ImGui::Button("-", ImVec2(size, size)) && val > min)
+		if (ImGui::Button("-", ImVec2(size, size)) && (val - change) > min)
 		{
-			val -= 1;
+			val -= change;
 			patch::SetFloat(address, val / mul, false);
 		}
 		ImGui::SameLine(0.0, 4.0);
-		if (ImGui::Button("+", ImVec2(size, size)) && val < max)
+		if (ImGui::Button("+", ImVec2(size, size)) && (val + change) < max)
 		{
-			val += 1;
+			val += change;
 			patch::SetFloat(address, val / mul, false);
 		}
 		ImGui::SameLine(0.0, 4.0);
