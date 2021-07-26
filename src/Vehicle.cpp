@@ -1028,113 +1028,116 @@ void Vehicle::Draw()
 				ImGui::EndChild();
 				ImGui::EndTabItem();
 			}
-			if (ImGui::BeginTabItem("Neons"))
+			if (Globals::renderer != Render_DirectX11)
 			{
-				ImGui::Spacing();
-				if (ImGui::Button("Remove neon", ImVec2(Ui::GetSize())))
+				if (ImGui::BeginTabItem("Neons"))
 				{
-					RemoveNeon(veh);
-					CHud::SetHelpMessage("Neon removed", false, false, false);
-				}
-
-				ImGui::Spacing();
-				ImGui::Columns(2, NULL, false);
-
-				bool pulsing = IsPulsingEnabled(veh);
-				if (Ui::CheckboxWithHint("Pulsing neons", &pulsing))
-					SetPulsing(veh, pulsing);
-
-				Ui::CheckboxWithHint("Rainbow neons", &m_Neon::m_bRainbowEffect, "Rainbow effect to neon lights");
-				ImGui::NextColumn();
-				Ui::CheckboxWithHint("Traffic neons", &m_Neon::m_bApplyOnTraffic, "Adds neon lights to traffic vehicles.\n\
-Only some vehicles will have them.");
-				ImGui::Columns(1);
-
-				ImGui::Spacing();
-
-				if (ImGui::ColorEdit3("Color picker", m_Neon::m_fColorPicker))
-					InstallNeon(veh, m_Neon::m_fColorPicker[0] * 255, m_Neon::m_fColorPicker[1] * 255,
-					            m_Neon::m_fColorPicker[2] * 255);
-
-				ImGui::Spacing();
-				ImGui::Text("Select neon preset:");
-
-				int count = (int)m_CarcolsColorData.size();
-				ImVec2 size = Ui::GetSize();
-				int btnsInRow = ImGui::GetWindowContentRegionWidth() / (size.y * 2);
-				int btnSize = (ImGui::GetWindowContentRegionWidth() - int(ImGuiStyleVar_ItemSpacing) * (btnsInRow -
-					0.6 * btnsInRow)) / btnsInRow;
-
-				ImGui::BeginChild("Neonss");
-
-				for (int color_id = 0; color_id < count; ++color_id)
-				{
-					if (Ui::ColorButton(color_id, m_CarcolsColorData[color_id], ImVec2(btnSize, btnSize)))
+					ImGui::Spacing();
+					if (ImGui::Button("Remove neon", ImVec2(Ui::GetSize())))
 					{
-						std::vector<float>& color = m_CarcolsColorData[color_id];
-						InstallNeon(veh, color[0] * 255, color[1] * 255, color[2] * 255);
-					}
-
-					if ((color_id + 1) % btnsInRow != 0)
-						ImGui::SameLine(0.0, 4.0);
-				}
-
-				ImGui::EndChild();
-				ImGui::EndTabItem();
-			}
-			if (ImGui::BeginTabItem("Textures"))
-			{
-				Paint::UpdateNodeListRecursive(veh);
-
-				ImGui::Spacing();
-				if (ImGui::Button("Reset texture", ImVec2(Ui::GetSize())))
-				{
-					Paint::ResetNodeTexture(veh, Paint::veh_nodes::selected);
-					CHud::SetHelpMessage("Texture reset", false, false, false);
-				}
-				ImGui::Spacing();
-
-				Ui::ListBoxStr("Component", Paint::veh_nodes::names_vec, Paint::veh_nodes::selected);
-				ImGui::Spacing();
-
-				int maxpjob, curpjob;
-				Command<Commands::GET_NUM_AVAILABLE_PAINTJOBS>(hveh, &maxpjob);
-
-				if (maxpjob > 0)
-				{
-					Command<Commands::GET_CURRENT_VEHICLE_PAINTJOB>(hveh, &curpjob);
-
-					if (ImGui::InputInt("Paintjob", &curpjob))
-					{
-						if (curpjob > maxpjob)
-							curpjob = -1;
-						if (curpjob < -1)
-							curpjob = maxpjob - 1;
-
-						Command<Commands::GIVE_VEHICLE_PAINTJOB>(hveh, curpjob);
+						RemoveNeon(veh);
+						CHud::SetHelpMessage("Neon removed", false, false, false);
 					}
 
 					ImGui::Spacing();
+					ImGui::Columns(2, NULL, false);
+
+					bool pulsing = IsPulsingEnabled(veh);
+					if (Ui::CheckboxWithHint("Pulsing neons", &pulsing))
+						SetPulsing(veh, pulsing);
+
+					Ui::CheckboxWithHint("Rainbow neons", &m_Neon::m_bRainbowEffect, "Rainbow effect to neon lights");
+					ImGui::NextColumn();
+					Ui::CheckboxWithHint("Traffic neons", &m_Neon::m_bApplyOnTraffic, "Adds neon lights to traffic vehicles.\n\
+	Only some vehicles will have them.");
+					ImGui::Columns(1);
+
+					ImGui::Spacing();
+
+					if (ImGui::ColorEdit3("Color picker", m_Neon::m_fColorPicker))
+						InstallNeon(veh, m_Neon::m_fColorPicker[0] * 255, m_Neon::m_fColorPicker[1] * 255,
+									m_Neon::m_fColorPicker[2] * 255);
+
+					ImGui::Spacing();
+					ImGui::Text("Select neon preset:");
+
+					int count = (int)m_CarcolsColorData.size();
+					ImVec2 size = Ui::GetSize();
+					int btnsInRow = ImGui::GetWindowContentRegionWidth() / (size.y * 2);
+					int btnSize = (ImGui::GetWindowContentRegionWidth() - int(ImGuiStyleVar_ItemSpacing) * (btnsInRow -
+						0.6 * btnsInRow)) / btnsInRow;
+
+					ImGui::BeginChild("Neonss");
+
+					for (int color_id = 0; color_id < count; ++color_id)
+					{
+						if (Ui::ColorButton(color_id, m_CarcolsColorData[color_id], ImVec2(btnSize, btnSize)))
+						{
+							std::vector<float>& color = m_CarcolsColorData[color_id];
+							InstallNeon(veh, color[0] * 255, color[1] * 255, color[2] * 255);
+						}
+
+						if ((color_id + 1) % btnsInRow != 0)
+							ImGui::SameLine(0.0, 4.0);
+					}
+
+					ImGui::EndChild();
+					ImGui::EndTabItem();
 				}
+				if (ImGui::BeginTabItem("Textures"))
+				{
+					Paint::UpdateNodeListRecursive(veh);
 
-				ImGui::Spacing();
-				ImGui::SameLine();
-				ImGui::Checkbox("Material filter", &m_Color::m_bMatFilter);
-				ImGui::Spacing();
-				Ui::DrawImages(m_TextureData.m_ImagesList, ImVec2(100, 80), m_TextureData.m_Categories, m_TextureData.m_Selected,
-				               m_TextureData.m_Filter,
-				               [](std::string& str)
-				               {
-					               Paint::SetNodeTexture(FindPlayerPed()->m_pVehicle, Paint::veh_nodes::selected, str,
-					                                     m_Color::m_bMatFilter);
-				               },
-				               nullptr,
-				               [](std::string& str)
-				               {
-					               return str;
-				               });
+					ImGui::Spacing();
+					if (ImGui::Button("Reset texture", ImVec2(Ui::GetSize())))
+					{
+						Paint::ResetNodeTexture(veh, Paint::veh_nodes::selected);
+						CHud::SetHelpMessage("Texture reset", false, false, false);
+					}
+					ImGui::Spacing();
 
-				ImGui::EndTabItem();
+					Ui::ListBoxStr("Component", Paint::veh_nodes::names_vec, Paint::veh_nodes::selected);
+					ImGui::Spacing();
+
+					int maxpjob, curpjob;
+					Command<Commands::GET_NUM_AVAILABLE_PAINTJOBS>(hveh, &maxpjob);
+
+					if (maxpjob > 0)
+					{
+						Command<Commands::GET_CURRENT_VEHICLE_PAINTJOB>(hveh, &curpjob);
+
+						if (ImGui::InputInt("Paintjob", &curpjob))
+						{
+							if (curpjob > maxpjob)
+								curpjob = -1;
+							if (curpjob < -1)
+								curpjob = maxpjob - 1;
+
+							Command<Commands::GIVE_VEHICLE_PAINTJOB>(hveh, curpjob);
+						}
+
+						ImGui::Spacing();
+					}
+
+					ImGui::Spacing();
+					ImGui::SameLine();
+					ImGui::Checkbox("Material filter", &m_Color::m_bMatFilter);
+					ImGui::Spacing();
+					Ui::DrawImages(m_TextureData.m_ImagesList, ImVec2(100, 80), m_TextureData.m_Categories, m_TextureData.m_Selected,
+								m_TextureData.m_Filter,
+								[](std::string& str)
+								{
+									Paint::SetNodeTexture(FindPlayerPed()->m_pVehicle, Paint::veh_nodes::selected, str,
+															m_Color::m_bMatFilter);
+								},
+								nullptr,
+								[](std::string& str)
+								{
+									return str;
+								});
+
+					ImGui::EndTabItem();
+				}
 			}
 			if (ImGui::BeginTabItem("Tune"))
 			{

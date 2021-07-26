@@ -530,10 +530,22 @@ void Ui::DrawImages(std::vector<std::unique_ptr<STextureStructure>>& img_vec, Im
 			&& (verify_func == nullptr || verify_func(text))
 		)
 		{
-			IDirect3DTexture9* texture =  (IDirect3DTexture9*)Util::GetTextureFromRaster(img_vec[i]->m_pRwTexture);
-			if (ImGui::ImageButton(texture, image_size, ImVec2(0, 0), ImVec2(1, 1), 1, ImVec4(1, 1, 1, 1),
-			                       ImVec4(1, 1, 1, 1)))
-				on_left_click(text);
+			if (Globals::renderer == Render_DirectX11)
+			{
+				if (ImGui::MenuItem(model_name.c_str()))
+				{
+					on_left_click(text);
+				}
+			}
+			else
+			{
+				IDirect3DTexture9* texture =  (IDirect3DTexture9*)Util::GetTextureFromRaster(img_vec[i]->m_pRwTexture);
+				if (ImGui::ImageButton(texture, image_size, ImVec2(0, 0), ImVec2(1, 1), 1, ImVec4(1, 1, 1, 1),ImVec4(1, 1, 1, 1)))
+				{
+					on_left_click(text);
+				}
+			}
+			
 
 			if (ImGui::IsItemClicked(1) && on_right_click != nullptr)
 			{
@@ -541,43 +553,47 @@ void Ui::DrawImages(std::vector<std::unique_ptr<STextureStructure>>& img_vec, Im
 				imgPopup.value = model_name;
 			}
 
-			if (ImGui::IsItemHovered())
+			if (Globals::renderer != Render_DirectX11)
 			{
-				ImDrawList* drawlist = ImGui::GetWindowDrawList();
-
-				ImVec2 btn_min = ImGui::GetItemRectMin();
-				ImVec2 btn_max = ImGui::GetItemRectMax();
-
-				drawlist->AddRectFilled(btn_min, btn_max, ImGui::GetColorU32(ImGuiCol_ModalWindowDimBg));
-
-				ImVec2 text_size = ImGui::CalcTextSize(model_name.c_str());
-				if (text_size.x < image_size.x)
+				if (ImGui::IsItemHovered())
 				{
-					float offsetX = (ImGui::GetItemRectSize().x - text_size.x) / 2;
-					drawlist->AddText(ImVec2(btn_min.x + offsetX, btn_min.y + 10), ImGui::GetColorU32(ImGuiCol_Text),
-					                  model_name.c_str());
-				}
-				else
-				{
-					std::string buff = "";
+					ImDrawList* drawlist = ImGui::GetWindowDrawList();
 
-					std::stringstream ss(model_name);
-					short count = 1;
+					ImVec2 btn_min = ImGui::GetItemRectMin();
+					ImVec2 btn_max = ImGui::GetItemRectMax();
 
-					while (ss >> buff)
+					drawlist->AddRectFilled(btn_min, btn_max, ImGui::GetColorU32(ImGuiCol_ModalWindowDimBg));
+
+					ImVec2 text_size = ImGui::CalcTextSize(model_name.c_str());
+					if (text_size.x < image_size.x)
 					{
-						text_size = ImGui::CalcTextSize(buff.c_str());
 						float offsetX = (ImGui::GetItemRectSize().x - text_size.x) / 2;
-						drawlist->AddText(ImVec2(btn_min.x + offsetX, btn_min.y + 10 * count),
-						                  ImGui::GetColorU32(ImGuiCol_Text), buff.c_str());
-						++count;
+						drawlist->AddText(ImVec2(btn_min.x + offsetX, btn_min.y + 10), ImGui::GetColorU32(ImGuiCol_Text),
+										model_name.c_str());
+					}
+					else
+					{
+						std::string buff = "";
+
+						std::stringstream ss(model_name);
+						short count = 1;
+
+						while (ss >> buff)
+						{
+							text_size = ImGui::CalcTextSize(buff.c_str());
+							float offsetX = (ImGui::GetItemRectSize().x - text_size.x) / 2;
+							drawlist->AddText(ImVec2(btn_min.x + offsetX, btn_min.y + 10 * count),
+											ImGui::GetColorU32(ImGuiCol_Text), buff.c_str());
+							++count;
+						}
 					}
 				}
+
+				if (images_count % images_in_row != 0)
+				{
+					ImGui::SameLine(0.0, ImGui::GetStyle().ItemInnerSpacing.x);
+				}
 			}
-
-			if (images_count % images_in_row != 0)
-				ImGui::SameLine(0.0, ImGui::GetStyle().ItemInnerSpacing.x);
-
 			images_count++;
 		}
 	}

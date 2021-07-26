@@ -4,7 +4,7 @@
 	Required:
 		DirectX 9 SDK
 		Plugin SDK
-		Visual Studio 2019 (v142)
+		Build Tools 2019 (v142)
 		Windows SDK
 */
 

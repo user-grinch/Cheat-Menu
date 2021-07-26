@@ -5,10 +5,21 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(Windows) Attach",
+            "name": "Launch SA",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "C:/Work/GTASanAndreas/gta_sa.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "C:/Work/GTASanAndreas/",
+            "environment": [],
+            "console": "internalConsole"
+        },
+        {
+            "name": "Attach",
             "type": "cppvsdbg",
             "request": "attach",
             "processId": "${command:pickProcess}"
-        },
+        }
     ]
 }
