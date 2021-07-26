@@ -5,6 +5,7 @@
 #include "Util.h"
 #include "CIplStore.h"
 
+static bool bSaveGameFlag = false;
 
 // Thanks to aap
 void Game::RealTimeClock()
@@ -43,6 +44,14 @@ Game::Game()
 		m_RandomCheats::m_EnabledCheats[std::stoi(element.key())][1] = "true";
 	}
 
+	Events::drawMenuBackgroundEvent += []()
+	{
+		if (bSaveGameFlag)
+		{
+			FrontEndMenuManager.m_nCurrentMenuPage = MENUPAGE_GAME_SAVE;
+			bSaveGameFlag = false;
+		}
+	};
 	Events::processScriptsEvent += []
 	{
 		uint timer = CTimer::m_snTimeInMilliseconds;
@@ -300,6 +309,13 @@ void Game::Draw()
 	ImGui::Spacing();
 	CPlayerPed* pPlayer = FindPlayerPed();
 	int hplayer = CPools::GetPedRef(pPlayer);
+
+	if (ImGui::Button("Save game (might cause game bugs)",Ui::GetSize()))
+	{
+		FrontEndMenuManager.m_bActivateMenuNextFrame = true;
+		bSaveGameFlag = true;
+	}
+	ImGui::Spacing();
 
 	if (ImGui::BeginTabBar("Game", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
 	{
