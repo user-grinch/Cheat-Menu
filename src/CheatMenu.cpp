@@ -55,7 +55,7 @@ void CheatMenu::DrawWindow()
 CheatMenu::CheatMenu()
 {
 	ApplyStyle();
-	window_callback = std::bind(&DrawWindow);
+	windowCallback = std::bind(&DrawWindow);
 
 	// Load menu settings
 	Globals::m_HeaderId = config.GetValue("window.id", std::string(""));

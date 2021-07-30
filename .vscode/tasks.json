@@ -6,7 +6,7 @@
         {
             "label": "Build Debug",
             "type": "shell",
-            "command": "Debug.bat",
+            "command": "${workspaceFolder}/tools/Debug.bat",
             "presentation": {
                 "echo": true,
                 "reveal": "always",
@@ -23,7 +23,7 @@
         {
             "label": "Build Release",
             "type": "shell",
-            "command": "Release.bat",
+            "command": "${workspaceFolder}/tools/Release.bat",
             "presentation": {
                 "echo": true,
                 "reveal": "always",

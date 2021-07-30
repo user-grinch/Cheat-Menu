@@ -37,7 +37,9 @@ HRESULT Hook::Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentat
 void Hook::RenderFrame(void* ptr)
 {
 	if (!ImGui::GetCurrentContext())
+	{
 		return;
+	}
 
 	ImGuiIO& io = ImGui::GetIO();
 
@@ -49,15 +51,19 @@ void Hook::RenderFrame(void* ptr)
 		ImVec2 size(screen::GetScreenWidth(), screen::GetScreenHeight());
 		if (Globals::m_fScreenSize.x != size.x && Globals::m_fScreenSize.y != size.y)
 		{
-			int font_size = static_cast<int>(size.y / 54.85f); // manually tested
+			int fontSize = static_cast<int>(size.y / 54.85f); // manually tested
 
-			io.FontDefault = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/trebucbd.ttf", font_size);
+			io.FontDefault = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/trebucbd.ttf", fontSize);
 			io.Fonts->Build();
 
 			if (Globals::renderer == Render_DirectX9)
+			{
 				ImGui_ImplDX9_InvalidateDeviceObjects();
+			}
 			else
+			{
 				ImGui_ImplDX11_InvalidateDeviceObjects();
+			}
 
 			if (Globals::m_fScreenSize.x != -1 && Globals::m_fScreenSize.y != -1)
 			{
@@ -66,36 +72,46 @@ void Hook::RenderFrame(void* ptr)
 			}
 
 			ImGuiStyle* style = &ImGui::GetStyle();
-			float scale_x = size.x / 1366.0f;
-			float scale_y = size.y / 768.0f;
+			float scaleX = size.x / 1366.0f;
+			float scaleY = size.y / 768.0f;
 
-			style->FramePadding = ImVec2(5 * scale_x, 3 * scale_y);
-			style->ItemSpacing = ImVec2(8 * scale_x, 4 * scale_y);
-			style->ScrollbarSize = 12 * scale_x;
-			style->IndentSpacing = 20 * scale_x;
-			style->ItemInnerSpacing = ImVec2(4 * scale_x, 4 * scale_y);
+			style->FramePadding = ImVec2(5 * scaleX, 3 * scaleY);
+			style->ItemSpacing = ImVec2(8 * scaleX, 4 * scaleY);
+			style->ScrollbarSize = 12 * scaleX;
+			style->IndentSpacing = 20 * scaleX;
+			style->ItemInnerSpacing = ImVec2(4 * scaleX, 4 * scaleY);
 
 			Globals::m_fScreenSize = size;
 		}
 
 		ImGui_ImplWin32_NewFrame();
 		if (Globals::renderer == Render_DirectX9)
+		{
 			ImGui_ImplDX9_NewFrame();
+		}
 		else
+		{
 			ImGui_ImplDX11_NewFrame();
+		}
 
 		ImGui::NewFrame();
 
-		if (window_callback != nullptr)
-			window_callback();
+		if (windowCallback != nullptr)
+		{
+			windowCallback();
+		}
 
 		ImGui::EndFrame();
 		ImGui::Render();
 
 		if (Globals::renderer == Render_DirectX9)
+		{
 			ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+		}
 		else
+		{
 			ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
+		}
 	}
 	else
 	{
@@ -240,10 +256,14 @@ static int _cdecl _GetMouseState(Mouse* pMouse)
 	GetCursorPos(&Point);
 
 	if (mouseInfo.x >= 0)
+	{
 		pMouse->x = int(Point.x - mouseInfo.x);
+	}
 
 	if (mouseInfo.y >= 0)
+	{
 		pMouse->y = int(Point.y - mouseInfo.y);
+	}
 
 	mouseInfo.wheelDelta = 0;
 

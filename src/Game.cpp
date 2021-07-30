@@ -91,10 +91,14 @@ Game::Game()
 					Command<Commands::CREATE_OBJECT>(3095, pos.x, pos.y, waterHeight, &m_nSolidWaterObj);
 					Command<Commands::SET_OBJECT_VISIBLE>(m_nSolidWaterObj, false);
 					if (pos.z < (waterHeight + 1))
+					{
 						pPlayer->SetPosn(pos.x, pos.y, waterHeight + 1);
+					}
 				}
 				else
+				{
 					Command<Commands::SET_OBJECT_COORDINATES>(m_nSolidWaterObj, pos.x, pos.y, waterHeight);
+				}
 			}
 			else
 			{
@@ -216,10 +220,14 @@ void Game::FreeCam()
 	m_Freecam::m_fTotalMouse.y = m_Freecam::m_fTotalMouse.y + m_Freecam::m_fMouse.y / 3;
 
 	if (m_Freecam::m_fTotalMouse.x > 150)
+	{
 		m_Freecam::m_fTotalMouse.y = 150;
+	}
 
 	if (m_Freecam::m_fTotalMouse.y < -150)
+	{
 		m_Freecam::m_fTotalMouse.y = -150;
+	}
 
 	if (Ui::HotKeyPressed(Menu::m_HotKeys::freeCamTeleportPlayer))
 	{
@@ -236,15 +244,21 @@ void Game::FreeCam()
 	}
 
 	if (KeyPressed(VK_RCONTROL))
+	{
 		deltaSpeed /= 2;
+	}
 
 	if (KeyPressed(VK_RSHIFT))
+	{
 		deltaSpeed *= 2;
+	}
 
 	if (KeyPressed(VK_KEY_I) || KeyPressed(VK_KEY_K))
 	{
 		if (KeyPressed(VK_KEY_K))
+		{
 			deltaSpeed *= -1;
+		}
 
 		float angle;
 		Command<Commands::GET_CHAR_HEADING>(m_Freecam::m_nPed, &angle);
@@ -256,7 +270,9 @@ void Game::FreeCam()
 	if (KeyPressed(VK_KEY_J) || KeyPressed(VK_KEY_L))
 	{
 		if (KeyPressed(VK_KEY_J))
+		{
 			deltaSpeed *= -1;
+		}
 
 		float angle;
 		Command<Commands::GET_CHAR_HEADING>(m_Freecam::m_nPed, &angle);
@@ -269,7 +285,9 @@ void Game::FreeCam()
 	if (CPad::NewMouseControllerState.wheelUp)
 	{
 		if (m_Freecam::m_fFOV > 10.0f)
+		{
 			m_Freecam::m_fFOV -= 2.0f * deltaSpeed;
+		}
 
 		TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_Freecam::m_fFOV, 250, true);
 		Command<Commands::CAMERA_PERSIST_FOV>(true);
@@ -278,7 +296,9 @@ void Game::FreeCam()
 	if (CPad::NewMouseControllerState.wheelDown)
 	{
 		if (m_Freecam::m_fFOV < 115.0f)
+		{
 			m_Freecam::m_fFOV += 2.0f * deltaSpeed;
+		}
 
 		TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_Freecam::m_fFOV, 250, true);
 		Command<Commands::CAMERA_PERSIST_FOV>(true);
@@ -341,9 +361,13 @@ void Game::Draw()
 			if (ImGui::Checkbox("Disable F1 & F3 replay", &m_bDisableReplay))
 			{
 				if (m_bDisableReplay)
+				{
 					patch::SetInt(0x460500, 0xC3, false);
+				}
 				else
+				{
 					patch::SetInt(0x460500, 0xBD844BB, false);
+				}
 			}
 
 			Ui::CheckboxAddress("Faster clock", 0x96913B);
@@ -352,9 +376,13 @@ void Game::Draw()
 of LS without completing missions"))
 			{
 				if (m_bForbiddenArea)
+				{
 					patch::Set<BYTE>(0x441770, 0x83, false);
+				}
 				else
+				{
 					patch::Set<BYTE>(0x441770, 0xC3, false);
+				}
 			}
 
 			Ui::CheckboxAddress("Free pay n spray", 0x96C009);
@@ -421,7 +449,10 @@ Lowers armour, health, stamina etc."))
 			{
 				int day = CClock::CurrentDay - 1;
 				if (Ui::ListBox("Select day", m_DayNames, day))
+				{
 					CClock::CurrentDay = day + 1;
+				}
+
 				ImGui::Spacing();
 				ImGui::Separator();
 			}
@@ -483,26 +514,38 @@ Lowers armour, health, stamina etc."))
 			{
 				using func = void(void);
 				if (ImGui::Button("Foggy", Ui::GetSize(3)))
+				{
 					((func*)0x438F80)();
+				}
 
 				ImGui::SameLine();
 				if (ImGui::Button("Overcast", Ui::GetSize(3)))
+				{
 					((func*)0x438F60)();
+				}
 
 				ImGui::SameLine();
 				if (ImGui::Button("Rainy", Ui::GetSize(3)))
+				{
 					((func*)0x438F70)();
+				}
 
 				if (ImGui::Button("Sandstorm", Ui::GetSize(3)))
+				{
 					((func*)0x439590)();
+				}
 
 				ImGui::SameLine();
 				if (ImGui::Button("Thunderstorm", Ui::GetSize(3)))
+				{
 					((func*)0x439570)();
+				}
 
 				ImGui::SameLine();
 				if (ImGui::Button("Very sunny", Ui::GetSize(3)))
+				{
 					((func*)0x438F50)();
+				}
 
 				ImGui::Spacing();
 				ImGui::Separator();
@@ -560,9 +603,11 @@ It's recommanded not to save after using the mission loader. Use it at your own 
 				{
 					for (auto _data : root.value().items())
 					{
-						auto name = _data.value().get<std::string>();
+						std::string name = _data.value().get<std::string>();
 						if (m_StatData.m_Filter.PassFilter(name.c_str()))
+						{
 							Ui::EditStat(name.c_str(), std::stoi(_data.key()));
+						}
 					}
 				}
 			}
@@ -586,12 +631,14 @@ It's recommanded not to save after using the mission loader. Use it at your own 
 			ImGui::Separator();
 			if (ImGui::BeginChild("Cheats list"))
 			{
-				for (auto element : m_RandomCheats::m_EnabledCheats)
+				for (std::string* element : m_RandomCheats::m_EnabledCheats)
 				{
 					bool selected = (element[1] == "true") ? true : false;
 
 					if (ImGui::MenuItem(element[0].c_str(), nullptr, selected))
+					{
 						element[1] = selected ? "false" : "true";
+					}
 				}
 				ImGui::EndChild();
 			}

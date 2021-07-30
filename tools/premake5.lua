@@ -24,17 +24,17 @@ workspace "CheatMenu"
     cppdialect "C++20"
     characterset "MBCS"
     staticruntime "On"
-    location "build"
+    location "../build"
 
 project "Depend"
     kind "StaticLib"
-    targetdir "build/bin"
+    targetdir "../build/bin"
 
     files { 
-        "depned/**.h", 
-        "depend/**.hpp", 
-        "depend/**.c", 
-        "depend/**.cpp" 
+        "../depned/**.h", 
+        "../depend/**.hpp", 
+        "../depend/**.c", 
+        "../depend/**.cpp" 
     }
     libdirs (PSDK_DIR .. "/output/lib")
 
@@ -52,9 +52,9 @@ project "CheatMenu"
     targetextension ".asi"
     
     files { 
-        "src/**.h", 
-        "src/**.hpp", 
-        "src/**.cpp" 
+        "../src/**.h", 
+        "../src/**.hpp", 
+        "../src/**.cpp" 
     }
     includedirs {
         PSDK_DIR .. "/plugin_sa/",
@@ -75,7 +75,7 @@ project "CheatMenu"
     }
 
     pchheader "pch.h"
-    pchsource "src/pch.cpp"
+    pchsource "../src/pch.cpp"
 
     filter "configurations:Debug"
         symbols "On"

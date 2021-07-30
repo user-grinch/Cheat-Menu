@@ -25,7 +25,7 @@ private:
 
 public:
 	inline static bool m_bShowMouse = false;
-	inline static std::function<void()> window_callback = nullptr;
+	inline static std::function<void()> windowCallback = nullptr;
 	static void ApplyMouseFix();
 
 	Hook();

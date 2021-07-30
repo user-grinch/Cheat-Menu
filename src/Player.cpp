@@ -407,23 +407,17 @@ void Player::Draw()
 			{
 				if (ImGui::BeginTabItem("Clothes"))
 				{
+					static int bClothOption = 0;
+					ImGui::RadioButton("Add", &bClothOption, 0);
+					ImGui::SameLine();
+					ImGui::RadioButton("Remove", &bClothOption, 1);
 					ImGui::Spacing();
 
 					if (pPlayer->m_nModelIndex == 0)
 					{
-						if (ImGui::Button("Remove clothes", ImVec2(Ui::GetSize())))
+						if (bClothOption == 0)
 						{
-							CPlayerPed* player = FindPlayerPed();
-
-							int temp = 0;
-							for (uint i = 0; i < 18; i++)
-								player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(temp, temp, i);
-
-							CClothes::RebuildPlayer(player, false);
-						}
-						ImGui::Spacing();
-
-						Ui::DrawImages(m_ClothData.m_ImagesList, ImVec2(70, 100), m_ClothData.m_Categories, m_ClothData.m_Selected,
+							Ui::DrawImages(m_ClothData.m_ImagesList, ImVec2(70, 100), m_ClothData.m_Categories, m_ClothData.m_Selected,
 						               m_ClothData.m_Filter, ChangePlayerCloth, nullptr,
 						               [](std::string str)
 						               {
@@ -435,6 +429,40 @@ void Player::Draw()
 
 							               return temp;
 						               }, nullptr, cloth_category, sizeof(cloth_category)/ sizeof(const char*));
+						}
+						else
+						{
+							size_t count = 0;
+
+							if(ImGui::Button("Remove all", ImVec2(Ui::GetSize(2))))
+							{
+								CPlayerPed* player = FindPlayerPed();
+								for (uint i = 0; i < 18; i++)
+								{
+									player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(0u, 0u, i);
+								}
+								CClothes::RebuildPlayer(player, false);
+							}
+							ImGui::SameLine();
+							for (const char* clothName : cloth_category)
+							{
+								if(ImGui::Button(clothName, ImVec2(Ui::GetSize(2))))
+								{
+									CPlayerPed* player = FindPlayerPed();
+									player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(0u, 0u, count);
+									CClothes::RebuildPlayer(player, false);
+								}
+
+								if (count %2 != 0)
+								{
+									ImGui::SameLine();
+								}
+								++count;
+							}
+
+							ImGui::Spacing();
+							ImGui::TextWrapped("If CJ is wearing a full suit, click 'Extras/ Remove all' to remove it.");
+						}
 					}
 					else
 					{
