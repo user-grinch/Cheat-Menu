@@ -7,17 +7,6 @@ LRESULT Hook::WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 
-	if (m_bShowMouse)
-	{
-		patch::Nop(0x4EB9F4, 5); //  disable radio scroll
-		CPad::ClearMouseHistory();
-
-		if (uMsg == WM_MOUSEWHEEL)
-			return 1;
-	}
-	else
-		patch::SetRaw(0x4EB9F4, (void*)"\xE8\x67\xFC\xFF\xFF", 5); // enable radio scroll
-
 	if (ImGui::GetIO().WantTextInput)
 	{
 		Call<0x53F1E0>(); // CPad::ClearKeyboardHistory
@@ -237,7 +226,7 @@ static LRESULT __stdcall _DispatchMessage(MSG* lpMsg)
 {
 	if (lpMsg->message == WM_MOUSEWHEEL && !Hook::m_bShowMouse)
 	{
-		mouseInfo.wheelDelta += *(int*)(&lpMsg->wParam);
+		mouseInfo.wheelDelta += GET_WHEEL_DELTA_WPARAM(lpMsg->wParam);
 	}
 
 	return DispatchMessageA(lpMsg);
@@ -246,7 +235,9 @@ static LRESULT __stdcall _DispatchMessage(MSG* lpMsg)
 static int _cdecl _GetMouseState(Mouse* pMouse)
 {
 	if (Hook::m_bShowMouse)
+	{
 		return -1;
+	}
 
 	struct tagPOINT Point;
 
