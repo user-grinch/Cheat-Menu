@@ -30,7 +30,6 @@ Game::Game()
 {
 	m_MissionData.m_Json.LoadData(m_MissionData.m_Categories, m_MissionData.m_Selected);
 	m_StatData.m_Json.LoadData(m_StatData.m_Categories, m_StatData.m_Selected);
-	m_Freecam::m_fFOV = TheCamera.FindCamFOV();
 
 	// Generate enabled cheats vector
 	for (auto element : m_RandomCheats::m_Json.m_Data.items())
@@ -482,11 +481,7 @@ Lowers armour, health, stamina etc."))
 				}
 				ImGui::Spacing();
 
-				if (ImGui::SliderFloat("Field of view", &m_Freecam::m_fFOV, 5.0f, 120.0f))
-				{
-					TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_Freecam::m_fFOV, 250.0f, true);
-					Command<Commands::CAMERA_PERSIST_FOV>(true);
-				}
+				ImGui::SliderFloat("Field of view", &m_Freecam::m_fFOV, 5.0f, 120.0f);
 				ImGui::SliderFloat("Movement Speed", &m_Freecam::m_fSpeed, 0.0f, 0.5f);
 				ImGui::Spacing();
 				ImGui::TextWrapped("Press Enter to teleport player to camera location");

@@ -19,7 +19,7 @@ public:
 	{
 		inline static bool m_bEnabled;
 		inline static float m_fSpeed = 0.08f;
-		inline static float m_fFOV = -1;
+		inline static float m_fFOV = 60.0f;
 		inline static bool m_bInitDone;
 		inline static CPed* m_pPed;
 		inline static int m_nPed = -1;
