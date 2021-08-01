@@ -387,10 +387,24 @@ of LS without completing missions"))
 
 			Ui::CheckboxAddress("Free pay n spray", 0x96C009);
 
-			if (ImGui::Checkbox("Freeze misson timer", &m_bMissionTimer))
-				Command<Commands::FREEZE_ONSCREEN_TIMER>(m_bMissionTimer);
+			if (ImGui::Checkbox("Freeze game time", &m_bFreezeTime))
+			{
+				if (m_bFreezeTime)
+				{
+					patch::SetRaw(0x52CF10, (char*)"\xEB\xEF", 2);
+				}
+				else
+				{
+					patch::SetRaw(0x52CF10, (char*)"\x56\x8B", 2);
+				}
+			}
 
 			ImGui::NextColumn();
+
+			if (ImGui::Checkbox("Freeze misson timer", &m_bMissionTimer))
+			{
+				Command<Commands::FREEZE_ONSCREEN_TIMER>(m_bMissionTimer);
+			}
 
 			if (Ui::CheckboxWithHint("Hard mode", &m_HardMode::m_bEnabled, "Makes the game more challanging to play. \n\
 Lowers armour, health, stamina etc."))
