@@ -286,9 +286,11 @@ void Teleport::Draw()
 			{
 				tp_data.m_Json.m_Data["Custom"][m_nLocationBuffer] = ("0, " + std::string(m_nInputBuffer));
 
+				#ifdef GTASA
 				// Clear the Radar coordinates
 				tp_data.m_Json.m_Data.erase("Radar");
 				tp_data.m_Json.m_Data["Radar"] = {};
+				#endif
 
 				tp_data.m_Json.WriteToDisk();
 			}
