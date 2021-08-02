@@ -7,21 +7,29 @@
 void CheatMenu::DrawWindow()
 {
 	ImGuiIO& io = ImGui::GetIO();
-	static bool game_running = true;
+	static bool bRunning = true;
 
+	#ifdef GTASA
 	if (FrontEndMenuManager.m_bMenuActive)
+	#elif GTAVC
+	if (FrontendMenuManager.m_bMenuVisible)
+	#endif
 	{
-		if (game_running)
+		if (bRunning)
 		{
 			config.WriteToDisk();
-			game_running = false;
+			bRunning = false;
 			m_bShowMouse = false;
 		}
 	}
 	else
 	{
-		game_running = true;
+		bRunning = true;
+		#ifdef GTASA
 		if (Globals::m_bShowMenu || m_Commands::m_bShowMenu)
+		#elif GTAVC
+		if (Globals::m_bShowMenu)
+		#endif
 		{
 			if (Globals::m_bShowMenu)
 			{
@@ -45,8 +53,12 @@ void CheatMenu::DrawWindow()
 					ImGui::End();
 				}
 			}
+			#ifdef GTASA
 			else
+			{
 				DrawShortcutsWindow();
+			}
+			#endif
 		}
 	}
 	DrawOverlay();
@@ -65,10 +77,18 @@ CheatMenu::CheatMenu()
 
 	Events::processScriptsEvent += []()
 	{
-		if (Globals::m_bInit && !FrontEndMenuManager.m_bMenuActive)
+		if (Globals::m_bInit && 
+		#ifdef GTASA
+		!FrontEndMenuManager.m_bMenuActive
+		#elif GTAVC
+		!FrontendMenuManager.m_bMenuVisible
+		#endif
+		)
 		{
 			if (Ui::HotKeyPressed(Menu::m_HotKeys::menuOpen))
+			{
 				Globals::m_bShowMenu = !Globals::m_bShowMenu;
+			}
 
 			if (Ui::HotKeyPressed(Menu::m_HotKeys::commandWindow))
 			{
@@ -176,7 +196,9 @@ void MenuThread(void* param)
 	}
 
 	static bool bGameInit = false;
+	#ifdef GTASA
 	Hook::ApplyMouseFix();
+	#endif
 
 	// Wait till the game is initialized
 	Events::initRwEvent += []
@@ -222,6 +244,7 @@ BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
 	if (nReason == DLL_PROCESS_ATTACH)
 	{
 		uint gameVersion = GetGameVersion();
+		#ifdef GTASA
 		if (gameVersion == GAME_10US_HOODLUM || gameVersion == GAME_10US_COMPACT)
 		{
 			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&MenuThread, nullptr, NULL, nullptr);
@@ -230,6 +253,16 @@ BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
 		{
 			MessageBox(HWND_DESKTOP, "Unknown game version. GTA SA v1.0 US is required.", "CheatMenu", MB_ICONERROR);
 		}
+		#elif GTAVC
+		if (gameVersion == GAME_10EN)
+		{
+			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&MenuThread, nullptr, NULL, nullptr);
+		}
+		else
+		{
+			MessageBox(HWND_DESKTOP, "Unknown game version. GTA VC v1.0 EN is required.", "CheatMenu", MB_ICONERROR);
+		}
+		#endif
 	}
 
 	return TRUE;

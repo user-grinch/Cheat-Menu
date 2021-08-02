@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "Util.h"
-#include <CCutsceneMgr.h>
 #include "psapi.h"
 #include "CFileLoader.h"
 
@@ -68,6 +67,44 @@ void* Util::GetTextureFromRaster(RwTexture *pTexture)
 	return (&raster->renderResource->texture);
 }
 
+std::string Util::GetLocationName(CVector* pos)
+{
+	#ifdef GTASA
+	int hplayer = CPools::GetPedRef(FindPlayerPed());
+
+	int interior = 0;
+	Command<Commands::GET_AREA_VISIBLE>(&interior);
+
+	std::string town = "San Andreas";
+	int city;
+	Command<Commands::GET_CITY_PLAYER_IS_IN>(&hplayer, &city);
+
+	switch (city)
+	{
+	case 0:
+		town = "CS";
+		break;
+	case 1:
+		town = "LS";
+		break;
+	case 2:
+		town = "SF";
+		break;
+	case 3:
+		town = "LV";
+		break;
+	}
+
+	if (interior == 0)
+		return CTheZones::FindSmallestZoneForPosition(*pos, true)->GetTranslatedName() + std::string(", ") + town;
+	return std::string("Interior ") + std::to_string(interior) + ", " + town;
+	
+	#elif GTAVC
+	return "Vice City";
+	#endif
+}
+
+#ifdef GTASA
 // Thanks DKPac22
 RwTexture* Util::LoadTextureFromMemory(char* data, unsigned int size)
 {
@@ -116,37 +153,6 @@ bool Util::IsOnMission()
 bool Util::IsOnCutscene()
 {
 	return CCutsceneMgr::ms_running;
-}
-
-std::string Util::GetLocationName(CVector* pos)
-{
-	int hplayer = CPools::GetPedRef(FindPlayerPed());
-	int interior = 0;
-	Command<Commands::GET_AREA_VISIBLE>(&interior);
-
-	std::string town = "San Andreas";
-	int city;
-	Command<Commands::GET_CITY_PLAYER_IS_IN>(&hplayer, &city);
-
-	switch (city)
-	{
-	case 0:
-		town = "CS";
-		break;
-	case 1:
-		town = "LS";
-		break;
-	case 2:
-		town = "SF";
-		break;
-	case 3:
-		town = "LV";
-		break;
-	}
-
-	if (interior == 0)
-		return CTheZones::FindSmallestZoneForPosition(*pos, true)->GetTranslatedName() + std::string(", ") + town;
-	return std::string("Interior ") + std::to_string(interior) + ", " + town;
 }
 
 int Util::GetLargestGangInZone()
@@ -212,6 +218,7 @@ CPed* Util::GetClosestPed()
 	}
 	return nullptr;
 }
+#endif	
 
 void Util::RainbowValues(int& r, int& g, int& b, float speed)
 {

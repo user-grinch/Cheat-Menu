@@ -62,7 +62,7 @@ Game::Game()
 			if (Ui::HotKeyPressed(Menu::m_HotKeys::quickSceenShot))
 			{
 				Command<Commands::TAKE_PHOTO>();
-				CHud::SetHelpMessage("Screenshot taken", false, false, false);
+				SetHelpMessage("Screenshot taken", false, false, false);
 			}
 		}
 
@@ -133,7 +133,7 @@ Game::Game()
 					if (m_RandomCheats::m_EnabledCheats[i][1] == "true")
 					{
 						((void(*)(int))0x00438370)(id); // cheatEnableLegimate(int CheatID)
-						CHud::SetHelpMessage(m_RandomCheats::m_EnabledCheats[i][0].c_str(), false, false, false);
+						SetHelpMessage(m_RandomCheats::m_EnabledCheats[i][0].c_str(), false, false, false);
 						m_RandomCheats::m_nTimer = timer;
 					}
 					break;
@@ -174,7 +174,7 @@ void SetPlayerMission(std::string& rootkey, std::string& name, std::string& id)
 		player->SetWantedLevel(0);
 		Command<Commands::LOAD_AND_LAUNCH_MISSION_INTERNAL>(std::stoi(id));
 	}
-	else CHud::SetHelpMessage("Can't start mission now", false, false, false);
+	else SetHelpMessage("Can't start mission now", false, false, false);
 }
 
 void Game::FreeCam()
@@ -239,7 +239,7 @@ void Game::FreeCam()
 		// disble them again cause they get enabled
 		CHud::bScriptDontDisplayRadar = true;
 		CHud::m_Wants_To_Draw_Hud = false;
-		CHud::SetHelpMessage("Player telported", false, false, false);
+		SetHelpMessage("Player telported", false, false, false);
 	}
 
 	if (KeyPressed(VK_RCONTROL))

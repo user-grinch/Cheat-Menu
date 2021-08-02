@@ -39,7 +39,7 @@ void Animation::PlayCutscene(std::string& rootKey, std::string& cutsceneId, std:
 {
 	if (Util::IsOnCutscene())
 	{
-		CHud::SetHelpMessage("Another cutscene is running", false, false, false);
+		SetHelpMessage("Another cutscene is running", false, false, false);
 		return;
 	}
 
@@ -97,7 +97,7 @@ void Animation::Draw()
 			if (Ui::ListBox("Fighting style", m_FightingStyleList, m_nFightingStyle))
 			{
 				Command<Commands::GIVE_MELEE_ATTACK_TO_CHAR>(hPlayer, m_nFightingStyle + 4, 6);
-				CHud::SetHelpMessage("Fighting anim set", false, false, false);
+				SetHelpMessage("Fighting anim set", false, false, false);
 			}
 			if (Ui::ListBoxStr("Walking style", m_WalkingStyleList, m_nWalkingStyle))
 			{
@@ -114,7 +114,7 @@ void Animation::Draw()
 					Command<Commands::SET_ANIM_GROUP_FOR_CHAR>(hPlayer, m_nWalkingStyle.c_str());
 					Command<Commands::REMOVE_ANIMATION>(m_nWalkingStyle.c_str());
 				}
-				CHud::SetHelpMessage("Walking anim set", false, false, false);
+				SetHelpMessage("Walking anim set", false, false, false);
 			}
 			ImGui::EndTabItem();
 		}
@@ -189,8 +189,8 @@ void Animation::RemoveAnimation(std::string& ifp, std::string& anim, std::string
 	{
 		m_AnimData.m_Json.m_Data["Custom"].erase(anim);
 		m_AnimData.m_Json.WriteToDisk();
-		CHud::SetHelpMessage("Animation removed", false, false, false);
+		SetHelpMessage("Animation removed", false, false, false);
 	}
 	else
-		CHud::SetHelpMessage("You can only remove custom anims", false, false, false);
+		SetHelpMessage("You can only remove custom anims", false, false, false);
 }

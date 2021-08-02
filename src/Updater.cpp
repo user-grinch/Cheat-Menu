@@ -12,7 +12,7 @@ void Updater::CheckForUpdate()
 
 	if (res == E_OUTOFMEMORY || res == INET_E_DOWNLOAD_FAILURE)
 	{
-		CHud::SetHelpMessage("Failed to check for updates", false, false, false);
+		SetHelpMessage("Failed to check for updates", false, false, false);
 		return;
 	}
 	CJson verinfo = CJson("versioninfo");
@@ -22,12 +22,12 @@ void Updater::CheckForUpdate()
 
 	if (m_LatestVersion > MENU_VERSION_NUMBER)
 	{
-		CHud::SetHelpMessage("Update found", false, false, false);
+		SetHelpMessage("Update found", false, false, false);
 		m_State = UPDATER_UPDATE_FOUND;
 	}
 	else
 	{
-		CHud::SetHelpMessage("No update found.", false, false, false);
+		SetHelpMessage("No update found.", false, false, false);
 		Updater::m_State = UPDATER_IDLE;
 	}
 }

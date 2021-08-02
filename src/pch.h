@@ -6,6 +6,12 @@
 #define DISCORD_INVITE "https://discord.gg/ZzW7kmf"
 #define GITHUB_LINK "https://github.com/user-grinch/Cheat-Menu"
 
+#ifdef GTASA
+#define BY_GAME(sa, vc) sa
+#elif GTAVC
+#define BY_GAME(sa, vc) vc
+#endif
+
 #include <d3d9.h>
 #include <d3d11.h>
 #include <d3d11Shader.h>
@@ -21,20 +27,14 @@
 #include "plugin.h"
 #include "CBike.h"
 #include "CCamera.h"
-#include "CCheat.h"
-#include "CClothes.h"
 #include "CClock.h"
 #include "CCivilianPed.h"
-#include "CCutsceneMgr.h"
 #include "CGangs.h"
-#include "CGangWars.h"
 #include "cHandlingDataMgr.h"
 #include "CHud.h"
 #include "CMenuManager.h"
 #include "CModelInfo.h"
-#include "CRadar.h"
 #include "RenderWare.h"
-#include "CShadows.h"
 #include "CStats.h"
 #include "CStreaming.h"
 #include "CTheScripts.h"
@@ -46,8 +46,17 @@
 #include "CWorld.h"
 #include "extensions/ScriptCommands.h"
 #include "extensions/Screen.h"
-#include "eVehicleClass.h"
 #include "extensions/Paths.h"
+
+#ifdef GTASA
+#include "CCheat.h"
+#include "CClothes.h"
+#include "CCutsceneMgr.h"
+#include "CRadar.h"
+#include "CShadows.h"
+#include "eVehicleClass.h"
+#include "CGangWars.h"
+#endif
 
 #include "../Depend/fla/IDaccess.h"
 #include "../Depend/imgui/imgui.h"
@@ -133,3 +142,14 @@ struct SSearchData
 	std::string m_Selected = "All";
 	std::vector<std::unique_ptr<STextureStructure>> m_ImagesList;
 };
+
+
+// Common defines
+static void SetHelpMessage(const char *message, bool b1, bool b2, bool b3)
+{
+	#if GTAVC
+    	CHud::SetHelpMessage(message, b1, b2);
+	#elif GTASA
+		CHud::SetHelpMessage(message, b1, b2, b3);
+	#endif
+}

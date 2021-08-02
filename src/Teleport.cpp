@@ -4,6 +4,7 @@
 #include "Ui.h"
 #include "Util.h"
 
+#ifdef GTASA
 // FlA
 tRadarTrace* CRadar::ms_RadarTrace = reinterpret_cast<tRadarTrace*>(patch::GetPointer(0x5838B0 + 2));
 
@@ -36,6 +37,7 @@ void Teleport::FetchRadarSpriteData()
 		*/
 	}
 }
+#endif
 
 Teleport::Teleport()
 {
@@ -48,15 +50,20 @@ Teleport::Teleport()
 		{
 			CPlayerPed* player = FindPlayerPed();
 
-			CEntity* player_entity = FindPlayerEntity(-1);
+			#ifdef GTASA
+			CEntity* player_entity = FindPlayerEntity();
 			m_Teleport::m_fPos.z = CWorld::FindGroundZFor3DCoord(m_Teleport::m_fPos.x, m_Teleport::m_fPos.y,
 			                                                 m_Teleport::m_fPos.z + 100.0f, nullptr, &player_entity) + 1.0f;
+			#elif GTAVC
+			m_Teleport::m_fPos.z = CWorld::FindGroundZFor3DCoord(m_Teleport::m_fPos.x, m_Teleport::m_fPos.y,
+			                                                 m_Teleport::m_fPos.z + 100.0f, nullptr) + 1.0f;
+			#endif											
 			CVehicle* pVeh = player->m_pVehicle;
 
-			if (pVeh && player->m_nPedFlags.bInVehicle)
-				pVeh->Teleport(m_Teleport::m_fPos, false);
+			if (pVeh && BY_GAME(player->m_nPedFlags.bInVehicle, player->m_pVehicle))
+				BY_GAME(pVeh->Teleport(m_Teleport::m_fPos, false), pVeh->Teleport(m_Teleport::m_fPos));
 			else
-				player->Teleport(m_Teleport::m_fPos, false);
+				BY_GAME(player->Teleport(m_Teleport::m_fPos, false), player->Teleport(m_Teleport::m_fPos));
 
 			m_Teleport::m_bEnabled = false;
 			Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(player), false);
@@ -80,14 +87,15 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, short interior_id)
 {
 	CPlayerPed* pPlayer = FindPlayerPed();
 	CVehicle* pVeh = pPlayer->m_pVehicle;
-
+	
+	#ifdef GTASA
 	if (get_marker)
 	{
 		tRadarTrace targetBlip = CRadar::ms_RadarTrace[LOWORD(FrontEndMenuManager.m_nTargetBlipIndex)];
 
 		if (targetBlip.m_nBlipSprite != RADAR_SPRITE_WAYPOINT)
 		{
-			CHud::SetHelpMessage("Target blip not found. You need to place it on the map first.", false, false, false);
+			SetHelpMessage("Target blip not found. You need to place it on the map first.", false, false, false);
 			return;
 		}
 		CEntity* pPlayerEntity = FindPlayerEntity(-1);
@@ -100,28 +108,41 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, short interior_id)
 		TheCamera.Fade(0, 0);
 		Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(pPlayer), true);
 	}
+	#endif
 
 	CStreaming::LoadScene(&pos);
 	CStreaming::LoadSceneCollision(&pos);
 	CStreaming::LoadAllRequestedModels(false);
 
+	#ifdef GTASA
 	if (pVeh && pPlayer->m_nPedFlags.bInVehicle)
 	{
 		pVeh->Teleport(pos, false);
-
+		
 		if (pVeh->m_nVehicleClass == VEHICLE_BIKE)
 			reinterpret_cast<CBike*>(pVeh)->PlaceOnRoadProperly();
 		else if (pVeh->m_nVehicleClass != VEHICLE_BOAT)
 			reinterpret_cast<CAutomobile*>(pVeh)->PlaceOnRoadProperly();
 
-		pVeh->m_nAreaCode = interior_id;
+		BY_GAME(pVeh->m_nAreaCode, pVeh->m_nInterior) = interior_id;
 	}
 	else
 	{
 		pPlayer->Teleport(pos, false);
 	}
+	#elif GTAVC
+	if (pVeh && pPlayer->m_pVehicle)
+	{
+		BY_GAME(pVeh->m_nAreaCode, pVeh->m_nInterior) = interior_id;
+		pVeh->Teleport(pos);
+	}
+	else
+	{
+		pPlayer->Teleport(pos);
+	}
+	#endif
 
-	pPlayer->m_nAreaCode = interior_id;
+	BY_GAME(pPlayer->m_nAreaCode, pPlayer->m_nInterior) = interior_id;
 	Command<Commands::SET_AREA_VISIBLE>(interior_id);
 }
 
@@ -150,7 +171,7 @@ void Teleport::TeleportToLocation(std::string& rootkey, std::string& bLocName, s
 	}
 	catch (...)
 	{
-		CHud::SetHelpMessage("Invalid location", false, false, false);
+		SetHelpMessage("Invalid location", false, false, false);
 	}
 }
 
@@ -159,10 +180,10 @@ void Teleport::RemoveTeleportEntry(std::string& category, std::string& key, std:
 	if (category == "Custom")
 	{
 		tp_data.m_Json.m_Data["Custom"].erase(key);
-		CHud::SetHelpMessage("Location removed", false, false, false);
+		SetHelpMessage("Location removed", false, false, false);
 		tp_data.m_Json.WriteToDisk();
 	}
-	else CHud::SetHelpMessage("You can only remove custom location", false, false, false);
+	else SetHelpMessage("You can only remove custom location", false, false, false);
 }
 
 void Teleport::Draw()
@@ -178,13 +199,14 @@ void Teleport::Draw()
 				ImGui::Columns(2, nullptr, false);
 				ImGui::Checkbox("Insert coordinates", &m_bInsertCoord);
 				ImGui::NextColumn();
+				#ifdef GTASA
 				if (Ui::CheckboxWithHint("Quick teleport", &m_bQuickTeleport,
 				                         (std::string("Teleport to the location of your radar\ntarget blip using ") 
 											 + Ui::GetHotKeyNameString(Menu::m_HotKeys::quickTeleport)).c_str()))
 				{
 					config.SetValue("quick_teleport", m_bQuickTeleport);
 				}
-
+				#endif	
 				ImGui::Columns(1);
 				ImGui::Spacing();
 
@@ -201,7 +223,7 @@ void Teleport::Draw()
 
 				ImGui::Spacing();
 
-				if (ImGui::Button("Teleport to Coord", Ui::GetSize(2)))
+				if (ImGui::Button("Teleport to coord", Ui::GetSize(2)))
 				{
 					std::stringstream ss(m_nInputBuffer);
 					std::string temp;
@@ -222,13 +244,21 @@ void Teleport::Draw()
 					}
 					catch (...)
 					{
-						CHud::SetHelpMessage("Invalid coordinate", false, false, false);
+						SetHelpMessage("Invalid coordinate", false, false, false);
 					}
 				}
 				ImGui::SameLine();
+				#ifdef GTASA
 				if (ImGui::Button("Teleport to marker", Ui::GetSize(2)))
+				{
 					TeleportPlayer(true);
-
+				}
+				#else
+				if (ImGui::Button("Teleport to map center", Ui::GetSize(2)))
+				{
+					TeleportPlayer(false, CVector(0, 0, 23));
+				}
+				#endif
 				ImGui::EndChild();
 			}
 			ImGui::EndTabItem();
@@ -236,7 +266,10 @@ void Teleport::Draw()
 
 		if (ImGui::BeginTabItem("Search"))
 		{
+			#ifdef GTASA
 			FetchRadarSpriteData();
+			#endif
+
 			ImGui::Spacing();
 			Ui::DrawJSON(tp_data.m_Json, tp_data.m_Categories, tp_data.m_Selected, tp_data.m_Filter, &TeleportToLocation,
 			             &RemoveTeleportEntry);

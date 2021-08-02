@@ -426,7 +426,7 @@ void Ui::DrawJSON(CJson& json, std::vector<std::string>& combo_items, std::strin
 	ImGui::EndChild();
 }
 
-
+#ifdef GTASA
 void Ui::EditStat(const char* label, const int stat_id, const int min, const int def, const int max)
 {
 	if (ImGui::CollapsingHeader(label))
@@ -465,6 +465,7 @@ void Ui::EditStat(const char* label, const int stat_id, const int min, const int
 		ImGui::Separator();
 	}
 }
+#endif
 
 void Ui::FilterWithHint(const char* label, ImGuiTextFilter& filter, const char* hint)
 {

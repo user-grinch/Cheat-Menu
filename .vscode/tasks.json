@@ -4,9 +4,9 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Build Debug",
+            "label": "Build DebugSA",
             "type": "shell",
-            "command": "${workspaceFolder}/tools/Debug.bat",
+            "command": "${workspaceFolder}/tools/DebugSA.bat",
             "presentation": {
                 "echo": true,
                 "reveal": "always",
@@ -21,9 +21,43 @@
             }
         },
         {
-            "label": "Build Release",
+            "label": "Build ReleaseSA",
             "type": "shell",
-            "command": "${workspaceFolder}/tools/Release.bat",
+            "command": "${workspaceFolder}/tools/ReleaseSA.bat",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build DebugVC",
+            "type": "shell",
+            "command": "${workspaceFolder}/tools/DebugVC.bat",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Build ReleaseVC",
+            "type": "shell",
+            "command": "${workspaceFolder}/tools/ReleaseVC.bat",
             "presentation": {
                 "echo": true,
                 "reveal": "always",

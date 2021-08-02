@@ -68,8 +68,11 @@ public:
 	static void EditReference(const char* label, T& address, int min = 0, int def = 0, int max = 100);
 	static void EditRadioButtonAddress(const char* label, std::vector<NamedMemory>& named_mem);
 	static void EditRadioButtonAddressEx(const char* label, int addr, std::vector<NamedValue>& named_val);
+	
+	#ifdef GTASA
 	static void EditStat(const char* label, int stat_id, int min = 0, int def = 0, int max = 1000);
-
+	#endif
+	
 	static void FilterWithHint(const char* label, ImGuiTextFilter& filter, const char* hint);
 
 	static ImVec2 GetSize(short count = 1, bool spacing = true);

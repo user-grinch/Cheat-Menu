@@ -31,7 +31,7 @@ void Ped::SpawnPed(std::string& model)
 {
 	if (m_SpawnPed::m_List.size() == SPAWN_PED_LIMIT)
 	{
-		CHud::SetHelpMessage("Max limit reached", false, false, false);
+		SetHelpMessage("Max limit reached", false, false, false);
 		return;
 	}
 

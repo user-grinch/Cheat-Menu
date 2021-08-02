@@ -16,6 +16,17 @@
             "console": "internalConsole"
         },
         {
+            "name": "Launch VC",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "F:/GTA Vice City/gta-vc.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "C:/Work/GTASanAndreas/",
+            "environment": [],
+            "console": "internalConsole"
+        },
+        {
             "name": "Attach",
             "type": "cppvsdbg",
             "request": "attach",

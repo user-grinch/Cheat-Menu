@@ -351,13 +351,13 @@ void Visual::Draw()
 			if (ImGui::Button("Generate timecyc file", Ui::GetSize(2)))
 			{
 				GenerateTimecycFile();
-				CHud::SetHelpMessage("File generated", false, false, false);
+				SetHelpMessage("File generated", false, false, false);
 			}
 			ImGui::SameLine();
 			if (ImGui::Button("Reset timecyc", Ui::GetSize(2)))
 			{
 				CTimeCycle::Initialise();
-				CHud::SetHelpMessage("Timecyc reset", false, false, false);
+				SetHelpMessage("Timecyc reset", false, false, false);
 			}
 			ImGui::Spacing();
 

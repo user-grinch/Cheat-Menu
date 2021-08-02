@@ -39,7 +39,7 @@ Vehicle::Vehicle()
 			{
 				player->m_pVehicle->Fix();
 				player->m_pVehicle->m_fHealth = 1000.0f;
-				CHud::SetHelpMessage("Vehicle fixed", false, false, false);
+				SetHelpMessage("Vehicle fixed", false, false, false);
 			}
 
 			if (Ui::HotKeyPressed(Menu::m_HotKeys::vehEngine))
@@ -47,9 +47,9 @@ Vehicle::Vehicle()
 				bool state = !veh->m_nVehicleFlags.bEngineBroken || veh->m_nVehicleFlags.bEngineOn;
 
 				if (state)
-					CHud::SetHelpMessage("Vehicle engine off", false, false, false);
+					SetHelpMessage("Vehicle engine off", false, false, false);
 				else
-					CHud::SetHelpMessage("Vehicle engine on", false, false, false);
+					SetHelpMessage("Vehicle engine on", false, false, false);
 
 				veh->m_nVehicleFlags.bEngineBroken = state;
 				veh->m_nVehicleFlags.bEngineOn = !state;
@@ -168,7 +168,7 @@ void Vehicle::AddComponent(const std::string& component, const bool display_mess
 		CStreaming::SetModelIsDeletable(icomp);
 
 		if (display_message)
-			CHud::SetHelpMessage("Component added", false, false, false);
+			SetHelpMessage("Component added", false, false, false);
 	}
 	catch (...)
 	{
@@ -188,7 +188,7 @@ void Vehicle::RemoveComponent(const std::string& component, const bool display_m
 		player->m_pVehicle->RemoveVehicleUpgrade(icomp);
 
 		if (display_message)
-			CHud::SetHelpMessage("Component removed", false, false, false);
+			SetHelpMessage("Component removed", false, false, false);
 	}
 	catch (...)
 	{
@@ -221,7 +221,7 @@ int Vehicle::GetRandomTrainIdForModel(int model)
 		_end = 10;
 		break;
 	default:
-		CHud::SetHelpMessage("Invalid train model", false, false, false);
+		SetHelpMessage("Invalid train model", false, false, false);
 		return -1;
 	}
 	int id = Random(_start, _end);
@@ -955,7 +955,7 @@ void Vehicle::Draw()
 				if (ImGui::Button("Reset color", ImVec2(Ui::GetSize())))
 				{
 					Paint::ResetNodeColor(veh, Paint::veh_nodes::selected);
-					CHud::SetHelpMessage("Color reset", false, false, false);
+					SetHelpMessage("Color reset", false, false, false);
 				}
 				ImGui::Spacing();
 
@@ -1036,7 +1036,7 @@ void Vehicle::Draw()
 					if (ImGui::Button("Remove neon", ImVec2(Ui::GetSize())))
 					{
 						RemoveNeon(veh);
-						CHud::SetHelpMessage("Neon removed", false, false, false);
+						SetHelpMessage("Neon removed", false, false, false);
 					}
 
 					ImGui::Spacing();
@@ -1092,7 +1092,7 @@ void Vehicle::Draw()
 					if (ImGui::Button("Reset texture", ImVec2(Ui::GetSize())))
 					{
 						Paint::ResetNodeTexture(veh, Paint::veh_nodes::selected);
-						CHud::SetHelpMessage("Texture reset", false, false, false);
+						SetHelpMessage("Texture reset", false, false, false);
 					}
 					ImGui::Spacing();
 
@@ -1167,7 +1167,7 @@ void Vehicle::Draw()
 				if (ImGui::Button("Reset handling", ImVec2(Ui::GetSize(3))))
 				{
 					gHandlingDataMgr.LoadHandlingData();
-					CHud::SetHelpMessage("Handling reset", false, false, false);
+					SetHelpMessage("Handling reset", false, false, false);
 				}
 
 				ImGui::SameLine();
@@ -1175,7 +1175,7 @@ void Vehicle::Draw()
 				if (ImGui::Button("Save to file", ImVec2(Ui::GetSize(3))))
 				{
 					GenerateHandlingDataFile(pHandling);
-					CHud::SetHelpMessage("Handling saved", false, false, false);
+					SetHelpMessage("Handling saved", false, false, false);
 				}
 
 				ImGui::SameLine();

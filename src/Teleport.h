@@ -11,7 +11,11 @@ private:
 	inline static SSearchData tp_data{"teleport"};
 	inline static char m_nLocationBuffer[INPUT_BUFFER_SIZE];
 	inline static uint m_nQuickTeleportTimer;
+
+	#ifdef GTASA
 	inline static CJson m_SpriteJson = CJson("radar sprite");
+	#endif
+
 	struct m_Teleport
 	{
 		inline static bool m_bEnabled;
@@ -20,11 +24,13 @@ private:
 	};
 
 
+	#ifdef GTASA
 	/*
 		Generates radar sprite coordinates on the fly.
 		Shouldn't get saved in 'teleport.json', needs to be cleared at game shutdown.
 	*/
 	static void FetchRadarSpriteData();
+	#endif
 
 protected:
 	Teleport();

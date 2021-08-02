@@ -120,7 +120,7 @@ Player::Player()
 		{
 			if (m_bGodMode)
 			{
-				CHud::SetHelpMessage("God mode disabled", false, false, false);
+				SetHelpMessage("God mode disabled", false, false, false);
 
 				patch::Set<bool>(0x96916D, m_bGodMode, false);
 				player->m_nPhysicalFlags.bBulletProof = false;
@@ -132,7 +132,7 @@ Player::Player()
 			}
 			else
 			{
-				CHud::SetHelpMessage("God mode enabled", false, false, false);
+				SetHelpMessage("God mode enabled", false, false, false);
 				m_bGodMode = true;
 			}
 		}
@@ -223,7 +223,7 @@ void Player::Draw()
 		std::string text = std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z);
 
 		ImGui::SetClipboardText(text.c_str());
-		CHud::SetHelpMessage("Coordinates copied", false, false, false);
+		SetHelpMessage("Coordinates copied", false, false, false);
 	}
 	ImGui::SameLine();
 	if (ImGui::Button("Suicide", ImVec2(Ui::GetSize(2))))

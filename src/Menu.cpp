@@ -1,12 +1,15 @@
 #include "pch.h"
 #include "MenuInfo.h"
 #include "Menu.h"
-#include "Teleport.h"
-#include "Weapon.h"
-#include "Vehicle.h"
 #include "Ui.h"
 #include "Util.h"
 #include "Updater.h"
+
+#ifdef GTASA
+#include "Teleport.h"
+#include "Weapon.h"
+#include "Vehicle.h"
+#endif
 
 Menu::Menu()
 {
@@ -142,7 +145,15 @@ void Menu::DrawOverlay()
 			GlobalMemoryStatusEx(&memInfo);
 			int mUsedRam = static_cast<int>((memInfo.ullTotalPhys - memInfo.ullAvailPhys) * 1e-6);
 			m_Overlay::fMemUsage = 100.0f * (static_cast<float>(mUsedRam) / static_cast<float>(m_Overlay::mTotalRam));
-			m_Overlay::mFPS = static_cast<size_t>(CTimer::game_FPS);
+			
+			m_Overlay::mFPS = static_cast<size_t>
+			(
+			#ifdef GTASA
+			CTimer::game_FPS
+			#elif GTAVC
+			io.Framerate
+			#endif
+			);
 
 			m_Overlay::mLastInterval = game_ms;
 		}
@@ -232,7 +243,7 @@ void Menu::ProcessCommands()
 		}
 		catch (...)
 		{
-			CHud::SetHelpMessage("Invalid value", false, false, false);
+			SetHelpMessage("Invalid value", false, false, false);
 		}
 	}
 
@@ -249,10 +260,11 @@ void Menu::ProcessCommands()
 		}
 		catch (...)
 		{
-			CHud::SetHelpMessage("Invalid value", false, false, false);
+			SetHelpMessage("Invalid value", false, false, false);
 		}
 	}
 
+	#ifdef GTASA
 	if (command == "tp")
 	{
 		try
@@ -273,7 +285,7 @@ void Menu::ProcessCommands()
 		}
 		catch (...)
 		{
-			CHud::SetHelpMessage("Invalid location", false, false, false);
+			SetHelpMessage("Invalid location", false, false, false);
 		}
 	}
 
@@ -286,7 +298,7 @@ void Menu::ProcessCommands()
 		{
 			std::string weapon = "-1";
 			Weapon::GiveWeaponToPlayer(weapon);
-			CHud::SetHelpMessage("Weapon given", false, false, false);
+			SetHelpMessage("Weapon given", false, false, false);
 		}
 		else
 		{
@@ -297,10 +309,10 @@ void Menu::ProcessCommands()
 			if (wep_name != "" && pweaponinfo->m_nModelId1 != -1)
 			{
 				Weapon::GiveWeaponToPlayer(weapon_name);
-				CHud::SetHelpMessage("Weapon given", false, false, false);
+				SetHelpMessage("Weapon given", false, false, false);
 			}
 			else
-				CHud::SetHelpMessage("Invalid command", false, false, false);
+				SetHelpMessage("Invalid command", false, false, false);
 		}
 
 		return;
@@ -315,11 +327,12 @@ void Menu::ProcessCommands()
 		{
 			std::string smodel = std::to_string(model);
 			Vehicle::SpawnVehicle(smodel);
-			CHud::SetHelpMessage("Vehicle spawned", false, false, false);
+			SetHelpMessage("Vehicle spawned", false, false, false);
 		}
 		else
-			CHud::SetHelpMessage("Invalid command", false, false, false);
+			SetHelpMessage("Invalid command", false, false, false);
 	}
+	#endif
 }
 
 void Menu::Draw()
