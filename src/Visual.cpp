@@ -400,6 +400,18 @@ void Visual::Draw()
 				Ui::ShowTooltip("Sync system time is enabled.\n(Game/Sync system time)");
 			}
 
+			if (ImGui::Checkbox("Freeze game time", &Game::m_bFreezeTime))
+			{
+				if (Game::m_bFreezeTime)
+				{
+					patch::SetRaw(0x52CF10, (char*)"\xEB\xEF", 2);
+				}
+				else
+				{
+					patch::SetRaw(0x52CF10, (char*)"\x56\x8B", 2);
+				}
+			}
+
 			ImGui::Spacing();
 			if (ImGui::BeginTabBar("Timecyc subtab", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
 			{

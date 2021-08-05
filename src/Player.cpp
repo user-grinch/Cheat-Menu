@@ -33,7 +33,9 @@ inline static void PlayerModelBrokenFix()
 	CPlayerPed* pPlayer = FindPlayerPed();
 
 	if (pPlayer->m_nModelIndex == 0)
+	{
 		Call<0x5A81E0>(0, pPlayer->m_pPlayerData->m_pPedClothesDesc, 0xBC1C78, false);
+	}
 }
 
 Player::Player()
@@ -55,13 +57,20 @@ Player::Player()
 					std::string file_name = p.path().stem().string();
 
 					if (file_name.size() < 9)
+					{
 						m_CustomSkins::m_List.push_back(file_name);
+					}
 					else
+					{
 						flog << "Custom Skin longer than 8 characters " << file_name << std::endl;
+					}
 				}
 			}
 		}
-		else fs::create_directory(m_CustomSkins::m_Path);
+		else 
+		{
+			fs::create_directory(m_CustomSkins::m_Path);
+		}
 
 		m_bModloaderInstalled = true;
 	}
@@ -168,10 +177,13 @@ void Player::ChangePlayerCloth(std::string& name)
 		else
 		{
 			if (texture9 == "12myfac")
+			{
 				player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(-1750049245, 1393983095, body_part);
+			}
 			else
-				player->m_pPlayerData->m_pPedClothesDesc->
-				        SetTextureAndModel(texture9.c_str(), model.c_str(), body_part);
+			{
+				player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(texture9.c_str(), model.c_str(), body_part);
+			}
 		}
 	}
 	CClothes::RebuildPlayer(player, false);
@@ -242,6 +254,9 @@ void Player::Draw()
 			ImGui::Columns(2, 0, false);
 
 			Ui::CheckboxAddress("Bounty on yourself", 0x96913F);
+			CPlayerInfo *pInfo = &CWorld::Players[CWorld::PlayerInFocus];
+
+			Ui::CheckboxAddress("Free healthcare", (int)&pInfo->m_bFreeHealthCare);
 			if (Ui::CheckboxWithHint("God mode", &m_bGodMode))
 			{
 				patch::Set<bool>(0x96916D, m_bGodMode, false);
@@ -262,15 +277,20 @@ void Player::Draw()
 
 			Ui::CheckboxWithHint("Keep position", &m_KeepPosition::m_bEnabled, "Teleport to the position you died from");
 			if (Ui::CheckboxBitFlag("Lock control", pad->bPlayerSafe))
+			{
 				pad->bPlayerSafe = (pad->bPlayerSafe == 1) ? 0 : 1;
+			}
 
 			Ui::CheckboxAddress("Mega jump", 0x96916C);
 			Ui::CheckboxAddress("Mega punch", 0x969173);
 			Ui::CheckboxAddress("Never get hungry", 0x969174);
-
+			Ui::CheckboxAddress("No arrest fee", (int)&pInfo->m_bGetOutOfJailFree);
+			
 			bool never_wanted = patch::Get<bool>(0x969171, false);
 			if (Ui::CheckboxWithHint("Never wanted", &never_wanted))
+			{
 				CCheat::NotWantedCheat();
+			}
 
 			ImGui::Columns(1);
 
@@ -281,25 +301,35 @@ void Player::Draw()
 
 			bool state = pPlayer->m_nPhysicalFlags.bBulletProof;
 			if (Ui::CheckboxWithHint("Bullet proof", &state, nullptr, m_bGodMode))
+			{
 				pPlayer->m_nPhysicalFlags.bBulletProof = state;
+			}
 
 			state = pPlayer->m_nPhysicalFlags.bCollisionProof;
 			if (Ui::CheckboxWithHint("Collision proof", &state, nullptr, m_bGodMode))
+			{
 				pPlayer->m_nPhysicalFlags.bCollisionProof = state;
+			}
 
 			state = pPlayer->m_nPhysicalFlags.bExplosionProof;
 			if (Ui::CheckboxWithHint("Explosion proof", &state, nullptr, m_bGodMode))
+			{
 				pPlayer->m_nPhysicalFlags.bExplosionProof = state;
+			}
 
 			ImGui::NextColumn();
 
 			state = pPlayer->m_nPhysicalFlags.bFireProof;
 			if (Ui::CheckboxWithHint("Fire proof", &state, nullptr, m_bGodMode))
+			{
 				pPlayer->m_nPhysicalFlags.bFireProof = state;
+			}
 
 			state = pPlayer->m_nPhysicalFlags.bMeeleProof;
 			if (Ui::CheckboxWithHint("Meele proof", &state, nullptr, m_bGodMode))
+			{
 				pPlayer->m_nPhysicalFlags.bMeeleProof = state;
+			}
 
 			ImGui::EndChild();
 			ImGui::EndTabItem();
