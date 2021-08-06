@@ -12,7 +12,7 @@ private:
 	inline static bool m_bNoDamage;
 	inline static int m_nDoorMenuButton;
 	inline static std::string m_DoorNames[6] =
-		{"Hood", "Boot", "Front left door", "Front right door", "Rear left door", "Rear right door"};
+	{ "Hood", "Boot", "Front left door", "Front right door", "Rear left door", "Rear right door" };
 	inline static int m_nVehRemoveRadius;
 	inline static bool m_bLockSpeed;
 	inline static float m_fLockSpeed;
@@ -24,11 +24,11 @@ private:
 		inline static bool m_bMatFilter = true;
 		inline static int m_nRadioButton = 1;
 		inline static bool bShowAll;
-		inline static float m_fColorPicker[3]{0, 0, 0};
+		inline static float m_fColorPicker[3]{ 0, 0, 0 };
 	};
 	struct m_Neon
 	{
-		inline static float m_fColorPicker[3]{0, 0, 0};
+		inline static float m_fColorPicker[3]{ 0, 0, 0 };
 		inline static bool m_bRainbowEffect;
 		inline static uint m_nRainbowTimer;
 		inline static bool m_bApplyOnTraffic;
@@ -49,7 +49,7 @@ private:
 		inline static bool m_bCompAdded;
 	};
 
-	inline static std::vector<std::string> (m_HandlingFlagNames) = // 32 flags
+	inline static std::vector<std::string>(m_HandlingFlagNames) = // 32 flags
 	{
 		"1G_BOOST", "2G_BOOST", "NPC_ANTI_ROLL", "NPC_NEUTRAL_HANDL", "NO_HANDBRAKE", "STEER_REARWHEELS",
 		"HB_REARWHEEL_STEER", "ALT_STEER_OPT",
@@ -61,7 +61,7 @@ private:
 		"Unused 4"
 	};
 
-	inline static std::vector<std::string> (m_ModelFlagNames) = // 32 flags
+	inline static std::vector<std::string>(m_ModelFlagNames) = // 32 flags
 	{
 		"IS_VAN", "IS_BUS", "IS_LOW", "IS_BIG", "REVERSE_BONNET", "HANGING_BOOT", "TAILGATE_BOOT", "NOSWING_BOOT",
 		"NO_DOORS", "TANDEM_SEATS",

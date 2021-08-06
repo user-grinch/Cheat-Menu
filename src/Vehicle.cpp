@@ -138,9 +138,9 @@ Vehicle::Vehicle()
 			if (veh->m_nVehicleSubClass == VEHICLE_BIKE || veh->m_nVehicleSubClass == VEHICLE_BMX)
 			{
 				if (sqrt(veh->m_vecMoveSpeed.x * veh->m_vecMoveSpeed.x
-						+ veh->m_vecMoveSpeed.y * veh->m_vecMoveSpeed.y
-						+ veh->m_vecMoveSpeed.z * veh->m_vecMoveSpeed.z
-					) > 0.0
+					+ veh->m_vecMoveSpeed.y * veh->m_vecMoveSpeed.y
+					+ veh->m_vecMoveSpeed.z * veh->m_vecMoveSpeed.z
+				) > 0.0
 					&& CTimer::ms_fTimeStep > 0.0)
 				{
 					veh->FlyingControl(3, -9999.9902f, -9999.9902f, -9999.9902f, -9999.9902f);
@@ -208,21 +208,21 @@ int Vehicle::GetRandomTrainIdForModel(int model)
 
 	switch (model)
 	{
-	case 449:
-		_start = 0;
-		_end = 1;
-		break;
-	case 537:
-		_start = 2;
-		_end = 7;
-		break;
-	case 538:
-		_start = 8;
-		_end = 10;
-		break;
-	default:
-		SetHelpMessage("Invalid train model", false, false, false);
-		return -1;
+		case 449:
+			_start = 0;
+			_end = 1;
+			break;
+		case 537:
+			_start = 2;
+			_end = 7;
+			break;
+		case 538:
+			_start = 8;
+			_end = 10;
+			break;
+		default:
+			SetHelpMessage("Invalid train model", false, false, false);
+			return -1;
 	}
 	int id = Random(_start, _end);
 	return train_ids[id];
@@ -329,7 +329,7 @@ void Vehicle::ParseCarcolsDAT()
 					getline(ss, temp, ',');
 					int blue = std::stoi(temp);
 
-					std::vector<float> color = {red / 255.0f, green / 255.0f, blue / 255.0f};
+					std::vector<float> color = { red / 255.0f, green / 255.0f, blue / 255.0f };
 					m_CarcolsColorData.push_back(color);
 
 					++count;
@@ -437,7 +437,7 @@ void Vehicle::SpawnVehicle(std::string& smodel)
 			int track = Random(0, 1);
 			int node = CTrain::FindClosestTrackNode(pos, &track);
 			CTrain::CreateMissionTrain(pos, (Random(0, 1)) == 1 ? true : false, train_id, &train, &carraige, node,
-			                           track, false);
+									   track, false);
 
 			veh = (CVehicle*)train;
 			hveh = CPools::GetVehicleRef(veh);
@@ -631,7 +631,7 @@ void Vehicle::Draw()
 			Ui::CheckboxAddress("Cars fly", 0x969160);
 			Ui::CheckboxWithHint("Cars heavy", &m_bVehHeavy);
 			if (Ui::CheckboxWithHint("Damage proof", &m_bNoDamage,
-			                         "Every vehicle entered will be damage proof\nBullet, Collision, Explosion, Fire, Meele etc"))
+				"Every vehicle entered will be damage proof\nBullet, Collision, Explosion, Fire, Meele etc"))
 			{
 				if (pVeh && !m_bNoDamage)
 				{
@@ -779,7 +779,7 @@ void Vehicle::Draw()
 							ImGui::SameLine();
 
 						if (ImGui::Button((std::string("Passenger ") + std::to_string(i + 1)).c_str(),
-						                  ImVec2(Ui::GetSize(2))))
+							ImVec2(Ui::GetSize(2))))
 							Command<Commands::WARP_CHAR_INTO_CAR_AS_PASSENGER>(hplayer, veh, i);
 					}
 				}
@@ -796,7 +796,7 @@ void Vehicle::Draw()
 				if (ImGui::Button("Remove vehicles", Ui::GetSize(1)))
 				{
 					CPlayerPed* player = FindPlayerPed();
-					for (CVehicle *pVeh : CPools::ms_pVehiclePool)
+					for (CVehicle* pVeh : CPools::ms_pVehiclePool)
 					{
 						if (DistanceBetweenPoints(pVeh->GetPosition(), player->GetPosition()) < m_nVehRemoveRadius
 							&& !(player->m_nPedFlags.bInVehicle && player->m_pVehicle == pVeh))
@@ -810,7 +810,7 @@ void Vehicle::Draw()
 			}
 			if (ImGui::CollapsingHeader("Traffic options"))
 			{
-				static std::vector<Ui::NamedMemory> color{{"Black", 0x969151}, {"Pink", 0x969150}};
+				static std::vector<Ui::NamedMemory> color{ {"Black", 0x969151}, {"Pink", 0x969150} };
 				static std::vector<Ui::NamedMemory> type{
 					{"Cheap", 0x96915E}, {"Country", 0x96917B}, {"Fast", 0x96915F}
 				};
@@ -849,20 +849,20 @@ void Vehicle::Draw()
 						{
 							switch (m_nDoorMenuButton)
 							{
-							case 0:
-								Command<Commands::DAMAGE_CAR_DOOR>(hveh, i);
-								break;
-							case 1:
-								Command<Commands::FIX_CAR_DOOR>(hveh, i);
-								break;
-							case 2:
-								Command<Commands::OPEN_CAR_DOOR>(hveh, i);
-								break;
-							case 3:
-								Command<Commands::POP_CAR_DOOR>(hveh, i);
-								break;
-							default:
-								break;
+								case 0:
+									Command<Commands::DAMAGE_CAR_DOOR>(hveh, i);
+									break;
+								case 1:
+									Command<Commands::FIX_CAR_DOOR>(hveh, i);
+									break;
+								case 2:
+									Command<Commands::OPEN_CAR_DOOR>(hveh, i);
+									break;
+								case 3:
+									Command<Commands::POP_CAR_DOOR>(hveh, i);
+									break;
+								default:
+									break;
 							}
 						}
 					}
@@ -873,20 +873,20 @@ void Vehicle::Draw()
 						{
 							switch (m_nDoorMenuButton)
 							{
-							case 0:
-								Command<Commands::DAMAGE_CAR_DOOR>(hveh, i);
-								break;
-							case 1:
-								Command<Commands::FIX_CAR_DOOR>(hveh, i);
-								break;
-							case 2:
-								Command<Commands::OPEN_CAR_DOOR>(hveh, i);
-								break;
-							case 3:
-								Command<Commands::POP_CAR_DOOR>(hveh, i);
-								break;
-							default:
-								break;
+								case 0:
+									Command<Commands::DAMAGE_CAR_DOOR>(hveh, i);
+									break;
+								case 1:
+									Command<Commands::FIX_CAR_DOOR>(hveh, i);
+									break;
+								case 2:
+									Command<Commands::OPEN_CAR_DOOR>(hveh, i);
+									break;
+								case 3:
+									Command<Commands::POP_CAR_DOOR>(hveh, i);
+									break;
+								default:
+									break;
 							}
 						}
 
@@ -935,11 +935,11 @@ void Vehicle::Draw()
 			ImGui::InputTextWithHint("##LicenseText", "License plate text", m_Spawner::m_nLicenseText, 9);
 
 			Ui::DrawImages(m_Spawner::m_VehData.m_ImagesList, ImVec2(100, 75), m_Spawner::m_VehData.m_Categories,
-			               m_Spawner::m_VehData.m_Selected, m_Spawner::m_VehData.m_Filter, SpawnVehicle, nullptr,
-			               [](std::string str)
-			               {
-				               return GetNameFromModel(std::stoi(str));
-			               });
+						   m_Spawner::m_VehData.m_Selected, m_Spawner::m_VehData.m_Filter, SpawnVehicle, nullptr,
+						   [](std::string str)
+						   {
+							   return GetNameFromModel(std::stoi(str));
+						   });
 
 			ImGui::EndTabItem();
 		}
@@ -966,7 +966,7 @@ void Vehicle::Draw()
 					uchar r = m_Color::m_fColorPicker[0] * 255;
 					uchar g = m_Color::m_fColorPicker[1] * 255;
 					uchar b = m_Color::m_fColorPicker[2] * 255;
-					Paint::SetNodeColor(veh, Paint::veh_nodes::selected, {r, g, b, 255}, m_Color::m_bMatFilter);
+					Paint::SetNodeColor(veh, Paint::veh_nodes::selected, { r, g, b, 255 }, m_Color::m_bMatFilter);
 				}
 
 				ImGui::Spacing();
@@ -1012,7 +1012,7 @@ void Vehicle::Draw()
 							for (int colorId : entry.second)
 							{
 								if (Ui::ColorButton(colorId, m_CarcolsColorData[colorId],
-								                    ImVec2(btnSize, btnSize)))
+									ImVec2(btnSize, btnSize)))
 									*(uint8_replacement*)(int(veh) + 0x433 + m_Color::m_nRadioButton) = colorId;
 
 								if (count % btnsInRow != 0)
@@ -1131,7 +1131,7 @@ void Vehicle::Draw()
 															m_Color::m_bMatFilter);
 								},
 								nullptr,
-								[](std::string& str)
+									[](std::string& str)
 								{
 									return str;
 								});
@@ -1143,14 +1143,14 @@ void Vehicle::Draw()
 			{
 				ImGui::Spacing();
 				Ui::DrawImages(m_TuneData.m_ImagesList, ImVec2(100, 80), m_TuneData.m_Categories, m_TuneData.m_Selected,
-				               m_TuneData.m_Filter,
-				               [](std::string& str) { AddComponent(str); },
-				               [](std::string& str) { RemoveComponent(str); },
-				               [](std::string& str) { return str; },
-				               [](std::string& str)
-				               {
-					               return ((bool(*)(int, CVehicle*))0x49B010)(std::stoi(str), player->m_pVehicle);
-				               }
+							   m_TuneData.m_Filter,
+							   [](std::string& str) { AddComponent(str); },
+							   [](std::string& str) { RemoveComponent(str); },
+							   [](std::string& str) { return str; },
+							   [](std::string& str)
+							   {
+								   return ((bool(*)(int, CVehicle*))0x49B010)(std::stoi(str), player->m_pVehicle);
+							   }
 				);
 
 				ImGui::EndTabItem();
@@ -1182,13 +1182,13 @@ void Vehicle::Draw()
 
 				if (ImGui::Button("Read more", ImVec2(Ui::GetSize(3))))
 					ShellExecute(NULL, "open", "https://projectcerbera.com/gta/sa/tutorials/handling", NULL, NULL,
-					             SW_SHOWNORMAL);
+								 SW_SHOWNORMAL);
 
 				ImGui::Spacing();
 
 				ImGui::BeginChild("HandlingChild");
 
-				static std::vector<Ui::NamedValue> abs{{"On", 1}, {"Off", 0}};
+				static std::vector<Ui::NamedValue> abs{ {"On", 1}, {"Off", 0} };
 				Ui::EditRadioButtonAddressEx("Abs", pHandling + 0x9C, abs);
 
 				Ui::EditFloat("Anti dive multiplier", pHandling + 0xC4, 0.0f, 0.0f, 1.0f);
@@ -1209,10 +1209,10 @@ void Vehicle::Draw()
 				Ui::EditFloat("Engine acceleration", pHandling + 0x7C, 0.0f, 0.0f, 49.0f, 12500.0f);
 				Ui::EditFloat("Engine inertia", pHandling + 0x80, 0.0f, 0.0f, 400.0f);
 
-				static std::vector<Ui::NamedValue> engine_type{{"Petrol", 80}, {"Diseal", 68}, {"Electric", 69}};
+				static std::vector<Ui::NamedValue> engine_type{ {"Petrol", 80}, {"Diseal", 68}, {"Electric", 69} };
 				Ui::EditRadioButtonAddressEx("Engine type", pHandling + 0x75, engine_type);
 
-				std::vector<Ui::NamedValue> front_lights{{"Long", 0}, {"Small", 1}, {"Big", 2}, {"Tall", 3}};
+				std::vector<Ui::NamedValue> front_lights{ {"Long", 0}, {"Small", 1}, {"Big", 2}, {"Tall", 3} };
 				Ui::EditRadioButtonAddressEx("Front lights", pHandling + 0xDC, front_lights);
 
 				Ui::EditFloat("Force level", pHandling + 0xAC, -10.0f, -10.0f, 10.0f); // test later
@@ -1231,7 +1231,7 @@ void Vehicle::Draw()
 				Ui::EditAddress<BYTE>("Number of gears", pHandling + 0x76, 1, 1, 10);
 				Ui::EditAddress<BYTE>("Percent submerged", pHandling + 0x20, 10, 10, 120);
 
-				static std::vector<Ui::NamedValue> rear_lights{{"Long", 0}, {"Small", 1}, {"Big", 2}, {"Tall", 3}};
+				static std::vector<Ui::NamedValue> rear_lights{ {"Long", 0}, {"Small", 1}, {"Big", 2}, {"Tall", 3} };
 				Ui::EditRadioButtonAddressEx("Rear lights", pHandling + 0xDD, rear_lights);
 
 				Ui::EditFloat("Seat offset distance", pHandling + 0xD4, 0.0f, 0.0f, 1.0f);

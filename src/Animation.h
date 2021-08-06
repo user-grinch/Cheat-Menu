@@ -18,8 +18,8 @@ private:
 	inline static bool m_Loop;
 	inline static bool m_bSecondary;
 	inline static std::string m_nWalkingStyle = "default";
-	inline static std::vector<std::string> m_FightingStyleList = {"Default", "Boxing", "Kung fu", "Kick Boxing", "Punch Kick"};
-	inline static std::vector<std::string> m_WalkingStyleList = 
+	inline static std::vector<std::string> m_FightingStyleList = { "Default", "Boxing", "Kung fu", "Kick Boxing", "Punch Kick" };
+	inline static std::vector<std::string> m_WalkingStyleList =
 	{
 		"default", "man", "shuffle", "oldman", "gang1", "gang2", "oldfatman",
 		"fatman", "jogger", "drunkman", "blindman", "swat", "woman", "shopping", "busywoman",

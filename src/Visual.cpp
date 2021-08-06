@@ -57,7 +57,7 @@ bool Visual::TimeCycColorEdit3(const char* label, uchar* r, uchar* g, uchar* b, 
 	auto green = static_cast<uchar*>(patch::GetPointer(int(g)));
 	auto blue = static_cast<uchar*>(patch::GetPointer(int(b)));
 
-	float col[3]{red[val] / 255.0f, green[val] / 255.0f, blue[val] / 255.0f};
+	float col[3]{ red[val] / 255.0f, green[val] / 255.0f, blue[val] / 255.0f };
 
 	if (ImGui::ColorEdit3(label, col, flags))
 	{
@@ -80,7 +80,7 @@ bool Visual::TimeCycColorEdit4(const char* label, uchar* r, uchar* g, uchar* b, 
 	auto blue = static_cast<uchar*>(patch::GetPointer(int(b)));
 	auto alpha = static_cast<uchar*>(patch::GetPointer(int(a)));
 
-	float col[4]{red[val] / 255.0f, green[val] / 255.0f, blue[val] / 255.0f, alpha[val] / 255.0f};
+	float col[4]{ red[val] / 255.0f, green[val] / 255.0f, blue[val] / 255.0f, alpha[val] / 255.0f };
 
 	if (ImGui::ColorEdit4(label, col, flags))
 	{
@@ -322,7 +322,7 @@ void Visual::Draw()
 					{"No outline", 0}, {"Thin outline", 1}, {"Default outline", 2}
 				};
 				Ui::EditRadioButtonAddressEx("Money font outline", 0x58F58D, font_outline);
-				static std::vector<Ui::NamedValue> style{{"Style 1", 1}, {"Style 2", 2}, {"Default style", 3}};
+				static std::vector<Ui::NamedValue> style{ {"Style 1", 1}, {"Style 2", 2}, {"Default style", 3} };
 				Ui::EditRadioButtonAddressEx("Money font style", 0x58F57F, style);
 				Ui::EditAddress<float>("Radar Height", *(int*)0x5834F6, 0, 76, 999);
 				Ui::EditAddress<float>("Radar Width", *(int*)0x5834C2, 0, 94, 999);
@@ -330,7 +330,7 @@ void Visual::Draw()
 				Ui::EditAddress<float>("Radar posY", *(int*)0x583500, -999, 104, 999);
 				Ui::EditAddress<int>("Radar zoom", 0xA444A3, 0, 0, 170);
 				Ui::ColorPickerAddress("Radio station color", 0xBAB24C, ImVec4(150, 150, 150, 255));
-				static std::vector<Ui::NamedValue> star_border{{"No border", 0}, {"Default", 1}, {"Bold border", 2}};
+				static std::vector<Ui::NamedValue> star_border{ {"No border", 0}, {"Default", 1}, {"Bold border", 2} };
 				Ui::EditRadioButtonAddressEx("Wanted star border", 0x58DD41, star_border);
 				Ui::EditAddress<float>("Wanted posX", *(int*)0x58DD0F, -999, 29, 999);
 				Ui::EditAddress<float>("Wanted posY", *(int*)0x58DDFC, -999, 114, 999);
@@ -400,6 +400,17 @@ void Visual::Draw()
 				Ui::ShowTooltip("Sync system time is enabled.\n(Game/Sync system time)");
 			}
 
+			if (ImGui::Checkbox("Freeze game time", &Game::m_bFreezeTime))
+			{
+				if (Game::m_bFreezeTime)
+				{
+					patch::SetRaw(0x52CF10, (char*)"\xEB\xEF", 2);
+				}
+				else
+				{
+					patch::SetRaw(0x52CF10, (char*)"\x56\x8B", 2);
+				}
+			}
 			ImGui::Spacing();
 			if (ImGui::BeginTabBar("Timecyc subtab", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
 			{
@@ -411,7 +422,7 @@ void Visual::Draw()
 					TimeCycColorEdit3("Ambient", m_nAmbientRed, m_nAmbientGreen, m_nAmbientBlue);
 					TimeCycColorEdit3("Ambient obj", m_nAmbientRed_Obj, m_nAmbientGreen_Obj, m_nAmbientBlue_Obj);
 					TimeCycColorEdit3("Fluffy clouds", m_nFluffyCloudsBottomRed, m_nFluffyCloudsBottomGreen,
-					                  m_nFluffyCloudsBottomBlue);
+									  m_nFluffyCloudsBottomBlue);
 					TimeCycColorEdit3("Low clouds", m_nLowCloudsRed, m_nLowCloudsGreen, m_nLowCloudsBlue);
 
 					TimeCycColorEdit4("Postfx 1", m_fPostFx1Red, m_fPostFx1Green, m_fPostFx1Blue, m_fPostFx1Alpha);

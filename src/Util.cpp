@@ -3,13 +3,14 @@
 #include "psapi.h"
 #include "CFileLoader.h"
 
-void Util::LoadTextureDirectory(SSearchData& data, char *path, bool pass_full_name)
+void Util::LoadTextureDirectory(SSearchData& data, char* path, bool pass_full_name)
 {
 	RwTexDictionary* pRwTexDictionary = &data.txd;
 
+	// allow SA textures for VC
 	pRwTexDictionary = CFileLoader::LoadTexDictionary(path);
 
-	if (pRwTexDictionary) 
+	if (pRwTexDictionary)
 	{
 		// FIX ME
 		if (pass_full_name)
@@ -19,6 +20,7 @@ void Util::LoadTextureDirectory(SSearchData& data, char *path, bool pass_full_na
 				SSearchData* sdata = reinterpret_cast<SSearchData*>(data);
 				sdata->m_ImagesList.push_back(std::make_unique<STextureStructure>());
 				sdata->m_ImagesList.back().get()->m_pRwTexture = tex;
+				sdata->m_ImagesList.back().get()->m_pTexture = Util::GetTextureFromRaster(tex);
 
 				std::stringstream ss(tex->name);
 				std::string str;
@@ -41,6 +43,7 @@ void Util::LoadTextureDirectory(SSearchData& data, char *path, bool pass_full_na
 				SSearchData* sdata = reinterpret_cast<SSearchData*>(data);
 				sdata->m_ImagesList.push_back(std::make_unique<STextureStructure>());
 				sdata->m_ImagesList.back().get()->m_pRwTexture = tex;
+				sdata->m_ImagesList.back().get()->m_pTexture = Util::GetTextureFromRaster(tex);
 
 				std::stringstream ss(tex->name);
 				std::string str;
@@ -60,16 +63,17 @@ void Util::LoadTextureDirectory(SSearchData& data, char *path, bool pass_full_na
 	}
 }
 
-void* Util::GetTextureFromRaster(RwTexture *pTexture)
+
+void* Util::GetTextureFromRaster(RwTexture* pTexture)
 {
 	RwRasterEx* raster = (RwRasterEx*)(&pTexture->raster->parent);
-	
+
 	return (&raster->renderResource->texture);
 }
 
 std::string Util::GetLocationName(CVector* pos)
 {
-	#ifdef GTASA
+#ifdef GTASA
 	int hplayer = CPools::GetPedRef(FindPlayerPed());
 
 	int interior = 0;
@@ -81,27 +85,27 @@ std::string Util::GetLocationName(CVector* pos)
 
 	switch (city)
 	{
-	case 0:
-		town = "CS";
-		break;
-	case 1:
-		town = "LS";
-		break;
-	case 2:
-		town = "SF";
-		break;
-	case 3:
-		town = "LV";
-		break;
+		case 0:
+			town = "CS";
+			break;
+		case 1:
+			town = "LS";
+			break;
+		case 2:
+			town = "SF";
+			break;
+		case 3:
+			town = "LV";
+			break;
 	}
 
 	if (interior == 0)
 		return CTheZones::FindSmallestZoneForPosition(*pos, true)->GetTranslatedName() + std::string(", ") + town;
 	return std::string("Interior ") + std::to_string(interior) + ", " + town;
-	
-	#elif GTAVC
+
+#elif GTAVC
 	return "Vice City";
-	#endif
+#endif
 }
 
 #ifdef GTASA
@@ -165,7 +169,7 @@ int Util::GetLargestGangInZone()
 
 		CZoneExtraInfo* zone_info = CTheZones::GetZoneInfo(&pos, nullptr);
 		int density = zone_info->m_nGangDensity[i];
-		
+
 		if (density > max_density)
 		{
 			max_density = density;

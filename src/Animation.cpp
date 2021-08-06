@@ -85,7 +85,7 @@ void Animation::Draw()
 			{
 				ImGui::Spacing();
 				Ui::DrawJSON(m_AnimData.m_Json, m_AnimData.m_Categories, m_AnimData.m_Selected, m_AnimData.m_Filter, &PlayAnimation,
-				             &RemoveAnimation);
+							 &RemoveAnimation);
 				ImGui::EndChild();
 			}
 			ImGui::EndTabItem();
@@ -154,7 +154,7 @@ void Animation::Draw()
 			{
 				ImGui::Spacing();
 				Ui::DrawJSON(m_Cutscene::m_Data.m_Json, m_Cutscene::m_Data.m_Categories, m_Cutscene::m_Data.m_Selected,
-				             m_Cutscene::m_Data.m_Filter, &PlayCutscene, nullptr);
+							 m_Cutscene::m_Data.m_Filter, &PlayCutscene, nullptr);
 				ImGui::EndChild();
 			}
 			ImGui::EndTabItem();

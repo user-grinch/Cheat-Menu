@@ -9,9 +9,9 @@ LRESULT Hook::WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 	if (ImGui::GetIO().WantTextInput)
 	{
-		#ifdef GTASA
+#ifdef GTASA
 		Call<0x53F1E0>(); // CPad::ClearKeyboardHistory
-		#endif
+#endif
 		return 1;
 	}
 
@@ -113,10 +113,10 @@ void Hook::RenderFrame(void* ptr)
 
 		ImGui_ImplWin32_Init(RsGlobal.ps->window);
 
-		#ifdef GTASA
-		// shift trigger fix
+#ifdef GTASA
+// shift trigger fix
 		patch::Nop(0x00531155, 5);
-		#endif
+#endif
 
 		if (Globals::renderer == Render_DirectX9)
 		{
@@ -165,9 +165,9 @@ void Hook::ShowMouse(bool state)
 
 		ImGui::GetIO().MouseDrawCursor = state;
 
-		#ifdef GTASA
+#ifdef GTASA
 		Hook::ApplyMouseFix(); // Reapply the patches
-		#elif GTAVC
+#elif GTAVC
 		if (m_bShowMouse)
 		{
 			patch::SetUChar(0x6020A0, 0xC3); // psSetMousePos
@@ -178,7 +178,7 @@ void Hook::ShowMouse(bool state)
 			patch::SetUChar(0x6020A0, 0x53);
 			patch::SetRaw(0x4AB6CA, (char*)"\xE8\x51\x21\x00\x00", 5);
 		}
-		#endif
+#endif
 
 		CPad::NewMouseControllerState.X = 0;
 		CPad::NewMouseControllerState.Y = 0;

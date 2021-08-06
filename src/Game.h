@@ -2,8 +2,8 @@
 class Game
 {
 public:
-	inline static SSearchData m_MissionData{"mission"};
-	inline static std::vector<std::string> m_DayNames = 
+	inline static SSearchData m_MissionData{ "mission" };
+	inline static std::vector<std::string> m_DayNames =
 	{
 		"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
 	};

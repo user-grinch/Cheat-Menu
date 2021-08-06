@@ -8,29 +8,29 @@ private:
 	inline static bool m_bInsertCoord;
 	inline static bool m_bQuickTeleport;
 	inline static char m_nInputBuffer[INPUT_BUFFER_SIZE];
-	inline static SSearchData tp_data{"teleport"};
+	inline static SSearchData tp_data{ "teleport" };
 	inline static char m_nLocationBuffer[INPUT_BUFFER_SIZE];
 	inline static uint m_nQuickTeleportTimer;
 
-	#ifdef GTASA
+#ifdef GTASA
 	inline static CJson m_SpriteJson = CJson("radar sprite");
-	#endif
+#endif
 
 	struct m_Teleport
 	{
 		inline static bool m_bEnabled;
-		inline static CVector m_fPos = {-1, -1, -1};
+		inline static CVector m_fPos = { -1, -1, -1 };
 		inline static uint m_nTimer;
 	};
 
 
-	#ifdef GTASA
-	/*
-		Generates radar sprite coordinates on the fly.
-		Shouldn't get saved in 'teleport.json', needs to be cleared at game shutdown.
-	*/
+#ifdef GTASA
+/*
+	Generates radar sprite coordinates on the fly.
+	Shouldn't get saved in 'teleport.json', needs to be cleared at game shutdown.
+*/
 	static void FetchRadarSpriteData();
-	#endif
+#endif
 
 protected:
 	Teleport();

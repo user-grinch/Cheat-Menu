@@ -45,7 +45,7 @@ bool Ui::ListBoxStr(const char* label, std::vector<std::string>& all_items, std:
 bool Ui::ListBoxCustomNames(const char* label, std::vector<std::string>& all_items, std::string& selected, const char* custom_names[], size_t length)
 {
 	bool rtn = false;
-	std::string display_selected = (selected == "All") ? selected: custom_names[std::stoi(selected)];
+	std::string display_selected = (selected == "All") ? selected : custom_names[std::stoi(selected)];
 
 	if (ImGui::BeginCombo(label, display_selected.c_str()))
 	{
@@ -249,7 +249,7 @@ bool Ui::CheckboxWithHint(const char* label, bool* v, const char* hint, bool is_
 		ImGui::InvisibleButton("?", ImGui::CalcTextSize("?", nullptr, true));
 		min = ImGui::GetItemRectMin();
 		drawlist->AddText(ImVec2(min.x, min.y + style.ItemInnerSpacing.y), ImGui::GetColorU32(ImGuiCol_TextDisabled),
-		                  "?");
+						  "?");
 
 		if (ImGui::IsItemHovered() && !is_disabled)
 		{
@@ -317,7 +317,7 @@ bool Ui::CheckboxAddressVar(const char* label, bool val, int addr, const char* h
 }
 
 bool Ui::CheckboxAddressVarEx(const char* label, bool val, int addr, int enabled_val, int disabled_val,
-                              const char* hint)
+							  const char* hint)
 {
 	bool rtn = false;
 	bool state = val;
@@ -348,9 +348,9 @@ bool Ui::CheckboxBitFlag(const char* label, uint flag, const char* hint)
 }
 
 void Ui::DrawJSON(CJson& json, std::vector<std::string>& combo_items, std::string& selected_item,
-                ImGuiTextFilter& filter,
-                std::function<void(std::string&, std::string&, std::string&)> func_left_click,
-                std::function<void(std::string&, std::string&, std::string&)> func_right_click)
+				ImGuiTextFilter& filter,
+				std::function<void(std::string&, std::string&, std::string&)> func_left_click,
+				std::function<void(std::string&, std::string&, std::string&)> func_right_click)
 {
 	ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() / 2 - 5);
 	ListBoxStr("##Categories", combo_items, selected_item);
@@ -485,10 +485,10 @@ void Ui::FilterWithHint(const char* label, ImGuiTextFilter& filter, const char* 
 
 // clean up the code someday
 void Ui::DrawImages(std::vector<std::unique_ptr<STextureStructure>>& img_vec, ImVec2 image_size,
-                    std::vector<std::string>& category_vec, std::string& selected_item, ImGuiTextFilter& filter,
-                    std::function<void(std::string&)> on_left_click, std::function<void(std::string&)> on_right_click,
-                    std::function<std::string(std::string&)> get_name_func,
-                    std::function<bool(std::string&)> verify_func, const char** custom_names, size_t length)
+					std::vector<std::string>& category_vec, std::string& selected_item, ImGuiTextFilter& filter,
+					std::function<void(std::string&)> on_left_click, std::function<void(std::string&)> on_right_click,
+					std::function<std::string(std::string&)> get_name_func,
+					std::function<bool(std::string&)> verify_func, const char** custom_names, size_t length)
 {
 	// scale image size
 	image_size.x *= screen::GetScreenWidth() / 1366.0f;
@@ -540,13 +540,12 @@ void Ui::DrawImages(std::vector<std::unique_ptr<STextureStructure>>& img_vec, Im
 			}
 			else
 			{
-				IDirect3DTexture9* texture =  (IDirect3DTexture9*)Util::GetTextureFromRaster(img_vec[i]->m_pRwTexture);
-				if (ImGui::ImageButton(texture, image_size, ImVec2(0, 0), ImVec2(1, 1), 1, ImVec4(1, 1, 1, 1),ImVec4(1, 1, 1, 1)))
+				if (ImGui::ImageButton(img_vec[i]->m_pTexture, image_size, ImVec2(0, 0), ImVec2(1, 1), 1, ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 1)))
 				{
 					on_left_click(text);
 				}
 			}
-			
+
 
 			if (ImGui::IsItemClicked(1) && on_right_click != nullptr)
 			{
@@ -769,7 +768,7 @@ void Ui::EditBits(const char* label, const int address, const std::vector<std::s
 }
 
 void Ui::EditFloat(const char* label, const int address, const float min, const float def, const float max,
-                   const float mul, const float change)
+				   const float mul, const float change)
 {
 	if (ImGui::CollapsingHeader(label))
 	{
@@ -881,7 +880,7 @@ bool Ui::HotKey(const char* label, HotKeyData& key_data)
 		text += (" + " + key_names[key_data.m_key2 - 1]);
 
 	if (ImGui::Button((text + std::string("##") + std::string(label)).c_str(),
-	                  ImVec2(ImGui::GetWindowContentRegionWidth() / 3.5, ImGui::GetFrameHeight())))
+		ImVec2(ImGui::GetWindowContentRegionWidth() / 3.5, ImGui::GetFrameHeight())))
 		if (!active)
 			m_CurrentHotkey = label;
 
@@ -955,7 +954,7 @@ bool Ui::ColorButton(int color_id, std::vector<float>& color, ImVec2 size)
 	{
 		ImDrawList* drawlist = ImGui::GetWindowDrawList();
 		drawlist->AddRectFilled(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(),
-		                        ImGui::GetColorU32(ImGuiCol_ModalWindowDimBg));
+								ImGui::GetColorU32(ImGuiCol_ModalWindowDimBg));
 	}
 
 	return rtn;

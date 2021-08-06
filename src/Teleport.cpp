@@ -51,7 +51,7 @@ Teleport::Teleport()
 			CPlayerPed* player = FindPlayerPed();
 
 			#ifdef GTASA
-			CEntity* player_entity = FindPlayerEntity();
+			CEntity* player_entity = FindPlayerEntity(-1);
 			m_Teleport::m_fPos.z = CWorld::FindGroundZFor3DCoord(m_Teleport::m_fPos.x, m_Teleport::m_fPos.y,
 			                                                 m_Teleport::m_fPos.z + 100.0f, nullptr, &player_entity) + 1.0f;
 			#elif GTAVC

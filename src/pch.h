@@ -131,6 +131,7 @@ struct STextureStructure
 	std::string m_FileName;
 	std::string m_CategoryName;
 	RwTexture *m_pRwTexture = nullptr;
+	void *m_pTexture = nullptr;
 };
 
 struct SSearchData

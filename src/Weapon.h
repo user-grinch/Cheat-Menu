@@ -3,7 +3,7 @@
 class Weapon
 {
 public:
-	inline static SSearchData m_WeaponData{"weapon"};
+	inline static SSearchData m_WeaponData{ "weapon" };
 	inline static bool m_bImagesLoaded;
 	inline static bool m_bAutoAim;
 	inline static bool m_bFastReload;

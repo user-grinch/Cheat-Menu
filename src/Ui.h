@@ -40,19 +40,19 @@ public:
 	static bool ColorButton(int color_id, std::vector<float>& color, ImVec2 size);
 	static bool CheckboxAddress(const char* label, int addr = NULL, const char* hint = nullptr);
 	static bool CheckboxAddressEx(const char* label, int addr = NULL, int enabled_val = 1, int disabled_val = 0,
-	                              const char* hint = nullptr);
+								  const char* hint = nullptr);
 	static bool CheckboxAddressVar(const char* label, bool val, int addr, const char* hint = nullptr);
 	static bool CheckboxAddressVarEx(const char* label, bool val, int addr, int enabled_val, int disabled_val,
-	                                 const char* hint = nullptr);
+									 const char* hint = nullptr);
 	static bool CheckboxBitFlag(const char* label, uint flag, const char* hint = nullptr);
 	static bool CheckboxWithHint(const char* label, bool* state, const char* hint = nullptr, bool is_disabled = false);
 	static void DrawHeaders(CallbackTable& data);
 
 	static void DrawJSON(CJson& json, std::vector<std::string>& combo_items, std::string& selected_item,
-	                     ImGuiTextFilter& filter,
-	                     std::function<void(std::string&, std::string&, std::string&)> func_left_click,
-	                     std::function<void(std::string&, std::string&, std::string&)> func_right_click);
-	static void DrawImages(	std::vector<std::unique_ptr<STextureStructure>>& img_vec, ImVec2 image_size,
+						 ImGuiTextFilter& filter,
+						 std::function<void(std::string&, std::string&, std::string&)> func_left_click,
+						 std::function<void(std::string&, std::string&, std::string&)> func_right_click);
+	static void DrawImages(std::vector<std::unique_ptr<STextureStructure>>& img_vec, ImVec2 image_size,
 							std::vector<std::string>& category_vec, std::string& selected_item, ImGuiTextFilter& filter,
 							std::function<void(std::string&)> on_left_click,
 							std::function<void(std::string&)> on_right_click,
@@ -68,11 +68,11 @@ public:
 	static void EditReference(const char* label, T& address, int min = 0, int def = 0, int max = 100);
 	static void EditRadioButtonAddress(const char* label, std::vector<NamedMemory>& named_mem);
 	static void EditRadioButtonAddressEx(const char* label, int addr, std::vector<NamedValue>& named_val);
-	
-	#ifdef GTASA
+
+#ifdef GTASA
 	static void EditStat(const char* label, int stat_id, int min = 0, int def = 0, int max = 1000);
-	#endif
-	
+#endif
+
 	static void FilterWithHint(const char* label, ImGuiTextFilter& filter, const char* hint);
 
 	static ImVec2 GetSize(short count = 1, bool spacing = true);

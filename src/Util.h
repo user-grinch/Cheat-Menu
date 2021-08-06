@@ -12,15 +12,15 @@ class Util
 {
 public:
 
-	#ifdef GTASA
+#ifdef GTASA
 	static void ClearCharTasksVehCheck(CPed* ped);
 	static CPed* GetClosestPed();
 	static CVehicle* GetClosestVehicle();
 	static int GetLargestGangInZone();
 	static bool IsOnCutscene();
 	static RwTexture* LoadTextureFromMemory(char* data, unsigned int size);
-	#endif
-	
+#endif
+
 	static std::string GetLocationName(CVector* pos);
 	static bool IsOnMission();
 	static void RainbowValues(int& r, int& g, int& b, float speed);

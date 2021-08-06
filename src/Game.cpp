@@ -329,7 +329,7 @@ void Game::Draw()
 	CPlayerPed* pPlayer = FindPlayerPed();
 	int hplayer = CPools::GetPedRef(pPlayer);
 
-	if (ImGui::Button("Save game (might cause game bugs)",Ui::GetSize()))
+	if (ImGui::Button("Save game (might cause game bugs)", Ui::GetSize()))
 	{
 		FrontEndMenuManager.m_bActivateMenuNextFrame = true;
 		bSaveGameFlag = true;
@@ -434,10 +434,10 @@ Lowers armour, health, stamina etc."))
 				Command<Commands::SWITCH_DEATH_PENALTIES>(m_bKeepStuff);
 			}
 			Ui::CheckboxWithHint("Screenshot shortcut", &m_bScreenShot,
-			                     (("Take screenshot using ") + Ui::GetHotKeyNameString(Menu::m_HotKeys::quickSceenShot)
-				                     + "\nSaved inside 'GTA San Andreas User Files\\Gallery'").c_str());
+								 (("Take screenshot using ") + Ui::GetHotKeyNameString(Menu::m_HotKeys::quickSceenShot)
+									 + "\nSaved inside 'GTA San Andreas User Files\\Gallery'").c_str());
 			if (Ui::CheckboxWithHint("Solid water", &m_bSolidWater,
-			                         "Player can walk on water\nTurn this off if you want to swim."))
+				"Player can walk on water\nTurn this off if you want to swim."))
 			{
 				if (!m_bSolidWater && m_nSolidWaterObj != 0)
 				{
@@ -588,7 +588,7 @@ It's recommanded not to save after using the mission loader. Use it at your own 
 				ImGui::Spacing();
 
 				Ui::DrawJSON(m_MissionData.m_Json, m_MissionData.m_Categories, m_MissionData.m_Selected, m_MissionData.m_Filter,
-				             SetPlayerMission, nullptr);
+							 SetPlayerMission, nullptr);
 			}
 			ImGui::EndTabItem();
 		}

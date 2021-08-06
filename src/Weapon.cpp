@@ -80,7 +80,7 @@ void Weapon::SetGangWeapon(std::string& weapon_type)
 {
 	m_nGangWeaponList[m_nSelectedGang][m_nSelectedWeapon] = std::stoi(weapon_type);
 	CGangs::SetGangWeapons(m_nSelectedGang, m_nGangWeaponList[m_nSelectedGang][0], m_nGangWeaponList[m_nSelectedGang][1],
-	                       m_nGangWeaponList[m_nSelectedGang][2]);
+						   m_nGangWeaponList[m_nSelectedGang][2]);
 }
 
 void Weapon::GiveWeaponToPlayer(std::string& weapon_type)
@@ -153,7 +153,7 @@ void Weapon::Draw()
 	}
 
 	ImGui::Spacing();
-	
+
 
 	if (ImGui::BeginTabBar("Ped", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
 	{
@@ -165,7 +165,7 @@ void Weapon::Draw()
 
 			Ui::CheckboxWithHint("Fast aim", &m_bAutoAim, "Enables aim assist on keyboard\n\nQ = left    E = right\n\nPress Q and E to switch targets.\nMoving mouse removes the target!");
 			if (Ui::CheckboxWithHint("Dual wield", &m_bDualWeild,
-			                         "Dual wield pistol, shawoff, uzi, tec9\n(Other weapons don't work)"))
+				"Dual wield pistol, shawoff, uzi, tec9\n(Other weapons don't work)"))
 			{
 				if (!m_bDualWeild)
 				{
@@ -233,13 +233,13 @@ void Weapon::Draw()
 
 			ImGui::Spacing();
 			ImGui::Text("Current weapon: %s",
-			            m_WeaponData.m_Json.m_Data[std::to_string(m_nGangWeaponList[m_nSelectedGang][m_nSelectedWeapon])].get<
-				            std::string>().c_str());
+						m_WeaponData.m_Json.m_Data[std::to_string(m_nGangWeaponList[m_nSelectedGang][m_nSelectedWeapon])].get<
+							std::string>().c_str());
 			ImGui::Spacing();
 			Ui::DrawImages(m_WeaponData.m_ImagesList, ImVec2(65, 65), m_WeaponData.m_Categories, m_WeaponData.m_Selected,
-			               m_WeaponData.m_Filter, SetGangWeapon, nullptr,
-			               [](std::string str) { return m_WeaponData.m_Json.m_Data[str].get<std::string>(); },
-			               [](std::string str) { return str != "-1"; /*Jetpack*/ }
+						   m_WeaponData.m_Filter, SetGangWeapon, nullptr,
+						   [](std::string str) { return m_WeaponData.m_Json.m_Data[str].get<std::string>(); },
+						   [](std::string str) { return str != "-1"; /*Jetpack*/ }
 			);
 			ImGui::EndTabItem();
 		}
@@ -252,9 +252,9 @@ void Weapon::Draw()
 				m_nAmmoCount = (m_nAmmoCount > 99999) ? 99999 : m_nAmmoCount;
 			}
 			Ui::DrawImages(m_WeaponData.m_ImagesList, ImVec2(65, 65), m_WeaponData.m_Categories, m_WeaponData.m_Selected,
-			               m_WeaponData.m_Filter, GiveWeaponToPlayer, nullptr,
-			               [](std::string str) { return m_WeaponData.m_Json.m_Data[str].get<std::string>(); },
-			               [](std::string str) { return str != "0"; /*Unarmed*/ }
+						   m_WeaponData.m_Filter, GiveWeaponToPlayer, nullptr,
+						   [](std::string str) { return m_WeaponData.m_Json.m_Data[str].get<std::string>(); },
+						   [](std::string str) { return str != "0"; /*Unarmed*/ }
 			);
 			ImGui::EndTabItem();
 		}
