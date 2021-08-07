@@ -347,17 +347,16 @@ bool Ui::CheckboxBitFlag(const char* label, uint flag, const char* hint)
 	return rtn;
 }
 
-void Ui::DrawJSON(CJson& json, std::vector<std::string>& combo_items, std::string& selected_item,
-				ImGuiTextFilter& filter,
+void Ui::DrawJSON(SSearchData& data,
 				std::function<void(std::string&, std::string&, std::string&)> func_left_click,
 				std::function<void(std::string&, std::string&, std::string&)> func_right_click)
 {
 	ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() / 2 - 5);
-	ListBoxStr("##Categories", combo_items, selected_item);
+	ListBoxStr("##Categories", data.m_Categories, data.m_Selected);
 	ImGui::SameLine();
 
-	filter.Draw("##Filter");
-	if (strlen(filter.InputBuf) == 0)
+	data.m_Filter.Draw("##Filter");
+	if (strlen(data.m_Filter.InputBuf) == 0)
 	{
 		ImDrawList* drawlist = ImGui::GetWindowDrawList();
 
@@ -377,14 +376,14 @@ void Ui::DrawJSON(CJson& json, std::vector<std::string>& combo_items, std::strin
 
 
 	ImGui::BeginChild(1);
-	for (auto root : json.m_Data.items())
+	for (auto root : data.m_Json.m_Data.items())
 	{
-		if (root.key() == selected_item || selected_item == "All")
+		if (root.key() == data.m_Selected || data.m_Selected == "All")
 		{
 			for (auto _data : root.value().items())
 			{
 				std::string name = _data.key();
-				if (filter.PassFilter(name.c_str()))
+				if (data.m_Filter.PassFilter(name.c_str()))
 				{
 					if (ImGui::MenuItem(name.c_str()) && func_left_click != nullptr)
 					{

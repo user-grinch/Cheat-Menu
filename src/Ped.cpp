@@ -2,11 +2,15 @@
 #include "Ped.h"
 #include "Ui.h"
 #include "Util.h"
+#include <CPopulation.h>
 
 Ped::Ped()
 {
+#ifdef GTASA
 	if (GetModuleHandle("ExGangWars.asi"))
+	{
 		m_bExGangWarsInstalled = true;
+	}
 
 	Events::processScriptsEvent += []
 	{
@@ -16,6 +20,9 @@ Ped::Ped()
 			m_bImagesLoaded = true;
 		}
 	};
+#elif GTAVC
+	m_PedData.m_Json.LoadData(m_PedData.m_Categories, m_PedData.m_Selected);
+#endif
 }
 
 Ped::~Ped()
@@ -27,7 +34,11 @@ Ped::~Ped()
 	}
 }
 
+#ifdef GTASA
 void Ped::SpawnPed(std::string& model)
+#elif GTAVC
+void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
+#endif
 {
 	if (m_SpawnPed::m_List.size() == SPAWN_PED_LIMIT)
 	{
@@ -35,7 +46,7 @@ void Ped::SpawnPed(std::string& model)
 		return;
 	}
 
-	if (m_PedData.m_Json.m_Data.contains(model))
+	if (BY_GAME(m_PedData.m_Json.m_Data.contains(model), true))
 	{
 		CPlayerPed* player = FindPlayerPed();
 		CVector pos = player->GetPosition();
@@ -44,6 +55,7 @@ void Ped::SpawnPed(std::string& model)
 		CPed* ped;
 		int hplayer;
 
+#ifdef GTASA
 		if (m_SpecialPedJson.m_Data.contains(model))
 		{
 			std::string name;
@@ -58,8 +70,27 @@ void Ped::SpawnPed(std::string& model)
 			Command<Commands::CREATE_CHAR>(m_SpawnPed::m_nSelectedPedType + 4, 291, pos.x, pos.y, pos.z + 1, &hplayer);
 			CStreaming::SetSpecialCharIsDeletable(291);
 		}
-		else
+#elif GTAVC
+
+		if (cat == "Special") // Special model
 		{
+			static size_t currentSlot = 1;
+
+			Command<Commands::LOAD_SPECIAL_CHARACTER>(currentSlot, model.c_str());
+			Command<Commands::LOAD_ALL_MODELS_NOW>();
+			
+			Command<Commands::CREATE_CHAR>(4, 108+currentSlot, pos.x, pos.y, pos.z + 1, &hplayer);
+			Command<Commands::UNLOAD_SPECIAL_CHARACTER>(currentSlot);
+
+			++currentSlot;
+			if (currentSlot > 21)
+			{
+				currentSlot = 1;
+			}
+		}
+#endif
+		else
+		{	
 			int iModel = std::stoi(model);
 			CStreaming::RequestModel(iModel, eStreamingFlags::PRIORITY_REQUEST);
 			CStreaming::LoadAllRequestedModels(false);
@@ -80,6 +111,7 @@ void Ped::SpawnPed(std::string& model)
 		ped->m_nWeaponAccuracy = m_SpawnPed::m_nAccuracy;
 		ped->m_fHealth = m_SpawnPed::m_nPedHealth;
 
+#ifdef GTASA
 		if (m_SpawnPed::m_nWeaponId != 0)
 		{
 			int model = 0;
@@ -88,8 +120,10 @@ void Ped::SpawnPed(std::string& model)
 			CStreaming::LoadAllRequestedModels(false);
 			Command<Commands::GIVE_WEAPON_TO_CHAR>(hplayer, m_SpawnPed::m_nWeaponId, 999);
 		}
+#endif
 	}
 }
+
 
 void Ped::Draw()
 {
@@ -100,7 +134,7 @@ void Ped::Draw()
 			ImGui::Spacing();
 			ImGui::BeginChild("CheckboxesChild");
 			ImGui::Columns(2, 0, false);
-
+#ifdef GTASA
 			Ui::CheckboxAddress("Elvis everywhere", 0x969157);
 			Ui::CheckboxAddress("Everyone is armed", 0x969140);
 			Ui::CheckboxAddress("Gangs control streets", 0x96915B);
@@ -113,7 +147,7 @@ void Ped::Draw()
 			Ui::CheckboxAddress("Peds attack with rockets", 0x969158);
 			Ui::CheckboxAddress("Peds riot", 0x969175);
 			Ui::CheckboxAddress("Slut magnet", 0x96915D);
-
+#endif
 			ImGui::Columns(1);
 			ImGui::EndChild();
 
@@ -124,6 +158,7 @@ void Ped::Draw()
 			ImGui::Spacing();
 			ImGui::BeginChild("MenusChild");
 
+#ifdef GTASA
 			if (ImGui::CollapsingHeader("Gang wars"))
 			{
 				if (ImGui::Button("Start gang war", ImVec2(Ui::GetSize(2))))
@@ -175,9 +210,9 @@ void Ped::Draw()
 				ImGui::Spacing();
 				ImGui::Separator();
 			}
-
-			Ui::EditAddress<float>("Pedestrian density multiplier", 0x8D2530, 0, 1, 10);
-
+#endif
+			Ui::EditReference<float>("Pedestrian density multiplier", CPopulation::PedDensityMultiplier, 0, 1, 10);
+#ifdef GTASA
 			if (ImGui::CollapsingHeader("Recruit anyone"))
 			{
 				static std::vector<Ui::NamedMemory> selectWeapon{
@@ -187,6 +222,8 @@ void Ped::Draw()
 				ImGui::Spacing();
 				ImGui::Separator();
 			}
+#endif
+
 			if (ImGui::CollapsingHeader("Remove peds in radius"))
 			{
 				ImGui::InputInt("Radius", &m_nPedRemoveRadius);
@@ -198,7 +235,9 @@ void Ped::Draw()
 					{
 						if (DistanceBetweenPoints(ped->GetPosition(), player->GetPosition()) < m_nPedRemoveRadius
 							&& ped->m_pVehicle == nullptr && ped != player)
+						{
 							Command<Commands::DELETE_CHAR>(CPools::GetPedRef(ped));
+						}
 					}
 				}
 				ImGui::Spacing();
@@ -227,10 +266,13 @@ void Ped::Draw()
 				if (ImGui::BeginTabItem("Spawner"))
 				{
 					ImGui::Spacing();
-
+#ifdef GTASA
 					Ui::DrawImages(m_PedData.m_ImagesList, ImVec2(65, 110), m_PedData.m_Categories, m_PedData.m_Selected,
 					               m_PedData.m_Filter, SpawnPed, nullptr,
 					               [](std::string str) { return m_PedData.m_Json.m_Data[str].get<std::string>(); });
+#elif GTAVC
+					Ui::DrawJSON(m_PedData, SpawnPed, nullptr);
+#endif
 					ImGui::EndTabItem();
 				}
 				if (ImGui::BeginTabItem("Config"))
@@ -254,11 +296,12 @@ void Ped::Draw()
 							m_SpawnPed::m_nPedHealth = 0;
 					}
 					Ui::ListBox("Ped type", m_SpawnPed::m_PedTypeList, m_SpawnPed::m_nSelectedPedType);
-
+#ifdef GTASA
 					ImGui::Spacing();
 					ImGui::Text("Selected weapon: %s",
 					            Weapon::m_WeaponData.m_Json.m_Data[std::to_string(m_SpawnPed::m_nWeaponId)].get<std::string>().c_str());
 					ImGui::Spacing();
+
 					Ui::DrawImages(Weapon::m_WeaponData.m_ImagesList, ImVec2(65, 65), Weapon::m_WeaponData.m_Categories,
 					               Weapon::m_WeaponData.m_Selected, Weapon::m_WeaponData.m_Filter,
 					               [](std::string str) { m_SpawnPed::m_nWeaponId = std::stoi(str); },
@@ -269,7 +312,7 @@ void Ped::Draw()
 					               },
 					               [](std::string str) { return str != "-1"; /*Jetpack*/ }
 					);
-
+#endif
 					ImGui::Spacing();
 					ImGui::EndChild();
 					ImGui::EndTabItem();

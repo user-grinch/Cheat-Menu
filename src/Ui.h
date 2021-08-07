@@ -48,8 +48,7 @@ public:
 	static bool CheckboxWithHint(const char* label, bool* state, const char* hint = nullptr, bool is_disabled = false);
 	static void DrawHeaders(CallbackTable& data);
 
-	static void DrawJSON(CJson& json, std::vector<std::string>& combo_items, std::string& selected_item,
-						 ImGuiTextFilter& filter,
+	static void DrawJSON(SSearchData& data,
 						 std::function<void(std::string&, std::string&, std::string&)> func_left_click,
 						 std::function<void(std::string&, std::string&, std::string&)> func_right_click);
 	static void DrawImages(std::vector<std::unique_ptr<STextureStructure>>& img_vec, ImVec2 image_size,

@@ -17,6 +17,8 @@ public:
 	inline static uchar m_nCurrentWeaponSlot = -1;
 	inline static int m_nSelectedGang;
 	inline static int m_nSelectedWeapon;
+
+#ifdef GTASA
 	inline static int m_nGangWeaponList[10][3] =
 	{
 		{WEAPON_PISTOL, WEAPON_MICRO_UZI, WEAPON_UNARMED}, // Ballas
@@ -30,6 +32,7 @@ public:
 		{WEAPON_UNARMED, WEAPON_UNARMED, WEAPON_UNARMED}, // Gang 9
 		{WEAPON_UNARMED, WEAPON_UNARMED, WEAPON_UNARMED}, // Gang 10
 	};
+#endif
 
 	Weapon();
 

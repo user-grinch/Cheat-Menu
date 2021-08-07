@@ -13,17 +13,17 @@
 #include "Menu.h"
 #include "Teleport.h"
 #include "Player.h"
+#include "Ped.h"
 
 #ifdef GTASA
 #include "Animation.h"
 #include "Game.h"
-#include "Ped.h"
 #include "Vehicle.h"
 #include "Visual.h"
 #include "Weapon.h"
 class CheatMenu : Hook, Animation, Game, Menu, Ped, Player, Teleport, Vehicle, Visual, Weapon
 #elif defined(GTAVC)
-class CheatMenu : Hook, Menu, Player, Teleport
+class CheatMenu : Hook, Menu, Player, Ped, Teleport
 #endif
 
 {
@@ -38,7 +38,8 @@ private:
 #elif GTAVC
 	inline static CallbackTable header
 	{
-		{"Teleport", &Teleport::Draw}, {"Player", &Player::Draw}, {"Menu", &Menu::Draw}
+		{"Teleport", &Teleport::Draw}, {"Player", &Player::Draw}, {"Ped", &Ped::Draw},
+		{"Menu", &Menu::Draw}
 	};
 #endif
 

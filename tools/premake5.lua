@@ -67,6 +67,8 @@ project "CheatMenuVC"
         "../src/Teleport.cpp",
         "../src/Player.h", 
         "../src/Player.cpp",
+        "../src/Ped.h", 
+        "../src/Ped.cpp",
         "../src/Ui.h", 
         "../src/Ui.cpp", 
         "../src/Util.h", 

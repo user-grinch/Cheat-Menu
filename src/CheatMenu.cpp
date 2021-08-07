@@ -9,11 +9,7 @@ void CheatMenu::DrawWindow()
 	ImGuiIO& io = ImGui::GetIO();
 	static bool bRunning = true;
 
-#ifdef GTASA
-	if (FrontEndMenuManager.m_bMenuActive)
-#elif GTAVC
-	if (FrontendMenuManager.m_bMenuVisible)
-#endif
+	if (BY_GAME(FrontEndMenuManager.m_bMenuActive, FrontendMenuManager.m_bMenuVisible))
 	{
 		if (bRunning)
 		{
@@ -25,11 +21,7 @@ void CheatMenu::DrawWindow()
 	else
 	{
 		bRunning = true;
-#ifdef GTASA
-		if (Globals::m_bShowMenu || m_Commands::m_bShowMenu)
-#elif GTAVC
-		if (Globals::m_bShowMenu)
-#endif
+		if (Globals::m_bShowMenu || BY_GAME(m_Commands::m_bShowMenu, true))
 		{
 			if (Globals::m_bShowMenu)
 			{

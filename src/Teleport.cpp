@@ -271,8 +271,7 @@ void Teleport::Draw()
 			#endif
 
 			ImGui::Spacing();
-			Ui::DrawJSON(tp_data.m_Json, tp_data.m_Categories, tp_data.m_Selected, tp_data.m_Filter, &TeleportToLocation,
-			             &RemoveTeleportEntry);
+			Ui::DrawJSON(tp_data, TeleportToLocation,RemoveTeleportEntry);
 			ImGui::EndTabItem();
 		}
 

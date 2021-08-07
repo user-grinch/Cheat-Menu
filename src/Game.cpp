@@ -587,8 +587,7 @@ It's recommanded not to save after using the mission loader. Use it at your own 
 
 				ImGui::Spacing();
 
-				Ui::DrawJSON(m_MissionData.m_Json, m_MissionData.m_Categories, m_MissionData.m_Selected, m_MissionData.m_Filter,
-							 SetPlayerMission, nullptr);
+				Ui::DrawJSON(m_MissionData, SetPlayerMission, nullptr);
 			}
 			ImGui::EndTabItem();
 		}

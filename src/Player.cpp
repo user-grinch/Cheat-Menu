@@ -37,8 +37,6 @@ inline static void PlayerModelBrokenFix()
 	if (pPlayer->m_nModelIndex == 0)
 		Call<0x5A81E0>(0, pPlayer->m_pPlayerData->m_pPedClothesDesc, 0xBC1C78, false);
 }
-#elif GTAVC
-inline static SSearchData tempPedData{ "peds" };
 #endif
 
 Player::Player()
@@ -46,9 +44,8 @@ Player::Player()
 #ifdef GTASA
 //	Fix player model being broken after rebuild
 	patch::RedirectCall(0x5A834D, &PlayerModelBrokenFix);
-#endif
-
 	m_bAimSkinChanger = config.GetValue("aim_skin_changer", false);
+#endif
 
 	// Custom skins setup
 	if (GetModuleHandle("modloader.asi"))
@@ -90,7 +87,7 @@ Player::Player()
 			#ifdef GTASA
 				Util::LoadTextureDirectory(m_ClothData, PLUGIN_PATH((char*)"CheatMenu\\clothes.txd"), true);
 			#elif GTAVC
-				tempPedData.m_Json.LoadData(tempPedData.m_Categories, tempPedData.m_Selected);
+				skinData.m_Json.LoadData(skinData.m_Categories, skinData.m_Selected);
 			#endif
 
 			m_bImagesLoaded = true;
@@ -672,7 +669,7 @@ Limitations:\n\
 			ImGui::Spacing();
 			ImGui::Text("Info");
 			Ui::ShowTooltip("Not all ped skins work. I've added the ones that works!");
-			Ui::DrawJSON(tempPedData.m_Json, tempPedData.m_Categories, tempPedData.m_Selected, tempPedData.m_Filter, ChangePlayerModel, nullptr);
+			Ui::DrawJSON(skinData, ChangePlayerModel, nullptr);
 			ImGui::EndTabItem();
 		}
 #endif

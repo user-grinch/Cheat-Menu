@@ -1,12 +1,16 @@
 #pragma once
 #include "Player.h"
+#ifdef GTASA
 #include "Weapon.h"
-
+#endif
 class Ped
 {
 private:
-	inline static SSearchData m_PedData{"ped"};
+#ifdef GTASA
 	inline static CJson m_SpecialPedJson = CJson("ped special");
+#endif
+
+	inline static SSearchData m_PedData{"ped"};
 	inline static bool m_bImagesLoaded;
 	inline static bool m_bExGangWarsInstalled;
 	inline static int m_nPedRemoveRadius = 5;
@@ -33,10 +37,17 @@ private:
 	};
 
 	friend class Player;
+#ifdef GTASA
 	friend class Weapon;
+#endif
 public:
 	Ped();
 	~Ped();
 	static void Draw();
+
+#ifdef GTASA
 	static void SpawnPed(std::string& model);
+#elif GTAVC
+	static void SpawnPed(std::string& cat, std::string& name, std::string& model);
+#endif
 };
