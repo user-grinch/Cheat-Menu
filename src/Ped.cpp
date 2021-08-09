@@ -79,7 +79,7 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
 			Command<Commands::LOAD_SPECIAL_CHARACTER>(currentSlot, model.c_str());
 			Command<Commands::LOAD_ALL_MODELS_NOW>();
 			
-			Command<Commands::CREATE_CHAR>(4, 108+currentSlot, pos.x, pos.y, pos.z + 1, &hplayer);
+			Command<Commands::CREATE_CHAR>(m_SpawnPed::m_nSelectedPedType + 4, 108+currentSlot, pos.x, pos.y, pos.z + 1, &hplayer);
 			Command<Commands::UNLOAD_SPECIAL_CHARACTER>(currentSlot);
 
 			++currentSlot;
@@ -147,6 +147,10 @@ void Ped::Draw()
 			Ui::CheckboxAddress("Peds attack with rockets", 0x969158);
 			Ui::CheckboxAddress("Peds riot", 0x969175);
 			Ui::CheckboxAddress("Slut magnet", 0x96915D);
+#elif GTAVC
+			Ui::CheckboxAddress("Slut magnet", 0xA10B5F);
+			ImGui::NextColumn();
+			Ui::CheckboxAddress("Weapons for all", 0xA10AB3);
 #endif
 			ImGui::Columns(1);
 			ImGui::EndChild();

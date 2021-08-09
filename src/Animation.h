@@ -1,3 +1,4 @@
+#ifdef GTASA
 #pragma once
 #include "pch.h"
 
@@ -35,3 +36,7 @@ public:
 	static void PlayCutscene(std::string& rootKey, std::string& cutsceneId, std::string& interior);
 	static void RemoveAnimation(std::string& rootKey, std::string& anim, std::string& ifp);
 };
+#else
+
+class Animation{};
+#endif

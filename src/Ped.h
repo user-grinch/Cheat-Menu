@@ -25,9 +25,15 @@ private:
 		inline static int m_nWeaponId;
 		inline static std::vector<std::string> m_PedTypeList =
 		{
-			"Civ male", "Civ female", "Cop", "Ballas", "Grove Street Families", "Los Santos Vagos",
+#ifdef GTASA
+			"Civ Male", "Civ Female", "Cop", "Ballas", "Grove Street Families", "Los Santos Vagos",
 			"San Fierro Rifa", "Da Nang Boys", "Mafia", "Mountain Cloud Triads", "Varrio Los Aztecas",
 			"Gang 9", "Medic", "Dealer", "Criminal", "Fireman", "Prostitute"
+#elif GTAVC
+			"Civ Male", "Civ Female", "Cop (crash)", "Cubans", "Haitians", "Streetwannabe's", "Diaz' Gang",
+			"Security Guards", "Biker Gang", "Vercetti Gang", "Golfers", "Gang 9", "Emergency",
+			"Fireman", "Criminal", "Unused", "Prostitute", "Special"
+#endif
 		};
 	};
 	inline static std::vector<std::string> m_GangNames =

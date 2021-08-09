@@ -14,15 +14,15 @@ public:
 
 #ifdef GTASA
 	static void ClearCharTasksVehCheck(CPed* ped);
-	static CPed* GetClosestPed();
-	static CVehicle* GetClosestVehicle();
 	static int GetLargestGangInZone();
-	static bool IsOnCutscene();
 	static RwTexture* LoadTextureFromMemory(char* data, unsigned int size);
 #endif
 
+	static CPed* GetClosestPed();
+	static CVehicle* GetClosestVehicle();
 	static std::string GetLocationName(CVector* pos);
 	static bool IsOnMission();
+	static bool IsOnCutscene();
 	static void RainbowValues(int& r, int& g, int& b, float speed);
 	static void GetCPUUsageInit();
 	static double GetCurrentCPUUsage();

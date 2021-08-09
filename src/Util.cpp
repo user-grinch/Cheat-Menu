@@ -73,8 +73,10 @@ void* Util::GetTextureFromRaster(RwTexture* pTexture)
 
 std::string Util::GetLocationName(CVector* pos)
 {
+	CPlayerPed  *pPlayer = FindPlayerPed();
+
 #ifdef GTASA
-	int hplayer = CPools::GetPedRef(FindPlayerPed());
+	int hplayer = CPools::GetPedRef(pPlayer);
 
 	int interior = 0;
 	Command<Commands::GET_AREA_VISIBLE>(&interior);
@@ -104,7 +106,14 @@ std::string Util::GetLocationName(CVector* pos)
 	return std::string("Interior ") + std::to_string(interior) + ", " + town;
 
 #elif GTAVC
-	return "Vice City";
+	if (pPlayer)
+	{
+		return std::to_string(pPlayer->m_nInterior) + ", Vice City" ;
+	} 
+	else
+	{
+		return "Vice City";
+	}
 #endif
 }
 
@@ -154,11 +163,6 @@ bool Util::IsOnMission()
 		CTheScripts::OnAMissionFlag);
 }
 
-bool Util::IsOnCutscene()
-{
-	return CCutsceneMgr::ms_running;
-}
-
 int Util::GetLargestGangInZone()
 {
 	int gang_id = 0, max_density = 0;
@@ -179,12 +183,15 @@ int Util::GetLargestGangInZone()
 
 	return gang_id;
 }
+#endif	
 
 // implemention of opcode 0AB5 (STORE_CLOSEST_ENTITIES)
 // https://github.com/cleolibrary/CLEO4/blob/916d400f4a731ba1dd0ff16e52bdb056f42b7038/source/CCustomOpcodeSystem.cpp#L1671
 CVehicle* Util::GetClosestVehicle()
 {
-	CPlayerPed* player = FindPlayerPed();
+CPlayerPed* player = FindPlayerPed();
+
+#ifdef GTASA
 	CPedIntelligence* pedintel;
 	if (player && (pedintel = player->m_pIntelligence))
 	{
@@ -200,11 +207,32 @@ CVehicle* Util::GetClosestVehicle()
 		return veh;
 	}
 	return nullptr;
+#elif GTAVC
+	
+	CVehicle *pClosestVeh = nullptr;
+	float distance = 0.0f;
+
+	CVector playerPos = player->GetPosition();
+
+	for (CVehicle *pVeh : CPools::ms_pVehiclePool)
+	{
+		CVector pos = pVeh->GetPosition();
+		float dist = DistanceBetweenPoints(playerPos, pos);
+
+		if (dist < distance && pVeh->m_pDriver != player)
+		{
+			pClosestVeh = pVeh;
+			distance = dist;
+		}
+	}
+	return pClosestVeh;
+#endif
 }
 
 CPed* Util::GetClosestPed()
 {
-	CPlayerPed* player = FindPlayerPed();
+CPlayerPed* player = FindPlayerPed();
+#ifdef GTASA
 	CPedIntelligence* pedintel;
 	if (player && (pedintel = player->m_pIntelligence))
 	{
@@ -221,8 +249,19 @@ CPed* Util::GetClosestPed()
 		return ped;
 	}
 	return nullptr;
+#elif GTAVC
+	return player->m_apNearPeds[0];
+#endif
 }
-#endif	
+
+bool Util::IsOnCutscene()
+{
+#ifdef GTASA
+	return CCutsceneMgr::ms_running;
+#elif GTAVC
+	return *(bool*)0xA10AB2; // CCutsceneMgr::ms_running
+#endif
+}
 
 void Util::RainbowValues(int& r, int& g, int& b, float speed)
 {

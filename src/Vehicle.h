@@ -1,8 +1,12 @@
 #pragma once
+#ifdef GTASA
 #include "Neon.h"
 #include "Paint.h"
 
 class Vehicle : public Paint, public Neon
+#elif GTAVC
+class Vehicle
+#endif
 {
 private:
 	inline static bool m_bBikeFly;
@@ -71,6 +75,8 @@ private:
 		"IS_PLANE", "IS_BOAT", "BOUNCE_PANELS",
 		"DOUBLE_RWHEELS", "FORCE_GROUND_CLEARANCE", "IS_HATCHBAC1K"
 	};
+private:
+	static void FixVehicle(CVehicle *pVeh);
 
 public:
 	static void AddComponent(const std::string& component, bool display_message = true);

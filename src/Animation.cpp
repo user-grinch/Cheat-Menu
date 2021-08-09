@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "Animation.h"
+#ifdef GTASA
 #include "Ui.h"
 #include "Util.h"
 
@@ -192,3 +193,4 @@ void Animation::RemoveAnimation(std::string& ifp, std::string& anim, std::string
 	else
 		SetHelpMessage("You can only remove custom anims", false, false, false);
 }
+#endif

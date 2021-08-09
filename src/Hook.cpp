@@ -160,9 +160,6 @@ void Hook::ShowMouse(bool state)
 {
 	if (m_bMouseVisibility != m_bShowMouse)
 	{
-		CPad::ClearMouseHistory();
-		CPad::UpdatePads();
-
 		ImGui::GetIO().MouseDrawCursor = state;
 
 #ifdef GTASA
@@ -298,8 +295,8 @@ void Hook::ApplyMouseFix()
 	patch::ReplaceFunctionCall(0x74542E, _SetCursorPos);
 	patch::Nop(0x748A7C, 1);
 	patch::ReplaceFunctionCall(0x748A7D, _DispatchMessage);
-	patch::SetChar(0x746A08, 32); // diMouseOffset
-	patch::SetChar(0x746A58, 32); // diDeviceoffset
+	// patch::SetChar(0x746A08, 32); // diMouseOffset
+	// patch::SetChar(0x746A58, 32); // diDeviceoffset
 }
 
 #endif

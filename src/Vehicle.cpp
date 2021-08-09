@@ -3,56 +3,89 @@
 #include "Menu.h"
 #include "Ui.h"
 #include "Util.h"
+#include <CPopulation.h>
+#include <CDamageManager.h>
+
+void Vehicle::FixVehicle(CVehicle *pVeh)
+{
+#ifdef GTASA
+	pVeh->Fix();
+#elif GTAVC
+	switch (pVeh->m_nVehicleClass)
+	{
+		case VEHICLE_AUTOMOBILE:
+		{
+			Call<0x588530>(); // CAutoMobile::Fix()
+			break;
+		}
+		case VEHICLE_BIKE:
+		{
+			Call<0x609F00>(); // CBike::Fix()
+			break;
+		}
+	}
+#endif	
+	pVeh->m_fHealth = 1000.0f;
+}
 
 Vehicle::Vehicle()
 {
+#ifdef GTASA
 	ParseVehiclesIDE();
+#endif
 	ParseCarcolsDAT();
 
 	Events::processScriptsEvent += [this]
 	{
+#ifdef GTASA
 		if (!m_bImagesLoaded)
 		{
 			Util::LoadTextureDirectory(m_Spawner::m_VehData, PLUGIN_PATH((char*)"CheatMenu\\vehicles.txd"));
 			Util::LoadTextureDirectory(m_TuneData, PLUGIN_PATH((char*)"CheatMenu\\components.txd"));
 			m_bImagesLoaded = true;
 		}
+#endif
 
 		uint timer = CTimer::m_snTimeInMilliseconds;
-		CPlayerPed* player = FindPlayerPed();
-		CVehicle* veh = player->m_pVehicle;
+		CPlayerPed* pPlayer = FindPlayerPed();
+		CVehicle* pVeh = pPlayer->m_pVehicle;
 
-		if (player && veh)
+		if (pPlayer && pVeh)
 		{
-			int hveh = CPools::GetVehicleRef(veh);
+			int hveh = CPools::GetVehicleRef(pVeh);
 
+#ifdef GTASA
 			if (Ui::HotKeyPressed(Menu::m_HotKeys::flipVeh))
 			{
-				float roll;
 				Command<Commands::GET_CAR_ROLL>(hveh, &roll);
 				roll += 180;
 				Command<Commands::SET_CAR_ROLL>(hveh, roll);
 				Command<Commands::SET_CAR_ROLL>(hveh, roll); // z rot fix
 			}
+#endif
 
 			if (Ui::HotKeyPressed(Menu::m_HotKeys::fixVeh))
 			{
-				player->m_pVehicle->Fix();
-				player->m_pVehicle->m_fHealth = 1000.0f;
+				FixVehicle(pVeh);
 				SetHelpMessage("Vehicle fixed", false, false, false);
 			}
 
 			if (Ui::HotKeyPressed(Menu::m_HotKeys::vehEngine))
 			{
-				bool state = !veh->m_nVehicleFlags.bEngineBroken || veh->m_nVehicleFlags.bEngineOn;
+				bool state = BY_GAME(!pVeh->m_nVehicleFlags.bEngineBroken, true) || pVeh->m_nVehicleFlags.bEngineOn;
 
 				if (state)
+				{
 					SetHelpMessage("Vehicle engine off", false, false, false);
+				}
 				else
+				{
 					SetHelpMessage("Vehicle engine on", false, false, false);
-
-				veh->m_nVehicleFlags.bEngineBroken = state;
-				veh->m_nVehicleFlags.bEngineOn = !state;
+				}
+#ifdef GTASA
+				pVeh->m_nVehicleFlags.bEngineBroken = state;
+#endif
+				pVeh->m_nVehicleFlags.bEngineOn = !state;
 			}
 
 			if (Ui::HotKeyPressed(Menu::m_HotKeys::vehInstantStart))
@@ -63,19 +96,35 @@ Vehicle::Vehicle()
 
 			if (m_bNoDamage)
 			{
-				veh->m_nPhysicalFlags.bBulletProof = true;
-				veh->m_nPhysicalFlags.bExplosionProof = true;
-				veh->m_nPhysicalFlags.bFireProof = true;
-				veh->m_nPhysicalFlags.bCollisionProof = true;
-				veh->m_nPhysicalFlags.bMeeleProof = true;
-				veh->m_nVehicleFlags.bCanBeDamaged = true;
+#ifdef GTASA
+				pVeh->m_nPhysicalFlags.bBulletProof = true;
+				pVeh->m_nPhysicalFlags.bExplosionProof = true;
+				pVeh->m_nPhysicalFlags.bFireProof = true;
+				pVeh->m_nPhysicalFlags.bCollisionProof = true;
+				pVeh->m_nPhysicalFlags.bMeeleProof = true;
+				pVeh->m_nVehicleFlags.bCanBeDamaged = true;
+#elif GTAVC
+				pVeh->m_nFlags.bBulletProof = true;
+				pVeh->m_nFlags.bExplosionProof = true;
+				pVeh->m_nFlags.bFireProof = true;
+				pVeh->m_nFlags.bCollisionProof = true;
+				pVeh->m_nFlags.bMeleeProof = true;
+#endif
 			}
 
-			player->m_nPedFlags.CantBeKnockedOffBike = m_bDontFallBike ? 1 : 2;
 			Command<Commands::SET_CAR_HEAVY>(hveh, m_bVehHeavy);
 			Command<Commands::SET_CAR_WATERTIGHT>(hveh, m_bVehWatertight);
 
-			if (m_UnlimitedNitro::m_bEnabled && player->m_pVehicle->m_nVehicleSubClass == VEHICLE_AUTOMOBILE)
+			if (m_bLockSpeed)
+			{
+				Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, m_fLockSpeed);
+			}
+
+#ifdef GTASA
+			pPlayer->m_nPedFlags.CantBeKnockedOffBike = m_bDontFallBike ? 1 : 2;
+
+			if (m_UnlimitedNitro::m_bEnabled 
+			&& BY_GAME(pVeh->m_nVehicleSubClass, pVeh->m_nVehicleClass) == VEHICLE_AUTOMOBILE)
 			{
 				patch::Set<BYTE>(0x969165, 0, true); // All cars have nitro
 				patch::Set<BYTE>(0x96918B, 0, true); // All taxis have nitro
@@ -98,9 +147,6 @@ Vehicle::Vehicle()
 				}
 			}
 
-			if (m_bLockSpeed)
-				Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, m_fLockSpeed);
-
 			if (m_Neon::m_bRainbowEffect && timer - m_Neon::m_nRainbowTimer > 50)
 			{
 				int red, green, blue;
@@ -109,8 +155,10 @@ Vehicle::Vehicle()
 				InstallNeon(veh, red, green, blue);
 				m_Neon::m_nRainbowTimer = timer;
 			}
+#endif
 		}
 
+#ifdef GTASA
 		// Traffic neons
 		if (m_Neon::m_bApplyOnTraffic && timer - m_Neon::m_bTrafficTimer > 1000)
 		{
@@ -133,20 +181,21 @@ Vehicle::Vehicle()
 			m_Neon::m_bTrafficTimer = timer;
 		}
 
-		if (m_bBikeFly && veh && veh->IsDriver(player))
+		if (m_bBikeFly && pVeh && pVeh->IsDriver(pPlayer))
 		{
-			if (veh->m_nVehicleSubClass == VEHICLE_BIKE || veh->m_nVehicleSubClass == VEHICLE_BMX)
+			if (pVeh->m_nVehicleSubClass == VEHICLE_BIKE || pVeh->m_nVehicleSubClass == VEHICLE_BMX)
 			{
-				if (sqrt(veh->m_vecMoveSpeed.x * veh->m_vecMoveSpeed.x
-					+ veh->m_vecMoveSpeed.y * veh->m_vecMoveSpeed.y
-					+ veh->m_vecMoveSpeed.z * veh->m_vecMoveSpeed.z
+				if (sqrt(pVeh->m_vecMoveSpeed.x * pVeh->m_vecMoveSpeed.x
+					+ pVeh->m_vecMoveSpeed.y * pVeh->m_vecMoveSpeed.y
+					+ pVeh->m_vecMoveSpeed.z * pVeh->m_vecMoveSpeed.z
 				) > 0.0
 					&& CTimer::ms_fTimeStep > 0.0)
 				{
-					veh->FlyingControl(3, -9999.9902f, -9999.9902f, -9999.9902f, -9999.9902f);
+					pVeh->FlyingControl(3, -9999.9902f, -9999.9902f, -9999.9902f, -9999.9902f);
 				}
 			}
 		}
+#endif
 	};
 }
 
@@ -154,6 +203,7 @@ Vehicle::~Vehicle()
 {
 }
 
+#ifdef GTASA
 void Vehicle::AddComponent(const std::string& component, const bool display_message)
 {
 	try
@@ -196,7 +246,7 @@ void Vehicle::RemoveComponent(const std::string& component, const bool display_m
 	}
 }
 
-// Why did I do this shit? Guess it was the weather
+// hardcoded for now
 int Vehicle::GetRandomTrainIdForModel(int model)
 {
 	static int train_ids[] = {
@@ -273,6 +323,7 @@ void Vehicle::ParseVehiclesIDE()
 	}
 	else flog << "Vehicle.ide file not found";
 }
+#endif 
 
 void Vehicle::ParseCarcolsDAT()
 {
@@ -371,7 +422,10 @@ void Vehicle::ParseCarcolsDAT()
 
 		file.close();
 	}
-	else flog << "Error locating Vehicle.ide";
+	else 
+	{
+		flog << "Error locating Vehicle.ide";
+	}
 }
 
 void Vehicle::SpawnVehicle(std::string& smodel)
@@ -382,37 +436,51 @@ void Vehicle::SpawnVehicle(std::string& smodel)
 	int imodel = std::stoi(smodel);
 	CVehicle* veh = nullptr;
 
-	int interior = player->m_nAreaCode;
+	int interior = BY_GAME(player->m_nAreaCode, player->m_nInterior);
 
 	if (Command<Commands::IS_MODEL_AVAILABLE>(imodel))
 	{
 		CVector pos = player->GetPosition();
 		int speed = 0;
 
-		if (player->m_nPedFlags.bInVehicle && m_Spawner::m_bSpawnInside)
+		bool bInVehicle = Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer);
+		if (bInVehicle && m_Spawner::m_bSpawnInside)
 		{
-			int hveh = 0;
-			Command<Commands::GET_CAR_CHAR_IS_USING>(hplayer, &hveh);
-			CVehicle* pveh = CPools::GetVehicle(hveh);
+			CVehicle* pveh = player->m_pVehicle;
+			int hveh = CPools::GetVehicleRef(pveh);
 			pos = pveh->GetPosition();
 
 			Command<Commands::GET_CAR_SPEED>(hveh, &speed);
 
 			Command<Commands::WARP_CHAR_FROM_CAR_TO_COORD>(hplayer, pos.x, pos.y, pos.z);
 
+#ifdef GTASA
 			if (pveh->m_nVehicleClass == VEHICLE_TRAIN)
+			{
 				Command<Commands::DELETE_MISSION_TRAIN>(hveh);
+			}
 			else
+			{
 				Command<Commands::DELETE_CAR>(hveh);
+			}
+#elif GTAVC
+			Command<Commands::DELETE_CAR>(hveh);
+#endif
 		}
 
 		if (interior == 0)
+		{
 			if (m_Spawner::m_bSpawnInAir && (CModelInfo::IsHeliModel(imodel) || CModelInfo::IsPlaneModel(imodel)))
+			{
 				pos.z = 400;
+			}
 			else
+			{
 				pos.z -= 5;
+			}
+		}
 
-
+#ifdef GTASA
 		if (CModelInfo::IsTrainModel(imodel))
 		{
 			int train_id = GetRandomTrainIdForModel(imodel);
@@ -460,36 +528,51 @@ void Vehicle::SpawnVehicle(std::string& smodel)
 		}
 		else
 		{
+#endif
 			CStreaming::RequestModel(imodel, PRIORITY_REQUEST);
 			CStreaming::LoadAllRequestedModels(false);
 
+#ifdef GTASA
 			if (m_Spawner::m_nLicenseText[0] != '\0')
+			{
 				Command<Commands::CUSTOM_PLATE_FOR_NEXT_CAR>(imodel, m_Spawner::m_nLicenseText);
+			}
+#endif
 
 			int hveh = 0;
 			if (m_Spawner::m_bSpawnInside)
 			{
 				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 4.0f, &hveh);
 				veh = CPools::GetVehicle(hveh);
+#ifdef GTASA
 				veh->SetHeading(player->GetHeading());
+#endif
 				Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
 				Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, speed);
 			}
 			else
 			{
+#ifdef GTASA
 				player->TransformFromObjectSpace(pos, CVector(0, 10, 0));
+#elif GTAVC
+				player->TransformFromObjectSpace(CVector(0, 10, 0));
+#endif
 
 				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 3.0f, &hveh);
 				veh = CPools::GetVehicle(hveh);
+#ifdef GTASA
 				veh->SetHeading(player->GetHeading() + 55.0f);
+#endif
 			}
-			veh->m_nDoorLock = CARLOCK_UNLOCKED;
-			veh->m_nAreaCode = interior;
+			BY_GAME(veh->m_nDoorLock, veh->m_nLockStatus) = CARLOCK_UNLOCKED;
+			BY_GAME(veh->m_nAreaCode, veh->m_nInterior) = interior;
 			Command<Commands::MARK_CAR_AS_NO_LONGER_NEEDED>(CPools::GetVehicleRef(veh));
 			CStreaming::SetModelIsDeletable(imodel);
 		}
+
+#ifdef GTASA
 		veh->m_nVehicleFlags.bHasBeenOwnedByPlayer = true;
-	}
+#endif
 }
 
 std::string Vehicle::GetNameFromModel(int model)
@@ -574,23 +657,26 @@ void Vehicle::GenerateHandlingDataFile(int phandling)
 void Vehicle::Draw()
 {
 	ImGui::Spacing();
-	static CPlayerPed* player = FindPlayerPed();
-	static int hplayer = CPools::GetPedRef(player);
+	CPlayerPed* player = FindPlayerPed();
+	int hplayer = CPools::GetPedRef(player);
+	CVehicle *pVeh = player->m_pVehicle;
 
-	if (ImGui::Button("Blow up cars", ImVec2(Ui::GetSize(3))))
-		((void(*)(void))0x439D80)();
+	if (ImGui::Button("Blow up cars", ImVec2(Ui::GetSize(BY_GAME(3,2)))))
+	{
+		Call<0x439D80>();
+	}
 
 	ImGui::SameLine();
 
-	if (ImGui::Button("Fix vehicle", ImVec2(Ui::GetSize(3))))
+	if (ImGui::Button("Fix vehicle", ImVec2(Ui::GetSize(BY_GAME(3,2)))))
 	{
-		if (player && player->m_pVehicle)
+		if (player && pVeh)
 		{
-			player->m_pVehicle->Fix();
-			player->m_pVehicle->m_fHealth = 1000.0f;
+			FixVehicle(pVeh);
 		}
 	}
 
+#ifdef GTASA
 	ImGui::SameLine();
 
 	if (ImGui::Button("Flip vehicle", ImVec2(Ui::GetSize(3))))
@@ -606,6 +692,7 @@ void Vehicle::Draw()
 			Command<Commands::SET_CAR_ROLL>(hveh, roll); // z rot fix
 		}
 	}
+#endif
 
 	ImGui::Spacing();
 
@@ -635,12 +722,20 @@ void Vehicle::Draw()
 			{
 				if (pVeh && !m_bNoDamage)
 				{
-					pVeh->m_nVehicleFlags.bCanBeDamaged = true;
-					pVeh->m_nPhysicalFlags.bBulletProof = false;
-					pVeh->m_nPhysicalFlags.bExplosionProof = false;
-					pVeh->m_nPhysicalFlags.bFireProof = false;
-					pVeh->m_nPhysicalFlags.bCollisionProof = false;
-					pVeh->m_nPhysicalFlags.bMeeleProof = false;
+#ifdef GTASA
+				pVeh->m_nPhysicalFlags.bBulletProof = false;
+				pVeh->m_nPhysicalFlags.bExplosionProof = false;
+				pVeh->m_nPhysicalFlags.bFireProof = false;
+				pVeh->m_nPhysicalFlags.bCollisionProof = false;
+				pVeh->m_nPhysicalFlags.bMeeleProof = false;
+				pVeh->m_nVehicleFlags.bCanBeDamaged = false;
+#elif GTAVC
+				pVeh->m_nFlags.bBulletProof = false;
+				pVeh->m_nFlags.bExplosionProof = false;
+				pVeh->m_nFlags.bFireProof = false;
+				pVeh->m_nFlags.bCollisionProof = false;
+				pVeh->m_nFlags.bMeleeProof = false;
+#endif
 				}
 			}
 			Ui::CheckboxAddress("Decreased traffic", 0x96917A);
@@ -667,78 +762,118 @@ void Vehicle::Draw()
 
 				ImGui::Columns(2, 0, false);
 
-				bool state = pVeh->m_nVehicleFlags.bAlwaysSkidMarks;
+				bool state = false;
+#ifdef GTASA
+				state = pVeh->m_nVehicleFlags.bAlwaysSkidMarks;
 				if (Ui::CheckboxWithHint("Always skid marks", &state, nullptr))
 					pVeh->m_nVehicleFlags.bAlwaysSkidMarks = state;
+#endif
 
-				state = pVeh->m_nPhysicalFlags.bBulletProof;
+				state = BY_GAME(pVeh->m_nPhysicalFlags.bBulletProof, pVeh->m_nFlags.bBulletProof);
 				if (Ui::CheckboxWithHint("Bullet proof", &state, nullptr, m_bNoDamage))
-					pVeh->m_nPhysicalFlags.bBulletProof = state;
+				{
+					BY_GAME(pVeh->m_nPhysicalFlags.bBulletProof, pVeh->m_nFlags.bBulletProof) = state;
+				}
 
-				state = pVeh->m_nPhysicalFlags.bCollisionProof;
+				state = BY_GAME(pVeh->m_nPhysicalFlags.bCollisionProof, pVeh->m_nFlags.bCollisionProof);
 				if (Ui::CheckboxWithHint("Collision proof", &state, nullptr, m_bNoDamage))
-					pVeh->m_nPhysicalFlags.bCollisionProof = state;
+				{
+					BY_GAME(pVeh->m_nPhysicalFlags.bCollisionProof, pVeh->m_nFlags.bCollisionProof) = state;
+				}
 
+#ifdef GTASA
 				state = pVeh->m_nVehicleFlags.bDisableParticles;
 				if (Ui::CheckboxWithHint("Disable particles", &state, nullptr))
+				{
 					pVeh->m_nVehicleFlags.bDisableParticles = state;
+				}
 
 				state = pVeh->m_nVehicleFlags.bVehicleCanBeTargetted;
 				if (Ui::CheckboxWithHint("Driver targetable", &state, "Driver can be targeted"))
+				{
 					pVeh->m_nVehicleFlags.bVehicleCanBeTargetted = state;
+				}
+#endif
 
-				state = !pVeh->m_nVehicleFlags.bEngineBroken || pVeh->m_nVehicleFlags.bEngineOn;
+				state = BY_GAME(!pVeh->m_nVehicleFlags.bEngineBroken, true) || pVeh->m_nVehicleFlags.bEngineOn;
 				if (Ui::CheckboxWithHint("Engine on", &state, nullptr, !is_driver))
 				{
+#ifdef GTASA
 					pVeh->m_nVehicleFlags.bEngineBroken = !state;
+#endif
 					pVeh->m_nVehicleFlags.bEngineOn = state;
 				}
-				state = pVeh->m_nPhysicalFlags.bExplosionProof;
+				
+				state = BY_GAME(pVeh->m_nPhysicalFlags.bExplosionProof, pVeh->m_nFlags.bExplosionProof);
 				if (Ui::CheckboxWithHint("Explosion proof", &state, nullptr, m_bNoDamage))
-					pVeh->m_nPhysicalFlags.bExplosionProof = state;
+				{
+					BY_GAME(pVeh->m_nPhysicalFlags.bExplosionProof, pVeh->m_nFlags.bExplosionProof) = state;
+				}
 
-				state = pVeh->m_nPhysicalFlags.bFireProof;
+				state = BY_GAME(pVeh->m_nPhysicalFlags.bFireProof, pVeh->m_nFlags.bFireProof);
 				if (Ui::CheckboxWithHint("Fire proof", &state, nullptr, m_bNoDamage))
-					pVeh->m_nPhysicalFlags.bFireProof = state;
+				{
+					BY_GAME(pVeh->m_nPhysicalFlags.bFireProof, pVeh->m_nFlags.bFireProof) = state;
+				}
 
 				ImGui::NextColumn();
 
+#ifdef GTASA
 				state = pVeh->m_nVehicleFlags.bVehicleCanBeTargettedByHS;
 				if (Ui::CheckboxWithHint("HS targetable", &state, "Heat Seaker missile can target this"))
+				{
 					pVeh->m_nVehicleFlags.bVehicleCanBeTargettedByHS = state;
+				}
+#endif
 
-				state = !pVeh->m_bIsVisible;
+				state = !BY_GAME(pVeh->m_bIsVisible, pVeh->m_nFlags.bIsVisible);
 				if (Ui::CheckboxWithHint("Invisible car", &state, nullptr, !is_driver))
-					pVeh->m_bIsVisible = !state;
+				{
+					BY_GAME(pVeh->m_bIsVisible, pVeh->m_nFlags.bIsVisible) = !state;
+				}
 
-				state = !pVeh->ms_forceVehicleLightsOff;
+				state = BY_GAME(!pVeh->ms_forceVehicleLightsOff, pVeh->m_nVehicleFlags.bLightsOn);
 				if (Ui::CheckboxWithHint("Lights on", &state, nullptr, !is_driver))
-					pVeh->ms_forceVehicleLightsOff = !state;
+				{
+					BY_GAME(!pVeh->ms_forceVehicleLightsOff, pVeh->m_nVehicleFlags.bLightsOn) = BY_GAME(!state, state);
+				}
 
-				state = pVeh->m_nDoorLock == CARLOCK_LOCKED_PLAYER_INSIDE;
+				state = BY_GAME(pVeh->m_nDoorLock, pVeh->m_nLockStatus) == CARLOCK_LOCKED_PLAYER_INSIDE;
 				if (Ui::CheckboxWithHint("Lock doors", &state, nullptr, !is_driver))
 				{
 					if (state)
-						pVeh->m_nDoorLock = CARLOCK_LOCKED_PLAYER_INSIDE;
+					{
+						BY_GAME(pVeh->m_nDoorLock, pVeh->m_nLockStatus) = CARLOCK_LOCKED_PLAYER_INSIDE;
+					}
 					else
-						pVeh->m_nDoorLock = CARLOCK_UNLOCKED;
+					{
+						BY_GAME(pVeh->m_nDoorLock, pVeh->m_nLockStatus) = CARLOCK_UNLOCKED;
+					}
 				}
 
-				state = pVeh->m_nPhysicalFlags.bMeeleProof;
+				state = BY_GAME(pVeh->m_nPhysicalFlags.bMeeleProof, pVeh->m_nFlags.bMeleeProof);
 				if (Ui::CheckboxWithHint("Melee proof", &state, nullptr, m_bNoDamage))
-					pVeh->m_nPhysicalFlags.bMeeleProof = state;
+				{
+					BY_GAME(pVeh->m_nPhysicalFlags.bMeeleProof, pVeh->m_nFlags.bMeleeProof) = state;
+				}
 
+#ifdef GTASA
 				state = pVeh->m_nVehicleFlags.bPetrolTankIsWeakPoint;
 				if (Ui::CheckboxWithHint("Petrol tank blow", &state, "Vehicle will blow up if petrol tank is shot"))
+				{
 					pVeh->m_nVehicleFlags.bPetrolTankIsWeakPoint = state;
+				}
 
 				state = pVeh->m_nVehicleFlags.bSirenOrAlarm;
 				if (Ui::CheckboxWithHint("Siren", &state))
+				{
 					pVeh->m_nVehicleFlags.bSirenOrAlarm = state;
+				}
 
 				state = pVeh->m_nVehicleFlags.bTakeLessDamage;
 				if (Ui::CheckboxWithHint("Take less dmg", &state, nullptr))
 					pVeh->m_nVehicleFlags.bTakeLessDamage = state;
+#endif
 
 				ImGui::Columns(1);
 			}
@@ -771,20 +906,28 @@ void Vehicle::Draw()
 
 					ImGui::Spacing();
 					if (ImGui::Button("Driver", ImVec2(Ui::GetSize(2))))
+					{
 						Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, veh);
+					}
 
 					for (int i = 0; i < seats; ++i)
 					{
 						if (i % 2 != 1)
+						{
 							ImGui::SameLine();
+						}
 
 						if (ImGui::Button((std::string("Passenger ") + std::to_string(i + 1)).c_str(),
 							ImVec2(Ui::GetSize(2))))
+						{
 							Command<Commands::WARP_CHAR_INTO_CAR_AS_PASSENGER>(hplayer, veh, i);
+						}
 					}
 				}
 				else
+				{
 					ImGui::Text("No nearby vehicles");
+				}
 
 				ImGui::Spacing();
 				ImGui::Separator();
@@ -799,7 +942,7 @@ void Vehicle::Draw()
 					for (CVehicle* pVeh : CPools::ms_pVehiclePool)
 					{
 						if (DistanceBetweenPoints(pVeh->GetPosition(), player->GetPosition()) < m_nVehRemoveRadius
-							&& !(player->m_nPedFlags.bInVehicle && player->m_pVehicle == pVeh))
+							&& !(BY_GAME(player->m_nPedFlags.bInVehicle, true) && player->m_pVehicle == pVeh))
 						{
 							Command<Commands::DELETE_CAR>(CPools::GetVehicleRef(pVeh));
 						}
@@ -828,6 +971,7 @@ void Vehicle::Draw()
 				int hVeh = CPools::GetVehicleRef(pVeh);
 
 				Ui::EditFloat("Dirt level", (int)pVeh + 0x4B0, 0, 7.5, 15);
+#ifdef GTASA
 				if (pVeh->m_nVehicleClass == VEHICLE_AUTOMOBILE && ImGui::CollapsingHeader("Doors"))
 				{
 					ImGui::Columns(2, 0, false);
@@ -891,13 +1035,15 @@ void Vehicle::Draw()
 						}
 
 						if (i % 2 != 1)
+						{
 							ImGui::SameLine();
+						}
 					}
 
 					ImGui::Spacing();
 					ImGui::Separator();
 				}
-
+#endif
 				if (ImGui::CollapsingHeader("Set speed"))
 				{
 					Ui::CheckboxWithHint("Lock speed", &m_bLockSpeed);
@@ -909,12 +1055,16 @@ void Vehicle::Draw()
 					m_fLockSpeed = m_fLockSpeed < 0 ? 0 : m_fLockSpeed;
 
 					if (ImGui::Button("Set speed##brn", ImVec2(Ui::GetSize(2))))
+					{
 						Command<Commands::SET_CAR_FORWARD_SPEED>(hVeh, m_fLockSpeed);
+					}
 
 					ImGui::SameLine();
 
 					if (ImGui::Button("Instant stop##brn", ImVec2(Ui::GetSize(2))))
+					{
 						Command<Commands::SET_CAR_FORWARD_SPEED>(hVeh, 0);
+					}
 				}
 			}
 			ImGui::EndChild();
@@ -943,6 +1093,7 @@ void Vehicle::Draw()
 
 			ImGui::EndTabItem();
 		}
+#ifdef GTASA
 		if (player->m_pVehicle && player->m_nPedFlags.bInVehicle)
 		{
 			CVehicle* veh = FindPlayerPed()->m_pVehicle;
@@ -1207,7 +1358,7 @@ void Vehicle::Draw()
 				Ui::EditRadioButtonAddressEx("Drive type", pHandling + 0x74, drive_type);
 
 				Ui::EditFloat("Engine acceleration", pHandling + 0x7C, 0.0f, 0.0f, 49.0f, 12500.0f);
-				Ui::EditFloat("Engine inertia", pHandling + 0x80, 0.0f, 0.0f, 400.0f);
+				Ui::EditFloat("Engine inertia", pHandling + 0x80, 0.1f, 0.1f, 400.0f);
 
 				static std::vector<Ui::NamedValue> engine_type{ {"Petrol", 80}, {"Diseal", 68}, {"Electric", 69} };
 				Ui::EditRadioButtonAddressEx("Engine type", pHandling + 0x75, engine_type);
@@ -1249,6 +1400,7 @@ void Vehicle::Draw()
 				ImGui::EndTabItem();
 			}
 		}
+#endif
 		ImGui::EndTabBar();
 	}
 }
