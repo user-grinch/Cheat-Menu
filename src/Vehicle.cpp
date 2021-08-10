@@ -15,12 +15,12 @@ void Vehicle::FixVehicle(CVehicle *pVeh)
 	{
 		case VEHICLE_AUTOMOBILE:
 		{
-			Call<0x588530>(); // CAutoMobile::Fix()
+			reinterpret_cast<CAutomobile *>(pVeh)->Fix();
 			break;
 		}
 		case VEHICLE_BIKE:
 		{
-			Call<0x609F00>(); // CBike::Fix()
+			reinterpret_cast<CBike *>(pVeh)->Fix();
 			break;
 		}
 	}
@@ -57,6 +57,7 @@ Vehicle::Vehicle()
 #ifdef GTASA
 			if (Ui::HotKeyPressed(Menu::m_HotKeys::flipVeh))
 			{
+				int roll = 0;
 				Command<Commands::GET_CAR_ROLL>(hveh, &roll);
 				roll += 180;
 				Command<Commands::SET_CAR_ROLL>(hveh, roll);
@@ -152,7 +153,7 @@ Vehicle::Vehicle()
 				int red, green, blue;
 
 				Util::RainbowValues(red, green, blue, 0.25);
-				InstallNeon(veh, red, green, blue);
+				InstallNeon(pVeh, red, green, blue);
 				m_Neon::m_nRainbowTimer = timer;
 			}
 #endif
@@ -175,8 +176,10 @@ Vehicle::Vehicle()
 				if (veh->m_nVehicleClass == CLASS_EXECUTIVE) // Executive
 					chance = Random(1, 3);
 
-				if (chance == 1 && !IsNeonInstalled(veh) && veh->m_pDriver != player)
+				if (chance == 1 && !IsNeonInstalled(veh) && veh->m_pDriver != pPlayer)
+				{
 					InstallNeon(veh, Random(0, 255), Random(0, 255), Random(0, 255));
+				}
 			}
 			m_Neon::m_bTrafficTimer = timer;
 		}
@@ -430,6 +433,7 @@ void Vehicle::ParseCarcolsDAT()
 
 void Vehicle::SpawnVehicle(std::string& smodel)
 {
+#ifdef GTASA
 	CPlayerPed* player = FindPlayerPed();
 	int hplayer = CPools::GetPedRef(player);
 
@@ -454,7 +458,6 @@ void Vehicle::SpawnVehicle(std::string& smodel)
 
 			Command<Commands::WARP_CHAR_FROM_CAR_TO_COORD>(hplayer, pos.x, pos.y, pos.z);
 
-#ifdef GTASA
 			if (pveh->m_nVehicleClass == VEHICLE_TRAIN)
 			{
 				Command<Commands::DELETE_MISSION_TRAIN>(hveh);
@@ -463,9 +466,6 @@ void Vehicle::SpawnVehicle(std::string& smodel)
 			{
 				Command<Commands::DELETE_CAR>(hveh);
 			}
-#elif GTAVC
-			Command<Commands::DELETE_CAR>(hveh);
-#endif
 		}
 
 		if (interior == 0)
@@ -480,7 +480,6 @@ void Vehicle::SpawnVehicle(std::string& smodel)
 			}
 		}
 
-#ifdef GTASA
 		if (CModelInfo::IsTrainModel(imodel))
 		{
 			int train_id = GetRandomTrainIdForModel(imodel);
@@ -528,50 +527,37 @@ void Vehicle::SpawnVehicle(std::string& smodel)
 		}
 		else
 		{
-#endif
 			CStreaming::RequestModel(imodel, PRIORITY_REQUEST);
 			CStreaming::LoadAllRequestedModels(false);
 
-#ifdef GTASA
 			if (m_Spawner::m_nLicenseText[0] != '\0')
 			{
 				Command<Commands::CUSTOM_PLATE_FOR_NEXT_CAR>(imodel, m_Spawner::m_nLicenseText);
 			}
-#endif
 
 			int hveh = 0;
 			if (m_Spawner::m_bSpawnInside)
 			{
 				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 4.0f, &hveh);
 				veh = CPools::GetVehicle(hveh);
-#ifdef GTASA
 				veh->SetHeading(player->GetHeading());
-#endif
 				Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
 				Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, speed);
 			}
 			else
 			{
-#ifdef GTASA
 				player->TransformFromObjectSpace(pos, CVector(0, 10, 0));
-#elif GTAVC
-				player->TransformFromObjectSpace(CVector(0, 10, 0));
-#endif
-
 				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 3.0f, &hveh);
 				veh = CPools::GetVehicle(hveh);
-#ifdef GTASA
 				veh->SetHeading(player->GetHeading() + 55.0f);
-#endif
 			}
 			BY_GAME(veh->m_nDoorLock, veh->m_nLockStatus) = CARLOCK_UNLOCKED;
 			BY_GAME(veh->m_nAreaCode, veh->m_nInterior) = interior;
 			Command<Commands::MARK_CAR_AS_NO_LONGER_NEEDED>(CPools::GetVehicleRef(veh));
 			CStreaming::SetModelIsDeletable(imodel);
 		}
-
-#ifdef GTASA
 		veh->m_nVehicleFlags.bHasBeenOwnedByPlayer = true;
+	}
 #endif
 }
 
@@ -585,12 +571,16 @@ std::string Vehicle::GetNameFromModel(int model)
 int Vehicle::GetModelFromName(const char* name)
 {
 	int model = 0;
-	CBaseModelInfo* model_info = CModelInfo::GetModelInfo((char*)name, &model);
+	CBaseModelInfo* pModelInfo = CModelInfo::GetModelInfo((char*)name, &model);
 
 	if (model > 0 && model < 1000000 && GetNameFromModel(model) != "")
+	{
 		return model;
+	}
 	else
+	{
 		return 0;
+	}
 }
 
 void Vehicle::GenerateHandlingDataFile(int phandling)
@@ -657,20 +647,27 @@ void Vehicle::GenerateHandlingDataFile(int phandling)
 void Vehicle::Draw()
 {
 	ImGui::Spacing();
-	CPlayerPed* player = FindPlayerPed();
-	int hplayer = CPools::GetPedRef(player);
-	CVehicle *pVeh = player->m_pVehicle;
+	CPlayerPed* pPlayer = FindPlayerPed();
+	int hplayer = CPools::GetPedRef(pPlayer);
+	CVehicle *pVeh = pPlayer->m_pVehicle;
 
 	if (ImGui::Button("Blow up cars", ImVec2(Ui::GetSize(BY_GAME(3,2)))))
 	{
+#ifdef GTASA
 		Call<0x439D80>();
+#elif GTAVC
+		for (CVehicle *pVeh : CPools::ms_pVehiclePool)
+		{
+			pVeh->BlowUpCar(pPlayer);
+		}
+#endif
 	}
 
 	ImGui::SameLine();
 
 	if (ImGui::Button("Fix vehicle", ImVec2(Ui::GetSize(BY_GAME(3,2)))))
 	{
-		if (player && pVeh)
+		if (pPlayer && pVeh)
 		{
 			FixVehicle(pVeh);
 		}
@@ -681,9 +678,9 @@ void Vehicle::Draw()
 
 	if (ImGui::Button("Flip vehicle", ImVec2(Ui::GetSize(3))))
 	{
-		if (player->m_nPedFlags.bInVehicle)
+		if (pPlayer->m_nPedFlags.bInVehicle)
 		{
-			int hveh = CPools::GetVehicleRef(player->m_pVehicle);
+			int hveh = CPools::GetVehicleRef(pPlayer->m_pVehicle);
 			float roll;
 
 			Command<Commands::GET_CAR_ROLL>(hveh, &roll);
@@ -698,8 +695,8 @@ void Vehicle::Draw()
 
 	if (ImGui::BeginTabBar("Vehicle", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
 	{
-		CVehicle* pVeh = player->m_pVehicle;
-		bool is_driver = pVeh && player->m_pVehicle->IsDriver(player);
+		CVehicle* pVeh = pPlayer->m_pVehicle;
+		bool is_driver = pVeh && pPlayer->m_pVehicle->IsDriver(pPlayer);
 
 		ImGui::Spacing();
 
@@ -835,7 +832,7 @@ void Vehicle::Draw()
 				state = BY_GAME(!pVeh->ms_forceVehicleLightsOff, pVeh->m_nVehicleFlags.bLightsOn);
 				if (Ui::CheckboxWithHint("Lights on", &state, nullptr, !is_driver))
 				{
-					BY_GAME(!pVeh->ms_forceVehicleLightsOff, pVeh->m_nVehicleFlags.bLightsOn) = BY_GAME(!state, state);
+					BY_GAME(pVeh->ms_forceVehicleLightsOff, pVeh->m_nVehicleFlags.bLightsOn) = state;
 				}
 
 				state = BY_GAME(pVeh->m_nDoorLock, pVeh->m_nLockStatus) == CARLOCK_LOCKED_PLAYER_INSIDE;
@@ -885,21 +882,20 @@ void Vehicle::Draw()
 		{
 			ImGui::Spacing();
 			ImGui::BeginChild("MenusChild");
-			Ui::EditFloat("Density multiplier", 0x8A5B20, 0, 1, 10);
+			Ui::EditReference("Density multiplier", CPopulation::PedDensityMultiplier, 0, 1, 10);
 			if (ImGui::CollapsingHeader("Enter nearest vehicle as"))
 			{
-				CPlayerPed* player = FindPlayerPed();
-				int hplayer = CPools::GetPedRef(player);
-				CVehicle* veh = Util::GetClosestVehicle();
+				int hplayer = CPools::GetPedRef(pPlayer);
+				CVehicle* pClosestVeh = Util::GetClosestVehicle();
 
-				if (veh)
+				if (pClosestVeh)
 				{
-					int seats = veh->m_nMaxPassengers;
+					int seats = pClosestVeh->m_nMaxPassengers;
 
 					ImGui::Spacing();
 					ImGui::Columns(2, 0, false);
 
-					ImGui::Text(GetNameFromModel(veh->m_nModelIndex).c_str());
+					ImGui::Text(GetNameFromModel(pClosestVeh->m_nModelIndex).c_str());
 					ImGui::NextColumn();
 					ImGui::Text("Total seats: %d", (seats + 1));
 					ImGui::Columns(1);
@@ -907,7 +903,7 @@ void Vehicle::Draw()
 					ImGui::Spacing();
 					if (ImGui::Button("Driver", ImVec2(Ui::GetSize(2))))
 					{
-						Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, veh);
+						Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, pClosestVeh);
 					}
 
 					for (int i = 0; i < seats; ++i)
@@ -920,7 +916,7 @@ void Vehicle::Draw()
 						if (ImGui::Button((std::string("Passenger ") + std::to_string(i + 1)).c_str(),
 							ImVec2(Ui::GetSize(2))))
 						{
-							Command<Commands::WARP_CHAR_INTO_CAR_AS_PASSENGER>(hplayer, veh, i);
+							Command<Commands::WARP_CHAR_INTO_CAR_AS_PASSENGER>(hplayer, pClosestVeh, i);
 						}
 					}
 				}
@@ -965,9 +961,9 @@ void Vehicle::Draw()
 				ImGui::Separator();
 			}
 
-			if (player && player->m_pVehicle)
+			if (pPlayer && pPlayer->m_pVehicle)
 			{
-				CVehicle* pVeh = player->m_pVehicle;
+				CVehicle* pVeh = pPlayer->m_pVehicle;
 				int hVeh = CPools::GetVehicleRef(pVeh);
 
 				Ui::EditFloat("Dirt level", (int)pVeh + 0x4B0, 0, 7.5, 15);
@@ -1094,7 +1090,7 @@ void Vehicle::Draw()
 			ImGui::EndTabItem();
 		}
 #ifdef GTASA
-		if (player->m_pVehicle && player->m_nPedFlags.bInVehicle)
+		if (pPlayer->m_pVehicle && pPlayer->m_nPedFlags.bInVehicle)
 		{
 			CVehicle* veh = FindPlayerPed()->m_pVehicle;
 			int hveh = CPools::GetVehicleRef(veh);
@@ -1154,7 +1150,7 @@ void Vehicle::Draw()
 					}
 				else
 				{
-					std::string vehName = GetNameFromModel(player->m_pVehicle->m_nModelIndex);
+					std::string vehName = GetNameFromModel(pPlayer->m_pVehicle->m_nModelIndex);
 					for (auto entry : m_CarcolsCarData)
 					{
 						if (entry.first == vehName)
@@ -1298,9 +1294,9 @@ void Vehicle::Draw()
 							   [](std::string& str) { AddComponent(str); },
 							   [](std::string& str) { RemoveComponent(str); },
 							   [](std::string& str) { return str; },
-							   [](std::string& str)
+							   [pPlayer](std::string& str)
 							   {
-								   return ((bool(*)(int, CVehicle*))0x49B010)(std::stoi(str), player->m_pVehicle);
+								   return ((bool(*)(int, CVehicle*))0x49B010)(std::stoi(str), pPlayer->m_pVehicle);
 							   }
 				);
 
@@ -1310,7 +1306,7 @@ void Vehicle::Draw()
 			{
 				ImGui::Spacing();
 
-				CBaseModelInfo* info = CModelInfo::GetModelInfo(player->m_pVehicle->m_nModelIndex);
+				CBaseModelInfo* info = CModelInfo::GetModelInfo(pPlayer->m_pVehicle->m_nModelIndex);
 				int pHandling = patch::Get<WORD>((int)info + 0x4A, false);
 				pHandling *= 0xE0;
 				pHandling += 0xC2B9DC;

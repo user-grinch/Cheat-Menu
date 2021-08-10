@@ -210,7 +210,7 @@ CPlayerPed* player = FindPlayerPed();
 #elif GTAVC
 	
 	CVehicle *pClosestVeh = nullptr;
-	float distance = 0.0f;
+	float distance = 999.0f;
 
 	CVector playerPos = player->GetPosition();
 

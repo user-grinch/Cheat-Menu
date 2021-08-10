@@ -40,8 +40,8 @@ Menu::Menu()
 	m_HotKeys::quickTeleport.m_key1 = config.GetValue("hotkey.quick_tp.key1", VK_KEY_X);
 	m_HotKeys::quickTeleport.m_key2 = config.GetValue("hotkey.quick_tp.key2", VK_KEY_Y);
 
-	m_HotKeys::menuOpen.m_key1 = VK_LCONTROL; config.GetValue("hotkey.menu_open.key1", VK_LCONTROL);
-	m_HotKeys::menuOpen.m_key2 = VK_KEY_M; config.GetValue("hotkey.menu_open.key2", VK_KEY_M);
+	m_HotKeys::menuOpen.m_key1 = config.GetValue("hotkey.menu_open.key1", VK_LCONTROL);
+	m_HotKeys::menuOpen.m_key2 = config.GetValue("hotkey.menu_open.key2", VK_KEY_M);
 
 	m_HotKeys::commandWindow.m_key1 = config.GetValue("hotkey.command_window.key1", VK_LMENU);
 	m_HotKeys::commandWindow.m_key2 = config.GetValue("hotkey.command_window.key2", VK_KEY_C);
