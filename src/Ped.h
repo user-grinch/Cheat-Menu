@@ -9,9 +9,10 @@ class Ped
 private:
 #ifdef GTASA
 	inline static CJson m_SpecialPedJson = CJson("ped special");
+	inline static ResourceStore m_PedData{"ped", eResourceType::TYPE_BOTH, ImVec2(65, 110)};
+#elif GTAVC
+	inline static ResourceStore m_PedData{"ped", eResourceType::TYPE_TEXT};
 #endif
-
-	inline static ResourceStore m_PedData{"ped", eResourceType::TYPE_TEXT, ImVec2(65, 110)};
 	inline static bool m_bImagesLoaded;
 	inline static bool m_bExGangWarsInstalled;
 	inline static int m_nPedRemoveRadius = 5;
