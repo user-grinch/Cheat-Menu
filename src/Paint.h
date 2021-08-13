@@ -73,7 +73,7 @@ private:
 	inline static VehicleExtendedData<VehData> m_VehData;
 
 protected:
-	inline static ResourceStore m_TextureData { "textures" };
+	inline static ResourceStore m_TextureData { "textures", eResourceType::TYPE_IMAGE, ImVec2(100, 80) };
 
 	struct veh_nodes
 	{

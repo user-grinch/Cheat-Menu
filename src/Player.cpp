@@ -534,8 +534,7 @@ void Player::Draw()
 					{
 						if (bClothOption == 0)
 						{
-							Ui::DrawImages(m_ClothData.m_ImagesList, ImVec2(70, 100), m_ClothData.m_Categories, m_ClothData.m_Selected,
-									   m_ClothData.m_Filter, ChangePlayerCloth, nullptr,
+							Ui::DrawImages(m_ClothData, ChangePlayerCloth, nullptr,
 									   [](std::string str)
 									   {
 										   std::stringstream ss(str);
@@ -596,8 +595,7 @@ void Player::Draw()
 				}
 				if (ImGui::BeginTabItem("Ped skins"))
 				{
-					Ui::DrawImages(Ped::m_PedData.m_ImagesList, ImVec2(65, 110), Ped::m_PedData.m_Categories,
-								   Ped::m_PedData.m_Selected, Ped::m_PedData.m_Filter, ChangePlayerModel, nullptr,
+					Ui::DrawImages(Ped::m_PedData, ChangePlayerModel, nullptr,
 								   [](std::string str) { return Ped::m_PedData.m_pJson->m_Data[str].get<std::string>(); });
 					ImGui::EndTabItem();
 				}

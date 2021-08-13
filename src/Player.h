@@ -15,7 +15,7 @@ private:
 #ifdef GTASA
 	inline static bool m_bAimSkinChanger;
 	inline static int m_nUiBodyState;
-	inline static ResourceStore m_ClothData { "clothes" };
+	inline static ResourceStore m_ClothData { "clothes" , eResourceType::TYPE_IMAGE, ImVec2(70, 100)};
 	struct m_CustomSkins
 	{
 		inline static std::string m_Path = paths::GetGameDirPathA() + std::string("\\modloader\\Custom Skins\\");;

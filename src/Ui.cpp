@@ -42,10 +42,10 @@ bool Ui::ListBoxStr(const char* label, std::vector<std::string>& all_items, std:
 	return rtn;
 }
 
-bool Ui::ListBoxCustomNames(const char* label, std::vector<std::string>& all_items, std::string& selected, const char* custom_names[], size_t length)
+bool Ui::ListBoxCustomNames(const char* label, std::vector<std::string>& all_items, std::string& selected, const char* customNames[], size_t length)
 {
 	bool rtn = false;
-	std::string display_selected = (selected == "All") ? selected : custom_names[std::stoi(selected)];
+	std::string display_selected = (selected == "All") ? selected : customNames[std::stoi(selected)];
 
 	if (ImGui::BeginCombo(label, display_selected.c_str()))
 	{
@@ -57,7 +57,7 @@ bool Ui::ListBoxCustomNames(const char* label, std::vector<std::string>& all_ite
 
 		for (size_t i = 0; i < length; ++i)
 		{
-			if (ImGui::MenuItem(custom_names[i]))
+			if (ImGui::MenuItem(customNames[i]))
 			{
 				selected = std::to_string(i);
 				rtn = true;
@@ -183,7 +183,7 @@ bool Ui::CheckboxWithHint(const char* label, bool* v, const char* hint, bool is_
 	// set things up
 	bool pressed = false;
 	const ImGuiStyle& style = ImGui::GetStyle();
-	const ImVec2 text_size = ImGui::CalcTextSize(label, nullptr, true);
+	const ImVec2 textSize = ImGui::CalcTextSize(label, nullptr, true);
 	float square_sz = ImGui::GetFrameHeight();
 	ImDrawList* drawlist = ImGui::GetWindowDrawList();
 	ImU32 color = ImGui::GetColorU32(ImGuiCol_FrameBg);
@@ -482,74 +482,79 @@ void Ui::FilterWithHint(const char* label, ImGuiTextFilter& filter, const char* 
 	}
 }
 
-// clean up the code someday
-void Ui::DrawImages(std::vector<std::unique_ptr<STextureResource>>& img_vec, ImVec2 image_size,
-					std::vector<std::string>& category_vec, std::string& selected_item, ImGuiTextFilter& filter,
-					std::function<void(std::string&)> on_left_click, std::function<void(std::string&)> on_right_click,
-					std::function<std::string(std::string&)> get_name_func,
-					std::function<bool(std::string&)> verify_func, const char** custom_names, size_t length)
+void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLeftClick, std::function<void(std::string&)> onRightClick,
+					std::function<std::string(std::string&)> getName, std::function<bool(std::string&)> verifyFunc,
+					const char** customNames, size_t length)
 {
-	// scale image size
-	image_size.x *= screen::GetScreenWidth() / 1366.0f;
-	image_size.y *= screen::GetScreenHeight() / 768.0f;
+	/*
+		Trying to scale images based on resolutions
+		Native 1366x768
+	*/
+	store.m_ImageSize.x *= screen::GetScreenWidth() / 1366.0f;
+	store.m_ImageSize.y *= screen::GetScreenHeight() / 768.0f;
 
-	int images_in_row = static_cast<int>(ImGui::GetWindowContentRegionWidth() / image_size.x);
-	image_size.x = ImGui::GetWindowContentRegionWidth() / images_in_row - static_cast<int>(ImGuiStyleVar_ItemSpacing) *
-		0.65f;
-
-	int images_count = 1;
+	int imageCount = 1;
+	int imagesInRow = static_cast<int>(ImGui::GetWindowContentRegionWidth() / store.m_ImageSize.x);
+	store.m_ImageSize.x = ImGui::GetWindowContentRegionWidth() / imagesInRow - static_cast<int>(ImGuiStyleVar_ItemSpacing) * 0.65f;
 
 	ImGui::Spacing();
 
+	// Hide the popup if right clicked again
 	if (ImGui::IsMouseClicked(1))
+	{
 		imgPopup.function = nullptr;
+	}
 
 	ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() / 2 - 5);
-	if (custom_names)
+	if (customNames)
 	{
-		ListBoxCustomNames("##Categories", category_vec, selected_item, custom_names, length);
+		ListBoxCustomNames("##Categories", store.m_Categories, store.m_Selected, customNames, length);
 	}
 	else
 	{
-		ListBoxStr("##Categories", category_vec, selected_item);
+		ListBoxStr("##Categories", store.m_Categories, store.m_Selected);
 	}
 
 	ImGui::SameLine();
-	FilterWithHint("##Filter", filter, "Search");
+	FilterWithHint("##Filter", store.m_Filter, "Search");
 
 	ImGui::Spacing();
 
 	ImGui::BeginChild("DrawImages");
-	for (uint i = 0; i < img_vec.size(); i++)
+	for (uint i = 0; i < store.m_ImagesList.size(); ++i)
 	{
-		std::string text = img_vec[i]->m_FileName;
-		std::string model_name = get_name_func(text);
+		std::string text = store.m_ImagesList[i]->m_FileName;
+		std::string modelName = getName(text);
 
-		if (filter.PassFilter(model_name.c_str())
-			&& (img_vec[i]->m_CategoryName == selected_item || selected_item == "All")
-			&& (verify_func == nullptr || verify_func(text))
+		if (store.m_Filter.PassFilter(modelName.c_str())
+			&& (store.m_ImagesList[i]->m_CategoryName == store.m_Selected || store.m_Selected == "All")
+			&& (verifyFunc == nullptr || verifyFunc(text))
 		)
 		{
+			/*
+				Couldn't figure out how to laod images for Dx11
+				Using texts for now
+			*/
 			if (Globals::renderer == Render_DirectX11)
 			{
-				if (ImGui::MenuItem(model_name.c_str()))
+				if (ImGui::MenuItem(modelName.c_str()))
 				{
-					on_left_click(text);
+					onLeftClick(text);
 				}
 			}
 			else
 			{
-				if (ImGui::ImageButton(img_vec[i]->m_pTexture, image_size, ImVec2(0, 0), ImVec2(1, 1), 1, ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 1)))
+				if (ImGui::ImageButton(store.m_ImagesList[i]->m_pTexture, store.m_ImageSize, ImVec2(0, 0), ImVec2(1, 1), 1, ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 1)))
 				{
-					on_left_click(text);
+					onLeftClick(text);
 				}
 			}
 
-
-			if (ImGui::IsItemClicked(1) && on_right_click != nullptr)
+			// Right click popup
+			if (ImGui::IsItemClicked(1) && onRightClick != nullptr)
 			{
-				imgPopup.function = on_right_click;
-				imgPopup.value = model_name;
+				imgPopup.function = onRightClick;
+				imgPopup.value = modelName;
 			}
 
 			if (Globals::renderer != Render_DirectX11)
@@ -558,45 +563,46 @@ void Ui::DrawImages(std::vector<std::unique_ptr<STextureResource>>& img_vec, ImV
 				{
 					ImDrawList* drawlist = ImGui::GetWindowDrawList();
 
-					ImVec2 btn_min = ImGui::GetItemRectMin();
-					ImVec2 btn_max = ImGui::GetItemRectMax();
+					// Drawing selected overlay
+					ImVec2 btnMin = ImGui::GetItemRectMin();
+					ImVec2 btnMax = ImGui::GetItemRectMax();
+					drawlist->AddRectFilled(btnMin, btnMax, ImGui::GetColorU32(ImGuiCol_ModalWindowDimBg));
 
-					drawlist->AddRectFilled(btn_min, btn_max, ImGui::GetColorU32(ImGuiCol_ModalWindowDimBg));
-
-					ImVec2 text_size = ImGui::CalcTextSize(model_name.c_str());
-					if (text_size.x < image_size.x)
+					// Calculating and drawing text over the image
+					ImVec2 textSize = ImGui::CalcTextSize(modelName.c_str());
+					if (textSize.x < store.m_ImageSize.x)
 					{
-						float offsetX = (ImGui::GetItemRectSize().x - text_size.x) / 2;
-						drawlist->AddText(ImVec2(btn_min.x + offsetX, btn_min.y + 10), ImGui::GetColorU32(ImGuiCol_Text),
-										model_name.c_str());
+						float offsetX = (ImGui::GetItemRectSize().x - textSize.x) / 2;
+						drawlist->AddText(ImVec2(btnMin.x + offsetX, btnMin.y + 10), ImGui::GetColorU32(ImGuiCol_Text),
+										modelName.c_str());
 					}
 					else
 					{
 						std::string buff = "";
-
-						std::stringstream ss(model_name);
+						std::stringstream ss(modelName);
 						short count = 1;
 
 						while (ss >> buff)
 						{
-							text_size = ImGui::CalcTextSize(buff.c_str());
-							float offsetX = (ImGui::GetItemRectSize().x - text_size.x) / 2;
-							drawlist->AddText(ImVec2(btn_min.x + offsetX, btn_min.y + 10 * count),
+							textSize = ImGui::CalcTextSize(buff.c_str());
+							float offsetX = (ImGui::GetItemRectSize().x - textSize.x) / 2;
+							drawlist->AddText(ImVec2(btnMin.x + offsetX, btnMin.y + 10 * count),
 											ImGui::GetColorU32(ImGuiCol_Text), buff.c_str());
 							++count;
 						}
 					}
 				}
 
-				if (images_count % images_in_row != 0)
+				if (imageCount % imagesInRow != 0)
 				{
 					ImGui::SameLine(0.0, ImGui::GetStyle().ItemInnerSpacing.x);
 				}
 			}
-			images_count++;
+			imageCount++;
 		}
 	}
 
+	// Draw popup code
 	if (imgPopup.function != nullptr)
 	{
 		if (ImGui::BeginPopupContextWindow())
@@ -604,11 +610,14 @@ void Ui::DrawImages(std::vector<std::unique_ptr<STextureResource>>& img_vec, ImV
 			ImGui::Text(imgPopup.value.c_str());
 			ImGui::Separator();
 			if (ImGui::MenuItem("Remove"))
+			{
 				imgPopup.function(imgPopup.value);
-
+			}
 
 			if (ImGui::MenuItem("Close"))
+			{
 				imgPopup.function = nullptr;
+			}
 
 			ImGui::EndPopup();
 		}

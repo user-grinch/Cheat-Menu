@@ -1106,8 +1106,7 @@ void Vehicle::Draw()
 			ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() - 2.5);
 			ImGui::InputTextWithHint("##LicenseText", "License plate text", m_Spawner::m_nLicenseText, 9);
 
-			Ui::DrawImages(m_Spawner::m_VehData.m_ImagesList, ImVec2(100, 75), m_Spawner::m_VehData.m_Categories,
-						   m_Spawner::m_VehData.m_Selected, m_Spawner::m_VehData.m_Filter, SpawnVehicle, nullptr,
+			Ui::DrawImages(m_Spawner::m_VehData, SpawnVehicle, nullptr,
 						   [](std::string str)
 						   {
 							   return GetNameFromModel(std::stoi(str));
@@ -1320,8 +1319,7 @@ void Vehicle::Draw()
 					ImGui::SameLine();
 					ImGui::Checkbox("Material filter", &m_Color::m_bMatFilter);
 					ImGui::Spacing();
-					Ui::DrawImages(m_TextureData.m_ImagesList, ImVec2(100, 80), m_TextureData.m_Categories, m_TextureData.m_Selected,
-								m_TextureData.m_Filter,
+					Ui::DrawImages(m_TextureData,
 								[](std::string& str)
 								{
 									Paint::SetNodeTexture(FindPlayerPed()->m_pVehicle, Paint::veh_nodes::selected, str,
@@ -1339,8 +1337,7 @@ void Vehicle::Draw()
 			if (ImGui::BeginTabItem("Tune"))
 			{
 				ImGui::Spacing();
-				Ui::DrawImages(m_TuneData.m_ImagesList, ImVec2(100, 80), m_TuneData.m_Categories, m_TuneData.m_Selected,
-							   m_TuneData.m_Filter,
+				Ui::DrawImages(m_TuneData,
 							   [](std::string& str) { AddComponent(str); },
 							   [](std::string& str) { RemoveComponent(str); },
 							   [](std::string& str) { return str; },

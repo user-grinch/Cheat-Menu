@@ -51,9 +51,7 @@ public:
 	static void DrawJSON(ResourceStore& data,
 						 std::function<void(std::string&, std::string&, std::string&)> func_left_click,
 						 std::function<void(std::string&, std::string&, std::string&)> func_right_click);
-	static void DrawImages(std::vector<std::unique_ptr<STextureResource>>& img_vec, ImVec2 image_size,
-							std::vector<std::string>& category_vec, std::string& selected_item, ImGuiTextFilter& filter,
-							std::function<void(std::string&)> on_left_click,
+	static void DrawImages(ResourceStore &store, std::function<void(std::string&)> on_left_click,
 							std::function<void(std::string&)> on_right_click,
 							std::function<std::string(std::string&)> get_name_func,
 							std::function<bool(std::string&)> verify_func = nullptr,

@@ -3,7 +3,11 @@
 class Weapon
 {
 public:
+#ifdef GTASA
+	inline static ResourceStore m_WeaponData{ "weapon", eResourceType::TYPE_BOTH, ImVec2(65, 65) };
+#elif GTAVC
 	inline static ResourceStore m_WeaponData{ "weapon", eResourceType::TYPE_TEXT };
+#endif
 	inline static bool m_bAutoAim;
 	inline static bool m_bFastReload;
 	inline static bool m_bHugeDamage;

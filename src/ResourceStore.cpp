@@ -2,10 +2,15 @@
 #include "CFileLoader.h"
 #include "extensions/Paths.h"
 
-ResourceStore::ResourceStore(const char* text, eResourceType type)
+ResourceStore::ResourceStore(const char* text, eResourceType type, ImVec2 imageSize)
+: m_ImageSize(imageSize)
 {
-    if (type == eResourceType::TYPE_IMAGE)
+    if (type != eResourceType::TYPE_TEXT)
     {
+        /*  
+            Textures need to be loaded from main thread
+            Loading it directly here doesn't work
+        */
         Events::processScriptsEvent += [text, this]()
         {
             if (!m_bTexturesLoaded)
@@ -14,9 +19,15 @@ ResourceStore::ResourceStore(const char* text, eResourceType type)
                 m_bTexturesLoaded = true;
             }
         };
+
+        if (type == eResourceType::TYPE_BOTH)
+        {
+            goto loadJson;
+        }
     }
     else
     {
+        loadJson:
         m_pJson = std::make_unique<CJson>(text);
 
         // Generate categories

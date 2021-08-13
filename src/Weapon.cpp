@@ -230,8 +230,7 @@ void Weapon::Draw()
 						m_WeaponData.m_pJson->m_Data[std::to_string(m_nGangWeaponList[m_nSelectedGang][m_nSelectedWeapon])].get<
 							std::string>().c_str());
 			ImGui::Spacing();
-			Ui::DrawImages(m_WeaponData.m_ImagesList, ImVec2(65, 65), m_WeaponData.m_Categories, m_WeaponData.m_Selected,
-						   m_WeaponData.m_Filter, SetGangWeapon, nullptr,
+			Ui::DrawImages(m_WeaponData, SetGangWeapon, nullptr,
 						   [](std::string str) { return m_WeaponData.m_pJson->m_Data[str].get<std::string>(); },
 						   [](std::string str) { return str != "-1"; /*Jetpack*/ }
 			);
@@ -245,8 +244,7 @@ void Weapon::Draw()
 				m_nAmmoCount = (m_nAmmoCount < 0) ? 0 : m_nAmmoCount;
 				m_nAmmoCount = (m_nAmmoCount > 99999) ? 99999 : m_nAmmoCount;
 			}
-			Ui::DrawImages(m_WeaponData.m_ImagesList, ImVec2(65, 65), m_WeaponData.m_Categories, m_WeaponData.m_Selected,
-						   m_WeaponData.m_Filter, GiveWeaponToPlayer, nullptr,
+			Ui::DrawImages(m_WeaponData, GiveWeaponToPlayer, nullptr,
 						   [](std::string str) { return m_WeaponData.m_pJson->m_Data[str].get<std::string>(); },
 						   [](std::string str) { return str != "0"; /*Unarmed*/ }
 			);

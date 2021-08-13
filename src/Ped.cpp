@@ -260,8 +260,7 @@ void Ped::Draw()
 				{
 					ImGui::Spacing();
 #ifdef GTASA
-					Ui::DrawImages(m_PedData.m_ImagesList, ImVec2(65, 110), m_PedData.m_Categories, m_PedData.m_Selected,
-					               m_PedData.m_Filter, SpawnPed, nullptr,
+					Ui::DrawImages(m_PedData, SpawnPed, nullptr,
 					               [](std::string str) { return m_PedData.m_pJson->m_Data[str].get<std::string>(); });
 #elif GTAVC
 					Ui::DrawJSON(m_PedData, SpawnPed, nullptr);
@@ -295,8 +294,7 @@ void Ped::Draw()
 					            Weapon::m_WeaponData.m_pJson->m_Data[std::to_string(m_SpawnPed::m_nWeaponId)].get<std::string>().c_str());
 					ImGui::Spacing();
 
-					Ui::DrawImages(Weapon::m_WeaponData.m_ImagesList, ImVec2(65, 65), Weapon::m_WeaponData.m_Categories,
-					               Weapon::m_WeaponData.m_Selected, Weapon::m_WeaponData.m_Filter,
+					Ui::DrawImages(Weapon::m_WeaponData,
 					               [](std::string str) { m_SpawnPed::m_nWeaponId = std::stoi(str); },
 					               nullptr,
 					               [](std::string str)

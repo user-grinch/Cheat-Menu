@@ -41,13 +41,13 @@ private:
 		inline static bool m_bApplyOnTraffic;
 		inline static uint m_bTrafficTimer;
 	};
-	inline static ResourceStore m_TuneData { "components" };
+	inline static ResourceStore m_TuneData { "components", eResourceType::TYPE_IMAGE, ImVec2(100, 80) };
 #endif	
 
 	struct m_Spawner
 	{
 #ifdef GTASA
-		inline static ResourceStore m_VehData { "vehicles" };
+		inline static ResourceStore m_VehData { "vehicles", eResourceType::TYPE_IMAGE, ImVec2(100, 75)};
 #elif GTAVC
 		inline static ResourceStore m_VehData{"vehicle", eResourceType::TYPE_TEXT};
 #endif

@@ -40,6 +40,7 @@ enum eResourceType
 {
 	TYPE_IMAGE,
 	TYPE_TEXT,
+	TYPE_BOTH,
 };
 
 using TextureResourceList = std::vector<std::unique_ptr<STextureResource>>;
@@ -54,7 +55,8 @@ public:
 	std::string m_Selected = "All";
 	std::unique_ptr<CJson> m_pJson;
 	TextureResourceList m_ImagesList;
+	ImVec2 m_ImageSize;
 	bool m_bTexturesLoaded = false;
 	
-	ResourceStore(const char* text, eResourceType type = TYPE_IMAGE);
+	ResourceStore(const char* text, eResourceType type = TYPE_IMAGE, ImVec2 imageSize = ImVec2(64, 64));
 };
