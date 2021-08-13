@@ -6,10 +6,10 @@ class Animation
 {
 private:
 	inline static char m_nAnimBuffer[INPUT_BUFFER_SIZE];
-	inline static SSearchData m_AnimData{ "animation" };
+	inline static ResourceStore m_AnimData{ "animation", eResourceType::TYPE_TEXT };
 	struct m_Cutscene
 	{
-		inline static SSearchData m_Data{ "cutscene" };
+		inline static ResourceStore m_Data{ "cutscene", eResourceType::TYPE_TEXT };
 		inline static std::string m_SceneName;
 		inline static int m_nInterior;
 		inline static bool m_bRunning;
@@ -38,5 +38,6 @@ public:
 };
 #else
 
+// Dummy Class for GTAVC
 class Animation{};
 #endif

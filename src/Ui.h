@@ -48,10 +48,10 @@ public:
 	static bool CheckboxWithHint(const char* label, bool* state, const char* hint = nullptr, bool is_disabled = false);
 	static void DrawHeaders(CallbackTable& data);
 
-	static void DrawJSON(SSearchData& data,
+	static void DrawJSON(ResourceStore& data,
 						 std::function<void(std::string&, std::string&, std::string&)> func_left_click,
 						 std::function<void(std::string&, std::string&, std::string&)> func_right_click);
-	static void DrawImages(std::vector<std::unique_ptr<STextureStructure>>& img_vec, ImVec2 image_size,
+	static void DrawImages(std::vector<std::unique_ptr<STextureResource>>& img_vec, ImVec2 image_size,
 							std::vector<std::string>& category_vec, std::string& selected_item, ImGuiTextFilter& filter,
 							std::function<void(std::string&)> on_left_click,
 							std::function<void(std::string&)> on_right_click,

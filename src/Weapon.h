@@ -3,8 +3,7 @@
 class Weapon
 {
 public:
-	inline static SSearchData m_WeaponData{ "weapon" };
-	inline static bool m_bImagesLoaded;
+	inline static ResourceStore m_WeaponData{ "weapon", eResourceType::TYPE_TEXT };
 	inline static bool m_bAutoAim;
 	inline static bool m_bFastReload;
 	inline static bool m_bHugeDamage;

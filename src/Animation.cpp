@@ -6,21 +6,20 @@
 
 Animation::Animation()
 {
-	m_AnimData.m_Json.LoadData(m_AnimData.m_Categories, m_AnimData.m_Selected);
-	m_Cutscene::m_Data.m_Json.LoadData(m_Cutscene::m_Data.m_Categories, m_Cutscene::m_Data.m_Selected);
-
 	Events::processScriptsEvent += [this]
 	{
 		if (m_Cutscene::m_bRunning)
 		{
 			if (Command<Commands::HAS_CUTSCENE_FINISHED>())
 			{
-				Command<Commands::CLEAR_CUTSCENE>();
-				m_Cutscene::m_bRunning = false;
-				m_Cutscene::m_SceneName = "";
-				CPlayerPed* player = FindPlayerPed();
-				player->m_nAreaCode = m_Cutscene::m_nInterior;
-				Command<Commands::SET_AREA_VISIBLE>(player->m_nAreaCode);
+				CPlayerPed* pPlayer = FindPlayerPed();
+				if (!pPlayer)
+				{
+					return;
+				}
+
+				pPlayer->m_nAreaCode = m_Cutscene::m_nInterior;
+				Command<Commands::SET_AREA_VISIBLE>(pPlayer->m_nAreaCode);
 				m_Cutscene::m_nInterior = 0;
 				TheCamera.Fade(0, 1);
 			}
@@ -43,10 +42,14 @@ void Animation::PlayCutscene(std::string& rootKey, std::string& cutsceneId, std:
 		SetHelpMessage("Another cutscene is running", false, false, false);
 		return;
 	}
-
+	CPlayerPed* pPlayer = FindPlayerPed();
+	if (!pPlayer)
+	{
+		return;
+	}	
+	
 	m_Cutscene::m_SceneName = cutsceneId;
 	Command<Commands::LOAD_CUTSCENE>(cutsceneId.c_str());
-	CPlayerPed* pPlayer = FindPlayerPed();
 	m_Cutscene::m_nInterior = pPlayer->m_nAreaCode;
 	pPlayer->m_nAreaCode = std::stoi(interior);
 	Command<Commands::SET_AREA_VISIBLE>(pPlayer->m_nAreaCode);
@@ -68,7 +71,9 @@ void Animation::Draw()
 			if (ImGui::Button("Stop animation", Ui::GetSize()))
 			{
 				if (hPlayer)
+				{
 					Command<Commands::CLEAR_CHAR_TASKS>(hPlayer);
+				}
 			}
 
 			ImGui::Spacing();
@@ -126,8 +131,8 @@ void Animation::Draw()
 			ImGui::Spacing();
 			if (ImGui::Button("Add animation", Ui::GetSize()))
 			{
-				m_AnimData.m_Json.m_Data["Custom"][m_nAnimBuffer] = ("0, " + std::string(m_nIfpBuffer));
-				m_AnimData.m_Json.WriteToDisk();
+				m_AnimData.m_pJson->m_Data["Custom"][m_nAnimBuffer] = ("0, " + std::string(m_nIfpBuffer));
+				m_AnimData.m_pJson->WriteToDisk();
 			}
 			ImGui::EndTabItem();
 		}
@@ -174,23 +179,31 @@ void Animation::PlayAnimation(std::string& ifp, std::string& anim, std::string& 
 
 	Command<Commands::CLEAR_CHAR_TASKS>(hplayer);
 	if (m_bSecondary)
+	{
 		Command<Commands::TASK_PLAY_ANIM_SECONDARY>(hplayer, anim.c_str(), ifp.c_str(), 4.0, m_Loop, 0, 0, 0, -1);
+	}
 	else
+	{
 		Command<Commands::TASK_PLAY_ANIM>(hplayer, anim.c_str(), ifp.c_str(), 4.0, m_Loop, 0, 0, 0, -1);
+	}
 
 	if (ifp != "PED")
+	{
 		Command<Commands::REMOVE_ANIMATION>(ifp.c_str());
+	}
 }
 
 void Animation::RemoveAnimation(std::string& ifp, std::string& anim, std::string& ifpRepeat)
 {
 	if (ifp == "Custom")
 	{
-		m_AnimData.m_Json.m_Data["Custom"].erase(anim);
-		m_AnimData.m_Json.WriteToDisk();
+		m_AnimData.m_pJson->m_Data["Custom"].erase(anim);
+		m_AnimData.m_pJson->WriteToDisk();
 		SetHelpMessage("Animation removed", false, false, false);
 	}
 	else
+	{
 		SetHelpMessage("You can only remove custom anims", false, false, false);
+	}
 }
 #endif

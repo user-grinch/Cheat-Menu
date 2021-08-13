@@ -86,14 +86,6 @@ void Paint::ResetAfterRenderEvent(CVehicle* pVeh)
 
 Paint::Paint()
 {
-	Events::processScriptsEvent += [] 
-	{
-		if (!m_bImagesLoaded)
-		{
-			Util::LoadTextureDirectory(m_TextureData, PLUGIN_PATH((char*)"CheatMenu\\textures.txd"));
-			m_bImagesLoaded = true;
-		}
-	};
 	Events::vehicleRenderEvent.before += RenderEvent;
 	Events::vehicleResetAfterRender += ResetAfterRenderEvent;
 }

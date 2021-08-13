@@ -8,12 +8,6 @@ Weapon::Weapon()
 {
 	Events::processScriptsEvent += []
 	{
-		if (!m_bImagesLoaded)
-		{
-			Util::LoadTextureDirectory(m_WeaponData, PLUGIN_PATH((char*)"CheatMenu\\weapons.txd"));
-			m_bImagesLoaded = true;
-		}
-
 		CPlayerPed* player = FindPlayerPed();
 		if (m_bAutoAim)
 		{
@@ -233,12 +227,12 @@ void Weapon::Draw()
 
 			ImGui::Spacing();
 			ImGui::Text("Current weapon: %s",
-						m_WeaponData.m_Json.m_Data[std::to_string(m_nGangWeaponList[m_nSelectedGang][m_nSelectedWeapon])].get<
+						m_WeaponData.m_pJson->m_Data[std::to_string(m_nGangWeaponList[m_nSelectedGang][m_nSelectedWeapon])].get<
 							std::string>().c_str());
 			ImGui::Spacing();
 			Ui::DrawImages(m_WeaponData.m_ImagesList, ImVec2(65, 65), m_WeaponData.m_Categories, m_WeaponData.m_Selected,
 						   m_WeaponData.m_Filter, SetGangWeapon, nullptr,
-						   [](std::string str) { return m_WeaponData.m_Json.m_Data[str].get<std::string>(); },
+						   [](std::string str) { return m_WeaponData.m_pJson->m_Data[str].get<std::string>(); },
 						   [](std::string str) { return str != "-1"; /*Jetpack*/ }
 			);
 			ImGui::EndTabItem();
@@ -253,7 +247,7 @@ void Weapon::Draw()
 			}
 			Ui::DrawImages(m_WeaponData.m_ImagesList, ImVec2(65, 65), m_WeaponData.m_Categories, m_WeaponData.m_Selected,
 						   m_WeaponData.m_Filter, GiveWeaponToPlayer, nullptr,
-						   [](std::string str) { return m_WeaponData.m_Json.m_Data[str].get<std::string>(); },
+						   [](std::string str) { return m_WeaponData.m_pJson->m_Data[str].get<std::string>(); },
 						   [](std::string str) { return str != "0"; /*Unarmed*/ }
 			);
 			ImGui::EndTabItem();

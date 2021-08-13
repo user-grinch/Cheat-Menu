@@ -28,9 +28,6 @@ void Game::RealTimeClock()
 
 Game::Game()
 {
-	m_MissionData.m_Json.LoadData(m_MissionData.m_Categories, m_MissionData.m_Selected);
-	m_StatData.m_Json.LoadData(m_StatData.m_Categories, m_StatData.m_Selected);
-
 	// Generate enabled cheats vector
 	for (auto element : m_RandomCheats::m_Json.m_Data.items())
 	{
@@ -605,7 +602,7 @@ It's recommanded not to save after using the mission loader. Use it at your own 
 			ImGui::Spacing();
 
 			ImGui::BeginChild("STATCHILD");
-			for (auto root : m_StatData.m_Json.m_Data.items())
+			for (auto root : m_StatData.m_pJson->m_Data.items())
 			{
 				if (root.key() == m_StatData.m_Selected || m_StatData.m_Selected == "All")
 				{

@@ -1,6 +1,10 @@
 #pragma once
 #include "../Depend/json.hpp"
 
+/*
+	Wrapper class for nlohmann::json
+	Contains helper methods 
+*/
 class CJson
 {
 private:
@@ -26,7 +30,9 @@ public:
 			nlohmann::json* json = &m_Data;
 
 			while (getline(ss, line, '.'))
+			{
 				json = &((*json)[line]);
+			}
 
 			// json library bugs with bool, using int instead
 			if (typeid(T) == typeid(bool))
@@ -52,7 +58,9 @@ public:
 			nlohmann::json* json = &m_Data;
 
 			while (getline(ss, line, '.'))
+			{
 				json = &((*json)[line]);
+			}
 
 			return json->get<std::string>();
 		}
@@ -66,7 +74,6 @@ public:
 		Allows to save values in json hierarchy using '.'
 		Example: "Menu.Window.X"
 	*/
-
 	template <typename T>
 	void SetValue(std::string&& key, T& val)
 	{
@@ -76,13 +83,20 @@ public:
 		nlohmann::json* json = &m_Data;
 
 		while (getline(ss, line, '.'))
+		{
 			json = &((*json)[line]);
+
+		}
 
 		// json library bugs with bool, using int instead
 		if (typeid(T) == typeid(bool))
+		{
 			*json = (val ? 1 : 0);
+		}
 		else
+		{
 			*json = val;
+		}
 	}
 
 	template <>
@@ -94,16 +108,12 @@ public:
 		nlohmann::json* json = &m_Data;
 
 		while (getline(ss, line, '.'))
+		{
 			json = &((*json)[line]);
+		}
 
 		*json = val;
 	}
-
-	/*
-		Loads the section names into a category vector.
-		Used to create drop down category menus
-	*/
-	void LoadData(std::vector<std::string>& vec, std::string& selected);
 
 	/*
 		Saves json data to disk

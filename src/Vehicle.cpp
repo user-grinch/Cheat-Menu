@@ -33,19 +33,10 @@ Vehicle::Vehicle()
 #ifdef GTASA
 	ParseVehiclesIDE();
 #endif
-	ParseCarcolsDAT();
 
 	Events::processScriptsEvent += [this]
 	{
-#ifdef GTASA
-		if (!m_bImagesLoaded)
-		{
-			Util::LoadTextureDirectory(m_Spawner::m_VehData, PLUGIN_PATH((char*)"CheatMenu\\vehicles.txd"));
-			Util::LoadTextureDirectory(m_TuneData, PLUGIN_PATH((char*)"CheatMenu\\components.txd"));
-			m_bImagesLoaded = true;
-		}
-#endif
-
+		ParseCarcolsDAT();
 		uint timer = CTimer::m_snTimeInMilliseconds;
 		CPlayerPed* pPlayer = FindPlayerPed();
 		CVehicle* pVeh = pPlayer->m_pVehicle;
@@ -326,11 +317,72 @@ void Vehicle::ParseVehiclesIDE()
 	}
 	else flog << "Vehicle.ide file not found";
 }
+
+
+void Vehicle::GenerateHandlingDataFile(int phandling)
+{
+	FILE* fp = fopen("handling.txt", "w");
+
+	std::string handlingId = m_VehicleIDE[FindPlayerPed()->m_pVehicle->m_nModelIndex];
+	float fMass = patch::Get<float>(phandling + 0x4);
+	float fTurnMass = patch::Get<float>(phandling + 0xC);
+	float fDragMult = patch::Get<float>(phandling + 0x10);
+	float CentreOfMassX = patch::Get<float>(phandling + 0x14);
+	float CentreOfMassY = patch::Get<float>(phandling + 0x18);
+	float CentreOfMassZ = patch::Get<float>(phandling + 0x1C);
+	int nPercentSubmerged = patch::Get<int>(phandling + 0x20);
+	float fTractionMultiplier = patch::Get<float>(phandling + 0x28);
+	float fTractionLoss = patch::Get<float>(phandling + 0xA4);
+	float TractionBias = patch::Get<float>(phandling + 0xA8);
+	float fEngineAcceleration = patch::Get<float>(phandling + 0x7C) * 12500;
+	float fEngineInertia = patch::Get<float>(phandling + 0x80);
+	int nDriveType = patch::Get<BYTE>(phandling + 0x74);
+	int nEngineType = patch::Get<BYTE>(phandling + 0x75);
+	float BrakeDeceleration = patch::Get<float>(phandling + 0x94) * 2500;
+	float BrakeBias = patch::Get<float>(phandling + 0x98);
+	int ABS = patch::Get<BYTE>(phandling + 0x9C);
+	float SteeringLock = patch::Get<float>(phandling + 0xA0);
+	float SuspensionForceLevel = patch::Get<float>(phandling + 0xAC);
+	float SuspensionDampingLevel = patch::Get<float>(phandling + 0xB0);
+	float SuspensionHighSpdComDamp = patch::Get<float>(phandling + 0xB4);
+	float Suspension_upper_limit = patch::Get<float>(phandling + 0xB8);
+	float Suspension_lower_limit = patch::Get<float>(phandling + 0xBC);
+	float Suspension_bias = patch::Get<float>(phandling + 0xC0);
+	float Suspension_anti_dive_multiplier = patch::Get<float>(phandling + 0xC4);
+	float fCollisionDamageMultiplier = patch::Get<float>(phandling + 0xC8) * 0.338;
+	int nMonetaryValue = patch::Get<int>(phandling + 0xD8);
+
+	int MaxVelocity = patch::Get<float>(phandling + 0x84);
+	MaxVelocity = MaxVelocity * 206 + (MaxVelocity - 0.918668) * 1501;
+
+	int modelFlags = patch::Get<int>(phandling + 0xCC);
+	int handlingFlags = patch::Get<int>(phandling + 0xD0);
+
+	int front_lights = patch::Get<BYTE>(phandling + 0xDC);
+	int rear_lights = patch::Get<BYTE>(phandling + 0xDD);
+	int vehicle_anim_group = patch::Get<BYTE>(phandling + 0xDE);
+	int nNumberOfGears = patch::Get<BYTE>(phandling + 0x76);
+	float fSeatOffsetDistance = patch::Get<float>(phandling + 0xD4);
+
+	fprintf(
+		fp,
+		"\n%s\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%d\t%.5g\t%.5g\t%.5g\t%d\t%d\t%.5g\t%.5g\t%c\t%c\t%.5g\t%.5g\t%d\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%d\t%d\t%d\t%d\t%d\t%d",
+		handlingId.c_str(), fMass, fTurnMass, fDragMult, CentreOfMassX, CentreOfMassY, CentreOfMassZ, nPercentSubmerged,
+		fTractionMultiplier, fTractionLoss, TractionBias, nNumberOfGears,
+		MaxVelocity, fEngineAcceleration, fEngineInertia, nDriveType, nEngineType, BrakeDeceleration, BrakeBias, ABS,
+		SteeringLock, SuspensionForceLevel, SuspensionDampingLevel,
+		SuspensionHighSpdComDamp, Suspension_upper_limit, Suspension_lower_limit, Suspension_bias,
+		Suspension_anti_dive_multiplier, fSeatOffsetDistance,
+		fCollisionDamageMultiplier, nMonetaryValue, modelFlags, handlingFlags, front_lights, rear_lights,
+		vehicle_anim_group);
+
+	fclose(fp);
+}
 #endif 
 
 void Vehicle::ParseCarcolsDAT()
 {
-	std::string m_FilePath = std::string(paths::GetGameDirPathA()) + "/data/carcols.dat";
+	std::string m_FilePath = GAME_PATH((char*)"/data/carcols.dat");
 
 	if (fs::exists(m_FilePath))
 	{
@@ -431,9 +483,12 @@ void Vehicle::ParseCarcolsDAT()
 	}
 }
 
-void Vehicle::SpawnVehicle(std::string& smodel)
-{
 #ifdef GTASA
+void Vehicle::SpawnVehicle(std::string& smodel)
+#elif GTAVC
+void Vehicle::SpawnVehicle(std::string& rootkey, std::string& vehName, std::string& smodel)
+#endif
+{
 	CPlayerPed* player = FindPlayerPed();
 	int hplayer = CPools::GetPedRef(player);
 
@@ -458,6 +513,7 @@ void Vehicle::SpawnVehicle(std::string& smodel)
 
 			Command<Commands::WARP_CHAR_FROM_CAR_TO_COORD>(hplayer, pos.x, pos.y, pos.z);
 
+#ifdef GTASA
 			if (pveh->m_nVehicleClass == VEHICLE_TRAIN)
 			{
 				Command<Commands::DELETE_MISSION_TRAIN>(hveh);
@@ -466,6 +522,9 @@ void Vehicle::SpawnVehicle(std::string& smodel)
 			{
 				Command<Commands::DELETE_CAR>(hveh);
 			}
+#elif GTAVC
+			Command<Commands::DELETE_CAR>(hveh);
+#endif
 		}
 
 		if (interior == 0)
@@ -480,6 +539,7 @@ void Vehicle::SpawnVehicle(std::string& smodel)
 			}
 		}
 
+#ifdef GTASA
 		if (CModelInfo::IsTrainModel(imodel))
 		{
 			int train_id = GetRandomTrainIdForModel(imodel);
@@ -527,38 +587,58 @@ void Vehicle::SpawnVehicle(std::string& smodel)
 		}
 		else
 		{
+#endif
 			CStreaming::RequestModel(imodel, PRIORITY_REQUEST);
 			CStreaming::LoadAllRequestedModels(false);
-
+#ifdef GTASA
 			if (m_Spawner::m_nLicenseText[0] != '\0')
 			{
 				Command<Commands::CUSTOM_PLATE_FOR_NEXT_CAR>(imodel, m_Spawner::m_nLicenseText);
 			}
-
+#endif
 			int hveh = 0;
 			if (m_Spawner::m_bSpawnInside)
 			{
 				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 4.0f, &hveh);
 				veh = CPools::GetVehicle(hveh);
+#ifdef GTASA
 				veh->SetHeading(player->GetHeading());
+#elif GTAVC
+				float x,y,z;
+				player->m_placement.GetOrientation(x, y, z);
+				veh->m_placement.SetOrientation(x, y, z);
+#endif
 				Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
 				Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, speed);
 			}
 			else
 			{
+#ifdef GTASA
 				player->TransformFromObjectSpace(pos, CVector(0, 10, 0));
+#elif GTAVC
+				player->TransformFromObjectSpace(pos);
+#endif				
 				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 3.0f, &hveh);
 				veh = CPools::GetVehicle(hveh);
+#ifdef GTASA
 				veh->SetHeading(player->GetHeading() + 55.0f);
+#elif GTAVC
+				float x,y,z;
+				player->m_placement.GetOrientation(x, y, z);
+				veh->m_placement.SetOrientation(x, y, z);
+#endif
 			}
 			BY_GAME(veh->m_nDoorLock, veh->m_nLockStatus) = CARLOCK_UNLOCKED;
 			BY_GAME(veh->m_nAreaCode, veh->m_nInterior) = interior;
 			Command<Commands::MARK_CAR_AS_NO_LONGER_NEEDED>(CPools::GetVehicleRef(veh));
 			CStreaming::SetModelIsDeletable(imodel);
+#ifdef GTASA
 		}
 		veh->m_nVehicleFlags.bHasBeenOwnedByPlayer = true;
-	}
+#elif GTAVC
+		Command<Commands::RESTORE_CAMERA_JUMPCUT>();
 #endif
+	}
 }
 
 std::string Vehicle::GetNameFromModel(int model)
@@ -583,67 +663,6 @@ int Vehicle::GetModelFromName(const char* name)
 	}
 }
 
-void Vehicle::GenerateHandlingDataFile(int phandling)
-{
-	FILE* fp = fopen("handling.txt", "w");
-
-	std::string handlingId = m_VehicleIDE[FindPlayerPed()->m_pVehicle->m_nModelIndex];
-	float fMass = patch::Get<float>(phandling + 0x4);
-	float fTurnMass = patch::Get<float>(phandling + 0xC);
-	float fDragMult = patch::Get<float>(phandling + 0x10);
-	float CentreOfMassX = patch::Get<float>(phandling + 0x14);
-	float CentreOfMassY = patch::Get<float>(phandling + 0x18);
-	float CentreOfMassZ = patch::Get<float>(phandling + 0x1C);
-	int nPercentSubmerged = patch::Get<int>(phandling + 0x20);
-	float fTractionMultiplier = patch::Get<float>(phandling + 0x28);
-	float fTractionLoss = patch::Get<float>(phandling + 0xA4);
-	float TractionBias = patch::Get<float>(phandling + 0xA8);
-	float fEngineAcceleration = patch::Get<float>(phandling + 0x7C) * 12500;
-	float fEngineInertia = patch::Get<float>(phandling + 0x80);
-	int nDriveType = patch::Get<BYTE>(phandling + 0x74);
-	int nEngineType = patch::Get<BYTE>(phandling + 0x75);
-	float BrakeDeceleration = patch::Get<float>(phandling + 0x94) * 2500;
-	float BrakeBias = patch::Get<float>(phandling + 0x98);
-	int ABS = patch::Get<BYTE>(phandling + 0x9C);
-	float SteeringLock = patch::Get<float>(phandling + 0xA0);
-	float SuspensionForceLevel = patch::Get<float>(phandling + 0xAC);
-	float SuspensionDampingLevel = patch::Get<float>(phandling + 0xB0);
-	float SuspensionHighSpdComDamp = patch::Get<float>(phandling + 0xB4);
-	float Suspension_upper_limit = patch::Get<float>(phandling + 0xB8);
-	float Suspension_lower_limit = patch::Get<float>(phandling + 0xBC);
-	float Suspension_bias = patch::Get<float>(phandling + 0xC0);
-	float Suspension_anti_dive_multiplier = patch::Get<float>(phandling + 0xC4);
-	float fCollisionDamageMultiplier = patch::Get<float>(phandling + 0xC8) * 0.338;
-	int nMonetaryValue = patch::Get<int>(phandling + 0xD8);
-
-	int MaxVelocity = patch::Get<float>(phandling + 0x84);
-	MaxVelocity = MaxVelocity * 206 + (MaxVelocity - 0.918668) * 1501;
-
-	int modelFlags = patch::Get<int>(phandling + 0xCC);
-	int handlingFlags = patch::Get<int>(phandling + 0xD0);
-
-	int front_lights = patch::Get<BYTE>(phandling + 0xDC);
-	int rear_lights = patch::Get<BYTE>(phandling + 0xDD);
-	int vehicle_anim_group = patch::Get<BYTE>(phandling + 0xDE);
-	int nNumberOfGears = patch::Get<BYTE>(phandling + 0x76);
-	float fSeatOffsetDistance = patch::Get<float>(phandling + 0xD4);
-
-	fprintf(
-		fp,
-		"\n%s\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%d\t%.5g\t%.5g\t%.5g\t%d\t%d\t%.5g\t%.5g\t%c\t%c\t%.5g\t%.5g\t%d\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%d\t%d\t%d\t%d\t%d\t%d",
-		handlingId.c_str(), fMass, fTurnMass, fDragMult, CentreOfMassX, CentreOfMassY, CentreOfMassZ, nPercentSubmerged,
-		fTractionMultiplier, fTractionLoss, TractionBias, nNumberOfGears,
-		MaxVelocity, fEngineAcceleration, fEngineInertia, nDriveType, nEngineType, BrakeDeceleration, BrakeBias, ABS,
-		SteeringLock, SuspensionForceLevel, SuspensionDampingLevel,
-		SuspensionHighSpdComDamp, Suspension_upper_limit, Suspension_lower_limit, Suspension_bias,
-		Suspension_anti_dive_multiplier, fSeatOffsetDistance,
-		fCollisionDamageMultiplier, nMonetaryValue, modelFlags, handlingFlags, front_lights, rear_lights,
-		vehicle_anim_group);
-
-	fclose(fp);
-}
-
-
 void Vehicle::Draw()
 {
 	ImGui::Spacing();
@@ -653,14 +672,10 @@ void Vehicle::Draw()
 
 	if (ImGui::Button("Blow up cars", ImVec2(Ui::GetSize(BY_GAME(3,2)))))
 	{
-#ifdef GTASA
-		Call<0x439D80>();
-#elif GTAVC
 		for (CVehicle *pVeh : CPools::ms_pVehiclePool)
 		{
-			pVeh->BlowUpCar(pPlayer);
+			BY_GAME(pVeh->BlowUpCar(pPlayer, false), pVeh->BlowUpCar(pPlayer));
 		}
-#endif
 	}
 
 	ImGui::SameLine();
@@ -705,15 +720,17 @@ void Vehicle::Draw()
 			ImGui::Spacing();
 			ImGui::BeginChild("CheckboxesChild");
 			ImGui::Columns(2, 0, false);
-
+#ifdef GTASA
 			Ui::CheckboxAddress("Aggressive drivers", 0x96914F);
 			Ui::CheckboxAddress("Aim while driving", 0x969179);
 			Ui::CheckboxAddress("All cars have nitro", 0x969165);
-			Ui::CheckboxAddress("All taxis have nitro", 0x96918B);
+#endif
+			Ui::CheckboxAddress("All taxis have nitro", BY_GAME(0x96918B,0xA10B3A));
 			Ui::CheckboxWithHint("Bikes fly", &m_bBikeFly);
-			Ui::CheckboxAddress("Boats fly", 0x969153);
-			Ui::CheckboxAddress("Cars fly", 0x969160);
+			Ui::CheckboxAddress("Boats fly", BY_GAME(0x969153,0xA10B11));
+			Ui::CheckboxAddress("Cars fly", BY_GAME(0x969160,0xA10B28));
 			Ui::CheckboxWithHint("Cars heavy", &m_bVehHeavy);
+			
 			if (Ui::CheckboxWithHint("Damage proof", &m_bNoDamage,
 				"Every vehicle entered will be damage proof\nBullet, Collision, Explosion, Fire, Meele etc"))
 			{
@@ -735,21 +752,28 @@ void Vehicle::Draw()
 #endif
 				}
 			}
+#ifdef GTASA
 			Ui::CheckboxAddress("Decreased traffic", 0x96917A);
-
+#endif
 			ImGui::NextColumn();
-
+#ifdef GTASA
 			Ui::CheckboxWithHint("Don't fall off bike", &m_bDontFallBike);
-			Ui::CheckboxAddress("Drive on water", 0x969152);
+#endif
+			Ui::CheckboxAddress("Drive on water", BY_GAME(0x969152,0xA10B81));
+#ifdef GTASA
 			Ui::CheckboxAddressEx("Lock train camera", 0x52A52F, 171, 6);
 			Ui::CheckboxAddress("Float away when hit", 0x969166);
-			Ui::CheckboxAddress("Green traffic lights", 0x96914E);
+#endif
+			Ui::CheckboxAddress("Green traffic lights", BY_GAME(0x96914E,0xA10ADC));
+#ifdef GTASA
 			Ui::CheckboxAddress("Perfect handling", 0x96914C);
 			Ui::CheckboxAddress("Tank mode", 0x969164);
+
 			Ui::CheckboxWithHint("Unlimited nitro", &m_UnlimitedNitro::m_bEnabled, "Nitro will activate when left clicked\n\
 \nEnabling this would disable\nAll cars have nitro\nAll taxis have nitro");
+#endif
 			Ui::CheckboxWithHint("Watertight car", &m_bVehWatertight);
-			Ui::CheckboxAddress("Wheels only", 0x96914B);
+			Ui::CheckboxAddress("Wheels only", BY_GAME(0x96914B,0xA10B70));
 			ImGui::Columns(1);
 
 			if (is_driver)
@@ -947,6 +971,7 @@ void Vehicle::Draw()
 				ImGui::Spacing();
 				ImGui::Separator();
 			}
+#ifdef GTASA			
 			if (ImGui::CollapsingHeader("Traffic options"))
 			{
 				static std::vector<Ui::NamedMemory> color{ {"Black", 0x969151}, {"Pink", 0x969150} };
@@ -960,14 +985,14 @@ void Vehicle::Draw()
 				ImGui::Spacing();
 				ImGui::Separator();
 			}
-
+#endif
 			if (pPlayer && pPlayer->m_pVehicle)
 			{
 				CVehicle* pVeh = pPlayer->m_pVehicle;
 				int hVeh = CPools::GetVehicleRef(pVeh);
 
-				Ui::EditFloat("Dirt level", (int)pVeh + 0x4B0, 0, 7.5, 15);
 #ifdef GTASA
+				Ui::EditFloat("Dirt level", (int)pVeh + 0x4B0, 0, 7.5, 15);
 				if (pVeh->m_nVehicleClass == VEHICLE_AUTOMOBILE && ImGui::CollapsingHeader("Doors"))
 				{
 					ImGui::Columns(2, 0, false);
@@ -1077,6 +1102,7 @@ void Vehicle::Draw()
 
 
 			ImGui::Spacing();
+#ifdef GTASA
 			ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() - 2.5);
 			ImGui::InputTextWithHint("##LicenseText", "License plate text", m_Spawner::m_nLicenseText, 9);
 
@@ -1086,16 +1112,19 @@ void Vehicle::Draw()
 						   {
 							   return GetNameFromModel(std::stoi(str));
 						   });
-
+#elif GTAVC
+			Ui::DrawJSON(m_Spawner::m_VehData, SpawnVehicle, nullptr);
+#endif
 			ImGui::EndTabItem();
 		}
-#ifdef GTASA
-		if (pPlayer->m_pVehicle && pPlayer->m_nPedFlags.bInVehicle)
+
+		if (pPlayer->m_pVehicle && Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer))
 		{
 			CVehicle* veh = FindPlayerPed()->m_pVehicle;
 			int hveh = CPools::GetVehicleRef(veh);
 			if (ImGui::BeginTabItem("Color"))
 			{
+#ifdef GTASA
 				Paint::UpdateNodeListRecursive(veh);
 
 				ImGui::Spacing();
@@ -1115,7 +1144,7 @@ void Vehicle::Draw()
 					uchar b = m_Color::m_fColorPicker[2] * 255;
 					Paint::SetNodeColor(veh, Paint::veh_nodes::selected, { r, g, b, 255 }, m_Color::m_bMatFilter);
 				}
-
+#endif
 				ImGui::Spacing();
 				ImGui::Columns(2, NULL, false);
 				ImGui::Checkbox("Material filter", &m_Color::m_bMatFilter);
@@ -1140,14 +1169,20 @@ void Vehicle::Draw()
 				ImGui::BeginChild("Colorss");
 
 				if (m_Color::bShowAll)
+				{
 					for (int colorId = 0; colorId < count; ++colorId)
 					{
 						if (Ui::ColorButton(colorId, m_CarcolsColorData[colorId], ImVec2(btnSize, btnSize)))
+						{
 							*(uint8_replacement*)(int(veh) + 0x433 + m_Color::m_nRadioButton) = colorId;
+						}
 
 						if ((colorId + 1) % btnsInRow != 0)
+						{
 							ImGui::SameLine(0.0, 4.0);
+						}
 					}
+				}
 				else
 				{
 					std::string vehName = GetNameFromModel(pPlayer->m_pVehicle->m_nModelIndex);
@@ -1160,10 +1195,14 @@ void Vehicle::Draw()
 							{
 								if (Ui::ColorButton(colorId, m_CarcolsColorData[colorId],
 									ImVec2(btnSize, btnSize)))
+								{
 									*(uint8_replacement*)(int(veh) + 0x433 + m_Color::m_nRadioButton) = colorId;
+								}
 
 								if (count % btnsInRow != 0)
+								{
 									ImGui::SameLine(0.0, 4.0);
+								}
 								++count;
 							}
 
@@ -1175,6 +1214,7 @@ void Vehicle::Draw()
 				ImGui::EndChild();
 				ImGui::EndTabItem();
 			}
+#ifdef GTASA
 			if (Globals::renderer != Render_DirectX11)
 			{
 				if (ImGui::BeginTabItem("Neons"))
@@ -1395,8 +1435,8 @@ void Vehicle::Draw()
 
 				ImGui::EndTabItem();
 			}
-		}
 #endif
+		}
 		ImGui::EndTabBar();
 	}
 }

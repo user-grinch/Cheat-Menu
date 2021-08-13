@@ -5,7 +5,6 @@ class Player
 {
 private:
 	inline static bool m_bGodMode;
-	inline static bool m_bImagesLoaded;
 	inline static bool m_bModloaderInstalled;
 	struct m_KeepPosition
 	{
@@ -16,7 +15,7 @@ private:
 #ifdef GTASA
 	inline static bool m_bAimSkinChanger;
 	inline static int m_nUiBodyState;
-	inline static SSearchData m_ClothData;
+	inline static ResourceStore m_ClothData { "clothes" };
 	struct m_CustomSkins
 	{
 		inline static std::string m_Path = paths::GetGameDirPathA() + std::string("\\modloader\\Custom Skins\\");;
@@ -24,7 +23,7 @@ private:
 		inline static std::vector<std::string> m_List;
 	};
 #elif GTAVC
-	inline static SSearchData skinData{ "skin" };
+	inline static ResourceStore skinData{ "skin", eResourceType::TYPE_TEXT };
 #endif
 
 public:

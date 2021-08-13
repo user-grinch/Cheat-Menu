@@ -347,7 +347,7 @@ bool Ui::CheckboxBitFlag(const char* label, uint flag, const char* hint)
 	return rtn;
 }
 
-void Ui::DrawJSON(SSearchData& data,
+void Ui::DrawJSON(ResourceStore& data,
 				std::function<void(std::string&, std::string&, std::string&)> func_left_click,
 				std::function<void(std::string&, std::string&, std::string&)> func_right_click)
 {
@@ -376,7 +376,7 @@ void Ui::DrawJSON(SSearchData& data,
 
 
 	ImGui::BeginChild(1);
-	for (auto root : data.m_Json.m_Data.items())
+	for (auto root : data.m_pJson->m_Data.items())
 	{
 		if (root.key() == data.m_Selected || data.m_Selected == "All")
 		{
@@ -483,7 +483,7 @@ void Ui::FilterWithHint(const char* label, ImGuiTextFilter& filter, const char* 
 }
 
 // clean up the code someday
-void Ui::DrawImages(std::vector<std::unique_ptr<STextureStructure>>& img_vec, ImVec2 image_size,
+void Ui::DrawImages(std::vector<std::unique_ptr<STextureResource>>& img_vec, ImVec2 image_size,
 					std::vector<std::string>& category_vec, std::string& selected_item, ImGuiTextFilter& filter,
 					std::function<void(std::string&)> on_left_click, std::function<void(std::string&)> on_right_click,
 					std::function<std::string(std::string&)> get_name_func,

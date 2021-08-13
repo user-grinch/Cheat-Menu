@@ -15,9 +15,11 @@ void Teleport::FetchRadarSpriteData()
 
 	// Update the radar list each 5 seconds
 	if (cur_timer - timer < 5000)
+	{
 		return;
+	}
 
-	tp_data.m_Json.m_Data.erase("Radar");
+	tp_data.m_pJson->m_Data.erase("Radar");
 
 	// 175 is the max number of sprites, FLA can increase this limit, might need to update this
 	for (int i = 0; i != 175; ++i)
@@ -27,7 +29,7 @@ void Teleport::FetchRadarSpriteData()
 		auto sprite_name = m_SpriteJson.m_Data[std::to_string(sprite)].get<std::string>();
 		std::string key_name = sprite_name + ", " + Util::GetLocationName(&pos);
 
-		tp_data.m_Json.m_Data["Radar"][key_name] = "0, " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " +
+		tp_data.m_pJson->m_Data["Radar"][key_name] = "0, " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " +
 			std::to_string(pos.z);
 
 		/*
@@ -41,7 +43,6 @@ void Teleport::FetchRadarSpriteData()
 
 Teleport::Teleport()
 {
-	tp_data.m_Json.LoadData(tp_data.m_Categories, tp_data.m_Selected);
 	m_bQuickTeleport = config.GetValue("quick_teleport", false);
 
 	Events::processScriptsEvent += []
@@ -61,9 +62,13 @@ Teleport::Teleport()
 			CVehicle* pVeh = player->m_pVehicle;
 
 			if (pVeh && BY_GAME(player->m_nPedFlags.bInVehicle, player->m_pVehicle))
+			{
 				BY_GAME(pVeh->Teleport(m_Teleport::m_fPos, false), pVeh->Teleport(m_Teleport::m_fPos));
+			}
 			else
+			{
 				BY_GAME(player->Teleport(m_Teleport::m_fPos, false), player->Teleport(m_Teleport::m_fPos));
+			}
 
 			m_Teleport::m_bEnabled = false;
 			Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(player), false);
@@ -83,7 +88,7 @@ Teleport::Teleport()
 	};
 }
 
-void Teleport::TeleportPlayer(bool get_marker, CVector pos, short interior_id)
+void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
 {
 	CPlayerPed* pPlayer = FindPlayerPed();
 	CVehicle* pVeh = pPlayer->m_pVehicle;
@@ -150,24 +155,10 @@ void Teleport::TeleportToLocation(std::string& rootkey, std::string& bLocName, s
 {
 	try
 	{
-		int interior = 0;
+		int dimension = 0;
 		CVector pos;
-		std::stringstream ss(loc);
-		std::string temp;
-
-		std::getline(ss, temp, ',');
-		interior = std::stoi(temp);
-
-		std::getline(ss, temp, ',');
-		pos.x = std::stof(temp);
-
-		std::getline(ss, temp, ',');
-		pos.y = std::stof(temp);
-
-		std::getline(ss, temp, ',');
-		pos.z = std::stof(temp);
-
-		TeleportPlayer(false, pos, static_cast<short>(interior));
+		sscanf(loc.c_str(), "%d,%f,%f,%f", &dimension, &pos.x, &pos.y, &pos.z);
+		TeleportPlayer(false, pos, dimension);
 	}
 	catch (...)
 	{
@@ -179,11 +170,14 @@ void Teleport::RemoveTeleportEntry(std::string& category, std::string& key, std:
 {
 	if (category == "Custom")
 	{
-		tp_data.m_Json.m_Data["Custom"].erase(key);
+		tp_data.m_pJson->m_Data["Custom"].erase(key);
 		SetHelpMessage("Location removed", false, false, false);
-		tp_data.m_Json.WriteToDisk();
+		tp_data.m_pJson->WriteToDisk();
 	}
-	else SetHelpMessage("You can only remove custom location", false, false, false);
+	else 
+	{
+		SetHelpMessage("You can only remove custom location", false, false, false);
+	}
 }
 
 void Teleport::Draw()
@@ -225,21 +219,12 @@ void Teleport::Draw()
 
 				if (ImGui::Button("Teleport to coord", Ui::GetSize(2)))
 				{
-					std::stringstream ss(m_nInputBuffer);
-					std::string temp;
-					CVector pos(0, 0, 0);
+					CVector pos;
 
 					try
 					{
-						getline(ss, temp, ',');
-						pos.x = std::stof(temp);
-
-						getline(ss, temp, ',');
-						pos.y = std::stof(temp);
-
-						getline(ss, temp, ',');
-						pos.z = std::stof(temp) + 1.0f;
-
+						sscanf(m_nInputBuffer,"%f,%f,%f", &pos.x, &pos.y, &pos.z);
+						pos.z += 1.0f;
 						TeleportPlayer(false, pos);
 					}
 					catch (...)
@@ -283,15 +268,15 @@ void Teleport::Draw()
 			ImGui::Spacing();
 			if (ImGui::Button("Add location", Ui::GetSize()))
 			{
-				tp_data.m_Json.m_Data["Custom"][m_nLocationBuffer] = ("0, " + std::string(m_nInputBuffer));
+				tp_data.m_pJson->m_Data["Custom"][m_nLocationBuffer] = ("0, " + std::string(m_nInputBuffer));
 
 				#ifdef GTASA
 				// Clear the Radar coordinates
-				tp_data.m_Json.m_Data.erase("Radar");
-				tp_data.m_Json.m_Data["Radar"] = {};
+				tp_data.m_pJson->m_Data.erase("Radar");
+				tp_data.m_pJson->m_Data["Radar"] = {};
 				#endif
 
-				tp_data.m_Json.WriteToDisk();
+				tp_data.m_pJson->WriteToDisk();
 			}
 			ImGui::EndTabItem();
 		}

@@ -192,14 +192,16 @@ void MenuThread(void* param)
 	Hook::ApplyMouseFix();
 #endif
 
-// Wait till the game is initialized
+	// Wait till game init
 	Events::initRwEvent += []
 	{
 		bGameInit = true;
 	};
 
 	while (!bGameInit)
+	{
 		Sleep(1000);
+	}
 
 	if (GetModuleHandle("SAMP.dll"))
 	{
@@ -212,7 +214,7 @@ void MenuThread(void* param)
 	CFastman92limitAdjuster::Init();
 	CheatMenu menu;
 
-	time_t     now = time(0);
+	time_t now = time(0);
 	struct tm  tstruct = *localtime(&now);
 	int last_check_date = config.GetValue("config.last_update_checked", 0);
 
@@ -227,7 +229,9 @@ void MenuThread(void* param)
 		Sleep(5000);
 
 		if (Updater::m_State == UPDATER_CHECKING)
+		{
 			Updater::CheckForUpdate();
+		}
 	}
 }
 
@@ -246,6 +250,8 @@ BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
 			MessageBox(HWND_DESKTOP, "Unknown game version. GTA SA v1.0 US is required.", "CheatMenu", MB_ICONERROR);
 		}
 #elif GTAVC
+		MessageBox(RsGlobal.ps->window, "Unknown game version. GTA VC v1.0 EN is required.", "CheatMenu", MB_ICONERROR);
+
 		if (gameVersion == GAME_10EN)
 		{
 			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&MenuThread, nullptr, NULL, nullptr);

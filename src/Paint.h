@@ -70,11 +70,10 @@ private:
 		void resetMaterialColor(RpMaterial* material);
 		void resetMaterialTexture(RpMaterial* material);
 	};
-	inline static bool m_bImagesLoaded;
 	inline static VehicleExtendedData<VehData> m_VehData;
 
 protected:
-	inline static SSearchData m_TextureData;
+	inline static ResourceStore m_TextureData { "textures" };
 
 	struct veh_nodes
 	{

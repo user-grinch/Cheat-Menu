@@ -26,6 +26,4 @@ public:
 	static void RainbowValues(int& r, int& g, int& b, float speed);
 	static void GetCPUUsageInit();
 	static double GetCurrentCPUUsage();
-	static void* GetTextureFromRaster(RwTexture* pTexture);
-	static void LoadTextureDirectory(SSearchData& data, char* path, bool pass_full_name = false);
 };

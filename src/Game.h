@@ -1,8 +1,9 @@
 #pragma once
+#include "pch.h"
 class Game
 {
 public:
-	inline static SSearchData m_MissionData{ "mission" };
+	inline static ResourceStore m_MissionData{ "mission", eResourceType::TYPE_TEXT };
 	inline static std::vector<std::string> m_DayNames =
 	{
 		"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
@@ -49,7 +50,7 @@ public:
 	inline static uint m_nSolidWaterObj;
 	inline static bool m_bMissionLoaderWarningShown;
 
-	inline static SSearchData m_StatData{ "stat" };
+	inline static ResourceStore m_StatData{ "stat", eResourceType::TYPE_TEXT };
 
 	Game();
 	static void Draw();

@@ -81,19 +81,6 @@ Player::Player()
 		CPlayerPed* player = FindPlayerPed();
 		int hplayer = CPools::GetPedRef(player);
 
-
-		if (!m_bImagesLoaded)
-		{
-			#ifdef GTASA
-				Util::LoadTextureDirectory(m_ClothData, PLUGIN_PATH((char*)"CheatMenu\\clothes.txd"), true);
-			#elif GTAVC
-				skinData.m_Json.LoadData(skinData.m_Categories, skinData.m_Selected);
-			#endif
-
-			m_bImagesLoaded = true;
-		}
-
-
 		if (m_KeepPosition::m_bEnabled)
 		{
 			if (Command<Commands::IS_CHAR_DEAD>(hplayer))
@@ -220,7 +207,7 @@ void Player::ChangePlayerModel(std::string& model)
 	bool custom_skin = std::find(m_CustomSkins::m_List.begin(), m_CustomSkins::m_List.end(), model) !=
 		m_CustomSkins::m_List.end();
 
-	if (Ped::m_PedData.m_Json.m_Data.contains(model) || custom_skin)
+	if (Ped::m_PedData.m_pJson->m_Data.contains(model) || custom_skin)
 	{
 		CPlayerPed* player = FindPlayerPed();
 		if (Ped::m_SpecialPedJson.m_Data.contains(model) || custom_skin)
@@ -611,7 +598,7 @@ void Player::Draw()
 				{
 					Ui::DrawImages(Ped::m_PedData.m_ImagesList, ImVec2(65, 110), Ped::m_PedData.m_Categories,
 								   Ped::m_PedData.m_Selected, Ped::m_PedData.m_Filter, ChangePlayerModel, nullptr,
-								   [](std::string str) { return Ped::m_PedData.m_Json.m_Data[str].get<std::string>(); });
+								   [](std::string str) { return Ped::m_PedData.m_pJson->m_Data[str].get<std::string>(); });
 					ImGui::EndTabItem();
 				}
 				if (ImGui::BeginTabItem("Custom skins"))

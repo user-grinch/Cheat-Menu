@@ -4,7 +4,9 @@
 CJson::CJson(const char* name)
 {
 	if (name == "" || !fs::is_directory(PLUGIN_PATH((char*)"CheatMenu")))
+	{
 		return;
+	}
 
 	m_FilePath = PLUGIN_PATH((char*)"/CheatMenu/json/") + std::string(name) + ".json";
 
@@ -27,9 +29,13 @@ CJson::CJson(const char* name)
 		m_Data = "{}"_json;
 
 		if (m_FilePath.find("config"))
+		{
 			flog << "Creating config.json file" << std::endl;
+		}
 		else
+		{
 			flog << "Failed to locate file " << m_FilePath << std::endl;
+		}
 	}
 }
 
@@ -38,10 +44,4 @@ void CJson::WriteToDisk()
 	std::ofstream file(m_FilePath);
 	file << m_Data.dump(4, ' ', false, nlohmann::json::error_handler_t::replace) << std::endl;
 	file.close();
-}
-
-void CJson::LoadData(std::vector<std::string>& vec, std::string& selected) // Test
-{
-	for (auto element : m_Data.items())
-		vec.push_back(element.key());
 }

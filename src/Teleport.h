@@ -8,7 +8,7 @@ private:
 	inline static bool m_bInsertCoord;
 	inline static bool m_bQuickTeleport;
 	inline static char m_nInputBuffer[INPUT_BUFFER_SIZE];
-	inline static SSearchData tp_data{ "teleport" };
+	inline static ResourceStore tp_data{ "teleport", eResourceType::TYPE_TEXT };
 	inline static char m_nLocationBuffer[INPUT_BUFFER_SIZE];
 	inline static uint m_nQuickTeleportTimer;
 
@@ -36,7 +36,7 @@ protected:
 	Teleport();
 public:
 	static void Draw();
-	static void TeleportPlayer(bool get_marker = false, CVector pos = CVector(0, 0, 0), short interior_id = 0);
+	static void TeleportPlayer(bool get_marker = false, CVector pos = CVector(0, 0, 0), int interior_id = 0);
 	static void TeleportToLocation(std::string& rootkey, std::string& bLocName, std::string& loc);
 	static void RemoveTeleportEntry(std::string& rootkey, std::string& key, std::string& val);
 };

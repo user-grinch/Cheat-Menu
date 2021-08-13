@@ -11,17 +11,6 @@ Ped::Ped()
 	{
 		m_bExGangWarsInstalled = true;
 	}
-
-	Events::processScriptsEvent += []
-	{
-		if (!m_bImagesLoaded)
-		{
-			Util::LoadTextureDirectory(m_PedData, PLUGIN_PATH((char*)"CheatMenu\\peds.txd"));
-			m_bImagesLoaded = true;
-		}
-	};
-#elif GTAVC
-	m_PedData.m_Json.LoadData(m_PedData.m_Categories, m_PedData.m_Selected);
 #endif
 }
 
@@ -46,7 +35,7 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
 		return;
 	}
 
-	if (BY_GAME(m_PedData.m_Json.m_Data.contains(model), true))
+	if (BY_GAME(m_PedData.m_pJson->m_Data.contains(model), true))
 	{
 		CPlayerPed* player = FindPlayerPed();
 		CVector pos = player->GetPosition();
@@ -273,7 +262,7 @@ void Ped::Draw()
 #ifdef GTASA
 					Ui::DrawImages(m_PedData.m_ImagesList, ImVec2(65, 110), m_PedData.m_Categories, m_PedData.m_Selected,
 					               m_PedData.m_Filter, SpawnPed, nullptr,
-					               [](std::string str) { return m_PedData.m_Json.m_Data[str].get<std::string>(); });
+					               [](std::string str) { return m_PedData.m_pJson->m_Data[str].get<std::string>(); });
 #elif GTAVC
 					Ui::DrawJSON(m_PedData, SpawnPed, nullptr);
 #endif
@@ -303,7 +292,7 @@ void Ped::Draw()
 #ifdef GTASA
 					ImGui::Spacing();
 					ImGui::Text("Selected weapon: %s",
-					            Weapon::m_WeaponData.m_Json.m_Data[std::to_string(m_SpawnPed::m_nWeaponId)].get<std::string>().c_str());
+					            Weapon::m_WeaponData.m_pJson->m_Data[std::to_string(m_SpawnPed::m_nWeaponId)].get<std::string>().c_str());
 					ImGui::Spacing();
 
 					Ui::DrawImages(Weapon::m_WeaponData.m_ImagesList, ImVec2(65, 65), Weapon::m_WeaponData.m_Categories,
@@ -312,7 +301,7 @@ void Ped::Draw()
 					               nullptr,
 					               [](std::string str)
 					               {
-						               return Weapon::m_WeaponData.m_Json.m_Data[str].get<std::string>();
+						               return Weapon::m_WeaponData.m_pJson->m_Data[str].get<std::string>();
 					               },
 					               [](std::string str) { return str != "-1"; /*Jetpack*/ }
 					);

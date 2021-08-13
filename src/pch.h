@@ -12,62 +12,7 @@
 #define BY_GAME(sa, vc) vc
 #endif
 
-#include <d3d9.h>
-#include <d3d11.h>
-#include <d3d11Shader.h>
-#include <filesystem>
-#include <fstream>
-#include <functional>
-#include <memory>
-#include <iostream>
-#include <sstream>
-#include <vector>
-#include <windows.h>
-
-#include "plugin.h"
-#include "CBike.h"
-#include "CCamera.h"
-#include "CClock.h"
-#include "CCivilianPed.h"
-#include "CGangs.h"
-#include "cHandlingDataMgr.h"
-#include "CHud.h"
-#include "CMenuManager.h"
-#include "CModelInfo.h"
-#include "RenderWare.h"
-#include "CStats.h"
-#include "CStreaming.h"
-#include "CTheScripts.h"
-#include "CTheZones.h"
-#include "CTimer.h"
-#include "CTimeCycle.h"
-#include "CTrain.h"
-#include "CWeather.h"
-#include "CWorld.h"
-#include "extensions/ScriptCommands.h"
-#include "extensions/Screen.h"
-#include "extensions/Paths.h"
-
-#ifdef GTASA
-#include "CCheat.h"
-#include "CClothes.h"
-#include "CCutsceneMgr.h"
-#include "CRadar.h"
-#include "CShadows.h"
-#include "eVehicleClass.h"
-#include "CGangWars.h"
-#endif
-
-#include "../Depend/fla/IDaccess.h"
-#include "../Depend/imgui/imgui.h"
-#include "../Depend/imgui/imgui_internal.h"
-#include "../Depend/imgui/imgui_impl_dx9.h"
-#include "../Depend/imgui/imgui_impl_dx11.h"
-#include "../Depend/imgui/imgui_impl_win32.h"
-
-#include "MoreEvents.h"
-#include "Json.h"
-#include "VKeys.h"
+#include "header_includes.h"
 
 // Globals
 using CallbackTable = std::vector<std::pair<std::string, void(*)()>>;
@@ -101,49 +46,6 @@ struct HotKeyData
 	int m_key2;
 	bool m_bPressed;
 };
-
-struct RwD3D9Raster
-{
-	union
-	{
-		IDirect3DTexture9* texture;
-		IDirect3DSurface9* surface;
-	};
-	unsigned char* palette;
-	unsigned char alpha;
-	unsigned char cubeTextureFlags; /* 0x01 IS_CUBEMAP_TEX */
-	unsigned char textureFlags; /* 0x10 IS_COMPRESSED */
-	unsigned char lockedLevel;
-	IDirect3DSurface9* lockedSurface;
-	D3DLOCKED_RECT lockedRect;
-	D3DFORMAT format;
-	IDirect3DSwapChain9* swapChain;
-	HWND* hwnd;
-};
-
-struct RwRasterEx : public RwRaster
-{
-	RwD3D9Raster *renderResource;
-};
-
-struct STextureStructure
-{
-	std::string m_FileName;
-	std::string m_CategoryName;
-	RwTexture *m_pRwTexture = nullptr;
-	void *m_pTexture = nullptr;
-};
-
-struct SSearchData
-{
-	CJson m_Json;
-	RwTexDictionary txd;
-	ImGuiTextFilter m_Filter = "";
-	std::vector<std::string> m_Categories = {"All"};
-	std::string m_Selected = "All";
-	std::vector<std::unique_ptr<STextureStructure>> m_ImagesList;
-};
-
 
 // Common defines
 static void SetHelpMessage(const char *message, bool b1, bool b2, bool b3)

@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 #include "Player.h"
 #ifdef GTASA
 #include "Weapon.h"
@@ -10,7 +11,7 @@ private:
 	inline static CJson m_SpecialPedJson = CJson("ped special");
 #endif
 
-	inline static SSearchData m_PedData{"ped"};
+	inline static ResourceStore m_PedData{"ped", eResourceType::TYPE_TEXT};
 	inline static bool m_bImagesLoaded;
 	inline static bool m_bExGangWarsInstalled;
 	inline static int m_nPedRemoveRadius = 5;
