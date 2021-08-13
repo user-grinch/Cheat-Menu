@@ -1,16 +1,10 @@
 {
-    "Pay n Spray":
-    {
-        "Little Haiti Pay n Spray": "0, -865, -121, 11",
-        "Oceanview Pay n Spray": "0, -15, -1258, 10",
-        "Vice Point Pay n Spray": "0, 330, 429, 11",
-        "Vice Port Pay n Spray": "0, -912, -1269, 11",
-        "Ocean Beach Car Wash": "0, 53, -1045, 10"
-    },
-    "Ammunation":
-    {
+    "Ammunation": {
         "Washington Ammunation": "0, -65, -1479, 10",
         "Washington Beach Ammunation": "0, 200, -474, 11"
+    },
+    "Custom": {
+        "Test": "0, -825, 1168, 10"
     },
     "Misc": {
         "1102 Safe House": "0, 95, -808, 10",
@@ -44,5 +38,12 @@
         "Vice Port Mainland": "0, -246, -1327, 8",
         "Washington Ave": "0, -194, -1387, 4",
         "Washington Mall": "0, 3, -937, 16"
+    },
+    "Pay n Spray": {
+        "Little Haiti Pay n Spray": "0, -865, -121, 11",
+        "Ocean Beach Car Wash": "0, 53, -1045, 10",
+        "Oceanview Pay n Spray": "0, -15, -1258, 10",
+        "Vice Point Pay n Spray": "0, 330, 429, 11",
+        "Vice Port Pay n Spray": "0, -912, -1269, 11"
     }
 }
