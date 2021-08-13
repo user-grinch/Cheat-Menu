@@ -193,10 +193,6 @@ Vehicle::Vehicle()
 	};
 }
 
-Vehicle::~Vehicle()
-{
-}
-
 #ifdef GTASA
 void Vehicle::AddComponent(const std::string& component, const bool display_message)
 {

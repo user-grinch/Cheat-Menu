@@ -5,7 +5,23 @@
 ResourceStore::ResourceStore(const char* text, eResourceType type, ImVec2 imageSize)
 : m_ImageSize(imageSize)
 {
-    if (type != eResourceType::TYPE_TEXT)
+    if (type == eResourceType::TYPE_TEXT
+    || type == eResourceType::TYPE_BOTH)
+    {
+        m_pJson = std::make_unique<CJson>(text);
+
+        if (type == eResourceType::TYPE_TEXT)
+        {
+            // Generate categories
+            for (auto element : m_pJson->m_Data.items())
+            {
+                m_Categories.push_back(element.key());
+            }
+        }
+    }
+    
+    if (type == eResourceType::TYPE_IMAGE
+    || type == eResourceType::TYPE_BOTH)
     {
         /*  
             Textures need to be loaded from main thread
@@ -19,22 +35,6 @@ ResourceStore::ResourceStore(const char* text, eResourceType type, ImVec2 imageS
                 m_bTexturesLoaded = true;
             }
         };
-
-        if (type == eResourceType::TYPE_BOTH)
-        {
-            goto loadJson;
-        }
-    }
-    else
-    {
-        loadJson:
-        m_pJson = std::make_unique<CJson>(text);
-
-        // Generate categories
-        for (auto element : m_pJson->m_Data.items())
-        {
-            m_Categories.push_back(element.key());
-        }
     }
 }
 
@@ -68,6 +68,7 @@ void ResourceStore::LoadTextureResource(std::string&& name)
             // Naming format in Txd `Category$TextureName`
             std::stringstream ss(pTex->name);
             std::string str;
+
             getline(ss, str, '$');
             m_ImagesList.back().get()->m_CategoryName = str;
 
@@ -83,10 +84,9 @@ void ResourceStore::LoadTextureResource(std::string&& name)
             }
 
             // Genereate categories
-            std::string itemNames;
-            if (!std::count(m_Categories.begin(), m_Categories.end(), itemNames))
+            if (!std::count(m_Categories.begin(), m_Categories.end(), m_ImagesList.back().get()->m_CategoryName))
             {
-                m_Categories.push_back(itemNames);
+                m_Categories.push_back(m_ImagesList.back().get()->m_CategoryName);
             }
             pRLL = (RwLinkList*)pEndDic;
         }

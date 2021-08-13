@@ -282,10 +282,14 @@ void Ped::Draw()
 					if (ImGui::InputInt("Health", &m_SpawnPed::m_nPedHealth))
 					{
 						if (m_SpawnPed::m_nPedHealth > 1000)
+						{
 							m_SpawnPed::m_nPedHealth = 1000;
+						}
 
 						if (m_SpawnPed::m_nPedHealth < 0)
+						{
 							m_SpawnPed::m_nPedHealth = 0;
+						}
 					}
 					Ui::ListBox("Ped type", m_SpawnPed::m_PedTypeList, m_SpawnPed::m_nSelectedPedType);
 #ifdef GTASA

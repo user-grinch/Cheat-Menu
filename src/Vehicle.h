@@ -107,5 +107,4 @@ public:
 	static int GetModelFromName(const char* name);
 	static void Draw();
 	Vehicle();
-	~Vehicle();
 };
