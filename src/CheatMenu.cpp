@@ -250,7 +250,6 @@ BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
 			MessageBox(HWND_DESKTOP, "Unknown game version. GTA SA v1.0 US is required.", "CheatMenu", MB_ICONERROR);
 		}
 #elif GTAVC
-		MessageBox(RsGlobal.ps->window, "Unknown game version. GTA VC v1.0 EN is required.", "CheatMenu", MB_ICONERROR);
 
 		if (gameVersion == GAME_10EN)
 		{

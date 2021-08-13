@@ -10,7 +10,6 @@ ResourceStore::ResourceStore(const char* text, eResourceType type)
         {
             if (!m_bTexturesLoaded)
             {
-                // LoadTextureDirectory(ResourceStore& data, char* path, bool pass_full_name)
                 LoadTextureResource(text);
                 m_bTexturesLoaded = true;
             }

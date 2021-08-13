@@ -23,7 +23,7 @@
 #include "Weapon.h"
 class CheatMenu : Hook, Animation, Game, Menu, Ped, Player, Teleport, Vehicle, Visual, Weapon
 #elif GTAVC
-class CheatMenu : Hook, Animation, Menu, Player, Ped, Teleport
+class CheatMenu : Hook, Animation, Menu, Player, Ped, Teleport, Vehicle
 #endif
 
 {

@@ -33,10 +33,10 @@ Vehicle::Vehicle()
 #ifdef GTASA
 	ParseVehiclesIDE();
 #endif
+	ParseCarcolsDAT();
 
 	Events::processScriptsEvent += [this]
 	{
-		ParseCarcolsDAT();
 		uint timer = CTimer::m_snTimeInMilliseconds;
 		CPlayerPed* pPlayer = FindPlayerPed();
 		CVehicle* pVeh = pPlayer->m_pVehicle;
@@ -1145,8 +1145,11 @@ void Vehicle::Draw()
 					Paint::SetNodeColor(veh, Paint::veh_nodes::selected, { r, g, b, 255 }, m_Color::m_bMatFilter);
 				}
 #endif
+
 				ImGui::Spacing();
 				ImGui::Columns(2, NULL, false);
+
+#ifdef GTASA
 				ImGui::Checkbox("Material filter", &m_Color::m_bMatFilter);
 				ImGui::RadioButton("Primary", &m_Color::m_nRadioButton, 1);
 				ImGui::RadioButton("Secondary", &m_Color::m_nRadioButton, 2);
@@ -1154,6 +1157,13 @@ void Vehicle::Draw()
 				ImGui::Checkbox("Show all", &m_Color::bShowAll);
 				ImGui::RadioButton("Tertiary", &m_Color::m_nRadioButton, 3);
 				ImGui::RadioButton("Quaternary", &m_Color::m_nRadioButton, 4);
+#elif GTAVC
+				ImGui::Checkbox("Show all", &m_Color::bShowAll);
+				ImGui::RadioButton("Primary", &m_Color::m_nRadioButton, 1);
+				ImGui::NextColumn();
+				ImGui::NewLine();
+				ImGui::RadioButton("Secondary", &m_Color::m_nRadioButton, 2);
+#endif			
 				ImGui::Spacing();
 				ImGui::Columns(1);
 				ImGui::Text("Select color preset:");
@@ -1174,7 +1184,7 @@ void Vehicle::Draw()
 					{
 						if (Ui::ColorButton(colorId, m_CarcolsColorData[colorId], ImVec2(btnSize, btnSize)))
 						{
-							*(uint8_replacement*)(int(veh) + 0x433 + m_Color::m_nRadioButton) = colorId;
+							*(uint8_replacement*)(int(veh) + BY_GAME(0x433, 0x19F) + m_Color::m_nRadioButton) = colorId;
 						}
 
 						if ((colorId + 1) % btnsInRow != 0)
@@ -1196,7 +1206,7 @@ void Vehicle::Draw()
 								if (Ui::ColorButton(colorId, m_CarcolsColorData[colorId],
 									ImVec2(btnSize, btnSize)))
 								{
-									*(uint8_replacement*)(int(veh) + 0x433 + m_Color::m_nRadioButton) = colorId;
+									*(uint8_replacement*)(int(veh) + BY_GAME(0x433, 0x19F) + m_Color::m_nRadioButton) = colorId;
 								}
 
 								if (count % btnsInRow != 0)
