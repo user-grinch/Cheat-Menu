@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img width="400" height="250" src="https://i.imgur.com/fZ71SbF.png">
+  <img width="400" height="250" src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/logo.png">
   </p>
 <p align="center">  
   Press <kbd>Left Ctrl</kbd> + <kbd>M</kbd> to open the menu. Doesn't work in multiplayer
@@ -13,7 +13,7 @@
 [![GTAF](https://img.shields.io/badge/Topic-GTA%20Forums-%23244052?style=for-the-badge)](https://gtaforums.com/topic/961636-moon-cheat-menu/)
 ## Introduction
 
-Cheat menu for Grand Theft Auto SanAndreas which allows a large set of modifications/cheats to be applied enabling a much more easier & amusing gameplay.
+Cheat menu for Grand Theft Auto San Andreas & Vice City which allows a large set of modifications/cheats to be applied enabling a much more easier & amusing gameplay.
 
 Get stable binaries from [here](https://github.com/user-grinch/Cheat-Menu/releases). Beta binaries are available at the discord server.
 
