@@ -4,10 +4,20 @@ class Game
 {
 public:
 	inline static ResourceStore m_MissionData{ "mission", eResourceType::TYPE_TEXT };
+
+#ifdef GTASA
+	inline static bool m_bForbiddenArea = true;
+	inline static bool m_bSolidWater;
+	inline static bool m_bScreenShot;
+	inline static uint m_nSolidWaterObj;
+	inline static bool m_bKeepStuff;
+	inline static ResourceStore m_StatData{ "stat", eResourceType::TYPE_TEXT };
+	
 	inline static std::vector<std::string> m_DayNames =
 	{
 		"Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
 	};
+
 	struct m_RandomCheats
 	{
 		inline static bool m_bEnabled;
@@ -37,24 +47,22 @@ public:
 		inline static float m_fBacArmour = 0.0f;
 		inline static float m_fBacStamina = 0.0f;
 	};
+	
+#endif
 	inline static bool m_bDisableCheats;
 	inline static bool m_bDisableReplay;
-	inline static bool m_bForbiddenArea = true;
 	inline static bool m_bMissionTimer;
 	inline static bool m_bFreezeTime;
-	inline static bool m_bKeepStuff;
-	inline static bool m_bSolidWater;
-	inline static bool m_bScreenShot;
 	inline static bool m_bSyncTime;
 	inline static uint m_nSyncTimer;
-	inline static uint m_nSolidWaterObj;
 	inline static bool m_bMissionLoaderWarningShown;
-
-	inline static ResourceStore m_StatData{ "stat", eResourceType::TYPE_TEXT };
 
 	Game();
 	static void Draw();
+	static void RealTimeClock();
+
+#ifdef GTASA
 	static void FreeCam();
 	static void ClearFreecamStuff();
-	static void RealTimeClock();
+#endif
 };

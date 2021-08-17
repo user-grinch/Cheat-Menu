@@ -318,7 +318,7 @@ void Weapon::Draw()
 				m_nAmmoCount = (m_nAmmoCount > 99999) ? 99999 : m_nAmmoCount;
 			}
 #ifdef GTASA
-			Ui::DrawImages(m_WesaponData, GiveWeaponToPlayer, nullptr,
+			Ui::DrawImages(m_WeaponData, GiveWeaponToPlayer, nullptr,
 						   [](std::string str) { return m_WeaponData.m_pJson->m_Data[str].get<std::string>(); },
 						   [](std::string str) { return str != "0"; /*Unarmed*/ }
 			);

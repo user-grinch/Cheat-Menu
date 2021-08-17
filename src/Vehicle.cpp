@@ -716,8 +716,8 @@ void Vehicle::Draw()
 			ImGui::Spacing();
 			ImGui::BeginChild("CheckboxesChild");
 			ImGui::Columns(2, 0, false);
+			Ui::CheckboxAddress("Aggressive drivers", BY_GAME(0x96914F,0xA10B47));
 #ifdef GTASA
-			Ui::CheckboxAddress("Aggressive drivers", 0x96914F);
 			Ui::CheckboxAddress("Aim while driving", 0x969179);
 			Ui::CheckboxAddress("All cars have nitro", 0x969165);
 #endif
@@ -761,6 +761,7 @@ void Vehicle::Draw()
 			Ui::CheckboxAddress("Float away when hit", 0x969166);
 #endif
 			Ui::CheckboxAddress("Green traffic lights", BY_GAME(0x96914E,0xA10ADC));
+			
 #ifdef GTASA
 			Ui::CheckboxAddress("Perfect handling", 0x96914C);
 			Ui::CheckboxAddress("Tank mode", 0x969164);
@@ -967,21 +968,26 @@ void Vehicle::Draw()
 				ImGui::Spacing();
 				ImGui::Separator();
 			}
-#ifdef GTASA			
+			
 			if (ImGui::CollapsingHeader("Traffic options"))
 			{
-				static std::vector<Ui::NamedMemory> color{ {"Black", 0x969151}, {"Pink", 0x969150} };
+
+				static std::vector<Ui::NamedMemory> color
+				{ 
+					{"Black", BY_GAME(0x969151, 0xA10B82)},
+					{"Pink", BY_GAME(0x969150, 0xA10B26)} 
+				};
+				Ui::RadioButtonAddress("Color", color);
+				ImGui::Spacing();
+#ifdef GTASA
 				static std::vector<Ui::NamedMemory> type{
 					{"Cheap", 0x96915E}, {"Country", 0x96917B}, {"Fast", 0x96915F}
 				};
-
-				Ui::RadioButtonAddress("Color", color);
-				ImGui::Spacing();
 				Ui::RadioButtonAddress("Type", type);
+#endif
 				ImGui::Spacing();
 				ImGui::Separator();
 			}
-#endif
 			if (pPlayer && pPlayer->m_pVehicle)
 			{
 				CVehicle* pVeh = pPlayer->m_pVehicle;

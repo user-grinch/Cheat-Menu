@@ -3,24 +3,31 @@
 #include "Game.h"
 #include "Ui.h"
 #include "Util.h"
+#ifdef GTASA
 #include "CIplStore.h"
+#endif
 
 static bool bSaveGameFlag = false;
 
 // Thanks to aap
 void Game::RealTimeClock()
 {
-	static int lastday;
 	time_t tmp = time(nullptr);
 	struct tm* now = localtime(&tmp);
 
+#ifdef GTASA
+	static int lastday;
 	if (now->tm_yday != lastday)
+	{
 		CStats::SetStatValue(0x86, CStats::GetStatValue(0x86) + 1.0f);
+	}
 
 	lastday = now->tm_yday;
 	CClock::ms_nGameClockMonth = now->tm_mon + 1;
 	CClock::ms_nGameClockDays = now->tm_mday;
 	CClock::CurrentDay = now->tm_wday + 1;
+#endif
+
 	CClock::ms_nGameClockHours = now->tm_hour;
 	CClock::ms_nGameClockMinutes = now->tm_min;
 	CClock::ms_nGameClockSeconds = now->tm_sec;
@@ -28,6 +35,7 @@ void Game::RealTimeClock()
 
 Game::Game()
 {
+#ifdef GTASA
 	// Generate enabled cheats vector
 	for (auto element : m_RandomCheats::m_Json.m_Data.items())
 	{
@@ -48,12 +56,15 @@ Game::Game()
 			bSaveGameFlag = false;
 		}
 	};
+#endif
+
 	Events::processScriptsEvent += []
 	{
 		uint timer = CTimer::m_snTimeInMilliseconds;
 		CPlayerPed* pPlayer = FindPlayerPed();
 		int hplayer = CPools::GetPedRef(pPlayer);
 
+#ifdef GTASA
 		if (m_bScreenShot)
 		{
 			if (Ui::HotKeyPressed(Menu::m_HotKeys::quickSceenShot))
@@ -106,6 +117,25 @@ Game::Game()
 			}
 		}
 
+		if (Ui::HotKeyPressed(Menu::m_HotKeys::freeCam))
+		{
+			if (m_Freecam::m_bEnabled)
+			{
+				m_Freecam::m_bEnabled = false;
+				ClearFreecamStuff();
+			}
+			else
+			{
+				m_Freecam::m_bEnabled = true;
+			}
+		}
+
+		if (m_Freecam::m_bEnabled)
+		{
+			FreeCam();
+		}
+#endif
+
 		// improve this later
 		if (m_bSyncTime && timer - m_nSyncTimer > 50)
 		{
@@ -118,6 +148,7 @@ Game::Game()
 			m_nSyncTimer = timer;
 		}
 
+#ifdef GTASA
 		if (m_RandomCheats::m_bEnabled
 			&& (timer - m_RandomCheats::m_nTimer) > (static_cast<uint>(m_RandomCheats::m_nInterval) * 1000))
 		{
@@ -137,24 +168,7 @@ Game::Game()
 				}
 			}
 		}
-
-		if (Ui::HotKeyPressed(Menu::m_HotKeys::freeCam))
-		{
-			if (m_Freecam::m_bEnabled)
-			{
-				m_Freecam::m_bEnabled = false;
-				ClearFreecamStuff();
-			}
-			else
-			{
-				m_Freecam::m_bEnabled = true;
-			}
-		}
-
-		if (m_Freecam::m_bEnabled)
-		{
-			FreeCam();
-		}
+#endif
 	};
 }
 
@@ -166,7 +180,7 @@ void SetPlayerMission(std::string& rootkey, std::string& name, std::string& id)
 
 	Command<0x09E8>(hplayer, &interior);
 
-	if (Util::IsOnMission() && interior == 0)
+	if (BY_GAME(Util::IsOnMission(), true) && interior == 0)
 	{
 		player->SetWantedLevel(0);
 		Command<Commands::LOAD_AND_LAUNCH_MISSION_INTERNAL>(std::stoi(id));
@@ -174,6 +188,7 @@ void SetPlayerMission(std::string& rootkey, std::string& name, std::string& id)
 	else SetHelpMessage("Can't start mission now", false, false, false);
 }
 
+#ifdef GTASA
 void Game::FreeCam()
 {
 	int deltaSpeed = m_Freecam::m_fSpeed * (CTimer::m_snTimeInMillisecondsNonClipped -
@@ -183,10 +198,12 @@ void Game::FreeCam()
 	{
 		CPlayerPed* player = FindPlayerPed(-1);
 		Command<Commands::SET_EVERYONE_IGNORE_PLAYER>(0, true);
+
 		m_Freecam::m_bHudState = patch::Get<BYTE>(0xBA6769); // hud
 		m_Freecam::m_bRadarState = patch::Get<BYTE>(0xBA676C); // radar
 		patch::Set<BYTE>(0xBA6769, 0); // hud
 		patch::Set<BYTE>(0xBA676C, 2); // radar
+
 		CVector player_pos = player->GetPosition();
 		CPad::GetPad(0)->DisablePlayerControls = true;
 
@@ -310,7 +327,7 @@ void Game::ClearFreecamStuff()
 {
 	m_Freecam::m_bInitDone = false;
 	Command<Commands::SET_EVERYONE_IGNORE_PLAYER>(0, false);
-	patch::Set<BYTE>(0xBA6769, m_Freecam::m_bHudState); // hud
+	patch::Set<BYTE>(BY_GAME(0xBA6769, 0x86963A), m_Freecam::m_bHudState); // hud
 	patch::Set<BYTE>(0xBA676C, m_Freecam::m_bRadarState); // radar
 	CPad::GetPad(0)->DisablePlayerControls = false;
 
@@ -319,6 +336,7 @@ void Game::ClearFreecamStuff()
 	Command<Commands::CAMERA_PERSIST_FOV>(false);
 	Command<Commands::RESTORE_CAMERA_JUMPCUT>();
 }
+#endif
 
 void Game::Draw()
 {
@@ -326,12 +344,14 @@ void Game::Draw()
 	CPlayerPed* pPlayer = FindPlayerPed();
 	int hplayer = CPools::GetPedRef(pPlayer);
 
+#ifdef GTASA
 	if (ImGui::Button("Save game (might cause game bugs)", Ui::GetSize()))
 	{
 		FrontEndMenuManager.m_bActivateMenuNextFrame = true;
 		bSaveGameFlag = true;
 	}
 	ImGui::Spacing();
+#endif
 
 	if (ImGui::BeginTabBar("Game", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
 	{
@@ -343,31 +363,41 @@ void Game::Draw()
 			{
 				if (m_bDisableCheats)
 				{
+#ifdef GTASA
 					patch::Set<BYTE>(0x4384D0, 0xE9, false);
 					patch::SetInt(0x4384D1, 0xD0, false);
 					patch::Nop(0x4384D5, 4, false);
+#elif GTAVC	
+					patch::Nop(0x602BD8, 5);
+					patch::Nop(0x602BE7, 5);
+#endif
 				}
 				else
 				{
+#ifdef GTASA
 					patch::Set<BYTE>(0x4384D0, 0x83, false);
-					patch::SetInt(0x4384D1, -0x7DF0F908, false);
+					patch::SetInt(0x4384D1, -0x7DF0F908, false); // correct?
 					patch::SetInt(0x4384D5, 0xCC, false);
+#elif GTAVC		
+					patch::SetRaw(0x602BD8, (char*)"\x88\xD8\x89\xF1\x50", 5);
+					patch::SetRaw(0x602BE7, (char*)"\xE8\x34\x91\xEA\xFF", 5);
+#endif
 				}
 			}
 			if (ImGui::Checkbox("Disable F1 & F3 replay", &m_bDisableReplay))
 			{
 				if (m_bDisableReplay)
 				{
-					patch::SetInt(0x460500, 0xC3, false);
+					patch::SetChar(BY_GAME(0x460500, 0x624EC0), 0xC3);
 				}
 				else
 				{
-					patch::SetInt(0x460500, 0xBD844BB, false);
+					patch::SetChar(BY_GAME(0x460500, 0x624EC0), 0x80);
 				}
 			}
 
-			Ui::CheckboxAddress("Faster clock", 0x96913B);
-
+			Ui::CheckboxAddress("Faster clock", BY_GAME(0x96913B, 0xA10B87));
+#ifdef GTASA
 			if (Ui::CheckboxWithHint("Forbidden area wl", &m_bForbiddenArea, "Wanted levels that appears outside \
 of LS without completing missions"))
 			{
@@ -380,28 +410,33 @@ of LS without completing missions"))
 					patch::Set<BYTE>(0x441770, 0xC3, false);
 				}
 			}
-
+#endif
 			Ui::CheckboxAddress("Free pay n spray", 0x96C009);
 
+#ifdef GTAVC
+			ImGui::NextColumn();
+#endif
+			Ui::CheckboxAddress("Freeze game", 0xA10B48);
 			if (ImGui::Checkbox("Freeze game time", &m_bFreezeTime))
 			{
 				if (m_bFreezeTime)
 				{
-					patch::SetRaw(0x52CF10, (char*)"\xEB\xEF", 2);
+					patch::SetRaw(BY_GAME(0x52CF10, 0x487010), (char*)"\xEB\xEF", 2);
 				}
 				else
 				{
-					patch::SetRaw(0x52CF10, (char*)"\x56\x8B", 2);
+					patch::SetRaw(BY_GAME(0x52CF10, 0x487010), (char*)BY_GAME("\x56\x8B","\x6A\x01"), 2);
 				}
 			}
 
+#ifdef GTASA
 			ImGui::NextColumn();
-
+#endif
 			if (ImGui::Checkbox("Freeze misson timer", &m_bMissionTimer))
 			{
 				Command<Commands::FREEZE_ONSCREEN_TIMER>(m_bMissionTimer);
 			}
-
+#ifdef GTASA
 			if (Ui::CheckboxWithHint("Hard mode", &m_HardMode::m_bEnabled, "Makes the game more challanging to play. \n\
 Lowers armour, health, stamina etc."))
 			{
@@ -424,7 +459,6 @@ Lowers armour, health, stamina etc."))
 					CWeaponInfo::LoadWeaponData();
 				}
 			}
-
 			if (Ui::CheckboxWithHint("Keep stuff", &m_bKeepStuff, "Keep stuff after arrest/death"))
 			{
 				Command<Commands::SWITCH_ARREST_PENALTIES>(m_bKeepStuff);
@@ -442,12 +476,17 @@ Lowers armour, health, stamina etc."))
 					m_nSolidWaterObj = 0;
 				}
 			}
+#endif
 			if (ImGui::Checkbox("Sync system time", &m_bSyncTime))
 			{
 				if (m_bSyncTime)
-					patch::RedirectCall(0x53BFBD, &RealTimeClock);
+				{
+					patch::RedirectCall(BY_GAME(0x53BFBD, 0x4A44F7), &RealTimeClock);
+				}
 				else
-					patch::RedirectCall(0x53BFBD, &CClock::Update);
+				{
+					patch::RedirectCall(BY_GAME(0x53BFBD, 0x4A44F7), &CClock::Update);
+				}
 			}
 
 			ImGui::Columns(1);
@@ -455,6 +494,7 @@ Lowers armour, health, stamina etc."))
 		}
 		if (ImGui::BeginTabItem("Menus"))
 		{
+#ifdef GTASA
 			if (ImGui::CollapsingHeader("Current day"))
 			{
 				int day = CClock::CurrentDay - 1;
@@ -466,15 +506,19 @@ Lowers armour, health, stamina etc."))
 				ImGui::Spacing();
 				ImGui::Separator();
 			}
-			Ui::EditAddress<int>("Days passed", 0xB79038, 0, 9999);
-			Ui::EditReference("FPS limit", RsGlobal.frameLimit, 1, 30, 60);
+#endif
+			Ui::EditAddress<int>("Days passed", BY_GAME(0xB79038,0x97F1F4), 0, 9999);
+			Ui::EditReference("FPS limit", BY_GAME(RsGlobal.frameLimit, RsGlobal.maxFPS), 1, 30, 60);
+#ifdef GTASA
 			if (ImGui::CollapsingHeader("Free cam"))
 			{
 				if (Ui::CheckboxWithHint("Enable", &m_Freecam::m_bEnabled, "Forward: I\tBackward: K\
 \nLeft: J\t\t  Right: L\n\nSlower: RCtrl\tFaster: RShift\n\nZoom: Mouse wheel"))
 				{
 					if (!m_Freecam::m_bEnabled)
+					{
 						ClearFreecamStuff();
+					}
 				}
 				ImGui::Spacing();
 
@@ -485,8 +529,9 @@ Lowers armour, health, stamina etc."))
 				ImGui::Spacing();
 				ImGui::Separator();
 			}
+#endif
 			Ui::EditReference("Game speed", CTimer::ms_fTimeScale, 1, 1, 10);
-			Ui::EditFloat("Gravity", 0x863984, -1.0f, 0.008f, 1.0f, 1.0f, 0.01f);
+			Ui::EditFloat("Gravity", BY_GAME(0x863984,0x68F5F0), -1.0f, 0.008f, 1.0f, 1.0f, 0.01f);
 
 			if (ImGui::CollapsingHeader("Set time"))
 			{
@@ -510,49 +555,69 @@ Lowers armour, health, stamina etc."))
 				ImGui::Spacing();
 				ImGui::Separator();
 			}
-
+#ifdef GTASA
 			static std::vector<Ui::NamedMemory> themes{
 				{"Beach", 0x969159}, {"Country", 0x96917D}, {"Fun house", 0x969176}, {"Ninja", 0x96915C}
 			};
 			Ui::EditRadioButtonAddress("Themes", themes);
-
+#endif
 			if (ImGui::CollapsingHeader("Weather"))
 			{
-				using func = void(void);
+#ifdef GTASA
 				if (ImGui::Button("Foggy", Ui::GetSize(3)))
 				{
-					((func*)0x438F80)();
+					Call<0x438F80>();
 				}
 
 				ImGui::SameLine();
 				if (ImGui::Button("Overcast", Ui::GetSize(3)))
 				{
-					((func*)0x438F60)();
+					Call<0x438F60>();
 				}
 
 				ImGui::SameLine();
 				if (ImGui::Button("Rainy", Ui::GetSize(3)))
 				{
-					((func*)0x438F70)();
+					Call<0x438F70>();
 				}
 
 				if (ImGui::Button("Sandstorm", Ui::GetSize(3)))
 				{
-					((func*)0x439590)();
+					Call<0x439590>();
 				}
 
 				ImGui::SameLine();
 				if (ImGui::Button("Thunderstorm", Ui::GetSize(3)))
 				{
-					((func*)0x439570)();
+					Call<0x439570>();
 				}
 
 				ImGui::SameLine();
 				if (ImGui::Button("Very sunny", Ui::GetSize(3)))
 				{
-					((func*)0x438F50)();
+					Call<0x438F50>();
+				}
+#elif GTAVC
+				if (ImGui::Button("Sunny", Ui::GetSize(3)))
+				{
+					CWeather::ForceWeatherNow(0);
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Cloudy", Ui::GetSize(3)))
+				{
+					CWeather::ForceWeatherNow(1);
+				}
+				ImGui::SameLine();
+				if (ImGui::Button("Rainy", Ui::GetSize(3)))
+				{
+					CWeather::ForceWeatherNow(2);
 				}
 
+				if (ImGui::Button("Foggy", Ui::GetSize(3)))
+				{
+					CWeather::ForceWeatherNow(3);
+				}
+#endif
 				ImGui::Spacing();
 				ImGui::Separator();
 			}
@@ -578,8 +643,10 @@ It's recommanded not to save after using the mission loader. Use it at your own 
 			{
 				if (ImGui::Button("Fail current mission", ImVec2(Ui::GetSize())))
 				{
-					if (!CCutsceneMgr::ms_running)
+					if (!Util::IsOnCutscene())
+					{
 						Command<Commands::FAIL_CURRENT_MISSION>();
+					}
 				}
 
 				ImGui::Spacing();
@@ -588,6 +655,7 @@ It's recommanded not to save after using the mission loader. Use it at your own 
 			}
 			ImGui::EndTabItem();
 		}
+#ifdef GTASA
 		if (ImGui::BeginTabItem("Stats"))
 		{
 			// similar to Ui::DrawJSON()
@@ -649,6 +717,7 @@ It's recommanded not to save after using the mission loader. Use it at your own 
 			}
 			ImGui::EndTabItem();
 		}
+#endif
 		ImGui::EndTabBar();
 	}
 }

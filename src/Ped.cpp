@@ -137,6 +137,7 @@ void Ped::Draw()
 			Ui::CheckboxAddress("Peds riot", 0x969175);
 			Ui::CheckboxAddress("Slut magnet", 0x96915D);
 #elif GTAVC
+			Ui::CheckboxAddress("No prostitutes", 0xA10B99);
 			Ui::CheckboxAddress("Slut magnet", 0xA10B5F);
 			ImGui::NextColumn();
 			Ui::CheckboxAddress("Weapons for all", 0xA10AB3);
