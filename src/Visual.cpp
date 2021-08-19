@@ -3,13 +3,20 @@
 #include "Ui.h"
 #include "Util.h"
 #include "Game.h"
-#include "CHudColours.h"
 #include "TimeCycle.h"
+
+#ifdef GTASA
+#include "CHudColours.h"
+#endif
 
 Visual::Visual()
 {
+#ifdef GTASA
 	if (GetModuleHandle("timecycle24.asi"))
+	{
 		m_nTimecycHour = 24;
+	}
+#endif
 
 	Events::processScriptsEvent += []
 	{
@@ -197,6 +204,8 @@ void Visual::Draw()
 		{
 			ImGui::Spacing();
 			ImGui::Columns(2, nullptr, false);
+
+#ifdef GTASA
 			Ui::CheckboxAddress("Armour border", 0x589123);
 			Ui::CheckboxAddress("Armour percentage", 0x589125);
 			Ui::CheckboxAddress("Breath border", 0x589207);
@@ -208,14 +217,20 @@ void Visual::Draw()
 			ImGui::NextColumn();
 
 			if (Ui::CheckboxWithHint("Hide area names", &CHud::bScriptDontDisplayAreaName))
+			{
 				Command<Commands::DISPLAY_ZONE_NAMES>(!CHud::bScriptDontDisplayAreaName);
+			}
 
 			if (Ui::CheckboxWithHint("Hide veh names", &CHud::bScriptDontDisplayVehicleName))
+			{
 				Command<Commands::DISPLAY_CAR_NAMES>(!CHud::bScriptDontDisplayVehicleName);
+			}
 
 			Ui::CheckboxAddressEx("Hide wanted level", 0x58DD1B, 0x90, 1);
 			if (Ui::CheckboxWithHint("Lock weather", &m_bLockWeather))
+			{
 				m_nBacWeatherType = CWeather::OldWeatherType;
+			}
 
 			bool radar_state = (patch::Get<BYTE>(0xBA676C) != 2);
 			if (Ui::CheckboxWithHint("Show radar", &radar_state))
@@ -224,12 +239,25 @@ void Visual::Draw()
 			}
 
 			Ui::CheckboxAddress("Show hud", 0xBA6769);
+#elif GTAVC	
+			Ui::CheckboxAddress("Hide radar", 0xA10AB6);
+			if (Ui::CheckboxWithHint("Lock weather", &m_bLockWeather))
+			{
+				m_nBacWeatherType = CWeather::OldWeatherType;
+			}
+			Ui::CheckboxAddress("Show hud", 0x86963A);
 
+			ImGui::NextColumn();
+
+			Ui::CheckboxAddress("Green scanlines", 0xA10B69);
+			Ui::CheckboxAddress("White scanlines", 0xA10B68);
+#endif
 			ImGui::Columns(1);
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem("Menus"))
 		{
+#ifdef GTASA
 			static bool init_patches = false;
 			static float clock_posX = *(float*)*(int*)0x58EC16;
 			static float clock_posY = *(float*)*(int*)0x58EC04;
@@ -296,9 +324,10 @@ void Visual::Draw()
 
 				init_patches = true;
 			}
-
+#endif
 			if (ImGui::BeginChild("VisualsChild"))
 			{
+#ifdef GTASA
 				ImGui::TextWrapped(
 					"These options won't work if you got any mods that drastically changes the game hud. i.e. Mobile Hud, GTA 5 Hud etc.");
 				ImGui::Spacing();
@@ -338,6 +367,11 @@ void Visual::Draw()
 				Ui::EditAddress<float>("Weapon ammo posY", *(int*)0x58F9E6, -999, 43, 999);
 				Ui::EditAddress<float>("Weapon icon posX", *(int*)0x58F927, -999, 32, 999);
 				Ui::EditAddress<float>("Weapon icon posY", *(int*)0x58F913, -999, 20, 999);
+#elif GTAVC
+				Ui::EditAddress<float>("Radar posX", 0x68FD2C, -999, 40, 999);
+				Ui::EditAddress<float>("Radar posY", 0x68FD34, -999, 104, 999);
+				Ui::EditAddress<BYTE>("Radar width", 0x68FD28, -999, 20, 999);
+#endif
 
 				ImGui::EndChild();
 			}
@@ -345,6 +379,7 @@ void Visual::Draw()
 			ImGui::EndTabItem();
 		}
 
+#ifdef GTASA
 		if (m_nTimecycHour == 8 ? ImGui::BeginTabItem("Timecyc") : ImGui::BeginTabItem("Timecyc 24h"))
 		{
 			ImGui::Spacing();
@@ -466,8 +501,7 @@ void Visual::Draw()
 
 			ImGui::EndTabItem();
 		}
-
-
+#endif
 		ImGui::EndTabBar();
 	}
 }

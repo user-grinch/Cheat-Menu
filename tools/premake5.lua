@@ -83,6 +83,8 @@ project "CheatMenuVC"
         "../src/Weapon.cpp",
         "../src/Game.h", 
         "../src/Game.cpp",
+        "../src/Visual.h", 
+        "../src/Visual.cpp",
         "../src/ResourceStore.h", 
         "../src/ResourceStore.cpp"
     }

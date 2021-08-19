@@ -24,8 +24,8 @@ Get stable binaries from [here](https://github.com/user-grinch/Cheat-Menu/releas
 3. Install [asi loader](https://www.gtagarage.com/mods/show.php?id=21709)
 4. Download **CheatMenu.7z** and extract everything in game directory (replace if necessary).
 5. (Only VC) Download and install [d3d8to9 wrapper](https://github.com/crosire/d3d8to9/releases). Sometimes the asi loader may come with Globals.ini. Remove the d3d8.dll from there.
-6. 
-(Vice City version is available at the discord server atm)
+
+(Vice City version is available at the discord server)
 
 ## Required to build
 1. [Build Tools 2019](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019)
