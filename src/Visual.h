@@ -18,7 +18,7 @@ private:
 	};
 
 	static void GenerateTimecycFile();
-	static int GetCurrentHourTimeId(int hour = -1);
+	static int CalcArrayIndex();
 	static bool TimeCycColorEdit3(const char* label, uchar* r, uchar* g, uchar* b, ImGuiColorEditFlags flags = 0);
 	static bool TimeCycColorEdit4(const char* label, uchar* r, uchar* g, uchar* b, uchar* a,
 								  ImGuiColorEditFlags flags = 0);
@@ -32,8 +32,12 @@ public:
 template <typename T>
 void Visual::TimecycSlider(const char* label, T* ptr, int min, int max)
 {
-	int val = 23 * GetCurrentHourTimeId() + CWeather::OldWeatherType;
+	int val = CalcArrayIndex();
+#ifdef GTASA
 	T* arr = static_cast<T*>(patch::GetPointer(int(ptr)));
+#elif GTAVC
+	T* arr = static_cast<T*>(ptr);
+#endif
 	int a = arr[val];
 
 	if (ImGui::SliderInt(label, &a, min, max))

@@ -25,6 +25,7 @@ private:
 		inline static bool m_bPedBleed;
 		inline static int m_nSelectedPedType;
 		inline static int m_nWeaponId;
+		inline static std::string m_nWeaponName = "None";
 		inline static std::vector<std::string> m_PedTypeList =
 		{
 #ifdef GTASA

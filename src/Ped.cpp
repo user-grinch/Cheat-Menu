@@ -3,6 +3,7 @@
 #include "Ui.h"
 #include "Util.h"
 #include <CPopulation.h>
+#include "Weapon.h"
 
 Ped::Ped()
 {
@@ -293,21 +294,29 @@ void Ped::Draw()
 						}
 					}
 					Ui::ListBox("Ped type", m_SpawnPed::m_PedTypeList, m_SpawnPed::m_nSelectedPedType);
-#ifdef GTASA
-					ImGui::Spacing();
-					ImGui::Text("Selected weapon: %s",
-					            Weapon::m_WeaponData.m_pJson->m_Data[std::to_string(m_SpawnPed::m_nWeaponId)].get<std::string>().c_str());
-					ImGui::Spacing();
 
+					ImGui::Spacing();
+					ImGui::Text("Selected weapon: %s", m_SpawnPed::m_nWeaponName.c_str());
+					ImGui::Spacing();
+#ifdef GTASA
 					Ui::DrawImages(Weapon::m_WeaponData,
 					               [](std::string str) { m_SpawnPed::m_nWeaponId = std::stoi(str); },
 					               nullptr,
 					               [](std::string str)
 					               {
-						               return Weapon::m_WeaponData.m_pJson->m_Data[str].get<std::string>();
+									   m_SpawnPed::m_nWeaponName = Weapon::m_WeaponData.m_pJson->m_Data[str].get<std::string>();
+						               return m_SpawnPed::m_nWeaponName;
 					               },
 					               [](std::string str) { return str != "-1"; /*Jetpack*/ }
 					);
+#elif GTAVC
+					Ui::DrawJSON(Weapon::m_WeaponData, 
+					[](std::string& root, std::string& key, std::string& id) 
+					{
+						m_SpawnPed::m_nWeaponId = std::stoi(id); 
+						m_SpawnPed::m_nWeaponName = key;
+					}, 
+					nullptr);
 #endif
 					ImGui::Spacing();
 					ImGui::EndChild();

@@ -1,97 +1,87 @@
-uchar* m_nDirectionalMult = (uchar*)0x55F7C7; //m_nDirectionalMult[184]
+uchar* m_nAmbientRed = (uchar*)BY_GAME(0x560C61, 0x9388C8);
+uchar* m_nAmbientGreen = (uchar*)BY_GAME(0x55F4D6, 0x78D508); 
+uchar* m_nAmbientBlue = (uchar*)BY_GAME(0x55F4E8, 0x813D48); 
 
-uchar* m_nWaterFogAlpha = (uchar*)0x55F7B8; //m_nWaterFogAlpha[184]
+uchar* m_nAmbientRed_Obj = (uchar*)BY_GAME(0x55F4FA, 0x7D53B0);
+uchar* m_nAmbientGreen_Obj = (uchar*)BY_GAME(0x55F50C, 0x7D9370);
+uchar* m_nAmbientBlue_Obj = (uchar*)BY_GAME(0x55F51E, 0x94C038); 
 
-uchar* m_nHighLightMinIntensity = (uchar*)0x55F7A9; //m_nHighLightMinIntensity[184]
+uchar* m_nSkyTopRed = (uchar*)BY_GAME(0x55F531, 0x94BE98); 
+uchar* m_nSkyTopGreen = (uchar*)BY_GAME(0x55F53D, 0x933A58); 
+uchar* m_nSkyTopBlue = (uchar*)BY_GAME(0x55F549, 0x94A170); 
 
-uchar* m_fCloudAlpha = (uchar*)0x55F793; //m_fCloudAlpha[184]
+uchar* m_nSkyBottomRed = (uchar*)BY_GAME(0x55F555, 0x7E44A0); 
+uchar* m_nSkyBottomGreen = (uchar*)BY_GAME(0x55F561, 0x7E9CD0); 
+uchar* m_nSkyBottomBlue = (uchar*)BY_GAME(0x55F56D, 0x92D420); 
 
-uchar* m_fPostFx2Alpha = (uchar*)0x55F77D; //m_fPostFx2Alpha[184]
+uchar* m_nSunCoreRed = (uchar*)BY_GAME(0x55F59D, 0x944098); 
+uchar* m_nSunCoreGreen = (uchar*)BY_GAME(0x55F5A9, 0x7D94C0); 
+uchar* m_nSunCoreBlue = (uchar*)BY_GAME(0x55F5B5, 0x8614F8); 
 
-uchar* m_fPostFx2Blue = (uchar*)0x55F767; //m_fPostFx2Blue[184]
+uchar* m_nSunCoronaRed = (uchar*)BY_GAME(0x55F579, 0x78CCD8); 
+uchar* m_nSunCoronaGreen = (uchar*)BY_GAME(0x55F585, 0x7DBC08); 
+uchar* m_nSunCoronaBlue = (uchar*)BY_GAME(0x55F591, 0x7D1818); 
 
-uchar* m_fPostFx2Green = (uchar*)0x55F751; //m_fPostFx2Green[184]
+uchar* m_nLowCloudsRed = (uchar*)BY_GAME(0x55F653, 0x8100C0); 
+uchar* m_nLowCloudsGreen = (uchar*)BY_GAME(0x55F65F, 0x94AEA0); 
+uchar* m_nLowCloudsBlue = (uchar*)BY_GAME(0x55F66B, 0x94BDF0); 
 
-uchar* m_fPostFx2Red = (uchar*)0x55F73B; //m_fPostFx2Red[184]
+uchar* m_fLightsOnGroundBrightness = (uchar*)BY_GAME(0x55F640, 0x92D378); 
+uchar* m_nPoleShadowStrength = (uchar*)BY_GAME(0x55F60F, 0x812090); 
+uchar* m_nLightShadowStrength = (uchar*)BY_GAME(0x55F603, 0x811828); 
+uchar* m_nShadowStrength = (uchar*)BY_GAME(0x55F5F7, 0x92D260); 
+uchar* m_fSpriteBrightness = (uchar*)BY_GAME(0x55F5E4, 0x7D5308); 
+uchar* m_fSpriteSize = (uchar*)BY_GAME(0x55F5D2, 0x94B848); 
+uchar* m_fSunSize = (uchar*)BY_GAME(0x55F5C0, 0x818720); 
+short* m_fFogStart = (short*)BY_GAME(0x55F62E, 0x94D638); 
+short* m_fFarClip = (short*)BY_GAME(0x55F61B, 0x94D4E8); 
 
-uchar* m_fPostFx1Alpha = (uchar*)0x55F725; //m_fPostFx1Alpha[184]
+uchar* m_fWaterRed = (uchar*)BY_GAME(0x55F69C, 0x7E5560); 
+uchar* m_fWaterGreen = (uchar*)BY_GAME(0x55F6B0, 0x7DE148); 
+uchar* m_fWaterBlue = (uchar*)BY_GAME(0x55F6C3, 0x862248); 
+uchar* m_fWaterAlpha = (uchar*)BY_GAME(0x55F6D6, 0x7DDAE0); 
 
-uchar* m_fPostFx1Blue = (uchar*)0x55F70F; //m_fPostFx1Blue[184]
+#ifdef GTASA
+uchar* m_fPostFx2Alpha = (uchar*)0x55F77D; 
+uchar* m_fPostFx2Blue = (uchar*)0x55F767; 
+uchar* m_fPostFx2Green = (uchar*)0x55F751; 
+uchar* m_fPostFx2Red = (uchar*)0x55F73B; 
+uchar* m_fPostFx1Alpha = (uchar*)0x55F725; 
+uchar* m_fPostFx1Blue = (uchar*)0x55F70F; 
+uchar* m_fPostFx1Green = (uchar*)0x55F6FC; 
+uchar* m_fPostFx1Red = (uchar*)0x55F6E9; 
 
-uchar* m_fPostFx1Green = (uchar*)0x55F6FC; //m_fPostFx1Green[184]
+uchar* m_nFluffyCloudsBottomRed = (uchar*)0x55F677; 
+uchar* m_nFluffyCloudsBottomGreen = (uchar*)0x55F683; 
+uchar* m_nFluffyCloudsBottomBlue = (uchar*)0x55F690; 
 
-uchar* m_fPostFx1Red = (uchar*)0x55F6E9; //m_fPostFx1Red[184]
+uchar* m_nDirectionalMult = (uchar*)0x55F7C7; 
+uchar* m_nWaterFogAlpha = (uchar*)0x55F7B8; 
+uchar* m_nHighLightMinIntensity = (uchar*)0x55F7A9; 
+uchar* m_fCloudAlpha = (uchar*)0x55F793; 
 
-uchar* m_fWaterAlpha = (uchar*)0x55F6D6; //m_fWaterAlpha[184]
+#elif GTAVC
+uchar* m_nAmbientBlRed = (uchar*)0x78D5B0;
+uchar* m_nAmbientBlGreen = (uchar*)0x861430; 
+uchar* m_nAmbientBlBlue = (uchar*)0x811740; 
 
-uchar* m_fWaterBlue = (uchar*)0x55F6C3; //m_fWaterBlue[184]
+uchar* m_nAmbientBlRed_Obj = (uchar*)0x7D9418;
+uchar* m_nAmbientBlGreen_Obj = (uchar*)0x818FC0; 
+uchar* m_nAmbientBlBlue_Obj = (uchar*)0x813B68; 
 
-uchar* m_fWaterGreen = (uchar*)0x55F6B0; //m_fWaterGreen[184]
+uchar* m_nDirRed = (uchar*)0x7E45E0;
+uchar* m_nDirGreen = (uchar*)0x7DDDF8; 
+uchar* m_nDirBlue = (uchar*)0x92D1B8; 
 
-uchar* m_fWaterRed = (uchar*)0x55F69C; //m_fWaterRed[184]
+uchar* m_nTopCloudsRed = (uchar*)0x7F3C80; 
+uchar* m_nTopCloudsGreen = (uchar*)0x813F70; 
+uchar* m_nTopCloudsBlue = (uchar*)0x938980; 
 
-uchar* m_nFluffyCloudsBottomBlue = (uchar*)0x55F690; //m_nFluffyCloudsBottomBlue[184]
+uchar* m_nBottomCloudsRed = (uchar*)0x7D3D98; 
+uchar* m_nBottomCloudsGreen = (uchar*)0x7FFE38; 
+uchar* m_nBottomCloudsBlue = (uchar*)0x7D9630; 
 
-uchar* m_nFluffyCloudsBottomGreen = (uchar*)0x55F683; //m_nFluffyCloudsBottomGreen[184]
-
-uchar* m_nFluffyCloudsBottomRed = (uchar*)0x55F677; //m_nFluffyCloudsBottomRed[184]
-
-uchar* m_nLowCloudsBlue = (uchar*)0x55F66B; //m_nLowCloudsBlue[184]
-
-uchar* m_nLowCloudsGreen = (uchar*)0x55F65F; //m_nLowCloudsGreen[184]
-
-uchar* m_nLowCloudsRed = (uchar*)0x55F653; //m_nLowCloudsRed[184]
-
-uchar* m_fLightsOnGroundBrightness = (uchar*)0x55F640; //m_fLightsOnGroundBrightness[184]
-
-short* m_fFogStart = (short*)0x55F62E; //m_fFogStart[184]
-
-short* m_fFarClip = (short*)0x55F61B; //m_fFarClip[184]
-
-uchar* m_nPoleShadowStrength = (uchar*)0x55F60F; //m_nPoleShadowStrength[184]
-
-uchar* m_nLightShadowStrength = (uchar*)0x55F603; //m_nLightShadowStrength[184]
-
-uchar* m_nShadowStrength = (uchar*)0x55F5F7; //m_nShadowStrength[184]
-
-uchar* m_fSpriteBrightness = (uchar*)0x55F5E4; //m_fSpriteBrightness[184]
-
-uchar* m_fSpriteSize = (uchar*)0x55F5D2; //m_fSpriteSize[184]
-
-uchar* m_fSunSize = (uchar*)0x55F5C0; //m_fSunSize[184]
-
-uchar* m_nSunCoronaBlue = (uchar*)0x55F5B5; //m_nSunCoronaBlue[184]
-
-uchar* m_nSunCoronaGreen = (uchar*)0x55F5A9; //m_nSunCoronaGreen[184]
-
-uchar* m_nSunCoronaRed = (uchar*)0x55F59D; //m_nSunCoronaRed[184]
-
-uchar* m_nSunCoreBlue = (uchar*)0x55F591; //m_nSunCoreBlue[184]
-
-uchar* m_nSunCoreGreen = (uchar*)0x55F585; //m_nSunCoreGreen[184]
-
-uchar* m_nSunCoreRed = (uchar*)0x55F579; //m_nSunCoreRed[184]
-
-uchar* m_nSkyBottomBlue = (uchar*)0x55F56D; //m_nSkyBottomBlue[184]
-
-uchar* m_nSkyBottomGreen = (uchar*)0x55F561; //m_nSkyBottomGreen[184]
-
-uchar* m_nSkyBottomRed = (uchar*)0x55F555; //m_nSkyBottomRed[184]
-
-uchar* m_nSkyTopBlue = (uchar*)0x55F549; //m_nSkyTopBlue[45]
-
-uchar* m_nSkyTopGreen = (uchar*)0x55F53D; //m_nSkyTopGreen[45]
-
-uchar* m_nSkyTopRed = (uchar*)0x55F531; //m_nSkyTopRed[45]
-
-uchar* m_nAmbientBlue_Obj = (uchar*)0x55F51E; //m_nAmbientBlue_Obj[184]
-
-uchar* m_nAmbientGreen_Obj = (uchar*)0x55F50C; //m_nAmbientGreen_Obj[184]
-
-uchar* m_nAmbientRed_Obj = (uchar*)0x55F4FA; //m_nAmbientRed_Obj[184]
-
-uchar* m_nAmbientBlue = (uchar*)0x55F4E8; //m_nAmbientBlue[184]
-
-uchar* m_nAmbientGreen = (uchar*)0x55F4D6; //m_nAmbientGreen[184]
-
-uchar* m_nAmbientRed = (uchar*)0x560C61; //m_nAmbientRed[184]
+uchar* m_nBlurRed = (uchar*)0x94B790; 
+uchar* m_nBlurGreen = (uchar*)0x8621A0; 
+uchar* m_nBlurBlue = (uchar*)0x945728; 
+#endif
