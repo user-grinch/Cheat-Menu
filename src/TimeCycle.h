@@ -1,3 +1,5 @@
+#pragma once
+
 uchar* m_nAmbientRed = (uchar*)BY_GAME(0x560C61, 0x9388C8);
 uchar* m_nAmbientGreen = (uchar*)BY_GAME(0x55F4D6, 0x78D508); 
 uchar* m_nAmbientBlue = (uchar*)BY_GAME(0x55F4E8, 0x813D48); 

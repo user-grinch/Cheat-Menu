@@ -132,6 +132,7 @@ void Visual::GenerateTimecycFile()
 {
 #ifdef GTASA
 	std::ofstream file;
+	std::string buffer;
 	if (m_nTimecycHour == 24)
 	{
 		file = std::ofstream("timecyc_24h.dat");
@@ -143,80 +144,116 @@ void Visual::GenerateTimecycFile()
 
 	for (uint i = 0; i < m_WeatherNames.size(); ++i)
 	{
-		file << "\n\n//////////// " << m_WeatherNames[i] << "\n";
-		file <<
-			"//\tAmb\t\t\t\t\tAmb Obj \t\t\t\tDir \t\t\t\t\tSky top\t\t\t\tSky bot\t\t\t\tSunCore\t\t\t\t\tSunCorona\t\t\tSunSz\tSprSz\tSprBght\t\tShdw\tLightShd\tPoleShd\t\tFarClp\t\tFogSt\tLightOnGround\tLowCloudsRGB\tBottomCloudRGB\t\tWaterRGBA\t\t\t\tARGB1\t\t\t\t\tARGB2\t\t\tCloudAlpha\t\tIntensityLimit\t\tWaterFogAlpha\tDirMult \n\n";
+		buffer += "\n// " + m_WeatherNames[i] + "\n";
+		buffer += "//	Amb					Amb Obj 				Dir 					Sky top				Sky bot				SunCore					SunCorona			SunSz	SprSz	SprBght		Shdw	LightShd	PoleShd		FarClp		FogSt	LightOnGround	LowCloudsRGB	BottomCloudRGB		WaterRGBA				ARGB1					ARGB2			CloudAlpha		IntensityLimit		WaterFogAlpha	DirMult";
 
+		file << buffer << std::endl;
 		for (int j = 0; j < m_nTimecycHour; ++j)
 		{
 			if (m_nTimecycHour == 24)
 			{
-				if (j >= 12)
-					file << "// " << j << " PM\n";
+				if (j < 12)
+				{
+					buffer = std::format("// {} AM\n", j);
+				}
 				else
-					file << "// " << j << " AM\n";
+				{
+					buffer = std::format("// {} PM\n", j);
+				}
 			}
 			else
 			{
-				if (j == 0) file << "// Midnight\n";
-				if (j == 1) file << "// 5 AM\n";
-				if (j == 2) file << "// 6 AM\n";
-				if (j == 3) file << "// 7 AM\n";
-				if (j == 4) file << "// Midday\n";
-				if (j == 5) file << "// 7 PM\n";
-				if (j == 6) file << "// 8 PM\n";
-				if (j == 7) file << "// 10 PM\n";
+				if (j == 0) buffer = "// Midnight\n";
+				if (j == 1) buffer = "// 5 AM\n";
+				if (j == 2) buffer = "// 6 AM\n";
+				if (j == 3) buffer = "// 7 AM\n";
+				if (j == 4) buffer = "// Midday\n";
+				if (j == 5) buffer = "// 7 PM\n";
+				if (j == 6) buffer = "// 8 PM\n";
+				if (j == 7) buffer = "// 10 PM\n";
 			}
 
 			int val = 23 * j + i;
 
-			file << "\t" << GetTCVal(m_nAmbientRed, val) << " " << GetTCVal(m_nAmbientGreen, val) << " " << GetTCVal(
-					m_nAmbientBlue, val) << " \t\t"
+			buffer += std::format("{} {} {}\t{} {} {}\t255 255 255\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {} {}\t{} {} {} {}\t{} {} {} {}\t{} {} {} {}",
+				GetTCVal(m_nAmbientRed, val), GetTCVal(m_nAmbientGreen, val), GetTCVal(m_nAmbientBlue, val),
+				GetTCVal(m_nAmbientRed_Obj, val), GetTCVal(m_nAmbientGreen_Obj, val), GetTCVal(m_nAmbientBlue_Obj, val),
+				GetTCVal(m_nSkyTopRed, val), GetTCVal(m_nSkyTopGreen, val), GetTCVal(m_nSkyTopBlue, val),
+				GetTCVal(m_nSkyBottomRed, val), GetTCVal(m_nSkyBottomGreen, val), GetTCVal(m_nSkyBottomBlue, val),
+				GetTCVal(m_nSunCoreRed, val), GetTCVal(m_nSunCoreGreen, val), GetTCVal(m_nSunCoreBlue, val),
+				GetTCVal(m_nSunCoronaRed, val), GetTCVal(m_nSunCoronaGreen, val), GetTCVal(m_nSunCoronaBlue, val),
+				GetTCVal(m_fSunSize, val) / 10.0f, GetTCVal(m_fSpriteSize, val) / 10.0f, GetTCVal(m_fSpriteBrightness, val) / 10.0f,
+				GetTCVal(m_nShadowStrength, val), GetTCVal(m_nLightShadowStrength, val), GetTCVal(m_nPoleShadowStrength, val),
+				GetTCVal(m_fFarClip, val), GetTCVal(m_fFogStart, val), GetTCVal(m_fLightsOnGroundBrightness, val)/ 10.0f,
+				GetTCVal(m_nLowCloudsRed, val), GetTCVal(m_nLowCloudsGreen, val), GetTCVal(m_nLowCloudsBlue, val),
+				GetTCVal(m_nSkyBottomRed, val), GetTCVal(m_nSkyBottomGreen, val), GetTCVal(m_nSkyBottomBlue, val),
+				GetTCVal(m_fWaterRed, val), GetTCVal(m_fWaterGreen, val), GetTCVal(m_fWaterBlue, val), GetTCVal(m_fWaterAlpha, val),
+				GetTCVal(m_fPostFx1Red, val), GetTCVal(m_fPostFx1Green, val), GetTCVal(m_fPostFx1Blue, val), GetTCVal(m_fPostFx1Alpha, val),
+				GetTCVal(m_fPostFx2Red, val), GetTCVal(m_fPostFx2Green, val), GetTCVal(m_fPostFx2Blue, val), GetTCVal(m_fPostFx2Alpha, val),
+				GetTCVal(m_fCloudAlpha, val), GetTCVal(m_nHighLightMinIntensity, val), GetTCVal(m_nWaterFogAlpha, val), GetTCVal(m_nDirectionalMult, val) / 100.0
+			);
+			file << buffer << std::endl;
+		}
+	}
+#elif GTAVC
+	std::ofstream file = std::ofstream("timecyc.dat");
 
-				<< "\t" << GetTCVal(m_nAmbientRed_Obj, val) << " " << GetTCVal(m_nAmbientGreen_Obj, val) << " " <<
-				GetTCVal(m_nAmbientBlue_Obj, val) << " \t\t"
+	for (uint i = 0; i < 4; ++i)
+	{
+		std::string buffer;
+		switch(i)
+		{
+		case 0:
+			buffer =  "\n// SUNNY\n";
+			break;
+		case 1:
+			buffer =  "\n// CLOUDY\n";
+			break;
+		case 2:
+			buffer =  "\n// RAINY\n";
+			break;
+		case 3:
+			buffer =  "\n// FOGGY\n";
+		} 
 
-				<< "\t255 255 255\t\t" // unused
+		buffer += "// Amb     Amb_Obj    Amb_bl     Amb_Obj_bl	   Dir          Sky top			Sky bot		SunCore 		SunCorona   SunSz  SprSz	SprBght Shdw LightShd  PoleShd 	FarClp 	 FogSt 	LightOnGround	LowCloudsRGB TopCloudRGB BottomCloudRGB		BlurRGB					WaterRGBA";
 
-				<< "\t" << GetTCVal(m_nSkyTopRed, val) << " " << GetTCVal(m_nSkyTopGreen, val) << " " << GetTCVal(
-					m_nSkyTopBlue, val) << " \t\t"
+		file << buffer << std::endl;
 
-				<< "\t" << GetTCVal(m_nSkyBottomRed, val) << " " << GetTCVal(m_nSkyBottomGreen, val) << " " << GetTCVal(
-					m_nSkyBottomBlue, val) << " \t\t"
+		for (size_t j = 0; j < 24; ++j)
+		{
+			buffer = "// " + std::to_string(j) + " ";
+			if (j < 12)
+			{
+				buffer += "AM\n"; 
+			}
+			else
+			{
+				buffer += "PM\n";
+			}
 
-				<< "\t" << GetTCVal(m_nSunCoreRed, val) << " " << GetTCVal(m_nSunCoreGreen, val) << " " << GetTCVal(
-					m_nSunCoreBlue, val) << " \t\t"
+			size_t val = 7 * i + j;
 
-				<< "\t" << GetTCVal(m_nSunCoronaRed, val) << " " << GetTCVal(m_nSunCoronaGreen, val) << " " << GetTCVal(
-					m_nSunCoronaBlue, val) << " \t\t"
-
-				<< "\t" << (GetTCVal(m_fSunSize, val) - 0.5f) / 10.0f << " " << (GetTCVal(m_fSpriteSize, val) - 0.5f) /
-				10.0f << " " << (GetTCVal(m_fSpriteBrightness, val) - 0.5f) / 10.0f << " \t\t"
-
-				<< "\t" << GetTCVal(m_nShadowStrength, val) << " " << GetTCVal(m_nLightShadowStrength, val) << " " <<
-				GetTCVal(m_nPoleShadowStrength, val) << " \t\t"
-
-				<< "\t" << GetTCVal(m_fFarClip, val) << " " << GetTCVal(m_fFogStart, val) << " " << (GetTCVal(
-					m_fLightsOnGroundBrightness, val) - 0.5) / 10.0f << " \t\t"
-
-				<< "\t" << GetTCVal(m_nLowCloudsRed, val) << " " << GetTCVal(m_nLowCloudsGreen, val) << " " << GetTCVal(
-					m_nLowCloudsBlue, val) << " \t\t"
-
-				<< "\t" << GetTCVal(m_nFluffyCloudsBottomRed, val) << " " << GetTCVal(m_nFluffyCloudsBottomGreen, val)
-				<< " " << GetTCVal(m_nFluffyCloudsBottomBlue, val) << " \t\t"
-
-				<< "\t" << GetTCVal(m_fWaterRed, val) << " " << GetTCVal(m_fWaterGreen, val) << " " <<
-				GetTCVal(m_fWaterBlue, val) << " " << GetTCVal(m_fWaterAlpha, val) << " \t\t"
-
-				<< "\t" << GetTCVal(m_fPostFx1Alpha, val) << " " << GetTCVal(m_fPostFx1Red, val) << " " <<
-				GetTCVal(m_fPostFx1Green, val) << " " << GetTCVal(m_fPostFx1Blue, val) << " \t\t"
-
-				<< "\t" << GetTCVal(m_fPostFx2Alpha, val) << " " << GetTCVal(m_fPostFx2Red, val) << " " <<
-				GetTCVal(m_fPostFx2Green, val) << " " << GetTCVal(m_fPostFx2Blue, val) << " \t\t"
-
-				<< "\t" << GetTCVal(m_fCloudAlpha, val) << " " << GetTCVal(m_nHighLightMinIntensity, val) << " " <<
-				GetTCVal(m_nWaterFogAlpha, val) << " " << GetTCVal(m_nDirectionalMult, val) / 100.0 << " \t\t" <<
-				std::endl;
+			buffer += std::format("{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {} {}",
+				GetTCVal(m_nAmbientRed, val), GetTCVal(m_nAmbientGreen, val), GetTCVal(m_nAmbientBlue, val),
+				GetTCVal(m_nAmbientRed_Obj, val), GetTCVal(m_nAmbientGreen_Obj, val), GetTCVal(m_nAmbientBlue_Obj, val),
+				GetTCVal(m_nAmbientBlRed, val), GetTCVal(m_nAmbientBlGreen, val), GetTCVal(m_nAmbientBlBlue, val),
+				GetTCVal(m_nAmbientBlRed_Obj, val), GetTCVal(m_nAmbientBlGreen_Obj, val), GetTCVal(m_nAmbientBlBlue_Obj, val),
+				GetTCVal(m_nDirRed, val), GetTCVal(m_nDirGreen, val), GetTCVal(m_nDirBlue, val),
+				GetTCVal(m_nSkyTopRed, val), GetTCVal(m_nSkyTopGreen, val), GetTCVal(m_nSkyTopBlue, val),
+				GetTCVal(m_nSkyBottomRed, val), GetTCVal(m_nSkyBottomGreen, val), GetTCVal(m_nSkyBottomBlue, val),
+				GetTCVal(m_nSunCoreRed, val), GetTCVal(m_nSunCoreGreen, val), GetTCVal(m_nSunCoreBlue, val),
+				GetTCVal(m_nSunCoronaRed, val), GetTCVal(m_nSunCoronaGreen, val), GetTCVal(m_nSunCoronaBlue, val),
+				GetTCVal(m_fSunSize, val) / 10.0f, GetTCVal(m_fSpriteSize, val) / 10.0f, GetTCVal(m_fSpriteBrightness, val) / 10.0f,
+				GetTCVal(m_nShadowStrength, val), GetTCVal(m_nLightShadowStrength, val), GetTCVal(m_nPoleShadowStrength, val),
+				GetTCVal(m_fFarClip, val), GetTCVal(m_fFogStart, val), GetTCVal(m_fLightsOnGroundBrightness, val)/ 10.0f,
+				GetTCVal(m_nLowCloudsRed, val), GetTCVal(m_nLowCloudsGreen, val), GetTCVal(m_nLowCloudsBlue, val),
+				GetTCVal(m_nTopCloudsRed, val), GetTCVal(m_nTopCloudsGreen, val), GetTCVal(m_nTopCloudsBlue, val),
+				GetTCVal(m_nBottomCloudsRed, val), GetTCVal(m_nBottomCloudsGreen, val), GetTCVal(m_nBottomCloudsBlue, val),
+				GetTCVal(m_nBlurRed, val), GetTCVal(m_nBlurGreen, val), GetTCVal(m_nBlurBlue, val),
+				GetTCVal(m_fWaterRed, val), GetTCVal(m_fWaterGreen, val), GetTCVal(m_fWaterBlue, val), GetTCVal(m_fWaterAlpha, val)
+			);
+			file << buffer << std::endl;
 		}
 	}
 #endif 
