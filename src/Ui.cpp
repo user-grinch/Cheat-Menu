@@ -490,12 +490,13 @@ void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLe
 		Trying to scale images based on resolutions
 		Native 1366x768
 	*/
-	store.m_ImageSize.x *= screen::GetScreenWidth() / 1366.0f;
-	store.m_ImageSize.y *= screen::GetScreenHeight() / 768.0f;
+	ImVec2 m_ImageSize = store.m_ImageSize;
+	m_ImageSize.x *= screen::GetScreenWidth() / 1366.0f;
+	m_ImageSize.y *= screen::GetScreenHeight() / 768.0f;
 
 	int imageCount = 1;
-	int imagesInRow = static_cast<int>(ImGui::GetWindowContentRegionWidth() / store.m_ImageSize.x);
-	store.m_ImageSize.x = ImGui::GetWindowContentRegionWidth() / imagesInRow - static_cast<int>(ImGuiStyleVar_ItemSpacing) * 0.65f;
+	int imagesInRow = static_cast<int>(ImGui::GetWindowContentRegionWidth() / m_ImageSize.x);
+	m_ImageSize.x = ImGui::GetWindowContentRegionWidth() / imagesInRow - static_cast<int>(ImGuiStyleVar_ItemSpacing) * 0.65f;
 
 	ImGui::Spacing();
 
@@ -544,7 +545,7 @@ void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLe
 			}
 			else
 			{
-				if (ImGui::ImageButton(store.m_ImagesList[i]->m_pTexture, store.m_ImageSize, ImVec2(0, 0), ImVec2(1, 1), 1, ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 1)))
+				if (ImGui::ImageButton(store.m_ImagesList[i]->m_pTexture, m_ImageSize, ImVec2(0, 0), ImVec2(1, 1), 1, ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 1)))
 				{
 					onLeftClick(text);
 				}
@@ -570,7 +571,7 @@ void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLe
 
 					// Calculating and drawing text over the image
 					ImVec2 textSize = ImGui::CalcTextSize(modelName.c_str());
-					if (textSize.x < store.m_ImageSize.x)
+					if (textSize.x < m_ImageSize.x)
 					{
 						float offsetX = (ImGui::GetItemRectSize().x - textSize.x) / 2;
 						drawlist->AddText(ImVec2(btnMin.x + offsetX, btnMin.y + 10), ImGui::GetColorU32(ImGuiCol_Text),

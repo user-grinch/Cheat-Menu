@@ -333,6 +333,25 @@ void Player::Draw()
 			{
 				CCheat::NotWantedCheat();
 			}
+#elif GTAVC
+			static bool neverWanted = false;
+			if (Ui::CheckboxWithHint("Never wanted", &neverWanted))
+			{
+				if (neverWanted)
+				{
+					pPlayer->m_pWanted->CheatWantedLevel(0);
+					pPlayer->m_pWanted->Update();
+					patch::SetRaw(0x4D2110, (char*)"\xC3\x90\x90\x90\x90\x90", 6); // CWanted::UpdateWantedLevel()
+					patch::Nop(0x5373D0, 5); // CWanted::Update();
+				}
+				else
+				{
+					pPlayer->m_pWanted->CheatWantedLevel(0);
+					pPlayer->m_pWanted->ClearQdCrimes();
+					patch::SetRaw(0x4D2110, (char*)"\x8B\x15\xDC\x10\x69\x00", 6);
+					patch::SetRaw(0x5373D0, (char*)"\xE8\x8B\xAE\xF9\xFF", 5);
+				}
+			}
 #endif
 			Ui::CheckboxAddress("No arrest fee", (int)&pInfo->m_bGetOutOfJailFree);
 

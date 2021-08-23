@@ -281,7 +281,9 @@ void Vehicle::ParseVehiclesIDE()
 		while (getline(file, line))
 		{
 			if (line[0] <= '0' || line[0] >= '9')
+			{
 				continue;
+			}
 
 			try
 			{
