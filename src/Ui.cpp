@@ -189,9 +189,8 @@ bool Ui::CheckboxWithHint(const char* label, bool* v, const char* hint, bool is_
 	ImU32 color = ImGui::GetColorU32(ImGuiCol_FrameBg);
 	std::string slabel = "##InvCheckboxBtn" + std::string(label);
 
-	if (is_disabled)
-		ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-
+	ImGui::BeginDisabled(is_disabled);
+	
 	// process the button states
 	if (ImGui::InvisibleButton(slabel.c_str(), ImVec2(square_sz, square_sz)) && !is_disabled)
 	{
@@ -260,8 +259,7 @@ bool Ui::CheckboxWithHint(const char* label, bool* v, const char* hint, bool is_
 		}
 	}
 
-	if (is_disabled)
-		ImGui::PopStyleVar();
+	ImGui::EndDisabled();
 
 	return pressed;
 }

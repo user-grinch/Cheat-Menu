@@ -4,7 +4,9 @@
 #include "Ui.h"
 #include "Util.h"
 #ifdef GTASA
-#include "CIplStore.h"
+#include <CIplStore.h>
+#include <CMessages.h>
+#include <CSprite2d.h>
 #endif
 
 static bool bSaveGameFlag = false;
@@ -54,6 +56,27 @@ Game::Game()
 		{
 			FrontEndMenuManager.m_nCurrentMenuPage = MENUPAGE_GAME_SAVE;
 			bSaveGameFlag = false;
+		}
+	};
+
+	Events::drawingEvent += []()
+	{
+		if (m_RandomCheats::m_bEnabled && m_RandomCheats::m_bProgressBar)
+		{
+			// Next cheat timer bar
+			uint screenWidth = screen::GetScreenWidth();
+			uint screenHeight = screen::GetScreenHeight();
+			uint timer = CTimer::m_snTimeInMilliseconds;
+			uint totalTime = m_RandomCheats::m_nInterval;
+			float progress = (totalTime - (timer - m_RandomCheats::m_nTimer) / 1000.0f) / totalTime;
+
+			CRect sizeBox = CRect(0,0, screenWidth, screenHeight/50);
+			CRect sizeProgress = CRect(0,0, screenWidth*progress, screenHeight/50);
+			CRGBA colorBG = CRGBA(24, 99, 44, 255);
+			CRGBA colorProgress = CRGBA(33, 145, 63, 255);
+
+			CSprite2d::DrawRect(sizeBox, colorBG);
+			CSprite2d::DrawRect(sizeProgress, colorProgress);
 		}
 	};
 #endif
@@ -149,22 +172,24 @@ Game::Game()
 		}
 
 #ifdef GTASA
-		if (m_RandomCheats::m_bEnabled
-			&& (timer - m_RandomCheats::m_nTimer) > (static_cast<uint>(m_RandomCheats::m_nInterval) * 1000))
+		if (m_RandomCheats::m_bEnabled)
 		{
-			int id = Random(0, 91);
-
-			for (int i = 0; i < 92; i++)
+			if ((timer - m_RandomCheats::m_nTimer) > (static_cast<uint>(m_RandomCheats::m_nInterval) * 1000))
 			{
-				if (i == id)
+				int id = Random(0, 91);
+
+				for (int i = 0; i < 92; i++)
 				{
-					if (m_RandomCheats::m_EnabledCheats[i][1] == "true")
+					if (i == id)
 					{
-						((void(*)(int))0x00438370)(id); // cheatEnableLegimate(int CheatID)
-						SetHelpMessage(m_RandomCheats::m_EnabledCheats[i][0].c_str(), false, false, false);
-						m_RandomCheats::m_nTimer = timer;
+						if (m_RandomCheats::m_EnabledCheats[i][1] == "true")
+						{
+							Call<0x00438370>(id); // cheatEnableLegimate(int CheatID)
+							CMessages::AddMessage((char*)m_RandomCheats::m_EnabledCheats[i][0].c_str(), 2000, 0, false);
+							m_RandomCheats::m_nTimer = timer;
+						}
+						break;
 					}
-					break;
 				}
 			}
 		}
@@ -388,11 +413,11 @@ void Game::Draw()
 			{
 				if (m_bDisableReplay)
 				{
-					patch::SetChar(BY_GAME(0x460500, 0x624EC0), 0xC3);
+					patch::SetUChar(BY_GAME(0x460500, 0x624EC0), 0xC3);
 				}
 				else
 				{
-					patch::SetChar(BY_GAME(0x460500, 0x624EC0), 0x80);
+					patch::SetUChar(BY_GAME(0x460500, 0x624EC0), 0x80);
 				}
 			}
 
@@ -690,13 +715,17 @@ It's recommanded not to save after using the mission loader. Use it at your own 
 		if (ImGui::BeginTabItem("Random cheats"))
 		{
 			ImGui::Spacing();
+			ImGui::Columns(2, NULL, false);
 			ImGui::Checkbox("Enable", &m_RandomCheats::m_bEnabled);
+			ImGui::NextColumn();
+			ImGui::Checkbox("Progress bar", &m_RandomCheats::m_bProgressBar);
+			ImGui::Columns(1);
 			ImGui::Spacing();
 
 			ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 2);
 
 			ImGui::SliderInt("Activate cheat timer", &m_RandomCheats::m_nInterval, 5, 60);
-			Ui::ShowTooltip("Wait time after a cheat is activated.");
+			Ui::ShowTooltip("Time for the next cheat activation.");
 
 			ImGui::PopItemWidth();
 

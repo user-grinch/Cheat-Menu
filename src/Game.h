@@ -21,6 +21,7 @@ public:
 	struct m_RandomCheats
 	{
 		inline static bool m_bEnabled;
+		inline static bool m_bProgressBar = true;
 		inline static std::string m_EnabledCheats[92][2];
 		inline static int m_nInterval = 10;
 		inline static CJson m_Json = CJson("cheat name");
