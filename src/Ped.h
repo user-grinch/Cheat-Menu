@@ -8,6 +8,8 @@ class Ped
 {
 private:
 #ifdef GTASA
+	inline static bool m_bBigHead;
+	inline static bool m_bThinBody;
 	inline static CJson m_SpecialPedJson = CJson("ped special");
 	inline static ResourceStore m_PedData{"ped", eResourceType::TYPE_BOTH, ImVec2(65, 110)};
 #elif GTAVC
@@ -56,6 +58,7 @@ public:
 
 #ifdef GTASA
 	static void SpawnPed(std::string& model);
+	static void BigHeadEffect(CPed *ped);
 #elif GTAVC
 	static void SpawnPed(std::string& cat, std::string& name, std::string& model);
 #endif

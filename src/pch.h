@@ -51,7 +51,7 @@ struct HotKeyData
 static void SetHelpMessage(const char *message, bool b1, bool b2, bool b3)
 {
 #if GTAVC
-    CHud::SetHelpMessage(message, b1, b2);
+	CHud::SetHelpMessage(message, b1, b2);
 #elif GTASA
 	CHud::SetHelpMessage(message, b1, b2, b3);
 #endif

@@ -63,7 +63,7 @@ void ResourceStore::LoadTextureResource(std::string&& name)
             m_ImagesList.back().get()->m_pRwTexture = pTex;
             
             // Fetch IDirec9Texture9* from RwTexture*
-	        m_ImagesList.back().get()->m_pTexture = GetTextureFromRaster(pTex);
+            m_ImagesList.back().get()->m_pTexture = GetTextureFromRaster(pTex);
 
             // Naming format in Txd `Category$TextureName`
             std::stringstream ss(pTex->name);

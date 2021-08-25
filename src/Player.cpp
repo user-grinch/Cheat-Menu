@@ -3,7 +3,6 @@
 #include "Menu.h"
 #include "Ui.h"
 #include "Util.h"
-
 #ifdef GTASA
 #include "Ped.h"
 
@@ -36,6 +35,72 @@ inline static void PlayerModelBrokenFix()
 
 	if (pPlayer->m_nModelIndex == 0)
 		Call<0x5A81E0>(0, pPlayer->m_pPlayerData->m_pPedClothesDesc, 0xBC1C78, false);
+}
+
+
+/*
+	Taken from gta chaos mod by Lordmau5
+	https://github.com/gta-chaos-mod/Trilogy-ASI-Script
+*/
+void Player::TopDownCameraView()
+{
+	CPlayerPed *player = FindPlayerPed ();
+	CVector     pos    = player->GetPosition ();
+	float       curOffset = m_TopDownCamera::m_fOffset;
+
+	// drunk effect causes issues
+	Command<eScriptCommands::COMMAND_SET_PLAYER_DRUNKENNESS> (0, 0);
+
+	CVehicle *vehicle = FindPlayerVehicle(-1, false);
+	
+	// TODO: implement smooth transition
+	if (vehicle)
+	{
+		float speed = vehicle->m_vecMoveSpeed.Magnitude();
+		if (speed > 1.2f)
+		{
+			speed = 1.2f;
+		}
+		if (speed * 40.0f > 40.0f)
+		{
+			speed = 40.0f;
+		}
+
+		if (speed < 0.0f)
+		{
+			speed = 0.0f;
+		}
+		curOffset += speed; 
+	}
+
+	CVector playerOffset = CVector (pos.x, pos.y, pos.z + 2.0f);
+	CVector cameraPos
+		= CVector (playerOffset.x, playerOffset.y, playerOffset.z + curOffset);
+
+	CColPoint outColPoint;
+	CEntity * outEntity;
+
+	// TODO: Which variable? X, Y or Z for the look direction?
+
+	if (CWorld::ProcessLineOfSight (playerOffset, cameraPos, outColPoint,
+									outEntity, true, true, true, true, true,
+									true, true, true))
+	{
+		Command<eScriptCommands::COMMAND_SET_FIXED_CAMERA_POSITION> (
+			outColPoint.m_vecPoint.x, outColPoint.m_vecPoint.y,
+			outColPoint.m_vecPoint.z, 0.0f, 0.0f, 0.0f);
+	}
+	else
+	{
+		Command<eScriptCommands::COMMAND_SET_FIXED_CAMERA_POSITION> (
+			cameraPos.x, cameraPos.y, cameraPos.z, 0.0f, 0.0f, 0.0f);
+	}
+
+	Command<eScriptCommands::COMMAND_POINT_CAMERA_AT_POINT> (pos.x, pos.y,
+															pos.z, 2);
+
+	TheCamera.m_fGenerationDistMultiplier = 10.0f;
+	TheCamera.m_fLODDistMultiplier        = 10.0f;
 }
 #endif
 
@@ -80,6 +145,16 @@ Player::Player()
 		uint timer = CTimer::m_snTimeInMilliseconds;
 		CPlayerPed* player = FindPlayerPed();
 		int hplayer = CPools::GetPedRef(player);
+
+		if (m_bDrunkEffect && !m_TopDownCamera::m_bEnabled)
+		{
+			Command<eScriptCommands::COMMAND_SET_PLAYER_DRUNKENNESS> (0, 100);
+		}
+
+		if (m_TopDownCamera::m_bEnabled)
+		{
+			TopDownCameraView();
+		}
 
 		if (m_KeepPosition::m_bEnabled)
 		{
@@ -282,7 +357,28 @@ void Player::Draw()
 			ImGui::Columns(2, 0, false);
 
 #ifdef GTASA
-			Ui::CheckboxAddress("Bounty on yourself", 0x96913F);		
+			Ui::CheckboxAddress("Bounty on yourself", 0x96913F);	
+
+			ImGui::BeginDisabled(m_TopDownCamera::m_bEnabled);
+			if (Ui::CheckboxWithHint("Drunk effect", &m_bDrunkEffect))
+			{
+				if (!m_bDrunkEffect)
+				{
+					Command<eScriptCommands::COMMAND_SET_PLAYER_DRUNKENNESS> (0, 0);
+				}
+			}
+			if (Ui::CheckboxWithHint("Fast Sprint", &m_bFastSprint, "Best to enable God Mode & Infinite sprint too"))
+			{
+				if(m_bFastSprint)
+				{
+					patch::Set<float>(0x8D2458, 0.1f);
+				}
+				else
+				{
+					patch::Set<float>(0x8D2458, 5.0f);
+				}
+			}
+			ImGui::EndDisabled();
 #endif
 			Ui::CheckboxAddress("Free healthcare", (int)&pInfo->m_bFreeHealthCare);
 
@@ -306,20 +402,18 @@ void Player::Draw()
 #ifdef GTASA
 			Ui::CheckboxAddress("Higher cycle jumps", 0x969161);
 			Ui::CheckboxAddress("Infinite oxygen", 0x96916E);
-			Ui::CheckboxAddress("Infinite run", 0xB7CEE4);
-
 			if (Ui::CheckboxBitFlag("Invisible player", pPlayer->m_nPedFlags.bDontRender))
 			{
 				pPlayer->m_nPedFlags.bDontRender = (pPlayer->m_nPedFlags.bDontRender == 1) ? 0 : 1;
 			}
 #elif GTAVC
-			Ui::CheckboxAddress("Infinite run", (int)&pInfo->m_bNeverGetsTired);
+			Ui::CheckboxAddress("Infinite sprint", (int)&pInfo->m_bNeverGetsTired);
 #endif
 
 			ImGui::NextColumn();
 
-			Ui::CheckboxWithHint("Keep position", &m_KeepPosition::m_bEnabled, "Teleport to the position you died from");
 #ifdef GTASA
+			Ui::CheckboxAddress("Infinite sprint", 0xB7CEE4);
 			if (Ui::CheckboxBitFlag("Lock control", pad->bPlayerSafe))
 			{
 				pad->bPlayerSafe = (pad->bPlayerSafe == 1) ? 0 : 1;
@@ -354,6 +448,7 @@ void Player::Draw()
 			}
 #endif
 			Ui::CheckboxAddress("No arrest fee", (int)&pInfo->m_bGetOutOfJailFree);
+			Ui::CheckboxWithHint("Respawn die location", &m_KeepPosition::m_bEnabled, "Respawn to the location you died from");
 
 			ImGui::Columns(1);
 
@@ -459,6 +554,17 @@ void Player::Draw()
 			Ui::EditStat("Muscle", STAT_MUSCLE);
 			Ui::EditStat("Respect", STAT_RESPECT);
 			Ui::EditStat("Stamina", STAT_STAMINA);
+			if (ImGui::CollapsingHeader("Top down camera"))
+			{
+				if (ImGui::Checkbox("Enabled", &m_TopDownCamera::m_bEnabled))
+				{
+					Command<Commands::RESTORE_CAMERA_JUMPCUT>();
+				}
+				ImGui::Spacing();
+				ImGui::SliderFloat("Camera zoom", &m_TopDownCamera::m_fOffset, 20.0f, 60.0f);
+				ImGui::Spacing();
+				ImGui::Separator();
+			}
 #endif
 			if (ImGui::CollapsingHeader("Wanted level"))
 			{
@@ -525,7 +631,6 @@ void Player::Draw()
 				ImGui::Spacing();
 				ImGui::Separator();
 			}
-
 			ImGui::EndChild();
 			ImGui::EndTabItem();
 		}

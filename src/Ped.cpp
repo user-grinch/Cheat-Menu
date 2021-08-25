@@ -5,6 +5,10 @@
 #include <CPopulation.h>
 #include "Weapon.h"
 
+#ifdef GTASA
+#include <ePedBones.h>
+#endif
+
 Ped::Ped()
 {
 #ifdef GTASA
@@ -12,6 +16,39 @@ Ped::Ped()
 	{
 		m_bExGangWarsInstalled = true;
 	}
+
+	/*
+		Taken from gta chaos mod by Lordmau5
+		https://github.com/gta-chaos-mod/Trilogy-ASI-Script
+
+		TODO: Implement in VC too
+	*/
+	Events::pedRenderEvent += [](CPed *ped)
+	{
+
+		if (m_bBigHead || m_bThinBody)
+		{
+			auto animHier = GetAnimHierarchyFromSkinClump (ped->m_pRwClump);
+			auto matrices = RpHAnimHierarchyGetMatrixArray (animHier);
+
+			RwV3d scale = {0.7f, 0.7f, 0.7f};
+			if (m_bThinBody)
+			{
+				for (int i = 1; i <= 52; i++)
+				{
+					RwMatrixScale (&matrices[RpHAnimIDGetIndex (animHier, i)], &scale, rwCOMBINEPRECONCAT);
+				}
+			}
+			scale = {3.0f, 3.0f, 3.0f};
+			if (m_bBigHead)
+			{
+				for (int i = BONE_NECK; i <= BONE_HEAD; i++)
+				{
+					RwMatrixScale (&matrices[RpHAnimIDGetIndex (animHier, i)], &scale, rwCOMBINEPRECONCAT);
+				}
+			}
+		}
+	};
 #endif
 }
 
@@ -114,7 +151,6 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
 	}
 }
 
-
 void Ped::Draw()
 {
 	if (ImGui::BeginTabBar("Ped", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
@@ -125,6 +161,7 @@ void Ped::Draw()
 			ImGui::BeginChild("CheckboxesChild");
 			ImGui::Columns(2, 0, false);
 #ifdef GTASA
+			Ui::CheckboxWithHint("Big head effect", &m_bBigHead);	
 			Ui::CheckboxAddress("Elvis everywhere", 0x969157);
 			Ui::CheckboxAddress("Everyone is armed", 0x969140);
 			Ui::CheckboxAddress("Gangs control streets", 0x96915B);
@@ -137,6 +174,7 @@ void Ped::Draw()
 			Ui::CheckboxAddress("Peds attack with rockets", 0x969158);
 			Ui::CheckboxAddress("Peds riot", 0x969175);
 			Ui::CheckboxAddress("Slut magnet", 0x96915D);
+			Ui::CheckboxWithHint("Thin body effect", &m_bThinBody);	
 #elif GTAVC
 			Ui::CheckboxAddress("No prostitutes", 0xA10B99);
 			Ui::CheckboxAddress("Slut magnet", 0xA10B5F);
