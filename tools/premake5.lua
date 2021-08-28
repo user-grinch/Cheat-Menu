@@ -86,7 +86,9 @@ project "CheatMenuVC"
         "../src/Visual.h", 
         "../src/Visual.cpp",
         "../src/ResourceStore.h", 
-        "../src/ResourceStore.cpp"
+        "../src/ResourceStore.cpp",
+        "../src/FileHandler.h", 
+        "../src/FileHandler.cpp"
     }
     includedirs {
         PSDK_DIR .. "/plugin_vc/",

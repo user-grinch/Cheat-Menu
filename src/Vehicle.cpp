@@ -40,7 +40,7 @@ Vehicle::Vehicle()
 	{
 		uint timer = CTimer::m_snTimeInMilliseconds;
 		CPlayerPed* pPlayer = FindPlayerPed();
-		CVehicle* pVeh = FindPlayerVehicle(-1, false);
+		CVehicle* pVeh = BY_GAME(FindPlayerVehicle(-1, false), FindPlayerVehicle());
 
 		if (pPlayer && pVeh)
 		{

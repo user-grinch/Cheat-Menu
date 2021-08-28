@@ -146,16 +146,6 @@ Player::Player()
 		CPlayerPed* player = FindPlayerPed();
 		int hplayer = CPools::GetPedRef(player);
 
-		if (m_bDrunkEffect && !m_TopDownCamera::m_bEnabled)
-		{
-			Command<eScriptCommands::COMMAND_SET_PLAYER_DRUNKENNESS> (0, 100);
-		}
-
-		if (m_TopDownCamera::m_bEnabled)
-		{
-			TopDownCameraView();
-		}
-
 		if (m_KeepPosition::m_bEnabled)
 		{
 			if (Command<Commands::IS_CHAR_DEAD>(hplayer))
@@ -195,6 +185,16 @@ Player::Player()
 		}
 
 #ifdef GTASA
+		if (m_bDrunkEffect && !m_TopDownCamera::m_bEnabled)
+		{
+			Command<eScriptCommands::COMMAND_SET_PLAYER_DRUNKENNESS> (0, 100);
+		}
+
+		if (m_TopDownCamera::m_bEnabled)
+		{
+			TopDownCameraView();
+		}
+
 		if (m_bAimSkinChanger && Ui::HotKeyPressed(Menu::m_HotKeys::aimSkinChanger))
 		{
 			CPed* targetPed = player->m_pPlayerTargettedPed;

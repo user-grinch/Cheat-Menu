@@ -228,11 +228,6 @@ bool Visual::TimeCycColorEdit3(const char* label, uchar* r, uchar* g, uchar* b, 
 	return rtn;
 }
 
-char __cdecl GetWaterLevelNoWaves(float x, float y, float z, int a4, __int64 a5)
-{
-	return 0;
-}
-
 bool Visual::TimeCycColorEdit4(const char* label, uchar* r, uchar* g, uchar* b, uchar* a, ImGuiColorEditFlags flags)
 {
 	bool rtn = false;
