@@ -6,6 +6,11 @@ private:
 	inline static bool m_bLockWeather;
 	inline static int m_nBacWeatherType;
 
+#ifdef GTASA
+	inline static bool m_bInvisibleWater;
+	inline static bool m_bNoWater;
+	inline static bool m_bDisableHydrant;
+#endif
 	// Timecyc
 	inline static int m_nTimecycHour = 8;
 	inline static std::vector<std::string> m_WeatherNames

@@ -249,27 +249,30 @@ void Player::ChangePlayerCloth(std::string& name)
 	std::string model = temp.c_str();
 
 	getline(ss, temp, '$');
-	std::string texture9 = temp.c_str();
+	std::string texName = temp.c_str();
 
 	CPlayerPed* player = FindPlayerPed();
 
-	if (texture9 == "cutoffchinosblue")
+	if (texName == "cutoffchinosblue")
 	{
 		player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(-697413025, 744365350, body_part);
 	}
 	else
 	{
-		if (texture9 == "sneakerbincblue")
+		if (texName == "sneakerbincblue")
 		{
 			player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(-915574819, 2099005073, body_part);
 		}
 		else
 		{
-			if (texture9 == "12myfac")
+			if (texName == "12myfac")
+			{
 				player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(-1750049245, 1393983095, body_part);
+			}
 			else
-				player->m_pPlayerData->m_pPedClothesDesc->
-				SetTextureAndModel(texture9.c_str(), model.c_str(), body_part);
+			{
+				player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(texName.c_str(), model.c_str(), body_part);
+			}
 		}
 	}
 	CClothes::RebuildPlayer(player, false);

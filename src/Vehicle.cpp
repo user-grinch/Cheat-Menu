@@ -3,6 +3,7 @@
 #include "Menu.h"
 #include "Ui.h"
 #include "Util.h"
+#include "FileHandler.h"
 #include <CPopulation.h>
 #include <CDamageManager.h>
 
@@ -31,15 +32,15 @@ void Vehicle::FixVehicle(CVehicle *pVeh)
 Vehicle::Vehicle()
 {
 #ifdef GTASA
-	ParseVehiclesIDE();
+	FileHandler::FetchHandlingID(m_VehicleIDE);
 #endif
-	ParseCarcolsDAT();
+	FileHandler::FetchColorData(m_CarcolsColorData, m_CarcolsCarData);
 
 	Events::processScriptsEvent += [this]
 	{
 		uint timer = CTimer::m_snTimeInMilliseconds;
 		CPlayerPed* pPlayer = FindPlayerPed();
-		CVehicle* pVeh = pPlayer->m_pVehicle;
+		CVehicle* pVeh = FindPlayerVehicle(-1, false);
 
 		if (pPlayer && pVeh)
 		{
@@ -159,13 +160,19 @@ Vehicle::Vehicle()
 				int chance = 0;
 
 				if (veh->m_nVehicleClass == CLASS_NORMAL) // Normal
+				{
 					chance = Random(1, 20);
+				}
 
 				if (veh->m_nVehicleClass == CLASS_RICHFAMILY) // Rich family
+				{
 					chance = Random(1, 4);
+				}
 
 				if (veh->m_nVehicleClass == CLASS_EXECUTIVE) // Executive
+				{
 					chance = Random(1, 3);
+				}
 
 				if (chance == 1 && !IsNeonInstalled(veh) && veh->m_pDriver != pPlayer)
 				{
@@ -228,7 +235,9 @@ void Vehicle::RemoveComponent(const std::string& component, const bool display_m
 		player->m_pVehicle->RemoveVehicleUpgrade(icomp);
 
 		if (display_message)
+		{
 			SetHelpMessage("Component removed", false, false, false);
+		}
 	}
 	catch (...)
 	{
@@ -267,219 +276,7 @@ int Vehicle::GetRandomTrainIdForModel(int model)
 	int id = Random(_start, _end);
 	return train_ids[id];
 }
-
-// Get vehicle HandlingId
-void Vehicle::ParseVehiclesIDE()
-{
-	std::string m_FilePath = std::string(paths::GetGameDirPathA()) + "/data/vehicles.ide";
-
-	if (fs::exists(m_FilePath))
-	{
-		std::ifstream file(m_FilePath);
-		std::string line;
-
-		while (getline(file, line))
-		{
-			if (line[0] <= '0' || line[0] >= '9')
-			{
-				continue;
-			}
-
-			try
-			{
-				std::string temp;
-				std::stringstream ss(line);
-
-				// model
-				getline(ss, temp, ',');
-
-				int model = std::stoi(temp);
-
-				// modelname, txd, type, handlingId
-				getline(ss, temp, ',');
-				getline(ss, temp, ',');
-				getline(ss, temp, ',');
-				getline(ss, temp, ',');
-
-				temp.erase(std::remove_if(temp.begin(), temp.end(), ::isspace), temp.end());
-
-				m_VehicleIDE[model] = temp;
-			}
-			catch (...)
-			{
-				flog << "Error while parsing line, " << line << std::endl;
-			}
-		}
-
-		file.close();
-	}
-	else flog << "Vehicle.ide file not found";
-}
-
-
-void Vehicle::GenerateHandlingDataFile(int phandling)
-{
-	FILE* fp = fopen("handling.txt", "w");
-
-	std::string handlingId = m_VehicleIDE[FindPlayerPed()->m_pVehicle->m_nModelIndex];
-	float fMass = patch::Get<float>(phandling + 0x4);
-	float fTurnMass = patch::Get<float>(phandling + 0xC);
-	float fDragMult = patch::Get<float>(phandling + 0x10);
-	float CentreOfMassX = patch::Get<float>(phandling + 0x14);
-	float CentreOfMassY = patch::Get<float>(phandling + 0x18);
-	float CentreOfMassZ = patch::Get<float>(phandling + 0x1C);
-	int nPercentSubmerged = patch::Get<int>(phandling + 0x20);
-	float fTractionMultiplier = patch::Get<float>(phandling + 0x28);
-	float fTractionLoss = patch::Get<float>(phandling + 0xA4);
-	float TractionBias = patch::Get<float>(phandling + 0xA8);
-	float fEngineAcceleration = patch::Get<float>(phandling + 0x7C) * 12500;
-	float fEngineInertia = patch::Get<float>(phandling + 0x80);
-	int nDriveType = patch::Get<BYTE>(phandling + 0x74);
-	int nEngineType = patch::Get<BYTE>(phandling + 0x75);
-	float BrakeDeceleration = patch::Get<float>(phandling + 0x94) * 2500;
-	float BrakeBias = patch::Get<float>(phandling + 0x98);
-	int ABS = patch::Get<BYTE>(phandling + 0x9C);
-	float SteeringLock = patch::Get<float>(phandling + 0xA0);
-	float SuspensionForceLevel = patch::Get<float>(phandling + 0xAC);
-	float SuspensionDampingLevel = patch::Get<float>(phandling + 0xB0);
-	float SuspensionHighSpdComDamp = patch::Get<float>(phandling + 0xB4);
-	float Suspension_upper_limit = patch::Get<float>(phandling + 0xB8);
-	float Suspension_lower_limit = patch::Get<float>(phandling + 0xBC);
-	float Suspension_bias = patch::Get<float>(phandling + 0xC0);
-	float Suspension_anti_dive_multiplier = patch::Get<float>(phandling + 0xC4);
-	float fCollisionDamageMultiplier = patch::Get<float>(phandling + 0xC8) * 0.338;
-	int nMonetaryValue = patch::Get<int>(phandling + 0xD8);
-
-	int MaxVelocity = patch::Get<float>(phandling + 0x84);
-	MaxVelocity = MaxVelocity * 206 + (MaxVelocity - 0.918668) * 1501;
-
-	int modelFlags = patch::Get<int>(phandling + 0xCC);
-	int handlingFlags = patch::Get<int>(phandling + 0xD0);
-
-	int front_lights = patch::Get<BYTE>(phandling + 0xDC);
-	int rear_lights = patch::Get<BYTE>(phandling + 0xDD);
-	int vehicle_anim_group = patch::Get<BYTE>(phandling + 0xDE);
-	int nNumberOfGears = patch::Get<BYTE>(phandling + 0x76);
-	float fSeatOffsetDistance = patch::Get<float>(phandling + 0xD4);
-
-	fprintf(
-		fp,
-		"\n%s\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%d\t%.5g\t%.5g\t%.5g\t%d\t%d\t%.5g\t%.5g\t%c\t%c\t%.5g\t%.5g\t%d\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%d\t%d\t%d\t%d\t%d\t%d",
-		handlingId.c_str(), fMass, fTurnMass, fDragMult, CentreOfMassX, CentreOfMassY, CentreOfMassZ, nPercentSubmerged,
-		fTractionMultiplier, fTractionLoss, TractionBias, nNumberOfGears,
-		MaxVelocity, fEngineAcceleration, fEngineInertia, nDriveType, nEngineType, BrakeDeceleration, BrakeBias, ABS,
-		SteeringLock, SuspensionForceLevel, SuspensionDampingLevel,
-		SuspensionHighSpdComDamp, Suspension_upper_limit, Suspension_lower_limit, Suspension_bias,
-		Suspension_anti_dive_multiplier, fSeatOffsetDistance,
-		fCollisionDamageMultiplier, nMonetaryValue, modelFlags, handlingFlags, front_lights, rear_lights,
-		vehicle_anim_group);
-
-	fclose(fp);
-}
 #endif 
-
-void Vehicle::ParseCarcolsDAT()
-{
-	std::string m_FilePath = GAME_PATH((char*)"/data/carcols.dat");
-
-	if (fs::exists(m_FilePath))
-	{
-		std::ifstream file(m_FilePath);
-		std::string line;
-
-		bool car_section = false;
-		bool col_section = false;
-		int count = 0;
-		while (getline(file, line))
-		{
-			if (line[0] == '#' || line == "")
-				continue;
-
-			if (line[0] == 'c' && line[1] == 'a' && line[2] == 'r')
-			{
-				car_section = true;
-				continue;
-			}
-
-			if (line[0] == 'c' && line[1] == 'o' && line[2] == 'l')
-			{
-				col_section = true;
-				continue;
-			}
-
-			if (line[0] == 'e' && line[1] == 'n' && line[2] == 'd')
-			{
-				car_section = false;
-				col_section = false;
-				continue;
-			}
-
-			if (col_section)
-			{
-				try
-				{
-					std::string temp;
-					std::stringstream ss(line);
-
-					std::replace(temp.begin(), temp.end(), '.', ','); // fix one instance where . is used instead of ,
-
-					// red, green, blue
-					getline(ss, temp, ',');
-					int red = std::stoi(temp);
-
-					getline(ss, temp, ',');
-					int green = std::stoi(temp);
-
-					getline(ss, temp, ',');
-					int blue = std::stoi(temp);
-
-					std::vector<float> color = { red / 255.0f, green / 255.0f, blue / 255.0f };
-					m_CarcolsColorData.push_back(color);
-
-					++count;
-				}
-				catch (...)
-				{
-					flog << "Error while parsing car line, " << line << std::endl;
-				}
-			}
-
-			if (car_section)
-			{
-				std::string temp;
-				std::stringstream ss(line);
-
-				getline(ss, temp, ',');
-				std::string name = temp;
-				while (getline(ss, temp, ','))
-				{
-					try
-					{
-						std::for_each(name.begin(), name.end(), [](char& c)
-						{
-							c = ::toupper(c);
-						});
-
-						int val = std::stoi(temp);
-						if (!(std::find(m_CarcolsCarData[name].begin(), m_CarcolsCarData[name].end(), val) !=
-							m_CarcolsCarData[name].end()))
-							m_CarcolsCarData[name].push_back(val);
-					}
-					catch (...)
-					{
-						flog << "Error while parsing car line, " << line << std::endl;
-					}
-				}
-			}
-		}
-
-		file.close();
-	}
-	else 
-	{
-		flog << "Error locating Vehicle.ide";
-	}
-}
 
 #ifdef GTASA
 void Vehicle::SpawnVehicle(std::string& smodel)
@@ -752,6 +549,29 @@ void Vehicle::Draw()
 			}
 #ifdef GTASA
 			Ui::CheckboxAddress("Decreased traffic", 0x96917A);
+			// if (Ui::CheckboxWithHint("Disable collisions", &m_bDisableColDetection))
+			// {
+			// 	if (m_bDisableColDetection)
+			// 	{
+			// 		patch::SetUChar(0x56717B, 0x7D);
+			// 		patch::SetUChar(0x56725D, 0x7D);
+			// 	}
+			// 	// update flags for exising vehicles
+			// 	for (auto veh : CPools::ms_pVehiclePool)
+			// 	{
+			// 		if (veh == FindPlayerVehicle(-1, false))
+			// 		{
+			// 			continue;
+			// 		}
+			// 		if (m_bDisableColDetection)
+			// 		{
+			// 			CCollisionData* pColData = veh->GetColModel()->m_pColData;
+			// 			// pColData->m_nNumSpheres = 0;
+			// 			pColData->m_nNumBoxes = 0;
+			// 			pColData->m_nNumTriangles = 0;
+			// 		}
+			// 	}
+			// }
 #endif
 			ImGui::NextColumn();
 #ifdef GTASA
@@ -1372,7 +1192,7 @@ void Vehicle::Draw()
 
 				if (ImGui::Button("Save to file", ImVec2(Ui::GetSize(3))))
 				{
-					GenerateHandlingDataFile(pHandling);
+					FileHandler::GenerateHandlingFile(pHandling, m_VehicleIDE);
 					SetHelpMessage("Handling saved", false, false, false);
 				}
 

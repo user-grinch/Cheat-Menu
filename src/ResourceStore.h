@@ -28,7 +28,7 @@ struct RwRasterEx : public RwRaster
 	RwD3D9Raster *m_pRenderResource;
 };
 
-struct STextureResource
+struct TextureResource
 {
 	std::string m_FileName;
 	std::string m_CategoryName;
@@ -43,7 +43,7 @@ enum eResourceType
 	TYPE_BOTH,
 };
 
-using TextureResourceList = std::vector<std::unique_ptr<STextureResource>>;
+using TextureResourceList = std::vector<std::unique_ptr<TextureResource>>;
 class ResourceStore
 {
 private:

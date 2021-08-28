@@ -3,7 +3,9 @@
 #ifdef GTASA
 #include "Neon.h"
 #include "Paint.h"
+#endif
 
+#ifdef GTASA
 class Vehicle : public Paint, public Neon
 #elif GTAVC
 class Vehicle
@@ -32,6 +34,7 @@ private:
 	};
 	
 #ifdef GTASA
+	inline static bool m_bDisableColDetection;
 	inline static std::map<int, std::string> m_VehicleIDE;
 	struct m_Neon
 	{
@@ -92,10 +95,8 @@ private:
 	static void AddComponent(const std::string& component, bool display_message = true);
 	static void RemoveComponent(const std::string& component, bool display_message = true);
 	static int GetRandomTrainIdForModel(int model);
-	static void ParseVehiclesIDE();
 	static void GenerateHandlingDataFile(int phandling);
 #endif
-	static void ParseCarcolsDAT();
 
 public:
 #ifdef GTASA

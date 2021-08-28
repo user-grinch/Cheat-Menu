@@ -59,7 +59,7 @@ void ResourceStore::LoadTextureResource(std::string&& name)
             pEndDic = (RwTexDictionary*)pRLL->link.next;
             RwTexture *pTex = (RwTexture*)&pRLL[-1];
 
-            m_ImagesList.push_back(std::make_unique<STextureResource>());
+            m_ImagesList.push_back(std::make_unique<TextureResource>());
             m_ImagesList.back().get()->m_pRwTexture = pTex;
             
             // Fetch IDirec9Texture9* from RwTexture*

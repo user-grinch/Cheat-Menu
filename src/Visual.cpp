@@ -29,94 +29,6 @@ Visual::Visual()
 	};
 }
 
-int Visual::CalcArrayIndex()
-{
-	int hour = CClock::ms_nGameClockHours;
-
-#ifdef GTASA
-	int result = 0;
-	
-	if (m_nTimecycHour == 24)
-	{
-		result = hour;
-	}
-	else
-	{
-		if (hour < 5) result = 0;
-		if (hour == 5) result = 1;
-		if (hour == 6) result = 2;
-		if (7 <= hour && hour < 12) result = 3;
-		if (12 <= hour && hour < 19) result = 4;
-		if (hour == 19) result = 5;
-		if (hour == 20 || hour == 21) result = 6;
-		if (hour == 22 || hour == 23) result = 7;
-	}
-
-	return 23 * result + CWeather::OldWeatherType;
-#elif GTAVC
-	return 7 * hour + CWeather::OldWeatherType;
-#endif 
-}
-
-bool Visual::TimeCycColorEdit3(const char* label, uchar* r, uchar* g, uchar* b, ImGuiColorEditFlags flags)
-{
-	bool rtn = false;
-	int val = CalcArrayIndex();
-
-#ifdef GTASA
-	auto red = static_cast<uchar*>(patch::GetPointer(int(r)));
-	auto green = static_cast<uchar*>(patch::GetPointer(int(g)));
-	auto blue = static_cast<uchar*>(patch::GetPointer(int(b)));
-#elif GTAVC
-	auto red = static_cast<uchar*>(r);
-	auto green = static_cast<uchar*>(g);
-	auto blue = static_cast<uchar*>(b);
-#endif
-
-	float col[3]{ red[val] / 255.0f, green[val] / 255.0f, blue[val] / 255.0f };
-
-	if (ImGui::ColorEdit3(label, col, flags))
-	{
-		red[val] = col[0] * 255;
-		green[val] = col[1] * 255;
-		blue[val] = col[2] * 255;
-		rtn = true;
-	}
-
-	return rtn;
-}
-
-bool Visual::TimeCycColorEdit4(const char* label, uchar* r, uchar* g, uchar* b, uchar* a, ImGuiColorEditFlags flags)
-{
-	bool rtn = false;
-	int val = CalcArrayIndex();
-
-#ifdef GTASA
-	auto red = static_cast<uchar*>(patch::GetPointer(int(r)));
-	auto green = static_cast<uchar*>(patch::GetPointer(int(g)));
-	auto blue = static_cast<uchar*>(patch::GetPointer(int(b)));
-	auto alpha = static_cast<uchar*>(patch::GetPointer(int(a)));
-#elif GTAVC
-	auto red = static_cast<uchar*>(r);
-	auto green = static_cast<uchar*>(g);
-	auto blue = static_cast<uchar*>(b);
-	auto alpha = static_cast<uchar*>(a);
-#endif
-
-	float col[4]{ red[val] / 255.0f, green[val] / 255.0f, blue[val] / 255.0f, alpha[val] / 255.0f };
-
-	if (ImGui::ColorEdit4(label, col, flags))
-	{
-		red[val] = col[0] * 255;
-		green[val] = col[1] * 255;
-		blue[val] = col[2] * 255;
-		alpha[val] = col[3] * 255;
-		rtn = true;
-	}
-
-	return rtn;
-}
-
 template <typename T>
 int GetTCVal(T* addr, int index)
 {
@@ -259,6 +171,99 @@ void Visual::GenerateTimecycFile()
 #endif 
 }
 
+int Visual::CalcArrayIndex()
+{
+	int hour = CClock::ms_nGameClockHours;
+
+#ifdef GTASA
+	int result = 0;
+	
+	if (m_nTimecycHour == 24)
+	{
+		result = hour;
+	}
+	else
+	{
+		if (hour < 5) result = 0;
+		if (hour == 5) result = 1;
+		if (hour == 6) result = 2;
+		if (7 <= hour && hour < 12) result = 3;
+		if (12 <= hour && hour < 19) result = 4;
+		if (hour == 19) result = 5;
+		if (hour == 20 || hour == 21) result = 6;
+		if (hour == 22 || hour == 23) result = 7;
+	}
+
+	return 23 * result + CWeather::OldWeatherType;
+#elif GTAVC
+	return 7 * hour + CWeather::OldWeatherType;
+#endif 
+}
+
+bool Visual::TimeCycColorEdit3(const char* label, uchar* r, uchar* g, uchar* b, ImGuiColorEditFlags flags)
+{
+	bool rtn = false;
+	int val = CalcArrayIndex();
+
+#ifdef GTASA
+	auto red = static_cast<uchar*>(patch::GetPointer(int(r)));
+	auto green = static_cast<uchar*>(patch::GetPointer(int(g)));
+	auto blue = static_cast<uchar*>(patch::GetPointer(int(b)));
+#elif GTAVC
+	auto red = static_cast<uchar*>(r);
+	auto green = static_cast<uchar*>(g);
+	auto blue = static_cast<uchar*>(b);
+#endif
+
+	float col[3]{ red[val] / 255.0f, green[val] / 255.0f, blue[val] / 255.0f };
+
+	if (ImGui::ColorEdit3(label, col, flags))
+	{
+		red[val] = col[0] * 255;
+		green[val] = col[1] * 255;
+		blue[val] = col[2] * 255;
+		rtn = true;
+	}
+
+	return rtn;
+}
+
+char __cdecl GetWaterLevelNoWaves(float x, float y, float z, int a4, __int64 a5)
+{
+	return 0;
+}
+
+bool Visual::TimeCycColorEdit4(const char* label, uchar* r, uchar* g, uchar* b, uchar* a, ImGuiColorEditFlags flags)
+{
+	bool rtn = false;
+	int val = CalcArrayIndex();
+
+#ifdef GTASA
+	auto red = static_cast<uchar*>(patch::GetPointer(int(r)));
+	auto green = static_cast<uchar*>(patch::GetPointer(int(g)));
+	auto blue = static_cast<uchar*>(patch::GetPointer(int(b)));
+	auto alpha = static_cast<uchar*>(patch::GetPointer(int(a)));
+#elif GTAVC
+	auto red = static_cast<uchar*>(r);
+	auto green = static_cast<uchar*>(g);
+	auto blue = static_cast<uchar*>(b);
+	auto alpha = static_cast<uchar*>(a);
+#endif
+
+	float col[4]{ red[val] / 255.0f, green[val] / 255.0f, blue[val] / 255.0f, alpha[val] / 255.0f };
+
+	if (ImGui::ColorEdit4(label, col, flags))
+	{
+		red[val] = col[0] * 255;
+		green[val] = col[1] * 255;
+		blue[val] = col[2] * 255;
+		alpha[val] = col[3] * 255;
+		rtn = true;
+	}
+
+	return rtn;
+}
+
 void Visual::Draw()
 {
 	if (ImGui::BeginTabBar("Visual", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
@@ -273,6 +278,18 @@ void Visual::Draw()
 			Ui::CheckboxAddress("Armour percentage", 0x589125);
 			Ui::CheckboxAddress("Breath border", 0x589207);
 			Ui::CheckboxAddress("Breath percentage", 0x589209);
+			if (Ui::CheckboxWithHint("Disable hydrant splash", &m_bDisableHydrant))
+			{
+				if (m_bDisableHydrant)
+				{
+					// don't call Fx_c::TriggerWaterHydrant
+					plugin::patch::Nop(0x4A0D70, 5); 
+				}
+				else
+				{
+					plugin::patch::SetRaw(0x4A0D70, (char*)"\xE9\x94\x3F\xF6\xFF", 5); 
+				}		
+			}
 			Ui::CheckboxAddress("Gray radar", 0xA444A4);
 			Ui::CheckboxAddress("Health border", 0x589353);
 			Ui::CheckboxAddress("Health percentage", 0x589355);
@@ -290,11 +307,52 @@ void Visual::Draw()
 			}
 
 			Ui::CheckboxAddressEx("Hide wanted level", 0x58DD1B, 0x90, 1);
+			
+			if (Ui::CheckboxWithHint("Invisible water", &m_bInvisibleWater))
+			{
+				if (!m_bNoWater)
+				{
+					if (m_bInvisibleWater)
+					{
+						// don't call CWaterLevel::RenderWater()
+						plugin::patch::Nop(0x53E004, 5); 
+						plugin::patch::Nop(0x53E142, 5); 
+					}
+					else
+					{
+						// restore call CWaterLevel::RenderWater()
+						plugin::patch::SetRaw(0x53E004, (char*)"\xE8\x47\x16\x1B\x00", 5); 
+						plugin::patch::SetRaw(0x53E142, (char*)"\xE8\x09\x15\x1B\x00", 5); 
+					}		
+				}
+			}
 			if (Ui::CheckboxWithHint("Lock weather", &m_bLockWeather))
 			{
 				m_nBacWeatherType = CWeather::OldWeatherType;
 			}
 
+			if (Ui::CheckboxWithHint("No water", &m_bNoWater))
+			{
+				if (m_bNoWater)
+				{
+					// don't call CWaterLevel::RenderWater()
+					plugin::patch::Nop(0x53E004, 5); 
+					plugin::patch::Nop(0x53E142, 5); 
+
+					// rtn CWaterLevel::GetWaterLevelNoWaves
+					plugin::patch::SetRaw(0x6E8580, (char*)"\x32\xC0\xC3", 3); 
+				}
+				else
+				{
+					// restore call CWaterLevel::RenderWater()
+					plugin::patch::SetRaw(0x53E004, (char*)"\xE8\x47\x16\x1B\x00", 5); 
+					plugin::patch::SetRaw(0x53E142, (char*)"\xE8\x09\x15\x1B\x00", 5); 
+
+					// restore CWaterLevel::GetWaterLevelNoWaves
+					plugin::patch::SetRaw(0x6E8580, (char*)"\x51\xD9\x44", 3); 
+				}		
+			}
+			
 			bool radar_state = (patch::Get<BYTE>(0xBA676C) != 2);
 			if (Ui::CheckboxWithHint("Show radar", &radar_state))
 			{
