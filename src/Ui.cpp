@@ -370,7 +370,9 @@ void Ui::DrawJSON(ResourceStore& data,
 	ImGui::Spacing();
 
 	if (ImGui::IsMouseClicked(1))
+	{
 		jsonPopup.function = nullptr;
+	}
 
 
 	ImGui::BeginChild(1);

@@ -288,13 +288,12 @@ void Visual::Draw()
 			Ui::CheckboxAddress("Gray radar", 0xA444A4);
 			Ui::CheckboxAddress("Health border", 0x589353);
 			Ui::CheckboxAddress("Health percentage", 0x589355);
-
-			ImGui::NextColumn();
-
 			if (Ui::CheckboxWithHint("Hide area names", &CHud::bScriptDontDisplayAreaName))
 			{
 				Command<Commands::DISPLAY_ZONE_NAMES>(!CHud::bScriptDontDisplayAreaName);
 			}
+
+			ImGui::NextColumn();
 
 			if (Ui::CheckboxWithHint("Hide veh names", &CHud::bScriptDontDisplayVehicleName))
 			{
@@ -355,6 +354,7 @@ void Visual::Draw()
 			}
 
 			Ui::CheckboxAddress("Show hud", 0xBA6769);
+			Ui::CheckboxAddressEx("Unfog map", 0xBA372C, 0x50, 0x0);
 #elif GTAVC	
 			Ui::CheckboxAddress("Hide radar", 0xA10AB6);
 			if (Ui::CheckboxWithHint("Lock weather", &m_bLockWeather))

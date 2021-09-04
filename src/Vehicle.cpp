@@ -725,7 +725,7 @@ void Vehicle::Draw()
 		{
 			ImGui::Spacing();
 			ImGui::BeginChild("MenusChild");
-			Ui::EditReference("Density multiplier", CPopulation::PedDensityMultiplier, 0, 1, 10);
+			Ui::EditReference("Density multiplier", 0x8A5B20, 0, 1, 10);
 			if (ImGui::CollapsingHeader("Enter nearest vehicle as"))
 			{
 				int hplayer = CPools::GetPedRef(pPlayer);

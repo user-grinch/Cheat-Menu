@@ -18,7 +18,17 @@
             "group": {
                 "kind": "build",
                 "isDefault": true
-            }
+            },
+            "windows": {
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": [
+                            "/d", "/c"
+                        ]
+                    }
+                }
+            },
         },
         {
             "label": "Build ReleaseSA",
@@ -35,7 +45,17 @@
             "group": {
                 "kind": "build",
                 "isDefault": true
-            }
+            },
+            "windows": {
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": [
+                            "/d", "/c"
+                        ]
+                    }
+                }
+            },
         },
         {
             "label": "Build DebugVC",
@@ -52,7 +72,17 @@
             "group": {
                 "kind": "build",
                 "isDefault": true
-            }
+            },
+            "windows": {
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": [
+                            "/d", "/c"
+                        ]
+                    }
+                }
+            },
         },
         {
             "label": "Build ReleaseVC",
@@ -69,7 +99,17 @@
             "group": {
                 "kind": "build",
                 "isDefault": true
-            }
+            },
+            "windows": {
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": [
+                            "/d", "/c"
+                        ]
+                    }
+                }
+            },
         }
     ]
 }
