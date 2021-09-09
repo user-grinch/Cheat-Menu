@@ -15,10 +15,18 @@ void Updater::CheckForUpdate()
 		SetHelpMessage("Failed to check for updates", false, false, false);
 		return;
 	}
+	
 	CJson verinfo = CJson("versioninfo");
 
 	// fetch the version number
-	m_LatestVersion = verinfo.m_Data.items().begin().value()["name"].get<std::string>();
+	if (verinfo.m_Data.empty())
+	{
+		m_LatestVersion = MENU_VERSION_NUMBER;
+	}
+	else
+	{
+		m_LatestVersion = verinfo.m_Data.items().begin().value()["name"].get<std::string>();
+	}
 
 	if (m_LatestVersion > MENU_VERSION_NUMBER)
 	{
