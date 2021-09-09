@@ -1,6 +1,6 @@
 /*
 	Author: Grinch_
-	Copyright GPLv3 2019-2021
+	Copyright Grinch_ 2019-2022. All rights reserved.
 	Required:
 		DirectX 9 SDK
 		Plugin SDK

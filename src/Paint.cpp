@@ -1,5 +1,4 @@
 // Portion of this source is taken from MoonAdditions https://github.com/THE-FYP/MoonAdditions
-// To keep the licensing simple this file would go under MIT License, GPLv3 won't apply
 
 // Copyright (c) 2012 DK22Pac
 // Copyright (c) 2017 FYP
