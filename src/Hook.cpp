@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Hook.h"
-#include "../Depend/kiero/kiero.h"
-#include "../Depend/kiero/minhook/MinHook.h"
+#include "../depend/kiero/kiero.h"
+#include "../depend/kiero/minhook/MinHook.h"
 
 LRESULT Hook::WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -46,6 +46,13 @@ void Hook::RenderFrame(void* ptr)
 
 			io.FontDefault = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/trebucbd.ttf", fontSize);
 			io.Fonts->Build();
+
+			// add icon font
+			ImFontConfig config;
+			config.MergeMode = true;
+			config.GlyphMinAdvanceX = 13.0f; // icon monospaced
+			static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
+			io.Fonts->AddFontFromFileTTF(PLUGIN_PATH((char*)"CheatMenu/icon_font.ttf"), 13.0f, &config, icon_ranges);
 
 			if (Globals::renderer == Render_DirectX9)
 			{
@@ -221,7 +228,7 @@ struct Mouse
 {
 	unsigned int x, y;
 	unsigned int wheelDelta;
-	char k1, k2, k3, k4, k5;
+	unsigned char buttons[8];
 };
 
 struct MouseInfo
@@ -232,7 +239,9 @@ struct MouseInfo
 static BOOL __stdcall _SetCursorPos(int X, int Y)
 {
 	if (Hook::m_bShowMouse || GetActiveWindow() != RsGlobal.ps->window)
+	{
 		return 1;
+	}
 
 	mouseInfo.x = X;
 	mouseInfo.y = Y;
@@ -266,7 +275,7 @@ static int _cdecl _GetMouseState(Mouse* pMouse)
 
 	if (mouseInfo.x >= 0)
 	{
-		pMouse->x = int(Point.x - mouseInfo.x);
+		pMouse->x = int(1.6f*(Point.x - mouseInfo.x)); // hacky fix
 	}
 
 	if (mouseInfo.y >= 0)
@@ -276,11 +285,11 @@ static int _cdecl _GetMouseState(Mouse* pMouse)
 
 	mouseInfo.wheelDelta = 0;
 
-	pMouse->k1 = (GetAsyncKeyState(1) >> 8);
-	pMouse->k2 = (GetAsyncKeyState(2) >> 8);
-	pMouse->k3 = (GetAsyncKeyState(4) >> 8);
-	pMouse->k4 = (GetAsyncKeyState(5) >> 8);
-	pMouse->k5 = (GetAsyncKeyState(6) >> 8);
+	pMouse->buttons[0] = (GetAsyncKeyState(1) >> 8);
+	pMouse->buttons[1] = (GetAsyncKeyState(2) >> 8);
+	pMouse->buttons[2] = (GetAsyncKeyState(4) >> 8);
+	pMouse->buttons[3] = (GetAsyncKeyState(5) >> 8);
+	pMouse->buttons[4] = (GetAsyncKeyState(6) >> 8);
 	return 0;
 }
 
@@ -295,8 +304,8 @@ void Hook::ApplyMouseFix()
 	patch::ReplaceFunctionCall(0x74542E, _SetCursorPos);
 	patch::Nop(0x748A7C, 1);
 	patch::ReplaceFunctionCall(0x748A7D, _DispatchMessage);
-	// patch::SetChar(0x746A08, 32); // diMouseOffset
-	// patch::SetChar(0x746A58, 32); // diDeviceoffset
+	patch::SetChar(0x746A08, 32); // diMouseOffset
+	patch::SetChar(0x746A58, 32); // diDeviceoffset
 }
 
 #endif
