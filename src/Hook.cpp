@@ -47,13 +47,6 @@ void Hook::RenderFrame(void* ptr)
 			io.FontDefault = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/trebucbd.ttf", fontSize);
 			io.Fonts->Build();
 
-			// add icon font
-			ImFontConfig config;
-			config.MergeMode = true;
-			config.GlyphMinAdvanceX = 13.0f; // icon monospaced
-			static const ImWchar icon_ranges[] = { ICON_MIN_FA, ICON_MAX_FA, 0 };
-			io.Fonts->AddFontFromFileTTF(PLUGIN_PATH((char*)"CheatMenu/icon_font.ttf"), 13.0f, &config, icon_ranges);
-
 			if (Globals::renderer == Render_DirectX9)
 			{
 				ImGui_ImplDX9_InvalidateDeviceObjects();

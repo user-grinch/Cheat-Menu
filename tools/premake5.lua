@@ -28,7 +28,7 @@ workspace "CheatMenu"
     location "../build"
 
 project "Depend"
-    kind "SharedLib"
+    kind "StaticLib"
     targetdir "../build/bin"
 
     files { 

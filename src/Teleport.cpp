@@ -219,7 +219,7 @@ void Teleport::Draw()
 
 				if (ImGui::Button("Teleport to coord", Ui::GetSize(2)))
 				{
-					CVector pos;
+					CVector pos{0, 0, 10};
 
 					try
 					{
