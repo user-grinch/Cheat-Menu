@@ -8,7 +8,7 @@ private:
 	inline static bool m_bInsertCoord;
 	inline static bool m_bQuickTeleport;
 	inline static char m_nInputBuffer[INPUT_BUFFER_SIZE];
-	inline static ResourceStore tp_data{ "teleport", eResourceType::TYPE_TEXT };
+	inline static ResourceStore m_tpData{ "teleport", eResourceType::TYPE_TEXT };
 	inline static char m_nLocationBuffer[INPUT_BUFFER_SIZE];
 	inline static uint m_nQuickTeleportTimer;
 

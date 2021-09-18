@@ -19,7 +19,7 @@ void Teleport::FetchRadarSpriteData()
 		return;
 	}
 
-	tp_data.m_pJson->m_Data.erase("Radar");
+	m_tpData.m_pJson->m_Data.erase("Radar");
 
 	// 175 is the max number of sprites, FLA can increase this limit, might need to update this
 	for (int i = 0; i != 175; ++i)
@@ -29,7 +29,7 @@ void Teleport::FetchRadarSpriteData()
 		auto sprite_name = m_SpriteJson.m_Data[std::to_string(sprite)].get<std::string>();
 		std::string key_name = sprite_name + ", " + Util::GetLocationName(&pos);
 
-		tp_data.m_pJson->m_Data["Radar"][key_name] = "0, " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " +
+		m_tpData.m_pJson->m_Data["Radar"][key_name] = "0, " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " +
 			std::to_string(pos.z);
 
 		/*
@@ -170,9 +170,9 @@ void Teleport::RemoveTeleportEntry(std::string& category, std::string& key, std:
 {
 	if (category == "Custom")
 	{
-		tp_data.m_pJson->m_Data["Custom"].erase(key);
+		m_tpData.m_pJson->m_Data["Custom"].erase(key);
 		SetHelpMessage("Location removed", false, false, false);
-		tp_data.m_pJson->WriteToDisk();
+		m_tpData.m_pJson->WriteToDisk();
 	}
 	else 
 	{
@@ -256,7 +256,7 @@ void Teleport::Draw()
 #endif
 
 			ImGui::Spacing();
-			Ui::DrawJSON(tp_data, TeleportToLocation,RemoveTeleportEntry);
+			Ui::DrawJSON(m_tpData, TeleportToLocation,RemoveTeleportEntry);
 			ImGui::EndTabItem();
 		}
 
@@ -268,15 +268,15 @@ void Teleport::Draw()
 			ImGui::Spacing();
 			if (ImGui::Button("Add location", Ui::GetSize()))
 			{
-				tp_data.m_pJson->m_Data["Custom"][m_nLocationBuffer] = ("0, " + std::string(m_nInputBuffer));
+				m_tpData.m_pJson->m_Data["Custom"][m_nLocationBuffer] = ("0, " + std::string(m_nInputBuffer));
 
 #ifdef GTASA
 				// Clear the Radar coordinates
-				tp_data.m_pJson->m_Data.erase("Radar");
-				tp_data.m_pJson->m_Data["Radar"] = {};
+				m_tpData.m_pJson->m_Data.erase("Radar");
+				m_tpData.m_pJson->m_Data["Radar"] = {};
 #endif
 
-				tp_data.m_pJson->WriteToDisk();
+				m_tpData.m_pJson->WriteToDisk();
 			}
 			ImGui::EndTabItem();
 		}

@@ -409,6 +409,7 @@ void Player::Draw()
 			{
 				pPlayer->m_nPedFlags.bDontRender = (pPlayer->m_nPedFlags.bDontRender == 1) ? 0 : 1;
 			}
+			Ui::CheckboxAddress("Infinite sprint", 0xB7CEE4);
 #elif GTAVC
 			Ui::CheckboxAddress("Infinite sprint", (int)&pInfo->m_bNeverGetsTired);
 #endif
@@ -416,11 +417,11 @@ void Player::Draw()
 			ImGui::NextColumn();
 
 #ifdef GTASA
-			Ui::CheckboxAddress("Infinite sprint", 0xB7CEE4);
 			if (Ui::CheckboxBitFlag("Lock control", pad->bPlayerSafe))
 			{
 				pad->bPlayerSafe = (pad->bPlayerSafe == 1) ? 0 : 1;
 			}
+			Ui::CheckboxAddressEx("Max sex appeal", 0x969180, 1, 0);
 			Ui::CheckboxAddress("Mega jump", 0x96916C);
 			Ui::CheckboxAddress("Mega punch", 0x969173);
 			Ui::CheckboxAddress("Never get hungry", 0x969174);
