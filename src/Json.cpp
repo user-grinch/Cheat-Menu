@@ -1,16 +1,16 @@
 #include "pch.h"
-#include "Json.h"
+#include "json.h"
 
 CJson::CJson(const char* name)
 {
-	if (name == "" || !fs::is_directory(PLUGIN_PATH((char*)"CheatMenu")))
+	if (name == "" || !std::filesystem::is_directory(PLUGIN_PATH((char*)"CheatMenu")))
 	{
 		return;
 	}
 
 	m_FilePath = PLUGIN_PATH((char*)"/CheatMenu/json/") + std::string(name) + ".json";
 
-	if (fs::exists(m_FilePath))
+	if (std::filesystem::exists(m_FilePath))
 	{
 		try
 		{
@@ -20,7 +20,7 @@ CJson::CJson(const char* name)
 		}
 		catch (...)
 		{
-			flog << "Error trying to read " << m_FilePath << std::endl;
+			gLog << "Error trying to read " << m_FilePath << std::endl;
 			m_Data = "{}"_json;
 		}
 	}
@@ -30,11 +30,11 @@ CJson::CJson(const char* name)
 
 		if (m_FilePath.find("config"))
 		{
-			flog << "Creating config.json file" << std::endl;
+			gLog << "Creating config.json file" << std::endl;
 		}
 		else
 		{
-			flog << "Failed to locate file " << m_FilePath << std::endl;
+			gLog << "Failed to locate file " << m_FilePath << std::endl;
 		}
 	}
 }

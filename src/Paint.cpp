@@ -23,76 +23,68 @@
 // SOFTWARE.
 
 #include "pch.h"
-#include "Paint.h"
+#include "paint.h"
 #include "NodeName.h"
-#include "Util.h"
-
-void Paint::RenderEvent(CVehicle* pVeh)
-{
-	VehData& data = m_VehData.Get(pVeh);
-
-	// reset custom color if color id changed
-	if (pVeh->m_nPrimaryColor != data.primary_color
-		|| pVeh->m_nSecondaryColor != data.secondary_color)
-	{
-		for (auto& it : data.materialProperties)
-			data.resetMaterialColor(it.first);
-
-		data.primary_color = pVeh->m_nPrimaryColor;
-		data.secondary_color = pVeh->m_nSecondaryColor;
-	}
-
-	for (auto& it : data.materialProperties)
-	{
-		if (it.second._recolor)
-		{
-			it.second._originalColor = it.first->color;
-			it.first->color = it.second._color;
-			it.second._originalGeometryFlags = it.second._geometry->flags;
-			it.second._geometry->flags |= rpGEOMETRYMODULATEMATERIALCOLOR;
-		}
-		if (it.second._retexture)
-		{
-			auto tex = it.second._texture;
-			if (tex)
-			{
-				it.second._originalTexture = it.first->texture;
-				it.first->texture = tex;
-			}
-			else
-			{
-				it.second._retexture = false;
-			}
-		}
-	}
-}
-
-void Paint::ResetAfterRenderEvent(CVehicle* pVeh)
-{
-	for (auto& it : m_VehData.Get(pVeh).materialProperties)
-	{
-		if (it.second._recolor)
-		{
-			it.first->color = it.second._originalColor;
-			it.second._geometry->flags = it.second._originalGeometryFlags;
-		}
-		if (it.second._retexture)
-		{
-			it.first->texture = it.second._originalTexture;
-		}
-	}
-}
+#include "util.h"
 
 Paint::Paint()
 {
-	Events::vehicleRenderEvent.before += RenderEvent;
-	Events::vehicleResetAfterRender += ResetAfterRenderEvent;
-}
+	Events::vehicleRenderEvent.before += [](CVehicle* pVeh)
+	{
+		VehData& data = m_VehData.Get(pVeh);
 
-Paint::~Paint()
-{
-	Events::vehicleRenderEvent.before -= RenderEvent;
-	Events::vehicleResetAfterRender -= ResetAfterRenderEvent;
+		// reset custom color if color id changed
+		if (pVeh->m_nPrimaryColor != data.primary_color
+			|| pVeh->m_nSecondaryColor != data.secondary_color)
+		{
+			for (auto& it : data.materialProperties)
+				data.resetMaterialColor(it.first);
+
+			data.primary_color = pVeh->m_nPrimaryColor;
+			data.secondary_color = pVeh->m_nSecondaryColor;
+		}
+
+		for (auto& it : data.materialProperties)
+		{
+			if (it.second._recolor)
+			{
+				it.second._originalColor = it.first->color;
+				it.first->color = it.second._color;
+				it.second._originalGeometryFlags = it.second._geometry->flags;
+				it.second._geometry->flags |= rpGEOMETRYMODULATEMATERIALCOLOR;
+			}
+			if (it.second._retexture)
+			{
+				auto tex = it.second._texture;
+				if (tex)
+				{
+					it.second._originalTexture = it.first->texture;
+					it.first->texture = tex;
+				}
+				else
+				{
+					it.second._retexture = false;
+				}
+			}
+		}
+	};
+	
+	ThiscallEvent<AddressList<0x55332A, H_CALL>, PRIORITY_BEFORE, ArgPickN<CVehicle*, 0>, void(CVehicle*)> vehicleResetAfterRender;
+	vehicleResetAfterRender += [](CVehicle* pVeh)
+	{
+		for (auto& it : m_VehData.Get(pVeh).materialProperties)
+		{
+			if (it.second._recolor)
+			{
+				it.first->color = it.second._originalColor;
+				it.second._geometry->flags = it.second._originalGeometryFlags;
+			}
+			if (it.second._retexture)
+			{
+				it.first->texture = it.second._originalTexture;
+			}
+		}
+	};
 }
 
 void Paint::VehData::setMaterialColor(RpMaterial* material, RpGeometry* geometry, RwRGBA color, bool filter_mat)

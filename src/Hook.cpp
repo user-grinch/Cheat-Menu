@@ -1,7 +1,10 @@
 #include "pch.h"
-#include "Hook.h"
+#include "hook.h"
 #include "../depend/kiero/kiero.h"
 #include "../depend/kiero/minhook/MinHook.h"
+#include "../depend/imgui/imgui_impl_dx9.h"
+#include "../depend/imgui/imgui_impl_dx11.h"
+#include "../depend/imgui/imgui_impl_win32.h"
 
 LRESULT Hook::WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -33,33 +36,29 @@ void Hook::RenderFrame(void* ptr)
 	}
 
 	ImGuiIO& io = ImGui::GetIO();
+	static bool bInit = false;
 
-	if (Globals::m_bInit)
+	if (bInit)
 	{
 		ShowMouse(m_bShowMouse);
 
 		// handle window scaling here
+		static ImVec2 fScreenSize = ImVec2(-1, -1);
 		ImVec2 size(screen::GetScreenWidth(), screen::GetScreenHeight());
-		if (Globals::m_fScreenSize.x != size.x && Globals::m_fScreenSize.y != size.y)
+		if (fScreenSize.x != size.x && fScreenSize.y != size.y)
 		{
 			int fontSize = static_cast<int>(size.y / 54.85f); // manually tested
 
 			io.FontDefault = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/trebucbd.ttf", fontSize);
 			io.Fonts->Build();
 
-			if (Globals::renderer == Render_DirectX9)
+			if (gRenderer == Render_DirectX9)
 			{
 				ImGui_ImplDX9_InvalidateDeviceObjects();
 			}
 			else
 			{
 				ImGui_ImplDX11_InvalidateDeviceObjects();
-			}
-
-			if (Globals::m_fScreenSize.x != -1 && Globals::m_fScreenSize.y != -1)
-			{
-				Globals::m_fMenuSize.x += (size.x - Globals::m_fScreenSize.x) / 4.0f;
-				Globals::m_fMenuSize.y += (size.y - Globals::m_fScreenSize.y) / 1.2f;
 			}
 
 			ImGuiStyle* style = &ImGui::GetStyle();
@@ -72,11 +71,11 @@ void Hook::RenderFrame(void* ptr)
 			style->IndentSpacing = 20 * scaleX;
 			style->ItemInnerSpacing = ImVec2(4 * scaleX, 4 * scaleY);
 
-			Globals::m_fScreenSize = size;
+			fScreenSize = size;
 		}
 
 		ImGui_ImplWin32_NewFrame();
-		if (Globals::renderer == Render_DirectX9)
+		if (gRenderer == Render_DirectX9)
 		{
 			ImGui_ImplDX9_NewFrame();
 		}
@@ -95,7 +94,7 @@ void Hook::RenderFrame(void* ptr)
 		ImGui::EndFrame();
 		ImGui::Render();
 
-		if (Globals::renderer == Render_DirectX9)
+		if (gRenderer == Render_DirectX9)
 		{
 			ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
 		}
@@ -106,7 +105,7 @@ void Hook::RenderFrame(void* ptr)
 	}
 	else
 	{
-		Globals::m_bInit = true;
+		bInit = true;
 		ImGui::CreateContext();
 
 		ImGuiStyle& style = ImGui::GetStyle();
@@ -114,23 +113,22 @@ void Hook::RenderFrame(void* ptr)
 		ImGui_ImplWin32_Init(RsGlobal.ps->window);
 
 #ifdef GTASA
-// shift trigger fix
+		// shift trigger fix
 		patch::Nop(0x00531155, 5);
 #endif
 
-		if (Globals::renderer == Render_DirectX9)
+		if (gRenderer == Render_DirectX9)
 		{
-			Globals::device = ptr;
-			ImGui_ImplDX9_Init(reinterpret_cast<IDirect3DDevice9*>(Globals::device));
+			ImGui_ImplDX9_Init(reinterpret_cast<IDirect3DDevice9*>(ptr));
 		}
 		else
 		{
 			// for dx11 device ptr is swapchain
-			reinterpret_cast<IDXGISwapChain*>(ptr)->GetDevice(__uuidof(ID3D11Device), &Globals::device);
+			reinterpret_cast<IDXGISwapChain*>(ptr)->GetDevice(__uuidof(ID3D11Device), &ptr);
 			ID3D11DeviceContext* context;
-			reinterpret_cast<ID3D11Device*>(Globals::device)->GetImmediateContext(&context);
+			reinterpret_cast<ID3D11Device*>(ptr)->GetImmediateContext(&context);
 
-			ImGui_ImplDX11_Init(reinterpret_cast<ID3D11Device*>(Globals::device), context);
+			ImGui_ImplDX11_Init(reinterpret_cast<ID3D11Device*>(ptr), context);
 		}
 
 		ImGui_ImplWin32_EnableDpiAwareness();
@@ -192,7 +190,7 @@ Hook::Hook()
 	// Nvidia Overlay crash fix
 	if (init(kiero::RenderType::D3D9) == kiero::Status::Success)
 	{
-		Globals::renderer = Render_DirectX9;
+		gRenderer = Render_DirectX9;
 		kiero::bind(16, (void**)&oReset, Reset);
 		kiero::bind(42, (void**)&oEndScene, Dx9Handler);
 	}
@@ -201,7 +199,7 @@ Hook::Hook()
 		// gtaRenderHook
 		if (init(kiero::RenderType::D3D11) == kiero::Status::Success)
 		{
-			Globals::renderer = Render_DirectX11;
+			gRenderer = Render_DirectX11;
 			kiero::bind(8, (void**)&oPresent11, Dx11Handler);
 		}
 	}

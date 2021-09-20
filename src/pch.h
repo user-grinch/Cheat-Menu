@@ -12,42 +12,77 @@
 #define BY_GAME(sa, vc) vc
 #endif
 
-#include "header_includes.h"
+#include <d3d9.h>
+#include <d3d11.h>
+#include <d3d11Shader.h>
+#include <filesystem>
+#include <fstream>
+#include <functional>
+#include <memory>
+#include <iostream>
+#include <sstream>
+#include <vector>
+#include <windows.h>
 
-// Globals
+#include "plugin.h"
+#include "CBike.h"
+#include "CCamera.h"
+#include "CClock.h"
+#include "CCivilianPed.h"
+#include "CGangs.h"
+#include "cHandlingDataMgr.h"
+#include "CHud.h"
+#include "CMenuManager.h"
+#include "CModelInfo.h"
+#include "RenderWare.h"
+#include "CStats.h"
+#include "CStreaming.h"
+#include "CTheScripts.h"
+#include "CTheZones.h"
+#include "CTimer.h"
+#include "CTimeCycle.h"
+#include "CTrain.h"
+#include "CWeather.h"
+#include "CWorld.h"
+#include "extensions/ScriptCommands.h"
+#include "extensions/Screen.h"
+#include "extensions/Paths.h"
+
+#ifdef GTASA
+#include "CCheat.h"
+#include "CClothes.h"
+#include "CCutsceneMgr.h"
+#include "CRadar.h"
+#include "CShadows.h"
+#include "eVehicleClass.h"
+#include "CGangWars.h"
+#endif
+
+#include "../depend/fla/IDaccess.h"
+#include "../depend/imgui/imgui.h"
+
+#include "json.h"
+#include "hotkeys.h"
+#include "vKeys.h"
+#include "resourcestore.h"
+
 using CallbackTable = std::vector<std::pair<std::string, void(*)()>>;
 using namespace plugin;
-namespace fs = std::filesystem;
 
-enum Renderer
+enum eRenderer
 {
 	Render_DirectX9,
 	Render_DirectX11,
 	Render_Unknown
 };
 
-struct Globals
-{
-	inline static std::string m_HeaderId;
-	inline static ImVec2 m_fMenuSize = ImVec2(screen::GetScreenWidth() / 4, screen::GetScreenHeight() / 1.2);
-	inline static ImVec2 m_fScreenSize = ImVec2(-1, -1);
-	inline static bool m_bShowMenu = false;
-	inline static bool m_bInit;
-	inline static Renderer renderer = Render_Unknown;
-	inline static void* device;
-};
+static eRenderer gRenderer = Render_Unknown;
+static std::ofstream gLog = std::ofstream("CheatMenu.log");
+// why doesn't this work?
+// inline CJson gConfig = CJson("config");
+extern CJson gConfig;
 
-extern std::ofstream flog;
-extern CJson config;
-
-struct HotKeyData
-{
-	int m_key1;
-	int m_key2;
-	bool m_bPressed;
-};
-
-// Common defines
+// Fix function clashes
 static void SetHelpMessage(const char *message, bool b1, bool b2, bool b3)
 {
 #if GTAVC

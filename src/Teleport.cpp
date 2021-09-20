@@ -1,8 +1,8 @@
 #include "pch.h"
-#include "Teleport.h"
-#include "Menu.h"
-#include "Ui.h"
-#include "Util.h"
+#include "teleport.h"
+#include "menu.h"
+#include "ui.h"
+#include "util.h"
 
 #ifdef GTASA
 // FlA
@@ -43,7 +43,7 @@ void Teleport::FetchRadarSpriteData()
 
 Teleport::Teleport()
 {
-	m_bQuickTeleport = config.GetValue("quick_teleport", false);
+	m_bQuickTeleport = gConfig.GetValue("quick_teleport", false);
 
 	Events::processScriptsEvent += []
 	{
@@ -78,7 +78,7 @@ Teleport::Teleport()
 
 		if (m_bQuickTeleport)
 		{
-			if (Ui::HotKeyPressed(Menu::m_HotKeys::quickTeleport)
+			if (quickTeleport.Pressed()
 				&& ((CTimer::m_snTimeInMilliseconds - m_nQuickTeleportTimer) > 500))
 			{
 				m_nQuickTeleportTimer = CTimer::m_snTimeInMilliseconds;
@@ -195,10 +195,10 @@ void Teleport::Draw()
 				ImGui::NextColumn();
 #ifdef GTASA
 				if (Ui::CheckboxWithHint("Quick teleport", &m_bQuickTeleport,
-				                         (std::string("Teleport to the location of your radar\ntarget blip using ") 
-											 + Ui::GetHotKeyNameString(Menu::m_HotKeys::quickTeleport)).c_str()))
+				                         std::string(std::string("Teleport to the location of your radar\ntarget blip using ") 
+											 + quickTeleport.GetNameString()).c_str()))
 				{
-					config.SetValue("quick_teleport", m_bQuickTeleport);
+					gConfig.SetValue("quick_teleport", m_bQuickTeleport);
 				}
 #endif	
 				ImGui::Columns(1);

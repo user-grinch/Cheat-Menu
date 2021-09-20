@@ -1,9 +1,9 @@
 #include "pch.h"
-#include "Visual.h"
-#include "Ui.h"
-#include "Util.h"
-#include "Game.h"
-#include "TimeCycle.h"
+#include "visual.h"
+#include "ui.h"
+#include "util.h"
+#include "game.h"
+#include "timecycle.h"
 
 #ifdef GTASA
 #include "CHudColours.h"
@@ -531,11 +531,7 @@ void Visual::Draw()
 			int hour = CClock::ms_nGameClockHours;
 			int minute = CClock::ms_nGameClockMinutes;
 
-			if (Game::m_bSyncTime)
-			{
-				ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-				ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-			}
+			ImGui::BeginDisabled(Game::m_bSyncTime);
 
 			if (ImGui::InputInt("Hour", &hour) & !Game::m_bSyncTime)
 			{
@@ -553,8 +549,7 @@ void Visual::Draw()
 
 			if (Game::m_bSyncTime)
 			{
-				ImGui::PopStyleVar();
-				ImGui::PopItemFlag();
+				ImGui::EndDisabled();
 				Ui::ShowTooltip("Sync system time is enabled.\n(Game/Sync system time)");
 			}
 

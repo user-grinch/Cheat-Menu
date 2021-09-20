@@ -3,9 +3,6 @@
 
 class Ui
 {
-private:
-	inline static std::string m_CurrentHotkey;
-
 public:
 	struct NamedMemory
 	{
@@ -32,9 +29,13 @@ public:
 		std::function<void(std::string&)> function;
 		std::string value;
 	};
+	static inline std::string m_HeaderId;
+	static inline JsonPopUpData jsonPopup;
+	static inline ImgPopUpData imgPopup;
 
-	inline static JsonPopUpData jsonPopup;
-	inline static ImgPopUpData imgPopup;
+
+	Ui() = delete;
+	Ui(Ui&) = delete;
 
 	static void CenterdText(const std::string& text);
 	static bool ColorButton(int color_id, std::vector<float>& color, ImVec2 size);
@@ -73,10 +74,6 @@ public:
 	static void FilterWithHint(const char* label, ImGuiTextFilter& filter, const char* hint);
 
 	static ImVec2 GetSize(short count = 1, bool spacing = true);
-
-	static bool HotKey(const char* label, HotKeyData& key_data);
-	static bool HotKeyPressed(HotKeyData& hotkey);
-	static std::string GetHotKeyNameString(HotKeyData& hotkey);
 
 	static bool ListBox(const char* label, std::vector<std::string>& all_items, int& selected);
 	static bool ListBoxStr(const char* label, std::vector<std::string>& all_items, std::string& selected);

@@ -1,34 +1,35 @@
 #pragma once
 #include "pch.h"
-#include "Player.h"
+#include "player.h"
 #ifdef GTASA
-#include "Weapon.h"
+#include "weapon.h"
 #endif
+
 class Ped
 {
 private:
 #ifdef GTASA
-	inline static bool m_bBigHead;
-	inline static bool m_bThinBody;
-	inline static CJson m_SpecialPedJson = CJson("ped special");
-	inline static ResourceStore m_PedData{"ped", eResourceType::TYPE_BOTH, ImVec2(65, 110)};
+	static inline bool m_bBigHead;
+	static inline bool m_bThinBody;
+	static inline CJson m_SpecialPedJson = CJson("ped special");
+	static inline ResourceStore m_PedData{"ped", eResourceType::TYPE_BOTH, ImVec2(65, 110)};
 #elif GTAVC
-	inline static ResourceStore m_PedData{"ped", eResourceType::TYPE_TEXT};
+	static inline ResourceStore m_PedData{"ped", eResourceType::TYPE_TEXT};
 #endif
-	inline static bool m_bImagesLoaded;
-	inline static bool m_bExGangWarsInstalled;
-	inline static int m_nPedRemoveRadius = 5;
+	static inline bool m_bImagesLoaded;
+	static inline bool m_bExGangWarsInstalled;
+	static inline int m_nPedRemoveRadius = 5;
 	struct m_SpawnPed
 	{
-		inline static std::vector<CPed*> m_List;
-		inline static int m_nAccuracy = 50;
-		inline static int m_nPedHealth = 100;
-		inline static bool m_bPedMove;
-		inline static bool m_bPedBleed;
-		inline static int m_nSelectedPedType;
-		inline static int m_nWeaponId;
-		inline static std::string m_nWeaponName = "None";
-		inline static std::vector<std::string> m_PedTypeList =
+		static inline std::vector<CPed*> m_List;
+		static inline int m_nAccuracy = 50;
+		static inline int m_nPedHealth = 100;
+		static inline bool m_bPedMove;
+		static inline bool m_bPedBleed;
+		static inline int m_nSelectedPedType;
+		static inline int m_nWeaponId;
+		static inline std::string m_nWeaponName = "None";
+		static inline std::vector<std::string> m_PedTypeList =
 		{
 #ifdef GTASA
 			"Civ Male", "Civ Female", "Cop", "Ballas", "Grove Street Families", "Los Santos Vagos",
@@ -41,7 +42,7 @@ private:
 #endif
 		};
 	};
-	inline static std::vector<std::string> m_GangNames =
+	static inline std::vector<std::string> m_GangNames =
 	{
 		"Ballas", "Grove street families", "Los santos vagos", "San fierro rifa",
 		"Da nang boys", "Mafia", "Mountain cloud triad", "Varrio los aztecas", "Gang9", "Gang10"
@@ -51,6 +52,7 @@ private:
 #ifdef GTASA
 	friend class Weapon;
 #endif
+
 public:
 	Ped();
 	~Ped();

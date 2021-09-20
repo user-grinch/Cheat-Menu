@@ -1,8 +1,8 @@
 #include "pch.h"
-#include "Animation.h"
+#include "animation.h"
 #ifdef GTASA
-#include "Ui.h"
-#include "Util.h"
+#include "ui.h"
+#include "util.h"
 
 Animation::Animation()
 {
@@ -42,6 +42,7 @@ void Animation::PlayCutscene(std::string& rootKey, std::string& cutsceneId, std:
 		SetHelpMessage("Another cutscene is running", false, false, false);
 		return;
 	}
+
 	CPlayerPed* pPlayer = FindPlayerPed();
 	if (!pPlayer)
 	{

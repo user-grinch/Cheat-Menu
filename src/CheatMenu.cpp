@@ -1,8 +1,8 @@
 #include "pch.h"
-#include "CheatMenu.h"
-#include "MenuInfo.h"
-#include "Ui.h"
-#include "Updater.h"
+#include "cheatMenu.h"
+#include "menuinfo.h"
+#include "ui.h"
+#include "updater.h"
 
 void CheatMenu::DrawWindow()
 {
@@ -13,7 +13,7 @@ void CheatMenu::DrawWindow()
 	{
 		if (bRunning)
 		{
-			config.WriteToDisk();
+			gConfig.WriteToDisk();
 			bRunning = false;
 			m_bShowMouse = false;
 		}
@@ -21,12 +21,21 @@ void CheatMenu::DrawWindow()
 	else
 	{
 		bRunning = true;
-		if (Globals::m_bShowMenu || BY_GAME(m_Commands::m_bShowMenu, true))
+		if (m_bShowMenu || BY_GAME(m_Commands::m_bShowMenu, true))
 		{
-			if (Globals::m_bShowMenu)
+			if (m_bShowMenu)
 			{
-				ImGui::SetNextWindowSize(Globals::m_fMenuSize);
-				if (ImGui::Begin(MENU_TITLE, &Globals::m_bShowMenu, ImGuiWindowFlags_NoCollapse))
+				static ImVec2 fScreenSize = ImVec2(-1, -1);
+				ImVec2 size(screen::GetScreenWidth(), screen::GetScreenHeight());
+				
+				if (fScreenSize.x != -1 && fScreenSize.y != -1)
+				{
+					m_fMenuSize.x += (size.x - fScreenSize.x) / 4.0f;
+					m_fMenuSize.y += (size.y - fScreenSize.y) / 1.2f;
+				}
+				ImGui::SetNextWindowSize(m_fMenuSize);
+
+				if (ImGui::Begin(MENU_TITLE, &m_bShowMenu, ImGuiWindowFlags_NoCollapse))
 				{
 					ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(250, 350));
 					ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
@@ -37,9 +46,9 @@ void CheatMenu::DrawWindow()
 					else
 						Ui::DrawHeaders(header);
 
-					Globals::m_fMenuSize = ImGui::GetWindowSize();
-					config.SetValue("window.sizeX", Globals::m_fMenuSize.x);
-					config.SetValue("window.sizeY", Globals::m_fMenuSize.y);
+					m_fMenuSize = ImGui::GetWindowSize();
+					gConfig.SetValue("window.sizeX", m_fMenuSize.x);
+					gConfig.SetValue("window.sizeY", m_fMenuSize.y);
 
 					ImGui::PopStyleVar(2);
 					ImGui::End();
@@ -62,27 +71,21 @@ CheatMenu::CheatMenu()
 	windowCallback = std::bind(&DrawWindow);
 
 	// Load menu settings
-	Globals::m_HeaderId = config.GetValue("window.id", std::string(""));
-	Globals::m_fMenuSize.x = config.GetValue("window.sizeX", screen::GetScreenWidth() / 4.0f);
-	Globals::m_fMenuSize.y = config.GetValue("window.sizeY", screen::GetScreenHeight() / 1.2f);
+	Ui::m_HeaderId = gConfig.GetValue("window.id", std::string(""));
+	m_fMenuSize.x = gConfig.GetValue("window.sizeX", screen::GetScreenWidth() / 4.0f);
+	m_fMenuSize.y = gConfig.GetValue("window.sizeY", screen::GetScreenHeight() / 1.2f);
 	srand(CTimer::m_snTimeInMilliseconds);
 
 	Events::processScriptsEvent += []()
 	{
-		if (Globals::m_bInit &&
-#ifdef GTASA
-		!FrontEndMenuManager.m_bMenuActive
-#elif GTAVC
-		!FrontendMenuManager.m_bMenuVisible
-#endif
-		)
+		if (!BY_GAME(FrontEndMenuManager.m_bMenuActive, FrontendMenuManager.m_bMenuVisible))
 		{
-			if (Ui::HotKeyPressed(Menu::m_HotKeys::menuOpen))
+			if (menuOpen.Pressed())
 			{
-				Globals::m_bShowMenu = !Globals::m_bShowMenu;
+				m_bShowMenu = !m_bShowMenu;
 			}
 
-			if (Ui::HotKeyPressed(Menu::m_HotKeys::commandWindow))
+			if (commandWindow.Pressed())
 			{
 				if (m_Commands::m_bShowMenu)
 				{
@@ -92,14 +95,14 @@ CheatMenu::CheatMenu()
 				m_Commands::m_bShowMenu = !m_Commands::m_bShowMenu;
 			}
 
-			if (m_bShowMouse != Globals::m_bShowMenu)
+			if (m_bShowMouse != m_bShowMenu)
 			{
 				if (m_bShowMouse) // Only write when the menu closes
 				{
-					config.WriteToDisk();
+					gConfig.WriteToDisk();
 				}
 
-				m_bShowMouse = Globals::m_bShowMenu;
+				m_bShowMouse = m_bShowMenu;
 			}
 		}
 	};
@@ -177,90 +180,4 @@ void CheatMenu::ApplyStyle()
 	colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00f, 1.00f, 1.00f, 0.70f);
 	colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.80f, 0.80f, 0.80f, 0.20f);
 	colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.26f, 0.59f, 0.98f, 0.35f);
-}
-
-void MenuThread(void* param)
-{
-	if (!fs::is_directory(PLUGIN_PATH((char*)"CheatMenu")))
-	{
-		flog << "CheatMenu folder not found. You need to put both \"CheatMenu.asi\" & \"CheatMenu\" folder in the same directory" << std::endl;
-		return;
-	}
-
-	static bool bGameInit = false;
-#ifdef GTASA
-	Hook::ApplyMouseFix();
-#endif
-
-	// Wait till game init
-	Events::initRwEvent += []
-	{
-		bGameInit = true;
-	};
-
-	while (!bGameInit)
-	{
-		Sleep(1000);
-	}
-
-	if (GetModuleHandle("SAMP.dll"))
-	{
-		MessageBox(RsGlobal.ps->window, "SAMP detected. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
-		return;
-	}
-
-	flog << "Starting...\nVersion: " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: "
-		GITHUB_LINK "\n" << std::endl;
-	CFastman92limitAdjuster::Init();
-	CheatMenu menu;
-
-	time_t now = time(0);
-	struct tm  tstruct = *localtime(&now);
-	int last_check_date = config.GetValue("config.last_update_checked", 0);
-
-	if (last_check_date != tstruct.tm_mday)
-	{
-		Updater::CheckForUpdate();
-		config.SetValue("config.last_update_checked", tstruct.tm_mday);
-	}
-
-	while (true)
-	{
-		Sleep(5000);
-
-		if (Updater::m_State == UPDATER_CHECKING)
-		{
-			Updater::CheckForUpdate();
-		}
-	}
-}
-
-BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
-{
-	if (nReason == DLL_PROCESS_ATTACH)
-	{
-		uint gameVersion = GetGameVersion();
-#ifdef GTASA
-		if (gameVersion == GAME_10US_HOODLUM || gameVersion == GAME_10US_COMPACT)
-		{
-			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&MenuThread, nullptr, NULL, nullptr);
-		}
-		else
-		{
-			MessageBox(HWND_DESKTOP, "Unknown game version. GTA SA v1.0 US is required.", "CheatMenu", MB_ICONERROR);
-		}
-#elif GTAVC
-
-		if (gameVersion == GAME_10EN)
-		{
-			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&MenuThread, nullptr, NULL, nullptr);
-		}
-		else
-		{
-			MessageBox(HWND_DESKTOP, "Unknown game version. GTA VC v1.0 EN is required.", "CheatMenu", MB_ICONERROR);
-		}
-#endif
-	}
-
-	return TRUE;
 }

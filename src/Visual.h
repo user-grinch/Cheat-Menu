@@ -3,17 +3,17 @@
 class Visual
 {
 private:
-	inline static bool m_bLockWeather;
-	inline static int m_nBacWeatherType;
+	static inline bool m_bLockWeather;
+	static inline int m_nBacWeatherType;
 
 #ifdef GTASA
-	inline static bool m_bInvisibleWater;
-	inline static bool m_bNoWater;
-	inline static bool m_bDisableHydrant;
+	static inline bool m_bInvisibleWater;
+	static inline bool m_bNoWater;
+	static inline bool m_bDisableHydrant;
 #endif
 	// Timecyc
-	inline static int m_nTimecycHour = 8;
-	inline static std::vector<std::string> m_WeatherNames
+	static inline int m_nTimecycHour = 8;
+	static inline std::vector<std::string> m_WeatherNames
 	{
 		"EXTRASUNNY LA", "SUNNY LA", "EXTRASUNNY SMOG LA", "SUNNY SMOG LA", "CLOUDY LA", "SUNNY SF", "EXTRASUNNY SF",
 		"CLOUDY SF", "RAINY SF", "FOGGY SF",

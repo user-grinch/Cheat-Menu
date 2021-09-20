@@ -11,8 +11,8 @@ enum UPDATER_STATE
 class Updater
 {
 public:
-	inline static UPDATER_STATE m_State = UPDATER_IDLE;
-	inline static std::string m_LatestVersion;
+	static inline UPDATER_STATE m_State = UPDATER_IDLE;
+	static inline std::string m_LatestVersion;
 
 	static void CheckForUpdate();
 	static void ShowUpdateScreen();

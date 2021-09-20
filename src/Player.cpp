@@ -1,10 +1,10 @@
 #include "pch.h"
-#include "Player.h"
-#include "Menu.h"
-#include "Ui.h"
-#include "Util.h"
+#include "player.h"
+#include "menu.h"
+#include "ui.h"
+#include "util.h"
 #ifdef GTASA
-#include "Ped.h"
+#include "ped.h"
 
 // hardcoded cloth category names
 const char* cloth_category[18] =
@@ -29,7 +29,7 @@ const char* cloth_category[18] =
 	"Extras"
 };
 
-inline static void PlayerModelBrokenFix()
+static inline void PlayerModelBrokenFix()
 {
 	CPlayerPed* pPlayer = FindPlayerPed();
 
@@ -109,16 +109,16 @@ Player::Player()
 #ifdef GTASA
 //	Fix player model being broken after rebuild
 	patch::RedirectCall(0x5A834D, &PlayerModelBrokenFix);
-	m_bAimSkinChanger = config.GetValue("aim_skin_changer", false);
+	m_bAimSkinChanger = gConfig.GetValue("aim_skin_changer", false);
 #endif
 
 	// Custom skins setup
 	if (GetModuleHandle("modloader.asi"))
 	{
 #ifdef GTASA
-		if (fs::is_directory(m_CustomSkins::m_Path))
+		if (std::filesystem::is_directory(m_CustomSkins::m_Path))
 		{
-			for (auto& p : fs::recursive_directory_iterator(m_CustomSkins::m_Path))
+			for (auto& p : std::filesystem::recursive_directory_iterator(m_CustomSkins::m_Path))
 			{
 				if (p.path().extension() == ".dff")
 				{
@@ -127,13 +127,13 @@ Player::Player()
 					if (file_name.size() < 9)
 						m_CustomSkins::m_List.push_back(file_name);
 					else
-						flog << "Custom Skin longer than 8 characters " << file_name << std::endl;
+						gLog << "Custom Skin longer than 8 characters " << file_name << std::endl;
 				}
 			}
 		}
 		else
 		{
-			fs::create_directory(m_CustomSkins::m_Path);
+			std::filesystem::create_directory(m_CustomSkins::m_Path);
 		}
 #endif
 
@@ -195,7 +195,7 @@ Player::Player()
 			TopDownCameraView();
 		}
 
-		if (m_bAimSkinChanger && Ui::HotKeyPressed(Menu::m_HotKeys::aimSkinChanger))
+		if (m_bAimSkinChanger && aimSkinChanger.Pressed())
 		{
 			CPed* targetPed = player->m_pPlayerTargettedPed;
 			if (targetPed)
@@ -206,7 +206,7 @@ Player::Player()
 		}
 #endif
 
-		if (Ui::HotKeyPressed(Menu::m_HotKeys::godMode))
+		if (godMode.Pressed())
 		{
 			if (m_bGodMode)
 			{
@@ -646,8 +646,8 @@ void Player::Draw()
 
 			if (Ui::CheckboxWithHint("Aim skin changer", &m_bAimSkinChanger,
 				(("Changes to the ped, player is targeting with a weapon.\nTo use aim a ped with a weapon and press ")
-					+ Ui::GetHotKeyNameString(Menu::m_HotKeys::aimSkinChanger)).c_str()))
-				config.SetValue("aim_skin_changer", m_bAimSkinChanger);
+					+ aimSkinChanger.Pressed())))
+				gConfig.SetValue("aim_skin_changer", m_bAimSkinChanger);
 			if (ImGui::BeginTabBar("AppearanceTabBar"))
 			{
 				if (ImGui::BeginTabItem("Clothes"))

@@ -1,9 +1,9 @@
 #include "pch.h"
-#include "Vehicle.h"
-#include "Menu.h"
-#include "Ui.h"
-#include "Util.h"
-#include "FileHandler.h"
+#include "vehicle.h"
+#include "menu.h"
+#include "ui.h"
+#include "util.h"
+#include "filehandler.h"
 #include <CPopulation.h>
 #include <CDamageManager.h>
 
@@ -47,7 +47,7 @@ Vehicle::Vehicle()
 			int hveh = CPools::GetVehicleRef(pVeh);
 
 #ifdef GTASA
-			if (Ui::HotKeyPressed(Menu::m_HotKeys::flipVeh))
+			if (flipVeh.Pressed())
 			{
 				int roll = 0;
 				Command<Commands::GET_CAR_ROLL>(hveh, &roll);
@@ -57,13 +57,13 @@ Vehicle::Vehicle()
 			}
 #endif
 
-			if (Ui::HotKeyPressed(Menu::m_HotKeys::fixVeh))
+			if (fixVeh.Pressed())
 			{
 				FixVehicle(pVeh);
 				SetHelpMessage("Vehicle fixed", false, false, false);
 			}
 
-			if (Ui::HotKeyPressed(Menu::m_HotKeys::vehEngine))
+			if (vehEngine.Pressed())
 			{
 				bool state = BY_GAME(!pVeh->m_nVehicleFlags.bEngineBroken, true) || pVeh->m_nVehicleFlags.bEngineOn;
 
@@ -81,10 +81,10 @@ Vehicle::Vehicle()
 				pVeh->m_nVehicleFlags.bEngineOn = !state;
 			}
 
-			if (Ui::HotKeyPressed(Menu::m_HotKeys::vehInstantStart))
+			if (vehInstantStart.Pressed())
 				Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, 40.0f);
 
-			if (Ui::HotKeyPressed(Menu::m_HotKeys::vehInstantStop))
+			if (vehInstantStop.Pressed())
 				Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, 0);
 
 			if (m_bNoDamage)
@@ -219,7 +219,7 @@ void Vehicle::AddComponent(const std::string& component, const bool display_mess
 	}
 	catch (...)
 	{
-		flog << "Failed to component to vehicle " << component << std::endl;
+		gLog << "Failed to component to vehicle " << component << std::endl;
 	}
 }
 
@@ -241,7 +241,7 @@ void Vehicle::RemoveComponent(const std::string& component, const bool display_m
 	}
 	catch (...)
 	{
-		flog << "Failed to remove component from vehicle " << component << std::endl;
+		gLog << "Failed to remove component from vehicle " << component << std::endl;
 	}
 }
 
@@ -1048,7 +1048,7 @@ void Vehicle::Draw()
 				ImGui::EndTabItem();
 			}
 #ifdef GTASA
-			if (Globals::renderer != Render_DirectX11)
+			if (gRenderer != Render_DirectX11)
 			{
 				if (ImGui::BeginTabItem("Neons"))
 				{

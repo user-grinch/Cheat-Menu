@@ -15,50 +15,33 @@ private:
 
 	struct m_Overlay
 	{
-		inline static bool bCoord = false;
-		inline static bool bFPS = false;
-		inline static int mFPS = 0;
-		inline static bool bLocName = false;
-		inline static bool bTransparent = false;
-		inline static bool bVehHealth = false;
-		inline static bool bVehSpeed = false;
-		inline static bool bCpuUsage = false;
-		inline static float fCpuUsage = 0.0f;
-		inline static bool bMemUsage = false;
-		inline static float fMemUsage = 0.0f;
-		inline static std::vector<std::string> posNames = {
+		static inline bool bCoord = false;
+		static inline bool bFPS = false;
+		static inline int mFPS = 0;
+		static inline bool bLocName = false;
+		static inline bool bTransparent = false;
+		static inline bool bVehHealth = false;
+		static inline bool bVehSpeed = false;
+		static inline bool bCpuUsage = false;
+		static inline float fCpuUsage = 0.0f;
+		static inline bool bMemUsage = false;
+		static inline float fMemUsage = 0.0f;
+		static inline std::vector<std::string> posNames = {
 			"Custom", "Top left", "Top right", "Bottom left", "Bottom right"
 		};
-		inline static DISPLAY_POS mSelectedPos = DISPLAY_POS::BOTTOM_RIGHT;
-		inline static float fPosX = 0.0f;
-		inline static float fPosY = 0.0f;
-		inline static size_t mInterval = 1000;
-		inline static size_t mLastInterval = 0;
-		inline static int mTotalRam = 0;
+		static inline DISPLAY_POS mSelectedPos = DISPLAY_POS::BOTTOM_RIGHT;
+		static inline float fPosX = 0.0f;
+		static inline float fPosY = 0.0f;
+		static inline size_t mInterval = 1000;
+		static inline size_t mLastInterval = 0;
+		static inline int mTotalRam = 0;
 	};
 
 public:
-	struct m_HotKeys
-	{
-		inline static HotKeyData aimSkinChanger;
-		inline static HotKeyData freeCam;
-		inline static HotKeyData commandWindow;
-		inline static HotKeyData fixVeh;
-		inline static HotKeyData flipVeh;
-		inline static HotKeyData freeCamTeleportPlayer{VK_RETURN,VK_RETURN};
-		inline static HotKeyData godMode;
-		inline static HotKeyData menuOpen;
-		inline static HotKeyData quickSceenShot;
-		inline static HotKeyData quickTeleport;
-		inline static HotKeyData vehEngine;
-		inline static HotKeyData vehInstantStart;
-		inline static HotKeyData vehInstantStop;
-	};
-
 	struct m_Commands
 	{
-		inline static bool m_bShowMenu = false;
-		inline static char m_nInputBuffer[INPUT_BUFFER_SIZE] = "";
+		static inline bool m_bShowMenu = false;
+		static inline char m_nInputBuffer[INPUT_BUFFER_SIZE] = "";
 	};
 
 	Menu();

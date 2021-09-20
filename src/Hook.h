@@ -10,11 +10,11 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 class Hook
 {
 private:
-	inline static WNDPROC oWndProc;
-	inline static f_Present11 oPresent11;
-	inline static f_EndScene oEndScene;
-	inline static f_Reset oReset;
-	inline static bool m_bMouseVisibility;
+	static inline WNDPROC oWndProc;
+	static inline f_Present11 oPresent11;
+	static inline f_EndScene oEndScene;
+	static inline f_Reset oReset;
+	static inline bool m_bMouseVisibility;
 
 	static void CALLBACK RenderFrame(void* ptr);
 	static HRESULT CALLBACK Dx9Handler(IDirect3DDevice9* pDevice);
@@ -24,8 +24,8 @@ private:
 	static void ShowMouse(bool state);
 
 public:
-	inline static bool m_bShowMouse = false;
-	inline static std::function<void()> windowCallback = nullptr;
+	static inline bool m_bShowMouse = false;
+	static inline std::function<void()> windowCallback = nullptr;
 
 #ifdef GTASA
 	static void ApplyMouseFix();

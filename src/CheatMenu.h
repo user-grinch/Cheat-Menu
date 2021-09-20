@@ -23,7 +23,10 @@
 class CheatMenu : Hook, Animation, Game, Menu, Ped, Player, Teleport, Vehicle, Visual, Weapon
 {
 private:
-	inline static CallbackTable header
+	static inline bool m_bShowMenu = false;
+	static inline ImVec2 m_fMenuSize = ImVec2(screen::GetScreenWidth() / 4, screen::GetScreenHeight() / 1.2);
+	
+	static inline CallbackTable header
 	{
 		{"Teleport", &Teleport::Draw}, {"Player", &Player::Draw}, {"Ped", &Ped::Draw},
 #ifdef GTASA	

@@ -1,6 +1,6 @@
 #include "pch.h"
-#include "FileHandler.h"
-#include "Visual.h"
+#include "filehandler.h"
+#include "visual.h"
 
 // TODO: Clean up this mess, use structures instead?
 void FileHandler::GenerateHandlingFile(int pHandling, std::map<int, std::string>& storeMap)
@@ -126,7 +126,7 @@ void FileHandler::FetchColorData(std::vector<std::vector<float>>& storeVec,
 				}
 				catch (...)
 				{
-					flog << "Error parsing carcols.dat, " << line << std::endl;
+					gLog << "Error parsing carcols.dat, " << line << std::endl;
 				}
 			}
 
@@ -156,7 +156,7 @@ void FileHandler::FetchColorData(std::vector<std::vector<float>>& storeVec,
 					}
 					catch (...)
 					{
-						flog << "Error parsing carcols.dat, " << line << std::endl;
+						gLog << "Error parsing carcols.dat, " << line << std::endl;
 					}
 				}
 			}
@@ -166,7 +166,7 @@ void FileHandler::FetchColorData(std::vector<std::vector<float>>& storeVec,
 	}
 	else 
 	{
-		flog << "Carcols.dat not found";
+		gLog << "Carcols.dat not found";
 	}
 }
 
@@ -212,7 +212,7 @@ void FileHandler::FetchHandlingID(std::map<int, std::string>& storeMap)
 			}
 			catch (...)
 			{
-				flog << "Error parsing vehicles.ide, " << line << std::endl;
+				gLog << "Error parsing vehicles.ide, " << line << std::endl;
 			}
 		}
 
@@ -220,6 +220,6 @@ void FileHandler::FetchHandlingID(std::map<int, std::string>& storeMap)
 	}
 	else 
     {
-        flog << "Vehicle.ide not found";
+        gLog << "Vehicle.ide not found";
     }
 }

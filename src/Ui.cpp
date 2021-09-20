@@ -1,6 +1,6 @@
 #include "pch.h"
-#include "Util.h"
-#include "Ui.h"
+#include "util.h"
+#include "ui.h"
 
 bool Ui::ListBox(const char* label, std::vector<std::string>& all_items, int& selected)
 {
@@ -108,7 +108,7 @@ void Ui::DrawHeaders(CallbackTable& data)
 	{
 		const char* btn_text = it->first.c_str();
 
-		if (btn_text == Globals::m_HeaderId)
+		if (btn_text == m_HeaderId)
 		{
 			colors[ImGuiCol_Button] = colors[ImGuiCol_ButtonActive];
 			func = it->second;
@@ -117,8 +117,8 @@ void Ui::DrawHeaders(CallbackTable& data)
 
 		if (ImGui::Button(btn_text, GetSize(3, false)))
 		{
-			Globals::m_HeaderId = btn_text;
-			config.SetValue("window.id", Globals::m_HeaderId);
+			m_HeaderId = btn_text;
+			gConfig.SetValue("window.id", m_HeaderId);
 			func = it->second;
 		}
 
@@ -131,7 +131,7 @@ void Ui::DrawHeaders(CallbackTable& data)
 	ImGui::PopStyleVar();
 	ImGui::Dummy(ImVec2(0, 10));
 
-	if (Globals::m_HeaderId == "")
+	if (m_HeaderId == "")
 	{
 		// Show Welcome page
 		ImGui::NewLine();
@@ -541,7 +541,7 @@ void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLe
 				Couldn't figure out how to laod images for Dx11
 				Using texts for now
 			*/
-			if (Globals::renderer == Render_DirectX11)
+			if (gRenderer == Render_DirectX11)
 			{
 				if (ImGui::MenuItem(modelName.c_str()))
 				{
@@ -563,7 +563,7 @@ void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLe
 				imgPopup.value = modelName;
 			}
 
-			if (Globals::renderer != Render_DirectX11)
+			if (gRenderer != Render_DirectX11)
 			{
 				if (ImGui::IsItemHovered())
 				{
@@ -851,109 +851,6 @@ void Ui::EditFloat(const char* label, const int address, const float min, const 
 		ImGui::Spacing();
 		ImGui::Separator();
 	}
-}
-
-bool Ui::HotKey(const char* label, HotKeyData& key_data)
-{
-	bool active = m_CurrentHotkey == label;
-	bool state = false;
-
-	if (active)
-	{
-		ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyle().Colors[ImGuiCol_ButtonActive]);
-		ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::GetStyle().Colors[ImGuiCol_ButtonActive]);
-
-		for (int key = 3; key != 135; ++key)
-		{
-			if (KeyPressed(key))
-			{
-				key_data.m_key1 = key;
-				break;
-			}
-		}
-
-		for (int key = 135; key != 3; --key)
-		{
-			if (KeyPressed(key))
-			{
-				key_data.m_key2 = key;
-				break;
-			}
-		}
-	}
-
-
-	std::string text;
-
-	if (key_data.m_key1 != VK_NONE)
-		text = key_names[key_data.m_key1 - 1];
-	else
-		text = "None";
-
-	if (key_data.m_key1 != key_data.m_key2)
-		text += (" + " + key_names[key_data.m_key2 - 1]);
-
-	if (ImGui::Button((text + std::string("##") + std::string(label)).c_str(),
-		ImVec2(ImGui::GetWindowContentRegionWidth() / 3.5, ImGui::GetFrameHeight())))
-		if (!active)
-			m_CurrentHotkey = label;
-
-	if (active && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
-	{
-		m_CurrentHotkey = "";
-		state = true;
-	}
-
-	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
-	{
-		if (ImGui::IsItemHovered())
-		{
-			key_data.m_key1 = VK_NONE;
-			key_data.m_key2 = VK_NONE;
-		}
-		else
-			m_CurrentHotkey = "";
-
-		state = true;
-	}
-
-	ImGui::SameLine();
-	ImGui::Text(label);
-
-	if (active)
-		ImGui::PopStyleColor(2);
-
-	return state;
-}
-
-bool Ui::HotKeyPressed(HotKeyData& hotkey)
-{
-	if (KeyPressed(hotkey.m_key1) && KeyPressed(hotkey.m_key2))
-		hotkey.m_bPressed = true;
-	else
-	{
-		if (hotkey.m_bPressed)
-		{
-			hotkey.m_bPressed = false;
-			return m_CurrentHotkey == "";
-		}
-	}
-	return false;
-}
-
-std::string Ui::GetHotKeyNameString(HotKeyData& hotkey)
-{
-	std::string text;
-
-	if (hotkey.m_key1 != VK_NONE)
-		text = key_names[hotkey.m_key1 - 1];
-	else
-		text = "None";
-
-	if (hotkey.m_key1 != hotkey.m_key2)
-		text += (" + " + key_names[hotkey.m_key2 - 1]);
-
-	return text;
 }
 
 bool Ui::ColorButton(int color_id, std::vector<float>& color, ImVec2 size)

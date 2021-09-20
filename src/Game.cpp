@@ -1,8 +1,8 @@
 #include "pch.h"
-#include "Menu.h"
-#include "Game.h"
-#include "Ui.h"
-#include "Util.h"
+#include "menu.h"
+#include "game.h"
+#include "ui.h"
+#include "util.h"
 #ifdef GTASA
 #include <CIplStore.h>
 #include <CMessages.h>
@@ -90,7 +90,7 @@ Game::Game()
 #ifdef GTASA
 		if (m_bScreenShot)
 		{
-			if (Ui::HotKeyPressed(Menu::m_HotKeys::quickSceenShot))
+			if (quickSceenShot.Pressed())
 			{
 				Command<Commands::TAKE_PHOTO>();
 				SetHelpMessage("Screenshot taken", false, false, false);
@@ -140,7 +140,7 @@ Game::Game()
 			}
 		}
 
-		if (Ui::HotKeyPressed(Menu::m_HotKeys::freeCam))
+		if (freeCam.Pressed())
 		{
 			if (m_Freecam::m_bEnabled)
 			{
@@ -267,7 +267,7 @@ void Game::FreeCam()
 		m_Freecam::m_fTotalMouse.y = -150;
 	}
 
-	if (Ui::HotKeyPressed(Menu::m_HotKeys::freeCamTeleportPlayer))
+	if (freeCamTeleportPlayer.Pressed())
 	{
 		CPlayerPed* player = FindPlayerPed(-1);
 		CVector pos = m_Freecam::m_pPed->GetPosition();
@@ -490,7 +490,7 @@ Lowers armour, health, stamina etc."))
 				Command<Commands::SWITCH_DEATH_PENALTIES>(m_bKeepStuff);
 			}
 			Ui::CheckboxWithHint("Screenshot shortcut", &m_bScreenShot,
-								 (("Take screenshot using ") + Ui::GetHotKeyNameString(Menu::m_HotKeys::quickSceenShot)
+								 (("Take screenshot using ") + quickSceenShot.GetNameString()
 									 + "\nSaved inside 'GTA San Andreas User Files\\Gallery'").c_str());
 			if (Ui::CheckboxWithHint("Solid water", &m_bSolidWater,
 				"Player can walk on water\nTurn this off if you want to swim."))

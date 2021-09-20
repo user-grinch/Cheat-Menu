@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "Util.h"
+#include "util.h"
 #include "psapi.h"
 
 std::string Util::GetLocationName(CVector* pos)

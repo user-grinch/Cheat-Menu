@@ -1,5 +1,5 @@
 #pragma once
-#include "../Depend/json.hpp"
+#include "../depend/json.hpp"
 
 /*
 	Wrapper class for nlohmann::json

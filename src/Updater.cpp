@@ -1,8 +1,8 @@
 #include "pch.h"
-#include "Updater.h"
-#include "Ui.h"
-#include "MenuInfo.h"
-#include "Util.h"
+#include "updater.h"
+#include "ui.h"
+#include "menuinfo.h"
+#include "util.h"
 
 void Updater::CheckForUpdate()
 {

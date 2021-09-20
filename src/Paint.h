@@ -1,5 +1,4 @@
 // Portion of this source is taken from MoonAdditions https://github.com/THE-FYP/MoonAdditions
-// To keep the licensing simple this file would go under MIT License, GPLv3 won't apply
 
 // Copyright (c) 2012 DK22Pac
 // Copyright (c) 2017 FYP
@@ -70,25 +69,22 @@ private:
 		void resetMaterialColor(RpMaterial* material);
 		void resetMaterialTexture(RpMaterial* material);
 	};
-	inline static VehicleExtendedData<VehData> m_VehData;
+	static inline VehicleExtendedData<VehData> m_VehData;
 
 protected:
-	inline static ResourceStore m_TextureData { "textures", eResourceType::TYPE_IMAGE, ImVec2(100, 80) };
+	static inline ResourceStore m_TextureData { "textures", eResourceType::TYPE_IMAGE, ImVec2(100, 80) };
 
 	struct veh_nodes
 	{
-		inline static std::vector<std::string> names_vec{"Default"};
-		inline static std::string selected = "Default";
+		static inline std::vector<std::string> names_vec{"Default"};
+		static inline std::string selected = "Default";
 	};
 
 	Paint();
-	~Paint();
 	static void UpdateNodeListRecursive(CVehicle* pVeh);
 	static void NodeWrapperRecursive(RwFrame* frame, CVehicle* pVeh, std::function<void(RwFrame*)> func);
 	static void SetNodeColor(CVehicle* pVeh, std::string node_name, CRGBA color, bool filter_mat = false);
 	static void SetNodeTexture(CVehicle* pVeh, std::string node_name, std::string texturename, bool filter_mat = false);
 	static void ResetNodeColor(CVehicle* veh, std::string node_name);
 	static void ResetNodeTexture(CVehicle* pVeh, std::string node_name);
-	static void RenderEvent(CVehicle* pVeh);
-	static void ResetAfterRenderEvent(CVehicle* pVeh);
 };

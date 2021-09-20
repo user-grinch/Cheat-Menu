@@ -1,9 +1,9 @@
 #include "pch.h"
-#include "Ped.h"
-#include "Ui.h"
-#include "Util.h"
+#include "ped.h"
+#include "ui.h"
+#include "util.h"
+#include "weapon.h"
 #include <CPopulation.h>
-#include "Weapon.h"
 
 #ifdef GTASA
 #include <ePedBones.h>

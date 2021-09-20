@@ -1,8 +1,8 @@
 #include "pch.h"
-#include "Weapon.h"
-#include "Ui.h"
-#include "Util.h"
-#include "Ped.h"
+#include "weapon.h"
+#include "ui.h"
+#include "util.h"
+#include "ped.h"
 #include "CWeaponInfo.h"
 
 Weapon::Weapon()

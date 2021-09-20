@@ -5,22 +5,22 @@
 class Teleport
 {
 private:
-	inline static bool m_bInsertCoord;
-	inline static bool m_bQuickTeleport;
-	inline static char m_nInputBuffer[INPUT_BUFFER_SIZE];
-	inline static ResourceStore m_tpData{ "teleport", eResourceType::TYPE_TEXT };
-	inline static char m_nLocationBuffer[INPUT_BUFFER_SIZE];
-	inline static uint m_nQuickTeleportTimer;
+	static inline bool m_bInsertCoord;
+	static inline bool m_bQuickTeleport;
+	static inline char m_nInputBuffer[INPUT_BUFFER_SIZE];
+	static inline ResourceStore m_tpData{ "teleport", eResourceType::TYPE_TEXT };
+	static inline char m_nLocationBuffer[INPUT_BUFFER_SIZE];
+	static inline uint m_nQuickTeleportTimer;
 
 #ifdef GTASA
-	inline static CJson m_SpriteJson = CJson("radar sprite");
+	static inline CJson m_SpriteJson = CJson("radar sprite");
 #endif
 
 	struct m_Teleport
 	{
-		inline static bool m_bEnabled;
-		inline static CVector m_fPos = { -1, -1, -1 };
-		inline static uint m_nTimer;
+		static inline bool m_bEnabled;
+		static inline CVector m_fPos = { -1, -1, -1 };
+		static inline uint m_nTimer;
 	};
 
 

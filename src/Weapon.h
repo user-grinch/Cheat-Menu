@@ -5,27 +5,27 @@ class Weapon
 {
 public:
 #ifdef GTASA
-	inline static ResourceStore m_WeaponData{ "weapon", eResourceType::TYPE_BOTH, ImVec2(65, 65) };
+	static inline ResourceStore m_WeaponData{ "weapon", eResourceType::TYPE_BOTH, ImVec2(65, 65) };
 
-	inline static bool m_bAutoAim;
-	inline static bool m_bRapidFire;
-	inline static bool m_bDualWeild;
-	inline static bool m_bMoveAim;
-	inline static bool m_bMoveFire;
-	inline static int m_nSelectedGang;
+	static inline bool m_bAutoAim;
+	static inline bool m_bRapidFire;
+	static inline bool m_bDualWeild;
+	static inline bool m_bMoveAim;
+	static inline bool m_bMoveFire;
+	static inline int m_nSelectedGang;
 #elif GTAVC
-	inline static ResourceStore m_WeaponData{ "weapon", eResourceType::TYPE_TEXT };
-	inline static bool m_bInfiniteAmmo;
+	static inline ResourceStore m_WeaponData{ "weapon", eResourceType::TYPE_TEXT };
+	static inline bool m_bInfiniteAmmo;
 #endif
-	inline static bool m_bFastReload;
-	inline static bool m_bHugeDamage;
-	inline static bool m_bLongRange;
-	inline static int m_nAmmoCount = 99999;
-	inline static uchar m_nCurrentWeaponSlot = -1;
-	inline static int m_nSelectedWeapon;
+	static inline bool m_bFastReload;
+	static inline bool m_bHugeDamage;
+	static inline bool m_bLongRange;
+	static inline int m_nAmmoCount = 99999;
+	static inline uchar m_nCurrentWeaponSlot = -1;
+	static inline int m_nSelectedWeapon;
 	
 #ifdef GTASA
-	inline static int m_nGangWeaponList[10][3] =
+	static inline int m_nGangWeaponList[10][3] =
 	{
 		{WEAPON_PISTOL, WEAPON_MICRO_UZI, WEAPON_UNARMED}, // Ballas
 		{WEAPON_PISTOL, WEAPON_UNARMED, WEAPON_UNARMED}, // Grove

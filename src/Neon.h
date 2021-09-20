@@ -23,9 +23,8 @@ private:
 		}
 	};
 
-	inline static bool m_bMaskLoaded = false;
-	inline static RwTexture* m_pNeonTexture = nullptr;
-	inline static VehicleExtendedData<NeonData> m_VehNeon;
+	static inline RwTexture* m_pNeonTexture = nullptr; // pointer to the neon mask texture
+	static inline VehicleExtendedData<NeonData> m_VehNeon;
 
 public:
 	Neon();
@@ -35,5 +34,4 @@ public:
 	static bool IsPulsingEnabled(CVehicle* veh);
 	static void SetPulsing(CVehicle* veh, bool state);
 	static void RemoveNeon(CVehicle* veh);
-	static void RenderEvent(CVehicle* veh);
 };
