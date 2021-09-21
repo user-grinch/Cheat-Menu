@@ -5,11 +5,15 @@ class Game
 public:
 	static inline ResourceStore m_MissionData{ "mission", eResourceType::TYPE_TEXT };
 
+	static inline bool m_bDisableCheats;
+	static inline bool m_bDisableReplay;
+	static inline bool m_bMissionTimer;
+	static inline bool m_bFreezeTime;
+	static inline bool m_bSyncTime;
 #ifdef GTASA
-	static inline bool m_bForbiddenArea = true;
-	static inline bool m_bSolidWater;
+	static inline bool m_bForbiddenArea = true; // wanted level when going outside playable aea
+	static inline bool m_bSolidWater; // walk on water hack
 	static inline bool m_bScreenShot;
-	static inline uint m_nSolidWaterObj;
 	static inline bool m_bKeepStuff;
 	static inline ResourceStore m_StatData{ "stat", eResourceType::TYPE_TEXT };
 	
@@ -50,19 +54,13 @@ public:
 	};
 	
 #endif
-	static inline bool m_bDisableCheats;
-	static inline bool m_bDisableReplay;
-	static inline bool m_bMissionTimer;
-	static inline bool m_bFreezeTime;
-	static inline bool m_bSyncTime;
-	static inline uint m_nSyncTimer;
-	static inline bool m_bMissionLoaderWarningShown;
 
 	Game();
 	static void Draw();
 	static void RealTimeClock();
 
 #ifdef GTASA
+	// TODO: Update freecam with aap's code
 	static void FreeCam();
 	static void ClearFreecamStuff();
 #endif

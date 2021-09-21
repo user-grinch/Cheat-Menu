@@ -21,10 +21,15 @@ Visual::Visual()
 	Events::processScriptsEvent += []
 	{
 		// TODO: Needs improvement
+		static short m_nBacWeatherType;
 		if (m_bLockWeather)
 		{
 			CWeather::OldWeatherType = m_nBacWeatherType;
 			CWeather::NewWeatherType = m_nBacWeatherType;
+		}
+		else
+		{
+			m_nBacWeatherType = CWeather::OldWeatherType;
 		}
 	};
 }
@@ -320,11 +325,7 @@ void Visual::Draw()
 					}		
 				}
 			}
-			if (Ui::CheckboxWithHint("Lock weather", &m_bLockWeather))
-			{
-				m_nBacWeatherType = CWeather::OldWeatherType;
-			}
-
+			Ui::CheckboxWithHint("Lock weather", &m_bLockWeather);
 			if (Ui::CheckboxWithHint("No water", &m_bNoWater))
 			{
 				if (m_bNoWater)
@@ -357,10 +358,7 @@ void Visual::Draw()
 			Ui::CheckboxAddressEx("Unfog map", 0xBA372C, 0x50, 0x0);
 #elif GTAVC	
 			Ui::CheckboxAddress("Hide radar", 0xA10AB6);
-			if (Ui::CheckboxWithHint("Lock weather", &m_bLockWeather))
-			{
-				m_nBacWeatherType = CWeather::OldWeatherType;
-			}
+			Ui::CheckboxWithHint("Lock weather", &m_bLockWeather);
 			Ui::CheckboxAddress("Show hud", 0x86963A);
 
 			ImGui::NextColumn();

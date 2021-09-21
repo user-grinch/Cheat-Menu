@@ -6,16 +6,23 @@
 
 void MenuThread(void* param)
 {
+	/*
+		Had to put this in place since some people put the folder in root 
+		directory and the asi in modloader. Why??
+
+		TODO: Unlikely they'd even read the log so have to do something else
+	*/
 	if (!std::filesystem::is_directory(PLUGIN_PATH((char*)"CheatMenu")))
 	{
 		gLog << "CheatMenu folder not found. You need to put both \"CheatMenu.asi\" & \"CheatMenu\" folder in the same directory" << std::endl;
 		return;
 	}
 
-	static bool bGameInit = false;
 #ifdef GTASA
 	Hook::ApplyMouseFix();
 #endif
+
+	static bool bGameInit = false;
 
 	// Wait till game init
 	Events::initRwEvent += []
@@ -43,11 +50,13 @@ void MenuThread(void* param)
 	CFastman92limitAdjuster::Init();
 	CheatMenu menu;
 
+
+	// Checking for updates once a day
 	time_t now = time(0);
 	struct tm  tstruct = *localtime(&now);
-	int last_check_date = gConfig.GetValue("config.last_update_checked", 0);
+	int lastCheckDate = gConfig.GetValue("config.last_update_checked", 0);
 
-	if (last_check_date != tstruct.tm_mday)
+	if (lastCheckDate != tstruct.tm_mday)
 	{
 		Updater::CheckForUpdate();
 		gConfig.SetValue("config.last_update_checked", tstruct.tm_mday);
@@ -70,7 +79,7 @@ BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
 	{
 		uint gameVersion = GetGameVersion();
 #ifdef GTASA
-		if (gameVersion == GAME_10US_HOODLUM || gameVersion == GAME_10US_COMPACT)
+		if (gameVersion == GAME_10US_HOODLUM)
 		{
 			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&MenuThread, nullptr, NULL, nullptr);
 		}
@@ -79,7 +88,6 @@ BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
 			MessageBox(HWND_DESKTOP, "Unknown game version. GTA SA v1.0 US is required.", "CheatMenu", MB_ICONERROR);
 		}
 #elif GTAVC
-
 		if (gameVersion == GAME_10EN)
 		{
 			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&MenuThread, nullptr, NULL, nullptr);

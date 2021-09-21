@@ -107,6 +107,7 @@ Game::Game()
 			CStats::SetStatValue(STAT_STAMINA, 0.0f);
 		}
 
+		static int m_nSolidWaterObj;
 		if (m_bSolidWater)
 		{
 			CVector pos = pPlayer->GetPosition();
@@ -130,13 +131,13 @@ Game::Game()
 					Command<Commands::SET_OBJECT_COORDINATES>(m_nSolidWaterObj, pos.x, pos.y, waterHeight);
 				}
 			}
-			else
+		}
+		else
+		{
+			if (m_nSolidWaterObj)
 			{
-				if (m_nSolidWaterObj != 0)
-				{
-					Command<Commands::DELETE_OBJECT>(m_nSolidWaterObj);
-					m_nSolidWaterObj = 0;
-				}
+				Command<Commands::DELETE_OBJECT>(m_nSolidWaterObj);
+				m_nSolidWaterObj = 0;
 			}
 		}
 
@@ -160,7 +161,8 @@ Game::Game()
 #endif
 
 		// improve this later
-		if (m_bSyncTime && timer - m_nSyncTimer > 50)
+		static uint syncTimer;
+		if (m_bSyncTime && timer - syncTimer > 50)
 		{
 			std::time_t t = std::time(nullptr);
 			std::tm* now = std::localtime(&t);
@@ -168,7 +170,7 @@ Game::Game()
 			CClock::ms_nGameClockHours = now->tm_hour;
 			CClock::ms_nGameClockMinutes = now->tm_min;
 
-			m_nSyncTimer = timer;
+			syncTimer = timer;
 		}
 
 #ifdef GTASA
@@ -492,15 +494,8 @@ Lowers armour, health, stamina etc."))
 			Ui::CheckboxWithHint("Screenshot shortcut", &m_bScreenShot,
 								 (("Take screenshot using ") + quickSceenShot.GetNameString()
 									 + "\nSaved inside 'GTA San Andreas User Files\\Gallery'").c_str());
-			if (Ui::CheckboxWithHint("Solid water", &m_bSolidWater,
-				"Player can walk on water\nTurn this off if you want to swim."))
-			{
-				if (!m_bSolidWater && m_nSolidWaterObj != 0)
-				{
-					Command<Commands::DELETE_OBJECT>(m_nSolidWaterObj);
-					m_nSolidWaterObj = 0;
-				}
-			}
+			Ui::CheckboxWithHint("Solid water", &m_bSolidWater,
+				"Player can walk on water\nTurn this off if you want to swim.");
 #endif
 			if (ImGui::Checkbox("Sync system time", &m_bSyncTime))
 			{
@@ -652,7 +647,8 @@ Lowers armour, health, stamina etc."))
 		{
 			ImGui::Spacing();
 
-			if (!m_bMissionLoaderWarningShown)
+			static bool bMissionLoaderWarningShown;
+			if (!bMissionLoaderWarningShown)
 			{
 				ImGui::TextWrapped("Mission loader may cause,\n\
 1. Game crashes\n\
@@ -662,7 +658,9 @@ Lowers armour, health, stamina etc."))
 It's recommanded not to save after using the mission loader. Use it at your own risk!");
 				ImGui::Spacing();
 				if (ImGui::Button("Show mission loader", ImVec2(Ui::GetSize())))
-					m_bMissionLoaderWarningShown = true;
+				{
+					bMissionLoaderWarningShown = true;
+				}
 			}
 			else
 			{

@@ -9,16 +9,16 @@
 */
 
 #pragma once
-#include "Animation.h"
-#include "Hook.h"
-#include "Menu.h"
-#include "Teleport.h"
-#include "Player.h"
-#include "Ped.h"
-#include "Vehicle.h"
-#include "Weapon.h"
-#include "Game.h"
-#include "Visual.h"
+#include "animation.h"
+#include "hook.h"
+#include "menu.h"
+#include "teleport.h"
+#include "player.h"
+#include "ped.h"
+#include "vehicle.h"
+#include "weapon.h"
+#include "game.h"
+#include "visual.h"
 
 class CheatMenu : Hook, Animation, Game, Menu, Ped, Player, Teleport, Vehicle, Visual, Weapon
 {
