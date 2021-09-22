@@ -8,7 +8,7 @@
 
 ## Introduction
 
-Cheat menu for Grand Theft Auto San Andreas & Vice City which allows a large set of modifications/cheats to be applied enabling a much more easier & amusing gameplay.
+A mod menu for Grand Theft Auto San Andreas & Vice City which allows a large set of modifications/cheats to be applied enabling a much more easier & amusing gameplay. This is **NOT** intended for use in multiplayer, I won't be responsible for any form of bans. Use it at your own risk!
 
 Get stable binaries from [here](https://github.com/user-grinch/Cheat-Menu/releases). Beta binaries are available at the discord server.
 

@@ -1,19 +1,19 @@
 #include "pch.h"
 #include "hotkeys.h"
 
-Hotkey aimSkinChanger(VK_KEY_N, VK_KEY_N);
-Hotkey freeCam(VK_LCONTROL, VK_KEY_C);
-Hotkey commandWindow(VK_LCONTROL, VK_KEY_V);
-Hotkey fixVeh(VK_DELETE, VK_DELETE);
-Hotkey flipVeh(VK_KEY_Z, VK_KEY_Z);
-Hotkey freeCamTeleportPlayer(VK_LCONTROL, VK_TAB);
-Hotkey godMode(VK_KEY_E, VK_KEY_E);
-Hotkey menuOpen(VK_KEY_E, VK_KEY_E);
-Hotkey quickSceenShot(VK_KEY_E, VK_KEY_E);
-Hotkey quickTeleport(VK_KEY_E, VK_KEY_E);
-Hotkey vehEngine(VK_KEY_E, VK_KEY_E);
-Hotkey vehInstantStart(VK_KEY_E, VK_KEY_E);
-Hotkey vehInstantStop(VK_KEY_E, VK_KEY_E);
+Hotkey aimSkinChanger;
+Hotkey freeCam;
+Hotkey commandWindow;
+Hotkey fixVeh;
+Hotkey flipVeh;
+Hotkey freeCamTeleportPlayer;
+Hotkey godMode;
+Hotkey menuOpen;
+Hotkey quickSceenShot;
+Hotkey quickTeleport;
+Hotkey vehEngine;
+Hotkey vehInstantStart;
+Hotkey vehInstantStop;
 
 bool Hotkey::DrawUI(const char* label)
 {

@@ -11,7 +11,7 @@ public:
     int m_key1;
     int m_key2;
     
-    Hotkey(int key1, int key2)
+    Hotkey(int key1 = -1, int key2 = -1)
     : m_key1(key1), m_key2(key2)
     {}
 
