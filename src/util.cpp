@@ -150,7 +150,7 @@ CPlayerPed* player = FindPlayerPed();
 		CVector pos = pVeh->GetPosition();
 		float dist = DistanceBetweenPoints(playerPos, pos);
 
-		if (dist < distance && pVeh->m_pDriver != player)
+		if (dist < distance)
 		{
 			pClosestVeh = pVeh;
 			distance = dist;

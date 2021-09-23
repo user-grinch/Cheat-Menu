@@ -749,6 +749,7 @@ void Vehicle::Draw()
 						Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, pClosestVeh);
 					}
 
+#ifdef GTASA
 					for (int i = 0; i < seats; ++i)
 					{
 						if (i % 2 != 1)
@@ -759,9 +760,24 @@ void Vehicle::Draw()
 						if (ImGui::Button((std::string("Passenger ") + std::to_string(i + 1)).c_str(),
 							ImVec2(Ui::GetSize(2))))
 						{
-							Command<Commands::WARP_CHAR_INTO_CAR_AS_PASSENGER>(hplayer, pClosestVeh, i);
+							Command<Commands::WARP_CHAR_INTO_CAR_AS_PASSENGER>(hplayer, pClosestVeh, i);					
 						}
 					}
+#elif GTAVC
+					// ImGui::SameLine();
+					// if (ImGui::Button("Passenger", ImVec2(Ui::GetSize(2))))
+					// {
+					// 	if (pPlayer->m_bInVehicle)
+					// 	{
+					// 		CVector pos = pClosestVeh->GetPosition();
+					// 		Command<Commands::WARP_CHAR_FROM_CAR_TO_COORD>(hplayer, pos.x, pos.y, pos.z);
+					// 	}
+
+					// 	pPlayer->SetObjective(OBJECTIVE_ENTER_CAR_AS_PASSENGER);
+					// 	pPlayer->WarpPedIntoCar(pClosestVeh);	
+					// 	// Command<Commands::SET_CAR_FORWARD_SPEED>(CPools::GetVehicleRef(pClosestVeh), 0);
+					// }
+#endif
 				}
 				else
 				{
