@@ -473,7 +473,7 @@ void Menu::Draw()
 		{
 			if (ImGui::BeginChild("CommandsChild"))
 			{
-				ImGui::TextWrapped("Open or close command window using %s", commandWindow.GetNameString());
+				ImGui::TextWrapped("Open or close command window using %s", commandWindow.GetNameString().c_str());
 				ImGui::Spacing();
 				if (ImGui::CollapsingHeader("Set health"))
 				{

@@ -78,25 +78,19 @@ BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
 	if (nReason == DLL_PROCESS_ATTACH)
 	{
 		uint gameVersion = GetGameVersion();
+		
+		if (gameVersion == BY_GAME(GAME_10US_HOODLUM, GAME_10EN))
+		{
+			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&MenuThread, nullptr, NULL, nullptr);
+		}
+		else
+		{
 #ifdef GTASA
-		if (gameVersion == GAME_10US_HOODLUM)
-		{
-			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&MenuThread, nullptr, NULL, nullptr);
-		}
-		else
-		{
 			MessageBox(HWND_DESKTOP, "Unknown game version. GTA SA v1.0 US is required.", "CheatMenu", MB_ICONERROR);
-		}
 #elif GTAVC
-		if (gameVersion == GAME_10EN)
-		{
-			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&MenuThread, nullptr, NULL, nullptr);
-		}
-		else
-		{
 			MessageBox(HWND_DESKTOP, "Unknown game version. GTA VC v1.0 EN is required.", "CheatMenu", MB_ICONERROR);
-		}
 #endif
+		}
 	}
 
 	return TRUE;
