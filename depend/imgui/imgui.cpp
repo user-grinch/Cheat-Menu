@@ -9826,19 +9826,20 @@ void ImGui::NavUpdateWindowingOverlay()
     SetNextWindowSizeConstraints(ImVec2(viewport->Size.x * 0.20f, viewport->Size.y * 0.20f), ImVec2(FLT_MAX, FLT_MAX));
     SetNextWindowPos(viewport->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
     PushStyleVar(ImGuiStyleVar_WindowPadding, g.Style.WindowPadding * 2.0f);
-    Begin("###NavWindowingList", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings);
-    for (int n = g.WindowsFocusOrder.Size - 1; n >= 0; n--)
-    {
-        ImGuiWindow* window = g.WindowsFocusOrder[n];
-        IM_ASSERT(window != NULL); // Fix static analyzers
-        if (!IsWindowNavFocusable(window))
-            continue;
-        const char* label = window->Name;
-        if (label == FindRenderedTextEnd(label))
-            label = GetFallbackWindowNameForWindowingList(window);
-        Selectable(label, g.NavWindowingTarget == window);
-    }
-    End();
+    
+    // Begin("###NavWindowingList", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings);
+    // for (int n = g.WindowsFocusOrder.Size - 1; n >= 0; n--)
+    // {
+    //     ImGuiWindow* window = g.WindowsFocusOrder[n];
+    //     IM_ASSERT(window != NULL); // Fix static analyzers
+    //     if (!IsWindowNavFocusable(window))
+    //         continue;
+    //     const char* label = window->Name;
+    //     if (label == FindRenderedTextEnd(label))
+    //         label = GetFallbackWindowNameForWindowingList(window);
+    //     Selectable(label, g.NavWindowingTarget == window);
+    // }
+    // End();
     PopStyleVar();
 }
 
