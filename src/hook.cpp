@@ -156,6 +156,30 @@ HRESULT Hook::Dx11Handler(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Fl
 
 void Hook::ShowMouse(bool state)
 {
+
+// Disable player controls for controllers
+#if GTASA
+	bool bMouseDisabled = false;
+
+	if (patch::Get<BYTE>(0xBA6818) && (m_bShowMouse || bMouseDisabled))
+	{
+		CPlayerPed *player = FindPlayerPed();
+		if (player && player->GetPadFromPlayer())
+		{
+			if (m_bShowMouse)
+			{
+				bMouseDisabled = true;
+				player->GetPadFromPlayer()->DisablePlayerControls = true;
+			}
+			else
+			{
+				bMouseDisabled = false;
+				player->GetPadFromPlayer()->DisablePlayerControls = false;
+			}
+		}
+	}
+#endif
+
 	if (m_bMouseVisibility != m_bShowMouse)
 	{
 		ImGui::GetIO().MouseDrawCursor = state;

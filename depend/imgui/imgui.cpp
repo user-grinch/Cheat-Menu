@@ -6194,23 +6194,23 @@ bool ImGui::Begin(const char* name, bool* p_open, ImGuiWindowFlags flags)
         window->DrawList->PushTextureID(g.Font->ContainerAtlas->TexID);
         PushClipRect(host_rect.Min, host_rect.Max, false);
 
-        // Draw modal window background (darkens what is behind them, all viewports)
-        const bool dim_bg_for_modal = (flags & ImGuiWindowFlags_Modal) && window == GetTopMostPopupModal() && window->HiddenFramesCannotSkipItems <= 0;
-        const bool dim_bg_for_window_list = g.NavWindowingTargetAnim && (window == g.NavWindowingTargetAnim->RootWindow);
-        if (dim_bg_for_modal || dim_bg_for_window_list)
-        {
-            const ImU32 dim_bg_col = GetColorU32(dim_bg_for_modal ? ImGuiCol_ModalWindowDimBg : ImGuiCol_NavWindowingDimBg, g.DimBgRatio);
-            window->DrawList->AddRectFilled(viewport_rect.Min, viewport_rect.Max, dim_bg_col);
-        }
+        // // Draw modal window background (darkens what is behind them, all viewports)
+        // const bool dim_bg_for_modal = (flags & ImGuiWindowFlags_Modal) && window == GetTopMostPopupModal() && window->HiddenFramesCannotSkipItems <= 0;
+        // const bool dim_bg_for_window_list = g.NavWindowingTargetAnim && (window == g.NavWindowingTargetAnim->RootWindow);
+        // if (dim_bg_for_modal || dim_bg_for_window_list)
+        // {
+        //     const ImU32 dim_bg_col = GetColorU32(dim_bg_for_modal ? ImGuiCol_ModalWindowDimBg : ImGuiCol_NavWindowingDimBg, g.DimBgRatio);
+        //      window->DrawList->AddRectFilled(viewport_rect.Min, viewport_rect.Max, dim_bg_col);
+        // }
 
-        // Draw navigation selection/windowing rectangle background
-        if (dim_bg_for_window_list && window == g.NavWindowingTargetAnim)
-        {
-            ImRect bb = window->Rect();
-            bb.Expand(g.FontSize);
-            if (!bb.Contains(viewport_rect)) // Avoid drawing if the window covers all the viewport anyway
-                window->DrawList->AddRectFilled(bb.Min, bb.Max, GetColorU32(ImGuiCol_NavWindowingHighlight, g.NavWindowingHighlightAlpha * 0.25f), g.Style.WindowRounding);
-        }
+        // // Draw navigation selection/windowing rectangle background
+        // if (dim_bg_for_window_list && window == g.NavWindowingTargetAnim)
+        // {
+        //     ImRect bb = window->Rect();
+        //     bb.Expand(g.FontSize);
+        //     if (!bb.Contains(viewport_rect)) // Avoid drawing if the window covers all the viewport anyway
+        //         window->DrawList->AddRectFilled(bb.Min, bb.Max, GetColorU32(ImGuiCol_NavWindowingHighlight, g.NavWindowingHighlightAlpha * 0.25f), g.Style.WindowRounding);
+        // }
 
         // Since 1.71, child window can render their decoration (bg color, border, scrollbars, etc.) within their parent to save a draw call.
         // When using overlapping child windows, this will break the assumption that child z-order is mapped to submission order.
@@ -6234,19 +6234,19 @@ bool ImGui::Begin(const char* name, bool* p_open, ImGuiWindowFlags flags)
                 window->DrawList = &window->DrawListInst;
         }
 
-        // Draw navigation selection/windowing rectangle border
-        if (g.NavWindowingTargetAnim == window)
-        {
-            float rounding = ImMax(window->WindowRounding, g.Style.WindowRounding);
-            ImRect bb = window->Rect();
-            bb.Expand(g.FontSize);
-            if (bb.Contains(viewport_rect)) // If a window fits the entire viewport, adjust its highlight inward
-            {
-                bb.Expand(-g.FontSize - 1.0f);
-                rounding = window->WindowRounding;
-            }
-            window->DrawList->AddRect(bb.Min, bb.Max, GetColorU32(ImGuiCol_NavWindowingHighlight, g.NavWindowingHighlightAlpha), rounding, 0, 3.0f);
-        }
+        // // Draw navigation selection/windowing rectangle border
+        // if (g.NavWindowingTargetAnim == window)
+        // {
+        //     float rounding = ImMax(window->WindowRounding, g.Style.WindowRounding);
+        //     ImRect bb = window->Rect();
+        //     bb.Expand(g.FontSize);
+        //     if (bb.Contains(viewport_rect)) // If a window fits the entire viewport, adjust its highlight inward
+        //     {
+        //         bb.Expand(-g.FontSize - 1.0f);
+        //         rounding = window->WindowRounding;
+        //     }
+        //     window->DrawList->AddRect(bb.Min, bb.Max, GetColorU32(ImGuiCol_NavWindowingHighlight, g.NavWindowingHighlightAlpha), rounding, 0, 3.0f);
+        // }
 
         // UPDATE RECTANGLES (2- THOSE AFFECTED BY SCROLLING)
 
@@ -9537,8 +9537,8 @@ static void ImGui::NavEndFrame()
     ImGuiContext& g = *GImGui;
 
     // Show CTRL+TAB list window
-    if (g.NavWindowingTarget != NULL)
-        NavUpdateWindowingOverlay();
+    // if (g.NavWindowingTarget != NULL)
+    //     NavUpdateWindowingOverlay();
 
     // Perform wrap-around in menus
     ImGuiWindow* window = g.NavWrapRequestWindow;
@@ -9827,19 +9827,19 @@ void ImGui::NavUpdateWindowingOverlay()
     SetNextWindowPos(viewport->GetCenter(), ImGuiCond_Always, ImVec2(0.5f, 0.5f));
     PushStyleVar(ImGuiStyleVar_WindowPadding, g.Style.WindowPadding * 2.0f);
     
-    // Begin("###NavWindowingList", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings);
-    // for (int n = g.WindowsFocusOrder.Size - 1; n >= 0; n--)
-    // {
-    //     ImGuiWindow* window = g.WindowsFocusOrder[n];
-    //     IM_ASSERT(window != NULL); // Fix static analyzers
-    //     if (!IsWindowNavFocusable(window))
-    //         continue;
-    //     const char* label = window->Name;
-    //     if (label == FindRenderedTextEnd(label))
-    //         label = GetFallbackWindowNameForWindowingList(window);
-    //     Selectable(label, g.NavWindowingTarget == window);
-    // }
-    // End();
+    Begin("###NavWindowingList", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoInputs | ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoSavedSettings);
+    for (int n = g.WindowsFocusOrder.Size - 1; n >= 0; n--)
+    {
+        ImGuiWindow* window = g.WindowsFocusOrder[n];
+        IM_ASSERT(window != NULL); // Fix static analyzers
+        if (!IsWindowNavFocusable(window))
+            continue;
+        const char* label = window->Name;
+        if (label == FindRenderedTextEnd(label))
+            label = GetFallbackWindowNameForWindowingList(window);
+        Selectable(label, g.NavWindowingTarget == window);
+    }
+    End();
     PopStyleVar();
 }
 
