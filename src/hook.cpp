@@ -158,27 +158,31 @@ void Hook::ShowMouse(bool state)
 {
 
 // Disable player controls for controllers
-#if GTASA
 	bool bMouseDisabled = false;
-
-	if (patch::Get<BYTE>(0xBA6818) && (m_bShowMouse || bMouseDisabled))
+	if (patch::Get<BYTE>(BY_GAME(0xBA6818, 0x86968B)) && (m_bShowMouse || bMouseDisabled))
 	{
+
+#ifdef GTASA
 		CPlayerPed *player = FindPlayerPed();
-		if (player && player->GetPadFromPlayer())
+		CPad *pad = player ? player->GetPadFromPlayer() : NULL;
+#elif GTAVC
+		CPad *pad = CPad::GetPad(0);
+#endif
+
+		if (pad)
 		{
 			if (m_bShowMouse)
 			{
 				bMouseDisabled = true;
-				player->GetPadFromPlayer()->DisablePlayerControls = true;
+				pad->DisablePlayerControls = true;
 			}
 			else
 			{
 				bMouseDisabled = false;
-				player->GetPadFromPlayer()->DisablePlayerControls = false;
+				pad->DisablePlayerControls = false;
 			}
 		}
 	}
-#endif
 
 	if (m_bMouseVisibility != m_bShowMouse)
 	{
