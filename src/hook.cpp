@@ -157,7 +157,7 @@ HRESULT Hook::Dx11Handler(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Fl
 void Hook::ShowMouse(bool state)
 {
 
-// Disable player controls for controllers
+	// Disable player controls for controllers
 	bool bMouseDisabled = false;
 	if (patch::Get<BYTE>(BY_GAME(0xBA6818, 0x86968B)) && (m_bShowMouse || bMouseDisabled))
 	{

@@ -276,6 +276,42 @@ int Vehicle::GetRandomTrainIdForModel(int model)
 	int id = Random(_start, _end);
 	return train_ids[id];
 }
+#elif GTAVC
+void WarpPlayerIntoVehicle(CVehicle *pVeh, int seatId)
+{
+	CPlayerPed *pPlayer = FindPlayerPed();
+
+	pPlayer->m_bInVehicle = true;
+	pPlayer->m_pVehicle = pVeh;
+	pPlayer->RegisterReference((CEntity**)&pPlayer->m_pVehicle);
+	pPlayer->m_pObjectiveVehicle = pVeh;
+	pPlayer->RegisterReference((CEntity**)&pPlayer->m_pObjectiveVehicle);
+	pPlayer->m_dwAction = ePedAction::Driving;
+	pPlayer->m_dwObjective = OBJECTIVE_NO_OBJ;
+
+	if (pVeh->m_passengers[seatId])
+	{
+		pVeh->m_passengers[seatId]->Remove();
+	}
+	pVeh->m_passengers[seatId] = pPlayer;
+	pVeh->RegisterReference((CEntity**)&pVeh->m_passengers[seatId]);
+
+	patch::Set<BYTE>(0x7838CD, 1); // player got in car flag
+	Call<0x41D370>(pVeh); // CCarCtrl::RegisterVehicleOfInterest
+
+	CWorld::Remove(pPlayer);
+	pPlayer->m_placement.pos.x = pVeh->m_placement.pos.x;
+	pPlayer->m_placement.pos.y = pVeh->m_placement.pos.y;
+	pPlayer->m_placement.pos.z = pVeh->m_placement.pos.z;
+	CWorld::Add(pPlayer);
+
+	pPlayer->m_nFlags.bUseCollision = false;
+	pPlayer->m_nPedFlags.bIsStanding = false;
+	pPlayer->m_nPedFlags.b03 = 0;
+	RpAnimBlendClumpSetBlendDeltas(pPlayer->m_pRwClump, 16, -1000);
+	pPlayer->AddInCarAnims(pVeh, false);
+	CallMethod<0x4FF6A0>(pPlayer); // char __thiscall RemoveWeaponWhenEnteringVehicle(CPed*)
+}
 #endif 
 
 #ifdef GTASA
@@ -749,7 +785,6 @@ void Vehicle::Draw()
 						Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, pClosestVeh);
 					}
 
-#ifdef GTASA
 					for (int i = 0; i < seats; ++i)
 					{
 						if (i % 2 != 1)
@@ -760,24 +795,13 @@ void Vehicle::Draw()
 						if (ImGui::Button((std::string("Passenger ") + std::to_string(i + 1)).c_str(),
 							ImVec2(Ui::GetSize(2))))
 						{
+#ifdef GTASA
 							Command<Commands::WARP_CHAR_INTO_CAR_AS_PASSENGER>(hplayer, pClosestVeh, i);					
+#elif GTAVC
+							WarpPlayerIntoVehicle(pClosestVeh, i);
+#endif
 						}
 					}
-#elif GTAVC
-					// ImGui::SameLine();
-					// if (ImGui::Button("Passenger", ImVec2(Ui::GetSize(2))))
-					// {
-					// 	if (pPlayer->m_bInVehicle)
-					// 	{
-					// 		CVector pos = pClosestVeh->GetPosition();
-					// 		Command<Commands::WARP_CHAR_FROM_CAR_TO_COORD>(hplayer, pos.x, pos.y, pos.z);
-					// 	}
-
-					// 	pPlayer->SetObjective(OBJECTIVE_ENTER_CAR_AS_PASSENGER);
-					// 	pPlayer->WarpPedIntoCar(pClosestVeh);	
-					// 	// Command<Commands::SET_CAR_FORWARD_SPEED>(CPools::GetVehicleRef(pClosestVeh), 0);
-					// }
-#endif
 				}
 				else
 				{
