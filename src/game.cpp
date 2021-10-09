@@ -212,15 +212,21 @@ void SetPlayerMission(std::string& rootkey, std::string& name, std::string& id)
 		player->SetWantedLevel(0);
 		Command<Commands::LOAD_AND_LAUNCH_MISSION_INTERNAL>(std::stoi(id));
 	}
-	else SetHelpMessage("Can't start mission now", false, false, false);
+	else 
+	{
+		SetHelpMessage("Can't start mission now", false, false, false);
+	}
 }
 
 #ifdef GTASA
 void Game::FreeCam()
 {
-	int deltaSpeed = m_Freecam::m_fSpeed * (CTimer::m_snTimeInMillisecondsNonClipped -
-		CTimer::m_snPreviousTimeInMillisecondsNonClipped);
-
+	int delta = (CTimer::m_snTimeInMillisecondsNonClipped -
+						CTimer::m_snPreviousTimeInMillisecondsNonClipped);
+						
+	int ratio = 1 / (1 + (delta * m_Freecam::m_nMul));
+	int speed = m_Freecam::m_nMul + m_Freecam::m_nMul * ratio * delta;
+	
 	if (!m_Freecam::m_bInitDone)
 	{
 		CPlayerPed* player = FindPlayerPed(-1);
@@ -285,48 +291,48 @@ void Game::FreeCam()
 
 	if (KeyPressed(VK_RCONTROL))
 	{
-		deltaSpeed /= 2;
+		speed /= 2;
 	}
 
 	if (KeyPressed(VK_RSHIFT))
 	{
-		deltaSpeed *= 2;
+		speed *= 2;
 	}
 
 	if (KeyPressed(VK_KEY_I) || KeyPressed(VK_KEY_K))
 	{
 		if (KeyPressed(VK_KEY_K))
 		{
-			deltaSpeed *= -1;
+			speed *= -1;
 		}
 
 		float angle;
 		Command<Commands::GET_CHAR_HEADING>(m_Freecam::m_nPed, &angle);
-		pos.x += deltaSpeed * cos(angle * 3.14159f / 180.0f);
-		pos.y += deltaSpeed * sin(angle * 3.14159f / 180.0f);
-		pos.z += deltaSpeed * 2 * sin(m_Freecam::m_fTotalMouse.y / 3 * 3.14159f / 180.0f);
+		pos.x += speed * cos(angle * 3.14159f / 180.0f);
+		pos.y += speed * sin(angle * 3.14159f / 180.0f);
+		pos.z += speed * 2 * sin(m_Freecam::m_fTotalMouse.y / 3 * 3.14159f / 180.0f);
 	}
 
 	if (KeyPressed(VK_KEY_J) || KeyPressed(VK_KEY_L))
 	{
 		if (KeyPressed(VK_KEY_J))
 		{
-			deltaSpeed *= -1;
+			speed *= -1;
 		}
 
 		float angle;
 		Command<Commands::GET_CHAR_HEADING>(m_Freecam::m_nPed, &angle);
 		angle -= 90;
 
-		pos.x += deltaSpeed * cos(angle * 3.14159f / 180.0f);
-		pos.y += deltaSpeed * sin(angle * 3.14159f / 180.0f);
+		pos.x += speed * cos(angle * 3.14159f / 180.0f);
+		pos.y += speed * sin(angle * 3.14159f / 180.0f);
 	}
 
 	if (CPad::NewMouseControllerState.wheelUp)
 	{
 		if (m_Freecam::m_fFOV > 10.0f)
 		{
-			m_Freecam::m_fFOV -= 2.0f * deltaSpeed;
+			m_Freecam::m_fFOV -= 2.0f * speed;
 		}
 
 		TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_Freecam::m_fFOV, 250, true);
@@ -337,7 +343,7 @@ void Game::FreeCam()
 	{
 		if (m_Freecam::m_fFOV < 115.0f)
 		{
-			m_Freecam::m_fFOV += 2.0f * deltaSpeed;
+			m_Freecam::m_fFOV += 2.0f * speed;
 		}
 
 		TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_Freecam::m_fFOV, 250, true);
@@ -543,7 +549,7 @@ Lowers armour, health, stamina etc."))
 				ImGui::Spacing();
 
 				ImGui::SliderFloat("Field of view", &m_Freecam::m_fFOV, 5.0f, 120.0f);
-				ImGui::SliderFloat("Movement Speed", &m_Freecam::m_fSpeed, 0.0f, 0.5f);
+				ImGui::SliderInt("Movement Speed", &m_Freecam::m_nMul, 1, 10);
 				ImGui::Spacing();
 				ImGui::TextWrapped("Press Enter to teleport player to camera location");
 				ImGui::Spacing();

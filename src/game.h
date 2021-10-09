@@ -34,7 +34,7 @@ public:
 	struct m_Freecam
 	{
 		static inline bool m_bEnabled;
-		static inline float m_fSpeed = 0.08f;
+		static inline int m_nMul = 1;
 		static inline float m_fFOV = 60.0f;
 		static inline bool m_bInitDone;
 		static inline CPed* m_pPed;

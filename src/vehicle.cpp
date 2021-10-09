@@ -280,7 +280,6 @@ int Vehicle::GetRandomTrainIdForModel(int model)
 void WarpPlayerIntoVehicle(CVehicle *pVeh, int seatId)
 {
 	CPlayerPed *pPlayer = FindPlayerPed();
-
 	pPlayer->m_bInVehicle = true;
 	pPlayer->m_pVehicle = pVeh;
 	pPlayer->RegisterReference((CEntity**)&pPlayer->m_pVehicle);
@@ -288,6 +287,8 @@ void WarpPlayerIntoVehicle(CVehicle *pVeh, int seatId)
 	pPlayer->RegisterReference((CEntity**)&pPlayer->m_pObjectiveVehicle);
 	pPlayer->m_dwAction = ePedAction::Driving;
 	pPlayer->m_dwObjective = OBJECTIVE_NO_OBJ;
+	patch::Set<BYTE>(0x7838CD, 1); // player got in car flag
+	Call<0x41D370>(pVeh); // CCarCtrl::RegisterVehicleOfInterest
 
 	if (pVeh->m_passengers[seatId])
 	{
@@ -296,9 +297,7 @@ void WarpPlayerIntoVehicle(CVehicle *pVeh, int seatId)
 	pVeh->m_passengers[seatId] = pPlayer;
 	pVeh->RegisterReference((CEntity**)&pVeh->m_passengers[seatId]);
 
-	patch::Set<BYTE>(0x7838CD, 1); // player got in car flag
-	Call<0x41D370>(pVeh); // CCarCtrl::RegisterVehicleOfInterest
-
+	// Set player position
 	CWorld::Remove(pPlayer);
 	pPlayer->m_placement.pos.x = pVeh->m_placement.pos.x;
 	pPlayer->m_placement.pos.y = pVeh->m_placement.pos.y;

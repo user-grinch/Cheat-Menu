@@ -81,6 +81,7 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
 
 		CPed* ped;
 		int hplayer;
+		static size_t currentSlot = 1;
 
 #ifdef GTASA
 		if (m_SpecialPedJson.m_Data.contains(model))
@@ -91,18 +92,22 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
 			else
 				name = model;
 
-			CStreaming::RequestSpecialChar(1, name.c_str(), PRIORITY_REQUEST);
+			CStreaming::RequestSpecialChar(currentSlot, name.c_str(), PRIORITY_REQUEST);
 			CStreaming::LoadAllRequestedModels(true);
 
-			Command<Commands::CREATE_CHAR>(m_SpawnPed::m_nSelectedPedType + 4, 291, pos.x, pos.y, pos.z + 1, &hplayer);
-			CStreaming::SetSpecialCharIsDeletable(291);
+			Command<Commands::CREATE_CHAR>(m_SpawnPed::m_nSelectedPedType + 4, 290 + currentSlot, pos.x, pos.y, pos.z + 1, &hplayer);
+			CStreaming::SetSpecialCharIsDeletable(290 + currentSlot);
+
+			// SA has 10 slots 
+			++currentSlot;
+			if (currentSlot > 10)
+			{
+				currentSlot = 1;
+			}
 		}
 #elif GTAVC
-
 		if (cat == "Special") // Special model
 		{
-			static size_t currentSlot = 1;
-
 			Command<Commands::LOAD_SPECIAL_CHARACTER>(currentSlot, model.c_str());
 			Command<Commands::LOAD_ALL_MODELS_NOW>();
 			
@@ -197,15 +202,20 @@ void Ped::Draw()
 				if (ImGui::Button("Start gang war", ImVec2(Ui::GetSize(2))))
 				{
 					if (Util::GetLargestGangInZone() == 1)
+					{
 						CGangWars::StartDefensiveGangWar();
+					}
 					else
+					{
 						CGangWars::StartOffensiveGangWar();
-
+					}
 					CGangWars::bGangWarsActive = true;
 				}
 				ImGui::SameLine();
 				if (ImGui::Button("End gang war", ImVec2(Ui::GetSize(2))))
+				{
 					CGangWars::EndGangWar(true);
+				}
 
 				ImGui::Dummy(ImVec2(0, 20));
 				ImGui::TextWrapped("Gang zone density:");
@@ -236,8 +246,10 @@ void Ped::Draw()
 					ImGui::TextWrapped("You'll need ExGangWars plugin to display some turf colors");
 					ImGui::Spacing();
 					if (ImGui::Button("Download ExGangWars", Ui::GetSize(1)))
+					{
 						ShellExecute(NULL, "open", "https://gtaforums.com/topic/682194-extended-gang-wars/", NULL, NULL,
 						             SW_SHOWNORMAL);
+					}
 				}
 
 				ImGui::Spacing();
