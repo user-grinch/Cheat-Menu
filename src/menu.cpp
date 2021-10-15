@@ -551,11 +551,6 @@ void Menu::Draw()
 				ImGui::Dummy(ImVec2(0, 10));
 				ImGui::TextWrapped("Thanks to Junior-Djjr");
 				ImGui::Dummy(ImVec2(0, 30));
-				ImGui::Text("Please note,");
-				ImGui::TextWrapped("1. You are NOT allowed to reupload this modifiction.");
-				ImGui::TextWrapped("2. If you're posting it somewhere, link to the official source.");
-				ImGui::TextWrapped("3. This can be ignored by getting permission from the author.");
-				ImGui::Dummy(ImVec2(0, 10));
 				Ui::CenterdText("Copyright Grinch_ 2019-2022. All rights reserved");
 
 				ImGui::EndChild();

@@ -256,7 +256,7 @@ void Weapon::Draw()
 				}
 			}
 #endif
-			if (Ui::CheckboxWithHint("Huge damage", &m_bHugeDamage))
+			if (Ui::CheckboxWithHint("Huge damage", &m_bHugeDamage, "Also enable 'Long range' if weapon range is short"))
 			{
 				if (!m_bHugeDamage)
 				{
