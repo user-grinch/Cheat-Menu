@@ -147,6 +147,15 @@ void Weapon::GiveWeaponToPlayer(std::string& weapon_type)
 	{
 		Command<Commands::TASK_JETPACK>(hplayer);
 	}
+	if (weapon_type == "-2") // CellPhone
+	{
+		CStreaming::RequestModel(330, PRIORITY_REQUEST);
+		CStreaming::LoadAllRequestedModels(false);
+		player->ClearWeaponTarget();
+		player->SetCurrentWeapon(WEAPON_UNARMED);
+		player->AddWeaponModel(330);
+		Command<Commands::MARK_MODEL_AS_NO_LONGER_NEEDED>(330);
+	}
 	else
 	{
 		int iweapon_type = std::stoi(weapon_type);
@@ -231,7 +240,6 @@ void Weapon::Draw()
 			ClearPlayerWeapon(pPlayer->m_aWeapons[pPlayer->m_nActiveWeaponSlot].m_nType);
 #endif
 	}
-
 	ImGui::Spacing();
 
 	if (ImGui::BeginTabBar("Ped", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
