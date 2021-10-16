@@ -5,6 +5,9 @@
 #include "../depend/imgui/imgui_impl_dx9.h"
 #include "../depend/imgui/imgui_impl_dx11.h"
 #include "../depend/imgui/imgui_impl_win32.h"
+#include <dinput.h>
+
+#define DIMOUSE ((LPDIRECTINPUTDEVICE8)(RsGlobal.ps->diMouse))
 
 LRESULT Hook::WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -280,35 +283,26 @@ static LRESULT __stdcall _DispatchMessage(MSG* lpMsg)
 
 static int _cdecl _GetMouseState(Mouse* pMouse)
 {
-	if (Hook::m_bShowMouse)
+	if (Hook::m_bShowMouse || !RsGlobal.ps->diMouse)
 	{
+		DIMOUSE->Unacquire();
 		return -1;
 	}
 
-	struct tagPOINT Point;
-
-	pMouse->x = 0;
-	pMouse->y = 0;
-	pMouse->wheelDelta = mouseInfo.wheelDelta;
-	GetCursorPos(&Point);
-
-	if (mouseInfo.x >= 0)
+	if (DIMOUSE->GetDeviceState(20, pMouse) < 0)
 	{
-		pMouse->x = int(1.6f*(Point.x - mouseInfo.x)); // hacky fix
+		if (DIMOUSE->Acquire() == -2147024866)
+		{
+			while (DIMOUSE->Acquire() == -2147024866);
+		}
 	}
-
-	if (mouseInfo.y >= 0)
-	{
-		pMouse->y = int(Point.y - mouseInfo.y);
-	}
-
-	mouseInfo.wheelDelta = 0;
 
 	pMouse->buttons[0] = (GetAsyncKeyState(1) >> 8);
 	pMouse->buttons[1] = (GetAsyncKeyState(2) >> 8);
 	pMouse->buttons[2] = (GetAsyncKeyState(4) >> 8);
 	pMouse->buttons[3] = (GetAsyncKeyState(5) >> 8);
 	pMouse->buttons[4] = (GetAsyncKeyState(6) >> 8);
+	
 	return 0;
 }
 
