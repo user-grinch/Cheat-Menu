@@ -72,11 +72,13 @@ void Util::ClearCharTasksVehCheck(CPed* ped)
 	uint hped = CPools::GetPedRef(ped);
 	uint hveh = NULL;
 	bool veh_engine = true;
+	float speed;
 
 	if (ped->m_nPedFlags.bInVehicle)
 	{
 		hveh = CPools::GetVehicleRef(ped->m_pVehicle);
 		veh_engine = ped->m_pVehicle->m_nVehicleFlags.bEngineOn;
+		speed = ped->m_pVehicle->m_vecMoveSpeed.Magnitude() * 50.0f;
 	}
 
 	Command<Commands::CLEAR_CHAR_TASKS_IMMEDIATELY>(hped);
@@ -85,6 +87,7 @@ void Util::ClearCharTasksVehCheck(CPed* ped)
 	{
 		Command<Commands::TASK_WARP_CHAR_INTO_CAR_AS_DRIVER>(hped, hveh);
 		ped->m_pVehicle->m_nVehicleFlags.bEngineOn = veh_engine;
+		Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, speed);
 	}
 }
 

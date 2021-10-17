@@ -300,7 +300,7 @@ void Player::ChangePlayerModel(std::string& model)
 			CStreaming::LoadAllRequestedModels(true);
 
 			player->SetModelIndex(291);
-
+			
 			CStreaming::SetSpecialCharIsDeletable(291);
 		}
 		else
@@ -312,6 +312,7 @@ void Player::ChangePlayerModel(std::string& model)
 			player->SetModelIndex(imodel);
 			CStreaming::SetModelIsDeletable(imodel);
 		}
+		Util::ClearCharTasksVehCheck(player);
 	}
 }
 #elif GTAVC
