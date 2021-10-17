@@ -5,8 +5,8 @@
 -- Environment vars
 PSDK_DIR = os.getenv("PLUGIN_SDK_DIR")
 DX9SDK_DIR = os.getenv("DIRECTX9_SDK_DIR")
-GTASA_DIR = "C:/Work/GTASanAndreas"
-GTAVC_DIR = "F:/GTA Vice City"
+GTASA_DIR = "F:/GTASanAndreas"
+GTAVC_DIR = "E:/GTA Vice City"
 
 if (DX9SDK_DIR == nil) then
     error("DIRECTX9_SDK_DIR environment variable not set")

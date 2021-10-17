@@ -291,9 +291,14 @@ static int _cdecl _GetMouseState(Mouse* pMouse)
 	
 	if (DIMOUSE->GetDeviceState(sizeof(Mouse), pMouse) < 0)
 	{
-		while (DIMOUSE->Acquire() == DIERR_NOTINITIALIZED);
+		if (DIMOUSE->Acquire() == DIERR_NOTINITIALIZED)
+		{
+			while (DIMOUSE->Acquire() == DIERR_NOTINITIALIZED);
+		}
 	}
 
+	pMouse->wheelDelta = mouseInfo.wheelDelta;
+	mouseInfo.wheelDelta = 0;
 	pMouse->buttons[0] = (GetAsyncKeyState(1) >> 8);
 	pMouse->buttons[1] = (GetAsyncKeyState(2) >> 8);
 	pMouse->buttons[2] = (GetAsyncKeyState(4) >> 8);
