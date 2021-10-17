@@ -288,13 +288,10 @@ static int _cdecl _GetMouseState(Mouse* pMouse)
 		DIMOUSE->Unacquire();
 		return -1;
 	}
-
-	if (DIMOUSE->GetDeviceState(20, pMouse) < 0)
+	
+	if (DIMOUSE->GetDeviceState(sizeof(Mouse), pMouse) < 0)
 	{
-		if (DIMOUSE->Acquire() == -2147024866)
-		{
-			while (DIMOUSE->Acquire() == -2147024866);
-		}
+		while (DIMOUSE->Acquire() == DIERR_NOTINITIALIZED);
 	}
 
 	pMouse->buttons[0] = (GetAsyncKeyState(1) >> 8);
