@@ -10,7 +10,6 @@ private:
 		CRGBA m_Color;
 		bool m_bNeonInstalled;
 		float m_fVal;
-		uint m_nTimer;
 		bool m_bIncrement;
 		bool m_bPulsing;
 
@@ -18,7 +17,6 @@ private:
 		{
 			m_bNeonInstalled = false;
 			m_fVal = 0.0;
-			m_nTimer = 0;
 			m_bIncrement = true;
 		}
 	};

@@ -183,30 +183,27 @@ Neon::Neon()
 			CShadows::StoreShadowToBeRendered(5, m_pNeonTexture, &center, up.x, up.y, right.x, right.y, 180, data->m_Color.r,
 											data->m_Color.g, data->m_Color.b, 2.0f, false, 1.0f, 0, true);
 
-			if (CTimer::m_snTimeInMilliseconds - data->m_nTimer > 150)
+			if (data->m_bPulsing)
 			{
-				data->m_nTimer = CTimer::m_snTimeInMilliseconds;
+				size_t delta = CTimer::m_snTimeInMilliseconds - CTimer::m_snPreviousTimeInMilliseconds;
 
-				if (data->m_bPulsing)
+				if (data->m_fVal < 0.0f)
 				{
-					if (data->m_fVal < 0.0f)
-					{
-						data->m_bIncrement = true;
-					}
+					data->m_bIncrement = true;
+				}
 
-					if (data->m_fVal > 0.3f)
-					{
-						data->m_bIncrement = false;
-					}
+				if (data->m_fVal > 0.3f)
+				{
+					data->m_bIncrement = false;
+				}
 
-					if (data->m_bIncrement)
-					{
-						data->m_fVal += 0.1f;
-					}
-					else
-					{
-						data->m_fVal -= 0.1f;
-					}
+				if (data->m_bIncrement)
+				{
+					data->m_fVal += 0.0003f * delta;
+				}
+				else
+				{
+					data->m_fVal -= 0.0003f * delta;
 				}
 			}
 		}
