@@ -8,9 +8,9 @@
 
 ## Introduction
 
-A mod menu for Grand Theft Auto San Andreas & Vice City which allows a large set of modifications/cheats to be applied enabling a much more easier & amusing gameplay. This is **NOT** intended for use in multiplayer, I won't be responsible for any form of bans. Use it at your own risk!
+A mod menu for Grand Theft Auto III, Vice City & San Andreas which allows a large set of modifications/cheats to be applied enabling a much more easier & amusing gameplay. This is **NOT** intended for use in multiplayer, I won't be responsible for any form of bans. Use it at your own risk!
 
-Get stable binaries from [here](https://github.com/user-grinch/Cheat-Menu/releases). Beta binaries are available at the discord server.
+Get stable binaries from [here](https://github.com/user-grinch/Cheat-Menu/releases). Beta binaries are available at the discord server. Binaries for GTA III are available at the discord server too.
 
 [![Discord Banner 2](https://discordapp.com/api/guilds/689515979847237649/widget.png?style=banner2)](https://discord.com/invite/ZzW7kmf)
 
@@ -18,9 +18,9 @@ Get stable binaries from [here](https://github.com/user-grinch/Cheat-Menu/releas
 
 1. Install [DirectX9](https://www.microsoft.com/en-us/download/details.aspx?id=35) &  [Visual C++ Redistributable 2019 x86](hhttps://aka.ms/vs/16/release/vc_redist.x86.exe) if not already installed.
 2. If your game version isn't v1.0 then you'll need to [downgrade](https://gtaforums.com/topic/927016-san-andreas-downgrader/).
-3. Install [asi loader](https://www.gtagarage.com/mods/show.php?id=21709)
+3. Install [asi loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases)
 4. Download **CheatMenu.7z** and extract everything in game directory (replace if necessary).
-5. (Only VC) Download and install [d3d8to9 wrapper](https://github.com/crosire/d3d8to9/releases). Sometimes the asi loader may come with Globals.ini. Remove the d3d8.dll from there.
+5. (For III & VC) Download and install [d3d8to9 wrapper](https://github.com/crosire/d3d8to9/releases). Sometimes the asi loader may come with Globals.ini. Remove the d3d8.dll from there.
 
 (Vice City version is available at the discord server)
 

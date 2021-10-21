@@ -55,13 +55,13 @@ Teleport::Teleport()
 			CEntity* player_entity = FindPlayerEntity(-1);
 			m_Teleport::m_fPos.z = CWorld::FindGroundZFor3DCoord(m_Teleport::m_fPos.x, m_Teleport::m_fPos.y,
 			                                                 m_Teleport::m_fPos.z + 100.0f, nullptr, &player_entity) + 1.0f;
-#elif GTAVC
+#else // GTA3 & GTAVC
 			m_Teleport::m_fPos.z = CWorld::FindGroundZFor3DCoord(m_Teleport::m_fPos.x, m_Teleport::m_fPos.y,
 			                                                 m_Teleport::m_fPos.z + 100.0f, nullptr) + 1.0f;
 #endif											
 			CVehicle* pVeh = player->m_pVehicle;
 
-			if (pVeh && BY_GAME(player->m_nPedFlags.bInVehicle, player->m_pVehicle))
+			if (pVeh && BY_GAME(player->m_nPedFlags.bInVehicle, player->m_pVehicle, player->m_pVehicle))
 			{
 				BY_GAME(pVeh->Teleport(m_Teleport::m_fPos, false), pVeh->Teleport(m_Teleport::m_fPos));
 			}
@@ -115,8 +115,12 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
 	}
 #endif
 
+#ifdef GTA3
+	CStreaming::LoadScene(pos);
+#else
 	CStreaming::LoadScene(&pos);
 	CStreaming::LoadSceneCollision(&pos);
+#endif
 	CStreaming::LoadAllRequestedModels(false);
 
 #ifdef GTASA
@@ -135,10 +139,12 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
 	{
 		pPlayer->Teleport(pos, false);
 	}
-#elif GTAVC
+#else // GTA3 & GTAVC
 	if (pVeh && pPlayer->m_pVehicle)
 	{
-		BY_GAME(pVeh->m_nAreaCode, pVeh->m_nInterior) = interior_id;
+#ifndef GTA3
+		BY_GAME(pPlayer->m_nAreaCode, pPlayer->m_nInterior, NULL) = interior_id;
+#endif
 		pVeh->Teleport(pos);
 	}
 	else
@@ -147,7 +153,9 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
 	}
 #endif
 
-	BY_GAME(pPlayer->m_nAreaCode, pPlayer->m_nInterior) = interior_id;
+#ifndef GTA3
+	BY_GAME(pPlayer->m_nAreaCode, pPlayer->m_nInterior, NULL) = interior_id;
+#endif
 	Command<Commands::SET_AREA_VISIBLE>(interior_id);
 }
 

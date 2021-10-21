@@ -70,6 +70,10 @@ project "CheatMenuIII"
         "../src/util.cpp",
         "../src/menu.h", 
         "../src/menu.cpp",
+        "../src/teleport.h", 
+        "../src/teleport.cpp",
+        "../src/resourcestore.h", 
+        "../src/resourcestore.cpp",
         "../src/hotkeys.h", 
         "../src/hotkeys.cpp",
         "../src/dllmain.cpp"
