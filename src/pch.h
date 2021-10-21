@@ -7,9 +7,11 @@
 #define GITHUB_LINK "https://github.com/user-grinch/Cheat-Menu"
 
 #ifdef GTASA
-#define BY_GAME(sa, vc) sa
+#define BY_GAME(sa, vc, iii) sa
 #elif GTAVC
-#define BY_GAME(sa, vc) vc
+#define BY_GAME(sa, vc, iii) vc
+#elif GTA3
+#define BY_GAME(sa, vc, iii) iii
 #endif
 
 #include <d3d9.h>
@@ -25,12 +27,10 @@
 #include <windows.h>
 
 #include "plugin.h"
-#include "CBike.h"
 #include "CCamera.h"
 #include "CClock.h"
 #include "CCivilianPed.h"
 #include "CGangs.h"
-#include "cHandlingDataMgr.h"
 #include "CHud.h"
 #include "CMenuManager.h"
 #include "CModelInfo.h"
@@ -38,7 +38,6 @@
 #include "CStats.h"
 #include "CStreaming.h"
 #include "CTheScripts.h"
-#include "CTheZones.h"
 #include "CTimer.h"
 #include "CTimeCycle.h"
 #include "CTrain.h"
@@ -47,6 +46,12 @@
 #include "extensions/ScriptCommands.h"
 #include "extensions/Screen.h"
 #include "extensions/Paths.h"
+
+#ifndef GTA3
+#include "CBike.h"
+#include "cHandlingDataMgr.h"
+#include "CTheZones.h"
+#endif
 
 #ifdef GTASA
 #include "CCheat.h"
@@ -85,9 +90,11 @@ extern CJson gConfig;
 // Fix function clashes
 static void SetHelpMessage(const char *message, bool b1, bool b2, bool b3)
 {
-#if GTAVC
-	CHud::SetHelpMessage(message, b1, b2);
-#elif GTASA
+#if GTASA
 	CHud::SetHelpMessage(message, b1, b2, b3);
+#elif GTAVC
+	CHud::SetHelpMessage(message, b1, b2);
+#else // GTA3
+	CHud::SetHelpMessage((wchar_t*)message, b1);
 #endif
 }

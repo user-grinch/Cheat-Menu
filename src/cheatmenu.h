@@ -9,9 +9,8 @@
 */
 
 #pragma once
+#ifndef GTA3
 #include "animation.h"
-#include "hook.h"
-#include "menu.h"
 #include "teleport.h"
 #include "player.h"
 #include "ped.h"
@@ -19,24 +18,35 @@
 #include "weapon.h"
 #include "game.h"
 #include "visual.h"
+#endif
+#include "menu.h"
+#include "hook.h"
 
+#ifndef GTA3
 class CheatMenu : Hook, Animation, Game, Menu, Ped, Player, Teleport, Vehicle, Visual, Weapon
+#else
+class CheatMenu : Hook, Menu
+#endif
 {
 private:
 	static inline bool m_bShowMenu = false;
 	static inline ImVec2 m_fMenuSize = ImVec2(screen::GetScreenWidth() / 4, screen::GetScreenHeight() / 1.2);
-	
+
+#ifdef GTA3
+	static inline CallbackTable header
+	{
+		{"Menu", &Menu::Draw}
+	};
+#else
 	static inline CallbackTable header
 	{
 		{"Teleport", &Teleport::Draw}, {"Player", &Player::Draw}, {"Ped", &Ped::Draw},
-#ifdef GTASA	
 		{"Animation", &Animation::Draw},
-#elif GTAVC
 		{"Dummy", nullptr},
-#endif
 		{"Vehicle", &Vehicle::Draw}, {"Weapon", &Weapon::Draw},
 		{"Game", &Game::Draw}, {"Visual", &Visual::Draw}, {"Menu", &Menu::Draw}
 	};
+#endif
 
 	static void ApplyStyle();
 	static void DrawWindow();

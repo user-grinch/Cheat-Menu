@@ -45,6 +45,8 @@ std::string Util::GetLocationName(CVector* pos)
 	{
 		return "Vice City";
 	}
+#else
+	return "Liberty City";
 #endif
 }
 
@@ -141,7 +143,7 @@ CPlayerPed* player = FindPlayerPed();
 		return veh;
 	}
 	return nullptr;
-#elif GTAVC
+#else // GTAVC & GTA3
 	
 	CVehicle *pClosestVeh = nullptr;
 	float distance = 999.0f;
@@ -183,18 +185,14 @@ CPlayerPed* player = FindPlayerPed();
 		return ped;
 	}
 	return nullptr;
-#elif GTAVC
+#else // GTA3 & GTAVC
 	return player->m_apNearPeds[0];
 #endif
 }
 
 bool Util::IsOnCutscene()
 {
-#ifdef GTASA
-	return CCutsceneMgr::ms_running;
-#elif GTAVC
-	return *(bool*)0xA10AB2; // CCutsceneMgr::ms_running
-#endif
+	return BY_GAME(CCutsceneMgr::ms_running, *(bool*)0xA10AB2, *(bool*)0x95CCF5);
 }
 
 void Util::RainbowValues(int& r, int& g, int& b, float speed)

@@ -35,6 +35,7 @@ void MenuThread(void* param)
 		Sleep(1000);
 	}
 
+#ifdef GTASA
     /*
         TODO: Find a better way
         Since you could still name it something else
@@ -44,10 +45,11 @@ void MenuThread(void* param)
 		MessageBox(RsGlobal.ps->window, "SAMP detected. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
 		return;
 	}
+	CFastman92limitAdjuster::Init();
+#endif
 
 	gLog << "Starting...\nVersion: " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: "
 		GITHUB_LINK "\n" << std::endl;
-	CFastman92limitAdjuster::Init();
 	CheatMenu menu;
 
 
@@ -79,7 +81,7 @@ BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
 	{
 		uint gameVersion = GetGameVersion();
 		
-		if (gameVersion == BY_GAME(GAME_10US_HOODLUM, GAME_10EN))
+		if (gameVersion == BY_GAME(GAME_10US_HOODLUM, GAME_10EN, GAME_10EN))
 		{
 			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&MenuThread, nullptr, NULL, nullptr);
 		}
@@ -89,6 +91,8 @@ BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
 			MessageBox(HWND_DESKTOP, "Unknown game version. GTA SA v1.0 US is required.", "CheatMenu", MB_ICONERROR);
 #elif GTAVC
 			MessageBox(HWND_DESKTOP, "Unknown game version. GTA VC v1.0 EN is required.", "CheatMenu", MB_ICONERROR);
+#else // GTA3
+			MessageBox(HWND_DESKTOP, "Unknown game version. GTA III v1.0 EN is required.", "CheatMenu", MB_ICONERROR);
 #endif
 		}
 	}

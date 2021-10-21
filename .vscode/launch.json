@@ -27,6 +27,17 @@
             "console": "internalConsole"
         },
         {
+            "name": "Launch III",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "program": "E:/GTA3/Gta3.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "F:/GTASanAndreas/",
+            "environment": [],
+            "console": "internalConsole"
+        },
+        {
             "name": "Attach",
             "type": "cppvsdbg",
             "request": "attach",

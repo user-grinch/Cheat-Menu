@@ -78,7 +78,7 @@ void Menu::DrawOverlay()
 	if (pPlayer)
 	{
 		bool m_bShowMenu = m_Overlay::bCoord || m_Overlay::bFPS || m_Overlay::bLocName || m_Overlay::bCpuUsage || m_Overlay::bMemUsage ||
-		((m_Overlay::bVehHealth || m_Overlay::bVehSpeed) && pPlayer && pPlayer->m_pVehicle && pPlayer->m_pVehicle->IsDriver(pPlayer));
+		((m_Overlay::bVehHealth || m_Overlay::bVehSpeed) && pPlayer && pPlayer->m_pVehicle && pPlayer->m_pVehicle->m_pDriver == pPlayer);
 
 		const float offset = 10.0f;
 		ImGuiIO& io = ImGui::GetIO();
@@ -145,7 +145,7 @@ void Menu::DrawOverlay()
 				int mUsedRam = static_cast<int>((memInfo.ullTotalPhys - memInfo.ullAvailPhys) * 1e-6);
 				m_Overlay::fMemUsage = 100.0f * (static_cast<float>(mUsedRam) / static_cast<float>(m_Overlay::mTotalRam));
 				
-				m_Overlay::mFPS = static_cast<size_t>(BY_GAME(CTimer::game_FPS, io.Framerate));
+				m_Overlay::mFPS = static_cast<size_t>(BY_GAME(CTimer::game_FPS, io.Framerate, io.Framerate));
 				m_Overlay::mLastInterval = game_ms;
 			}
 
@@ -174,7 +174,7 @@ void Menu::DrawOverlay()
 				ImGui::Text("RAM usage: %.2f%%", m_Overlay::fMemUsage);
 			}
 
-			if (pPlayer->m_pVehicle && pPlayer->m_pVehicle->IsDriver(pPlayer))
+			if (pPlayer->m_pVehicle && pPlayer->m_pVehicle->m_pDriver == pPlayer)
 			{
 				if (m_Overlay::bVehHealth)
 				{

@@ -41,7 +41,7 @@ void Visual::TimecycSlider(const char* label, T* ptr, int min, int max)
 #ifdef GTASA
 	// Compatable with 24h TimeCyc
 	T* arr = static_cast<T*>(patch::GetPointer(int(ptr)));
-#elif GTAVC
+#else // GTA3 & GTAVC
 	T* arr = static_cast<T*>(ptr);
 #endif
 	int a = arr[val];

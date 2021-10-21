@@ -7,7 +7,7 @@
 
 #ifdef GTASA
 class Vehicle : public Paint, public Neon
-#elif GTAVC
+#else // GTA3 & GTAVC
 class Vehicle
 #endif
 {

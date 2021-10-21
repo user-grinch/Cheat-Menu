@@ -44,6 +44,6 @@ public:
 };
 #else
 
-// Dummy Class for GTAVC
+// Dummy Class for VC & III
 class Animation{};
 #endif

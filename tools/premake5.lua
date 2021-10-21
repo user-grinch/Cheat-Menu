@@ -7,6 +7,7 @@ PSDK_DIR = os.getenv("PLUGIN_SDK_DIR")
 DX9SDK_DIR = os.getenv("DIRECTX9_SDK_DIR")
 GTASA_DIR = "F:/GTASanAndreas"
 GTAVC_DIR = "E:/GTA Vice City"
+GTA3_DIR = "E:/GTA3"
 
 if (DX9SDK_DIR == nil) then
     error("DIRECTX9_SDK_DIR environment variable not set")
@@ -46,6 +47,77 @@ project "Depend"
     filter "configurations:Release"
         defines { "NDEBUG", "IS_PLATFORM_WIN" }
         optimize "On"
+
+project "CheatMenuIII"
+    kind "SharedLib"
+    targetdir (GTA3_DIR)
+    targetextension ".asi"
+    
+    files { 
+        "../src/cheatmenu.h", 
+        "../src/cheatmenu.cpp", 
+        "../src/pch.h", 
+        "../src/pch.cpp", 
+        "../src/hook.h", 
+        "../src/hook.cpp", 
+        "../src/updater.h", 
+        "../src/updater.cpp", 
+        "../src/json.h", 
+        "../src/json.cpp",
+        "../src/ui.h", 
+        "../src/ui.cpp",
+        "../src/util.h", 
+        "../src/util.cpp",
+        "../src/menu.h", 
+        "../src/menu.cpp",
+        "../src/hotkeys.h", 
+        "../src/hotkeys.cpp",
+        "../src/dllmain.cpp"
+    }
+    includedirs {
+        PSDK_DIR .. "/plugin_III/",
+        PSDK_DIR .. "/plugin_III/game_III/",
+        PSDK_DIR .. "/shared/",
+        PSDK_DIR .. "/shared/game/"
+    }
+    libdirs (PSDK_DIR .. "/output/lib")
+    
+    defines { 
+        "NDEBUG", 
+        "IS_PLATFORM_WIN" ,
+        "_CRT_SECURE_NO_WARNINGS",
+        "_CRT_NON_CONFORMING_SWPRINTFS",
+        "GTA3",
+        "_DX9_SDK_INSTALLED",
+        "PLUGIN_SGV_10US"
+    }
+
+    pchheader "pch.h"
+    pchsource "../src/pch.cpp"
+
+    filter "configurations:Debug"
+        symbols "On"
+        links { 
+            "Depend",
+            "d3d9",
+            "d3d11",
+            "XInput9_1_0",
+            "Pdh",
+            "urlmon",
+            "plugin_III_d.lib" 
+        }
+
+    filter "configurations:Release"
+        optimize "On"
+        links { 
+            "Depend",
+            "d3d9",
+            "d3d11",
+            "XInput9_1_0",
+            "Pdh",
+            "urlmon",
+            "plugin_III.lib" 
+        }
 
 project "CheatMenuVC"
     kind "SharedLib"

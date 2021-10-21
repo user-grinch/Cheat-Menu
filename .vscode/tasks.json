@@ -110,6 +110,60 @@
                     }
                 }
             },
-        }
+        },
+        {
+            "label": "Build DebugIII",
+            "type": "shell",
+            "command": "${workspaceFolder}/tools/DebugIII.bat",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "windows": {
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": [
+                            "/d", "/c"
+                        ]
+                    }
+                }
+            },
+        },
+        {
+            "label": "Build ReleaseIII",
+            "type": "shell",
+            "command": "${workspaceFolder}/tools/ReleaseIII.bat",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "windows": {
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": [
+                            "/d", "/c"
+                        ]
+                    }
+                }
+            },
+        },
     ]
 }

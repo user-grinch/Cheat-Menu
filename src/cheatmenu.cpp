@@ -9,7 +9,7 @@ void CheatMenu::DrawWindow()
 	ImGuiIO& io = ImGui::GetIO();
 	static bool bRunning = true;
 
-	if (BY_GAME(FrontEndMenuManager.m_bMenuActive, FrontendMenuManager.m_bMenuVisible))
+	if (BY_GAME(FrontEndMenuManager.m_bMenuActive, FrontendMenuManager.m_bMenuVisible, FrontEndMenuManager.m_bMenuActive))
 	{
 		if (bRunning)
 		{
@@ -21,7 +21,7 @@ void CheatMenu::DrawWindow()
 	else
 	{
 		bRunning = true;
-		if (m_bShowMenu || BY_GAME(m_Commands::m_bShowMenu, true))
+		if (m_bShowMenu || BY_GAME(m_Commands::m_bShowMenu, true, true))
 		{
 			if (m_bShowMenu)
 			{
@@ -78,7 +78,7 @@ CheatMenu::CheatMenu()
 
 	Events::processScriptsEvent += []()
 	{
-		if (!BY_GAME(FrontEndMenuManager.m_bMenuActive, FrontendMenuManager.m_bMenuVisible))
+		if (!BY_GAME(FrontEndMenuManager.m_bMenuActive, FrontendMenuManager.m_bMenuVisible, FrontEndMenuManager.m_bMenuActive))
 		{
 			if (menuOpen.Pressed())
 			{

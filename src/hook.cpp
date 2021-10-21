@@ -109,10 +109,7 @@ void Hook::RenderFrame(void* ptr)
 	else
 	{
 		bInit = true;
-		ImGui::CreateContext();
-
 		ImGuiStyle& style = ImGui::GetStyle();
-
 		ImGui_ImplWin32_Init(RsGlobal.ps->window);
 
 #ifdef GTASA
@@ -159,16 +156,15 @@ HRESULT Hook::Dx11Handler(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Fl
 
 void Hook::ShowMouse(bool state)
 {
-
 	// Disable player controls for controllers
 	bool bMouseDisabled = false;
-	if (patch::Get<BYTE>(BY_GAME(0xBA6818, 0x86968B)) && (m_bShowMouse || bMouseDisabled))
+	if (patch::Get<BYTE>(BY_GAME(0xBA6818, 0x86968B, 0x5F03D8)) && (m_bShowMouse || bMouseDisabled))
 	{
 
 #ifdef GTASA
 		CPlayerPed *player = FindPlayerPed();
 		CPad *pad = player ? player->GetPadFromPlayer() : NULL;
-#elif GTAVC
+#else
 		CPad *pad = CPad::GetPad(0);
 #endif
 
@@ -177,12 +173,20 @@ void Hook::ShowMouse(bool state)
 			if (m_bShowMouse)
 			{
 				bMouseDisabled = true;
+#ifdef GTA3
+				pad->m_bDisablePlayerControls = true;
+#else //GTAVC & GTASA
 				pad->DisablePlayerControls = true;
+#endif
 			}
 			else
 			{
 				bMouseDisabled = false;
+#ifdef GTA3
+				pad->m_bDisablePlayerControls = false;
+#else //GTAVC & GTASA
 				pad->DisablePlayerControls = false;
+#endif
 			}
 		}
 	}
@@ -193,22 +197,32 @@ void Hook::ShowMouse(bool state)
 
 #ifdef GTASA
 		Hook::ApplyMouseFix(); // Reapply the patches
-#elif GTAVC
+#else
 		if (m_bShowMouse)
 		{
-			patch::SetUChar(0x6020A0, 0xC3); // psSetMousePos
-			patch::Nop(0x4AB6CA, 5); // don't call CPad::UpdateMouse()
+			
+			patch::SetUChar(BY_GAME(0, 0x6020A0, 0x580D20), 0xC3); // psSetMousePos
+			patch::Nop(BY_GAME(0, 0x4AB6CA, 0x49272F), 5); // don't call CPad::UpdateMouse()
 		}
 		else
 		{
-			patch::SetUChar(0x6020A0, 0x53);
+			
+			patch::SetUChar(BY_GAME(0, 0x6020A0, 0x580D20), 0x53);
+#ifdef GTAVC
 			patch::SetRaw(0x4AB6CA, (char*)"\xE8\x51\x21\x00\x00", 5);
+#else // GTA3
+			patch::SetRaw(0x49272F, (char*)"\xE8\x6C\xF5\xFF\xFF", 5);
+#endif
 		}
 #endif
 
 		CPad::NewMouseControllerState.X = 0;
 		CPad::NewMouseControllerState.Y = 0;
+#ifdef GTA3
+		CPad::GetPad(0)->ClearMouseHistory();
+#else // GTAVC & GTASA
 		CPad::ClearMouseHistory();
+#endif
 		CPad::UpdatePads();
 		m_bMouseVisibility = m_bShowMouse;
 	}
@@ -322,5 +336,4 @@ void Hook::ApplyMouseFix()
 	patch::SetChar(0x746A08, 32); // diMouseOffset
 	patch::SetChar(0x746A58, 32); // diDeviceoffset
 }
-
 #endif
