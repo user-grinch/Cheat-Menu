@@ -181,6 +181,12 @@ Player::Player()
 			player->m_nFlags.bExplosionProof = 1;
 			player->m_nFlags.bFireProof = 1;
 			player->m_nFlags.bMeleeProof = 1;
+#else // GTA3
+			player->m_nEntityFlags.bBulletProof = m_bGodMode;
+			player->m_nEntityFlags.bCollisionProof = m_bGodMode;
+			player->m_nEntityFlags.bExplosionProof = m_bGodMode;
+			player->m_nEntityFlags.bFireProof = m_bGodMode;
+			player->m_nEntityFlags.bMeleeProof = m_bGodMode;
 #endif
 		}
 
@@ -224,6 +230,12 @@ Player::Player()
 				player->m_nFlags.bExplosionProof = 0;
 				player->m_nFlags.bFireProof = 0;
 				player->m_nFlags.bMeleeProof = 0;
+#else // GTA3
+				player->m_nEntityFlags.bBulletProof = m_bGodMode;
+				player->m_nEntityFlags.bCollisionProof = m_bGodMode;
+				player->m_nEntityFlags.bExplosionProof = m_bGodMode;
+				player->m_nEntityFlags.bFireProof = m_bGodMode;
+				player->m_nEntityFlags.bMeleeProof = m_bGodMode;
 #endif
 				m_bGodMode = false;
 			}
@@ -315,13 +327,33 @@ void Player::ChangePlayerModel(std::string& model)
 		Util::ClearCharTasksVehCheck(player);
 	}
 }
-#elif GTAVC
-void Player::ChangePlayerModel(std::string& cat, std::string& name, std::string& id)
+#else // GTA3 & GTAVC
+void Player::ChangePlayerModel(std::string& cat, std::string& key, std::string& val)
 {
 	CPlayerPed* player = FindPlayerPed();
+
+#ifdef GTAVC
 	player->Undress(id.c_str());
 	CStreaming::LoadAllRequestedModels(false);
 	player->Dress();
+#else // GTA3
+	if (cat == "Special")
+	{
+		// CStreaming::RequestSpecialChar(1, val.c_str(), PRIORITY_REQUEST);
+		// CStreaming::LoadAllRequestedModels(true);
+		// player->SetModelIndex(127);
+		// CStreaming::SetMissionDoesntRequireSpecialChar(127);
+		SetHelpMessage("Spawning special peds isn't implemented yet.", false, false, false);
+	}
+	else
+	{
+		int imodel = std::stoi(val);
+		CStreaming::RequestModel(imodel, eStreamingFlags::PRIORITY_REQUEST);
+		CStreaming::LoadAllRequestedModels(true);
+		player->SetModelIndex(imodel);
+		CStreaming::SetModelIsDeletable(imodel);
+	}
+#endif
 }
 #endif
 
@@ -384,7 +416,8 @@ void Player::Draw()
 			}
 			ImGui::EndDisabled();
 #endif
-			Ui::CheckboxAddress("Free healthcare", (int)&pInfo->m_bFreeHealthCare);
+			Ui::CheckboxAddress("Free healthcare", BY_GAME((int)&pInfo->m_bFreeHealthCare, 
+							(int)&pInfo->m_bFreeHealthCare, (int)&pInfo->m_bGetOutOfHospitalFree));
 
 			if (Ui::CheckboxWithHint("God mode", &m_bGodMode))
 			{
@@ -401,6 +434,12 @@ void Player::Draw()
 				pPlayer->m_nFlags.bExplosionProof = m_bGodMode;
 				pPlayer->m_nFlags.bFireProof = m_bGodMode;
 				pPlayer->m_nFlags.bMeleeProof = m_bGodMode;
+#else // GTA3
+				pPlayer->m_nEntityFlags.bBulletProof = m_bGodMode;
+				pPlayer->m_nEntityFlags.bCollisionProof = m_bGodMode;
+				pPlayer->m_nEntityFlags.bExplosionProof = m_bGodMode;
+				pPlayer->m_nEntityFlags.bFireProof = m_bGodMode;
+				pPlayer->m_nEntityFlags.bMeleeProof = m_bGodMode;
 #endif
 			}
 #ifdef GTASA
@@ -411,8 +450,8 @@ void Player::Draw()
 				pPlayer->m_nPedFlags.bDontRender = (pPlayer->m_nPedFlags.bDontRender == 1) ? 0 : 1;
 			}
 			Ui::CheckboxAddress("Infinite sprint", 0xB7CEE4);
-#elif GTAVC
-			Ui::CheckboxAddress("Infinite sprint", (int)&pInfo->m_bNeverGetsTired);
+#else // GTA3 & GTAVC
+			Ui::CheckboxAddress("Infinite sprint", BY_GAME(NULL, (int)&pInfo->m_bNeverGetsTired, (int)&pInfo->m_bInfiniteSprint));
 #endif
 
 			ImGui::NextColumn();
@@ -432,23 +471,33 @@ void Player::Draw()
 			{
 				CCheat::NotWantedCheat();
 			}
-#elif GTAVC
+#else // GTA3 & GTAVC
 			static bool neverWanted = false;
 			if (Ui::CheckboxWithHint("Never wanted", &neverWanted))
 			{
 				if (neverWanted)
 				{
+#ifdef GTA3
+					pPlayer->m_pWanted->SetWantedLevel(0);
+#else
 					pPlayer->m_pWanted->CheatWantedLevel(0);
+#endif
 					pPlayer->m_pWanted->Update();
-					patch::SetRaw(0x4D2110, (char*)"\xC3\x90\x90\x90\x90\x90", 6); // CWanted::UpdateWantedLevel()
-					patch::Nop(0x5373D0, 5); // CWanted::Update();
+					patch::SetRaw(BY_GAME(NULL, 0x4D2110, 0x4AD900), (char*)"\xC3\x90\x90\x90\x90\x90", 6); // CWanted::UpdateWantedLevel()
+					patch::Nop(BY_GAME(NULL, 0x5373D0, 0x4EFE73), 5); // CWanted::Update();
 				}
 				else
 				{
-					pPlayer->m_pWanted->CheatWantedLevel(0);
 					pPlayer->m_pWanted->ClearQdCrimes();
+#ifdef GTA3
+					pPlayer->m_pWanted->SetWantedLevel(0);
+					patch::SetRaw(0x4AD900, (char*)"\xA1\x18\x77\x5F\x00", 6);
+					patch::SetRaw(0x4EFE73, (char*)"\xE8\x38\xD9\xFB\xFF", 5);
+#else
+					pPlayer->m_pWanted->CheatWantedLevel(0);
 					patch::SetRaw(0x4D2110, (char*)"\x8B\x15\xDC\x10\x69\x00", 6);
 					patch::SetRaw(0x5373D0, (char*)"\xE8\x8B\xAE\xF9\xFF", 5);
+#endif
 				}
 			}
 #endif
@@ -462,36 +511,46 @@ void Player::Draw()
 
 			ImGui::Columns(2, 0, false);
 
-			bool state = BY_GAME(pPlayer->m_nPhysicalFlags.bBulletProof, pPlayer->m_nFlags.bBulletProof);
+			bool state = BY_GAME(pPlayer->m_nPhysicalFlags.bBulletProof, pPlayer->m_nFlags.bBulletProof,
+							pPlayer->m_nEntityFlags.bBulletProof);
 			if (Ui::CheckboxWithHint("Bullet proof", &state, nullptr, m_bGodMode))
 			{
-				BY_GAME(pPlayer->m_nPhysicalFlags.bBulletProof, pPlayer->m_nFlags.bBulletProof) = state;
+				BY_GAME(pPlayer->m_nPhysicalFlags.bBulletProof, pPlayer->m_nFlags.bBulletProof,
+							pPlayer->m_nEntityFlags.bBulletProof) = state;
 			}
 
-			state = BY_GAME(pPlayer->m_nPhysicalFlags.bCollisionProof, pPlayer->m_nFlags.bCollisionProof);
+			state = BY_GAME(pPlayer->m_nPhysicalFlags.bCollisionProof, pPlayer->m_nFlags.bCollisionProof,
+							pPlayer->m_nEntityFlags.bCollisionProof);
 			if (Ui::CheckboxWithHint("Collision proof", &state, nullptr, m_bGodMode))
 			{
-				BY_GAME(pPlayer->m_nPhysicalFlags.bCollisionProof, pPlayer->m_nFlags.bCollisionProof) = state;
+				BY_GAME(pPlayer->m_nPhysicalFlags.bCollisionProof, pPlayer->m_nFlags.bCollisionProof,
+							pPlayer->m_nEntityFlags.bCollisionProof) = state;
 			}
 
-			state = BY_GAME(pPlayer->m_nPhysicalFlags.bExplosionProof, pPlayer->m_nFlags.bExplosionProof);
+			state = BY_GAME(pPlayer->m_nPhysicalFlags.bExplosionProof, pPlayer->m_nFlags.bExplosionProof,
+							pPlayer->m_nEntityFlags.bExplosionProof);
 			if (Ui::CheckboxWithHint("Explosion proof", &state, nullptr, m_bGodMode))
 			{
-				BY_GAME(pPlayer->m_nPhysicalFlags.bExplosionProof, pPlayer->m_nFlags.bExplosionProof) = state;
+				BY_GAME(pPlayer->m_nPhysicalFlags.bExplosionProof, pPlayer->m_nFlags.bExplosionProof,
+							pPlayer->m_nEntityFlags.bExplosionProof) = state;
 			}
 
 			ImGui::NextColumn();
 
-			state = BY_GAME(pPlayer->m_nPhysicalFlags.bFireProof, pPlayer->m_nFlags.bFireProof);
+			state = BY_GAME(pPlayer->m_nPhysicalFlags.bFireProof, pPlayer->m_nFlags.bFireProof,
+							pPlayer->m_nEntityFlags.bFireProof);
 			if (Ui::CheckboxWithHint("Fire proof", &state, nullptr, m_bGodMode))
 			{
-				BY_GAME(pPlayer->m_nPhysicalFlags.bFireProof, pPlayer->m_nFlags.bFireProof) = state;
+				BY_GAME(pPlayer->m_nPhysicalFlags.bFireProof, pPlayer->m_nFlags.bFireProof,
+							pPlayer->m_nEntityFlags.bFireProof) = state;
 			}
 
-			state = BY_GAME(pPlayer->m_nPhysicalFlags.bMeeleProof, pPlayer->m_nFlags.bMeleeProof);
+			state = BY_GAME(pPlayer->m_nPhysicalFlags.bMeeleProof, pPlayer->m_nFlags.bMeleeProof,
+							pPlayer->m_nEntityFlags.bMeleeProof);
 			if (Ui::CheckboxWithHint("Meele proof", &state, nullptr, m_bGodMode))
 			{
-				BY_GAME(pPlayer->m_nPhysicalFlags.bMeeleProof, pPlayer->m_nFlags.bMeleeProof) = state;
+				BY_GAME(pPlayer->m_nPhysicalFlags.bMeeleProof, pPlayer->m_nFlags.bMeleeProof,
+							pPlayer->m_nEntityFlags.bMeleeProof) = state;
 			}
 
 			ImGui::EndChild();
@@ -542,12 +601,12 @@ void Player::Draw()
 			Ui::EditStat("Energy", STAT_ENERGY);
 			Ui::EditStat("Fat", STAT_FAT);
 #endif
-			Ui::EditReference("Health", pPlayer->m_fHealth, 0, 100, BY_GAME(static_cast<int>(pPlayer->m_fMaxHealth), 100));
+			Ui::EditReference("Health", pPlayer->m_fHealth, 0, 100, BY_GAME(static_cast<int>(pPlayer->m_fMaxHealth), 100, 100));
 #ifdef GTASA
 			Ui::EditStat("Lung capacity", STAT_LUNG_CAPACITY);
 			Ui::EditStat("Max health", STAT_MAX_HEALTH, 0, 569, 1450);
 			Ui::EditAddress<int>("Money", 0xB7CE50, -99999999, 0, 99999999);
-#elif GTAVC
+#else // GTA3 & GTAVC
 			int money = pInfo->m_nMoney;
 			Ui::EditAddress<int>("Money", (int)&money, -9999999, 0, 99999999);
 			pInfo->m_nMoney = money;
@@ -577,7 +636,7 @@ void Player::Draw()
 				int val = pPlayer->m_pPlayerData->m_pWanted->m_nWantedLevel;
 				int max_wl = pPlayer->m_pPlayerData->m_pWanted->MaximumWantedLevel;
 				max_wl = max_wl < 6 ? 6 : max_wl;
-#elif GTAVC
+#else // GTA3 & GTAVC
 				int val = pPlayer->m_pWanted->m_nWantedLevel;
 				int max_wl = 6;
 #endif
@@ -598,6 +657,8 @@ void Player::Draw()
 					pPlayer->CheatWantedLevel(val);
 #elif GTAVC
 					pPlayer->m_pWanted->CheatWantedLevel(val);
+#else // GTA3
+					pPlayer->m_pWanted->SetWantedLevel(val);
 #endif
 				}
 
@@ -608,6 +669,8 @@ void Player::Draw()
 					pPlayer->CheatWantedLevel(0);
 #elif GTAVC
 					pPlayer->m_pWanted->CheatWantedLevel(0);
+#else // GTA3
+					pPlayer->m_pWanted->SetWantedLevel(0);
 #endif
 				}
 
@@ -619,6 +682,8 @@ void Player::Draw()
 					pPlayer->CheatWantedLevel(0);
 #elif GTAVC
 					pPlayer->m_pWanted->CheatWantedLevel(0);
+#else // GTA3
+					pPlayer->m_pWanted->SetWantedLevel(0);
 #endif
 				}
 
@@ -630,6 +695,8 @@ void Player::Draw()
 					pPlayer->CheatWantedLevel(max_wl);
 #elif GTAVC
 					pPlayer->m_pWanted->CheatWantedLevel(max_wl);
+#else // GTA3
+					pPlayer->m_pWanted->SetWantedLevel(max_wl);
 #endif
 				}
 
@@ -777,12 +844,16 @@ Limitations:\n\
 			}
 			ImGui::EndTabItem();
 		}
-#elif GTAVC
+#else // GTA3 & GTA
 		if (ImGui::BeginTabItem("Skins"))
 		{
 			ImGui::Spacing();
-			ImGui::Text("Info");
-			Ui::ShowTooltip("Not all ped skins work. I've added the ones that works!");
+#ifdef GTA3
+			ImGui::TextWrapped("Player must be frozen to change skins.");
+			CPad::GetPad(0)->m_bDisablePlayerControls = true;
+#else
+			ImGui::TextWrapped("Only contains the skins that works.");
+#endif
 			Ui::DrawJSON(skinData, ChangePlayerModel, nullptr);
 			ImGui::EndTabItem();
 		}

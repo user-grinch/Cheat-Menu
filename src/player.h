@@ -30,7 +30,7 @@ private:
 		static inline bool m_bEnabled = false;
 		static inline float m_fOffset = 40.0f;
 	};
-#elif GTAVC
+#else // GTA3 & GTAVC
 	static inline ResourceStore skinData{ "skin", eResourceType::TYPE_TEXT };
 #endif
 
@@ -42,7 +42,7 @@ public:
 	static void ChangePlayerModel(std::string& model);
 	static void ChangePlayerCloth(std::string& model);
 	static void TopDownCameraView();
-#elif GTAVC
+#else // GTA3 & GTAVC
 	static void ChangePlayerModel(std::string& cat, std::string& name, std::string& id);
 #endif
 };

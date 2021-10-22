@@ -158,7 +158,18 @@ void Hook::ShowMouse(bool state)
 {
 	// Disable player controls for controllers
 	bool bMouseDisabled = false;
-	if (patch::Get<BYTE>(BY_GAME(0xBA6818, 0x86968B, 0x5F03D8)) && (m_bShowMouse || bMouseDisabled))
+	bool isController;
+
+#ifdef GTA3
+	isController =  !patch::Get<BYTE>(0x5F03D8);
+#elif GTAVC
+	isController =  patch::Get<BYTE>(0x86968B);
+#else // GTASA
+	isController =  patch::Get<BYTE>(0xBA6818);
+#endif
+
+
+	if (isController && (m_bShowMouse || bMouseDisabled))
 	{
 
 #ifdef GTASA

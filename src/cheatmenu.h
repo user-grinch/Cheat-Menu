@@ -11,13 +11,13 @@
 #pragma once
 #ifndef GTA3
 #include "animation.h"
-#include "player.h"
 #include "ped.h"
 #include "vehicle.h"
 #include "weapon.h"
 #include "game.h"
 #include "visual.h"
 #endif
+#include "player.h"
 #include "teleport.h"
 #include "menu.h"
 #include "hook.h"
@@ -25,7 +25,7 @@
 #ifndef GTA3
 class CheatMenu : Hook, Animation, Game, Menu, Ped, Player, Teleport, Vehicle, Visual, Weapon
 #else
-class CheatMenu : Hook, Menu, Teleport
+class CheatMenu : Hook, Menu, Player, Teleport
 #endif
 {
 private:
@@ -35,14 +35,18 @@ private:
 #ifdef GTA3
 	static inline CallbackTable header
 	{
-		{"Teleport", &Teleport::Draw}, {"Menu", &Menu::Draw}
+		{"Teleport", &Teleport::Draw}, {"Player", &Player::Draw}, {"Menu", &Menu::Draw},
+		{"Dummy", nullptr}
 	};
 #else
 	static inline CallbackTable header
 	{
 		{"Teleport", &Teleport::Draw}, {"Player", &Player::Draw}, {"Ped", &Ped::Draw},
+#ifdef GTASA
 		{"Animation", &Animation::Draw},
+#else
 		{"Dummy", nullptr},
+#endif
 		{"Vehicle", &Vehicle::Draw}, {"Weapon", &Weapon::Draw},
 		{"Game", &Game::Draw}, {"Visual", &Visual::Draw}, {"Menu", &Menu::Draw}
 	};
