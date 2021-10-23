@@ -15,19 +15,25 @@ Get stable binaries from [here](https://github.com/user-grinch/Cheat-Menu/releas
 [![Discord Banner 2](https://discordapp.com/api/guilds/689515979847237649/widget.png?style=banner2)](https://discord.com/invite/ZzW7kmf)
 
 ## Installation
+Only these versions of the game is supported. I highly recommand installing the menu on a fresh, non-modded game first.
+- GTA SA v1.0 US Hoodlum 
+- GTA VC v1.0 EN
+- GTA III v1.0 EN
 
-1. Install [DirectX9](https://www.microsoft.com/en-us/download/details.aspx?id=35) &  [Visual C++ Redistributable 2019 x86](hhttps://aka.ms/vs/16/release/vc_redist.x86.exe) if not already installed.
-2. If your game version isn't v1.0 then you'll need to [downgrade](https://gtaforums.com/topic/927016-san-andreas-downgrader/).
-3. Install [asi loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases)
-4. Download **CheatMenu.7z** and extract everything in game directory (replace if necessary).
-5. (For III & VC) Download and install [d3d8to9 wrapper](https://github.com/crosire/d3d8to9/releases). Sometimes the asi loader may come with Globals.ini. Remove the d3d8.dll from there.
+If you have those mentioned versions installed follow the steps below,
+1. Install [DirectX9](https://www.microsoft.com/en-us/download/details.aspx?id=35), [Visual C++ Redistributable 2019 x86](https://aka.ms/vs/16/release/vc_redist.x86.exe) & [Asi loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases).
+2. Download [**CheatMenuSA/VC/III.7z**](https://github.com/user-grinch/Cheat-Menu/releases) and extract everything in game root directory. The **CheatMenu** folder & **.asi** file must be placed in the same place.
 
-(Vice City version is available at the discord server)
+### For III & VC
+3. Install [D3D8to9 wrapper](https://github.com/crosire/d3d8to9/releases). Sometimes the asi loader blocks **d3d8.dll** file. Just delete the **Globals.ini** file and you should be good to go.
+
+Be sure to check [here](https://github.com/user-grinch/Cheat-Menu/issues/48) to know about incompatibilities with other mods.
 
 ## Required to build
 1. [Build Tools 2019](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019)
 2. [DirectX9 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=6812)
-3. [Plugin SDK](https://github.com/DK22Pac/plugin-sdk)
+4. [Plugin SDK](https://github.com/DK22Pac/plugin-sdk)
+5. [Premake5](https://premake.github.io/) - Comes with already.
 
 ## Projects used
 1. [ImGui](https://github.com/ocornut/imgui)
@@ -48,21 +54,17 @@ Get stable binaries from [here](https://github.com/user-grinch/Cheat-Menu/releas
   <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/visual.gif">
 </details>
 
-## How to add ___ to CheatMenu
+## How to add ___ to CheatMenu (SA Only)
 
 *Be careful about editing 'json' files, especially commas! Check [here](https://en.wikipedia.org/wiki/JSON)*
-
-### Clothes
-Haven't found any tutorials for this yet. But CheatMenu loads cloths from *CheatMenu\clothes.txd*<br/>
-**Name format: body_part$model_name$texture_name**.<br/>
 
 ### Player Skins (Recommended)
 *If you just want more player skins without much hassel use this*
 
-1. For this you need [modloader](https://github.com/thelink2012/modloader/releases/tag/v0.3.7) installed.
-2. Get your skin **dff** & **txd** file and put them inside *modloader\Custom Skins\* directory.
-3. Rename your **dff** & **txd** filenames into 8 characters. Having more than 8 characters will crash your game.
-4. Important thing to remember is that you can't rename these files while the game is running! If you do, your game will crash.
+1. Install [Modloader](https://github.com/thelink2012/modloader/releases/tag/v0.3.7).
+2. Get your skin **.dff** & **.txd** files and put them inside *modloader\Custom Skins\* directory.
+3. Rename your **dff** & **txd** filenames to less than **8** characters. Having more than **8** characters will **crash** your game.
+**Note:** After installing, don't rename or delete files while your game is running. It'll crash!
 
 ### Peds + Player Skins
 *If you want to add both peds & skin then follow this*
