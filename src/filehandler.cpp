@@ -61,8 +61,7 @@ void FileHandler::GenerateHandlingFile(int pHandling, std::map<int, std::string>
 	fclose(fp);
 }
 
-void FileHandler::FetchColorData(std::vector<std::vector<float>>& storeVec,
-        std::map<std::string, std::vector<int>>& storeMap)
+void FileHandler::FetchColorData(std::vector<std::vector<float>>& storeVec)
 {
 	std::string m_FilePath = GAME_PATH((char*)"/data/carcols.dat");
 
@@ -127,37 +126,6 @@ void FileHandler::FetchColorData(std::vector<std::vector<float>>& storeVec,
 				catch (...)
 				{
 					gLog << "Error parsing carcols.dat, " << line << std::endl;
-				}
-			}
-
-			if (bIsCar)
-			{
-				std::string temp;
-				std::stringstream ss(line);
-
-                // Format: modelname, colorindex1, colorindex2,...
-				getline(ss, temp, ',');
-				std::string name = temp;
-				while (getline(ss, temp, ','))
-				{
-					try
-					{
-						std::for_each(name.begin(), name.end(), [](char& c)
-						{
-							c = ::toupper(c);
-						});
-
-						int val = std::stoi(temp);
-						if (!(std::find(storeMap[name].begin(), storeMap[name].end(), val) !=
-							storeMap[name].end()))
-                        {
-                            storeMap[name].push_back(val);
-                        }
-					}
-					catch (...)
-					{
-						gLog << "Error parsing carcols.dat, " << line << std::endl;
-					}
 				}
 			}
 		}

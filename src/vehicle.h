@@ -24,12 +24,10 @@ private:
 	static inline bool m_bLockSpeed;
 	static inline float m_fLockSpeed;
 	static inline std::vector<std::vector<float>> m_CarcolsColorData;
-	static inline std::map<std::string, std::vector<int>> m_CarcolsCarData;
 	struct m_Color
 	{
 		static inline bool m_bMatFilter = true;
 		static inline int m_nRadioButton = 1;
-		static inline bool bShowAll;
 		static inline float m_fColorPicker[3]{ 0, 0, 0 };
 	};
 	

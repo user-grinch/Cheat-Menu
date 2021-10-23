@@ -36,7 +36,7 @@ Vehicle::Vehicle()
 #ifdef GTASA
 	FileHandler::FetchHandlingID(m_VehicleIDE);
 #endif
-	FileHandler::FetchColorData(m_CarcolsColorData, m_CarcolsCarData);
+	FileHandler::FetchColorData(m_CarcolsColorData);
 
 	Events::processScriptsEvent += [this]
 	{
@@ -335,169 +335,164 @@ void Vehicle::SpawnVehicle(std::string& rootkey, std::string& vehName, std::stri
 
 	int interior = BY_GAME(player->m_nAreaCode, player->m_nInterior, 0);
 
-	if (Command<Commands::IS_MODEL_AVAILABLE>(imodel))
+	CVector pos = player->GetPosition();
+	int speed = 0;
+
+	bool bInVehicle = Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer);
+	if (bInVehicle && m_Spawner::m_bSpawnInside)
 	{
-		CVector pos = player->GetPosition();
-		int speed = 0;
+		CVehicle* pveh = player->m_pVehicle;
+		int hveh = CPools::GetVehicleRef(pveh);
+		pos = pveh->GetPosition();
 
-		bool bInVehicle = Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer);
-		if (bInVehicle && m_Spawner::m_bSpawnInside)
-		{
-			CVehicle* pveh = player->m_pVehicle;
-			int hveh = CPools::GetVehicleRef(pveh);
-			pos = pveh->GetPosition();
+		Command<Commands::GET_CAR_SPEED>(hveh, &speed);
 
-			Command<Commands::GET_CAR_SPEED>(hveh, &speed);
-
-			Command<Commands::WARP_CHAR_FROM_CAR_TO_COORD>(hplayer, pos.x, pos.y, pos.z);
+		Command<Commands::WARP_CHAR_FROM_CAR_TO_COORD>(hplayer, pos.x, pos.y, pos.z);
 
 #ifdef GTASA
-			if (pveh->m_nVehicleClass == VEHICLE_TRAIN)
-			{
-				Command<Commands::DELETE_MISSION_TRAIN>(hveh);
-			}
-			else
-			{
-				Command<Commands::DELETE_CAR>(hveh);
-			}
-#else // GTA3 & GTAVC
-			Command<Commands::DELETE_CAR>(hveh);
-#endif
-		}
-
-		if (interior == 0)
+		if (pveh->m_nVehicleClass == VEHICLE_TRAIN)
 		{
-			if (m_Spawner::m_bSpawnInAir && (CModelInfo::IsHeliModel(imodel) || CModelInfo::IsPlaneModel(imodel)))
-			{
-				pos.z = 400;
-			}
-			else
-			{
-				pos.z -= 5;
-			}
-		}
-
-#ifdef GTASA
-		if (CModelInfo::IsTrainModel(imodel))
-		{
-			int train_id = GetRandomTrainIdForModel(imodel);
-
-			if (train_id == -1) // Unknown train id
-				return;
-
-			int hveh = 0;
-
-			// Loading all train related models
-			CStreaming::RequestModel(590, PRIORITY_REQUEST);
-			CStreaming::RequestModel(538, PRIORITY_REQUEST);
-			CStreaming::RequestModel(570, PRIORITY_REQUEST);
-			CStreaming::RequestModel(569, PRIORITY_REQUEST);
-			CStreaming::RequestModel(537, PRIORITY_REQUEST);
-			CStreaming::RequestModel(449, PRIORITY_REQUEST);
-
-			CStreaming::LoadAllRequestedModels(false);
-
-			CTrain* train = nullptr;
-			CTrain* carraige = nullptr;
-			int track = Random(0, 1);
-			int node = CTrain::FindClosestTrackNode(pos, &track);
-			CTrain::CreateMissionTrain(pos, (Random(0, 1)) == 1 ? true : false, train_id, &train, &carraige, node,
-									   track, false);
-
-			veh = (CVehicle*)train;
-			hveh = CPools::GetVehicleRef(veh);
-			if (veh->m_pDriver)
-				Command<Commands::DELETE_CHAR>(CPools::GetPedRef(veh->m_pDriver));
-
-			if (m_Spawner::m_bSpawnInside)
-			{
-				Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
-				Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, speed);
-			}
-			Command<Commands::MARK_MISSION_TRAIN_AS_NO_LONGER_NEEDED>(hveh);
-			Command<Commands::MARK_CAR_AS_NO_LONGER_NEEDED>(hveh);
-			CStreaming::SetModelIsDeletable(590);
-			CStreaming::SetModelIsDeletable(538);
-			CStreaming::SetModelIsDeletable(570);
-			CStreaming::SetModelIsDeletable(569);
-			CStreaming::SetModelIsDeletable(537);
-			CStreaming::SetModelIsDeletable(449);
+			Command<Commands::DELETE_MISSION_TRAIN>(hveh);
 		}
 		else
 		{
-#endif
-			CStreaming::RequestModel(imodel, PRIORITY_REQUEST);
-			CStreaming::LoadAllRequestedModels(false);
-#ifdef GTASA
-			if (m_Spawner::m_nLicenseText[0] != '\0')
-			{
-				Command<Commands::CUSTOM_PLATE_FOR_NEXT_CAR>(imodel, m_Spawner::m_nLicenseText);
-			}
-#endif
-			int hveh = 0;
-			if (m_Spawner::m_bSpawnInside)
-			{
-				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 4.0f, &hveh);
-				veh = CPools::GetVehicle(hveh);
-#ifdef GTASA
-				veh->SetHeading(player->GetHeading());
-#elif GTAVC
-				float x,y,z;
-				player->m_placement.GetOrientation(x, y, z);
-				veh->m_placement.SetOrientation(x, y, z);
-#else // GTA3 
-				float x,y,z;
-				player->GetOrientation(x, y, z);
-				veh->SetOrientation(x, y, z);
-#endif
-				Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
-				Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, speed);
-			}
-			else
-			{
-#ifdef GTASA
-				player->TransformFromObjectSpace(pos, CVector(0, 10, 0));
-#else // GTA3 & GTAVC
-				player->TransformFromObjectSpace(pos);
-#endif				
-				Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 3.0f, &hveh);
-				veh = CPools::GetVehicle(hveh);
-#ifdef GTASA
-				veh->SetHeading(player->GetHeading() + 55.0f);
-#elif GTAVC
-				float x,y,z;
-				player->m_placement.GetOrientation(x, y, z);
-				veh->m_placement.SetOrientation(x, y, z);
-#else // GTA3 
-				float x,y,z;
-				player->GetOrientation(x, y, z);
-				veh->SetOrientation(x, y, z);
-#endif
-			}
-			BY_GAME(veh->m_nDoorLock, veh->m_nLockStatus, veh->m_nDoorLock) = CARLOCK_UNLOCKED;
-#ifndef GTA3
-			BY_GAME(veh->m_nAreaCode, veh->m_nInterior) = interior;
-#endif
-			Command<Commands::MARK_CAR_AS_NO_LONGER_NEEDED>(CPools::GetVehicleRef(veh));
-			CStreaming::SetModelIsDeletable(imodel);
-#ifdef GTASA
+			Command<Commands::DELETE_CAR>(hveh);
 		}
-		veh->m_nVehicleFlags.bHasBeenOwnedByPlayer = true;
 #else // GTA3 & GTAVC
-		Command<Commands::RESTORE_CAMERA_JUMPCUT>();
+		Command<Commands::DELETE_CAR>(hveh);
 #endif
 	}
+
+	if (interior == 0)
+	{
+		if (m_Spawner::m_bSpawnInAir && (CModelInfo::IsHeliModel(imodel) || CModelInfo::IsPlaneModel(imodel)))
+		{
+			pos.z = 400;
+		}
+		else
+		{
+			pos.z -= 5;
+		}
+	}
+
+#ifdef GTASA
+	if (CModelInfo::IsTrainModel(imodel))
+	{
+		int train_id = GetRandomTrainIdForModel(imodel);
+
+		if (train_id == -1) // Unknown train id
+			return;
+
+		int hveh = 0;
+
+		// Loading all train related models
+		CStreaming::RequestModel(590, PRIORITY_REQUEST);
+		CStreaming::RequestModel(538, PRIORITY_REQUEST);
+		CStreaming::RequestModel(570, PRIORITY_REQUEST);
+		CStreaming::RequestModel(569, PRIORITY_REQUEST);
+		CStreaming::RequestModel(537, PRIORITY_REQUEST);
+		CStreaming::RequestModel(449, PRIORITY_REQUEST);
+
+		CStreaming::LoadAllRequestedModels(false);
+
+		CTrain* train = nullptr;
+		CTrain* carraige = nullptr;
+		int track = Random(0, 1);
+		int node = CTrain::FindClosestTrackNode(pos, &track);
+		CTrain::CreateMissionTrain(pos, (Random(0, 1)) == 1 ? true : false, train_id, &train, &carraige, node,
+									track, false);
+
+		veh = (CVehicle*)train;
+		hveh = CPools::GetVehicleRef(veh);
+		if (veh->m_pDriver)
+			Command<Commands::DELETE_CHAR>(CPools::GetPedRef(veh->m_pDriver));
+
+		if (m_Spawner::m_bSpawnInside)
+		{
+			Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
+			Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, speed);
+		}
+		Command<Commands::MARK_MISSION_TRAIN_AS_NO_LONGER_NEEDED>(hveh);
+		Command<Commands::MARK_CAR_AS_NO_LONGER_NEEDED>(hveh);
+		CStreaming::SetModelIsDeletable(590);
+		CStreaming::SetModelIsDeletable(538);
+		CStreaming::SetModelIsDeletable(570);
+		CStreaming::SetModelIsDeletable(569);
+		CStreaming::SetModelIsDeletable(537);
+		CStreaming::SetModelIsDeletable(449);
+	}
+	else
+	{
+#endif
+		CStreaming::RequestModel(imodel, PRIORITY_REQUEST);
+		CStreaming::LoadAllRequestedModels(false);
+#ifdef GTASA
+		if (m_Spawner::m_nLicenseText[0] != '\0')
+		{
+			Command<Commands::CUSTOM_PLATE_FOR_NEXT_CAR>(imodel, m_Spawner::m_nLicenseText);
+		}
+#endif
+		int hveh = 0;
+		if (m_Spawner::m_bSpawnInside)
+		{
+			Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 4.0f, &hveh);
+			veh = CPools::GetVehicle(hveh);
+#ifdef GTASA
+			veh->SetHeading(player->GetHeading());
+#elif GTAVC
+			float x,y,z;
+			player->m_placement.GetOrientation(x, y, z);
+			veh->m_placement.SetOrientation(x, y, z);
+#else // GTA3 
+			float x,y,z;
+			player->GetOrientation(x, y, z);
+			veh->SetOrientation(x, y, z);
+#endif
+			Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
+			Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, speed);
+		}
+		else
+		{
+#ifdef GTASA
+			player->TransformFromObjectSpace(pos, CVector(0, 10, 0));
+#else // GTA3 & GTAVC
+			player->TransformFromObjectSpace(pos);
+#endif				
+			Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 3.0f, &hveh);
+			veh = CPools::GetVehicle(hveh);
+#ifdef GTASA
+			veh->SetHeading(player->GetHeading() + 55.0f);
+#elif GTAVC
+			float x,y,z;
+			player->m_placement.GetOrientation(x, y, z);
+			veh->m_placement.SetOrientation(x, y, z);
+#else // GTA3 
+			float x,y,z;
+			player->GetOrientation(x, y, z);
+			veh->SetOrientation(x, y, z);
+#endif
+		}
+		BY_GAME(veh->m_nDoorLock, veh->m_nLockStatus, veh->m_nDoorLock) = CARLOCK_UNLOCKED;
+#ifndef GTA3
+		BY_GAME(veh->m_nAreaCode, veh->m_nInterior) = interior;
+#endif
+		Command<Commands::MARK_CAR_AS_NO_LONGER_NEEDED>(CPools::GetVehicleRef(veh));
+		CStreaming::SetModelIsDeletable(imodel);
+#ifdef GTASA
+	}
+	veh->m_nVehicleFlags.bHasBeenOwnedByPlayer = true;
+#else // GTA3 & GTAVC
+	Command<Commands::RESTORE_CAMERA_JUMPCUT>();
+#endif
 }
 
 std::string Vehicle::GetNameFromModel(int model)
 {
-	CBaseModelInfo* info;
-#ifdef GTASA
-	info = CModelInfo::GetModelInfo(model);
+#ifdef GTA3
+	return std::to_string(model);
 #else
-	info = CModelInfo::ms_modelInfoPtrs[model];
+	return (const char*)CModelInfo::GetModelInfo(model) + 0x32;
 #endif
-	return (const char*)info + 0x32;
 }
 
 int Vehicle::GetModelFromName(const char* name)
@@ -522,7 +517,7 @@ void Vehicle::Draw()
 	int hplayer = CPools::GetPedRef(pPlayer);
 	CVehicle *pVeh = pPlayer->m_pVehicle;
 
-	if (ImGui::Button("Blow up cars", ImVec2(Ui::GetSize(BY_GAME(3,2)))))
+	if (ImGui::Button("Blow up cars", ImVec2(Ui::GetSize(BY_GAME(3,2,2)))))
 	{
 		for (CVehicle *pVeh : CPools::ms_pVehiclePool)
 		{
@@ -532,7 +527,7 @@ void Vehicle::Draw()
 
 	ImGui::SameLine();
 
-	if (ImGui::Button("Fix vehicle", ImVec2(Ui::GetSize(BY_GAME(3,2)))))
+	if (ImGui::Button("Fix vehicle", ImVec2(Ui::GetSize(BY_GAME(3,2,2)))))
 	{
 		if (pPlayer && pVeh)
 		{
@@ -802,7 +797,10 @@ void Vehicle::Draw()
 		{
 			ImGui::Spacing();
 			ImGui::BeginChild("MenusChild");
+			
+#ifdef GTASA
 			Ui::EditAddress<float>("Density multiplier", 0x8A5B20, 0, 1, 10);
+#endif
 			if (ImGui::CollapsingHeader("Enter nearest vehicle as"))
 			{
 				int hplayer = CPools::GetPedRef(pPlayer);
@@ -829,6 +827,7 @@ void Vehicle::Draw()
 						Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, pClosestVeh);
 					}
 
+#ifndef GTA3
 					for (int i = 0; i < seats; ++i)
 					{
 						if (i % 2 != 1)
@@ -846,6 +845,7 @@ void Vehicle::Draw()
 #endif
 						}
 					}
+#endif
 				}
 				else
 				{
@@ -865,7 +865,7 @@ void Vehicle::Draw()
 					for (CVehicle* pVeh : CPools::ms_pVehiclePool)
 					{
 						if (DistanceBetweenPoints(pVeh->GetPosition(), player->GetPosition()) < m_nVehRemoveRadius
-							&& !(BY_GAME(player->m_nPedFlags.bInVehicle, true, true) && player->m_pVehicle == pVeh))
+							&& player->m_pVehicle != pVeh)
 						{
 							Command<Commands::DELETE_CAR>(CPools::GetVehicleRef(pVeh));
 						}
@@ -875,6 +875,7 @@ void Vehicle::Draw()
 				ImGui::Separator();
 			}
 			
+#ifndef GTA3
 			if (ImGui::CollapsingHeader("Traffic options"))
 			{
 
@@ -894,6 +895,7 @@ void Vehicle::Draw()
 				ImGui::Spacing();
 				ImGui::Separator();
 			}
+#endif
 			if (pPlayer && pPlayer->m_pVehicle)
 			{
 				CVehicle* pVeh = pPlayer->m_pVehicle;
@@ -1019,7 +1021,7 @@ void Vehicle::Draw()
 						   {
 							   return GetNameFromModel(std::stoi(str));
 						   });
-#elif GTAVC
+#else // GTA3 & GTAVC
 			Ui::DrawJSON(m_Spawner::m_VehData, SpawnVehicle, nullptr);
 #endif
 			ImGui::EndTabItem();
@@ -1061,14 +1063,12 @@ void Vehicle::Draw()
 				ImGui::RadioButton("Primary", &m_Color::m_nRadioButton, 1);
 				ImGui::RadioButton("Secondary", &m_Color::m_nRadioButton, 2);
 				ImGui::NextColumn();
-				ImGui::Checkbox("Show all", &m_Color::bShowAll);
+				ImGui::NewLine();
 				ImGui::RadioButton("Tertiary", &m_Color::m_nRadioButton, 3);
 				ImGui::RadioButton("Quaternary", &m_Color::m_nRadioButton, 4);
-#elif GTAVC
-				ImGui::Checkbox("Show all", &m_Color::bShowAll);
+#else // GTA3 & GTAVC
 				ImGui::RadioButton("Primary", &m_Color::m_nRadioButton, 1);
 				ImGui::NextColumn();
-				ImGui::NewLine();
 				ImGui::RadioButton("Secondary", &m_Color::m_nRadioButton, 2);
 #endif			
 				ImGui::Spacing();
@@ -1085,46 +1085,16 @@ void Vehicle::Draw()
 
 				ImGui::BeginChild("Colorss");
 
-				if (m_Color::bShowAll)
+				for (int colorId = 0; colorId < count; ++colorId)
 				{
-					for (int colorId = 0; colorId < count; ++colorId)
+					if (Ui::ColorButton(colorId, m_CarcolsColorData[colorId], ImVec2(btnSize, btnSize)))
 					{
-						if (Ui::ColorButton(colorId, m_CarcolsColorData[colorId], ImVec2(btnSize, btnSize)))
-						{
-							*(uint8_replacement*)(int(veh) + BY_GAME(0x433, 0x19F) + m_Color::m_nRadioButton) = colorId;
-						}
-
-						if ((colorId + 1) % btnsInRow != 0)
-						{
-							ImGui::SameLine(0.0, 4.0);
-						}
+						*(uint8_replacement*)(int(veh) + BY_GAME(0x433, 0x19F, 0x19B) + m_Color::m_nRadioButton) = colorId;
 					}
-				}
-				else
-				{
-					std::string vehName = GetNameFromModel(pPlayer->m_pVehicle->m_nModelIndex);
-					for (auto entry : m_CarcolsCarData)
+
+					if ((colorId + 1) % btnsInRow != 0)
 					{
-						if (entry.first == vehName)
-						{
-							int count = 1;
-							for (int colorId : entry.second)
-							{
-								if (Ui::ColorButton(colorId, m_CarcolsColorData[colorId],
-									ImVec2(btnSize, btnSize)))
-								{
-									*(uint8_replacement*)(int(veh) + BY_GAME(0x433, 0x19F) + m_Color::m_nRadioButton) = colorId;
-								}
-
-								if (count % btnsInRow != 0)
-								{
-									ImGui::SameLine(0.0, 4.0);
-								}
-								++count;
-							}
-
-							break;
-						}
+						ImGui::SameLine(0.0, 4.0);
 					}
 				}
 
