@@ -76,6 +76,8 @@ project "CheatMenuIII"
         "../src/animation.cpp",
         "../src/teleport.h", 
         "../src/teleport.cpp",
+        "../src/ped.h", 
+        "../src/ped.cpp",
         "../src/resourcestore.h", 
         "../src/resourcestore.cpp",
         "../src/hotkeys.h", 

@@ -339,10 +339,10 @@ void Player::ChangePlayerModel(std::string& cat, std::string& key, std::string& 
 #else // GTA3
 	if (cat == "Special")
 	{
-		// CStreaming::RequestSpecialChar(1, val.c_str(), PRIORITY_REQUEST);
+		// CStreaming::RequestSpecialChar(109, val.c_str(), PRIORITY_REQUEST);
 		// CStreaming::LoadAllRequestedModels(true);
-		// player->SetModelIndex(127);
-		// CStreaming::SetMissionDoesntRequireSpecialChar(127);
+		// player->SetModelIndex(109);
+		// CStreaming::SetMissionDoesntRequireSpecialChar(109);
 		SetHelpMessage("Spawning special peds isn't implemented yet.", false, false, false);
 	}
 	else

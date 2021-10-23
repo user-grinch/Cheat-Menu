@@ -11,12 +11,12 @@
 #pragma once
 #ifndef GTA3
 #include "animation.h"
-#include "ped.h"
 #include "vehicle.h"
 #include "weapon.h"
 #include "game.h"
 #include "visual.h"
 #endif
+#include "ped.h"
 #include "player.h"
 #include "teleport.h"
 #include "menu.h"
@@ -35,8 +35,8 @@ private:
 #ifdef GTA3
 	static inline CallbackTable header
 	{
-		{"Teleport", &Teleport::Draw}, {"Player", &Player::Draw}, {"Menu", &Menu::Draw},
-		{"Dummy", nullptr}
+		{"Teleport", &Teleport::Draw}, {"Player", &Player::Draw}, {"Ped", &Ped::Draw},
+		{"Dummy", nullptr}, {"Menu", &Menu::Draw},
 	};
 #else
 	static inline CallbackTable header

@@ -13,7 +13,13 @@ private:
 	static inline bool m_bThinBody;
 	static inline CJson m_SpecialPedJson = CJson("ped special");
 	static inline ResourceStore m_PedData{"ped", eResourceType::TYPE_BOTH, ImVec2(65, 110)};
-#elif GTAVC
+
+	static inline std::vector<std::string> m_GangNames =
+	{
+		"Ballas", "Grove street families", "Los santos vagos", "San fierro rifa",
+		"Da nang boys", "Mafia", "Mountain cloud triad", "Varrio los aztecas", "Gang9", "Gang10"
+	};
+#else // GTA3 & GTAVC
 	static inline ResourceStore m_PedData{"ped", eResourceType::TYPE_TEXT};
 #endif
 	static inline bool m_bImagesLoaded;
@@ -39,13 +45,11 @@ private:
 			"Civ Male", "Civ Female", "Cop (crash)", "Cubans", "Haitians", "Streetwannabe's", "Diaz' Gang",
 			"Security Guards", "Biker Gang", "Vercetti Gang", "Golfers", "Gang 9", "Emergency",
 			"Fireman", "Criminal", "Unused", "Prostitute", "Special"
+#else // GTA3
+			"Civ Male", "Civ Female", "Cop", "Leones", "Triads", "Diablos", "Yakuza", "Yardies", "Colombians",
+			"Hoods", "unused", "unused", "Emergency", "Fireman", "Criminal", "unused", "Prostitute", "Special"
 #endif
 		};
-	};
-	static inline std::vector<std::string> m_GangNames =
-	{
-		"Ballas", "Grove street families", "Los santos vagos", "San fierro rifa",
-		"Da nang boys", "Mafia", "Mountain cloud triad", "Varrio los aztecas", "Gang9", "Gang10"
 	};
 
 	friend class Player;
@@ -61,7 +65,7 @@ public:
 #ifdef GTASA
 	static void SpawnPed(std::string& model);
 	static void BigHeadEffect(CPed *ped);
-#elif GTAVC
+#else // GTA3 & GTAVC
 	static void SpawnPed(std::string& cat, std::string& name, std::string& model);
 #endif
 };

@@ -63,7 +63,7 @@ Ped::~Ped()
 
 #ifdef GTASA
 void Ped::SpawnPed(std::string& model)
-#elif GTAVC
+#else // GTA3 & GTAVC
 void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
 #endif
 {
@@ -73,7 +73,7 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
 		return;
 	}
 
-	if (BY_GAME(m_PedData.m_pJson->m_Data.contains(model), true))
+	if (BY_GAME(m_PedData.m_pJson->m_Data.contains(model), true, true))
 	{
 		CPlayerPed* player = FindPlayerPed();
 		CVector pos = player->GetPosition();
@@ -105,9 +105,13 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
 				currentSlot = 1;
 			}
 		}
-#elif GTAVC
+#else // GTA3 & GTAVC
 		if (cat == "Special") // Special model
 		{
+#ifdef GTA3
+			SetHelpMessage("Spawning special peds isn't implemented yet.", false, false, false);
+			return;
+#else // GTAVC
 			Command<Commands::LOAD_SPECIAL_CHARACTER>(currentSlot, model.c_str());
 			Command<Commands::LOAD_ALL_MODELS_NOW>();
 			
@@ -119,6 +123,7 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
 			{
 				currentSlot = 1;
 			}
+#endif
 		}
 #endif
 		else
@@ -134,15 +139,20 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
 		ped = CPools::GetPed(hplayer);
 
 		if (m_SpawnPed::m_bPedMove)
+		{
 			m_SpawnPed::m_List.push_back(ped);
+		}
 		else
 		{
 			Command<Commands::MARK_CHAR_AS_NO_LONGER_NEEDED>(hplayer);
 		}
 		ped->m_nPedFlags.bPedIsBleeding = m_SpawnPed::m_bPedBleed;
+#ifdef GTA3
+		ped->m_nWepAccuracy = m_SpawnPed::m_nAccuracy;
+#else
 		ped->m_nWeaponAccuracy = m_SpawnPed::m_nAccuracy;
+#endif
 		ped->m_fHealth = m_SpawnPed::m_nPedHealth;
-
 #ifdef GTASA
 		if (m_SpawnPed::m_nWeaponId != 0)
 		{
@@ -185,6 +195,21 @@ void Ped::Draw()
 			Ui::CheckboxAddress("Slut magnet", 0xA10B5F);
 			ImGui::NextColumn();
 			Ui::CheckboxAddress("Weapons for all", 0xA10AB3);
+#else // GTA3
+			// Bad idea lol
+			static bool pedsMayhem;
+			if (Ui::CheckboxWithHint("Peds mayhem", &pedsMayhem))
+			{
+				Call<0x4911C0>();
+			}
+			static bool everyoneAttacksPlayer;
+			if (Ui::CheckboxWithHint("Everyone attacks players", &everyoneAttacksPlayer))
+			{
+				Call<0x491270>();
+			}
+			ImGui::NextColumn();
+			Ui::CheckboxAddress("Nasty limbs", 0x95CD44);
+			Ui::CheckboxAddress("Weapons for all", 0x95CCF6);
 #endif
 			ImGui::Columns(1);
 			ImGui::EndChild();
@@ -314,7 +339,7 @@ void Ped::Draw()
 #ifdef GTASA
 					Ui::DrawImages(m_PedData, SpawnPed, nullptr,
 					               [](std::string str) { return m_PedData.m_pJson->m_Data[str].get<std::string>(); });
-#elif GTAVC
+#else // GTA3 & GTAVC
 					Ui::DrawJSON(m_PedData, SpawnPed, nullptr);
 #endif
 					ImGui::EndTabItem();

@@ -31,7 +31,7 @@ private:
 		static inline float m_fOffset = 40.0f;
 	};
 #else // GTA3 & GTAVC
-	static inline ResourceStore skinData{ "skin", eResourceType::TYPE_TEXT };
+	static inline ResourceStore skinData{ BY_GAME(NULL, "skin", "ped"), eResourceType::TYPE_TEXT };
 #endif
 
 public:
