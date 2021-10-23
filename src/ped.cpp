@@ -253,7 +253,7 @@ void Ped::Draw()
 					CZone szone = CZone();
 					CZone* pZone = &szone;
 
-					CZoneExtraInfo* zoneInfo = CTheZones::GetZoneInfo(&pos, &pZone);
+					CZoneInfo* zoneInfo = CTheZones::GetZoneInfo(&pos, &pZone);
 					int density = zoneInfo->m_nGangDensity[i];
 
 					if (ImGui::SliderInt(m_GangNames[i].c_str(), &density, 0, 127))

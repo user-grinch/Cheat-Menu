@@ -51,7 +51,7 @@ private:
 	{
 #ifdef GTASA
 		static inline ResourceStore m_VehData { "vehicles", eResourceType::TYPE_IMAGE, ImVec2(100, 75)};
-#elif GTAVC
+#else // GTA3 & GTAVC
 		static inline ResourceStore m_VehData{"vehicle", eResourceType::TYPE_TEXT};
 #endif
 		static inline bool m_bSpawnInside = true;
@@ -101,7 +101,7 @@ private:
 public:
 #ifdef GTASA
 	static void SpawnVehicle(std::string& name);
-#elif GTAVC
+#else // GTA3 & GTAVC
 	static void SpawnVehicle(std::string& rootkey, std::string& vehName, std::string& model);
 #endif
 	static std::string GetNameFromModel(int model);

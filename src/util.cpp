@@ -107,7 +107,7 @@ int Util::GetLargestGangInZone()
 	{
 		CVector pos = FindPlayerPed()->GetPosition();
 
-		CZoneExtraInfo* zone_info = CTheZones::GetZoneInfo(&pos, nullptr);
+		CZoneInfo* zone_info = CTheZones::GetZoneInfo(&pos, nullptr);
 		int density = zone_info->m_nGangDensity[i];
 
 		if (density > max_density)

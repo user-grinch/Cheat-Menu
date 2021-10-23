@@ -82,6 +82,10 @@ project "CheatMenuIII"
         "../src/resourcestore.cpp",
         "../src/hotkeys.h", 
         "../src/hotkeys.cpp",
+        "../src/vehicle.h", 
+        "../src/vehicle.cpp",
+        "../src/filehandler.h", 
+        "../src/filehandler.cpp",
         "../src/dllmain.cpp"
     }
     includedirs {

@@ -26,41 +26,42 @@
 #include <vector>
 #include <windows.h>
 
-#include "plugin.h"
-#include "CCamera.h"
-#include "CClock.h"
-#include "CCivilianPed.h"
-#include "CGangs.h"
-#include "CHud.h"
-#include "CMenuManager.h"
-#include "CModelInfo.h"
-#include "RenderWare.h"
-#include "CStats.h"
-#include "CStreaming.h"
-#include "CTheScripts.h"
-#include "CTimer.h"
-#include "CTimeCycle.h"
-#include "CTrain.h"
-#include "CWeather.h"
-#include "CWorld.h"
-#include "extensions/ScriptCommands.h"
-#include "extensions/Screen.h"
-#include "extensions/Paths.h"
+#include <plugin.h>
+#include <CCamera.h>
+#include <CClock.h>
+#include <CCivilianPed.h>
+#include <CGangs.h>
+#include <CHud.h>
+#include <CMenuManager.h>
+#include <CModelInfo.h>
+#include <RenderWare.h>
+#include <CStats.h>
+#include <CStreaming.h>
+#include <CTheScripts.h>
+#include <CTimer.h>
+#include <CTimeCycle.h>
+#include <CTrain.h>
+#include <CWeather.h>
+#include <CWorld.h>
+#include <extensions/ScriptCommands.h>
+#include <extensions/Screen.h>
+#include <extensions/Paths.h>
 
 #ifndef GTA3
-#include "CBike.h"
-#include "cHandlingDataMgr.h"
-#include "CTheZones.h"
+#include <CBike.h>
+#include <cHandlingDataMgr.h>
+#include <CTheZones.h>
+#include <CZoneInfo.h>
 #endif
 
 #ifdef GTASA
-#include "CCheat.h"
-#include "CClothes.h"
-#include "CCutsceneMgr.h"
-#include "CRadar.h"
-#include "CShadows.h"
-#include "eVehicleClass.h"
-#include "CGangWars.h"
+#include <CCheat.h>
+#include <CClothes.h>
+#include <CCutsceneMgr.h>
+#include <CRadar.h>
+#include <CShadows.h>
+#include <eVehicleClass.h>
+#include <CGangWars.h>
 #endif
 
 #include "../depend/fla/IDaccess.h"

@@ -147,7 +147,7 @@ void Weapon::GiveWeaponToPlayer(std::string& weapon_type)
 	{
 		Command<Commands::TASK_JETPACK>(hplayer);
 	}
-	if (weapon_type == "-2") // CellPhone
+	else if (weapon_type == "-2") // CellPhone
 	{
 		CStreaming::RequestModel(330, PRIORITY_REQUEST);
 		CStreaming::LoadAllRequestedModels(false);
