@@ -13,7 +13,7 @@ public:
 	static inline bool m_bMoveAim;
 	static inline bool m_bMoveFire;
 	static inline int m_nSelectedGang;
-#elif GTAVC
+#else // GTA3 & GTAVC
 	static inline ResourceStore m_WeaponData{ "weapon", eResourceType::TYPE_TEXT };
 	static inline bool m_bInfiniteAmmo;
 #endif
@@ -46,7 +46,7 @@ public:
 
 #ifdef GTASA
 	static void GiveWeaponToPlayer(std::string& weapon_type);
-#elif GTAVC
+#else // GTA3 & GTAVC
 	static void GiveWeaponToPlayer(std::string& rootkey, std::string& model, std::string& name);
 #endif
 	

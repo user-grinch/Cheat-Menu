@@ -84,6 +84,8 @@ project "CheatMenuIII"
         "../src/hotkeys.cpp",
         "../src/vehicle.h", 
         "../src/vehicle.cpp",
+        "../src/weapon.h", 
+        "../src/weapon.cpp",
         "../src/filehandler.h", 
         "../src/filehandler.cpp",
         "../src/dllmain.cpp"

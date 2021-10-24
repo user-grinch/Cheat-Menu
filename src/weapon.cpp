@@ -28,13 +28,20 @@ Weapon::Weapon()
 		}
 #endif
 
-		uchar slot = player->m_nActiveWeaponSlot;
+		
+		uchar slot = BY_GAME(player->m_nActiveWeaponSlot, player->m_nActiveWeaponSlot, player->m_nCurrentWeapon);
 		if (m_nCurrentWeaponSlot != slot)
 		{
+
+#ifdef GTA3
+			eWeaponType weaponType = player->m_aWeapons[slot].m_eWeaponType;
+#else
 			eWeaponType weaponType = player->m_aWeapons[slot].m_nType;
+#endif
+
 #ifdef GTASA
 			CWeaponInfo* pWeaponInfo = CWeaponInfo::GetWeaponInfo(weaponType, player->GetWeaponSkill(weaponType));
-#elif GTAVC
+#else // GTA3 & GTAVC
 			CWeaponInfo* pWeaponInfo = CWeaponInfo::GetWeaponInfo(weaponType);
 
 			if(m_bInfiniteAmmo)
@@ -55,7 +62,7 @@ Weapon::Weapon()
 				pWeaponInfo->m_fWeaponRange = 1000.0f;
 				pWeaponInfo->m_fAccuracy = 1.0f;
 				pWeaponInfo->m_nFlags.bReload2Start = true;
-#elif GTAVC
+#else // GTA3 & GTAVC
 				pWeaponInfo->m_fRange = 1000.0f;
 #endif
 			}
@@ -95,25 +102,45 @@ void Weapon::SetGangWeapon(std::string& weapon_type)
 	CGangs::SetGangWeapons(m_nSelectedGang, m_nGangWeaponList[m_nSelectedGang][0], m_nGangWeaponList[m_nSelectedGang][1],
 						   m_nGangWeaponList[m_nSelectedGang][2]);
 }
-#elif GTAVC
+#else // GTA3 & GTAVC
 // Implementation of SA opcode 0x555
 static void ClearPlayerWeapon(eWeaponType weaponType)
 {
-  	int weaponSlot = CWeaponInfo::GetWeaponInfo(weaponType)->m_WeaponSlot;
 	CPlayerPed *pPlayer = FindPlayerPed();
+
+#ifdef GTA3
+  	int weaponSlot = pPlayer->GetWeaponSlot(weaponType);
+#else
+	int weaponSlot = CWeaponInfo::GetWeaponInfo(weaponType)->m_WeaponSlot;
+#endif
 
 	if ( weaponSlot != -1 )
 	{
 		CWeapon *pWeapon = &pPlayer->m_aWeapons[weaponSlot];
-		if ( pWeapon->m_nType == weaponType )
+
+#ifdef GTA3
+		if (pWeapon->m_eWeaponType == weaponType)
 		{
-			if ( pPlayer->m_nActiveWeaponSlot == weaponSlot )
+			if (pPlayer->m_nCurrentWeapon == weaponSlot)
+			{
+				Command<Commands::SET_CURRENT_PLAYER_WEAPON>(0, WEAPONTYPE_UNARMED);
+			}
+			// This doesn't work for melee weapons aka bats, chainsaw etc
+			pWeapon->m_eWeaponState = WEAPONSTATE_OUT_OF_AMMO;
+			pWeapon->m_nAmmoTotal = 0;
+			pWeapon->m_nAmmoInClip = 0;
+		}
+#else
+		if (pWeapon->m_nType == weaponType)
+		{
+			if (pPlayer->m_nActiveWeaponSlot == weaponSlot)
 			{
 				CWeaponInfo *pWeaponInfo = CWeaponInfo::GetWeaponInfo(WEAPONTYPE_UNARMED);
 				pPlayer->SetCurrentWeapon(pWeaponInfo->m_WeaponSlot);
 			}
 			pWeapon->Shutdown();
 		}
+#endif
 	}
 }
 
@@ -124,7 +151,8 @@ static eWeaponType GetWeaponTypeFromModel(int model)
 
   	for (size_t i = 0; i < 37; i++)
 	{
-  		int temp = CallAndReturn<int,0x4418B0>(i); // int __cdecl CPickups::ModelForWeapon(int a1)
+		
+  		int temp = CallAndReturn<int, BY_GAME(NULL, 0x4418B0, 0x430690)>(i); // int __cdecl CPickups::ModelForWeapon(int a1)
 
 		if (temp == model)
 		{
@@ -181,7 +209,7 @@ void Weapon::GiveWeaponToPlayer(std::string& weapon_type)
 		Command<Commands::MARK_MODEL_AS_NO_LONGER_NEEDED>(model);
 	}
 }
-#elif GTAVC
+#else // GTA3 & GTAVC
 void Weapon::GiveWeaponToPlayer(std::string& rootkey, std::string& name, std::string& model)
 {
 	CPlayerPed* player = FindPlayerPed();
@@ -193,6 +221,9 @@ void Weapon::GiveWeaponToPlayer(std::string& rootkey, std::string& name, std::st
 	eWeaponType weaponType = GetWeaponTypeFromModel(iModel);
 	Command<Commands::GIVE_WEAPON_TO_CHAR>(hplayer, weaponType, m_nAmmoCount);
 	Command<Commands::MARK_MODEL_AS_NO_LONGER_NEEDED>(iModel);
+#ifdef GTA3
+	Command<Commands::SET_CURRENT_PLAYER_WEAPON>(0, weaponType);
+#endif
 }
 #endif
 
@@ -206,21 +237,26 @@ void Weapon::Draw()
 	{
 		float x, y, z;
 		Command<Commands::GET_OFFSET_FROM_CHAR_IN_WORLD_COORDS>(hplayer, 0.0, 3.0, 0.0, &x, &y, &z);
+
+#ifdef GTA3
+		eWeaponType weaponType = pPlayer->m_aWeapons[pPlayer->m_nCurrentWeapon].m_eWeaponType;
+#else
 		eWeaponType weaponType = pPlayer->m_aWeapons[pPlayer->m_nActiveWeaponSlot].m_nType;
+#endif
 
 		if (weaponType)
 		{
 			int model = 0, pickup = 0;
 #ifdef GTASA
 			Command<Commands::GET_WEAPONTYPE_MODEL>(weaponType, &model);
-#elif GTAVC
-			model = CallAndReturn<int,0x4418B0>(weaponType); // int __cdecl CPickups::ModelForWeapon(int a1)
+#else // GTA3 & GTAVC
+			model = CallAndReturn<int, BY_GAME(NULL, 0x4418B0, 0x430690)>(weaponType); // int __cdecl CPickups::ModelForWeapon(int a1)
 #endif
 			Command<Commands::CREATE_PICKUP_WITH_AMMO>(model, 3, 999, x, y, z, &pickup);
 
 #ifdef GTASA
 			Command<Commands::REMOVE_WEAPON_FROM_CHAR>(hplayer, weaponType);
-#elif GTAVC
+#else // GTA3 & GTAVC
 			ClearPlayerWeapon(weaponType);
 #endif
 		}
@@ -228,16 +264,18 @@ void Weapon::Draw()
 	ImGui::SameLine();
 	if (ImGui::Button("Remove all", Ui::GetSize(3)))
 	{
-		Command<Commands::REMOVE_ALL_CHAR_WEAPONS>(hplayer);
+		pPlayer->ClearWeapons();
 	}
 
 	ImGui::SameLine();
 	if (ImGui::Button("Remove current", Ui::GetSize(3)))
 	{
 #ifdef GTASA
-			Command<Commands::REMOVE_WEAPON_FROM_CHAR>(hplayer, pPlayer->m_aWeapons[pPlayer->m_nActiveWeaponSlot].m_nType);
+		Command<Commands::REMOVE_WEAPON_FROM_CHAR>(hplayer, pPlayer->m_aWeapons[pPlayer->m_nActiveWeaponSlot].m_nType);
 #elif GTAVC
-			ClearPlayerWeapon(pPlayer->m_aWeapons[pPlayer->m_nActiveWeaponSlot].m_nType);
+		ClearPlayerWeapon(pPlayer->m_aWeapons[pPlayer->m_nActiveWeaponSlot].m_nType);
+#else // GTA3
+		ClearPlayerWeapon(pPlayer->m_aWeapons[pPlayer->m_nCurrentWeapon].m_eWeaponType);
 #endif
 	}
 	ImGui::Spacing();
@@ -278,9 +316,9 @@ void Weapon::Draw()
 
 #ifdef GTASA
 			Ui::CheckboxAddress("Infinite ammo", 0x969178);
-#endif
 			ImGui::NextColumn();
-#ifdef GTAVC
+#else
+			ImGui::NextColumn();
 			Ui::CheckboxWithHint("Infinite ammo", &m_bInfiniteAmmo);
 #endif
 			if (Ui::CheckboxWithHint("Long range", &m_bLongRange))
@@ -330,7 +368,7 @@ void Weapon::Draw()
 						   [](std::string str) { return m_WeaponData.m_pJson->m_Data[str].get<std::string>(); },
 						   [](std::string str) { return str != "0"; /*Unarmed*/ }
 			);
-#elif GTAVC
+#else // GTA3 & GTAVC
 			Ui::DrawJSON(m_WeaponData, GiveWeaponToPlayer, nullptr);
 #endif
 			ImGui::EndTabItem();

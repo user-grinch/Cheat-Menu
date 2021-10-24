@@ -384,7 +384,7 @@ void Ped::Draw()
 					               },
 					               [](std::string str) { return str != "-1"; /*Jetpack*/ }
 					);
-#elif GTAVC
+#else // GTA3 & GTAVC
 					Ui::DrawJSON(Weapon::m_WeaponData, 
 					[](std::string& root, std::string& key, std::string& id) 
 					{
