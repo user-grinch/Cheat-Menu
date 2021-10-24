@@ -205,9 +205,11 @@ void SetPlayerMission(std::string& rootkey, std::string& name, std::string& id)
 	uint hplayer = CPools::GetPedRef(player);
 	int interior = 0;
 
+#ifndef GTA3
 	Command<0x09E8>(hplayer, &interior);
+#endif
 
-	if (BY_GAME(Util::IsOnMission(), true) && interior == 0)
+	if (BY_GAME(Util::IsOnMission(), true, true) && interior == 0)
 	{
 		player->SetWantedLevel(0);
 		Command<Commands::LOAD_AND_LAUNCH_MISSION_INTERNAL>(std::stoi(id));
@@ -403,6 +405,9 @@ void Game::Draw()
 #elif GTAVC	
 					patch::Nop(0x602BD8, 5);
 					patch::Nop(0x602BE7, 5);
+#else // GTA3
+					patch::Nop(0x5841B8, 5);
+					patch::Nop(0x5841C7, 5);
 #endif
 				}
 				else
@@ -414,6 +419,9 @@ void Game::Draw()
 #elif GTAVC		
 					patch::SetRaw(0x602BD8, (char*)"\x88\xD8\x89\xF1\x50", 5);
 					patch::SetRaw(0x602BE7, (char*)"\xE8\x34\x91\xEA\xFF", 5);
+#else // GTA3
+					patch::SetRaw(0x5841B8, (char*)"\x88\xD8\x89\xF1\x50", 5);
+					patch::SetRaw(0x5841C7, (char*)"\xE8\x84\xE2\xF0\xFF", 5);
 #endif
 				}
 			}
@@ -421,15 +429,15 @@ void Game::Draw()
 			{
 				if (m_bDisableReplay)
 				{
-					patch::SetUChar(BY_GAME(0x460500, 0x624EC0), 0xC3);
+					patch::SetUChar(BY_GAME(0x460500, 0x624EC0, 0x593170), 0xC3);
 				}
 				else
 				{
-					patch::SetUChar(BY_GAME(0x460500, 0x624EC0), 0x80);
+					patch::SetUChar(BY_GAME(0x460500, 0x624EC0, 0x593170), 0x80);
 				}
 			}
 
-			Ui::CheckboxAddress("Faster clock", BY_GAME(0x96913B, 0xA10B87));
+			Ui::CheckboxAddress("Faster clock", BY_GAME(0x96913B, 0xA10B87, 0x95CDBB));
 #ifdef GTASA
 			if (Ui::CheckboxWithHint("Forbidden area wl", &m_bForbiddenArea, "Wanted levels that appears outside \
 of LS without completing missions"))
@@ -443,22 +451,24 @@ of LS without completing missions"))
 					patch::Set<BYTE>(0x441770, 0xC3, false);
 				}
 			}
-#endif
 			Ui::CheckboxAddress("Free pay n spray", 0x96C009);
+#endif
 
 #ifdef GTAVC
 			ImGui::NextColumn();
 #endif
+#ifdef GTASA
 			Ui::CheckboxAddress("Freeze game", 0xA10B48);
+#endif
 			if (ImGui::Checkbox("Freeze game time", &m_bFreezeTime))
 			{
 				if (m_bFreezeTime)
 				{
-					patch::SetRaw(BY_GAME(0x52CF10, 0x487010), (char*)"\xEB\xEF", 2);
+					patch::SetRaw(BY_GAME(0x52CF10, 0x487010, 0x473460), (char*)"\xEB\xEF", 2);
 				}
 				else
 				{
-					patch::SetRaw(BY_GAME(0x52CF10, 0x487010), (char*)BY_GAME("\x56\x8B","\x6A\x01"), 2);
+					patch::SetRaw(BY_GAME(0x52CF10, 0x487010, 0x473460), (char*)BY_GAME("\x56\x8B", "\x6A\x01", "\x6A\x01"), 2);
 				}
 			}
 
@@ -507,11 +517,11 @@ Lowers armour, health, stamina etc."))
 			{
 				if (m_bSyncTime)
 				{
-					patch::RedirectCall(BY_GAME(0x53BFBD, 0x4A44F7), &RealTimeClock);
+					patch::RedirectCall(BY_GAME(0x53BFBD, 0x4A44F7, 0x48C8EB), &RealTimeClock);
 				}
 				else
 				{
-					patch::RedirectCall(BY_GAME(0x53BFBD, 0x4A44F7), &CClock::Update);
+					patch::RedirectCall(BY_GAME(0x53BFBD, 0x4A44F7, 0x48C8EB), &CClock::Update);
 				}
 			}
 
@@ -533,8 +543,8 @@ Lowers armour, health, stamina etc."))
 				ImGui::Separator();
 			}
 #endif
-			Ui::EditAddress<int>("Days passed", BY_GAME(0xB79038,0x97F1F4), 0, 9999);
-			Ui::EditReference("FPS limit", BY_GAME(RsGlobal.frameLimit, RsGlobal.maxFPS), 1, 30, 60);
+			Ui::EditAddress<int>("Days passed", BY_GAME(0xB79038, 0x97F1F4, 0x8F2BB8), 0, 9999);
+			Ui::EditReference("FPS limit", BY_GAME(RsGlobal.frameLimit, RsGlobal.maxFPS, RsGlobal.maxFPS), 1, 30, 60);
 #ifdef GTASA
 			if (ImGui::CollapsingHeader("Free cam"))
 			{
@@ -557,7 +567,7 @@ Lowers armour, health, stamina etc."))
 			}
 #endif
 			Ui::EditReference("Game speed", CTimer::ms_fTimeScale, 1, 1, 10);
-			Ui::EditFloat("Gravity", BY_GAME(0x863984,0x68F5F0), -1.0f, 0.008f, 1.0f, 1.0f, 0.01f);
+			Ui::EditFloat("Gravity", BY_GAME(0x863984, 0x68F5F0, 0x5F68D4), -1.0f, 0.008f, 1.0f, 1.0f, 0.01f);
 
 			if (ImGui::CollapsingHeader("Set time"))
 			{
@@ -623,7 +633,7 @@ Lowers armour, health, stamina etc."))
 				{
 					Call<0x438F50>();
 				}
-#elif GTAVC
+#else // GTA3 & GTAVC
 				if (ImGui::Button("Sunny", Ui::GetSize(3)))
 				{
 					CWeather::ForceWeatherNow(0);
