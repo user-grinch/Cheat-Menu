@@ -10,7 +10,7 @@
 
 A mod menu for Grand Theft Auto III, Vice City & San Andreas which allows a large set of modifications/cheats to be applied enabling a much more easier & amusing gameplay. This is **NOT** intended for use in multiplayer, I won't be responsible for any form of bans. Use it at your own risk!
 
-Get stable binaries from [here](https://github.com/user-grinch/Cheat-Menu/releases). Beta binaries are available at the discord server. Binaries for GTA III are available at the discord server too.
+Get stable binaries from [here](https://github.com/user-grinch/Cheat-Menu/releases). Beta binaries are available at the discord server. Binaries for GTA III are available at the discord server.
 
 [![Discord Banner 2](https://discordapp.com/api/guilds/689515979847237649/widget.png?style=banner2)](https://discord.com/invite/ZzW7kmf)
 
@@ -28,6 +28,21 @@ If you have those mentioned versions installed follow the steps below,
 3. Install [D3D8to9 wrapper](https://github.com/crosire/d3d8to9/releases). Sometimes the asi loader blocks **d3d8.dll** file. Just delete the **Globals.ini** file and you should be good to go.
 
 Be sure to check [here](https://github.com/user-grinch/Cheat-Menu/issues/48) to know about incompatibilities with other mods.
+
+## Things to do on crash
+1. Delete the `CheatMenu/json/config.json` file and try again.
+2. If it's happening after installing a recent mod try removing it. A list of incompatibile mods are [here](https://github.com/user-grinch/Cheat-Menu/issues/48).
+3. Try on a fresh installation of the game.
+4. If still doesn't fix your issue, go ahead and report it.
+
+### Crash reports/ Bug reports
+Install [Crash info](https://www.mixmods.com.br/2021/06/crashinfo.html) & reproduce your crash. When reporting the crash upload the crashinfo logfile with it. Explain how to reproduce the crash in details. Also include,
+- Game version
+- Menu version
+- List of mods installed
+
+You can either open a issue here or directly contact me on discord (Recommended).
+
 
 ## Required to build
 1. [Build Tools 2019](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2019)
