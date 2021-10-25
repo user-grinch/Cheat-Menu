@@ -9,9 +9,6 @@
 */
 
 #pragma once
-#ifndef GTA3
-#include "visual.h"
-#endif
 #include "animation.h"
 #include "game.h"
 #include "hook.h"
@@ -20,24 +17,15 @@
 #include "player.h"
 #include "teleport.h"
 #include "vehicle.h"
+#include "visual.h"
 #include "weapon.h"
 
-#ifndef GTA3
 class CheatMenu : Hook, Animation, Game, Menu, Ped, Player, Teleport, Vehicle, Visual, Weapon
-#else
-class CheatMenu : Hook, Animation, Game, Menu, Ped, Player, Teleport, Vehicle, Weapon
-#endif
 {
 private:
     static inline bool m_bShowMenu = false;
     static inline ImVec2 m_fMenuSize = ImVec2(screen::GetScreenWidth() / 4, screen::GetScreenHeight() / 1.2);
 
-#ifdef GTA3
-    static inline CallbackTable header{
-        {"Teleport", &Teleport::Draw}, {"Player", &Player::Draw}, {"Ped", &Ped::Draw},   {"Dummy", nullptr},
-        {"Vehicle", &Vehicle::Draw},   {"Weapon", &Weapon::Draw}, {"Game", &Game::Draw}, {"Menu", &Menu::Draw},
-    };
-#else
     static inline CallbackTable header{
         {"Teleport", &Teleport::Draw},   {"Player", &Player::Draw}, {"Ped", &Ped::Draw},
 #ifdef GTASA
@@ -46,8 +34,8 @@ private:
 		{"Dummy", nullptr},
 #endif
         {"Vehicle", &Vehicle::Draw},     {"Weapon", &Weapon::Draw}, {"Game", &Game::Draw},
-        {"Visual", &Visual::Draw},       {"Menu", &Menu::Draw}};
-#endif
+        {"Visual", &Visual::Draw},       {"Menu", &Menu::Draw}
+    };
 
     static void ApplyStyle();
     static void DrawWindow();

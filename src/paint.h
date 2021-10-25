@@ -27,59 +27,64 @@
 class Paint
 {
 private:
-    // store vehicle specific data
-    struct VehData
-    {
-        struct MaterialProperties
-        {
-            MaterialProperties()
-                : _color{0, 0, 0, 0}, _recolor(false), _retexture(false),
-                  _geometry(nullptr), _originalColor{0, 0, 0, 0}, _originalTexture(nullptr), _originalGeometryFlags(0)
-            {
-            }
+	// store vehicle specific data
+	struct VehData
+	{
+		struct MaterialProperties
+		{
+			MaterialProperties() :
+				_color{0, 0, 0, 0},
+				_recolor(false),
+				_retexture(false),
+				_geometry(nullptr),
+				_originalColor{0, 0, 0, 0},
+				_originalTexture(nullptr),
+				_originalGeometryFlags(0)
+			{
+			}
 
-            RwRGBA _color;
-            RwTexture *_texture;
-            bool _recolor;
-            bool _retexture;
-            RpGeometry *_geometry;
-            RwRGBA _originalColor;
-            RwTexture *_originalTexture;
-            RwInt32 _originalGeometryFlags;
-        };
+			RwRGBA _color;
+			RwTexture* _texture;
+			bool _recolor;
+			bool _retexture;
+			RpGeometry* _geometry;
+			RwRGBA _originalColor;
+			RwTexture* _originalTexture;
+			RwInt32 _originalGeometryFlags;
+		};
 
-        // carcols color id
-        uchar primary_color = 0;
-        uchar secondary_color = 0;
-        std::unordered_map<RpMaterial *, MaterialProperties> materialProperties;
+		// carcols color id
+		uchar primary_color = 0;
+		uchar secondary_color = 0;
+		std::unordered_map<RpMaterial*, MaterialProperties> materialProperties;
 
-        VehData(CVehicle *veh)
-        {
-            primary_color = veh->m_nPrimaryColor;
-            secondary_color = veh->m_nSecondaryColor;
-        }
+		VehData(CVehicle* veh)
+		{
+			primary_color = veh->m_nPrimaryColor;
+			secondary_color = veh->m_nSecondaryColor;
+		}
 
-        void setMaterialColor(RpMaterial *material, RpGeometry *geometry, RwRGBA color, bool filter_mat = false);
-        void setMaterialTexture(RpMaterial *material, RwTexture *texture, bool filter_mat = false);
-        void resetMaterialColor(RpMaterial *material);
-        void resetMaterialTexture(RpMaterial *material);
-    };
-    static inline VehicleExtendedData<VehData> m_VehData;
+		void setMaterialColor(RpMaterial* material, RpGeometry* geometry, RwRGBA color, bool filter_mat = false);
+		void setMaterialTexture(RpMaterial* material, RwTexture* texture, bool filter_mat = false);
+		void resetMaterialColor(RpMaterial* material);
+		void resetMaterialTexture(RpMaterial* material);
+	};
+	static inline VehicleExtendedData<VehData> m_VehData;
 
 protected:
-    static inline ResourceStore m_TextureData{"textures", eResourceType::TYPE_IMAGE, ImVec2(100, 80)};
+	static inline ResourceStore m_TextureData { "textures", eResourceType::TYPE_IMAGE, ImVec2(100, 80) };
 
-    struct veh_nodes
-    {
-        static inline std::vector<std::string> names_vec{"Default"};
-        static inline std::string selected = "Default";
-    };
+	struct veh_nodes
+	{
+		static inline std::vector<std::string> names_vec{"Default"};
+		static inline std::string selected = "Default";
+	};
 
-    Paint();
-    static void UpdateNodeListRecursive(CVehicle *pVeh);
-    static void NodeWrapperRecursive(RwFrame *frame, CVehicle *pVeh, std::function<void(RwFrame *)> func);
-    static void SetNodeColor(CVehicle *pVeh, std::string node_name, CRGBA color, bool filter_mat = false);
-    static void SetNodeTexture(CVehicle *pVeh, std::string node_name, std::string texturename, bool filter_mat = false);
-    static void ResetNodeColor(CVehicle *veh, std::string node_name);
-    static void ResetNodeTexture(CVehicle *pVeh, std::string node_name);
+	Paint();
+	static void UpdateNodeListRecursive(CVehicle* pVeh);
+	static void NodeWrapperRecursive(RwFrame* frame, CVehicle* pVeh, std::function<void(RwFrame*)> func);
+	static void SetNodeColor(CVehicle* pVeh, std::string node_name, CRGBA color, bool filter_mat = false);
+	static void SetNodeTexture(CVehicle* pVeh, std::string node_name, std::string texturename, bool filter_mat = false);
+	static void ResetNodeColor(CVehicle* veh, std::string node_name);
+	static void ResetNodeTexture(CVehicle* pVeh, std::string node_name);
 };

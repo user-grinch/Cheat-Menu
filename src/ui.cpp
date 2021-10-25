@@ -1,864 +1,867 @@
-#include "ui.h"
 #include "pch.h"
 #include "util.h"
+#include "ui.h"
 
-bool Ui::ListBox(const char *label, std::vector<std::string> &all_items, int &selected)
+bool Ui::ListBox(const char* label, std::vector<std::string>& all_items, int& selected)
 {
-    bool rtn = false;
-    if (ImGui::BeginCombo(label, all_items[selected].c_str()))
-    {
-        for (size_t index = 0; index < all_items.size(); index++)
-        {
-            if (selected != index)
-            {
-                if (ImGui::MenuItem(all_items[index].c_str()))
-                {
-                    selected = index;
-                    rtn = true;
-                }
-            }
-        }
-        ImGui::EndCombo();
-    }
-    return rtn;
+	bool rtn = false;
+	if (ImGui::BeginCombo(label, all_items[selected].c_str()))
+	{
+		for (size_t index = 0; index < all_items.size(); index++)
+		{
+			if (selected != index)
+			{
+				if (ImGui::MenuItem(all_items[index].c_str()))
+				{
+					selected = index;
+					rtn = true;
+				}
+			}
+		}
+		ImGui::EndCombo();
+	}
+	return rtn;
 }
 
-bool Ui::ListBoxStr(const char *label, std::vector<std::string> &all_items, std::string &selected)
+bool Ui::ListBoxStr(const char* label, std::vector<std::string>& all_items, std::string& selected)
 {
-    bool rtn = false;
-    if (ImGui::BeginCombo(label, selected.c_str()))
-    {
-        for (std::string current_item : all_items)
-        {
-            if (ImGui::MenuItem(current_item.c_str()))
-            {
-                selected = current_item;
-                rtn = true;
-            }
-        }
-        ImGui::EndCombo();
-    }
+	bool rtn = false;
+	if (ImGui::BeginCombo(label, selected.c_str()))
+	{
+		for (std::string current_item : all_items)
+		{
+			if (ImGui::MenuItem(current_item.c_str()))
+			{
+				selected = current_item;
+				rtn = true;
+			}
+		}
+		ImGui::EndCombo();
+	}
 
-    return rtn;
+	return rtn;
 }
 
-bool Ui::ListBoxCustomNames(const char *label, std::vector<std::string> &all_items, std::string &selected,
-                            const char *customNames[], size_t length)
+bool Ui::ListBoxCustomNames(const char* label, std::vector<std::string>& all_items, std::string& selected, const char* customNames[], size_t length)
 {
-    bool rtn = false;
-    std::string display_selected = (selected == "All") ? selected : customNames[std::stoi(selected)];
+	bool rtn = false;
+	std::string display_selected = (selected == "All") ? selected : customNames[std::stoi(selected)];
 
-    if (ImGui::BeginCombo(label, display_selected.c_str()))
-    {
-        if (ImGui::MenuItem("All"))
-        {
-            selected = "All";
-            rtn = true;
-        }
+	if (ImGui::BeginCombo(label, display_selected.c_str()))
+	{
+		if (ImGui::MenuItem("All"))
+		{
+			selected = "All";
+			rtn = true;
+		}
 
-        for (size_t i = 0; i < length; ++i)
-        {
-            if (ImGui::MenuItem(customNames[i]))
-            {
-                selected = std::to_string(i);
-                rtn = true;
-                break;
-            }
-        }
-        ImGui::EndCombo();
-    }
-    return rtn;
+		for (size_t i = 0; i < length; ++i)
+		{
+			if (ImGui::MenuItem(customNames[i]))
+			{
+				selected = std::to_string(i);
+				rtn = true;
+				break;
+			}
+		}
+		ImGui::EndCombo();
+	}
+	return rtn;
 }
 
 ImVec2 Ui::GetSize(short count, bool spacing)
 {
-    if (count == 1)
-        spacing = false;
+	if (count == 1)
+		spacing = false;
 
-    float factor = ImGui::GetStyle().ItemSpacing.x / 2.0f;
-    float x;
+	float factor = ImGui::GetStyle().ItemSpacing.x / 2.0f;
+	float x;
 
-    if (count == 3)
-        factor = ImGui::GetStyle().ItemSpacing.x / 1.403f;
+	if (count == 3)
+		factor = ImGui::GetStyle().ItemSpacing.x / 1.403f;
 
-    if (spacing)
-        x = ImGui::GetWindowContentRegionWidth() / count - factor;
-    else
-        x = ImGui::GetWindowContentRegionWidth() / count;
+	if (spacing)
+		x = ImGui::GetWindowContentRegionWidth() / count - factor;
+	else
+		x = ImGui::GetWindowContentRegionWidth() / count;
 
-    return ImVec2(x, ImGui::GetFrameHeight() * 1.3f);
+	return ImVec2(x, ImGui::GetFrameHeight() * 1.3f);
 }
 
-void Ui::CenterdText(const std::string &text)
+void Ui::CenterdText(const std::string& text)
 {
-    float font_size = ImGui::GetFontSize() * text.size() / 2;
-    ImGui::NewLine();
-    ImGui::SameLine(ImGui::GetWindowSize().x / 2 - font_size + (font_size / 1.8));
-    ImGui::Text(text.c_str());
+	float font_size = ImGui::GetFontSize() * text.size() / 2;
+	ImGui::NewLine();
+	ImGui::SameLine(ImGui::GetWindowSize().x / 2 - font_size + (font_size / 1.8));
+	ImGui::Text(text.c_str());
 }
 
-void Ui::DrawHeaders(CallbackTable &data)
+void Ui::DrawHeaders(CallbackTable& data)
 {
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 
-    short i = 1;
-    auto colors = ImGui::GetStyle().Colors;
-    ImVec4 btn_col = colors[ImGuiCol_Button];
-    static void *func;
-    for (auto it = data.begin(); it != data.end(); ++it)
-    {
-        const char *btn_text = it->first.c_str();
+	short i = 1;
+	auto colors = ImGui::GetStyle().Colors;
+	ImVec4 btn_col = colors[ImGuiCol_Button];
+	static void* func;
+	for (auto it = data.begin(); it != data.end(); ++it)
+	{
+		const char* btn_text = it->first.c_str();
 
-        if (btn_text == m_HeaderId)
-        {
-            colors[ImGuiCol_Button] = colors[ImGuiCol_ButtonActive];
-            func = it->second;
-        }
+		if (btn_text == m_HeaderId)
+		{
+			colors[ImGuiCol_Button] = colors[ImGuiCol_ButtonActive];
+			func = it->second;
+		}
 
-        if (ImGui::Button(btn_text, GetSize(3, false)))
-        {
-            m_HeaderId = btn_text;
-            gConfig.SetValue("window.id", m_HeaderId);
-            func = it->second;
-        }
 
-        colors[ImGuiCol_Button] = btn_col;
+		if (ImGui::Button(btn_text, GetSize(3, false)))
+		{
+			m_HeaderId = btn_text;
+			gConfig.SetValue("window.id", m_HeaderId);
+			func = it->second;
+		}
 
-        if (i % 3 != 0)
-            ImGui::SameLine();
-        i++;
-    }
-    ImGui::PopStyleVar();
-    ImGui::Dummy(ImVec2(0, 10));
+		colors[ImGuiCol_Button] = btn_col;
 
-    if (m_HeaderId == "")
-    {
-        // Show Welcome page
-        ImGui::NewLine();
+		if (i % 3 != 0)
+			ImGui::SameLine();
+		i++;
+	}
+	ImGui::PopStyleVar();
+	ImGui::Dummy(ImVec2(0, 10));
 
-        CenterdText("Welcome to Cheat Menu");
-        CenterdText("Author: Grinch_");
+	if (m_HeaderId == "")
+	{
+		// Show Welcome page
+		ImGui::NewLine();
 
-        ImGui::NewLine();
-        ImGui::TextWrapped("Please ensure you have the latest version from GitHub.");
-        ImGui::NewLine();
-        if (ImGui::Button("Discord server", ImVec2(GetSize(2))))
-            ShellExecute(nullptr, "open", DISCORD_INVITE, nullptr, nullptr, SW_SHOWNORMAL);
+		CenterdText("Welcome to Cheat Menu");
+		CenterdText("Author: Grinch_");
 
-        ImGui::SameLine();
+		ImGui::NewLine();
+		ImGui::TextWrapped("Please ensure you have the latest version from GitHub.");
+		ImGui::NewLine();
+		if (ImGui::Button("Discord server", ImVec2(GetSize(2))))
+			ShellExecute(nullptr, "open", DISCORD_INVITE, nullptr, nullptr, SW_SHOWNORMAL);
 
-        if (ImGui::Button("GitHub repo", ImVec2(GetSize(2))))
-            ShellExecute(nullptr, "open", GITHUB_LINK, nullptr, nullptr, SW_SHOWNORMAL);
+		ImGui::SameLine();
 
-        ImGui::NewLine();
-        ImGui::TextWrapped("If you find bugs or have suggestions, you can let me know on discord :)");
-        ImGui::Dummy(ImVec2(0, 30));
-        CenterdText("Copyright Grinch_ 2019-2022. All rights reserved.");
-    }
-    else
-    {
-        if (func != nullptr && ImGui::BeginChild("TABSBAR"))
-        {
-            static_cast<void (*)()>(func)();
-            ImGui::EndChild();
-        }
-    }
+		if (ImGui::Button("GitHub repo", ImVec2(GetSize(2))))
+			ShellExecute(nullptr, "open", GITHUB_LINK, nullptr, nullptr, SW_SHOWNORMAL);
+
+		ImGui::NewLine();
+		ImGui::TextWrapped("If you find bugs or have suggestions, you can let me know on discord :)");
+		ImGui::Dummy(ImVec2(0, 30));
+		CenterdText("Copyright Grinch_ 2019-2022. All rights reserved.");
+	}
+	else
+	{
+		if (func != nullptr && ImGui::BeginChild("TABSBAR"))
+		{
+			static_cast<void(*)()>(func)();
+			ImGui::EndChild();
+		}
+	}
 }
 
-void Ui::ShowTooltip(const char *text)
+void Ui::ShowTooltip(const char* text)
 {
-    ImGui::SameLine();
-    ImGui::TextDisabled("?");
+	ImGui::SameLine();
+	ImGui::TextDisabled("?");
 
-    if (ImGui::IsItemHovered())
-    {
-        ImGui::BeginTooltip();
-        ImGui::Text(text);
-        ImGui::EndTooltip();
-    }
+	if (ImGui::IsItemHovered())
+	{
+		ImGui::BeginTooltip();
+		ImGui::Text(text);
+		ImGui::EndTooltip();
+	}
 }
 
-bool Ui::CheckboxWithHint(const char *label, bool *v, const char *hint, bool is_disabled)
+bool Ui::CheckboxWithHint(const char* label, bool* v, const char* hint, bool is_disabled)
 {
-    // set things up
-    bool pressed = false;
-    const ImGuiStyle &style = ImGui::GetStyle();
-    const ImVec2 textSize = ImGui::CalcTextSize(label, nullptr, true);
-    float square_sz = ImGui::GetFrameHeight();
-    ImDrawList *drawlist = ImGui::GetWindowDrawList();
-    ImU32 color = ImGui::GetColorU32(ImGuiCol_FrameBg);
-    std::string slabel = "##InvCheckboxBtn" + std::string(label);
+	// set things up
+	bool pressed = false;
+	const ImGuiStyle& style = ImGui::GetStyle();
+	const ImVec2 textSize = ImGui::CalcTextSize(label, nullptr, true);
+	float square_sz = ImGui::GetFrameHeight();
+	ImDrawList* drawlist = ImGui::GetWindowDrawList();
+	ImU32 color = ImGui::GetColorU32(ImGuiCol_FrameBg);
+	std::string slabel = "##InvCheckboxBtn" + std::string(label);
 
-    ImGui::BeginDisabled(is_disabled);
+	ImGui::BeginDisabled(is_disabled);
+	
+	// process the button states
+	if (ImGui::InvisibleButton(slabel.c_str(), ImVec2(square_sz, square_sz)) && !is_disabled)
+	{
+		pressed = true;
+		*v = !*v;
+	}
 
-    // process the button states
-    if (ImGui::InvisibleButton(slabel.c_str(), ImVec2(square_sz, square_sz)) && !is_disabled)
-    {
-        pressed = true;
-        *v = !*v;
-    }
+	if (ImGui::IsItemHovered() && !is_disabled)
+		color = ImGui::GetColorU32(ImGuiCol_FrameBgHovered);
 
-    if (ImGui::IsItemHovered() && !is_disabled)
-        color = ImGui::GetColorU32(ImGuiCol_FrameBgHovered);
+	// draw the button
+	ImVec2 min = ImGui::GetItemRectMin();
+	ImVec2 max = ImGui::GetItemRectMax();
+	drawlist->AddRectFilled(min, max, color);
 
-    // draw the button
-    ImVec2 min = ImGui::GetItemRectMin();
-    ImVec2 max = ImGui::GetItemRectMax();
-    drawlist->AddRectFilled(min, max, color);
+	int pad = static_cast<int>(square_sz / 6.0);
+	pad = (pad < 1) ? 1 : pad;
 
-    int pad = static_cast<int>(square_sz / 6.0);
-    pad = (pad < 1) ? 1 : pad;
+	if (*v)
+	{
+		// draw the checkmark
+		float sz = (square_sz - pad * 2.0);
+		float thickness = sz / 5.0;
+		thickness = (thickness < 1.0) ? 1.0 : thickness;
+		sz = sz - thickness * 0.5;
 
-    if (*v)
-    {
-        // draw the checkmark
-        float sz = (square_sz - pad * 2.0);
-        float thickness = sz / 5.0;
-        thickness = (thickness < 1.0) ? 1.0 : thickness;
-        sz = sz - thickness * 0.5;
+		auto pos = ImVec2(min.x + pad, min.y + pad);
+		pos.x = pos.x + thickness * 0.25;
+		pos.y = pos.y + thickness * 0.25;
 
-        auto pos = ImVec2(min.x + pad, min.y + pad);
-        pos.x = pos.x + thickness * 0.25;
-        pos.y = pos.y + thickness * 0.25;
+		float third = sz / 3.0;
+		float bx = pos.x + third;
+		float by = pos.y + sz - third * 0.5;
 
-        float third = sz / 3.0;
-        float bx = pos.x + third;
-        float by = pos.y + sz - third * 0.5;
+		drawlist->PathLineTo(ImVec2(bx - third, by - third));
+		drawlist->PathLineTo(ImVec2(bx, by));
+		drawlist->PathLineTo(ImVec2(bx + third * 2.0, by - third * 2.0));
+		drawlist->PathStroke(ImGui::GetColorU32(ImGuiCol_CheckMark), false, thickness);
+	}
 
-        drawlist->PathLineTo(ImVec2(bx - third, by - third));
-        drawlist->PathLineTo(ImVec2(bx, by));
-        drawlist->PathLineTo(ImVec2(bx + third * 2.0, by - third * 2.0));
-        drawlist->PathStroke(ImGui::GetColorU32(ImGuiCol_CheckMark), false, thickness);
-    }
+	// draw label
+	ImGui::SameLine(0, style.ItemInnerSpacing.x);
+	if (ImGui::InvisibleButton(label, ImVec2(ImGui::CalcTextSize(label, nullptr, true).x, square_sz)) && !is_disabled)
+	{
+		pressed = true;
+		*v = !*v;
+	}
+	min = ImGui::GetItemRectMin();
+	drawlist->AddText(ImVec2(min.x, min.y + style.ItemInnerSpacing.y), ImGui::GetColorU32(ImGuiCol_Text), label);
 
-    // draw label
-    ImGui::SameLine(0, style.ItemInnerSpacing.x);
-    if (ImGui::InvisibleButton(label, ImVec2(ImGui::CalcTextSize(label, nullptr, true).x, square_sz)) && !is_disabled)
-    {
-        pressed = true;
-        *v = !*v;
-    }
-    min = ImGui::GetItemRectMin();
-    drawlist->AddText(ImVec2(min.x, min.y + style.ItemInnerSpacing.y), ImGui::GetColorU32(ImGuiCol_Text), label);
+	// draw hint
+	if (hint != nullptr)
+	{
+		ImGui::SameLine(0, style.ItemInnerSpacing.x);
+		ImGui::InvisibleButton("?", ImGui::CalcTextSize("?", nullptr, true));
+		min = ImGui::GetItemRectMin();
+		drawlist->AddText(ImVec2(min.x, min.y + style.ItemInnerSpacing.y), ImGui::GetColorU32(ImGuiCol_TextDisabled),
+						  "?");
 
-    // draw hint
-    if (hint != nullptr)
-    {
-        ImGui::SameLine(0, style.ItemInnerSpacing.x);
-        ImGui::InvisibleButton("?", ImGui::CalcTextSize("?", nullptr, true));
-        min = ImGui::GetItemRectMin();
-        drawlist->AddText(ImVec2(min.x, min.y + style.ItemInnerSpacing.y), ImGui::GetColorU32(ImGuiCol_TextDisabled),
-                          "?");
+		if (ImGui::IsItemHovered() && !is_disabled)
+		{
+			ImGui::BeginTooltip();
+			ImGui::Text(hint);
+			ImGui::Spacing();
+			ImGui::EndTooltip();
+		}
+	}
 
-        if (ImGui::IsItemHovered() && !is_disabled)
-        {
-            ImGui::BeginTooltip();
-            ImGui::Text(hint);
-            ImGui::Spacing();
-            ImGui::EndTooltip();
-        }
-    }
+	ImGui::EndDisabled();
 
-    ImGui::EndDisabled();
-
-    return pressed;
+	return pressed;
 }
 
-bool Ui::CheckboxAddress(const char *label, const int addr, const char *hint)
+bool Ui::CheckboxAddress(const char* label, const int addr, const char* hint)
 {
-    bool rtn = false;
-    bool state = patch::Get<bool>(addr, false);
+	bool rtn = false;
+	bool state = patch::Get<bool>(addr, false);
 
-    if (CheckboxWithHint(label, &state, hint) && addr != NULL)
-    {
-        patch::Set<bool>(addr, state, false);
-        rtn = true;
-    }
+	if (CheckboxWithHint(label, &state, hint) && addr != NULL)
+	{
+		patch::Set<bool>(addr, state, false);
+		rtn = true;
+	}
 
-    return rtn;
+	return rtn;
 }
 
-bool Ui::CheckboxAddressEx(const char *label, const int addr, int enabled_val, int disabled_val, const char *hint)
+bool Ui::CheckboxAddressEx(const char* label, const int addr, int enabled_val, int disabled_val, const char* hint)
 {
-    bool rtn = false;
+	bool rtn = false;
 
-    bool state = false;
-    int val = 0;
-    patch::GetRaw(addr, &val, 1, false);
+	bool state = false;
+	int val = 0;
+	patch::GetRaw(addr, &val, 1, false);
 
-    if (val == enabled_val)
-        state = true;
+	if (val == enabled_val)
+		state = true;
 
-    if (CheckboxWithHint(label, &state, hint) && addr != NULL)
-    {
-        if (state)
-            patch::SetRaw(addr, &enabled_val, 1, false);
-        else
-            patch::SetRaw(addr, &disabled_val, 1, false);
-        rtn = true;
-    }
+	if (CheckboxWithHint(label, &state, hint) && addr != NULL)
+	{
+		if (state)
+			patch::SetRaw(addr, &enabled_val, 1, false);
+		else
+			patch::SetRaw(addr, &disabled_val, 1, false);
+		rtn = true;
+	}
 
-    return rtn;
+	return rtn;
 }
 
-bool Ui::CheckboxAddressVar(const char *label, bool val, int addr, const char *hint)
+bool Ui::CheckboxAddressVar(const char* label, bool val, int addr, const char* hint)
 {
-    bool rtn = false;
-    bool state = val;
-    if (CheckboxWithHint(label, &state, hint))
-    {
-        patch::Set<bool>(addr, state, false);
-        rtn = true;
-    }
+	bool rtn = false;
+	bool state = val;
+	if (CheckboxWithHint(label, &state, hint))
+	{
+		patch::Set<bool>(addr, state, false);
+		rtn = true;
+	}
 
-    return rtn;
+	return rtn;
 }
 
-bool Ui::CheckboxAddressVarEx(const char *label, bool val, int addr, int enabled_val, int disabled_val,
-                              const char *hint)
+bool Ui::CheckboxAddressVarEx(const char* label, bool val, int addr, int enabled_val, int disabled_val,
+							  const char* hint)
 {
-    bool rtn = false;
-    bool state = val;
-    if (CheckboxWithHint(label, &state, hint))
-    {
-        if (state)
-            patch::SetRaw(addr, &enabled_val, 1, false);
-        else
-            patch::SetRaw(addr, &disabled_val, 1, false);
+	bool rtn = false;
+	bool state = val;
+	if (CheckboxWithHint(label, &state, hint))
+	{
+		if (state)
+			patch::SetRaw(addr, &enabled_val, 1, false);
+		else
+			patch::SetRaw(addr, &disabled_val, 1, false);
 
-        rtn = true;
-    }
+		rtn = true;
+	}
 
-    return rtn;
+	return rtn;
 }
 
-bool Ui::CheckboxBitFlag(const char *label, uint flag, const char *hint)
+bool Ui::CheckboxBitFlag(const char* label, uint flag, const char* hint)
 {
-    bool rtn = false;
-    bool state = (flag == 1) ? true : false;
-    if (CheckboxWithHint(label, &state, hint))
-    {
-        flag = state ? 1 : 0;
-        rtn = true;
-    }
+	bool rtn = false;
+	bool state = (flag == 1) ? true : false;
+	if (CheckboxWithHint(label, &state, hint))
+	{
+		flag = state ? 1 : 0;
+		rtn = true;
+	}
 
-    return rtn;
+	return rtn;
 }
 
-void Ui::DrawJSON(ResourceStore &data, std::function<void(std::string &, std::string &, std::string &)> func_left_click,
-                  std::function<void(std::string &, std::string &, std::string &)> func_right_click)
+void Ui::DrawJSON(ResourceStore& data,
+				std::function<void(std::string&, std::string&, std::string&)> func_left_click,
+				std::function<void(std::string&, std::string&, std::string&)> func_right_click)
 {
-    ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() / 2 - 5);
-    ListBoxStr("##Categories", data.m_Categories, data.m_Selected);
-    ImGui::SameLine();
+	ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() / 2 - 5);
+	ListBoxStr("##Categories", data.m_Categories, data.m_Selected);
+	ImGui::SameLine();
 
-    data.m_Filter.Draw("##Filter");
-    if (strlen(data.m_Filter.InputBuf) == 0)
-    {
-        ImDrawList *drawlist = ImGui::GetWindowDrawList();
+	data.m_Filter.Draw("##Filter");
+	if (strlen(data.m_Filter.InputBuf) == 0)
+	{
+		ImDrawList* drawlist = ImGui::GetWindowDrawList();
 
-        ImVec2 min = ImGui::GetItemRectMin();
-        min.x += ImGui::GetStyle().FramePadding.x;
-        min.y += ImGui::GetStyle().FramePadding.y;
+		ImVec2 min = ImGui::GetItemRectMin();
+		min.x += ImGui::GetStyle().FramePadding.x;
+		min.y += ImGui::GetStyle().FramePadding.y;
 
-        drawlist->AddText(min, ImGui::GetColorU32(ImGuiCol_TextDisabled), "Search");
-    }
+		drawlist->AddText(min, ImGui::GetColorU32(ImGuiCol_TextDisabled), "Search");
+	}
 
-    ImGui::PopItemWidth();
+	ImGui::PopItemWidth();
 
-    ImGui::Spacing();
+	ImGui::Spacing();
 
-    if (ImGui::IsMouseClicked(1))
-    {
-        jsonPopup.function = nullptr;
-    }
+	if (ImGui::IsMouseClicked(1))
+	{
+		jsonPopup.function = nullptr;
+	}
 
-    ImGui::BeginChild(1);
-    for (auto root : data.m_pJson->m_Data.items())
-    {
-        if (root.key() == data.m_Selected || data.m_Selected == "All")
-        {
-            for (auto _data : root.value().items())
-            {
-                std::string name = _data.key();
-                if (data.m_Filter.PassFilter(name.c_str()))
-                {
-                    if (ImGui::MenuItem(name.c_str()) && func_left_click != nullptr)
-                    {
-                        std::string root_key = root.key();
-                        std::string data_key = _data.key();
-                        std::string data_val = _data.value();
 
-                        func_left_click(root_key, data_key, data_val);
-                    }
+	ImGui::BeginChild(1);
+	for (auto root : data.m_pJson->m_Data.items())
+	{
+		if (root.key() == data.m_Selected || data.m_Selected == "All")
+		{
+			for (auto _data : root.value().items())
+			{
+				std::string name = _data.key();
+				if (data.m_Filter.PassFilter(name.c_str()))
+				{
+					if (ImGui::MenuItem(name.c_str()) && func_left_click != nullptr)
+					{
+						std::string root_key = root.key();
+						std::string data_key = _data.key();
+						std::string data_val = _data.value();
 
-                    if (ImGui::IsItemClicked(1) && func_right_click != nullptr)
-                    {
-                        jsonPopup.function = func_right_click;
-                        jsonPopup.rootKey = root.key();
-                        jsonPopup.key = name;
-                        jsonPopup.value = _data.value();
-                    }
-                }
-            }
-        }
-    }
+						func_left_click(root_key, data_key, data_val);
+					}
 
-    if (jsonPopup.function != nullptr)
-    {
-        if (ImGui::BeginPopupContextWindow())
-        {
-            ImGui::Text(jsonPopup.key.c_str());
-            ImGui::Separator();
-            if (ImGui::MenuItem("Remove"))
-                jsonPopup.function(jsonPopup.rootKey, jsonPopup.key, jsonPopup.value);
+					if (ImGui::IsItemClicked(1) && func_right_click != nullptr)
+					{
+						jsonPopup.function = func_right_click;
+						jsonPopup.rootKey = root.key();
+						jsonPopup.key = name;
+						jsonPopup.value = _data.value();
+					}
+				}
+			}
+		}
+	}
 
-            if (ImGui::MenuItem("Close"))
-                jsonPopup.function = nullptr;
+	if (jsonPopup.function != nullptr)
+	{
+		if (ImGui::BeginPopupContextWindow())
+		{
+			ImGui::Text(jsonPopup.key.c_str());
+			ImGui::Separator();
+			if (ImGui::MenuItem("Remove"))
+				jsonPopup.function(jsonPopup.rootKey, jsonPopup.key, jsonPopup.value);
 
-            ImGui::EndPopup();
-        }
-    }
-    ImGui::EndChild();
+
+			if (ImGui::MenuItem("Close"))
+				jsonPopup.function = nullptr;
+
+			ImGui::EndPopup();
+		}
+	}
+	ImGui::EndChild();
 }
 
 #ifdef GTASA
-void Ui::EditStat(const char *label, const int stat_id, const int min, const int def, const int max)
+void Ui::EditStat(const char* label, const int stat_id, const int min, const int def, const int max)
 {
-    if (ImGui::CollapsingHeader(label))
-    {
-        int val = static_cast<int>(CStats::GetStatValue(stat_id));
+	if (ImGui::CollapsingHeader(label))
+	{
+		int val = static_cast<int>(CStats::GetStatValue(stat_id));
 
-        ImGui::Columns(3, nullptr, false);
-        ImGui::Text("Min: %d", min);
-        ImGui::NextColumn();
-        ImGui::Text("Def: %d", def);
-        ImGui::NextColumn();
-        ImGui::Text("Max: %d", max);
-        ImGui::Columns(1);
+		ImGui::Columns(3, nullptr, false);
+		ImGui::Text("Min: %d", min);
+		ImGui::NextColumn();
+		ImGui::Text("Def: %d", def);
+		ImGui::NextColumn();
+		ImGui::Text("Max: %d", max);
+		ImGui::Columns(1);
 
-        ImGui::Spacing();
+		ImGui::Spacing();
 
-        if (ImGui::InputInt(("Set value##" + std::string(label)).c_str(), &val))
-            CStats::SetStatValue(stat_id, static_cast<float>(val));
+		if (ImGui::InputInt(("Set value##" + std::string(label)).c_str(), &val))
+			CStats::SetStatValue(stat_id, static_cast<float>(val));
 
-        ImGui::Spacing();
+		ImGui::Spacing();
 
-        if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), GetSize(3)))
-            CStats::SetStatValue(stat_id, static_cast<float>(min));
+		if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), GetSize(3)))
+			CStats::SetStatValue(stat_id, static_cast<float>(min));
 
-        ImGui::SameLine();
+		ImGui::SameLine();
 
-        if (ImGui::Button(("Default##" + std::string(label)).c_str(), GetSize(3)))
-            CStats::SetStatValue(stat_id, static_cast<float>(def));
+		if (ImGui::Button(("Default##" + std::string(label)).c_str(), GetSize(3)))
+			CStats::SetStatValue(stat_id, static_cast<float>(def));
 
-        ImGui::SameLine();
+		ImGui::SameLine();
 
-        if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), GetSize(3)))
-            CStats::SetStatValue(stat_id, static_cast<float>(max));
+		if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), GetSize(3)))
+			CStats::SetStatValue(stat_id, static_cast<float>(max));
 
-        ImGui::Spacing();
-        ImGui::Separator();
-    }
+		ImGui::Spacing();
+		ImGui::Separator();
+	}
 }
 #endif
 
-void Ui::FilterWithHint(const char *label, ImGuiTextFilter &filter, const char *hint)
+void Ui::FilterWithHint(const char* label, ImGuiTextFilter& filter, const char* hint)
 {
-    filter.Draw(label);
+	filter.Draw(label);
 
-    if (strlen(filter.InputBuf) == 0)
-    {
-        ImDrawList *drawlist = ImGui::GetWindowDrawList();
+	if (strlen(filter.InputBuf) == 0)
+	{
+		ImDrawList* drawlist = ImGui::GetWindowDrawList();
 
-        ImVec2 min = ImGui::GetItemRectMin();
-        min.x += ImGui::GetStyle().FramePadding.x;
-        min.y += ImGui::GetStyle().FramePadding.y;
+		ImVec2 min = ImGui::GetItemRectMin();
+		min.x += ImGui::GetStyle().FramePadding.x;
+		min.y += ImGui::GetStyle().FramePadding.y;
 
-        drawlist->AddText(min, ImGui::GetColorU32(ImGuiCol_TextDisabled), hint);
-    }
+		drawlist->AddText(min, ImGui::GetColorU32(ImGuiCol_TextDisabled), hint);
+	}
 }
 
-void Ui::DrawImages(ResourceStore &store, std::function<void(std::string &)> onLeftClick,
-                    std::function<void(std::string &)> onRightClick, std::function<std::string(std::string &)> getName,
-                    std::function<bool(std::string &)> verifyFunc, const char **customNames, size_t length)
+void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLeftClick, std::function<void(std::string&)> onRightClick,
+					std::function<std::string(std::string&)> getName, std::function<bool(std::string&)> verifyFunc,
+					const char** customNames, size_t length)
 {
-    /*
-        Trying to scale images based on resolutions
-        Native 1366x768
-    */
-    ImVec2 m_ImageSize = store.m_ImageSize;
-    m_ImageSize.x *= screen::GetScreenWidth() / 1366.0f;
-    m_ImageSize.y *= screen::GetScreenHeight() / 768.0f;
+	/*
+		Trying to scale images based on resolutions
+		Native 1366x768
+	*/
+	ImVec2 m_ImageSize = store.m_ImageSize;
+	m_ImageSize.x *= screen::GetScreenWidth() / 1366.0f;
+	m_ImageSize.y *= screen::GetScreenHeight() / 768.0f;
 
-    int imageCount = 1;
-    int imagesInRow = static_cast<int>(ImGui::GetWindowContentRegionWidth() / m_ImageSize.x);
-    m_ImageSize.x =
-        ImGui::GetWindowContentRegionWidth() / imagesInRow - static_cast<int>(ImGuiStyleVar_ItemSpacing) * 0.65f;
+	int imageCount = 1;
+	int imagesInRow = static_cast<int>(ImGui::GetWindowContentRegionWidth() / m_ImageSize.x);
+	m_ImageSize.x = ImGui::GetWindowContentRegionWidth() / imagesInRow - static_cast<int>(ImGuiStyleVar_ItemSpacing) * 0.65f;
 
-    ImGui::Spacing();
+	ImGui::Spacing();
 
-    // Hide the popup if right clicked again
-    if (ImGui::IsMouseClicked(1))
-    {
-        imgPopup.function = nullptr;
-    }
+	// Hide the popup if right clicked again
+	if (ImGui::IsMouseClicked(1))
+	{
+		imgPopup.function = nullptr;
+	}
 
-    ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() / 2 - 5);
-    if (customNames)
-    {
-        ListBoxCustomNames("##Categories", store.m_Categories, store.m_Selected, customNames, length);
-    }
-    else
-    {
-        ListBoxStr("##Categories", store.m_Categories, store.m_Selected);
-    }
+	ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() / 2 - 5);
+	if (customNames)
+	{
+		ListBoxCustomNames("##Categories", store.m_Categories, store.m_Selected, customNames, length);
+	}
+	else
+	{
+		ListBoxStr("##Categories", store.m_Categories, store.m_Selected);
+	}
 
-    ImGui::SameLine();
-    FilterWithHint("##Filter", store.m_Filter, "Search");
+	ImGui::SameLine();
+	FilterWithHint("##Filter", store.m_Filter, "Search");
 
-    ImGui::Spacing();
+	ImGui::Spacing();
 
-    ImGui::BeginChild("DrawImages");
-    for (uint i = 0; i < store.m_ImagesList.size(); ++i)
-    {
-        std::string text = store.m_ImagesList[i]->m_FileName;
-        std::string modelName = getName(text);
+	ImGui::BeginChild("DrawImages");
+	for (uint i = 0; i < store.m_ImagesList.size(); ++i)
+	{
+		std::string text = store.m_ImagesList[i]->m_FileName;
+		std::string modelName = getName(text);
 
-        if (store.m_Filter.PassFilter(modelName.c_str()) &&
-            (store.m_ImagesList[i]->m_CategoryName == store.m_Selected || store.m_Selected == "All") &&
-            (verifyFunc == nullptr || verifyFunc(text)))
-        {
-            /*
-                Couldn't figure out how to laod images for Dx11
-                Using texts for now
-            */
-            if (gRenderer == Render_DirectX11)
-            {
-                if (ImGui::MenuItem(modelName.c_str()))
-                {
-                    onLeftClick(text);
-                }
-            }
-            else
-            {
-                if (ImGui::ImageButton(store.m_ImagesList[i]->m_pTexture, m_ImageSize, ImVec2(0, 0), ImVec2(1, 1), 1,
-                                       ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 1)))
-                {
-                    onLeftClick(text);
-                }
-            }
+		if (store.m_Filter.PassFilter(modelName.c_str())
+			&& (store.m_ImagesList[i]->m_CategoryName == store.m_Selected || store.m_Selected == "All")
+			&& (verifyFunc == nullptr || verifyFunc(text))
+		)
+		{
+			/*
+				Couldn't figure out how to laod images for Dx11
+				Using texts for now
+			*/
+			if (gRenderer == Render_DirectX11)
+			{
+				if (ImGui::MenuItem(modelName.c_str()))
+				{
+					onLeftClick(text);
+				}
+			}
+			else
+			{
+				if (ImGui::ImageButton(store.m_ImagesList[i]->m_pTexture, m_ImageSize, ImVec2(0, 0), ImVec2(1, 1), 1, ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 1)))
+				{
+					onLeftClick(text);
+				}
+			}
 
-            // Right click popup
-            if (ImGui::IsItemClicked(1) && onRightClick != nullptr)
-            {
-                imgPopup.function = onRightClick;
-                imgPopup.value = modelName;
-            }
+			// Right click popup
+			if (ImGui::IsItemClicked(1) && onRightClick != nullptr)
+			{
+				imgPopup.function = onRightClick;
+				imgPopup.value = modelName;
+			}
 
-            if (gRenderer != Render_DirectX11)
-            {
-                if (ImGui::IsItemHovered())
-                {
-                    ImDrawList *drawlist = ImGui::GetWindowDrawList();
+			if (gRenderer != Render_DirectX11)
+			{
+				if (ImGui::IsItemHovered())
+				{
+					ImDrawList* drawlist = ImGui::GetWindowDrawList();
 
-                    // Drawing selected overlay
-                    ImVec2 btnMin = ImGui::GetItemRectMin();
-                    ImVec2 btnMax = ImGui::GetItemRectMax();
-                    drawlist->AddRectFilled(btnMin, btnMax, ImGui::GetColorU32(ImGuiCol_ModalWindowDimBg));
+					// Drawing selected overlay
+					ImVec2 btnMin = ImGui::GetItemRectMin();
+					ImVec2 btnMax = ImGui::GetItemRectMax();
+					drawlist->AddRectFilled(btnMin, btnMax, ImGui::GetColorU32(ImGuiCol_ModalWindowDimBg));
 
-                    // Calculating and drawing text over the image
-                    ImVec2 textSize = ImGui::CalcTextSize(modelName.c_str());
-                    if (textSize.x < m_ImageSize.x)
-                    {
-                        float offsetX = (ImGui::GetItemRectSize().x - textSize.x) / 2;
-                        drawlist->AddText(ImVec2(btnMin.x + offsetX, btnMin.y + 10), ImGui::GetColorU32(ImGuiCol_Text),
-                                          modelName.c_str());
-                    }
-                    else
-                    {
-                        std::string buff = "";
-                        std::stringstream ss(modelName);
-                        short count = 1;
+					// Calculating and drawing text over the image
+					ImVec2 textSize = ImGui::CalcTextSize(modelName.c_str());
+					if (textSize.x < m_ImageSize.x)
+					{
+						float offsetX = (ImGui::GetItemRectSize().x - textSize.x) / 2;
+						drawlist->AddText(ImVec2(btnMin.x + offsetX, btnMin.y + 10), ImGui::GetColorU32(ImGuiCol_Text),
+										modelName.c_str());
+					}
+					else
+					{
+						std::string buff = "";
+						std::stringstream ss(modelName);
+						short count = 1;
 
-                        while (ss >> buff)
-                        {
-                            textSize = ImGui::CalcTextSize(buff.c_str());
-                            float offsetX = (ImGui::GetItemRectSize().x - textSize.x) / 2;
-                            drawlist->AddText(ImVec2(btnMin.x + offsetX, btnMin.y + 10 * count),
-                                              ImGui::GetColorU32(ImGuiCol_Text), buff.c_str());
-                            ++count;
-                        }
-                    }
-                }
+						while (ss >> buff)
+						{
+							textSize = ImGui::CalcTextSize(buff.c_str());
+							float offsetX = (ImGui::GetItemRectSize().x - textSize.x) / 2;
+							drawlist->AddText(ImVec2(btnMin.x + offsetX, btnMin.y + 10 * count),
+											ImGui::GetColorU32(ImGuiCol_Text), buff.c_str());
+							++count;
+						}
+					}
+				}
 
-                if (imageCount % imagesInRow != 0)
-                {
-                    ImGui::SameLine(0.0, ImGui::GetStyle().ItemInnerSpacing.x);
-                }
-            }
-            imageCount++;
-        }
-    }
+				if (imageCount % imagesInRow != 0)
+				{
+					ImGui::SameLine(0.0, ImGui::GetStyle().ItemInnerSpacing.x);
+				}
+			}
+			imageCount++;
+		}
+	}
 
-    // Draw popup code
-    if (imgPopup.function != nullptr)
-    {
-        if (ImGui::BeginPopupContextWindow())
-        {
-            ImGui::Text(imgPopup.value.c_str());
-            ImGui::Separator();
-            if (ImGui::MenuItem("Remove"))
-            {
-                imgPopup.function(imgPopup.value);
-            }
+	// Draw popup code
+	if (imgPopup.function != nullptr)
+	{
+		if (ImGui::BeginPopupContextWindow())
+		{
+			ImGui::Text(imgPopup.value.c_str());
+			ImGui::Separator();
+			if (ImGui::MenuItem("Remove"))
+			{
+				imgPopup.function(imgPopup.value);
+			}
 
-            if (ImGui::MenuItem("Close"))
-            {
-                imgPopup.function = nullptr;
-            }
+			if (ImGui::MenuItem("Close"))
+			{
+				imgPopup.function = nullptr;
+			}
 
-            ImGui::EndPopup();
-        }
-    }
-    ImGui::EndChild();
+			ImGui::EndPopup();
+		}
+	}
+	ImGui::EndChild();
 }
 
-void Ui::RadioButtonAddress(const char *label, std::vector<NamedMemory> &named_mem)
+void Ui::RadioButtonAddress(const char* label, std::vector<NamedMemory>& named_mem)
 {
-    size_t btn_in_column = named_mem.size() / 2 - 1;
+	size_t btn_in_column = named_mem.size() / 2 - 1;
 
-    ImGui::Text(label);
-    ImGui::Columns(2, nullptr, false);
+	ImGui::Text(label);
+	ImGui::Columns(2, nullptr, false);
 
-    bool state = true;
+	bool state = true;
 
-    for (size_t i = 0; i < named_mem.size(); i++)
-    {
-        if (patch::Get<bool>(named_mem[i].addr, false))
-            state = false;
-    }
+	for (size_t i = 0; i < named_mem.size(); i++)
+	{
+		if (patch::Get<bool>(named_mem[i].addr, false))
+			state = false;
+	}
 
-    if (ImGui::RadioButton((std::string("None##") + label).c_str(), state))
-    {
-        for (size_t i = 0; i < named_mem.size(); i++)
-            patch::Set<bool>(named_mem[i].addr, false);
-    }
+	if (ImGui::RadioButton((std::string("None##") + label).c_str(), state))
+	{
+		for (size_t i = 0; i < named_mem.size(); i++)
+			patch::Set<bool>(named_mem[i].addr, false);
+	}
 
-    for (size_t i = 0; i < named_mem.size(); i++)
-    {
-        state = patch::Get<bool>(named_mem[i].addr, false);
+	for (size_t i = 0; i < named_mem.size(); i++)
+	{
+		state = patch::Get<bool>(named_mem[i].addr, false);
 
-        if (ImGui::RadioButton(named_mem[i].name.c_str(), state))
-        {
-            for (size_t i = 0; i < named_mem.size(); i++)
-                patch::Set<bool>(named_mem[i].addr, false);
+		if (ImGui::RadioButton(named_mem[i].name.c_str(), state))
+		{
+			for (size_t i = 0; i < named_mem.size(); i++)
+				patch::Set<bool>(named_mem[i].addr, false);
 
-            patch::Set<bool>(named_mem[i].addr, true);
-        }
+			patch::Set<bool>(named_mem[i].addr, true);
+		}
 
-        if (i == btn_in_column)
-            ImGui::NextColumn();
-    }
-    ImGui::Columns(1);
+		if (i == btn_in_column)
+			ImGui::NextColumn();
+	}
+	ImGui::Columns(1);
 }
 
-void Ui::RadioButtonAddressEx(const char *label, int addr, std::vector<NamedValue> &named_val)
+void Ui::RadioButtonAddressEx(const char* label, int addr, std::vector<NamedValue>& named_val)
 {
-    size_t btn_in_column = named_val.size() / 2;
+	size_t btn_in_column = named_val.size() / 2;
 
-    ImGui::Text(label);
-    ImGui::Columns(2, nullptr, false);
+	ImGui::Text(label);
+	ImGui::Columns(2, nullptr, false);
 
-    int mem_val = 0;
-    patch::GetRaw(addr, &mem_val, 1, false);
+	int mem_val = 0;
+	patch::GetRaw(addr, &mem_val, 1, false);
 
-    for (size_t i = 0; i < named_val.size(); i++)
-    {
-        if (ImGui::RadioButton(named_val[i].name.c_str(), &mem_val, named_val[i].value))
-            patch::SetRaw(addr, &named_val[i].value, 1, false);
+	for (size_t i = 0; i < named_val.size(); i++)
+	{
+		if (ImGui::RadioButton(named_val[i].name.c_str(), &mem_val, named_val[i].value))
+			patch::SetRaw(addr, &named_val[i].value, 1, false);
 
-        if (i == btn_in_column)
-            ImGui::NextColumn();
-    }
-    ImGui::Columns(1);
+		if (i == btn_in_column)
+			ImGui::NextColumn();
+	}
+	ImGui::Columns(1);
 }
 
-void Ui::EditRadioButtonAddress(const char *label, std::vector<NamedMemory> &named_mem)
+void Ui::EditRadioButtonAddress(const char* label, std::vector<NamedMemory>& named_mem)
 {
-    if (ImGui::CollapsingHeader(label))
-    {
-        RadioButtonAddress(label, named_mem);
-        ImGui::Spacing();
-        ImGui::Separator();
-    }
+	if (ImGui::CollapsingHeader(label))
+	{
+		RadioButtonAddress(label, named_mem);
+		ImGui::Spacing();
+		ImGui::Separator();
+	}
 }
 
-void Ui::EditRadioButtonAddressEx(const char *label, int addr, std::vector<NamedValue> &named_val)
+void Ui::EditRadioButtonAddressEx(const char* label, int addr, std::vector<NamedValue>& named_val)
 {
-    if (ImGui::CollapsingHeader(label))
-    {
-        RadioButtonAddressEx(label, addr, named_val);
-        ImGui::Spacing();
-        ImGui::Separator();
-    }
+	if (ImGui::CollapsingHeader(label))
+	{
+		RadioButtonAddressEx(label, addr, named_val);
+		ImGui::Spacing();
+		ImGui::Separator();
+	}
 }
 
-void Ui::ColorPickerAddress(const char *label, int base_addr, ImVec4 &&default_color)
+void Ui::ColorPickerAddress(const char* label, int base_addr, ImVec4&& default_color)
 {
-    if (ImGui::CollapsingHeader(label))
-    {
-        float cur_color[4];
-        cur_color[0] = patch::Get<BYTE>(base_addr, false);
-        cur_color[1] = patch::Get<BYTE>(base_addr + 1, false);
-        cur_color[2] = patch::Get<BYTE>(base_addr + 2, false);
-        cur_color[3] = patch::Get<BYTE>(base_addr + 3, false);
+	if (ImGui::CollapsingHeader(label))
+	{
+		float cur_color[4];
+		cur_color[0] = patch::Get<BYTE>(base_addr, false);
+		cur_color[1] = patch::Get<BYTE>(base_addr + 1, false);
+		cur_color[2] = patch::Get<BYTE>(base_addr + 2, false);
+		cur_color[3] = patch::Get<BYTE>(base_addr + 3, false);
 
-        // 0-255 -> 0-1
-        cur_color[0] /= 255;
-        cur_color[1] /= 255;
-        cur_color[2] /= 255;
-        cur_color[3] /= 255;
+		// 0-255 -> 0-1
+		cur_color[0] /= 255;
+		cur_color[1] /= 255;
+		cur_color[2] /= 255;
+		cur_color[3] /= 255;
 
-        if (ImGui::ColorPicker4(std::string("Pick color##" + std::string(label)).c_str(), cur_color))
-        {
-            // 0-1 -> 0-255
-            cur_color[0] *= 255;
-            cur_color[1] *= 255;
-            cur_color[2] *= 255;
-            cur_color[3] *= 255;
+		if (ImGui::ColorPicker4(std::string("Pick color##" + std::string(label)).c_str(), cur_color))
+		{
+			// 0-1 -> 0-255
+			cur_color[0] *= 255;
+			cur_color[1] *= 255;
+			cur_color[2] *= 255;
+			cur_color[3] *= 255;
 
-            patch::Set<BYTE>(base_addr, cur_color[0], false);
-            patch::Set<BYTE>(base_addr + 1, cur_color[1], false);
-            patch::Set<BYTE>(base_addr + 2, cur_color[2], false);
-            patch::Set<BYTE>(base_addr + 3, cur_color[3], false);
-        }
-        ImGui::Spacing();
+			patch::Set<BYTE>(base_addr, cur_color[0], false);
+			patch::Set<BYTE>(base_addr + 1, cur_color[1], false);
+			patch::Set<BYTE>(base_addr + 2, cur_color[2], false);
+			patch::Set<BYTE>(base_addr + 3, cur_color[3], false);
+		}
+		ImGui::Spacing();
 
-        if (ImGui::Button("Reset to default", GetSize()))
-        {
-            patch::Set<BYTE>(base_addr, default_color.x, false);
-            patch::Set<BYTE>(base_addr + 1, default_color.y, false);
-            patch::Set<BYTE>(base_addr + 2, default_color.z, false);
-            patch::Set<BYTE>(base_addr + 3, default_color.w, false);
-        }
+		if (ImGui::Button("Reset to default", GetSize()))
+		{
+			patch::Set<BYTE>(base_addr, default_color.x, false);
+			patch::Set<BYTE>(base_addr + 1, default_color.y, false);
+			patch::Set<BYTE>(base_addr + 2, default_color.z, false);
+			patch::Set<BYTE>(base_addr + 3, default_color.w, false);
+		}
 
-        ImGui::Spacing();
-        ImGui::Separator();
-    }
+		ImGui::Spacing();
+		ImGui::Separator();
+	}
 }
 
-void Ui::EditBits(const char *label, const int address, const std::vector<std::string> &names)
+void Ui::EditBits(const char* label, const int address, const std::vector<std::string>& names)
 {
-    auto mem_val = (int *)address;
+	auto mem_val = (int*)address;
 
-    if (ImGui::CollapsingHeader(label))
-    {
-        ImGui::Columns(2, nullptr, false);
+	if (ImGui::CollapsingHeader(label))
+	{
+		ImGui::Columns(2, nullptr, false);
 
-        for (int i = 0; i < 32; ++i)
-        {
-            int mask = 1 << i;
-            bool state = *mem_val & mask;
+		for (int i = 0; i < 32; ++i)
+		{
+			int mask = 1 << i;
+			bool state = *mem_val & mask;
 
-            if (ImGui::Checkbox(names[i].c_str(), &state))
-                *mem_val ^= mask;
+			if (ImGui::Checkbox(names[i].c_str(), &state))
+				*mem_val ^= mask;
 
-            if (i + 1 == 32 / 2)
-                ImGui::NextColumn();
-        }
-        ImGui::Columns(1);
+			if (i + 1 == 32 / 2)
+				ImGui::NextColumn();
+		}
+		ImGui::Columns(1);
 
-        ImGui::Spacing();
-        ImGui::Separator();
-    }
+		ImGui::Spacing();
+		ImGui::Separator();
+	}
 }
 
-void Ui::EditFloat(const char *label, const int address, const float min, const float def, const float max,
-                   const float mul, const float change)
+void Ui::EditFloat(const char* label, const int address, const float min, const float def, const float max,
+				   const float mul, const float change)
 {
-    if (ImGui::CollapsingHeader(label))
-    {
-        float val = patch::Get<float>(address, false) * mul;
+	if (ImGui::CollapsingHeader(label))
+	{
+		float val = patch::Get<float>(address, false) * mul;
 
-        int items = 3;
+		int items = 3;
 
-        if (min == def)
-            items = 2;
+		if (min == def)
+			items = 2;
 
-        ImGui::Columns(items, nullptr, false);
+		ImGui::Columns(items, nullptr, false);
 
-        ImGui::Text("Min: %f", min);
+		ImGui::Text("Min: %f", min);
 
-        if (items == 3)
-        {
-            ImGui::NextColumn();
-            ImGui::Text("Def: %f", def);
-        }
+		if (items == 3)
+		{
+			ImGui::NextColumn();
+			ImGui::Text("Def: %f", def);
+		}
 
-        ImGui::NextColumn();
-        ImGui::Text("Max: %f", max);
-        ImGui::Columns(1);
+		ImGui::NextColumn();
+		ImGui::Text("Max: %f", max);
+		ImGui::Columns(1);
 
-        ImGui::Spacing();
+		ImGui::Spacing();
 
-        int size = ImGui::GetFrameHeight();
+		int size = ImGui::GetFrameHeight();
 
-        if (ImGui::InputFloat(("##" + std::string(label)).c_str(), &val))
-            patch::SetFloat(address, val / mul, false);
+		if (ImGui::InputFloat(("##" + std::string(label)).c_str(), &val))
+			patch::SetFloat(address, val / mul, false);
 
-        ImGui::SameLine(0.0, 4.0);
-        if (ImGui::Button("-", ImVec2(size, size)) && (val - change) > min)
-        {
-            val -= change;
-            patch::SetFloat(address, val / mul, false);
-        }
-        ImGui::SameLine(0.0, 4.0);
-        if (ImGui::Button("+", ImVec2(size, size)) && (val + change) < max)
-        {
-            val += change;
-            patch::SetFloat(address, val / mul, false);
-        }
-        ImGui::SameLine(0.0, 4.0);
-        ImGui::Text("Set");
+		ImGui::SameLine(0.0, 4.0);
+		if (ImGui::Button("-", ImVec2(size, size)) && (val - change) > min)
+		{
+			val -= change;
+			patch::SetFloat(address, val / mul, false);
+		}
+		ImGui::SameLine(0.0, 4.0);
+		if (ImGui::Button("+", ImVec2(size, size)) && (val + change) < max)
+		{
+			val += change;
+			patch::SetFloat(address, val / mul, false);
+		}
+		ImGui::SameLine(0.0, 4.0);
+		ImGui::Text("Set");
 
-        ImGui::Spacing();
 
-        if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), GetSize(items)))
-            patch::Set<float>(address, min / mul, false);
+		ImGui::Spacing();
 
-        if (items == 3)
-        {
-            ImGui::SameLine();
+		if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), GetSize(items)))
+			patch::Set<float>(address, min / mul, false);
 
-            if (ImGui::Button(("Default##" + std::string(label)).c_str(), GetSize(items)))
-                patch::Set<float>(address, def / mul, false);
-        }
+		if (items == 3)
+		{
+			ImGui::SameLine();
 
-        ImGui::SameLine();
+			if (ImGui::Button(("Default##" + std::string(label)).c_str(), GetSize(items)))
+				patch::Set<float>(address, def / mul, false);
+		}
 
-        if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), GetSize(items)))
-            patch::Set<float>(address, max / mul, false);
+		ImGui::SameLine();
 
-        ImGui::Spacing();
-        ImGui::Separator();
-    }
+		if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), GetSize(items)))
+			patch::Set<float>(address, max / mul, false);
+
+		ImGui::Spacing();
+		ImGui::Separator();
+	}
 }
 
-bool Ui::ColorButton(int color_id, std::vector<float> &color, ImVec2 size)
+bool Ui::ColorButton(int color_id, std::vector<float>& color, ImVec2 size)
 {
-    bool rtn = false;
-    std::string label = "Color " + std::to_string(color_id);
+	bool rtn = false;
+	std::string label = "Color " + std::to_string(color_id);
 
-    if (ImGui::ColorButton(label.c_str(), ImVec4(color[0], color[1], color[2], 1), 0, size))
-        rtn = true;
+	if (ImGui::ColorButton(label.c_str(), ImVec4(color[0], color[1], color[2], 1), 0, size))
+		rtn = true;
 
-    if (ImGui::IsItemHovered())
-    {
-        ImDrawList *drawlist = ImGui::GetWindowDrawList();
-        drawlist->AddRectFilled(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(),
-                                ImGui::GetColorU32(ImGuiCol_ModalWindowDimBg));
-    }
+	if (ImGui::IsItemHovered())
+	{
+		ImDrawList* drawlist = ImGui::GetWindowDrawList();
+		drawlist->AddRectFilled(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(),
+								ImGui::GetColorU32(ImGuiCol_ModalWindowDimBg));
+	}
 
-    return rtn;
+	return rtn;
 }

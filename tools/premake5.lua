@@ -88,6 +88,9 @@ project "CheatMenuIII"
         "../src/weapon.cpp",
         "../src/game.h", 
         "../src/game.cpp",
+        "../src/timecyc.h", 
+        "../src/visual.h", 
+        "../src/visual.cpp",
         "../src/filehandler.h", 
         "../src/filehandler.cpp",
         "../src/dllmain.cpp"
