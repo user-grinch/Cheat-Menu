@@ -63,11 +63,11 @@ Teleport::Teleport()
 
 			if (pVeh && BY_GAME(player->m_nPedFlags.bInVehicle, player->m_pVehicle, player->m_pVehicle))
 			{
-				BY_GAME(pVeh->Teleport(m_Teleport::m_fPos, false, false), pVeh->Teleport(m_Teleport::m_fPos), player->Teleport(m_Teleport::m_fPos));
+				BY_GAME(pVeh->Teleport(m_Teleport::m_fPos, false), pVeh->Teleport(m_Teleport::m_fPos), player->Teleport(m_Teleport::m_fPos));
 			}
 			else
 			{
-				BY_GAME(player->Teleport(m_Teleport::m_fPos, false, false), player->Teleport(m_Teleport::m_fPos), player->Teleport(m_Teleport::m_fPos));
+				BY_GAME(player->Teleport(m_Teleport::m_fPos, false), player->Teleport(m_Teleport::m_fPos), player->Teleport(m_Teleport::m_fPos));
 			}
 
 			m_Teleport::m_bEnabled = false;
@@ -133,7 +133,7 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
 		else if (pVeh->m_nVehicleClass != VEHICLE_BOAT)
 			reinterpret_cast<CAutomobile*>(pVeh)->PlaceOnRoadProperly();
 
-		BY_GAME(pVeh->m_nAreaCode, pVeh->m_nInterior) = interior_id;
+		BY_GAME(pVeh->m_nAreaCode, pVeh->m_nInterior, NULL) = interior_id;
 	}
 	else
 	{

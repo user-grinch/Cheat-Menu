@@ -125,7 +125,7 @@ Vehicle::Vehicle()
 			pPlayer->m_nPedFlags.CantBeKnockedOffBike = m_bDontFallBike ? 1 : 2;
 
 			if (m_UnlimitedNitro::m_bEnabled 
-			&& BY_GAME(pVeh->m_nVehicleSubClass, pVeh->m_nVehicleClass) == VEHICLE_AUTOMOBILE)
+			&& BY_GAME(pVeh->m_nVehicleSubClass, pVeh->m_nVehicleClass, NULL) == VEHICLE_AUTOMOBILE)
 			{
 				patch::Set<BYTE>(0x969165, 0, true); // All cars have nitro
 				patch::Set<BYTE>(0x96918B, 0, true); // All taxis have nitro
@@ -474,7 +474,7 @@ void Vehicle::SpawnVehicle(std::string& rootkey, std::string& vehName, std::stri
 		}
 		BY_GAME(veh->m_nDoorLock, veh->m_nLockStatus, veh->m_nDoorLock) = CARLOCK_UNLOCKED;
 #ifndef GTA3
-		BY_GAME(veh->m_nAreaCode, veh->m_nInterior) = interior;
+		BY_GAME(veh->m_nAreaCode, veh->m_nInterior, NULL) = interior;
 #endif
 		Command<Commands::MARK_CAR_AS_NO_LONGER_NEEDED>(CPools::GetVehicleRef(veh));
 		CStreaming::SetModelIsDeletable(imodel);
@@ -640,14 +640,14 @@ void Vehicle::Draw()
 			Ui::CheckboxWithHint("Don't fall off bike", &m_bDontFallBike);
 #endif
 #ifndef GTA3
-			Ui::CheckboxAddress("Drive on water", BY_GAME(0x969152,0xA10B81));
+			Ui::CheckboxAddress("Drive on water", BY_GAME(0x969152, 0xA10B81, NULL));
 #endif
 #ifdef GTASA
 			Ui::CheckboxAddressEx("Lock train camera", 0x52A52F, 171, 6);
 			Ui::CheckboxAddress("Float away when hit", 0x969166);
 #endif
 #ifndef GTA3
-			Ui::CheckboxAddress("Green traffic lights", BY_GAME(0x96914E,0xA10ADC));
+			Ui::CheckboxAddress("Green traffic lights", BY_GAME(0x96914E, 0xA10ADC, NULL));
 #endif
 #ifdef GTASA
 			Ui::CheckboxAddress("Perfect handling", 0x96914C);
@@ -881,8 +881,8 @@ void Vehicle::Draw()
 
 				static std::vector<Ui::NamedMemory> color
 				{ 
-					{"Black", BY_GAME(0x969151, 0xA10B82)},
-					{"Pink", BY_GAME(0x969150, 0xA10B26)} 
+					{"Black", BY_GAME(0x969151, 0xA10B82, NULL)},
+					{"Pink", BY_GAME(0x969150, 0xA10B26, NULL)} 
 				};
 				Ui::RadioButtonAddress("Color", color);
 				ImGui::Spacing();

@@ -139,12 +139,14 @@ void Visual::GenerateTimecycFile()
 			break;
 		case 3:
 			buffer =  "\n// FOGGY\n";
+#ifdef GTAVC
 		case 4:
 			buffer =  "\n// EXTRA SUNNY\n";
 		case 5:
 			buffer =  "\n// HURRICANE\n";
 		case 6:
 			buffer =  "\n// EXTRA COLORS (INTERIORS)\n// These colours do not belong to a weather type but can be set by the level designers for interiors.\n";
+#endif
 		} 
 
 #ifdef GTA3
@@ -156,6 +158,38 @@ void Visual::GenerateTimecycFile()
 
 		for (size_t j = 0; j < 24; ++j)
 		{		
+
+#ifdef GTAVC	
+			if (i == 6) //EXTRA COLORS
+			{
+				buffer = "// Extra Color " + std::to_string(j);
+
+				static std::string intNames[] = {
+					"Maibu Club", "Strip Club", "Hotel", "Bank", "Police HQ", "Mall", "Rifle Range", "Mansion", "Dirtring", "Blood ring", 
+					"Hotring", "Concert Hall", "Auntie Poulets", "Intro at Docks", "Biker Bar", "Intro Cafe Dark Room", "Studio"
+				};
+
+				if (j < 18)
+				{
+					buffer += "(" + intNames[j] + ")";
+				}
+			}
+			else
+			{
+#endif
+				buffer = "// " + std::to_string(j) + " ";
+				if (j < 12)
+				{
+					buffer += "AM\n"; 
+				}
+				else
+				{
+					buffer += "PM\n";
+				}
+#ifdef GTAVC
+			}
+#endif
+
 #ifdef GTA3
 			size_t val = i + TOTAL_WEATHERS*j;
 			buffer += std::format("{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {} {}",
@@ -174,35 +208,6 @@ void Visual::GenerateTimecycFile()
 				GetTCVal(m_fPostFxRed, val), GetTCVal(m_fPostFxGreen, val), GetTCVal(m_fPostFxBlue, val), GetTCVal(m_fPostFxAlpha, val)
 			);
 #elif GTAVC
-
-			if (i == 6) //EXTRA COLORS
-			{
-				buffer = "// Extra Color " + std::to_string(j);
-
-				static std::string intNames[] = {
-					"Maibu Club", "Strip Club", "Hotel", "Bank", "Police HQ", "Mall", "Rifle Range", "Mansion", "Dirtring", "Blood ring", 
-					"Hotring", "Concert Hall", "Auntie Poulets", "Intro at Docks", "Biker Bar", "Intro Cafe Dark Room", "Studio"
-
-				};
-
-				if (j < 18)
-				{
-					buffer += "(" + intNames[j] + ")";
-				}
-			}
-			else
-			{
-				buffer = "// " + std::to_string(j) + " ";
-				if (j < 12)
-				{
-					buffer += "AM\n"; 
-				}
-				else
-				{
-					buffer += "PM\n";
-				}
-			}
-
 			size_t val = TOTAL_WEATHERS * i + j;
 			buffer += std::format("{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {} {}",
 				GetTCVal(m_nAmbientRed, val), GetTCVal(m_nAmbientGreen, val), GetTCVal(m_nAmbientBlue, val),

@@ -50,8 +50,6 @@
 #ifndef GTA3
 #include <CBike.h>
 #include <cHandlingDataMgr.h>
-#include <CTheZones.h>
-#include <CZoneInfo.h>
 #endif
 
 #ifdef GTASA
@@ -62,6 +60,7 @@
 #include <CShadows.h>
 #include <eVehicleClass.h>
 #include <CGangWars.h>
+#include <CZoneInfo.h>
 #endif
 
 #include "../depend/fla/IDaccess.h"

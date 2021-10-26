@@ -333,7 +333,7 @@ void Player::ChangePlayerModel(std::string& cat, std::string& key, std::string& 
 	CPlayerPed* player = FindPlayerPed();
 
 #ifdef GTAVC
-	player->Undress(id.c_str());
+	player->Undress(val.c_str());
 	CStreaming::LoadAllRequestedModels(false);
 	player->Dress();
 #else // GTA3
