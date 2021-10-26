@@ -98,7 +98,7 @@ void Visual::GenerateTimecycFile()
 				if (j == 7) buffer = "// 10 PM\n";
 			}
 
-			int val = 23 * j + i;
+			int val = TOTAL_WEATHERS * j + i;
 
 			buffer += std::format("{} {} {}\t{} {} {}\t255 255 255\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {} {}\t{} {} {} {}\t{} {} {} {}\t{} {} {} {}",
 				GetTCVal(m_nAmbientRed, val), GetTCVal(m_nAmbientGreen, val), GetTCVal(m_nAmbientBlue, val),
@@ -120,7 +120,7 @@ void Visual::GenerateTimecycFile()
 			file << buffer << std::endl;
 		}
 	}
-#elif GTAVC
+#else // GTA3 & GTAVC
 	std::ofstream file = std::ofstream("timecyc.dat");
 
 	for (uint i = 0; i < 4; ++i)
@@ -141,8 +141,11 @@ void Visual::GenerateTimecycFile()
 			buffer =  "\n// FOGGY\n";
 		} 
 
+#ifdef GTA3
+		buffer += "// Amb     Dir        Sky top	Sky bot			SunCore 		SunCorona   SunSz  SprSz	SprBght Shdw LightShd  TreeShd FarClp  FogSt	LightOnGround 	LowCloudsRGB 	TopCloudRGB 	BottomCloudRGB		PostFx";
+#else // GTAVC
 		buffer += "// Amb     Amb_Obj    Amb_bl     Amb_Obj_bl	   Dir          Sky top			Sky bot		SunCore 		SunCorona   SunSz  SprSz	SprBght Shdw LightShd  PoleShd 	FarClp 	 FogSt 	LightOnGround	LowCloudsRGB TopCloudRGB BottomCloudRGB		BlurRGB					WaterRGBA";
-
+#endif
 		file << buffer << std::endl;
 
 		for (size_t j = 0; j < 24; ++j)
@@ -157,8 +160,25 @@ void Visual::GenerateTimecycFile()
 				buffer += "PM\n";
 			}
 
-			size_t val = 7 * i + j;
+			size_t val = TOTAL_WEATHERS * i + j;
 
+#ifdef GTA3
+			buffer += std::format("{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {} {}",
+				GetTCVal(m_nAmbientRed, val), GetTCVal(m_nAmbientGreen, val), GetTCVal(m_nAmbientBlue, val),
+				GetTCVal(m_nDirRed, val), GetTCVal(m_nDirGreen, val), GetTCVal(m_nDirBlue, val),
+				GetTCVal(m_nSkyTopRed, val), GetTCVal(m_nSkyTopGreen, val), GetTCVal(m_nSkyTopBlue, val),
+				GetTCVal(m_nSkyBottomRed, val), GetTCVal(m_nSkyBottomGreen, val), GetTCVal(m_nSkyBottomBlue, val),
+				GetTCVal(m_nSunCoreRed, val), GetTCVal(m_nSunCoreGreen, val), GetTCVal(m_nSunCoreBlue, val),
+				GetTCVal(m_nSunCoronaRed, val), GetTCVal(m_nSunCoronaGreen, val), GetTCVal(m_nSunCoronaBlue, val),
+				GetTCVal(m_fSunSize, val), GetTCVal(m_fSpriteSize, val), GetTCVal(m_fSpriteBrightness, val),
+				GetTCVal(m_nShadowStrength, val), GetTCVal(m_nLightShadowStrength, val), GetTCVal(m_nTreeShadowStrength, val),
+				GetTCVal(m_fFarClip, val), GetTCVal(m_fFogStart, val), GetTCVal(m_fLightsOnGroundBrightness, val),
+				GetTCVal(m_nLowCloudsRed, val), GetTCVal(m_nLowCloudsGreen, val), GetTCVal(m_nLowCloudsBlue, val),
+				GetTCVal(m_nTopCloudsRed, val), GetTCVal(m_nTopCloudsGreen, val), GetTCVal(m_nTopCloudsBlue, val),
+				GetTCVal(m_nBottomCloudsRed, val), GetTCVal(m_nBottomCloudsGreen, val), GetTCVal(m_nBottomCloudsBlue, val),
+				GetTCVal(m_fPostFxRed, val), GetTCVal(m_fPostFxGreen, val), GetTCVal(m_fPostFxBlue, val), GetTCVal(m_fPostFxAlpha, val)
+			);
+#elif GTAVC
 			buffer += std::format("{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {}\t{} {} {} {}",
 				GetTCVal(m_nAmbientRed, val), GetTCVal(m_nAmbientGreen, val), GetTCVal(m_nAmbientBlue, val),
 				GetTCVal(m_nAmbientRed_Obj, val), GetTCVal(m_nAmbientGreen_Obj, val), GetTCVal(m_nAmbientBlue_Obj, val),
@@ -178,6 +198,7 @@ void Visual::GenerateTimecycFile()
 				GetTCVal(m_nBlurRed, val), GetTCVal(m_nBlurGreen, val), GetTCVal(m_nBlurBlue, val),
 				GetTCVal(m_fWaterRed, val), GetTCVal(m_fWaterGreen, val), GetTCVal(m_fWaterBlue, val), GetTCVal(m_fWaterAlpha, val)
 			);
+#endif
 			file << buffer << std::endl;
 		}
 	}
@@ -217,19 +238,21 @@ int Visual::CalcArrayIndex()
     return TOTAL_WEATHERS * hour + CWeather::OldWeatherType;
 }
 
-bool Visual::TimeCycColorEdit3(const char* label, uchar* r, uchar* g, uchar* b, ImGuiColorEditFlags flags)
+
+template<typename T>
+bool Visual::TimeCycColorEdit3(const char* label, T* r, T* g, T* b, ImGuiColorEditFlags flags)
 {
 	bool rtn = false;
 	int val = CalcArrayIndex();
 
 #ifdef GTASA
-	auto red = static_cast<uchar*>(patch::GetPointer(int(r)));
-	auto green = static_cast<uchar*>(patch::GetPointer(int(g)));
-	auto blue = static_cast<uchar*>(patch::GetPointer(int(b)));
+	auto red = static_cast<T*>(patch::GetPointer(int(r)));
+	auto green = static_cast<T*>(patch::GetPointer(int(g)));
+	auto blue = static_cast<T*>(patch::GetPointer(int(b)));
 #else // GTA3 & GTAVC
-	auto red = static_cast<uchar*>(r);
-	auto green = static_cast<uchar*>(g);
-	auto blue = static_cast<uchar*>(b);
+	auto red = static_cast<T*>(r);
+	auto green = static_cast<T*>(g);
+	auto blue = static_cast<T*>(b);
 #endif
 
 	float col[3]{ red[val] / 255.0f, green[val] / 255.0f, blue[val] / 255.0f };
@@ -245,21 +268,38 @@ bool Visual::TimeCycColorEdit3(const char* label, uchar* r, uchar* g, uchar* b, 
 	return rtn;
 }
 
-bool Visual::TimeCycColorEdit4(const char* label, uchar* r, uchar* g, uchar* b, uchar* a, ImGuiColorEditFlags flags)
+template <typename T>
+void Visual::TimecycSlider(const char* label, T* ptr, int min, int max)
+{
+	int val = CalcArrayIndex();
+#ifdef GTASA
+	// Compatable with 24h TimeCyc
+	T* arr = static_cast<T*>(patch::GetPointer(int(ptr)));
+#else // GTA3 & GTAVC
+	T* arr = static_cast<T*>(ptr);
+#endif
+	int a = arr[val];
+
+	if (ImGui::SliderInt(label, &a, min, max))
+		arr[val] = static_cast<T>(a);
+}
+
+template <typename T>
+bool Visual::TimeCycColorEdit4(const char* label, T* r, T* g, T* b, T* a, ImGuiColorEditFlags flags)
 {
 	bool rtn = false;
 	int val = CalcArrayIndex();
 
 #ifdef GTASA
-	auto red = static_cast<uchar*>(patch::GetPointer(int(r)));
-	auto green = static_cast<uchar*>(patch::GetPointer(int(g)));
-	auto blue = static_cast<uchar*>(patch::GetPointer(int(b)));
-	auto alpha = static_cast<uchar*>(patch::GetPointer(int(a)));
+	auto red = static_cast<T*>(patch::GetPointer(int(r)));
+	auto green = static_cast<T*>(patch::GetPointer(int(g)));
+	auto blue = static_cast<T*>(patch::GetPointer(int(b)));
+	auto alpha = static_cast<T*>(patch::GetPointer(int(a)));
 #else // GTA3 & GTAVC
-	auto red = static_cast<uchar*>(r);
-	auto green = static_cast<uchar*>(g);
-	auto blue = static_cast<uchar*>(b);
-	auto alpha = static_cast<uchar*>(a);
+	auto red = static_cast<T*>(r);
+	auto green = static_cast<T*>(g);
+	auto blue = static_cast<T*>(b);
+	auto alpha = static_cast<T*>(a);
 #endif
 
 	float col[4]{ red[val] / 255.0f, green[val] / 255.0f, blue[val] / 255.0f, alpha[val] / 255.0f };
@@ -378,11 +418,10 @@ void Visual::Draw()
 			Ui::CheckboxAddress("Green scanlines", 0xA10B69);
 			Ui::CheckboxAddress("White scanlines", 0xA10B68);
 #else // GTA3
-            Ui::CheckboxWithHint("Lock weather", &m_bLockWeather);
-            static bool showHud, showRadar;
-            if (Ui::CheckboxWithHint("Show hud", &showHud))
+			static bool hideHud, hideRadar;
+            if (Ui::CheckboxWithHint("Hide hud", &hideHud))
             {
-                if (showHud)
+                if (hideHud)
                 {
                     patch::Nop(0x48E420, 5); // CHud::Draw
                 }
@@ -391,9 +430,9 @@ void Visual::Draw()
                     patch::SetRaw(0x48E420, (char*)"\xE8\x7B\x6E\x07\x00", 5);
                 }
             }
-            if (Ui::CheckboxWithHint("Show radar", &showRadar))
+            if (Ui::CheckboxWithHint("Hide radar", &hideRadar))
             {
-                if (showHud)
+                if (hideHud)
                 {
                     patch::Nop(0x50838D, 5); // CRadar::Draw
                 }
@@ -402,6 +441,7 @@ void Visual::Draw()
                     patch::SetRaw(0x50838D, (char*)"\xE8\x6E\xBE\xF9\xFF", 5);
                 }
             }
+            Ui::CheckboxWithHint("Lock weather", &m_bLockWeather);
 #endif
 			ImGui::Columns(1);
 			ImGui::EndTabItem();
@@ -566,7 +606,10 @@ void Visual::Draw()
 			int hour = CClock::ms_nGameClockHours;
 			int minute = CClock::ms_nGameClockMinutes;
 
-			ImGui::BeginDisabled(Game::m_bSyncTime);
+			if (Game::m_bSyncTime)
+			{
+				ImGui::BeginDisabled(Game::m_bSyncTime);
+			}
 
 			if (ImGui::InputInt("Hour", &hour) & !Game::m_bSyncTime)
 			{
@@ -631,8 +674,10 @@ void Visual::Draw()
 #endif
 
 #ifdef GTASA
-                    TimeCycColorEdit4("Postfx 1", m_fPostFx1Red, m_fPostFx1Green, m_fPostFx1Blue, m_fPostFx1Alpha);
-                    TimeCycColorEdit4("Postfx 2", m_fPostFx2Red, m_fPostFx2Green, m_fPostFx2Blue, m_fPostFx1Alpha);
+                    TimeCycColorEdit4("PostFx 1", m_fPostFx1Red, m_fPostFx1Green, m_fPostFx1Blue, m_fPostFx1Alpha);
+                    TimeCycColorEdit4("PostFx 2", m_fPostFx2Red, m_fPostFx2Green, m_fPostFx2Blue, m_fPostFx1Alpha);
+#elif GTA3
+					TimeCycColorEdit4("PostFx", m_fPostFxRed, m_fPostFxGreen, m_fPostFxBlue, m_fPostFxAlpha);
 #endif
 
                     TimeCycColorEdit3("Sky bottom", m_nSkyBottomRed, m_nSkyBottomGreen, m_nSkyBottomBlue);
@@ -640,8 +685,9 @@ void Visual::Draw()
                     TimeCycColorEdit3("Sun corona", m_nSunCoronaRed, m_nSunCoronaGreen, m_nSunCoronaBlue);
                     TimeCycColorEdit3("Sky top", m_nSkyTopRed, m_nSkyTopGreen, m_nSkyTopBlue);
 
+#ifndef GTA3
                     TimeCycColorEdit4("Water", m_fWaterRed, m_fWaterGreen, m_fWaterBlue, m_fWaterAlpha);
-
+#endif
                     ImGui::EndChild();
                     ImGui::EndTabItem();
 				}
@@ -654,8 +700,8 @@ void Visual::Draw()
                     TimecycSlider("Cloud alpha", m_fCloudAlpha, 0, 255);
                     TimecycSlider("Directional mult", m_nDirectionalMult, 0, 255);
 #endif
-                    TimecycSlider("Far clip", m_fFarClip, 0, 2000);
-                    TimecycSlider("Fog start", m_fFogStart, 0, 1500);
+                    TimecycSlider("Far clip", m_fFarClip, 0, 5000);
+                    TimecycSlider("Fog start", m_fFogStart, 0, 5000);
 #ifdef GTASA
                     TimecycSlider("High light min intensity", m_nHighLightMinIntensity, 0, 255);
 #endif

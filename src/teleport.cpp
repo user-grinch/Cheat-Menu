@@ -63,11 +63,11 @@ Teleport::Teleport()
 
 			if (pVeh && BY_GAME(player->m_nPedFlags.bInVehicle, player->m_pVehicle, player->m_pVehicle))
 			{
-				BY_GAME(pVeh->Teleport(m_Teleport::m_fPos, false, false), pVeh->Teleport(m_Teleport::m_fPos));
+				BY_GAME(pVeh->Teleport(m_Teleport::m_fPos, false, false), pVeh->Teleport(m_Teleport::m_fPos), player->Teleport(m_Teleport::m_fPos));
 			}
 			else
 			{
-				BY_GAME(player->Teleport(m_Teleport::m_fPos, false, false), player->Teleport(m_Teleport::m_fPos));
+				BY_GAME(player->Teleport(m_Teleport::m_fPos, false, false), player->Teleport(m_Teleport::m_fPos), player->Teleport(m_Teleport::m_fPos));
 			}
 
 			m_Teleport::m_bEnabled = false;

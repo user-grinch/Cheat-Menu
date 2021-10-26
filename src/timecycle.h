@@ -132,54 +132,54 @@ uchar *m_nBlurBlue = (uchar *)0x945728;
 
 #else // GTA3
 
-uchar *m_nAmbientRed = (uchar *)0x86AF78;
-uchar *m_nAmbientGreen = (uchar *)0x665308;
-uchar *m_nAmbientBlue = (uchar *)0x72CF88;
+int *m_nAmbientRed = (int *)0x86AF78;
+int *m_nAmbientGreen = (int *)0x665308;
+int *m_nAmbientBlue = (int *)0x72CF88;
 
-uchar *m_nDirRed = (uchar *)0x6FAB78;
-uchar *m_nDirGreen = (uchar *)0x6F4528;
-uchar *m_nDirBlue = (uchar *)0x83CE58;
+int *m_nDirRed = (int *)0x6FAB78;
+int *m_nDirGreen = (int *)0x6F4528;
+int *m_nDirBlue = (int *)0x83CE58;
 
-uchar *m_nSkyTopRed = (uchar *)0x87FB90;
-uchar *m_nSkyTopGreen = (uchar *)0x8460A8;
-uchar *m_nSkyTopBlue = (uchar *)0x87B158;
+int *m_nSkyTopRed = (int *)0x87FB90;
+int *m_nSkyTopGreen = (int *)0x8460A8;
+int *m_nSkyTopBlue = (int *)0x87B158;
 
-uchar *m_nSkyBottomRed = (uchar *)0x6FA960;
-uchar *m_nSkyBottomGreen = (uchar *)0x70D6A8;
-uchar *m_nSkyBottomBlue = (uchar *)0x83D288;
+int *m_nSkyBottomRed = (int *)0x6FA960;
+int *m_nSkyBottomGreen = (int *)0x70D6A8;
+int *m_nSkyBottomBlue = (int *)0x83D288;
 
-uchar *m_nSunCoreRed = (uchar *)0x878360;
-uchar *m_nSunCoreGreen = (uchar *)0x6EE088;
-uchar *m_nSunCoreBlue = (uchar *)0x773A68;
+int *m_nSunCoreRed = (int *)0x878360;
+int *m_nSunCoreGreen = (int *)0x6EE088;
+int *m_nSunCoreBlue = (int *)0x773A68;
 
-uchar *m_nSunCoronaRed = (uchar *)0x664B60;
-uchar *m_nSunCoronaGreen = (uchar *)0x6F01E0;
-uchar *m_nSunCoronaBlue = (uchar *)0x6E6340;
+int *m_nSunCoronaRed = (int *)0x664B60;
+int *m_nSunCoronaGreen = (int *)0x6F01E0;
+int *m_nSunCoronaBlue = (int *)0x6E6340;
 
-uchar *m_nShadowStrength = (uchar *)0x83CFD8;
-uchar *m_nLightShadowStrength = (uchar *)0x72B0F8;
-uchar *m_nTreeShadowStrength = (uchar *)0x733450;
-uchar *m_fSunSize = (uchar *)0x733510;
-uchar *m_fSpriteSize = (uchar *)0x87F820;
-uchar *m_fSpriteBrightness = (uchar *)0x6E96F0;
-short *m_fFarClip = (short *)0x8804E0;
-short *m_fFogStart = (short *)0x8806C8;
-uchar *m_fLightsOnGroundBrightness = (uchar *)0x83D108;
+short *m_nShadowStrength = (short *)0x83CFD8;
+short *m_nLightShadowStrength = (short *)0x72B0F8;
+short *m_nTreeShadowStrength = (short *)0x733450;
+float *m_fSunSize = (float *)0x733510;
+float *m_fSpriteSize = (float *)0x87F820;
+float *m_fSpriteBrightness = (float *)0x6E96F0;
+float *m_fFarClip = (float *)0x8804E0;
+float *m_fFogStart = (float *)0x8806C8;
+float *m_fLightsOnGroundBrightness = (float *)0x83D108;
 
-uchar *m_nLowCloudsRed = (uchar *)0x726770;
-uchar *m_nLowCloudsGreen = (uchar *)0x87BF08;
-uchar *m_nLowCloudsBlue = (uchar *)0x87FA10;
+int *m_nLowCloudsRed = (int *)0x726770;
+int *m_nLowCloudsGreen = (int *)0x87BF08;
+int *m_nLowCloudsBlue = (int *)0x87FA10;
 
-uchar *m_nTopCloudsRed = (uchar *)0x70F2B0;
-uchar *m_nTopCloudsGreen = (uchar *)0x72D288;
-uchar *m_nTopCloudsBlue = (uchar *)0x86B108;
+int *m_nTopCloudsRed = (int *)0x70F2B0;
+int *m_nTopCloudsGreen = (int *)0x72D288;
+int *m_nTopCloudsBlue = (int *)0x86B108;
 
-uchar *m_nBottomCloudsRed = (uchar *)0x6E8DA8;
-uchar *m_nBottomCloudsGreen = (uchar *)0x715AA8;
-uchar *m_nBottomCloudsBlue = (uchar *)0x6EE2D0;
+int *m_nBottomCloudsRed = (int *)0x6E8DA8;
+int *m_nBottomCloudsGreen = (int *)0x715AA8;
+int *m_nBottomCloudsBlue = (int *)0x6EE2D0;
 
-uchar *m_fWaterRed = (uchar *)0x87C7E0;
-uchar *m_fWaterGreen = (uchar *)0x774C10;
-uchar *m_fWaterBlue = (uchar *)0x8784E0;
-uchar *m_fWaterAlpha = (uchar *)0x733690;
+float *m_fPostFxRed = (float *)0x87C7E0;
+float *m_fPostFxGreen = (float *)0x774C10;
+float *m_fPostFxBlue = (float *)0x8784E0;
+float *m_fPostFxAlpha = (float *)0x733690;
 #endif
