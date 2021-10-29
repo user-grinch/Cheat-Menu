@@ -1,7 +1,7 @@
 @echo off
 cd tools
-premake5.exe vs2019
+premake5.exe vs2022
 cd ../build
-call "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\Common7\Tools\VsDevCmd.bat"
+call "C:\Program Files\Microsoft Visual Studio\2022\Preview\Common7\Tools\VsDevCmd.bat"
 MsBuild CheatMenu.sln /property:Configuration=Release /t:CheatMenuVC
 cd ..
