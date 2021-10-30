@@ -33,7 +33,9 @@ std::string Util::GetLocationName(CVector* pos)
 	}
 
 	if (interior == 0)
+	{
 		return CTheZones::FindSmallestZoneForPosition(*pos, true)->GetTranslatedName() + std::string(", ") + town;
+	}
 	return std::string("Interior ") + std::to_string(interior) + ", " + town;
 
 #elif GTAVC

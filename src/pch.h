@@ -61,6 +61,7 @@
 #include <eVehicleClass.h>
 #include <CGangWars.h>
 #include <CZoneInfo.h>
+#include <CTheZones.h>
 #endif
 
 #include "../depend/fla/IDaccess.h"

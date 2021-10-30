@@ -362,7 +362,7 @@ void Game::ClearFreecamStuff()
 {
 	m_Freecam::m_bInitDone = false;
 	Command<Commands::SET_EVERYONE_IGNORE_PLAYER>(0, false);
-	patch::Set<BYTE>(BY_GAME(0xBA6769, 0x86963A), m_Freecam::m_bHudState); // hud
+	patch::Set<BYTE>(BY_GAME(0xBA6769, 0x86963A, NULL), m_Freecam::m_bHudState); // hud
 	patch::Set<BYTE>(0xBA676C, m_Freecam::m_bRadarState); // radar
 	CPad::GetPad(0)->DisablePlayerControls = false;
 

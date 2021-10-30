@@ -68,7 +68,7 @@ Weapon::Weapon()
 			}
 
 #ifdef GTASA			
-			if (m_bRapidFire && weaponType != BY_GAME(WEAPON_MINIGUN, WEAPONTYPE_MINIGUN)) // mingun doesn't work with rapidfire
+			if (m_bRapidFire && weaponType != BY_GAME(WEAPON_MINIGUN, WEAPONTYPE_MINIGUN, WEAPONTYPE_MINIGUN)) // mingun doesn't work with rapidfire
 			{
 				pWeaponInfo->m_nFlags.bContinuosFire = true;
 

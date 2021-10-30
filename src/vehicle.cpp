@@ -84,10 +84,14 @@ Vehicle::Vehicle()
 			}
 
 			if (vehInstantStart.Pressed())
+			{
 				Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, 40.0f);
+			}
 
 			if (vehInstantStop.Pressed())
+			{
 				Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, 0);
+			}
 
 			if (m_bNoDamage)
 			{
@@ -589,16 +593,14 @@ void Vehicle::Draw()
 			Ui::CheckboxAddress("All cars have nitro", 0x969165);
 #endif
 
-#ifdef GTA3
-			Ui::CheckboxAddress("Cars fly", 0x95CD75);
-#else
+#ifndef GTA3
 			Ui::CheckboxAddress("Aggressive drivers", BY_GAME(0x96914F,0xA10B47, NULL));
 			Ui::CheckboxAddress("All taxis have nitro", BY_GAME(0x96918B,0xA10B3A, NULL));
 			Ui::CheckboxWithHint("Bikes fly", &m_bBikeFly);
 			Ui::CheckboxAddress("Boats fly", BY_GAME(0x969153, 0xA10B11, NULL));
-			Ui::CheckboxAddress("Cars fly", BY_GAME(0x969160, 0xA10B28, NULL));
-			Ui::CheckboxWithHint("Cars heavy", &m_bVehHeavy);
 #endif
+			Ui::CheckboxAddress("Cars fly", BY_GAME(0x969160, 0xA10B28, 0x95CD75));
+			Ui::CheckboxWithHint("Cars heavy", &m_bVehHeavy);
 			if (Ui::CheckboxWithHint("Damage proof", &m_bNoDamage,
 				"Every vehicle entered will be damage proof\nBullet, Collision, Explosion, Fire, Meele etc"))
 			{
