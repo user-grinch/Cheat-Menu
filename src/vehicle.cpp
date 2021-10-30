@@ -517,7 +517,7 @@ void Vehicle::Draw()
 	int hplayer = CPools::GetPedRef(pPlayer);
 	CVehicle *pVeh = pPlayer->m_pVehicle;
 
-	if (ImGui::Button("Blow up cars", ImVec2(Ui::GetSize(BY_GAME(3,2,2)))))
+	if (ImGui::Button("Blow up cars", ImVec2(Ui::GetSize(3))))
 	{
 		for (CVehicle *pVeh : CPools::ms_pVehiclePool)
 		{
@@ -527,7 +527,7 @@ void Vehicle::Draw()
 
 	ImGui::SameLine();
 
-	if (ImGui::Button("Fix vehicle", ImVec2(Ui::GetSize(BY_GAME(3,2,2)))))
+	if (ImGui::Button("Fix vehicle", ImVec2(Ui::GetSize(3))))
 	{
 		if (pPlayer && pVeh)
 		{
@@ -535,11 +535,11 @@ void Vehicle::Draw()
 		}
 	}
 
-#ifdef GTASA
 	ImGui::SameLine();
 
 	if (ImGui::Button("Flip vehicle", ImVec2(Ui::GetSize(3))))
-	{
+	{	
+#ifdef GTASA
 		if (pPlayer->m_nPedFlags.bInVehicle)
 		{
 			int hveh = CPools::GetVehicleRef(pPlayer->m_pVehicle);
@@ -550,8 +550,25 @@ void Vehicle::Draw()
 			Command<Commands::SET_CAR_ROLL>(hveh, roll);
 			Command<Commands::SET_CAR_ROLL>(hveh, roll); // z rot fix
 		}
-	}
+#elif GTAVC
+		if (pPlayer->m_bInVehicle)
+		{
+			float x,y,z;
+			pPlayer->m_pVehicle->m_placement.GetOrientation(x, y, z);
+			y += 135.0f;
+			pPlayer->m_pVehicle->m_placement.SetOrientation(x, y, z);
+		}
+			
+#else // GTA3 
+		if (pPlayer->m_bInVehicle)
+		{
+			float x,y,z;
+			pPlayer->m_pVehicle->GetOrientation(x, y, z);
+			y += 135.0f;
+			pPlayer->m_pVehicle->SetOrientation(x, y, z);
+		}
 #endif
+	}
 
 	ImGui::Spacing();
 
