@@ -214,8 +214,7 @@ void Menu::DrawShortcutsWindow()
 		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetStyle().FramePadding.x, resY / 130));
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(3, 3));
 
-		ImGui::SetNextItemWidth(resX);
-		ImGui::SetKeyboardFocusHere(-1);
+		ImGui::SetNextItemWidth(ImGui::GetContentRegionMax().x);
 
 		if (ImGui::InputTextWithHint("##TEXTFIELD", "Enter command", m_Commands::m_nInputBuffer, INPUT_BUFFER_SIZE,
 		                             ImGuiInputTextFlags_EnterReturnsTrue))
@@ -224,7 +223,10 @@ void Menu::DrawShortcutsWindow()
 			m_Commands::m_bShowMenu = false;
 			strcpy(m_Commands::m_nInputBuffer, "");
 		}
-
+		if (!ImGui::IsAnyItemActive())
+		{
+    		ImGui::SetKeyboardFocusHere(-1);
+		}
 		ImGui::PopStyleVar(2);
 		ImGui::End();
 	}
