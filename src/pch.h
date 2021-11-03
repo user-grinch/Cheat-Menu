@@ -96,9 +96,10 @@ static void SetHelpMessage(const char *message, bool b1, bool b2, bool b3)
 #elif GTAVC
 	CHud::SetHelpMessage(message, b1, b2);
 #else // GTA3
-	const size_t cSize = strlen(message)+1;
-    wchar_t* wc = new wchar_t[cSize];
-    mbstowcs (wc, message, cSize);
-	CHud::SetHelpMessage((wchar_t*)wc, b1);
+	const size_t size = strlen(message)+1;
+    wchar_t* wc = new wchar_t[size];
+    mbstowcs(wc, message, size);
+	CHud::SetHelpMessage(wc, b1);
+	delete wc;
 #endif
 }

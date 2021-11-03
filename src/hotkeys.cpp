@@ -104,13 +104,15 @@ bool Hotkey::DrawUI(const char* label)
 bool Hotkey::Pressed()
 {
 	if (KeyPressed(m_key1) && KeyPressed(m_key2))
+	{
 		m_bPressed = true;
+	}
 	else
 	{
 		if (m_bPressed)
 		{
 			m_bPressed = false;
-			return m_CurrentHotkey == "";
+			return (m_CurrentHotkey == "");
 		}
 	}
 	return false;
