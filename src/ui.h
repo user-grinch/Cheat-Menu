@@ -57,7 +57,7 @@ public:
 							std::function<std::string(std::string&)> get_name_func,
 							std::function<bool(std::string&)> verify_func = nullptr,
 							const char** custom_names = nullptr, size_t length = 0);
-
+	static bool DrawTitleBar();
 	template <typename T>
 	static void EditAddress(const char* label, int address, int min = 0, int def = 0, int max = 100);
 	static void EditBits(const char* label, int address, const std::vector<std::string>& names);
@@ -81,7 +81,7 @@ public:
 
 	static void RadioButtonAddress(const char* label, std::vector<NamedMemory>& named_mem);
 	static void RadioButtonAddressEx(const char* label, int addr, std::vector<NamedValue>& named_val);
-
+	static bool RoundedImageButton(ImTextureID user_texture_id, ImVec2& size, const char* hover_text, int frame_padding, const ImVec4& bg_col, const ImVec4& tint_col);
 	static void ColorPickerAddress(const char* label, int base_addr, ImVec4&& default_color);
 	static void ShowTooltip(const char* text);
 };

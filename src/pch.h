@@ -5,6 +5,7 @@
 #define SPAWN_PED_LIMIT 20
 #define DISCORD_INVITE "https://discord.gg/ZzW7kmf"
 #define GITHUB_LINK "https://github.com/user-grinch/Cheat-Menu"
+#define IMGUI_DEFINE_MATH_OPERATORS
 
 #ifdef GTASA
 #define BY_GAME(sa, vc, iii) sa
@@ -71,6 +72,7 @@
 #include "hotkeys.h"
 #include "vKeys.h"
 #include "resourcestore.h"
+#include "fontmgr.h"
 
 using CallbackTable = std::vector<std::pair<std::string, void(*)()>>;
 using namespace plugin;

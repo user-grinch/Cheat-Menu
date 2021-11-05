@@ -1,6 +1,123 @@
 #include "pch.h"
 #include "util.h"
 #include "ui.h"
+#include "../depend/imgui/imgui_internal.h"
+#include "menuinfo.h"
+
+// Really messy code, cleanup someday
+bool Ui::DrawTitleBar()
+{
+	ImGuiContext& g = *GImGui;
+	ImGuiWindow* window = g.CurrentWindow;
+	ImGuiID id = window->GetID("#CLOSE");
+
+	ImGui::PushFont(FontMgr::GetFont("title"));
+	CenterdText(MENU_TITLE);
+
+	if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_RootWindow | ImGuiHoveredFlags_ChildWindows 
+		| ImGuiHoveredFlags_AllowWhenBlockedByPopup | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
+	{
+		ImGui::PopFont();
+		return false;
+	}
+
+	ImVec2 rectMin = ImGui::GetItemRectMin(); // get pos of title text
+	ImGuiStyle& Style = ImGui::GetStyle();
+	float framePadding = Style.FramePadding.x;
+	float fontSize = ImGui::GetFontSize();
+	ImRect title_bar_rect = window->TitleBarRect();
+	ImVec2 pos = ImVec2(title_bar_rect.Max.x - framePadding*2 - fontSize, title_bar_rect.Min.y);
+
+	// drawing the close button
+    const ImRect bb(pos, pos + ImVec2(g.FontSize, g.FontSize) + g.Style.FramePadding * 2.0f);
+    ImRect bb_interact = bb;
+    const float area_to_visible_ratio = window->OuterRectClipped.GetArea() / bb.GetArea();
+	if (area_to_visible_ratio < 1.5f)
+	{
+		bb_interact.Expand(ImFloor(bb_interact.GetSize() * -0.25f));
+	}
+
+    bool hovered, held;
+    bool pressed = ImGui::ButtonBehavior(bb_interact, id, &hovered, &held);
+
+	float cross_extent = (fontSize * 0.3f) - 1.0f;
+	ImVec2 closePos = ImVec2(bb.GetCenter().x - cross_extent, rectMin.y);
+    ImU32 closeCol = ImGui::GetColorU32(held || hovered ? ImVec4(0.80f, 0.0f, 0.0f, 1.0f) : ImVec4(0.80f, 0.80f, 0.80f, 1.00f));
+	window->DrawList->AddText(closePos, closeCol, " X ");
+	ImGui::PopFont();
+
+	return pressed;
+}
+
+bool Ui::RoundedImageButton(ImTextureID user_texture_id, ImVec2& size, const char* hover_text, int frame_padding, const ImVec4& bg_col, const ImVec4& tint_col)
+{
+    ImGuiContext& g = *GImGui;
+    ImGuiWindow* window = g.CurrentWindow;
+    if (window->SkipItems)
+        return false;
+
+    // Default to using texture ID as ID. User can still push string/integer prefixes.
+    ImGui::PushID((void*)(intptr_t)user_texture_id);
+    const ImGuiID id = window->GetID("#image");
+	ImGui::PopID();
+
+    ImVec2 padding = (frame_padding >= 0) ? ImVec2((float)frame_padding, (float)frame_padding) : g.Style.FramePadding;
+
+	if (window->SkipItems)
+		return false;
+
+	const ImRect bb(window->DC.CursorPos, window->DC.CursorPos + size + padding * 2);
+	ImGui::ItemSize(bb);
+	if (!ImGui::ItemAdd(bb, id))
+		return false;
+
+	bool hovered, held;
+	bool pressed = ImGui::ButtonBehavior(bb, id, &hovered, &held);
+
+	// Render
+	const ImU32 col = ImGui::GetColorU32((held && hovered) ? ImGuiCol_ButtonActive : hovered ? ImGuiCol_ButtonHovered : ImGuiCol_Button);
+	ImGui::RenderNavHighlight(bb, id);
+	ImGui::RenderFrame(bb.Min, bb.Max, col, true, ImClamp((float)ImMin(padding.x, padding.y), 0.0f, g.Style.FrameRounding));
+	if (bg_col.w > 0.0f)
+		window->DrawList->AddRectFilled(bb.Min + padding, bb.Max - padding, ImGui::GetColorU32(bg_col));
+
+	window->DrawList->AddImageRounded(user_texture_id, bb.Min + padding, bb.Max - padding, ImVec2(0, 0), ImVec2(1, 1), ImGui::GetColorU32(tint_col), 5.0f);
+
+	if (ImGui::IsItemHovered())
+	{
+		ImDrawList* drawlist = ImGui::GetWindowDrawList();
+
+		// Drawing selected overlay
+		ImVec2 btnMin = ImGui::GetItemRectMin();
+		ImVec2 btnMax = ImGui::GetItemRectMax();
+		drawlist->AddRectFilled(btnMin, btnMax, ImGui::GetColorU32(ImGuiCol_ModalWindowDimBg), 8.0f);
+
+		// Calculating and drawing text over the image
+		ImVec2 textSize = ImGui::CalcTextSize(hover_text);
+		if (textSize.x < size.x)
+		{
+			float offsetX = (ImGui::GetItemRectSize().x - textSize.x) / 2;
+			drawlist->AddText(ImVec2(btnMin.x + offsetX, btnMin.y + 10), ImGui::GetColorU32(ImGuiCol_Text), hover_text);
+		}
+		else
+		{
+			std::string buff = "";
+			std::stringstream ss(hover_text);
+			short count = 1;
+
+			while (ss >> buff)
+			{
+				textSize = ImGui::CalcTextSize(buff.c_str());
+				float offsetX = (ImGui::GetItemRectSize().x - textSize.x) / 2;
+				drawlist->AddText(ImVec2(btnMin.x + offsetX, btnMin.y + 10 * count),
+					ImGui::GetColorU32(ImGuiCol_Text), buff.c_str());
+				++count;
+			}
+		}
+	}
+
+	return pressed;
+}
 
 bool Ui::ListBox(const char* label, std::vector<std::string>& all_items, int& selected)
 {
@@ -90,9 +207,12 @@ ImVec2 Ui::GetSize(short count, bool spacing)
 
 void Ui::CenterdText(const std::string& text)
 {
-	float font_size = ImGui::GetFontSize() * text.size() / 2;
+	ImVec2 size = ImGui::CalcTextSize(text.c_str());
 	ImGui::NewLine();
-	ImGui::SameLine(ImGui::GetWindowSize().x / 2 - font_size + (font_size / 1.8));
+	ImGui::SameLine(
+		((ImGui::GetWindowContentRegionWidth() - size.x) / 2)
+	);
+
 	ImGui::Text(text.c_str());
 }
 
@@ -104,6 +224,7 @@ void Ui::DrawHeaders(CallbackTable& data)
 	auto colors = ImGui::GetStyle().Colors;
 	ImVec4 btn_col = colors[ImGuiCol_Button];
 	static void* func;
+	ImGui::PushFont(FontMgr::GetFont("header"));
 	for (auto it = data.begin(); it != data.end(); ++it)
 	{
 		const char* btn_text = it->first.c_str();
@@ -128,6 +249,7 @@ void Ui::DrawHeaders(CallbackTable& data)
 			ImGui::SameLine();
 		i++;
 	}
+	ImGui::PopFont();
 	ImGui::PopStyleVar();
 	ImGui::Dummy(ImVec2(0, 10));
 
@@ -204,7 +326,7 @@ bool Ui::CheckboxWithHint(const char* label, bool* v, const char* hint, bool is_
 	// draw the button
 	ImVec2 min = ImGui::GetItemRectMin();
 	ImVec2 max = ImGui::GetItemRectMax();
-	drawlist->AddRectFilled(min, max, color);
+	drawlist->AddRectFilled(min, max, color, ImGui::GetStyle().FrameRounding);
 
 	int pad = static_cast<int>(square_sz / 6.0);
 	pad = (pad < 1) ? 1 : pad;
@@ -239,7 +361,7 @@ bool Ui::CheckboxWithHint(const char* label, bool* v, const char* hint, bool is_
 		*v = !*v;
 	}
 	min = ImGui::GetItemRectMin();
-	drawlist->AddText(ImVec2(min.x, min.y + style.ItemInnerSpacing.y), ImGui::GetColorU32(ImGuiCol_Text), label);
+	drawlist->AddText(ImVec2(min.x, min.y + style.ItemInnerSpacing.y / 2), ImGui::GetColorU32(ImGuiCol_Text), label);
 
 	// draw hint
 	if (hint != nullptr)
@@ -247,7 +369,7 @@ bool Ui::CheckboxWithHint(const char* label, bool* v, const char* hint, bool is_
 		ImGui::SameLine(0, style.ItemInnerSpacing.x);
 		ImGui::InvisibleButton("?", ImGui::CalcTextSize("?", nullptr, true));
 		min = ImGui::GetItemRectMin();
-		drawlist->AddText(ImVec2(min.x, min.y + style.ItemInnerSpacing.y), ImGui::GetColorU32(ImGuiCol_TextDisabled),
+		drawlist->AddText(ImVec2(min.x, min.y + style.ItemInnerSpacing.y / 2), ImGui::GetColorU32(ImGuiCol_TextDisabled),
 						  "?");
 
 		if (ImGui::IsItemHovered() && !is_disabled)
@@ -522,6 +644,14 @@ void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLe
 	ImGui::Spacing();
 
 	ImGui::BeginChild("DrawImages");
+	if (gRenderer == Render_DirectX9)
+	{
+		ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(3, 3));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(3, 3));
+		ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(3, 3));
+		ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, 10.0f);
+	}
+
 	for (uint i = 0; i < store.m_ImagesList.size(); ++i)
 	{
 		std::string text = store.m_ImagesList[i]->m_FileName;
@@ -545,7 +675,7 @@ void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLe
 			}
 			else
 			{
-				if (ImGui::ImageButton(store.m_ImagesList[i]->m_pTexture, m_ImageSize, ImVec2(0, 0), ImVec2(1, 1), 1, ImVec4(1, 1, 1, 1), ImVec4(1, 1, 1, 1)))
+				if (Ui::RoundedImageButton(store.m_ImagesList[i]->m_pTexture, m_ImageSize, modelName.c_str(), 0, ImVec4(0, 0, 0, 0), ImVec4(1, 1, 1, 1)))
 				{
 					onLeftClick(text);
 				}
@@ -560,40 +690,6 @@ void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLe
 
 			if (gRenderer != Render_DirectX11)
 			{
-				if (ImGui::IsItemHovered())
-				{
-					ImDrawList* drawlist = ImGui::GetWindowDrawList();
-
-					// Drawing selected overlay
-					ImVec2 btnMin = ImGui::GetItemRectMin();
-					ImVec2 btnMax = ImGui::GetItemRectMax();
-					drawlist->AddRectFilled(btnMin, btnMax, ImGui::GetColorU32(ImGuiCol_ModalWindowDimBg));
-
-					// Calculating and drawing text over the image
-					ImVec2 textSize = ImGui::CalcTextSize(modelName.c_str());
-					if (textSize.x < m_ImageSize.x)
-					{
-						float offsetX = (ImGui::GetItemRectSize().x - textSize.x) / 2;
-						drawlist->AddText(ImVec2(btnMin.x + offsetX, btnMin.y + 10), ImGui::GetColorU32(ImGuiCol_Text),
-										modelName.c_str());
-					}
-					else
-					{
-						std::string buff = "";
-						std::stringstream ss(modelName);
-						short count = 1;
-
-						while (ss >> buff)
-						{
-							textSize = ImGui::CalcTextSize(buff.c_str());
-							float offsetX = (ImGui::GetItemRectSize().x - textSize.x) / 2;
-							drawlist->AddText(ImVec2(btnMin.x + offsetX, btnMin.y + 10 * count),
-											ImGui::GetColorU32(ImGuiCol_Text), buff.c_str());
-							++count;
-						}
-					}
-				}
-
 				if (imageCount % imagesInRow != 0)
 				{
 					ImGui::SameLine(0.0, ImGui::GetStyle().ItemInnerSpacing.x);
@@ -601,6 +697,11 @@ void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLe
 			}
 			imageCount++;
 		}
+	}
+
+	if (gRenderer == Render_DirectX9)
+	{
+		ImGui::PopStyleVar(4);
 	}
 
 	// Draw popup code

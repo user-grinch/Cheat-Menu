@@ -50,10 +50,7 @@ void Hook::RenderFrame(void* ptr)
 		ImVec2 size(screen::GetScreenWidth(), screen::GetScreenHeight());
 		if (fScreenSize.x != size.x && fScreenSize.y != size.y)
 		{
-			int fontSize = static_cast<int>(size.y / 54.85f); // manually tested
-
-			io.FontDefault = io.Fonts->AddFontFromFileTTF("C:/Windows/Fonts/trebucbd.ttf", fontSize);
-			io.Fonts->Build();
+			FontMgr::ReinitFonts();
 
 			if (gRenderer == Render_DirectX9)
 			{
@@ -68,11 +65,11 @@ void Hook::RenderFrame(void* ptr)
 			float scaleX = size.x / 1366.0f;
 			float scaleY = size.y / 768.0f;
 
-			style->FramePadding = ImVec2(5 * scaleX, 3 * scaleY);
+			style->FramePadding = ImVec2(5 * scaleX, 5 * scaleY);
 			style->ItemSpacing = ImVec2(8 * scaleX, 4 * scaleY);
 			style->ScrollbarSize = 12 * scaleX;
 			style->IndentSpacing = 20 * scaleX;
-			style->ItemInnerSpacing = ImVec2(4 * scaleX, 4 * scaleY);
+			style->ItemInnerSpacing = ImVec2(5 * scaleX, 5 * scaleY);
 
 			fScreenSize = size;
 		}
@@ -133,6 +130,11 @@ void Hook::RenderFrame(void* ptr)
 
 		ImGui_ImplWin32_EnableDpiAwareness();
 
+		// Loading fonts
+		io.FontDefault = FontMgr::LoadFont("text", 1.0f);
+		FontMgr::LoadFont("title", 2.0f);
+		FontMgr::LoadFont("header", 1.25f);
+		
 		io.IniFilename = nullptr;
 		io.LogFilename = nullptr;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
