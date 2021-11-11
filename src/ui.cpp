@@ -43,7 +43,7 @@ bool Ui::DrawTitleBar()
 	float cross_extent = (fontSize * 0.3f) - 1.0f;
 	ImVec2 closePos = ImVec2(bb.GetCenter().x - cross_extent, rectMin.y);
     ImU32 closeCol = ImGui::GetColorU32(held || hovered ? ImVec4(0.80f, 0.0f, 0.0f, 1.0f) : ImVec4(0.80f, 0.80f, 0.80f, 1.00f));
-	window->DrawList->AddText(closePos, closeCol, " X ");
+	window->DrawList->AddText(closePos, closeCol, "X");
 	ImGui::PopFont();
 
 	return pressed;
@@ -189,18 +189,26 @@ bool Ui::ListBoxCustomNames(const char* label, std::vector<std::string>& all_ite
 ImVec2 Ui::GetSize(short count, bool spacing)
 {
 	if (count == 1)
+	{
 		spacing = false;
+	}
 
 	float factor = ImGui::GetStyle().ItemSpacing.x / 2.0f;
 	float x;
 
 	if (count == 3)
+	{
 		factor = ImGui::GetStyle().ItemSpacing.x / 1.403f;
+	}
 
 	if (spacing)
+	{
 		x = ImGui::GetWindowContentRegionWidth() / count - factor;
+	}
 	else
+	{
 		x = ImGui::GetWindowContentRegionWidth() / count;
+	}
 
 	return ImVec2(x, ImGui::GetFrameHeight() * 1.3f);
 }

@@ -72,8 +72,9 @@ void CheatMenu::DrawWindow()
 
 CheatMenu::CheatMenu()
 {
+	ImGui::CreateContext();
 	ApplyStyle();
-	windowCallback = std::bind(&DrawWindow);
+	pCallbackFunc = std::bind(&DrawWindow);
 
 	// Load menu settings
 	Ui::m_HeaderId = gConfig.GetValue("window.id", std::string(""));
@@ -152,9 +153,9 @@ void CheatMenu::ApplyStyle()
 	style->Colors[ImGuiCol_TitleBgActive] = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
 	style->Colors[ImGuiCol_MenuBarBg] = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
 	style->Colors[ImGuiCol_ScrollbarBg] = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
-	style->Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
-	style->Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.16f, 0.16f, 0.16f, 1.00f);
-	style->Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
+	style->Colors[ImGuiCol_ScrollbarGrab] = ImVec4(0.8f, 0.8f, 0.8f, 0.3f);
+	style->Colors[ImGuiCol_ScrollbarGrabHovered] = ImVec4(0.5f, 0.5f, 0.5f, 0.3f);
+	style->Colors[ImGuiCol_ScrollbarGrabActive] = ImVec4(0.2f, 0.2f, 0.2f, 1.00f);
 	style->Colors[ImGuiCol_CheckMark] = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
 	style->Colors[ImGuiCol_SliderGrab] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);
 	style->Colors[ImGuiCol_SliderGrabActive] = ImVec4(0.20f, 0.20f, 0.20f, 1.00f);

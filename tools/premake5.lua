@@ -1,13 +1,13 @@
 
 ----------------------------
--- Project Generator
+-- Premake Project Generator
 ----------------------------
+
 -- Environment vars
+----------------------------
+-- Should get picked up automatically if you installed them properly
 PSDK_DIR = os.getenv("PLUGIN_SDK_DIR")
 DX9SDK_DIR = os.getenv("DIRECTX9_SDK_DIR")
-GTASA_DIR = "F:/GTASanAndreas"
-GTAVC_DIR = "E:/GTA Vice City"
-GTA3_DIR = "E:/GTA3"
 
 if (DX9SDK_DIR == nil) then
     error("DIRECTX9_SDK_DIR environment variable not set")
@@ -16,6 +16,13 @@ end
 if (PSDK_DIR == nil) then
     error("PLUGIN_SDK_DIR environment variable not set")
 end
+
+-- Build directories
+----------------------------
+GTASA_DIR = "F:/GTASanAndreas"
+GTAVC_DIR = "E:/GTA Vice City"
+GTA3_DIR = "E:/GTA3"
+
 ----------------------------
 
 workspace "CheatMenu"

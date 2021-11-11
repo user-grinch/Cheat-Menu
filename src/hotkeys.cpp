@@ -61,7 +61,7 @@ bool Hotkey::DrawUI(const char* label)
 	}
 
 	if (ImGui::Button((text + std::string("##") + std::string(label)).c_str(),
-		ImVec2(ImGui::GetWindowContentRegionWidth() / 3.5, ImGui::GetFrameHeight())))
+		ImVec2(ImGui::GetWindowContentRegionWidth() / 3.5, ImGui::GetFrameHeight()*1.35f)))
 	{
 		if (!active)
 		{

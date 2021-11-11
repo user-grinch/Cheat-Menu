@@ -35,7 +35,7 @@ void Hook::RenderFrame(void* ptr)
 {
 	if (!ImGui::GetCurrentContext())
 	{
-		return;
+		ImGui::CreateContext();
 	}
 
 	ImGuiIO& io = ImGui::GetIO();
@@ -45,7 +45,7 @@ void Hook::RenderFrame(void* ptr)
 	{
 		ShowMouse(m_bShowMouse);
 
-		// handle window scaling here
+		// Scale the menu if game resolution changed
 		static ImVec2 fScreenSize = ImVec2(-1, -1);
 		ImVec2 size(screen::GetScreenWidth(), screen::GetScreenHeight());
 		if (fScreenSize.x != size.x && fScreenSize.y != size.y)
@@ -86,9 +86,9 @@ void Hook::RenderFrame(void* ptr)
 
 		ImGui::NewFrame();
 
-		if (windowCallback != nullptr)
+		if (pCallbackFunc != nullptr)
 		{
-			windowCallback();
+			pCallbackFunc();
 		}
 
 		ImGui::EndFrame();
@@ -106,7 +106,6 @@ void Hook::RenderFrame(void* ptr)
 	else
 	{
 		bInit = true;
-		ImGuiStyle& style = ImGui::GetStyle();
 		ImGui_ImplWin32_Init(RsGlobal.ps->window);
 
 #ifdef GTASA
@@ -139,7 +138,6 @@ void Hook::RenderFrame(void* ptr)
 		io.LogFilename = nullptr;
 		io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
 
-		style.WindowTitleAlign = ImVec2(0.5, 0.5);
 		oWndProc = (WNDPROC)SetWindowLongPtr(RsGlobal.ps->window, GWL_WNDPROC, (LRESULT)WndProc);
 	}
 }
@@ -243,7 +241,6 @@ void Hook::ShowMouse(bool state)
 
 Hook::Hook()
 {
-	ImGui::CreateContext();
 
 	// Nvidia Overlay crash fix
 	if (init(kiero::RenderType::D3D9) == kiero::Status::Success)
