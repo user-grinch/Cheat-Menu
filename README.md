@@ -29,6 +29,9 @@ If you have those mentioned versions installed follow the steps below,
 
 Be sure to check [here](https://github.com/user-grinch/Cheat-Menu/issues/48) to know about incompatibilities with other mods.
 
+### Optional
+- Install [SilentPatch](https://gtaforums.com/topic/669045-silentpatch/) (If you're having mouse movement or click issues)
+
 ## Things to do on crash
 1. Delete the `CheatMenu/json/config.json` file and try again.
 2. If it's happening after installing a recent mod try removing it. A list of incompatibile mods are [here](https://github.com/user-grinch/Cheat-Menu/issues/48).
