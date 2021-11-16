@@ -6,22 +6,6 @@
 
 void MenuThread(void* param)
 {
-	/*
-		Had to put this in place since some people put the folder in root 
-		directory and the asi in modloader. Why??
-
-		TODO: Unlikely they'd even read the log so have to do something else
-	*/
-	if (!std::filesystem::is_directory(PLUGIN_PATH((char*)"CheatMenu")))
-	{
-		gLog << "CheatMenu folder not found. You need to put both \"CheatMenu.asi\" & \"CheatMenu\" folder in the same directory" << std::endl;
-		return;
-	}
-
-#ifdef GTASA
-	Hook::ApplyMouseFix();
-#endif
-
 	static bool bGameInit = false;
 
 	// Wait till game init
@@ -35,6 +19,29 @@ void MenuThread(void* param)
 		Sleep(1000);
 	}
 
+	/*
+		Had to put this in place since some people put the folder in root 
+		directory and the asi in modloader. Why??
+
+		TODO: Unlikely they'd even read the log so have to do something else
+	*/
+	if (!std::filesystem::is_directory(PLUGIN_PATH((char*)"CheatMenu")))
+	{
+		MessageBox(RsGlobal.ps->window, "CheatMenu folder not found. You need to put both \"CheatMenu.asi\" & \"CheatMenu\" folder in the same directory", "CheatMenu", MB_ICONERROR);
+		return;
+	}
+
+	if (!GetModuleHandle(BY_GAME("SilentPatchSA.asi" ,"SilentPatchVC.asi" ,"SilentPatchIII.asi")))
+	{
+		int msgID = MessageBox(RsGlobal.ps->window, "SilentPatch not found. Do you want to install Silent Patch? (Game restart required)", "CheatMenu", MB_OKCANCEL | MB_DEFBUTTON1);
+
+		if (msgID == IDOK)
+		{
+			ShellExecute(nullptr, "open", "https://gtaforums.com/topic/669045-silentpatch/", nullptr, nullptr, SW_SHOWNORMAL);
+		};
+		return;
+	}
+
 #ifdef GTASA
     /*
         TODO: Find a better way
@@ -46,6 +53,14 @@ void MenuThread(void* param)
 		return;
 	}
 	CFastman92limitAdjuster::Init();
+#elif GTA3
+
+	// There's a issue with ddraw.dll, dunno how to fix atm
+	if (GetModuleHandle("ddraw.dll"))
+	{
+		MessageBox(RsGlobal.ps->window, "Please remove the ddraw.dll (SilentPatch) from game directory and restart.", "CheatMenu", MB_ICONERROR);
+		return;
+	}
 #endif
 
 	gLog << "Starting...\nVersion: " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: "

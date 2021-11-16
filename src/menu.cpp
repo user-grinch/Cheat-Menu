@@ -526,13 +526,16 @@ void Menu::Draw()
 			ImGui::SameLine();
 
 			if (ImGui::Button("Discord server", ImVec2(Ui::GetSize(3))))
+			{
 				ShellExecute(nullptr, "open", DISCORD_INVITE, nullptr, nullptr, SW_SHOWNORMAL);
+			}
 
 			ImGui::SameLine();
 
 			if (ImGui::Button("GitHub repo", ImVec2(Ui::GetSize(3))))
+			{
 				ShellExecute(nullptr, "open", GITHUB_LINK, nullptr, nullptr, SW_SHOWNORMAL);
-
+			}
 			ImGui::Spacing();
 
 			if (ImGui::BeginChild("AboutChild"))

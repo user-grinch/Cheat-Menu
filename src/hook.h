@@ -27,10 +27,6 @@ public:
 	static inline bool m_bShowMouse = false;
 	static inline std::function<void()> pCallbackFunc = nullptr;
 
-#ifdef GTASA
-	static void ApplyMouseFix();
-#endif
-
 	Hook();
 	~Hook();
 };
