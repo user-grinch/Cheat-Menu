@@ -23,8 +23,7 @@ Only these versions of the game is supported. I highly recommand installing the 
 If you have those mentioned versions installed follow the steps below,
 1. Install [DirectX9](https://www.microsoft.com/en-us/download/details.aspx?id=35), [Visual C++ Redistributable 2022 x86](https://aka.ms/vs/17/release/vc_redist.x86.exe) & [Asi loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases).
 2. Download [**CheatMenuSA/VC/III.7z**](https://github.com/user-grinch/Cheat-Menu/releases) and extract everything in game root directory. The **CheatMenu** folder & **.asi** file must be placed in the same place.
-
-3. Install [SilentPatch](https://gtaforums.com/topic/669045-silentpatch/) (required)
+3. Install [SilentPatch](https://gtaforums.com/topic/669045-silentpatch/) (For GTA III don't install the ddraw.dll component)
 
 ### For III & VC
 3. Install [D3D8to9 wrapper](https://github.com/crosire/d3d8to9/releases). Sometimes the asi loader blocks **d3d8.dll** file. Just delete the **Globals.ini** file and you should be good to go.

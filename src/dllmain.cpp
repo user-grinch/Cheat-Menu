@@ -22,17 +22,21 @@ void MenuThread(void* param)
 	/*
 		Had to put this in place since some people put the folder in root 
 		directory and the asi in modloader. Why??
-
-		TODO: Unlikely they'd even read the log so have to do something else
 	*/
 	if (!std::filesystem::is_directory(PLUGIN_PATH((char*)"CheatMenu")))
 	{
+		gLog << "Error: CheatMenu folder not found. You need to put both \"CheatMenu.asi\" & \"CheatMenu\" folder in the same directory" << std::endl;
 		MessageBox(RsGlobal.ps->window, "CheatMenu folder not found. You need to put both \"CheatMenu.asi\" & \"CheatMenu\" folder in the same directory", "CheatMenu", MB_ICONERROR);
 		return;
 	}
 
+	/*
+		Need SilentPatch since all gta games have issues with mouse input
+		Implementing mouse fix is a headache anyway
+	*/
 	if (!GetModuleHandle(BY_GAME("SilentPatchSA.asi" ,"SilentPatchVC.asi" ,"SilentPatchIII.asi")))
 	{
+		gLog << "Error: SilentPatch not found. Please install it from here https://gtaforums.com/topic/669045-silentpatch/" << std::endl;
 		int msgID = MessageBox(RsGlobal.ps->window, "SilentPatch not found. Do you want to install Silent Patch? (Game restart required)", "CheatMenu", MB_OKCANCEL | MB_DEFBUTTON1);
 
 		if (msgID == IDOK)
@@ -49,18 +53,11 @@ void MenuThread(void* param)
     */
 	if (GetModuleHandle("SAMP.dll") || GetModuleHandle("SAMP.asi"))
 	{
+		gLog << "Error: CheatMenu doesn't support SAMP" << std::endl;
 		MessageBox(RsGlobal.ps->window, "SAMP detected. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
 		return;
 	}
 	CFastman92limitAdjuster::Init();
-#elif GTA3
-
-	// There's a issue with ddraw.dll, dunno how to fix atm
-	if (GetModuleHandle("ddraw.dll"))
-	{
-		MessageBox(RsGlobal.ps->window, "Please remove the ddraw.dll (SilentPatch) from game directory and restart.", "CheatMenu", MB_ICONERROR);
-		return;
-	}
 #endif
 
 	gLog << "Starting...\nVersion: " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: "
@@ -102,8 +99,9 @@ BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
 		}
 		else
 		{
+			gLog << "Error: Unknown game version. GTA " <<  BY_GAME("SA v1.0 US Hoodlum", "GTA VC v1.0 EN", "GTA III v1.0 EN") << " is required." << std::endl;
 #ifdef GTASA
-			MessageBox(HWND_DESKTOP, "Unknown game version. GTA SA v1.0 US is required.", "CheatMenu", MB_ICONERROR);
+			MessageBox(HWND_DESKTOP, "Unknown game version. GTA SA v1.0 US Hoodlum is required.", "CheatMenu", MB_ICONERROR);
 #elif GTAVC
 			MessageBox(HWND_DESKTOP, "Unknown game version. GTA VC v1.0 EN is required.", "CheatMenu", MB_ICONERROR);
 #else // GTA3
