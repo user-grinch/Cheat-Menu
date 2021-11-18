@@ -159,7 +159,7 @@ void Hook::ShowMouse(bool state)
 	bool bMouseDisabled = false;
 	bool isController = patch::Get<BYTE>(BY_GAME(0x5F03D8, 0x86968B, 0xBA6818));
 
-#ifdef GTA3
+#ifdef GTASA
 	isController =  !isController;
 #endif
 
