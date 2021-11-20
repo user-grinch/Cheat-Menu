@@ -100,7 +100,7 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
 
 			// SA has 10 slots 
 			++currentSlot;
-			if (currentSlot > 10)
+			if (currentSlot > 9)
 			{
 				currentSlot = 1;
 			}
