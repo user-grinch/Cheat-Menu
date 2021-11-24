@@ -453,7 +453,10 @@ void Vehicle::SpawnVehicle(std::string& rootkey, std::string& vehName, std::stri
 			veh->SetOrientation(x, y, z);
 #endif
 			Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
+
+#ifndef GTA3
 			Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, speed);
+#endif
 		}
 		else
 		{

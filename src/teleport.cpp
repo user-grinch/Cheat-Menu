@@ -155,8 +155,8 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
 
 #ifndef GTA3
 	BY_GAME(pPlayer->m_nAreaCode, pPlayer->m_nInterior, NULL) = interior_id;
-#endif
 	Command<Commands::SET_AREA_VISIBLE>(interior_id);
+#endif
 }
 
 void Teleport::TeleportToLocation(std::string& rootkey, std::string& bLocName, std::string& loc)
