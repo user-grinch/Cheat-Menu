@@ -350,6 +350,7 @@ void Player::ChangePlayerModel(std::string& cat, std::string& key, std::string& 
 		int imodel = std::stoi(val);
 		CStreaming::RequestModel(imodel, eStreamingFlags::PRIORITY_REQUEST);
 		CStreaming::LoadAllRequestedModels(true);
+		player->DeleteRwObject();
 		player->SetModelIndex(imodel);
 		CStreaming::SetModelIsDeletable(imodel);
 	}
