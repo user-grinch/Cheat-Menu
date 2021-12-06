@@ -68,10 +68,9 @@ Weapon::Weapon()
 			}
 
 #ifdef GTASA			
-			if (m_bRapidFire && weaponType != WEAPON_FTHROWER && weaponType != WEAPON_MINIGUN)) // mingun doesn't work with rapidfire
+			if (m_bRapidFire && weaponType != WEAPON_FTHROWER && weaponType != WEAPON_MINIGUN) // mingun & flamethrower doesn't work with rapidfire
 			{
 				pWeaponInfo->m_nFlags.bContinuosFire = true;
-
 			}
 
 			if (m_bDualWeild && (weaponType == WEAPON_PISTOL || weaponType == WEAPON_MICRO_UZI || weaponType ==
