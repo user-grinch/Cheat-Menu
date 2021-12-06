@@ -31,6 +31,39 @@ void Vehicle::FixVehicle(CVehicle *pVeh)
 	pVeh->m_fHealth = 1000.0f;
 }
 
+void FlipVehicle()
+{
+	CPlayerPed* pPlayer = FindPlayerPed();
+#ifdef GTASA
+	if (pPlayer->m_nPedFlags.bInVehicle)
+	{
+		int hveh = CPools::GetVehicleRef(pPlayer->m_pVehicle);
+		float roll;
+
+		Command<Commands::GET_CAR_ROLL>(hveh, &roll);
+		roll += 180;
+		Command<Commands::SET_CAR_ROLL>(hveh, roll);
+		Command<Commands::SET_CAR_ROLL>(hveh, roll); // z rot fix
+	}
+#elif GTAVC
+	if (pPlayer->m_bInVehicle)
+	{
+		float x,y,z;
+		pPlayer->m_pVehicle->m_placement.GetOrientation(x, y, z);
+		y += 135.0f;
+		pPlayer->m_pVehicle->m_placement.SetOrientation(x, y, z);
+	}
+#else // GTA3 
+	if (pPlayer->m_bInVehicle)
+	{
+		float x,y,z;
+		pPlayer->m_pVehicle->GetOrientation(x, y, z);
+		y += 135.0f;
+		pPlayer->m_pVehicle->SetOrientation(x, y, z);
+	}
+#endif
+}
+
 Vehicle::Vehicle()
 {
 #ifdef GTASA
@@ -48,16 +81,10 @@ Vehicle::Vehicle()
 		{
 			int hveh = CPools::GetVehicleRef(pVeh);
 
-#ifdef GTASA
 			if (flipVeh.Pressed())
 			{
-				int roll = 0;
-				Command<Commands::GET_CAR_ROLL>(hveh, &roll);
-				roll += 180;
-				Command<Commands::SET_CAR_ROLL>(hveh, roll);
-				Command<Commands::SET_CAR_ROLL>(hveh, roll); // z rot fix
+				FlipVehicle();
 			}
-#endif
 
 			if (fixVeh.Pressed())
 			{
@@ -546,35 +573,7 @@ void Vehicle::Draw()
 
 	if (ImGui::Button("Flip vehicle", ImVec2(Ui::GetSize(3))))
 	{	
-#ifdef GTASA
-		if (pPlayer->m_nPedFlags.bInVehicle)
-		{
-			int hveh = CPools::GetVehicleRef(pPlayer->m_pVehicle);
-			float roll;
-
-			Command<Commands::GET_CAR_ROLL>(hveh, &roll);
-			roll += 180;
-			Command<Commands::SET_CAR_ROLL>(hveh, roll);
-			Command<Commands::SET_CAR_ROLL>(hveh, roll); // z rot fix
-		}
-#elif GTAVC
-		if (pPlayer->m_bInVehicle)
-		{
-			float x,y,z;
-			pPlayer->m_pVehicle->m_placement.GetOrientation(x, y, z);
-			y += 135.0f;
-			pPlayer->m_pVehicle->m_placement.SetOrientation(x, y, z);
-		}
-			
-#else // GTA3 
-		if (pPlayer->m_bInVehicle)
-		{
-			float x,y,z;
-			pPlayer->m_pVehicle->GetOrientation(x, y, z);
-			y += 135.0f;
-			pPlayer->m_pVehicle->SetOrientation(x, y, z);
-		}
-#endif
+		FlipVehicle();
 	}
 
 	ImGui::Spacing();
