@@ -226,36 +226,35 @@ void Ui::CenterdText(const std::string& text)
 
 void Ui::DrawHeaders(CallbackTable& data)
 {
-	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+	static void* pCallback;
+	static int buttonInRow = 3;
+	static ImVec2 size = GetSize(buttonInRow, false);
+	ImGuiStyle &style = ImGui::GetStyle();
+	ImVec4 buttonCol = style.Colors[ImGuiCol_Button];
 
-	short i = 1;
-	auto colors = ImGui::GetStyle().Colors;
-	ImVec4 btn_col = colors[ImGuiCol_Button];
-	static void* func;
+	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 	ImGui::PushFont(FontMgr::GetFont("header"));
-	for (auto it = data.begin(); it != data.end(); ++it)
+	for (int i = 0; i < data.size(); ++i)
 	{
-		const char* btn_text = it->first.c_str();
+		const char* btn_text = data[i].first.c_str();
 
 		if (btn_text == m_HeaderId)
 		{
-			colors[ImGuiCol_Button] = colors[ImGuiCol_ButtonActive];
-			func = it->second;
+			style.Colors[ImGuiCol_Button] = style.Colors[ImGuiCol_ButtonActive];
+			pCallback = data[i].second;
 		}
-
-
-		if (ImGui::Button(btn_text, GetSize(3, false)))
+		if (ImGui::Button(btn_text, size))
 		{
 			m_HeaderId = btn_text;
 			gConfig.SetValue("window.id", m_HeaderId);
-			func = it->second;
+			pCallback = data[i].second;
 		}
+		style.Colors[ImGuiCol_Button] = buttonCol;
 
-		colors[ImGuiCol_Button] = btn_col;
-
-		if (i % 3 != 0)
+		if (i % 3 != 2)
+		{
 			ImGui::SameLine();
-		i++;
+		}
 	}
 	ImGui::PopFont();
 	ImGui::PopStyleVar();
@@ -273,12 +272,16 @@ void Ui::DrawHeaders(CallbackTable& data)
 		ImGui::TextWrapped("Please ensure you have the latest version from GitHub.");
 		ImGui::NewLine();
 		if (ImGui::Button("Discord server", ImVec2(GetSize(2))))
+		{
 			ShellExecute(nullptr, "open", DISCORD_INVITE, nullptr, nullptr, SW_SHOWNORMAL);
+		}
 
 		ImGui::SameLine();
 
 		if (ImGui::Button("GitHub repo", ImVec2(GetSize(2))))
+		{
 			ShellExecute(nullptr, "open", GITHUB_LINK, nullptr, nullptr, SW_SHOWNORMAL);
+		}
 
 		ImGui::NewLine();
 		ImGui::TextWrapped("If you find bugs or have suggestions, you can let me know on discord :)");
@@ -287,9 +290,9 @@ void Ui::DrawHeaders(CallbackTable& data)
 	}
 	else
 	{
-		if (func != nullptr && ImGui::BeginChild("TABSBAR"))
+		if (pCallback != nullptr && ImGui::BeginChild("TABSBAR"))
 		{
-			static_cast<void(*)()>(func)();
+			static_cast<void(*)()>(pCallback)();
 			ImGui::EndChild();
 		}
 	}
