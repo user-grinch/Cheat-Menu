@@ -228,7 +228,7 @@ void Ui::DrawHeaders(CallbackTable& data)
 {
 	static void* pCallback;
 	static int buttonInRow = 3;
-	static ImVec2 size = GetSize(buttonInRow, false);
+	ImVec2 size = GetSize(buttonInRow, false);
 	ImGuiStyle &style = ImGui::GetStyle();
 	ImVec4 buttonCol = style.Colors[ImGuiCol_Button];
 
