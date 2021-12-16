@@ -25,14 +25,6 @@ void CheatMenu::DrawWindow()
 		{
 			if (m_bShowMenu)
 			{
-				static ImVec2 fScreenSize = ImVec2(-1, -1);
-				ImVec2 size(screen::GetScreenWidth(), screen::GetScreenHeight());
-				
-				if (fScreenSize.x != -1 && fScreenSize.y != -1)
-				{
-					m_fMenuSize.x += (size.x - fScreenSize.x) / 4.0f;
-					m_fMenuSize.y += (size.y - fScreenSize.y) / 1.2f;
-				}
 				ImGui::SetNextWindowSize(m_fMenuSize);
 
 				if (ImGui::Begin(MENU_TITLE, NULL, ImGuiWindowFlags_NoCollapse || ImGuiWindowFlags_NoTitleBar))
@@ -51,7 +43,14 @@ void CheatMenu::DrawWindow()
 						Ui::DrawHeaders(header);
 					}
 
-					m_fMenuSize = ImGui::GetWindowSize();
+					if (m_bSizeChangedExternal)
+					{
+						m_bSizeChangedExternal = false;
+					}
+					else
+					{
+						m_fMenuSize = ImGui::GetWindowSize();
+					}
 					gConfig.SetValue("window.sizeX", m_fMenuSize.x);
 					gConfig.SetValue("window.sizeY", m_fMenuSize.y);
 
@@ -77,7 +76,7 @@ CheatMenu::CheatMenu()
 	pCallbackFunc = std::bind(&DrawWindow);
 
 	// Load menu settings
-	Ui::m_HeaderId = gConfig.GetValue("window.id", std::string(""));
+	Ui::m_HeaderId = gConfig.GetValue("window.idnum", -1);
 	m_fMenuSize.x = gConfig.GetValue("window.sizeX", screen::GetScreenWidth() / 4.0f);
 	m_fMenuSize.y = gConfig.GetValue("window.sizeY", screen::GetScreenHeight() / 1.2f);
 	srand(CTimer::m_snTimeInMilliseconds);
@@ -178,4 +177,11 @@ void CheatMenu::ApplyStyle()
 	style->Colors[ImGuiCol_PlotHistogramHovered] = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
 	style->Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.06f, 0.05f, 0.06f, 0.95f);
 	style->Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.20f, 0.20f, 0.20f, 0.6f);
+}
+
+void CheatMenu::ResetMenuSize()
+{
+	m_fMenuSize.x = screen::GetScreenWidth() / 4.0f;
+	m_fMenuSize.y = screen::GetScreenHeight() / 1.2f;
+	m_bSizeChangedExternal = true;
 }

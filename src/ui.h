@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 
+// TODO: Fix this messy code
 class Ui
 {
 public:
@@ -20,7 +21,7 @@ public:
 	{
 		std::function<void(std::string&, std::string&, std::string&)> function;
 		std::string key;
-		std::string rootKey;
+		std::string root;
 		std::string value;
 	};
 
@@ -29,7 +30,7 @@ public:
 		std::function<void(std::string&)> function;
 		std::string value;
 	};
-	static inline std::string m_HeaderId;
+	static inline int m_HeaderId;
 	static inline JsonPopUpData jsonPopup;
 	static inline ImgPopUpData imgPopup;
 
@@ -96,7 +97,9 @@ void Ui::EditAddress(const char* label, const int address, const int min, const 
 		int items = 3;
 
 		if (min == def)
+		{
 			items = 2;
+		}
 
 		ImGui::Columns(items, nullptr, false);
 		ImGui::Text(("Min: " + std::to_string(min)).c_str());
@@ -114,31 +117,43 @@ void Ui::EditAddress(const char* label, const int address, const int min, const 
 		ImGui::Spacing();
 
 		if (ImGui::InputInt(("Set value##" + std::string(label)).c_str(), &val))
+		{
 			patch::Set<T>(address, val, false);
+		}
 
 		ImGui::Spacing();
 
 		if (val < min)
+		{
 			val = min;
+		}
 
 		if (val > max)
+		{
 			val = max;
+		}
 
 		if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), GetSize(items)))
+		{
 			patch::Set<T>(address, min, false);
+		}
 
 		if (items == 3)
 		{
 			ImGui::SameLine();
 
 			if (ImGui::Button(("Default##" + std::string(label)).c_str(), GetSize(3)))
+			{
 				patch::Set<T>(address, def, false);
+			}
 		}
 
 		ImGui::SameLine();
 
 		if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), GetSize(items)))
+		{
 			patch::Set<T>(address, max, false);
+		}
 
 		ImGui::Spacing();
 		ImGui::Separator();
@@ -163,22 +178,30 @@ void Ui::EditReference(const char* label, T& address, const int min, const int d
 		ImGui::Spacing();
 
 		if (ImGui::InputInt(("Set value##" + std::string(label)).c_str(), &val))
+		{
 			address = static_cast<float>(val);
+		}
 
 		ImGui::Spacing();
 
 		if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), GetSize(3)))
+		{
 			address = static_cast<float>(min);
+		}
 
 		ImGui::SameLine();
 
 		if (ImGui::Button(("Default##" + std::string(label)).c_str(), GetSize(3)))
+		{
 			address = static_cast<float>(def);
+		}
 
 		ImGui::SameLine();
 
 		if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), GetSize(3)))
+		{
 			address = static_cast<float>(max);
+		}
 
 		ImGui::Spacing();
 		ImGui::Separator();

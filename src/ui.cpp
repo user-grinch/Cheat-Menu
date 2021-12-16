@@ -227,29 +227,52 @@ void Ui::CenterdText(const std::string& text)
 void Ui::DrawHeaders(CallbackTable& data)
 {
 	static void* pCallback;
-	static int buttonInRow = 3;
-	ImVec2 size = GetSize(buttonInRow, false);
+	ImVec2 size = GetSize(3, false);
 	ImGuiStyle &style = ImGui::GetStyle();
-	ImVec4 buttonCol = style.Colors[ImGuiCol_Button];
 
 	ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 	ImGui::PushFont(FontMgr::GetFont("header"));
+
+	ImDrawList *pDrawList = ImGui::GetWindowDrawList();
 	for (int i = 0; i < data.size(); ++i)
 	{
 		const char* btn_text = data[i].first.c_str();
 
-		if (btn_text == m_HeaderId)
+		ImVec4 color;
+		if (i == m_HeaderId)
 		{
-			style.Colors[ImGuiCol_Button] = style.Colors[ImGuiCol_ButtonActive];
+			color = style.Colors[ImGuiCol_ButtonActive];
 			pCallback = data[i].second;
 		}
-		if (ImGui::Button(btn_text, size))
+		else
 		{
-			m_HeaderId = btn_text;
-			gConfig.SetValue("window.id", m_HeaderId);
+			color = style.Colors[ImGuiCol_Button];
+		}
+
+		if (ImGui::InvisibleButton(btn_text, size))
+		{
+			m_HeaderId = i;
+			gConfig.SetValue("window.idnum", m_HeaderId);
 			pCallback = data[i].second;
 		}
-		style.Colors[ImGuiCol_Button] = buttonCol;
+
+		if (ImGui::IsItemHovered())
+		{
+			color = style.Colors[ImGuiCol_ButtonHovered];
+		}
+
+		// hardcoded
+		ImDrawFlags flags = ImDrawFlags_RoundCornersNone;
+		if (i == 0) flags = ImDrawFlags_RoundCornersTopLeft;
+		if (i == 2) flags = ImDrawFlags_RoundCornersTopRight;
+		if (i == 6) flags = ImDrawFlags_RoundCornersBottomLeft;
+		if (i == 8) flags = ImDrawFlags_RoundCornersBottomRight;
+		
+		ImVec2 min = ImGui::GetItemRectMin();
+		ImVec2 max = ImGui::GetItemRectMax();
+		ImVec2 size = ImGui::CalcTextSize(btn_text);
+		pDrawList->AddRectFilled(min, max, ImGui::GetColorU32(color), style.FrameRounding, flags);
+		ImGui::RenderTextClipped(min + style.FramePadding, max - style.FramePadding, btn_text, NULL, &size, style.ButtonTextAlign);
 
 		if (i % 3 != 2)
 		{
@@ -260,7 +283,7 @@ void Ui::DrawHeaders(CallbackTable& data)
 	ImGui::PopStyleVar();
 	ImGui::Dummy(ImVec2(0, 10));
 
-	if (m_HeaderId == "")
+	if (m_HeaderId == -1)
 	{
 		// Show Welcome page
 		ImGui::NewLine();
@@ -530,7 +553,7 @@ void Ui::DrawJSON(ResourceStore& data,
 					if (ImGui::IsItemClicked(1) && func_right_click != nullptr)
 					{
 						jsonPopup.function = func_right_click;
-						jsonPopup.rootKey = root.key();
+						jsonPopup.root = root.key();
 						jsonPopup.key = name;
 						jsonPopup.value = _data.value();
 					}
@@ -546,7 +569,7 @@ void Ui::DrawJSON(ResourceStore& data,
 			ImGui::Text(jsonPopup.key.c_str());
 			ImGui::Separator();
 			if (ImGui::MenuItem("Remove"))
-				jsonPopup.function(jsonPopup.rootKey, jsonPopup.key, jsonPopup.value);
+				jsonPopup.function(jsonPopup.root, jsonPopup.key, jsonPopup.value);
 
 
 			if (ImGui::MenuItem("Close"))
@@ -966,7 +989,9 @@ bool Ui::ColorButton(int color_id, std::vector<float>& color, ImVec2 size)
 	std::string label = "Color " + std::to_string(color_id);
 
 	if (ImGui::ColorButton(label.c_str(), ImVec4(color[0], color[1], color[2], 1), 0, size))
+	{
 		rtn = true;
+	}
 
 	if (ImGui::IsItemHovered())
 	{

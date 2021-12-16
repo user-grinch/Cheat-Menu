@@ -4,6 +4,7 @@
 #include "ui.h"
 #include "util.h"
 #include "updater.h"
+#include "cheatmenu.h"
 
 #ifdef GTASA
 #include "teleport.h"
@@ -343,6 +344,20 @@ void Menu::ProcessCommands()
 
 void Menu::Draw()
 {
+	ImGui::Spacing();
+	if (ImGui::Button("Reset config", ImVec2(Ui::GetSize(2))))
+	{
+		gConfig.m_Data.clear();
+		SetHelpMessage("Config reset", false, false, false);
+	}
+	ImGui::SameLine();
+	if (ImGui::Button("Reset size", ImVec2(Ui::GetSize(2))))
+	{
+		CheatMenu::ResetMenuSize();
+		SetHelpMessage("Menu size reset", false, false, false);
+	}
+
+	ImGui::Spacing();
 	if (ImGui::BeginTabBar("Menu", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
 	{
 		if (ImGui::BeginTabItem("Overlay"))
