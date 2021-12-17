@@ -10,7 +10,7 @@
 
 A mod menu for Grand Theft Auto III, Vice City & San Andreas which allows a large set of modifications/cheats to be applied enabling a much more easier & amusing gameplay. This is **NOT** intended for use in multiplayer, I won't be responsible for any form of bans. Use it at your own risk!
 
-Get stable binaries from [here](https://github.com/user-grinch/Cheat-Menu/releases). Beta binaries are available at the discord server. Binaries for GTA III are available at the discord server.
+Get stable binaries from [here](https://github.com/user-grinch/Cheat-Menu/releases). Beta binaries are available at the discord server.
 
 [![Discord Banner 2](https://discordapp.com/api/guilds/689515979847237649/widget.png?style=banner2)](https://discord.com/invite/ZzW7kmf)
 
@@ -60,14 +60,25 @@ You can either open a issue here or directly contact me on discord (Recommended)
 ## Images
 <details>
   <summary>Show Images</summary>
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/teleport.gif">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/player.gif">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/ped.gif">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/animation.gif">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/vehicle.gif">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/weapon.gif">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/game.gif">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/visual.gif">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/1.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/2.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/3.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/4.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/5.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/6.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/7.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/8.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/9.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/10.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/11.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/12.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/13.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/14.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/15.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/16.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/17.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/18.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/19.png">
 </details>
 
 ## How to add ___ to CheatMenu (SA Only)
