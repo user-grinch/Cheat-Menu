@@ -1,11 +1,196 @@
 #include "pch.h"
 #include "animation.h"
-#ifdef GTASA
 #include "ui.h"
 #include "util.h"
 
+#ifndef GTASA
+#include <CAnimationStyleDescriptor.h>
+#include <CAnimManager.h>
+#include "../depend/kiero/minhook/MinHook.h"
+#include "eAnimations.h"
+#include <CAnimBlendAssociation.h>
+#endif
+
+#ifdef GTA3
+#include <RpAnimBlend.h>
+#endif
+
+#ifdef GTASA
+void Animation::PlayCutscene(std::string& rootKey, std::string& cutsceneId, std::string& interior)
+{
+	if (Util::IsOnCutscene())
+	{
+		SetHelpMessage("Another cutscene is running", false, false, false);
+		return;
+	}
+
+	CPlayerPed* pPlayer = FindPlayerPed();
+	if (!pPlayer)
+	{
+		return;
+	}	
+	
+	m_Cutscene::m_SceneName = cutsceneId;
+	Command<Commands::LOAD_CUTSCENE>(cutsceneId.c_str());
+	m_Cutscene::m_nInterior = pPlayer->m_nAreaCode;
+	pPlayer->m_nAreaCode = std::stoi(interior);
+	Command<Commands::SET_AREA_VISIBLE>(pPlayer->m_nAreaCode);
+}
+
+#elif GTAVC
+// Thanks to codenulls(https://github.com/codenulls/)
+
+static auto OLD_CStreaming_RemoveModel = (bool(__cdecl*)(int))0x40D6E0;
+static bool NEW_CStreaming_RemoveModel(int modelID)
+{
+	// Check if it's IFP animation block
+	if (modelID >= 7916 && modelID <= 7950)
+	{
+		// Do not unload the animation block
+		return true;
+	}
+	return OLD_CStreaming_RemoveModel(modelID);
+}
+
+void Animation::_PlayAnimation(RpClump* pClump, int animGroup, int animID, float blend)
+{
+	if (animGroup < CAnimManager::ms_numAnimAssocDefinitions)
+	{
+		CAnimationStyleDescriptor* pAnimDef = &CAnimManager::ms_aAnimAssocDefinitions[animGroup];
+		if (pAnimDef)
+		{
+			if (!_LoadAnimationBlock(pAnimDef->blockName))
+			{
+				return;
+			}
+		}
+	}
+
+	CAnimBlendAssociation* pAnimAssoc = RpAnimBlendClumpGetFirstAssociation(pClump);
+	while (pAnimAssoc)
+	{
+		if (pAnimAssoc->m_nAnimId == animID && pAnimAssoc->m_nAnimGroup == animGroup)
+		{
+			// Destroy the animation
+			pAnimAssoc->~CAnimBlendAssociation();
+			break;
+		}
+		pAnimAssoc = RpAnimBlendGetNextAssociation(pAnimAssoc);
+	}
+	pAnimAssoc = CAnimManager::BlendAnimation(pClump, animGroup, animID, blend);
+	pAnimAssoc->m_nFlags = ANIMATION_STARTED | ANIMATION_MOVEMENT;
+	
+	if (m_Loop)
+	{
+		pAnimAssoc->m_nFlags |= ANIMATION_LOOPED;
+	}
+
+	if (m_bSecondary)
+	{
+		pAnimAssoc->m_nFlags |= ANIMATION_PARTIAL;
+	}
+}
+
+bool Animation::_LoadAnimationBlock(const char* szBlockName)
+{
+	CAnimBlock* pAnimBlock = CAnimManager::GetAnimationBlock(szBlockName);
+	if (pAnimBlock)
+	{
+		if (!pAnimBlock->bLoaded)
+		{
+			int animIndex = ((unsigned char*)pAnimBlock - (unsigned char*)CAnimManager::ms_aAnimBlocks) / 32;
+			CStreaming::RequestModel(7916 + animIndex, 0x20 | MISSION_REQUIRED | PRIORITY_REQUEST);
+			CStreaming::LoadAllRequestedModels(true);
+			if (pAnimBlock->bLoaded)
+			{
+				return true;
+			}
+		}
+		else
+		{
+			return true;
+		}
+	}
+	return false;
+}
+#else // GTA III
+
+void Animation::_PlayAnimation(RpClump* pClump, int animGroup, int animID, float blend)
+{
+	CAnimBlendAssociation* pAnimStaticAssoc = CAnimManager::GetAnimAssociation((AssocGroupId)animGroup, (AnimationId)animID);
+	CAnimBlendAssociation* pAnimAssoc = RpAnimBlendClumpGetFirstAssociation(pClump);
+	while (pAnimAssoc)
+	{
+		if (pAnimAssoc->m_nAnimID == pAnimStaticAssoc->m_nAnimID && pAnimAssoc->m_pAnimBlendHierarchy == pAnimStaticAssoc->m_pAnimBlendHierarchy)
+		{
+			// Destroy the animation
+			pAnimAssoc->FreeAnimBlendNodeArray();
+			break;
+		}
+		pAnimAssoc = RpAnimBlendGetNextAssociation(pAnimAssoc);
+	}
+	pAnimAssoc = CAnimManager::BlendAnimation(pClump, (AssocGroupId)animGroup, (AnimationId)animID, blend);
+	pAnimAssoc->m_nFlags = 0x1 | 0x20;
+	
+	if (m_Loop)
+	{
+		pAnimAssoc->m_nFlags |= 0x2;
+	}
+
+	if (m_bSecondary)
+	{
+		pAnimAssoc->m_nFlags |= 0x10;
+	}
+}
+#endif
+
+
+void Animation::PlayAnimation(std::string& ifp, std::string& anim, std::string& value)
+{
+	CPlayerPed *pPlayer = FindPlayerPed();
+
+	if (!pPlayer)
+	{
+		return;
+	}
+
+#ifdef GTASA
+	int hplayer = CPools::GetPedRef(pPlayer);
+
+	if (ifp != "PED")
+	{
+		Command<Commands::REQUEST_ANIMATION>(ifp.c_str());
+		Command<Commands::LOAD_ALL_MODELS_NOW>();
+	}
+
+	Command<Commands::CLEAR_CHAR_TASKS>(hplayer);
+	if (m_bSecondary)
+	{
+		Command<Commands::TASK_PLAY_ANIM_SECONDARY>(hplayer, anim.c_str(), ifp.c_str(), 4.0, m_Loop, 0, 0, 0, -1);
+	}
+	else
+	{
+		Command<Commands::TASK_PLAY_ANIM>(hplayer, anim.c_str(), ifp.c_str(), 4.0, m_Loop, 0, 0, 0, -1);
+	}
+
+	if (ifp != "PED")
+	{
+		Command<Commands::REMOVE_ANIMATION>(ifp.c_str());
+	}
+
+#else // GTA VC & III
+	if (pPlayer)
+	{
+		int groupID, animID;
+		sscanf(value.c_str(), "%d$%d,", &groupID, &animID);
+		_PlayAnimation(pPlayer->m_pRwClump, groupID, animID, 4.0f);
+	}
+#endif
+}
+
 Animation::Animation()
 {
+#ifdef GTASA
 	Events::processScriptsEvent += [this]
 	{
 		if (m_Cutscene::m_bRunning)
@@ -33,27 +218,18 @@ Animation::Animation()
 			}
 		}
 	};
-}
-
-void Animation::PlayCutscene(std::string& rootKey, std::string& cutsceneId, std::string& interior)
-{
-	if (Util::IsOnCutscene())
-	{
-		SetHelpMessage("Another cutscene is running", false, false, false);
-		return;
-	}
-
-	CPlayerPed* pPlayer = FindPlayerPed();
-	if (!pPlayer)
-	{
-		return;
-	}	
+#elif GTAVC
+	// mov al, 01
+	// ret
+	// nop (2x)
+	patch::SetRaw(0x40C9C0, (void*)"\xB0\x01\xC3\x90\x90", 5);
+	// // ret
+	// // nop (3x)
+	patch::SetRaw(0x404950, (void*)"\xC3\x90\x90\x90", 4);
 	
-	m_Cutscene::m_SceneName = cutsceneId;
-	Command<Commands::LOAD_CUTSCENE>(cutsceneId.c_str());
-	m_Cutscene::m_nInterior = pPlayer->m_nAreaCode;
-	pPlayer->m_nAreaCode = std::stoi(interior);
-	Command<Commands::SET_AREA_VISIBLE>(pPlayer->m_nAreaCode);
+	MH_CreateHook((void*)0x40D6E0, NEW_CStreaming_RemoveModel, (void**)&OLD_CStreaming_RemoveModel);
+	MH_EnableHook((void*)0x40D6E0);
+#endif
 }
 
 void Animation::Draw()
@@ -73,7 +249,11 @@ void Animation::Draw()
 			{
 				if (hPlayer)
 				{
+#ifdef GTASA
 					Command<Commands::CLEAR_CHAR_TASKS>(hPlayer);
+#else
+					_PlayAnimation(pPlayer->m_pRwClump, ANIM_GROUP_MAN, ANIM_MAN_IDLE_STANCE, 4.0f);
+#endif
 				}
 			}
 
@@ -96,7 +276,19 @@ void Animation::Draw()
 			}
 			ImGui::EndTabItem();
 		}
-
+		if (ImGui::BeginTabItem("Custom"))
+		{
+			ImGui::InputTextWithHint("IFP name", "ped", m_nIfpBuffer, INPUT_BUFFER_SIZE);
+			ImGui::InputTextWithHint("Anim name", "cower", m_nAnimBuffer, INPUT_BUFFER_SIZE);
+			ImGui::Spacing();
+			if (ImGui::Button("Add animation", Ui::GetSize()))
+			{
+				m_AnimData.m_pJson->m_Data["Custom"][m_nAnimBuffer] = ("0, " + std::string(m_nIfpBuffer));
+				m_AnimData.m_pJson->WriteToDisk();
+			}
+			ImGui::EndTabItem();
+		}
+#ifdef GTASA
 		if (ImGui::BeginTabItem("Misc"))
 		{
 			ImGui::Spacing();
@@ -121,19 +313,6 @@ void Animation::Draw()
 					Command<Commands::REMOVE_ANIMATION>(m_nWalkingStyle.c_str());
 				}
 				SetHelpMessage("Walking anim set", false, false, false);
-			}
-			ImGui::EndTabItem();
-		}
-
-		if (ImGui::BeginTabItem("Custom"))
-		{
-			ImGui::InputTextWithHint("IFP name", "ped", m_nIfpBuffer, INPUT_BUFFER_SIZE);
-			ImGui::InputTextWithHint("Anim name", "cower", m_nAnimBuffer, INPUT_BUFFER_SIZE);
-			ImGui::Spacing();
-			if (ImGui::Button("Add animation", Ui::GetSize()))
-			{
-				m_AnimData.m_pJson->m_Data["Custom"][m_nAnimBuffer] = ("0, " + std::string(m_nIfpBuffer));
-				m_AnimData.m_pJson->WriteToDisk();
 			}
 			ImGui::EndTabItem();
 		}
@@ -164,33 +343,8 @@ void Animation::Draw()
 			}
 			ImGui::EndTabItem();
 		}
+#endif
 		ImGui::EndTabBar();
-	}
-}
-
-void Animation::PlayAnimation(std::string& ifp, std::string& anim, std::string& ifpRepeat)
-{
-	int hplayer = CPools::GetPedRef(FindPlayerPed());
-
-	if (ifp != "PED")
-	{
-		Command<Commands::REQUEST_ANIMATION>(ifp.c_str());
-		Command<Commands::LOAD_ALL_MODELS_NOW>();
-	}
-
-	Command<Commands::CLEAR_CHAR_TASKS>(hplayer);
-	if (m_bSecondary)
-	{
-		Command<Commands::TASK_PLAY_ANIM_SECONDARY>(hplayer, anim.c_str(), ifp.c_str(), 4.0, m_Loop, 0, 0, 0, -1);
-	}
-	else
-	{
-		Command<Commands::TASK_PLAY_ANIM>(hplayer, anim.c_str(), ifp.c_str(), 4.0, m_Loop, 0, 0, 0, -1);
-	}
-
-	if (ifp != "PED")
-	{
-		Command<Commands::REMOVE_ANIMATION>(ifp.c_str());
 	}
 }
 
@@ -207,4 +361,3 @@ void Animation::RemoveAnimation(std::string& ifp, std::string& anim, std::string
 		SetHelpMessage("You can only remove custom anims", false, false, false);
 	}
 }
-#endif

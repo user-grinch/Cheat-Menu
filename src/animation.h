@@ -1,4 +1,3 @@
-#ifdef GTASA
 #pragma once
 #include "pch.h"
 
@@ -13,6 +12,7 @@ private:
 	static inline bool m_Loop; // loop animation
 	static inline bool m_bSecondary; // play animation as secondary
 
+#ifdef GTASA
 	// Cutscene player
 	struct m_Cutscene
 	{
@@ -32,6 +32,7 @@ private:
 		"fatman", "jogger", "drunkman", "blindman", "swat", "woman", "shopping", "busywoman",
 		"sexywoman", "pro", "oldwoman", "fatwoman", "jogwoman", "oldfatwoman", "skate"
 	};
+#endif
 
 protected:
 	Animation();
@@ -39,11 +40,15 @@ protected:
 public:
 	static void Draw();
 	static void PlayAnimation(std::string& rootKey, std::string& anim, std::string& ifp);
-	static void PlayCutscene(std::string& rootKey, std::string& cutsceneId, std::string& interior);
 	static void RemoveAnimation(std::string& rootKey, std::string& anim, std::string& ifp);
-};
-#else
 
-// Dummy Class for VC & III
-class Animation{};
+#ifdef GTASA
+	static void PlayCutscene(std::string& rootKey, std::string& cutsceneId, std::string& interior);
+#elif GTAVC
+	static bool _LoadAnimationBlock(const char* szBlockName);
 #endif
+
+#ifndef GTASA
+	static void _PlayAnimation(RpClump* pClump, int animGroup, int animID, float blend);
+#endif
+};

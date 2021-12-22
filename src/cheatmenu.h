@@ -29,11 +29,7 @@ private:
 
     static inline CallbackTable header{
         {"Teleport", &Teleport::Draw},   {"Player", &Player::Draw}, {"Ped", &Ped::Draw},
-#ifdef GTASA
         {"Animation", &Animation::Draw},
-#else
-		{"Dummy", nullptr},
-#endif
         {"Vehicle", &Vehicle::Draw},     {"Weapon", &Weapon::Draw}, {"Game", &Game::Draw},
         {"Visual", &Visual::Draw},       {"Menu", &Menu::Draw}
     };
