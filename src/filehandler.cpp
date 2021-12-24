@@ -64,130 +64,124 @@ void FileHandler::GenerateHandlingFile(int pHandling, std::map<int, std::string>
 void FileHandler::FetchColorData(std::vector<std::vector<float>>& storeVec)
 {
 	std::string m_FilePath = GAME_PATH((char*)"/data/carcols.dat");
-
-	if (std::filesystem::exists(m_FilePath))
-	{
-		std::ifstream file(m_FilePath);
-		std::string line;
-		bool bIsCar = false;
-		bool bIsCol = false;
-		int nLineCount = 0;
-
-		while (getline(file, line))
-		{
-            // skip commented & emety lines
-			if (line[0] == '#' || line == "")
-            {
-                continue;
-            }
-
-            // section blocks
-			if (line[0] == 'c' && line[1] == 'a' && line[2] == 'r')
-			{
-				bIsCar = true;
-				continue;
-			}
-
-			if (line[0] == 'c' && line[1] == 'o' && line[2] == 'l')
-			{
-				bIsCol = true;
-				continue;
-			}
-
-			if (line[0] == 'e' && line[1] == 'n' && line[2] == 'd')
-			{
-				bIsCar = false;
-				bIsCol = false;
-				continue;
-			}
-
-			if (bIsCol)
-			{
-				try
-				{
-					std::string temp;
-					std::stringstream ss(line);
-
-                    // fix one instance where . is used instead of ,
-					std::replace(temp.begin(), temp.end(), '.', ','); 
-
-                    // Format: red, green, blue
-                    int r,g,b;
-					getline(ss, temp, ',');
-					r = std::stoi(temp);
-					getline(ss, temp, ',');
-					g = std::stoi(temp);
-					getline(ss, temp, ',');
-					b = std::stoi(temp);
-
-					storeVec.push_back({r / 255.0f, g / 255.0f, b / 255.0f});
-					++nLineCount;
-				}
-				catch (...)
-				{
-					gLog << "Error parsing carcols.dat, " << line << std::endl;
-				}
-			}
-		}
-
-		file.close();
-	}
-	else 
+	if (!std::filesystem::exists(m_FilePath))
 	{
 		gLog << "Carcols.dat not found";
+		return;
 	}
-}
 
-void FileHandler::FetchHandlingID(std::map<int, std::string>& storeMap)
-{
-	std::string m_FilePath = GAME_PATH((char*)"/data/vehicles.ide");
+	std::ifstream file(m_FilePath);
+	std::string line;
+	bool isCar, isCol;
+	int count = 0;
 
-	if (std::filesystem::exists(m_FilePath))
+	while (getline(file, line))
 	{
-		std::ifstream file(m_FilePath);
-		std::string line;
-
-		while (getline(file, line))
+		// skip commented & empty lines
+		if (line[0] == '#' || line == "")
 		{
-            /*
-                Format: model, modelname, txdname, type, handlingId, ...
-                Skip if first thing isn't model id
-            */
-			if (line[0] <= '0' || line[0] >= '9')
-			{
-				continue;
-			}
+			continue;
+		}
 
-            // running inside try block to handle user errors, mostly commas
+		// section blocks
+		if (line[0] == 'c' && line[1] == 'a' && line[2] == 'r')
+		{
+			isCar = true;
+			continue;
+		}
+
+		if (line[0] == 'c' && line[1] == 'o' && line[2] == 'l')
+		{
+			isCol = true;
+			continue;
+		}
+
+		if (line[0] == 'e' && line[1] == 'n' && line[2] == 'd')
+		{
+			isCar = false;
+			isCol = false;
+			continue;
+		}
+
+		if (isCol)
+		{
 			try
 			{
 				std::string temp;
 				std::stringstream ss(line);
 
-				// get model
-				getline(ss, temp, ',');
-				int model = std::stoi(temp);
+				// fix one instance where . is used instead of ,
+				std::replace(temp.begin(), temp.end(), '.', ','); 
 
-				// get modelname, txd, type, handlingId
+				// Format: red, green, blue
+				int r,g,b;
 				getline(ss, temp, ',');
+				r = std::stoi(temp);
 				getline(ss, temp, ',');
+				g = std::stoi(temp);
 				getline(ss, temp, ',');
-				getline(ss, temp, ',');
+				b = std::stoi(temp);
 
-				temp.erase(std::remove_if(temp.begin(), temp.end(), ::isspace), temp.end());
-
-				storeMap[model] = temp;
+				storeVec.push_back({r / 255.0f, g / 255.0f, b / 255.0f});
+				++count;
 			}
 			catch (...)
 			{
-				gLog << "Error parsing vehicles.ide, " << line << std::endl;
+				gLog << "Error parsing carcols.dat, " << line << std::endl;
 			}
 		}
-
-		file.close();
 	}
-	else 
-    {
+
+	file.close();
+}
+
+void FileHandler::FetchHandlingID(std::map<int, std::string>& storeMap)
+{
+	std::string m_FilePath = GAME_PATH((char*)"/data/vehicles.ide");
+	if (!std::filesystem::exists(m_FilePath))
+	{
         gLog << "Vehicle.ide not found";
+		return;
     }
+
+	std::ifstream file(m_FilePath);
+	std::string line;
+	while (getline(file, line))
+	{
+		/*
+			Format: model, modelname, txdname, type, handlingId, ...
+			Skip if first thing isn't model id
+		*/
+		if (line[0] <= '0' || line[0] >= '9')
+		{
+			continue;
+		}
+
+		// running inside try block to handle user errors, mostly commas
+		try
+		{
+			std::string temp;
+			std::stringstream ss(line);
+
+			// get model
+			getline(ss, temp, ',');
+			int model = std::stoi(temp);
+
+			// get modelname, txd, type, handlingId
+			getline(ss, temp, ',');
+			getline(ss, temp, ',');
+			getline(ss, temp, ',');
+			getline(ss, temp, ',');
+
+			temp.erase(std::remove_if(temp.begin(), temp.end(), isspace), temp.end());
+
+			storeMap[model] = temp;
+		}
+		catch (...)
+		{
+			gLog << "Error parsing vehicles.ide, " << line << std::endl;
+		}
+	}
+
+	file.close();
 }

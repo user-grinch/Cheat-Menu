@@ -6,15 +6,15 @@
 
 void MenuThread(void* param)
 {
-	static bool bGameInit = false;
+	static bool gameInit;
 
 	// Wait till game init
 	Events::initRwEvent += []
 	{
-		bGameInit = true;
+		gameInit = true;
 	};
 
-	while (!bGameInit)
+	while (!gameInit)
 	{
 		Sleep(1000);
 	}
@@ -91,22 +91,14 @@ BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
 {
 	if (nReason == DLL_PROCESS_ATTACH)
 	{
-		uint gameVersion = GetGameVersion();
-		
-		if (gameVersion == BY_GAME(GAME_10US_HOODLUM, GAME_10EN, GAME_10EN))
+		if (GetGameVersion() == BY_GAME(GAME_10US_HOODLUM, GAME_10EN, GAME_10EN))
 		{
 			CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&MenuThread, nullptr, NULL, nullptr);
 		}
 		else
 		{
 			gLog << "Error: Unknown game version. GTA " <<  BY_GAME("SA v1.0 US Hoodlum", "GTA VC v1.0 EN", "GTA III v1.0 EN") << " is required." << std::endl;
-#ifdef GTASA
-			MessageBox(HWND_DESKTOP, "Unknown game version. GTA SA v1.0 US Hoodlum is required.", "CheatMenu", MB_ICONERROR);
-#elif GTAVC
-			MessageBox(HWND_DESKTOP, "Unknown game version. GTA VC v1.0 EN is required.", "CheatMenu", MB_ICONERROR);
-#else // GTA3
-			MessageBox(HWND_DESKTOP, "Unknown game version. GTA III v1.0 EN is required.", "CheatMenu", MB_ICONERROR);
-#endif
+			MessageBox(HWND_DESKTOP, "Unknown game version. GTA " BY_GAME("SA v1.0 US Hoodlum", "GTA VC v1.0 EN", "GTA III v1.0 EN") " is required.", "CheatMenu", MB_ICONERROR);
 		}
 	}
 

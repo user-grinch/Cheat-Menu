@@ -15,23 +15,24 @@ private:
 
 	struct m_Overlay
 	{
-		static inline bool bCoord = false;
-		static inline bool bFPS = false;
-		static inline int mFPS = 0;
-		static inline bool bLocName = false;
-		static inline bool bTransparent = false;
-		static inline bool bVehHealth = false;
-		static inline bool bVehSpeed = false;
-		static inline bool bCpuUsage = false;
-		static inline float fCpuUsage = 0.0f;
-		static inline bool bMemUsage = false;
-		static inline float fMemUsage = 0.0f;
-		static inline std::vector<std::string> posNames = {
+		static inline bool bCoord;
+		static inline bool bFPS;
+		static inline int mFPS;
+		static inline bool bLocName;
+		static inline bool bTransparent;
+		static inline bool bVehHealth;
+		static inline bool bVehSpeed;
+		static inline bool bCpuUsage;
+		static inline float fCpuUsage;
+		static inline bool bMemUsage;
+		static inline float fMemUsage;
+		static inline std::vector<std::string> posNames = 
+		{
 			"Custom", "Top left", "Top right", "Bottom left", "Bottom right"
 		};
 		static inline DISPLAY_POS mSelectedPos = DISPLAY_POS::BOTTOM_RIGHT;
-		static inline float fPosX = 0.0f;
-		static inline float fPosY = 0.0f;
+		static inline float fPosX;
+		static inline float fPosY;
 		static inline size_t mInterval = 1000;
 		static inline size_t mLastInterval = 0;
 		static inline int mTotalRam = 0;
@@ -40,7 +41,7 @@ private:
 public:
 	struct m_Commands
 	{
-		static inline bool m_bShowMenu = false;
+		static inline bool m_bShowMenu;
 		static inline char m_nInputBuffer[INPUT_BUFFER_SIZE] = "";
 	};
 

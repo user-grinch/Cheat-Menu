@@ -4,6 +4,10 @@
 #include "../depend/imgui/imgui.h"
 #include "d3d9.h"
 
+/*
+	Global resource handler class
+	Handles both image and json resources
+*/
 struct RwD3D9Raster
 {
 	union

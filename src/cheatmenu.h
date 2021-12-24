@@ -27,11 +27,11 @@ private:
     static inline ImVec2 m_fMenuSize = ImVec2(screen::GetScreenWidth() / 4, screen::GetScreenHeight() / 1.2);
     static inline bool m_bSizeChangedExternal = false;
 
-    static inline CallbackTable header{
-        {"Teleport", &Teleport::Draw},   {"Player", &Player::Draw}, {"Ped", &Ped::Draw},
-        {"Animation", &Animation::Draw},
-        {"Vehicle", &Vehicle::Draw},     {"Weapon", &Weapon::Draw}, {"Game", &Game::Draw},
-        {"Visual", &Visual::Draw},       {"Menu", &Menu::Draw}
+    static inline CallbackTable header
+    {
+        {"Teleport", &Teleport::Draw}, {"Player", &Player::Draw}, {"Ped", &Ped::Draw},
+        {"Animation", &Animation::Draw}, {"Vehicle", &Vehicle::Draw}, {"Weapon", &Weapon::Draw},
+        {"Game", &Game::Draw}, {"Visual", &Visual::Draw}, {"Menu", &Menu::Draw}
     };
 
     static void ApplyStyle();

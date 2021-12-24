@@ -1,9 +1,5 @@
 #pragma once
 #include "pch.h"
-#include "player.h"
-#ifdef GTASA
-#include "weapon.h"
-#endif
 
 class Ped
 {
@@ -22,7 +18,6 @@ private:
 #else // GTA3 & GTAVC
 	static inline ResourceStore m_PedData{"ped", eResourceType::TYPE_TEXT};
 #endif
-	static inline bool m_bImagesLoaded;
 	static inline bool m_bExGangWarsInstalled;
 	static inline int m_nPedRemoveRadius = 5;
 	struct m_SpawnPed

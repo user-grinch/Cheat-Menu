@@ -20,22 +20,28 @@ ImFont* FontMgr::LoadFont(const char* fontName, float fontMul)
     size_t fontSize = static_cast<int>(screen::GetScreenHeight() / 54.85f) * fontMul;
 
     std::string fullPath = std::string(PLUGIN_PATH((char*)"CheatMenu/fonts/")) + fontName + ".ttf";
-    m_vecFonts.push_back({io.Fonts->AddFontFromFileTTF(fullPath.c_str(), fontSize), fontSize,
+    m_vecFonts.push_back({io.Fonts->AddFontFromFileTTF(fullPath.c_str(), fontSize), fontSize, fontMul,
                      std::string(fontName)});
     io.Fonts->Build();
 
     return m_vecFonts.back().m_pFont;
 }
 
-void FontMgr::ReinitFonts()
+void FontMgr::UnloadFonts()
 {
-    ImGuiIO& io = ImGui::GetIO();
-    io.Fonts->Clear();
+    ImGui::GetIO().Fonts->Clear();
+}
 
+void FontMgr::ReloadFonts()
+{
+    UnloadFonts();
+
+    ImGuiIO& io = ImGui::GetIO();
     for (auto &data : m_vecFonts)
     {
+        size_t fontSize = static_cast<int>(screen::GetScreenHeight() / 54.85f) * data.m_fMul;
         std::string fullPath = PLUGIN_PATH((char*)"CheatMenu/fonts/") + data.m_path + ".ttf";
-        data.m_pFont = io.Fonts->AddFontFromFileTTF(fullPath.c_str(), data.fontSize);
+        data.m_pFont = io.Fonts->AddFontFromFileTTF(fullPath.c_str(), data.m_nSize);
     }
     io.FontDefault = GetFont("text");
     io.Fonts->Build();

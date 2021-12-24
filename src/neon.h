@@ -1,6 +1,13 @@
 #pragma once
 #include "extender/VehicleExtender.h"
 
+/*
+	Vehicle Neon implementation class for GTA: San Andreas
+	Handles neon colors and neon color changing
+
+	TODO: Implement for VC & 3 too (maybe)
+	Dunno how it'd work with the d3d8to9 wrapper
+*/
 class Neon
 {
 private:

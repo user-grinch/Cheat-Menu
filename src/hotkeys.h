@@ -1,6 +1,10 @@
 #pragma once
 #include <string>
 
+/*
+    ImGui HotKey Implementation class
+    Handles hotkeys and hotkey-related functions
+*/
 class Hotkey
 {
 private:

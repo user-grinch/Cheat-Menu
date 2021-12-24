@@ -557,7 +557,7 @@ void Visual::Draw()
 				Ui::ColorPickerAddress("Breathbar color", *(int*)0x5891EB, ImVec4(172, 203, 241, 255));
 				Ui::EditAddress<float>("Breathbar posX", *(int*)0x58F11F, -999, 94, 999);
 				Ui::EditAddress<float>("Breathbar posY", *(int*)0x58F100, -999, 62, 999);
-				Ui::ColorPickerAddress("Clock color", *(int*)0x58EBD1, ImVec4(180, 25, 29, 255));
+				Ui::ColorPickerAddress("Clock color", *(int*)0x58EBD1, ImVec4(255, 255, 255, 255));
 				Ui::EditAddress<float>("Clock posX", *(int*)0x58EC16, -999, 32, 999);
 				Ui::EditAddress<float>("Clock posY", *(int*)0x58EC04, -999, 22, 999);
 				Ui::ColorPickerAddress("Healthbar color", *(int*)0x589331, ImVec4(180, 25, 29, 255));

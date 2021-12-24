@@ -50,7 +50,7 @@ void Hook::RenderFrame(void* ptr)
 		ImVec2 size(screen::GetScreenWidth(), screen::GetScreenHeight());
 		if (fScreenSize.x != size.x && fScreenSize.y != size.y)
 		{
-			FontMgr::ReinitFonts();
+			FontMgr::ReloadFonts();
 
 			if (gRenderer == Render_DirectX9)
 			{
