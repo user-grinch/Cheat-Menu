@@ -1,7 +1,7 @@
 @echo off
-cd tools
-premake5.exe vs2022
-cd ../build
-call "C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\VsDevCmd.bat"
+echo --------------------------------------------------
+echo Building DebugIII
+echo --------------------------------------------------
+echo[
+call "tools\Setup.bat"
 MsBuild CheatMenu.sln /property:Configuration=Debug /t:CheatMenuIII
-cd ..
