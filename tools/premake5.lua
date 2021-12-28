@@ -17,12 +17,6 @@ if (PSDK_DIR == nil) then
     error("PLUGIN_SDK_DIR environment variable not set")
 end
 
--- Build directories
-----------------------------
-GTASA_DIR = "F:/GTASanAndreas"
-GTAVC_DIR = "E:/GTA Vice City"
-GTA3_DIR = "E:/GTA3"
-
 ----------------------------
 
 workspace "CheatMenu"
@@ -34,10 +28,10 @@ workspace "CheatMenu"
     characterset "MBCS"
     staticruntime "On"
     location "../build"
+    targetdir "../build/bin"
 
 project "Depend"
     kind "StaticLib"
-    targetdir "../build/bin"
 
     files { 
         "../depned/**.h", 
@@ -57,7 +51,6 @@ project "Depend"
 
 project "CheatMenuIII"
     kind "SharedLib"
-    targetdir (GTA3_DIR)
     targetextension ".asi"
     
     files { 
@@ -151,7 +144,6 @@ project "CheatMenuIII"
 
 project "CheatMenuVC"
     kind "SharedLib"
-    targetdir (GTAVC_DIR)
     targetextension ".asi"
     
     files { 
@@ -244,7 +236,6 @@ project "CheatMenuVC"
 
 project "CheatMenuSA"
     kind "SharedLib"
-    targetdir (GTASA_DIR)
     targetextension ".asi"
     
     files { 

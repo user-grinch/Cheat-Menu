@@ -1,25 +1,19 @@
 @echo off
 @REM Packs all game files into their proper archives (Yes I'm that lazy)
 
-@REM ------------------------------------------------------
-@REM Set game paths below
-set "SA_DIR="F:\GTASanAndreas""
-set "VC_DIR="E:\GTA Vice City""
-set "III_DIR="E:\GTA3""
-@REM ------------------------------------------------------
-
 echo ------------------------------------------------------
 echo "CheatMenu Packaging Utility"
 echo ------------------------------------------------------
+rd /S /Q "archive" /Q
 cd tools
 echo Packing SA...
-call :copyFiles %SA_DIR% "CheatMenuSA"
+call :copyFiles "CheatMenuSA"
 echo Packing VC...
-call :copyFiles %VC_DIR% "CheatMenuVC"
+call :copyFiles "CheatMenuVC"
 echo Packing III...
-call :copyFiles %III_DIR% "CheatMenuIII"
-cd ..
+call :copyFiles "CheatMenuIII"
 rd /S /Q "pack" /Q
+cd ..
 exit
 
 
@@ -30,9 +24,9 @@ exit
 
 
 :copyFiles
-set "asiPath="%~1\%~2.asi""
-set "folderpath="%~1\CheatMenu""
-set "archivePath="..\%~2.7z""
+set "asiPath="..\build\bin\%~1.asi""
+set "folderpath="..\resource\%~1""
+set "archivePath="..\archive\%~1.7z""
 
 @REM Remove existing files
 rd /S /Q "pack" /Q
@@ -42,6 +36,7 @@ rd /S /Q %archivePath% /Q
 @REM straight xcopy doesn't seem to work on my system, broken registry?
 %systemroot%\System32\xcopy /s %asiPath% "pack\" /K /D /H /Y 
 %systemroot%\System32\xcopy /s %folderpath% "pack\CheatMenu\" /K /D /H /Y 
+%systemroot%\System32\xcopy /s "..\resource\common\" "pack\CheatMenu\" /K /D /H /Y
 
 @REM Remove the config and versioninfo files since we don't want to distribute them
 del "pack\CheatMenu\json\config.json" /Q
