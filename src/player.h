@@ -4,6 +4,7 @@
 class Player
 {
 private:
+	static inline bool m_bAutoHeal;
 	static inline bool m_bGodMode;
 	static inline bool m_bModloaderInstalled;
 	struct m_KeepPosition

@@ -27,6 +27,11 @@ Menu::Menu()
 	m_Overlay::mSelectedPos = (DISPLAY_POS)gConfig.GetValue("overlay.selected_pos", (int)DISPLAY_POS::BOTTOM_RIGHT);
 	m_Overlay::fPosX = gConfig.GetValue("overlay.pox", 0);
 	m_Overlay::fPosY = gConfig.GetValue("overlay.posy", 0);
+	m_Overlay::textColor[0] = gConfig.GetValue("overlay.text_color.r", 1.0f);
+	m_Overlay::textColor[1] = gConfig.GetValue("overlay.text_color.g", 1.0f);
+	m_Overlay::textColor[2] = gConfig.GetValue("overlay.text_color.b", 1.0f);
+	m_Overlay::textColor[3] = gConfig.GetValue("overlay.text_color.a", 1.0f);
+
 
 	// Hotkeys
 	aimSkinChanger.m_key1 = gConfig.GetValue("hotkey.aim_skin_changer.key1", VK_RETURN);
@@ -128,15 +133,15 @@ void Menu::DrawOverlay()
 		}
 
 		ImGui::SetNextWindowBgAlpha(m_Overlay::bTransparent ? 0.0f : 0.5f);
-
+		ImGui::PushStyleColor(ImGuiCol_Text, *(ImVec4*)&m_Overlay::textColor);
 		if (m_bShowMenu && ImGui::Begin("Overlay", nullptr, window_flags))
 		{
 			CVector pos{0,0,0};
 			pos = pPlayer->GetPosition();
 
 			size_t game_ms = CTimer::m_snTimeInMilliseconds;
-
-			if (game_ms - m_Overlay::mLastInterval > m_Overlay::mInterval)
+			static size_t interval = 0;
+			if (game_ms - interval > 1000)
 			{
 				m_Overlay::fCpuUsage = static_cast<float>(Util::GetCurrentCPUUsage());
 
@@ -147,7 +152,7 @@ void Menu::DrawOverlay()
 				m_Overlay::fMemUsage = 100.0f * (static_cast<float>(mUsedRam) / static_cast<float>(m_Overlay::mTotalRam));
 				
 				m_Overlay::mFPS = static_cast<size_t>(BY_GAME(CTimer::game_FPS, io.Framerate, io.Framerate));
-				m_Overlay::mLastInterval = game_ms;
+				interval = game_ms;
 			}
 
 			if (m_Overlay::bCoord)
@@ -195,6 +200,7 @@ void Menu::DrawOverlay()
 
 			ImGui::End();
 		}
+		ImGui::PopStyleColor();
 	}
 }
 
@@ -348,7 +354,7 @@ void Menu::Draw()
 	if (ImGui::Button("Reset config", ImVec2(Ui::GetSize(2))))
 	{
 		gConfig.m_Data.clear();
-		SetHelpMessage("Config reset", false, false, false);
+		SetHelpMessage("Config has been reset. Restart the game for it to take effect.", false, false, false);
 	}
 	ImGui::SameLine();
 	if (ImGui::Button("Reset size", ImVec2(Ui::GetSize(2))))
@@ -365,37 +371,65 @@ void Menu::Draw()
 			ImGui::Spacing();
 			ImGui::Spacing();
 			ImGui::SameLine();
-			if (Ui::ListBox("Overlay", m_Overlay::posNames, (int&)m_Overlay::mSelectedPos))
+			if (Ui::ListBox("Position", m_Overlay::posNames, (int&)m_Overlay::mSelectedPos))
+			{
 				gConfig.SetValue("overlay.selected_pos", m_Overlay::mSelectedPos);
+			}
+
+			ImGui::Spacing();
+			ImGui::SameLine();
+			if (ImGui::ColorEdit4("Text color", m_Overlay::textColor))
+			{
+				gConfig.SetValue("overlay.text_color.r", m_Overlay::textColor[0]);
+				gConfig.SetValue("overlay.text_color.g", m_Overlay::textColor[1]);
+				gConfig.SetValue("overlay.text_color.b", m_Overlay::textColor[2]);
+				gConfig.SetValue("overlay.text_color.a", m_Overlay::textColor[3]);
+			}
 
 			ImGui::Spacing();
 
 			ImGui::Columns(2, nullptr, false);
 			if (ImGui::Checkbox("No background", &m_Overlay::bTransparent))
+			{
 				gConfig.SetValue("overlay.transparent", m_Overlay::bTransparent);
+			}
 
 			if (ImGui::Checkbox("Show coordinates", &m_Overlay::bCoord))
+			{
 				gConfig.SetValue("overlay.coord", m_Overlay::bCoord);
+			}
 
 			if (ImGui::Checkbox("Show CPU usage", &m_Overlay::bCpuUsage))
+			{
 				gConfig.SetValue("overlay.cpu_usage", m_Overlay::bCpuUsage);
+			}
 
 			if (ImGui::Checkbox("Show FPS", &m_Overlay::bFPS))
+			{
 				gConfig.SetValue("overlay.fps", m_Overlay::bFPS);
+			}
 
 			ImGui::NextColumn();
 
 			if (ImGui::Checkbox("Show location", &m_Overlay::bLocName))
+			{
 				gConfig.SetValue("overlay.loc_name", m_Overlay::bLocName);
+			}
 
 			if (ImGui::Checkbox("Show RAM usage", &m_Overlay::bMemUsage))
+			{			
 				gConfig.SetValue("overlay.mem_usage", m_Overlay::bMemUsage);
+			}
 
 			if (ImGui::Checkbox("Show veh health", &m_Overlay::bVehHealth))
+			{
 				gConfig.SetValue("overlay.veh_health", m_Overlay::bVehHealth);
+			}
 
 			if (ImGui::Checkbox("Show veh speed", &m_Overlay::bVehSpeed))
+			{
 				gConfig.SetValue("overlay.veh_speed", m_Overlay::bVehSpeed);
+			}
 
 			ImGui::Columns(1);
 
@@ -504,6 +538,13 @@ void Menu::Draw()
 					ImGui::Spacing();
 					ImGui::TextWrapped("Set current game time.\nExample: time (hour) (minute).\n");
 					ImGui::TextWrapped("Writing something like 'time 12' would be interpreted as 'time 12 12'");
+					ImGui::Spacing();
+					ImGui::Separator();
+				}
+				if (ImGui::CollapsingHeader("Teleport"))
+				{
+					ImGui::Spacing();
+					ImGui::TextWrapped("Teleports player to specified coordinates.\nExample: tp x y z");
 					ImGui::Spacing();
 					ImGui::Separator();
 				}

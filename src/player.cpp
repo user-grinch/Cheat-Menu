@@ -146,6 +146,30 @@ Player::Player()
 		CPlayerPed* player = FindPlayerPed();
 		int hplayer = CPools::GetPedRef(player);
 
+		if (m_bAutoHeal)
+		{
+			static uint lastDmgTimer = 0;
+			static uint lastHealTimer = 0;
+			static float health = 0;
+			float maxHealth = BY_GAME(player->m_fMaxHealth, 100, 100);
+
+			if (player->m_fHealth != health)
+			{
+				health = player->m_fHealth;
+				lastDmgTimer = timer;
+			}
+
+			if (player->m_fHealth != maxHealth
+			&& timer - lastDmgTimer > 5000  
+			&& timer - lastHealTimer > 1000  
+			)
+			{
+				player->m_fHealth += 0.2f;
+				lastHealTimer = timer;
+				health = player->m_fHealth;
+			}
+		}
+
 		if (m_KeepPosition::m_bEnabled)
 		{
 			if (Command<Commands::IS_CHAR_DEAD>(hplayer))
@@ -392,6 +416,7 @@ void Player::Draw()
 			ImGui::BeginChild("CheckboxesChild");
 
 			ImGui::Columns(2, 0, false);
+			Ui::CheckboxWithHint("Auto heal", &m_bAutoHeal, "Player will heal when not taken damage for 5 seconds");	
 
 #ifdef GTASA
 			Ui::CheckboxAddress("Bounty on yourself", 0x96913F);	

@@ -549,7 +549,7 @@ void Visual::Draw()
 			{
 #ifdef GTASA
 				ImGui::TextWrapped(
-					"These options won't work if you got any mods that drastically changes the game hud. i.e. Mobile Hud, GTA 5 Hud etc.");
+					"These options won't work if you got any mods that drastically change the game hud. i.e. Mobile Hud, GTA 5 Hud, VHud etc.");
 				ImGui::Spacing();
 				Ui::ColorPickerAddress("Armourbar color", *(int*)0x5890FC, ImVec4(225, 225, 225, 255));
 				Ui::EditAddress<float>("Armourbar posX", 0x866B78, -999, 94, 999);

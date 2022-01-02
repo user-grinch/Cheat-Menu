@@ -33,9 +33,8 @@ private:
 		static inline DISPLAY_POS mSelectedPos = DISPLAY_POS::BOTTOM_RIGHT;
 		static inline float fPosX;
 		static inline float fPosY;
-		static inline size_t mInterval = 1000;
-		static inline size_t mLastInterval = 0;
 		static inline int mTotalRam = 0;
+		static inline float textColor[4] = {1.0f, 1.0f, 1.0f, 1.0f};
 	};
 
 public:

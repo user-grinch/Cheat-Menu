@@ -14,7 +14,7 @@ public:
 
 #ifdef GTASA
 	static void ClearCharTasksVehCheck(CPed* ped);
-	static int GetLargestGangInZone();
+	static int GetLargestGangInZone();	
 	static RwTexture* LoadTextureFromMemory(char* data, unsigned int size);
 #endif
 

@@ -684,7 +684,7 @@ void Vehicle::Draw()
 				Call<0x490EE0>();
 			}
 #endif
-			Ui::CheckboxWithHint("Watertight car", &m_bVehWatertight);
+			Ui::CheckboxWithHint("Watertight car", &m_bVehWatertight, "Peds inside won't drown if the vehicle\nis submerged in water");
 			Ui::CheckboxAddress("Wheels only", BY_GAME(0x96914B, 0xA10B70, 0x95CD78));
 			ImGui::Columns(1);
 
