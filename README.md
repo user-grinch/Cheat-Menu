@@ -30,6 +30,17 @@ If you have those mentioned versions installed follow the steps below,
 
 Be sure to check [here](https://github.com/user-grinch/Cheat-Menu/issues/48) to know about incompatibilities with other mods.
 
+## Incompatible Mods
+### GTA SA
+1. **ENB/ SA_DirectX 2.0** - **FIX:** disable Effect/ Enable water
+2. **MSI Afterburner** - **FIX:**  Enable Stealth mode in rivatuner
+3. **GTA Underground**
+
+### GTA III
+1. SilentPatch **ddraw.dll** component. Just delete it for now.
+
+Let me know if you mind more.
+
 ## Things to do on crash
 1. Delete the `CheatMenu/json/config.json` file and try again.
 2. If it's happening after installing a recent mod try removing it. A list of incompatibile mods are [here](https://github.com/user-grinch/Cheat-Menu/issues/48).
