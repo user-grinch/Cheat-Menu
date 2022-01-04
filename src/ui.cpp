@@ -234,7 +234,7 @@ void Ui::DrawHeaders(CallbackTable& data)
 	ImGui::PushFont(FontMgr::GetFont("header"));
 
 	ImDrawList *pDrawList = ImGui::GetWindowDrawList();
-	for (int i = 0; i < data.size(); ++i)
+	for (size_t i = 0; i < data.size(); ++i)
 	{
 		const char* btn_text = data[i].first.c_str();
 
@@ -283,35 +283,7 @@ void Ui::DrawHeaders(CallbackTable& data)
 	ImGui::PopStyleVar();
 	ImGui::Dummy(ImVec2(0, 10));
 
-	if (m_HeaderId == -1)
-	{
-		// Show Welcome page
-		ImGui::NewLine();
-
-		CenterdText("Welcome to Cheat Menu");
-		CenterdText("Author: Grinch_");
-
-		ImGui::NewLine();
-		ImGui::TextWrapped("Please ensure you have the latest version from GitHub.");
-		ImGui::NewLine();
-		if (ImGui::Button("Discord server", ImVec2(GetSize(2))))
-		{
-			ShellExecute(nullptr, "open", DISCORD_INVITE, nullptr, nullptr, SW_SHOWNORMAL);
-		}
-
-		ImGui::SameLine();
-
-		if (ImGui::Button("GitHub repo", ImVec2(GetSize(2))))
-		{
-			ShellExecute(nullptr, "open", GITHUB_LINK, nullptr, nullptr, SW_SHOWNORMAL);
-		}
-
-		ImGui::NewLine();
-		ImGui::TextWrapped("If you find bugs or have suggestions, you can let me know on discord :)");
-		ImGui::Dummy(ImVec2(0, 30));
-		CenterdText("Copyright Grinch_ 2019-2022. All rights reserved.");
-	}
-	else
+	if (m_HeaderId != -1)
 	{
 		if (pCallback != nullptr && ImGui::BeginChild("TABSBAR"))
 		{

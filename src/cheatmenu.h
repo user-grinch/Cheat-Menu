@@ -4,7 +4,7 @@
     Required:
         DirectX 9 SDK
         Plugin SDK
-        Build Tools 2019 (v142)
+        Build Tools 2022 (v143)
         Windows SDK
 */
 
@@ -36,6 +36,8 @@ private:
 
     static void ApplyStyle();
     static void DrawWindow();
+    static void ShowUpdateScreen();
+    static void ShowWelcomeScreen();
 
 public:
     CheatMenu();

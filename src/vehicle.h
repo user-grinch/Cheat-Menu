@@ -1,15 +1,7 @@
 #pragma once
 #include "pch.h"
-#ifdef GTASA
-#include "neon.h"
-#include "paint.h"
-#endif
 
-#ifdef GTASA
-class Vehicle : public Paint, public Neon
-#else // GTA3 & GTAVC
 class Vehicle
-#endif
 {
 private:
 	static inline bool m_bBikeFly;
@@ -24,11 +16,13 @@ private:
 	static inline bool m_bLockSpeed;
 	static inline float m_fLockSpeed;
 	static inline std::vector<std::vector<float>> m_CarcolsColorData;
-	struct m_Color
+	struct m_Paint
 	{
 		static inline bool m_bMatFilter = true;
 		static inline int m_nRadioButton = 1;
 		static inline float m_fColorPicker[3]{ 0, 0, 0 };
+		static inline std::vector<std::string> m_vecNames{"Default"};
+		static inline std::string m_Selected = "Default";
 	};
 	
 #ifdef GTASA
@@ -106,4 +100,5 @@ public:
 	static int GetModelFromName(const char* name);
 	static void Draw();
 	Vehicle();
+	~Vehicle();
 };

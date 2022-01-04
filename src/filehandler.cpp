@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "filehandler.h"
-#include "visual.h"
 
 // TODO: Clean up this mess, use structures instead?
 void FileHandler::GenerateHandlingFile(int pHandling, std::map<int, std::string>& storeMap)

@@ -1,8 +1,11 @@
 #pragma once
 #include <map>
 #include <vector>
-#include <string>
 
+/*
+    FileHandler class
+    Handles files IO and processing
+*/
 class FileHandler
 {
 public:

@@ -23,6 +23,7 @@
 // SOFTWARE.
 
 #pragma once
+#include <vector>
 
 class Paint
 {
@@ -70,19 +71,13 @@ private:
 		void resetMaterialTexture(RpMaterial* material);
 	};
 	static inline VehicleExtendedData<VehData> m_VehData;
+	static void NodeWrapperRecursive(RwFrame* frame, CVehicle* pVeh, std::function<void(RwFrame*)> func);
 
-protected:
+public:
 	static inline ResourceStore m_TextureData { "textures", eResourceType::TYPE_IMAGE, ImVec2(100, 80) };
 
-	struct veh_nodes
-	{
-		static inline std::vector<std::string> names_vec{"Default"};
-		static inline std::string selected = "Default";
-	};
-
-	Paint();
-	static void UpdateNodeListRecursive(CVehicle* pVeh);
-	static void NodeWrapperRecursive(RwFrame* frame, CVehicle* pVeh, std::function<void(RwFrame*)> func);
+	static void InitHooks();
+	static void GenerateNodeList(CVehicle* pVeh, std::vector<std::string>& names_vec);
 	static void SetNodeColor(CVehicle* pVeh, std::string node_name, CRGBA color, bool filter_mat = false);
 	static void SetNodeTexture(CVehicle* pVeh, std::string node_name, std::string texturename, bool filter_mat = false);
 	static void ResetNodeColor(CVehicle* veh, std::string node_name);

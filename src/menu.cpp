@@ -24,7 +24,7 @@ Menu::Menu()
 	m_Overlay::bMemUsage = gConfig.GetValue("overlay.mem_usage", false);
 	m_Overlay::bVehHealth = gConfig.GetValue("overlay.veh_health", false);
 	m_Overlay::bVehSpeed = gConfig.GetValue("overlay.veh_speed", false);
-	m_Overlay::mSelectedPos = (DISPLAY_POS)gConfig.GetValue("overlay.selected_pos", (int)DISPLAY_POS::BOTTOM_RIGHT);
+	m_Overlay::mSelectedPos = (DisplayPos)gConfig.GetValue("overlay.selected_pos", (int)DisplayPos::BOTTOM_RIGHT);
 	m_Overlay::fPosX = gConfig.GetValue("overlay.pox", 0);
 	m_Overlay::fPosY = gConfig.GetValue("overlay.posy", 0);
 	m_Overlay::textColor[0] = gConfig.GetValue("overlay.text_color.r", 1.0f);
@@ -91,7 +91,7 @@ void Menu::DrawOverlay()
 		ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize |
 			ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
 
-		if (m_Overlay::mSelectedPos == DISPLAY_POS::CUSTOM)
+		if (m_Overlay::mSelectedPos == DisplayPos::CUSTOM)
 		{
 			if (m_Overlay::fPosX != NULL && m_Overlay::fPosY != NULL)
 			{
@@ -105,25 +105,25 @@ void Menu::DrawOverlay()
 			window_flags |= ImGuiWindowFlags_NoMove;
 			ImVec2 pos, pivot;
 
-			if (m_Overlay::mSelectedPos == DISPLAY_POS::TOP_LEFT)
+			if (m_Overlay::mSelectedPos == DisplayPos::TOP_LEFT)
 			{
 				pos = ImVec2(offset, offset);
 				pivot = ImVec2(0.0f, 0.0f);
 			}
 
-			if (m_Overlay::mSelectedPos == DISPLAY_POS::TOP_RIGHT)
+			if (m_Overlay::mSelectedPos == DisplayPos::TOP_RIGHT)
 			{
 				pos = ImVec2(io.DisplaySize.x - offset, offset);
 				pivot = ImVec2(1.0f, 0.0f);
 			}
 
-			if (m_Overlay::mSelectedPos == DISPLAY_POS::BOTTOM_LEFT)
+			if (m_Overlay::mSelectedPos == DisplayPos::BOTTOM_LEFT)
 			{
 				pos = ImVec2(offset, io.DisplaySize.y - offset);
 				pivot = ImVec2(0.0f, 1.0f);
 			}
 
-			if (m_Overlay::mSelectedPos == DISPLAY_POS::BOTTOM_RIGHT)
+			if (m_Overlay::mSelectedPos == DisplayPos::BOTTOM_RIGHT)
 			{
 				pos = ImVec2(io.DisplaySize.x - offset, io.DisplaySize.y - offset);
 				pivot = ImVec2(1.0f, 1.0f);
@@ -573,10 +573,7 @@ void Menu::Draw()
 
 			if (ImGui::Button("Check update", ImVec2(Ui::GetSize(3))))
 			{
-				if (Updater::m_State == UPDATER_IDLE)
-				{
-					Updater::m_State = UPDATER_CHECKING;
-				}
+				Updater::CheckUpdate();
 			}
 
 			ImGui::SameLine();

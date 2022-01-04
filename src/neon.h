@@ -30,13 +30,17 @@ private:
 
 	static inline RwTexture* m_pNeonTexture = nullptr; // pointer to the neon mask texture
 	static inline VehicleExtendedData<NeonData> m_VehNeon;
+	static inline bool m_bInit;
 
 public:
-	Neon();
-	~Neon();
-	static void InstallNeon(CVehicle* veh, int red, int green, int blue);
-	static bool IsNeonInstalled(CVehicle* veh);
+	Neon() = delete;
+	Neon(Neon&) = delete;
+
+	static void InitHooks();
+	static void Install(CVehicle* veh, int red, int green, int blue);
+	static bool IsInstalled(CVehicle* veh);
 	static bool IsPulsingEnabled(CVehicle* veh);
 	static void SetPulsing(CVehicle* veh, bool state);
-	static void RemoveNeon(CVehicle* veh);
+	static void RemoveHooks();
+	static void Remove(CVehicle* veh);
 };

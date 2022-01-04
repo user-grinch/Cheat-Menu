@@ -27,7 +27,7 @@
 #include "NodeName.h"
 #include "util.h"
 
-Paint::Paint()
+void Paint::InitHooks()
 {
 	Events::vehicleRenderEvent.before += [](CVehicle* pVeh)
 	{
@@ -142,16 +142,16 @@ void Paint::NodeWrapperRecursive(RwFrame* frame, CVehicle* pVeh, std::function<v
 	return;
 }
 
-void Paint::UpdateNodeListRecursive(CVehicle* pVeh)
+void Paint::GenerateNodeList(CVehicle* pVeh, std::vector<std::string>& names_vec)
 {
 	RwFrame* frame = (RwFrame*)pVeh->m_pRwClump->object.parent;
 
-	NodeWrapperRecursive(frame, pVeh, [](RwFrame* frame)
+	NodeWrapperRecursive(frame, pVeh, [&](RwFrame* frame)
 	{
 		const std::string name = GetFrameNodeName(frame);
 
-		if (!(std::find(veh_nodes::names_vec.begin(), veh_nodes::names_vec.end(), name) != veh_nodes::names_vec.end()))
-			veh_nodes::names_vec.push_back(name);
+		if (!(std::find(names_vec.begin(), names_vec.end(), name) != names_vec.end()))
+			names_vec.push_back(name);
 	});
 }
 

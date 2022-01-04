@@ -1,19 +1,31 @@
 #pragma once
-#include <string>
 
-enum UPDATER_STATE
-{
-	UPDATER_IDLE,
-	UPDATER_CHECKING,
-	UPDATER_UPDATE_FOUND
-};
-
+/*
+	Update class
+	Checks for menu updates and provides a way to update the menu.
+*/
 class Updater
 {
+private:
+	enum class States
+	{
+		IDLE,
+		CHECKING,
+		FOUND
+	};
+	static inline States curState = States::IDLE;
+	static inline std::string latestVer;
+	
 public:
-	static inline UPDATER_STATE m_State = UPDATER_IDLE;
-	static inline std::string m_LatestVersion;
 
-	static void CheckForUpdate();
-	static void ShowUpdateScreen();
+	Updater() = delete;
+	Updater(const Updater&) = delete;
+
+	static void CheckUpdate();
+	static std::string GetUpdateVersion();
+	static bool IsUpdateAvailable();
+
+	// Needs to run in it's own thread to prevent the game from freezing
+	static void Process();
+	static void ResetUpdaterState();
 };

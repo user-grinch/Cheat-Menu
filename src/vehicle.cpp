@@ -7,6 +7,11 @@
 #include <CPopulation.h>
 #include <CDamageManager.h>
 
+#ifdef GTASA
+#include "neon.h"
+#include "paint.h"
+#endif
+
 void Vehicle::FixVehicle(CVehicle *pVeh)
 {
 #ifdef GTASA
@@ -68,7 +73,10 @@ Vehicle::Vehicle()
 {
 #ifdef GTASA
 	FileHandler::FetchHandlingID(m_VehicleIDE);
+	Neon::InitHooks();
+	Paint::InitHooks();
 #endif
+
 	FileHandler::FetchColorData(m_CarcolsColorData);
 
 	Events::processScriptsEvent += [this]
@@ -184,7 +192,7 @@ Vehicle::Vehicle()
 				int red, green, blue;
 
 				Util::RainbowValues(red, green, blue, 0.25);
-				InstallNeon(pVeh, red, green, blue);
+				Neon::Install(pVeh, red, green, blue);
 				m_Neon::m_nRainbowTimer = timer;
 			}
 #endif
@@ -213,9 +221,9 @@ Vehicle::Vehicle()
 					chance = Random(1, 3);
 				}
 
-				if (chance == 1 && !IsNeonInstalled(veh) && veh->m_pDriver != pPlayer)
+				if (chance == 1 && !Neon::IsInstalled(veh) && veh->m_pDriver != pPlayer)
 				{
-					InstallNeon(veh, Random(0, 255), Random(0, 255), Random(0, 255));
+					Neon::Install(veh, Random(0, 255), Random(0, 255), Random(0, 255));
 				}
 			}
 			m_Neon::m_bTrafficTimer = timer;
@@ -237,6 +245,13 @@ Vehicle::Vehicle()
 		}
 #endif
 	};
+}
+
+Vehicle::~Vehicle()
+{
+#ifdef GTASA
+	Neon::RemoveHooks();
+#endif
 }
 
 #ifdef GTASA
@@ -1055,24 +1070,24 @@ void Vehicle::Draw()
 			if (ImGui::BeginTabItem("Color"))
 			{
 #ifdef GTASA
-				Paint::UpdateNodeListRecursive(veh);
+				Paint::GenerateNodeList(veh, m_Paint::m_vecNames);
 
 				ImGui::Spacing();
 				if (ImGui::Button("Reset color", ImVec2(Ui::GetSize())))
 				{
-					Paint::ResetNodeColor(veh, Paint::veh_nodes::selected);
+					Paint::ResetNodeColor(veh, m_Paint::m_Selected);
 					SetHelpMessage("Color reset", false, false, false);
 				}
 				ImGui::Spacing();
 
-				Ui::ListBoxStr("Component", Paint::veh_nodes::names_vec, Paint::veh_nodes::selected);
+				Ui::ListBoxStr("Component", m_Paint::m_vecNames, m_Paint::m_Selected);
 
-				if (ImGui::ColorEdit3("Color picker", m_Color::m_fColorPicker))
+				if (ImGui::ColorEdit3("Color picker", m_Paint::m_fColorPicker))
 				{
-					uchar r = m_Color::m_fColorPicker[0] * 255;
-					uchar g = m_Color::m_fColorPicker[1] * 255;
-					uchar b = m_Color::m_fColorPicker[2] * 255;
-					Paint::SetNodeColor(veh, Paint::veh_nodes::selected, { r, g, b, 255 }, m_Color::m_bMatFilter);
+					uchar r = m_Paint::m_fColorPicker[0] * 255;
+					uchar g = m_Paint::m_fColorPicker[1] * 255;
+					uchar b = m_Paint::m_fColorPicker[2] * 255;
+					Paint::SetNodeColor(veh, m_Paint::m_Selected, { r, g, b, 255 }, m_Paint::m_bMatFilter);
 				}
 #endif
 
@@ -1080,13 +1095,13 @@ void Vehicle::Draw()
 				ImGui::Columns(2, NULL, false);
 
 #ifdef GTASA
-				ImGui::Checkbox("Material filter", &m_Color::m_bMatFilter);
-				ImGui::RadioButton("Primary", &m_Color::m_nRadioButton, 1);
-				ImGui::RadioButton("Secondary", &m_Color::m_nRadioButton, 2);
+				ImGui::Checkbox("Material filter", &m_Paint::m_bMatFilter);
+				ImGui::RadioButton("Primary", &m_Paint::m_nRadioButton, 1);
+				ImGui::RadioButton("Secondary", &m_Paint::m_nRadioButton, 2);
 				ImGui::NextColumn();
 				ImGui::NewLine();
-				ImGui::RadioButton("Tertiary", &m_Color::m_nRadioButton, 3);
-				ImGui::RadioButton("Quaternary", &m_Color::m_nRadioButton, 4);
+				ImGui::RadioButton("Tertiary", &m_Paint::m_nRadioButton, 3);
+				ImGui::RadioButton("Quaternary", &m_Paint::m_nRadioButton, 4);
 #else // GTA3 & GTAVC
 				ImGui::RadioButton("Primary", &m_Color::m_nRadioButton, 1);
 				ImGui::NextColumn();
@@ -1110,7 +1125,7 @@ void Vehicle::Draw()
 				{
 					if (Ui::ColorButton(colorId, m_CarcolsColorData[colorId], ImVec2(btnSize, btnSize)))
 					{
-						*(uint8_replacement*)(int(veh) + BY_GAME(0x433, 0x19F, 0x19B) + m_Color::m_nRadioButton) = colorId;
+						*(uint8_replacement*)(int(veh) + BY_GAME(0x433, 0x19F, 0x19B) + m_Paint::m_nRadioButton) = colorId;
 					}
 
 					if ((colorId + 1) % btnsInRow != 0)
@@ -1130,16 +1145,18 @@ void Vehicle::Draw()
 					ImGui::Spacing();
 					if (ImGui::Button("Remove neon", ImVec2(Ui::GetSize())))
 					{
-						RemoveNeon(veh);
+						Neon::Remove(veh);
 						SetHelpMessage("Neon removed", false, false, false);
 					}
 
 					ImGui::Spacing();
 					ImGui::Columns(2, NULL, false);
 
-					bool pulsing = IsPulsingEnabled(veh);
+					bool pulsing = Neon::IsPulsingEnabled(veh);
 					if (Ui::CheckboxWithHint("Pulsing neons", &pulsing))
-						SetPulsing(veh, pulsing);
+					{
+						Neon::SetPulsing(veh, pulsing);
+					}
 
 					Ui::CheckboxWithHint("Rainbow neons", &m_Neon::m_bRainbowEffect, "Rainbow effect to neon lights");
 					ImGui::NextColumn();
@@ -1150,8 +1167,11 @@ void Vehicle::Draw()
 					ImGui::Spacing();
 
 					if (ImGui::ColorEdit3("Color picker", m_Neon::m_fColorPicker))
-						InstallNeon(veh, m_Neon::m_fColorPicker[0] * 255, m_Neon::m_fColorPicker[1] * 255,
-									m_Neon::m_fColorPicker[2] * 255);
+					{
+						Neon::Install(veh, m_Neon::m_fColorPicker[0] * 255, m_Neon::m_fColorPicker[1] * 255,
+															m_Neon::m_fColorPicker[2] * 255);
+					}
+						
 
 					ImGui::Spacing();
 					ImGui::Text("Select neon preset:");
@@ -1169,11 +1189,13 @@ void Vehicle::Draw()
 						if (Ui::ColorButton(color_id, m_CarcolsColorData[color_id], ImVec2(btnSize, btnSize)))
 						{
 							std::vector<float>& color = m_CarcolsColorData[color_id];
-							InstallNeon(veh, color[0] * 255, color[1] * 255, color[2] * 255);
+							Neon::Install(veh, color[0] * 255, color[1] * 255, color[2] * 255);
 						}
 
 						if ((color_id + 1) % btnsInRow != 0)
+						{
 							ImGui::SameLine(0.0, 4.0);
+						}
 					}
 
 					ImGui::EndChild();
@@ -1181,17 +1203,17 @@ void Vehicle::Draw()
 				}
 				if (ImGui::BeginTabItem("Textures"))
 				{
-					Paint::UpdateNodeListRecursive(veh);
+					Paint::GenerateNodeList(veh, m_Paint::m_vecNames);
 
 					ImGui::Spacing();
 					if (ImGui::Button("Reset texture", ImVec2(Ui::GetSize())))
 					{
-						Paint::ResetNodeTexture(veh, Paint::veh_nodes::selected);
+						Paint::ResetNodeTexture(veh, m_Paint::m_Selected);
 						SetHelpMessage("Texture reset", false, false, false);
 					}
 					ImGui::Spacing();
 
-					Ui::ListBoxStr("Component", Paint::veh_nodes::names_vec, Paint::veh_nodes::selected);
+					Ui::ListBoxStr("Component", m_Paint::m_vecNames, m_Paint::m_Selected);
 					ImGui::Spacing();
 
 					int maxpjob, curpjob;
@@ -1216,13 +1238,13 @@ void Vehicle::Draw()
 
 					ImGui::Spacing();
 					ImGui::SameLine();
-					ImGui::Checkbox("Material filter", &m_Color::m_bMatFilter);
+					ImGui::Checkbox("Material filter", &m_Paint::m_bMatFilter);
 					ImGui::Spacing();
-					Ui::DrawImages(m_TextureData,
+					Ui::DrawImages(Paint::m_TextureData,
 								[](std::string& str)
 								{
-									Paint::SetNodeTexture(FindPlayerPed()->m_pVehicle, Paint::veh_nodes::selected, str,
-															m_Color::m_bMatFilter);
+									Paint::SetNodeTexture(FindPlayerPed()->m_pVehicle, m_Paint::m_Selected, str,
+															m_Paint::m_bMatFilter);
 								},
 								nullptr,
 									[](std::string& str)

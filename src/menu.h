@@ -4,7 +4,7 @@ class Menu
 {
 private:
 
-	enum DISPLAY_POS
+	enum class DisplayPos
 	{
 		CUSTOM,
 		TOP_LEFT,
@@ -30,7 +30,7 @@ private:
 		{
 			"Custom", "Top left", "Top right", "Bottom left", "Bottom right"
 		};
-		static inline DISPLAY_POS mSelectedPos = DISPLAY_POS::BOTTOM_RIGHT;
+		static inline DisplayPos mSelectedPos = DisplayPos::BOTTOM_RIGHT;
 		static inline float fPosX;
 		static inline float fPosY;
 		static inline int mTotalRam = 0;

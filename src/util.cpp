@@ -4,9 +4,9 @@
 
 std::string Util::GetLocationName(CVector* pos)
 {
-	CPlayerPed  *pPlayer = FindPlayerPed();
 
 #ifdef GTASA
+	CPlayerPed  *pPlayer = FindPlayerPed();
 	int hplayer = CPools::GetPedRef(pPlayer);
 
 	int interior = 0;
@@ -39,38 +39,13 @@ std::string Util::GetLocationName(CVector* pos)
 	return std::string("Interior ") + std::to_string(interior) + ", " + town;
 
 #elif GTAVC
-	if (pPlayer)
-	{
-		return std::to_string(pPlayer->m_nInterior) + ", Vice City" ;
-	} 
-	else
-	{
-		return "Vice City";
-	}
+	return "Vice City";
 #else
 	return "Liberty City";
 #endif
 }
 
 #ifdef GTASA
-// Thanks DKPac22
-RwTexture* Util::LoadTextureFromMemory(char* data, unsigned int size)
-{
-	patch::SetChar(0x7CF9CA, rwSTREAMMEMORY);
-	RwMemory memoryImage;
-	RwInt32 width, height, depth, flags;
-	memoryImage.start = (RwUInt8*)data;
-	memoryImage.length = size;
-	RwImage* image = RtPNGImageRead((char*)&memoryImage);
-	RwImageFindRasterFormat(image, 4, &width, &height, &depth, &flags);
-	RwRaster* raster = RwRasterCreate(width, height, depth, flags);
-	RwRasterSetFromImage(raster, image);
-	RwImageDestroy(image);
-	patch::SetChar(0x7CF9CA, rwSTREAMFILENAME);
-
-	return RwTextureCreate(raster);
-}
-
 void Util::ClearCharTasksVehCheck(CPed* ped)
 {
 	uint hped = CPools::GetPedRef(ped);
@@ -97,8 +72,7 @@ void Util::ClearCharTasksVehCheck(CPed* ped)
 
 bool Util::IsOnMission()
 {
-	return FindPlayerPed()->CanPlayerStartMission() && !*(patch::Get<char*>(0x5D5380, false) +
-		CTheScripts::OnAMissionFlag);
+	return FindPlayerPed()->CanPlayerStartMission() && !*(patch::Get<char*>(0x5D5380, false) + CTheScripts::OnAMissionFlag);
 }
 
 int Util::GetLargestGangInZone()

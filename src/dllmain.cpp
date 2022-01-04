@@ -72,18 +72,14 @@ void MenuThread(void* param)
 
 	if (lastCheckDate != tstruct.tm_mday)
 	{
-		Updater::CheckForUpdate();
+		Updater::CheckUpdate();
 		gConfig.SetValue("config.last_update_checked", tstruct.tm_mday);
 	}
 
 	while (true)
 	{
 		Sleep(5000);
-
-		if (Updater::m_State == UPDATER_CHECKING)
-		{
-			Updater::CheckForUpdate();
-		}
+		Updater::Process();
 	}
 }
 
@@ -97,8 +93,8 @@ BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
 		}
 		else
 		{
-			gLog << "Error: Unknown game version. GTA " <<  BY_GAME("SA v1.0 US Hoodlum", "GTA VC v1.0 EN", "GTA III v1.0 EN") << " is required." << std::endl;
-			MessageBox(HWND_DESKTOP, "Unknown game version. GTA " BY_GAME("SA v1.0 US Hoodlum", "GTA VC v1.0 EN", "GTA III v1.0 EN") " is required.", "CheatMenu", MB_ICONERROR);
+			gLog << "Error: Unknown game version. GTA " <<  BY_GAME("SA v1.0 US Hoodlum", "VC v1.0 EN", "III v1.0 EN") << " is required." << std::endl;
+			MessageBox(HWND_DESKTOP, "Unknown game version. GTA " BY_GAME("SA v1.0 US Hoodlum", "VC v1.0 EN", "III v1.0 EN") " is required.", "CheatMenu", MB_ICONERROR);
 		}
 	}
 

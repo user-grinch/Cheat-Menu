@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "neon.h"
-#include "util.h"
 
 // Neon sprite
 const unsigned char neon_mask[1689] =
@@ -161,13 +160,36 @@ const unsigned char neon_mask[1689] =
 	0x4e, 0x44, 0xae, 0x42, 0x60, 0x82
 };
 
-Neon::Neon()
+// Thanks DKPac22
+static RwTexture* LoadTextureFromMemory(char* data, unsigned int size)
 {
-	Events::processScriptsEvent += [this]
+	patch::SetChar(0x7CF9CA, rwSTREAMMEMORY);
+	RwMemory memoryImage;
+	RwInt32 width, height, depth, flags;
+	memoryImage.start = (RwUInt8*)data;
+	memoryImage.length = size;
+	RwImage* image = RtPNGImageRead((char*)&memoryImage);
+	RwImageFindRasterFormat(image, 4, &width, &height, &depth, &flags);
+	RwRaster* raster = RwRasterCreate(width, height, depth, flags);
+	RwRasterSetFromImage(raster, image);
+	RwImageDestroy(image);
+	patch::SetChar(0x7CF9CA, rwSTREAMFILENAME);
+
+	return RwTextureCreate(raster);
+}
+
+void Neon::InitHooks()
+{
+	if (m_bInit)
+	{
+		return;
+	}
+
+	Events::processScriptsEvent += []
 	{
 		if (!m_pNeonTexture)
 		{
-			m_pNeonTexture = Util::LoadTextureFromMemory((char*)neon_mask, sizeof(neon_mask));
+			m_pNeonTexture = LoadTextureFromMemory((char*)neon_mask, sizeof(neon_mask));
 		}
 	};
 
@@ -208,9 +230,11 @@ Neon::Neon()
 			}
 		}
 	};
+
+	m_bInit = true;
 }
 
-Neon::~Neon()
+void Neon::RemoveHooks()
 {
 	if (m_pNeonTexture)
 	{
@@ -219,7 +243,7 @@ Neon::~Neon()
 	}
 }
 
-bool Neon::IsNeonInstalled(CVehicle* pVeh)
+bool Neon::IsInstalled(CVehicle* pVeh)
 {
 	return m_VehNeon.Get(pVeh).m_bNeonInstalled;
 }
@@ -234,7 +258,7 @@ void Neon::SetPulsing(CVehicle* pVeh, bool state)
 	m_VehNeon.Get(pVeh).m_bPulsing = state;
 }
 
-void Neon::InstallNeon(CVehicle* pVeh, int red, int green, int blue)
+void Neon::Install(CVehicle* pVeh, int red, int green, int blue)
 {
 	CRGBA& color = m_VehNeon.Get(pVeh).m_Color;
 
@@ -246,7 +270,7 @@ void Neon::InstallNeon(CVehicle* pVeh, int red, int green, int blue)
 	m_VehNeon.Get(pVeh).m_bNeonInstalled = true;
 }
 
-void Neon::RemoveNeon(CVehicle* pVeh)
+void Neon::Remove(CVehicle* pVeh)
 {
 	m_VehNeon.Get(pVeh).m_bNeonInstalled = false;
 }
