@@ -3,10 +3,10 @@
 #include "extensions/Paths.h"
 
 ResourceStore::ResourceStore(const char* text, eResourceType type, ImVec2 imageSize)
-: m_ImageSize(imageSize)
+    : m_ImageSize(imageSize)
 {
     if (type == eResourceType::TYPE_TEXT
-    || type == eResourceType::TYPE_BOTH)
+            || type == eResourceType::TYPE_BOTH)
     {
         m_pJson = std::make_unique<CJson>(text);
 
@@ -19,11 +19,11 @@ ResourceStore::ResourceStore(const char* text, eResourceType type, ImVec2 imageS
             }
         }
     }
-    
+
     if (type == eResourceType::TYPE_IMAGE
-    || type == eResourceType::TYPE_BOTH)
+            || type == eResourceType::TYPE_BOTH)
     {
-        /*  
+        /*
             Textures need to be loaded from main thread
             Loading it directly here doesn't work
         */
@@ -40,18 +40,18 @@ ResourceStore::ResourceStore(const char* text, eResourceType type, ImVec2 imageS
 
 static void* GetTextureFromRaster(RwTexture* pTexture)
 {
-	RwRasterEx* raster = (RwRasterEx*)(&pTexture->raster->parent);
+    RwRasterEx* raster = (RwRasterEx*)(&pTexture->raster->parent);
 
-	return (&raster->m_pRenderResource->texture);
+    return (&raster->m_pRenderResource->texture);
 }
 
 void ResourceStore::LoadTextureResource(std::string&& name)
 {
     std::string fullPath = PLUGIN_PATH((char*)"CheatMenu\\") + name + ".txd";
-	RwTexDictionary* pRwTexDictionary = CFileLoader::LoadTexDictionary(fullPath.c_str());
+    RwTexDictionary* pRwTexDictionary = CFileLoader::LoadTexDictionary(fullPath.c_str());
 
-	if (pRwTexDictionary)
-	{
+    if (pRwTexDictionary)
+    {
         RwLinkList *pRLL = (RwLinkList*)pRwTexDictionary->texturesInDict.link.next;
         RwTexDictionary *pEndDic;
         do
@@ -61,7 +61,7 @@ void ResourceStore::LoadTextureResource(std::string&& name)
 
             m_ImagesList.push_back(std::make_unique<TextureResource>());
             m_ImagesList.back().get()->m_pRwTexture = pTex;
-            
+
             // Fetch IDirec9Texture9* from RwTexture*
             m_ImagesList.back().get()->m_pTexture = GetTextureFromRaster(pTex);
 
@@ -91,5 +91,5 @@ void ResourceStore::LoadTextureResource(std::string&& name)
             pRLL = (RwLinkList*)pEndDic;
         }
         while ( pEndDic != (RwTexDictionary*)&pRwTexDictionary->texturesInDict );
-	}
+    }
 }

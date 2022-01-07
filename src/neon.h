@@ -11,36 +11,35 @@
 class Neon
 {
 private:
-	class NeonData
-	{
-	public:
-		CRGBA m_Color;
-		bool m_bNeonInstalled;
-		float m_fVal;
-		bool m_bIncrement;
-		bool m_bPulsing;
+    class NeonData
+    {
+    public:
+        CRGBA m_Color;
+        bool m_bNeonInstalled;
+        float m_fVal;
+        bool m_bIncrement;
+        bool m_bPulsing;
 
-		NeonData(CVehicle* pVeh)
-		{
-			m_bNeonInstalled = false;
-			m_fVal = 0.0;
-			m_bIncrement = true;
-		}
-	};
+        NeonData(CVehicle* pVeh)
+        {
+            m_bNeonInstalled = false;
+            m_fVal = 0.0;
+            m_bIncrement = true;
+        }
+    };
 
-	static inline RwTexture* m_pNeonTexture = nullptr; // pointer to the neon mask texture
-	static inline VehicleExtendedData<NeonData> m_VehNeon;
-	static inline bool m_bInit;
+    static inline RwTexture* m_pNeonTexture = nullptr; // pointer to the neon mask texture
+    static inline VehicleExtendedData<NeonData> m_VehNeon;
 
 public:
-	Neon() = delete;
-	Neon(Neon&) = delete;
+    Neon() = delete;
+    Neon(Neon&) = delete;
 
-	static void InitHooks();
-	static void Install(CVehicle* veh, int red, int green, int blue);
-	static bool IsInstalled(CVehicle* veh);
-	static bool IsPulsingEnabled(CVehicle* veh);
-	static void SetPulsing(CVehicle* veh, bool state);
-	static void RemoveHooks();
-	static void Remove(CVehicle* veh);
+    static void InitHooks();
+    static void Install(CVehicle* veh, int red, int green, int blue);
+    static bool IsInstalled(CVehicle* veh);
+    static bool IsPulsingEnabled(CVehicle* veh);
+    static void SetPulsing(CVehicle* veh, bool state);
+    static void RemoveHooks();
+    static void Remove(CVehicle* veh);
 };

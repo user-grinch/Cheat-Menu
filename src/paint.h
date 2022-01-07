@@ -28,58 +28,58 @@
 class Paint
 {
 private:
-	// store vehicle specific data
-	struct VehData
-	{
-		struct MaterialProperties
-		{
-			MaterialProperties() :
-				_color{0, 0, 0, 0},
-				_recolor(false),
-				_retexture(false),
-				_geometry(nullptr),
-				_originalColor{0, 0, 0, 0},
-				_originalTexture(nullptr),
-				_originalGeometryFlags(0)
-			{
-			}
+    // store vehicle specific data
+    struct VehData
+    {
+        struct MaterialProperties
+        {
+            MaterialProperties() :
+                _color{0, 0, 0, 0},
+                _recolor(false),
+                _retexture(false),
+                _geometry(nullptr),
+                _originalColor{0, 0, 0, 0},
+                _originalTexture(nullptr),
+                _originalGeometryFlags(0)
+            {
+            }
 
-			RwRGBA _color;
-			RwTexture* _texture;
-			bool _recolor;
-			bool _retexture;
-			RpGeometry* _geometry;
-			RwRGBA _originalColor;
-			RwTexture* _originalTexture;
-			RwInt32 _originalGeometryFlags;
-		};
+            RwRGBA _color;
+            RwTexture* _texture;
+            bool _recolor;
+            bool _retexture;
+            RpGeometry* _geometry;
+            RwRGBA _originalColor;
+            RwTexture* _originalTexture;
+            RwInt32 _originalGeometryFlags;
+        };
 
-		// carcols color id
-		uchar primary_color = 0;
-		uchar secondary_color = 0;
-		std::unordered_map<RpMaterial*, MaterialProperties> materialProperties;
+        // carcols color id
+        uchar primary_color = 0;
+        uchar secondary_color = 0;
+        std::unordered_map<RpMaterial*, MaterialProperties> materialProperties;
 
-		VehData(CVehicle* veh)
-		{
-			primary_color = veh->m_nPrimaryColor;
-			secondary_color = veh->m_nSecondaryColor;
-		}
+        VehData(CVehicle* veh)
+        {
+            primary_color = veh->m_nPrimaryColor;
+            secondary_color = veh->m_nSecondaryColor;
+        }
 
-		void setMaterialColor(RpMaterial* material, RpGeometry* geometry, RwRGBA color, bool filter_mat = false);
-		void setMaterialTexture(RpMaterial* material, RwTexture* texture, bool filter_mat = false);
-		void resetMaterialColor(RpMaterial* material);
-		void resetMaterialTexture(RpMaterial* material);
-	};
-	static inline VehicleExtendedData<VehData> m_VehData;
-	static void NodeWrapperRecursive(RwFrame* frame, CVehicle* pVeh, std::function<void(RwFrame*)> func);
+        void setMaterialColor(RpMaterial* material, RpGeometry* geometry, RwRGBA color, bool filter_mat = false);
+        void setMaterialTexture(RpMaterial* material, RwTexture* texture, bool filter_mat = false);
+        void resetMaterialColor(RpMaterial* material);
+        void resetMaterialTexture(RpMaterial* material);
+    };
+    static inline VehicleExtendedData<VehData> m_VehData;
+    static void NodeWrapperRecursive(RwFrame* frame, CVehicle* pVeh, std::function<void(RwFrame*)> func);
 
 public:
-	static inline ResourceStore m_TextureData { "textures", eResourceType::TYPE_IMAGE, ImVec2(100, 80) };
+    static inline ResourceStore m_TextureData { "textures", eResourceType::TYPE_IMAGE, ImVec2(100, 80) };
 
-	static void InitHooks();
-	static void GenerateNodeList(CVehicle* pVeh, std::vector<std::string>& names_vec);
-	static void SetNodeColor(CVehicle* pVeh, std::string node_name, CRGBA color, bool filter_mat = false);
-	static void SetNodeTexture(CVehicle* pVeh, std::string node_name, std::string texturename, bool filter_mat = false);
-	static void ResetNodeColor(CVehicle* veh, std::string node_name);
-	static void ResetNodeTexture(CVehicle* pVeh, std::string node_name);
+    static void InitHooks();
+    static void GenerateNodeList(CVehicle* pVeh, std::vector<std::string>& names_vec);
+    static void SetNodeColor(CVehicle* pVeh, std::string node_name, CRGBA color, bool filter_mat = false);
+    static void SetNodeTexture(CVehicle* pVeh, std::string node_name, std::string texturename, bool filter_mat = false);
+    static void ResetNodeColor(CVehicle* veh, std::string node_name);
+    static void ResetNodeTexture(CVehicle* pVeh, std::string node_name);
 };

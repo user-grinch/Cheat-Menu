@@ -130,7 +130,7 @@ uchar *m_nBlurRed = (uchar *)0x94B790;
 uchar *m_nBlurGreen = (uchar *)0x8621A0;
 uchar *m_nBlurBlue = (uchar *)0x945728;
 
-#else // GTA3
+#else
 
 int *m_nAmbientRed = (int *)0x86AF78;
 int *m_nAmbientGreen = (int *)0x665308;

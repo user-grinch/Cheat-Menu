@@ -10,23 +10,23 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 class Hook
 {
 private:
-	static inline WNDPROC oWndProc;
-	static inline f_Present11 oPresent11;
-	static inline f_EndScene oEndScene;
-	static inline f_Reset oReset;
-	static inline bool m_bMouseVisibility;
+    static inline WNDPROC oWndProc;
+    static inline f_Present11 oPresent11;
+    static inline f_EndScene oEndScene;
+    static inline f_Reset oReset;
+    static inline bool m_bMouseVisibility;
 
-	static void CALLBACK RenderFrame(void* ptr);
-	static HRESULT CALLBACK Dx9Handler(IDirect3DDevice9* pDevice);
-	static HRESULT CALLBACK Dx11Handler(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
-	static HRESULT CALLBACK Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
-	static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-	static void ShowMouse(bool state);
+    static void CALLBACK RenderFrame(void* ptr);
+    static HRESULT CALLBACK Dx9Handler(IDirect3DDevice9* pDevice);
+    static HRESULT CALLBACK Dx11Handler(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
+    static HRESULT CALLBACK Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters);
+    static LRESULT CALLBACK WndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    static void ShowMouse(bool state);
 
 public:
-	static inline bool m_bShowMouse = false;
-	static inline std::function<void()> pCallbackFunc = nullptr;
+    static inline bool m_bShowMouse = false;
+    static inline std::function<void()> pCallbackFunc = nullptr;
 
-	Hook();
-	~Hook();
+    Hook();
+    ~Hook();
 };

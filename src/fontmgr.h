@@ -22,7 +22,7 @@ public:
 
     static ImFont* GetFont(const char* fontName);
     static ImFont* LoadFont(const char* fontName, float fontMul = 1.0f);
-    
+
     // ImGui::GetIO().Default font must be loaded after unloading all fonts
     static void UnloadFonts();
     static void ReloadFonts();

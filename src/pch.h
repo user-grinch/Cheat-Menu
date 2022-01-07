@@ -79,9 +79,9 @@ using namespace plugin;
 
 enum eRenderer
 {
-	Render_DirectX9,
-	Render_DirectX11,
-	Render_Unknown
+    Render_DirectX9,
+    Render_DirectX11,
+    Render_Unknown
 };
 
 static eRenderer gRenderer = Render_Unknown;
@@ -94,14 +94,14 @@ extern CJson gConfig;
 static void SetHelpMessage(const char *message, bool b1, bool b2, bool b3)
 {
 #if GTASA
-	CHud::SetHelpMessage(message, b1, b2, b3);
+    CHud::SetHelpMessage(message, b1, b2, b3);
 #elif GTAVC
-	CHud::SetHelpMessage(message, b1, b2);
-#else // GTA3
-	const size_t size = strlen(message)+1;
+    CHud::SetHelpMessage(message, b1, b2);
+#else
+    const size_t size = strlen(message)+1;
     wchar_t* wc = new wchar_t[size];
     mbstowcs(wc, message, size);
-	CHud::SetHelpMessage(wc, b1);
-	delete wc;
+    CHud::SetHelpMessage(wc, b1);
+    delete wc;
 #endif
 }

@@ -5,10 +5,10 @@ ImFont* FontMgr::GetFont(const char* fontName)
 {
     for (auto &data : m_vecFonts)
     {
-       if (data.m_path == std::string(fontName))
-       {
-           return data.m_pFont;
-       }
+        if (data.m_path == std::string(fontName))
+        {
+            return data.m_pFont;
+        }
     }
 
     return nullptr;
@@ -21,7 +21,7 @@ ImFont* FontMgr::LoadFont(const char* fontName, float fontMul)
 
     std::string fullPath = std::string(PLUGIN_PATH((char*)"CheatMenu/fonts/")) + fontName + ".ttf";
     m_vecFonts.push_back({io.Fonts->AddFontFromFileTTF(fullPath.c_str(), fontSize), fontSize, fontMul,
-                     std::string(fontName)});
+                          std::string(fontName)});
     io.Fonts->Build();
 
     return m_vecFonts.back().m_pFont;
