@@ -28,8 +28,6 @@ If you have those mentioned versions installed follow the steps below,
 ### For III & VC
 3. Install [D3D8to9 wrapper](https://github.com/crosire/d3d8to9/releases). Sometimes the asi loader blocks **d3d8.dll** file. Just delete the **Globals.ini** file and you should be good to go.
 
-Be sure to check [here](https://github.com/user-grinch/Cheat-Menu/issues/48) to know about incompatibilities with other mods.
-
 ## Incompatible Mods
 ### GTA SA
 1. **ENB/ SA_DirectX 2.0**  **FIX:** Disable Effect/ Enable water

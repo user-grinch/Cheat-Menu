@@ -327,7 +327,9 @@ bool Ui::CheckboxWithHint(const char* label, bool* v, const char* hint, bool is_
     }
 
     if (ImGui::IsItemHovered() && !is_disabled)
+    {
         color = ImGui::GetColorU32(ImGuiCol_FrameBgHovered);
+    }
 
     // draw the button
     ImVec2 min = ImGui::GetItemRectMin();
@@ -414,15 +416,17 @@ bool Ui::CheckboxAddressEx(const char* label, const int addr, int enabled_val, i
     int val = 0;
     patch::GetRaw(addr, &val, 1, false);
 
-    if (val == enabled_val)
-        state = true;
-
+    state = (val == enabled_val);
     if (CheckboxWithHint(label, &state, hint) && addr != NULL)
     {
         if (state)
+        {
             patch::SetRaw(addr, &enabled_val, 1, false);
+        }
         else
+        {
             patch::SetRaw(addr, &disabled_val, 1, false);
+        }
         rtn = true;
     }
 
@@ -450,9 +454,13 @@ bool Ui::CheckboxAddressVarEx(const char* label, bool val, int addr, int enabled
     if (CheckboxWithHint(label, &state, hint))
     {
         if (state)
+        {
             patch::SetRaw(addr, &enabled_val, 1, false);
+        }
         else
+        {
             patch::SetRaw(addr, &disabled_val, 1, false);
+        }
 
         rtn = true;
     }

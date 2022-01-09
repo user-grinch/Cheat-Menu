@@ -11,7 +11,9 @@ private:
     static inline char m_nIfpBuffer[INPUT_BUFFER_SIZE];
     static inline bool m_Loop; // loop animation
     static inline bool m_bSecondary; // play animation as secondary
-
+    static inline bool m_PedAnim;
+    static inline CPed *m_pTarget = nullptr;
+    
 #ifdef GTASA
     // Cutscene player
     struct m_Cutscene

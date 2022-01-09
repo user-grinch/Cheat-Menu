@@ -147,15 +147,15 @@ void Animation::_PlayAnimation(RpClump* pClump, int animGroup, int animID, float
 
 void Animation::PlayAnimation(std::string& ifp, std::string& anim, std::string& value)
 {
-    CPlayerPed *pPlayer = FindPlayerPed();
+    CPed *pPed = m_PedAnim ? m_pTarget : FindPlayerPed();
 
-    if (!pPlayer)
+    if (!pPed)
     {
         return;
     }
 
 #ifdef GTASA
-    int hplayer = CPools::GetPedRef(pPlayer);
+    int hped = CPools::GetPedRef(pPed);
 
     if (ifp != "PED")
     {
@@ -163,14 +163,14 @@ void Animation::PlayAnimation(std::string& ifp, std::string& anim, std::string& 
         Command<Commands::LOAD_ALL_MODELS_NOW>();
     }
 
-    Command<Commands::CLEAR_CHAR_TASKS>(hplayer);
+    Command<Commands::CLEAR_CHAR_TASKS>(hped);
     if (m_bSecondary)
     {
-        Command<Commands::TASK_PLAY_ANIM_SECONDARY>(hplayer, anim.c_str(), ifp.c_str(), 4.0, m_Loop, 0, 0, 0, -1);
+        Command<Commands::TASK_PLAY_ANIM_SECONDARY>(hped, anim.c_str(), ifp.c_str(), 4.0, m_Loop, 0, 0, 0, -1);
     }
     else
     {
-        Command<Commands::TASK_PLAY_ANIM>(hplayer, anim.c_str(), ifp.c_str(), 4.0, m_Loop, 0, 0, 0, -1);
+        Command<Commands::TASK_PLAY_ANIM>(hped, anim.c_str(), ifp.c_str(), 4.0, m_Loop, 0, 0, 0, -1);
     }
 
     if (ifp != "PED")
@@ -179,11 +179,11 @@ void Animation::PlayAnimation(std::string& ifp, std::string& anim, std::string& 
     }
 
 #else
-    if (pPlayer)
+    if (pPed)
     {
         int groupID, animID;
         sscanf(value.c_str(), "%d$%d,", &groupID, &animID);
-        _PlayAnimation(pPlayer->m_pRwClump, groupID, animID, 4.0f);
+        _PlayAnimation(pPed->m_pRwClump, groupID, animID, 4.0f);
     }
 #endif
 }
@@ -193,11 +193,11 @@ Animation::Animation()
 #ifdef GTASA
     Events::processScriptsEvent += [this]
     {
+        CPlayerPed* pPlayer = FindPlayerPed();
         if (m_Cutscene::m_bRunning)
         {
             if (Command<Commands::HAS_CUTSCENE_FINISHED>())
             {
-                CPlayerPed* pPlayer = FindPlayerPed();
                 if (!pPlayer)
                 {
                     return;
@@ -216,6 +216,16 @@ Animation::Animation()
                 Command<Commands::START_CUTSCENE>();
                 m_Cutscene::m_bRunning = true;
             }
+        }
+
+        if (pPlayer && pPlayer->m_pPlayerTargettedPed)
+        {
+            m_pTarget = pPlayer->m_pPlayerTargettedPed;
+        }
+
+        if (m_pTarget && !m_pTarget->IsAlive())
+        {
+            m_pTarget = nullptr;
         }
     };
 #elif GTAVC
@@ -242,7 +252,7 @@ void Animation::Draw()
 
         ImGui::Spacing();
 
-        if (ImGui::BeginTabItem("Anims"))
+        if (ImGui::BeginTabItem("Animation##TABBAR"))
         {
             ImGui::Spacing();
             if (ImGui::Button("Stop animation", Ui::GetSize()))
@@ -260,20 +270,29 @@ void Animation::Draw()
             ImGui::Spacing();
 
             ImGui::Columns(2, nullptr, false);
-            ImGui::Checkbox("Loop", &m_Loop);
-            Ui::ShowTooltip("Keep playing the animation on repeat");
+            Ui::CheckboxWithHint("Loop", &m_Loop, "Keep playing the animation on repeat");
+            Ui::CheckboxWithHint("Secondary", &m_bSecondary, "Player can move while playing the animation");
             ImGui::NextColumn();
-            ImGui::Checkbox("Secondary", &m_bSecondary);
-            Ui::ShowTooltip("Player can move while playing the animation");
+#ifdef GTASA
+            Ui::CheckboxWithHint("Ped anim", &m_PedAnim, "Play animation on other peds.\nSelect with weapon target.");
+#endif
             ImGui::Columns(1);
             ImGui::Spacing();
 
-            if (ImGui::BeginChild("Anims Child"))
+            if (m_PedAnim && !m_pTarget)
             {
-                ImGui::Spacing();
-                Ui::DrawJSON(m_AnimData, PlayAnimation, RemoveAnimation);
-                ImGui::EndChild();
+                ImGui::TextWrapped("No player target found. Aim a ped with a weapon to select it for animation player.");
             }
+            else
+            {
+                if (ImGui::BeginChild("Anims Child"))
+                {
+                    ImGui::Spacing();
+                    Ui::DrawJSON(m_AnimData, PlayAnimation, RemoveAnimation);
+                    ImGui::EndChild();
+                }
+            }
+            
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem("Custom"))

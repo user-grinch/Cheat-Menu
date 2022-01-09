@@ -1105,9 +1105,9 @@ void Vehicle::Draw()
                 ImGui::RadioButton("Tertiary", &m_Paint::m_nRadioButton, 3);
                 ImGui::RadioButton("Quaternary", &m_Paint::m_nRadioButton, 4);
 #else
-                ImGui::RadioButton("Primary", &m_Color::m_nRadioButton, 1);
+                ImGui::RadioButton("Primary", &m_Paint::m_nRadioButton, 1);
                 ImGui::NextColumn();
-                ImGui::RadioButton("Secondary", &m_Color::m_nRadioButton, 2);
+                ImGui::RadioButton("Secondary", &m_Paint::m_nRadioButton, 2);
 #endif
                 ImGui::Spacing();
                 ImGui::Columns(1);
