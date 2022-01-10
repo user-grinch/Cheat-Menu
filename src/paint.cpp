@@ -27,7 +27,7 @@
 #include "NodeName.h"
 #include "util.h"
 
-void Paint::InitHooks()
+void Paint::InjectHooks()
 {
     static bool init;
 

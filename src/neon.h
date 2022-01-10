@@ -35,7 +35,7 @@ public:
     Neon() = delete;
     Neon(Neon&) = delete;
 
-    static void InitHooks();
+    static void InjectHooks();
     static void Install(CVehicle* veh, int red, int green, int blue);
     static bool IsInstalled(CVehicle* veh);
     static bool IsPulsingEnabled(CVehicle* veh);

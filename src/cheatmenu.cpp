@@ -3,6 +3,7 @@
 #include "menuinfo.h"
 #include "ui.h"
 #include "updater.h"
+#include "d3dhook.h"
 
 void CheatMenu::DrawWindow()
 {
@@ -15,7 +16,7 @@ void CheatMenu::DrawWindow()
         {
             gConfig.WriteToDisk();
             bRunning = false;
-            m_bShowMouse = false;
+            D3dHook::SetMouseState(false);
         }
     }
     else
@@ -76,9 +77,12 @@ void CheatMenu::DrawWindow()
 
 CheatMenu::CheatMenu()
 {
-    ImGui::CreateContext();
+    if (!D3dHook::InjectHook(DrawWindow))
+    {
+        return;
+    }
+    
     ApplyStyle();
-    pCallbackFunc = std::bind(&DrawWindow);
 
     // Load menu settings
     Ui::m_HeaderId = gConfig.GetValue("window.idnum", -1);
@@ -105,17 +109,23 @@ CheatMenu::CheatMenu()
                 m_Commands::m_bShowMenu = !m_Commands::m_bShowMenu;
             }
 
-            if (m_bShowMouse != m_bShowMenu)
+            bool mouseState = D3dHook::GetMouseState();
+            if (mouseState != m_bShowMenu)
             {
-                if (m_bShowMouse) // Only write when the menu closes
+                if (mouseState) // Only write when the menu closes
                 {
                     gConfig.WriteToDisk();
                 }
 
-                m_bShowMouse = m_bShowMenu;
+                D3dHook::SetMouseState(m_bShowMenu);
             }
         }
     };
+}
+
+CheatMenu::~CheatMenu()
+{
+    D3dHook::RemoveHook();
 }
 
 void CheatMenu::ShowWelcomeScreen()

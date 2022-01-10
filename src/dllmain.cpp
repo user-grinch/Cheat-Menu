@@ -1,8 +1,8 @@
 #include "pch.h"
-#include "hook.h"
 #include "cheatmenu.h"
 #include "updater.h"
 #include "menuinfo.h"
+#include "d3dhook.h"
 
 void MenuThread(void* param)
 {
@@ -62,6 +62,7 @@ void MenuThread(void* param)
 
     gLog << "Starting...\nVersion: " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: "
          GITHUB_LINK "\n" << std::endl;
+
     CheatMenu menu;
 
 

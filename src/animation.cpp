@@ -6,13 +6,16 @@
 #ifndef GTASA
 #include <CAnimationStyleDescriptor.h>
 #include <CAnimManager.h>
-#include "../depend/kiero/minhook/MinHook.h"
 #include "eAnimations.h"
 #include <CAnimBlendAssociation.h>
 #endif
 
 #ifdef GTA3
 #include <RpAnimBlend.h>
+#endif
+
+#ifdef GTAVC
+#include "../depend/kiero/minhook/MinHook.h"
 #endif
 
 #ifdef GTASA

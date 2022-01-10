@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "hook.h"
+#include "d3dhook.h"
 #include "../depend/kiero/kiero.h"
 #include "../depend/kiero/minhook/MinHook.h"
 #include "../depend/imgui/imgui_impl_dx9.h"
@@ -8,8 +8,19 @@
 #include <dinput.h>
 
 #define DIMOUSE ((LPDIRECTINPUTDEVICE8)(RsGlobal.ps->diMouse))
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-LRESULT Hook::WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+bool D3dHook::GetMouseState()
+{
+    return mouseShown;
+}
+
+void D3dHook::SetMouseState(bool state)
+{
+    mouseShown = state;
+}
+
+LRESULT D3dHook::hkWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 
@@ -24,14 +35,14 @@ LRESULT Hook::WndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
 }
 
-HRESULT Hook::Reset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters)
+HRESULT D3dHook::hkReset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters)
 {
     ImGui_ImplDX9_InvalidateDeviceObjects();
 
     return oReset(pDevice, pPresentationParameters);
 }
 
-void Hook::RenderFrame(void* ptr)
+void D3dHook::ProcessFrame(void* ptr)
 {
     if (!ImGui::GetCurrentContext())
     {
@@ -43,7 +54,7 @@ void Hook::RenderFrame(void* ptr)
 
     if (bInit)
     {
-        ShowMouse(m_bShowMouse);
+        ProcessMouse();
 
         // Scale the menu if game resolution changed
         static ImVec2 fScreenSize = ImVec2(-1, -1);
@@ -88,7 +99,7 @@ void Hook::RenderFrame(void* ptr)
 
         if (pCallbackFunc != nullptr)
         {
-            pCallbackFunc();
+            ((void(*)())pCallbackFunc)();
         }
 
         ImGui::EndFrame();
@@ -137,23 +148,23 @@ void Hook::RenderFrame(void* ptr)
         io.IniFilename = nullptr;
         io.LogFilename = nullptr;
         io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;
-        oWndProc = (WNDPROC)SetWindowLongPtr(RsGlobal.ps->window, GWL_WNDPROC, (LRESULT)WndProc);
+        oWndProc = (WNDPROC)SetWindowLongPtr(RsGlobal.ps->window, GWL_WNDPROC, (LRESULT)hkWndProc);
     }
 }
 
-HRESULT Hook::Dx9Handler(IDirect3DDevice9* pDevice)
+HRESULT D3dHook::hkEndScene(IDirect3DDevice9* pDevice)
 {
-    RenderFrame(pDevice);
+    ProcessFrame(pDevice);
     return oEndScene(pDevice);
 }
 
-HRESULT Hook::Dx11Handler(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
+HRESULT D3dHook::hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
 {
-    RenderFrame(pSwapChain);
-    return oPresent11(pSwapChain, SyncInterval, Flags);
+    ProcessFrame(pSwapChain);
+    return oPresent(pSwapChain, SyncInterval, Flags);
 }
 
-void Hook::ShowMouse(bool state)
+void D3dHook::ProcessMouse()
 {
     // Disable player controls for controllers
     bool bMouseDisabled = false;
@@ -163,7 +174,7 @@ void Hook::ShowMouse(bool state)
     isController =  !isController;
 #endif
 
-    if (isController && (state || bMouseDisabled))
+    if (isController && (mouseShown || bMouseDisabled))
     {
 
 #ifdef GTASA
@@ -175,12 +186,12 @@ void Hook::ShowMouse(bool state)
 
         if (pad)
         {
-            if (state)
+            if (mouseShown)
             {
                 bMouseDisabled = true;
 #ifdef GTA3
                 pad->m_bDisablePlayerControls = true;
-#else //GTAVC & GTASA
+#else 
                 pad->DisablePlayerControls = true;
 #endif
             }
@@ -189,18 +200,19 @@ void Hook::ShowMouse(bool state)
                 bMouseDisabled = false;
 #ifdef GTA3
                 pad->m_bDisablePlayerControls = false;
-#else //GTAVC & GTASA
+#else 
                 pad->DisablePlayerControls = false;
 #endif
             }
         }
     }
 
-    if (m_bMouseVisibility != state)
+    static bool mouseState;
+    if (mouseState != mouseShown)
     {
-        ImGui::GetIO().MouseDrawCursor = state;
+        ImGui::GetIO().MouseDrawCursor = mouseShown;
 
-        if (state)
+        if (mouseShown)
         {
 
             patch::SetUChar(BY_GAME(0x6194A0, 0x6020A0, 0x580D20), 0xC3); // psSetMousePos
@@ -227,19 +239,27 @@ void Hook::ShowMouse(bool state)
         CPad::ClearMouseHistory();
 #endif
         CPad::UpdatePads();
-        m_bMouseVisibility = state;
+        mouseState = mouseShown;
     }
 }
 
-Hook::Hook()
+bool D3dHook::InjectHook(void *pCallback)
 {
-
-    // Nvidia Overlay crash fix
+    ImGui::CreateContext();
+    
+    /*
+        Must check for d3d9 first!
+        Seems to crash with nvidia geforce experience overlay
+        if anything else is checked before d3d9
+    */
     if (init(kiero::RenderType::D3D9) == kiero::Status::Success)
     {
         gRenderer = Render_DirectX9;
-        kiero::bind(16, (void**)&oReset, Reset);
-        kiero::bind(42, (void**)&oEndScene, Dx9Handler);
+        kiero::bind(16, (void**)&oReset, hkReset);
+        kiero::bind(42, (void**)&oEndScene, hkEndScene);
+        pCallbackFunc = pCallback;
+
+        return true;
     }
     else
     {
@@ -247,13 +267,19 @@ Hook::Hook()
         if (init(kiero::RenderType::D3D11) == kiero::Status::Success)
         {
             gRenderer = Render_DirectX11;
-            kiero::bind(8, (void**)&oPresent11, Dx11Handler);
+            kiero::bind(8, (void**)&oPresent, hkPresent);
+            pCallbackFunc = pCallback;
+
+            return true;
         }
     }
+
+    return false;
 }
 
-Hook::~Hook()
+void D3dHook::RemoveHook()
 {
+    pCallbackFunc = nullptr;
     SetWindowLongPtr(RsGlobal.ps->window, GWL_WNDPROC, (LRESULT)oWndProc);
     ImGui_ImplDX9_Shutdown();
     ImGui_ImplWin32_Shutdown();

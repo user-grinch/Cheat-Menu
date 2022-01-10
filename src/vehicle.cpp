@@ -73,8 +73,8 @@ Vehicle::Vehicle()
 {
 #ifdef GTASA
     FileHandler::FetchHandlingID(m_VehicleIDE);
-    Neon::InitHooks();
-    Paint::InitHooks();
+    Neon::InjectHooks();
+    Paint::InjectHooks();
 #endif
 
     FileHandler::FetchColorData(m_CarcolsColorData);
@@ -120,12 +120,12 @@ Vehicle::Vehicle()
 
             if (vehInstantStart.Pressed())
             {
-                Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, 40.0f);
+                Util::SetCarForwardSpeed(pVeh, 40.0f);
             }
 
             if (vehInstantStop.Pressed())
             {
-                Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, 0);
+                Util::SetCarForwardSpeed(pVeh, 0.0f);
             }
 
             if (m_bNoDamage)
@@ -157,7 +157,7 @@ Vehicle::Vehicle()
 
             if (m_bLockSpeed)
             {
-                Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, m_fLockSpeed);
+                Util::SetCarForwardSpeed(pVeh, m_fLockSpeed);
             }
 
 #ifdef GTASA
@@ -457,7 +457,7 @@ void Vehicle::SpawnVehicle(std::string& rootkey, std::string& vehName, std::stri
         if (m_Spawner::m_bSpawnInside)
         {
             Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
-            Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, speed);
+            Util::SetCarForwardSpeed(veh, speed);
         }
         Command<Commands::MARK_MISSION_TRAIN_AS_NO_LONGER_NEEDED>(hveh);
         Command<Commands::MARK_CAR_AS_NO_LONGER_NEEDED>(hveh);
@@ -497,9 +497,7 @@ void Vehicle::SpawnVehicle(std::string& rootkey, std::string& vehName, std::stri
 #endif
             Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
 
-#ifndef GTA3
-            Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, speed);
-#endif
+            Util::SetCarForwardSpeed(veh, speed);
         }
         else
         {
@@ -1025,14 +1023,14 @@ void Vehicle::Draw()
 
                     if (ImGui::Button("Set speed##brn", ImVec2(Ui::GetSize(2))))
                     {
-                        Command<Commands::SET_CAR_FORWARD_SPEED>(hVeh, m_fLockSpeed);
+                        Util::SetCarForwardSpeed(pVeh, m_fLockSpeed);
                     }
 
                     ImGui::SameLine();
 
                     if (ImGui::Button("Instant stop##brn", ImVec2(Ui::GetSize(2))))
                     {
-                        Command<Commands::SET_CAR_FORWARD_SPEED>(hVeh, 0);
+                        Util::SetCarForwardSpeed(pVeh, 0.0f);
                     }
                 }
             }

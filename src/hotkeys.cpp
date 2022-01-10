@@ -17,7 +17,7 @@ Hotkey vehInstantStop;
 
 bool Hotkey::DrawUI(const char* label)
 {
-    bool active = m_CurrentHotkey == label;
+    bool active = (m_CurrentHotkey == label);
     bool state = false;
 
     if (active)

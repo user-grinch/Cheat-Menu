@@ -2,9 +2,21 @@
 #include "util.h"
 #include "psapi.h"
 
+void Util::SetCarForwardSpeed(CVehicle *pVeh, float speed)
+{
+#ifdef GTA3
+    CVector inVec = pVeh->m_matrix.up;
+    double speedFactor = speed * 0.016766668;
+    pVeh->m_vecMoveSpeed.x = speedFactor * inVec.x;
+    pVeh->m_vecMoveSpeed.y = speedFactor * inVec.y;
+    pVeh->m_vecMoveSpeed.z = speedFactor * inVec.z;
+#else 
+    Command<Commands::SET_CAR_FORWARD_SPEED>(CPools::GetVehicleRef(pVeh), 0);
+#endif
+}
+
 std::string Util::GetLocationName(CVector* pos)
 {
-
 #ifdef GTASA
     CPlayerPed  *pPlayer = FindPlayerPed();
     int hplayer = CPools::GetPedRef(pPlayer);

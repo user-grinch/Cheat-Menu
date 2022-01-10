@@ -20,6 +20,7 @@ public:
     static int GetLargestGangInZone();
 #endif
 
+    static void SetCarForwardSpeed(CVehicle *pVeh, float speed);
     static CPed* GetClosestPed();
     static CVehicle* GetClosestVehicle();
     static void GetCPUUsageInit();

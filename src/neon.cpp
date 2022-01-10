@@ -178,7 +178,7 @@ static RwTexture* LoadTextureFromMemory(char* data, unsigned int size)
     return RwTextureCreate(raster);
 }
 
-void Neon::InitHooks()
+void Neon::InjectHooks()
 {
     static bool init;
     if (init)

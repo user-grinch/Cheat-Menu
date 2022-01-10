@@ -70,7 +70,7 @@
 
 #include "json.h"
 #include "hotkeys.h"
-#include "vKeys.h"
+#include "vkeys.h"
 #include "resourcestore.h"
 #include "fontmgr.h"
 

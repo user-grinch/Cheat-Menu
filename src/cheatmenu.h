@@ -11,7 +11,6 @@
 #pragma once
 #include "animation.h"
 #include "game.h"
-#include "hook.h"
 #include "menu.h"
 #include "ped.h"
 #include "player.h"
@@ -20,7 +19,7 @@
 #include "visual.h"
 #include "weapon.h"
 
-class CheatMenu : Hook, Animation, Game, Menu, Ped, Player, Teleport, Vehicle, Visual, Weapon
+class CheatMenu : Animation, Game, Menu, Ped, Player, Teleport, Vehicle, Visual, Weapon
 {
 private:
     static inline bool m_bShowMenu = false;
@@ -41,6 +40,7 @@ private:
 
 public:
     CheatMenu();
+    ~CheatMenu();
 
     static void ResetMenuSize();
 };
