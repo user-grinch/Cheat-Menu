@@ -41,8 +41,15 @@ private:
 #endif
         };
     };
-public:
 
+#ifdef GTASA
+    static void SpawnPed(std::string& model);
+    static void BigHeadEffect(CPed *ped);
+#else
+    static void SpawnPed(std::string& cat, std::string& name, std::string& model);
+#endif
+
+public:
 #ifdef GTASA
     static inline CJson m_SpecialPedJson = CJson("ped special");
     static inline ResourceStore m_PedData{"ped", eResourceType::TYPE_BOTH, ImVec2(65, 110)};
@@ -53,11 +60,4 @@ public:
     Ped();
     ~Ped();
     static void Draw();
-
-#ifdef GTASA
-    static void SpawnPed(std::string& model);
-    static void BigHeadEffect(CPed *ped);
-#else
-    static void SpawnPed(std::string& cat, std::string& name, std::string& model);
-#endif
 };

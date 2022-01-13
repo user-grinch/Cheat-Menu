@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "updater.h"
-#include "menuinfo.h"
+#include "version.h"
 
 bool Updater::IsUpdateAvailable()
 {

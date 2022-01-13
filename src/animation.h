@@ -4,7 +4,6 @@
 class Animation
 {
 private:
-
     // Animation player
     static inline ResourceStore m_AnimData{ "animation", eResourceType::TYPE_TEXT };
     static inline char m_nAnimBuffer[INPUT_BUFFER_SIZE];
@@ -13,7 +12,7 @@ private:
     static inline bool m_bSecondary; // play animation as secondary
     static inline bool m_PedAnim;
     static inline CPed *m_pTarget = nullptr;
-    
+
 #ifdef GTASA
     // Cutscene player
     struct m_Cutscene
@@ -36,21 +35,18 @@ private:
     };
 #endif
 
-protected:
-    Animation();
-
-public:
-    static void Draw();
     static void PlayAnimation(std::string& rootKey, std::string& anim, std::string& ifp);
     static void RemoveAnimation(std::string& rootKey, std::string& anim, std::string& ifp);
-
 #ifdef GTASA
     static void PlayCutscene(std::string& rootKey, std::string& cutsceneId, std::string& interior);
 #elif GTAVC
     static bool _LoadAnimationBlock(const char* szBlockName);
 #endif
-
 #ifndef GTASA
     static void _PlayAnimation(RpClump* pClump, int animGroup, int animID, float blend);
 #endif
+
+public:
+    Animation();
+    static void Draw();
 };

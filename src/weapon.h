@@ -3,10 +3,8 @@
 
 class Weapon
 {
-public:
+private:
 #ifdef GTASA
-    static inline ResourceStore m_WeaponData { "weapon", eResourceType::TYPE_BOTH, ImVec2(65, 65) };
-
     static inline bool m_bAutoAim;
     static inline bool m_bRapidFire;
     static inline bool m_bDualWeild;
@@ -33,7 +31,6 @@ public:
         "Da nang boys", "Mafia", "Mountain cloud triad", "Varrio los aztecas", "Gang9", "Gang10"
     };
 #else
-    static inline ResourceStore m_WeaponData { "weapon", eResourceType::TYPE_TEXT };
     static inline bool m_bInfiniteAmmo;
 #endif
     static inline bool m_bFastReload;
@@ -43,13 +40,18 @@ public:
     static inline uchar m_nCurrentWeaponSlot = -1;
     static inline int m_nSelectedWeapon;
 
-    Weapon();
-    static void Draw();
-
+public:
 #ifdef GTASA
+    static inline ResourceStore m_WeaponData { "weapon", eResourceType::TYPE_BOTH, ImVec2(65, 65) };
+
     static void GiveWeaponToPlayer(std::string& weapon_type);
     static void SetGangWeapon(std::string& weapon_type);
 #else
+    static inline ResourceStore m_WeaponData { "weapon", eResourceType::TYPE_TEXT };
+
     static void GiveWeaponToPlayer(std::string& rootkey, std::string& model, std::string& name);
 #endif
+
+    Weapon();
+    static void Draw();
 };

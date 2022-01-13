@@ -50,9 +50,8 @@ void D3dHook::ProcessFrame(void* ptr)
     }
 
     ImGuiIO& io = ImGui::GetIO();
-    static bool bInit = false;
-
-    if (bInit)
+    static bool init;
+    if (init)
     {
         ProcessMouse();
 
@@ -116,12 +115,11 @@ void D3dHook::ProcessFrame(void* ptr)
     }
     else
     {
-        bInit = true;
+        init = true;
         ImGui_ImplWin32_Init(RsGlobal.ps->window);
 
 #ifdef GTASA
-        // shift trigger fix
-        patch::Nop(0x00531155, 5);
+        patch::Nop(0x00531155, 5); // shift trigger fix
 #endif
 
         if (gRenderer == Render_DirectX9)
@@ -191,7 +189,7 @@ void D3dHook::ProcessMouse()
                 bMouseDisabled = true;
 #ifdef GTA3
                 pad->m_bDisablePlayerControls = true;
-#else 
+#else
                 pad->DisablePlayerControls = true;
 #endif
             }
@@ -200,7 +198,7 @@ void D3dHook::ProcessMouse()
                 bMouseDisabled = false;
 #ifdef GTA3
                 pad->m_bDisablePlayerControls = false;
-#else 
+#else
                 pad->DisablePlayerControls = false;
 #endif
             }
@@ -245,8 +243,14 @@ void D3dHook::ProcessMouse()
 
 bool D3dHook::InjectHook(void *pCallback)
 {
+    static bool hookInjected;
+    if (hookInjected)
+    {
+        return false;
+    }
+
     ImGui::CreateContext();
-    
+
     /*
         Must check for d3d9 first!
         Seems to crash with nvidia geforce experience overlay
@@ -258,8 +262,7 @@ bool D3dHook::InjectHook(void *pCallback)
         kiero::bind(16, (void**)&oReset, hkReset);
         kiero::bind(42, (void**)&oEndScene, hkEndScene);
         pCallbackFunc = pCallback;
-
-        return true;
+        hookInjected = true;
     }
     else
     {
@@ -269,12 +272,11 @@ bool D3dHook::InjectHook(void *pCallback)
             gRenderer = Render_DirectX11;
             kiero::bind(8, (void**)&oPresent, hkPresent);
             pCallbackFunc = pCallback;
-
-            return true;
+            hookInjected = true;
         }
     }
 
-    return false;
+    return hookInjected;
 }
 
 void D3dHook::RemoveHook()

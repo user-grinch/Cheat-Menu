@@ -23,17 +23,3 @@ public:
     bool Pressed();
     std::string GetNameString();
 };
-
-extern Hotkey aimSkinChanger;
-extern Hotkey freeCam;
-extern Hotkey commandWindow;
-extern Hotkey fixVeh;
-extern Hotkey flipVeh;
-extern Hotkey freeCamTeleportPlayer;
-extern Hotkey godMode;
-extern Hotkey menuOpen;
-extern Hotkey quickSceenShot;
-extern Hotkey quickTeleport;
-extern Hotkey vehEngine;
-extern Hotkey vehInstantStart;
-extern Hotkey vehInstantStop;

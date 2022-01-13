@@ -1,23 +1,12 @@
 #include "pch.h"
 #include "cheatmenu.h"
 #include "updater.h"
-#include "menuinfo.h"
-#include "d3dhook.h"
+#include "version.h"
 
 void MenuThread(void* param)
 {
-    static bool gameInit;
-
-    // Wait till game init
-    Events::initRwEvent += []
-    {
-        gameInit = true;
-    };
-
-    while (!gameInit)
-    {
-        Sleep(1000);
-    }
+    // wait for game init
+    Sleep(3000);
 
     /*
     	Had to put this in place since some people put the folder in root
@@ -46,11 +35,11 @@ void MenuThread(void* param)
         return;
     }
 
-#ifdef GTASA
     /*
         TODO: Find a better way
         Since you could still name it something else
     */
+#ifdef GTASA
     if (GetModuleHandle("SAMP.dll") || GetModuleHandle("SAMP.asi"))
     {
         gLog << "Error: CheatMenu doesn't support SAMP" << std::endl;
@@ -58,6 +47,13 @@ void MenuThread(void* param)
         return;
     }
     CFastman92limitAdjuster::Init();
+#elif GTAVC
+    if (GetModuleHandle("vcmp-proxy.dll") || GetModuleHandle("vcmp-proxy.asi"))
+    {
+        gLog << "Error: CheatMenu doesn't support VCMP" << std::endl;
+        MessageBox(RsGlobal.ps->window, "VCMP detected. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
+        return;
+    }
 #endif
 
     gLog << "Starting...\nVersion: " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: "
@@ -69,12 +65,10 @@ void MenuThread(void* param)
     // Checking for updates once a day
     time_t now = time(0);
     struct tm  tstruct = *localtime(&now);
-    int lastCheckDate = gConfig.GetValue("config.last_update_checked", 0);
-
-    if (lastCheckDate != tstruct.tm_mday)
+    if (gConfig.GetValue("config.update_date", 0) != tstruct.tm_mday)
     {
         Updater::CheckUpdate();
-        gConfig.SetValue("config.last_update_checked", tstruct.tm_mday);
+        gConfig.SetValue("config.update_date", tstruct.tm_mday);
     }
 
     while (true)

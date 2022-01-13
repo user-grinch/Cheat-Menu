@@ -2,7 +2,7 @@
 #include "util.h"
 #include "ui.h"
 #include "../depend/imgui/imgui_internal.h"
-#include "menuinfo.h"
+#include "version.h"
 
 // Really messy code, cleanup someday
 bool Ui::DrawTitleBar()

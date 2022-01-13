@@ -32,11 +32,12 @@ private:
     static void FetchRadarSpriteData();
 #endif
 
-protected:
-    Teleport();
-public:
-    static void Draw();
-    static void TeleportPlayer(bool get_marker = false, CVector pos = CVector(0, 0, 0), int interior_id = 0);
     static void TeleportToLocation(std::string& rootkey, std::string& bLocName, std::string& loc);
     static void RemoveTeleportEntry(std::string& rootkey, std::string& key, std::string& val);
+
+public:
+    Teleport();
+
+    static void TeleportPlayer(bool get_marker = false, CVector pos = CVector(0, 0, 0), int interior_id = 0);
+    static void Draw();
 };

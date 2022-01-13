@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "cheatMenu.h"
-#include "menuinfo.h"
+#include "version.h"
 #include "ui.h"
 #include "updater.h"
 #include "d3dhook.h"
@@ -81,7 +81,7 @@ CheatMenu::CheatMenu()
     {
         return;
     }
-    
+
     ApplyStyle();
 
     // Load menu settings

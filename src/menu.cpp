@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "menuinfo.h"
+#include "version.h"
 #include "menu.h"
 #include "ui.h"
 #include "util.h"

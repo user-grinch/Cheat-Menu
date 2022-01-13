@@ -105,3 +105,17 @@ static void SetHelpMessage(const char *message, bool b1, bool b2, bool b3)
     delete wc;
 #endif
 }
+
+extern Hotkey aimSkinChanger;
+extern Hotkey freeCam;
+extern Hotkey commandWindow;
+extern Hotkey fixVeh;
+extern Hotkey flipVeh;
+extern Hotkey freeCamTeleportPlayer;
+extern Hotkey godMode;
+extern Hotkey menuOpen;
+extern Hotkey quickSceenShot;
+extern Hotkey quickTeleport;
+extern Hotkey vehEngine;
+extern Hotkey vehInstantStart;
+extern Hotkey vehInstantStop;

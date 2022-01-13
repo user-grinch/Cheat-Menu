@@ -4,7 +4,7 @@
 class Player
 {
 private:
-    static inline bool m_bAutoHeal;
+    static inline bool m_bHealthRegen;
     static inline bool m_bGodMode;
     static inline bool m_bModloaderInstalled;
     struct m_KeepPosition
@@ -31,13 +31,17 @@ private:
         static inline bool m_bEnabled = false;
         static inline float m_fOffset = 40.0f;
     };
+
+    static inline const char* clothNameList[18] =
+    {
+        "Shirts", "Heads", "Trousers", "Shoes", "Tattoos left lower arm", "Tattoos left upper arm",
+        "Tattoos right upper arm", "Tattoos right lower arm", "Tattoos back", "Tattoos left chest",
+        "Tattoos right chest", "Tattoos stomach", "Tattoos lower back", "Necklaces", "Watches",
+        "Glasses", "Hats", "Extras"
+    };
 #else
     static inline ResourceStore skinData { BY_GAME(NULL, "skin", "ped"), eResourceType::TYPE_TEXT };
 #endif
-
-public:
-    Player();
-    static void Draw();
 
 #ifdef GTASA
     static void ChangePlayerModel(std::string& model);
@@ -46,4 +50,8 @@ public:
 #else
     static void ChangePlayerModel(std::string& cat, std::string& name, std::string& id);
 #endif
+
+public:
+    Player();
+    static void Draw();
 };

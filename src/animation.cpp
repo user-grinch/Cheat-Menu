@@ -295,7 +295,7 @@ void Animation::Draw()
                     ImGui::EndChild();
                 }
             }
-            
+
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem("Custom"))

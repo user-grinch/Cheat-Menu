@@ -91,6 +91,8 @@ private:
 #endif
 
 public:
+    Vehicle();
+    ~Vehicle();
 #ifdef GTASA
     static void SpawnVehicle(std::string& name);
 #else
@@ -99,6 +101,4 @@ public:
     static std::string GetNameFromModel(int model);
     static int GetModelFromName(const char* name);
     static void Draw();
-    Vehicle();
-    ~Vehicle();
 };

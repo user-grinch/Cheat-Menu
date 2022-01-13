@@ -1,20 +1,6 @@
 #include "pch.h"
 #include "hotkeys.h"
 
-Hotkey aimSkinChanger;
-Hotkey freeCam;
-Hotkey commandWindow;
-Hotkey fixVeh;
-Hotkey flipVeh;
-Hotkey freeCamTeleportPlayer;
-Hotkey godMode;
-Hotkey menuOpen;
-Hotkey quickSceenShot;
-Hotkey quickTeleport;
-Hotkey vehEngine;
-Hotkey vehInstantStart;
-Hotkey vehInstantStop;
-
 bool Hotkey::DrawUI(const char* label)
 {
     bool active = (m_CurrentHotkey == label);

@@ -7,29 +7,6 @@
 #ifdef GTASA
 #include "ped.h"
 
-// hardcoded cloth category names
-const char* cloth_category[18] =
-{
-    "Shirts",
-    "Heads",
-    "Trousers",
-    "Shoes",
-    "Tattoos left lower arm",
-    "Tattoos left upper arm",
-    "Tattoos right upper arm",
-    "Tattoos right lower arm",
-    "Tattoos back",
-    "Tattoos left chest",
-    "Tattoos right chest",
-    "Tattoos stomach",
-    "Tattoos lower back",
-    "Necklaces",
-    "Watches",
-    "Glasses",
-    "Hats",
-    "Extras"
-};
-
 static inline void PlayerModelBrokenFix()
 {
     CPlayerPed* pPlayer = FindPlayerPed();
@@ -147,7 +124,7 @@ Player::Player()
         CPlayerPed* player = FindPlayerPed();
         int hplayer = CPools::GetPedRef(player);
 
-        if (m_bAutoHeal)
+        if (m_bHealthRegen)
         {
             static uint lastDmgTimer = 0;
             static uint lastHealTimer = 0;
@@ -417,7 +394,6 @@ void Player::Draw()
             ImGui::BeginChild("CheckboxesChild");
 
             ImGui::Columns(2, 0, false);
-            Ui::CheckboxWithHint("Auto heal", &m_bAutoHeal, "Player will heal when not taken damage for 5 seconds");
 
 #ifdef GTASA
             Ui::CheckboxAddress("Bounty on yourself", 0x96913F);
@@ -469,6 +445,7 @@ void Player::Draw()
                 pPlayer->m_nEntityFlags.bMeleeProof = m_bGodMode;
 #endif
             }
+            Ui::CheckboxWithHint("Health regeneration", &m_bHealthRegen, "Player heals if not taken damage for 5 seconds");
 #ifdef GTASA
             Ui::CheckboxAddress("Higher cycle jumps", 0x969161);
             Ui::CheckboxAddress("Infinite oxygen", 0x96916E);
@@ -759,7 +736,7 @@ void Player::Draw()
                             getline(ss, temp, '$');
 
                             return temp;
-                        }, nullptr, cloth_category, sizeof(cloth_category) / sizeof(const char*));
+                        }, nullptr, clothNameList, sizeof(clothNameList) / sizeof(const char*));
                     }
                     else
                     {
@@ -792,7 +769,7 @@ void Player::Draw()
                         CClothes::RebuildPlayer(player, false);
                     }
                     ImGui::SameLine();
-                    for (const char* clothName : cloth_category)
+                    for (const char* clothName : clothNameList)
                     {
                         if (ImGui::Button(clothName, ImVec2(Ui::GetSize(2))))
                         {
