@@ -241,7 +241,12 @@ void Game::FreeCam()
         m_Freecam::m_bRadarState = patch::Get<BYTE>(BY_GAME(0xBA676C, 0xA10AB6, NULL)); // radar
 
         CVector playerPos = player->GetPosition();
+
+#ifdef GTA3
+        CPad::GetPad(0)->m_bDisablePlayerControls = true;
+#else
         CPad::GetPad(0)->DisablePlayerControls = true;
+#endif
 
         Command<Commands::CREATE_RANDOM_CHAR>(playerPos.x, playerPos.y, playerPos.z, &m_Freecam::m_nPed);
         m_Freecam::m_pPed = CPools::GetPed(m_Freecam::m_nPed);
@@ -260,11 +265,15 @@ void Game::FreeCam()
         TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_Freecam::m_fFOV, 1000, true);
         Command<Commands::CAMERA_PERSIST_FOV>(true);
         patch::Set<BYTE>(0xBA676C, 2); // disable radar
-#else
+#elif GTAVC
         m_Freecam::m_pPed->m_nFlags.bIsVisible = false;
         m_Freecam::m_pPed->m_nFlags.bUseCollision = false;
         m_Freecam::m_pPed->SetPosition(playerPos);
         patch::Set<BYTE>(0xA10AB6, 1); // disable radar
+#else
+        m_Freecam::m_pPed->m_nEntityFlags.bIsVisible = false;
+        m_Freecam::m_pPed->m_nEntityFlags.bUsesCollision = false;
+        m_Freecam::m_pPed->SetPosition(playerPos.x, playerPos.y, playerPos.z);
 #endif
 
         m_Freecam::m_bInitDone = true;
@@ -301,7 +310,9 @@ void Game::FreeCam()
         Command<Commands::SET_CHAR_COORDINATES>(CPools::GetPedRef(player), pos.x, pos.y, pos.z);
 
         // disble them again cause they get enabled
+#ifndef GTA3
         CHud::bScriptDontDisplayRadar = true;
+#endif
         CHud::m_Wants_To_Draw_Hud = false;
         SetHelpMessage("Player telported", false, false, false);
     }
@@ -372,9 +383,12 @@ void Game::FreeCam()
     Command<Commands::ATTACH_CAMERA_TO_CHAR>(m_Freecam::m_nPed, 0.0, 0.0, 20.0, 90.0, 180, m_Freecam::m_fTotalMouse.y, 0.0, 2);
     m_Freecam::m_pPed->SetPosn(pos);
     CIplStore::AddIplsNeededAtPosn(pos);
-#else
+#elif GTAVC
     m_Freecam::m_pPed->m_placement.SetHeading(m_Freecam::m_fTotalMouse.x);
     m_Freecam::m_pPed->SetPosition(pos);
+#else
+    m_Freecam::m_pPed->SetHeading(m_Freecam::m_fTotalMouse.x);
+    m_Freecam::m_pPed->SetPosition(pos.x, pos.y, pos.z);
 #endif
 }
 
@@ -384,7 +398,12 @@ void Game::ClearFreecamStuff()
     Command<Commands::SET_EVERYONE_IGNORE_PLAYER>(0, false);
     patch::Set<BYTE>(BY_GAME(0xBA6769, 0x86963A, NULL), m_Freecam::m_bHudState); // hud
     patch::Set<BYTE>(BY_GAME(0xBA676C, 0xA10AB6, NULL), m_Freecam::m_bRadarState); // radar
-    CPad::GetPad(0)->DisablePlayerControls = false;
+
+#ifdef GTA3
+        CPad::GetPad(0)->m_bDisablePlayerControls = false;
+#else
+        CPad::GetPad(0)->DisablePlayerControls = false;
+#endif
 
     Command<Commands::DELETE_CHAR>(m_Freecam::m_nPed);
     m_Freecam::m_pPed = nullptr;
