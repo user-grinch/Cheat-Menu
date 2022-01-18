@@ -692,11 +692,6 @@ void Vehicle::Draw()
 \nEnabling this would disable\nAll cars have nitro\nAll taxis have nitro");
 #elif GTA3
             Ui::CheckboxAddress("Perfect handling", 0x95CD66);
-            static bool bTankMode = false;
-            if (Ui::CheckboxWithHint("Tank mode", &bTankMode))
-            {
-                Call<0x490EE0>();
-            }
 #endif
             Ui::CheckboxWithHint("Watertight car", &m_bVehWatertight, "Peds inside won't drown if the vehicle\nis submerged in water");
             Ui::CheckboxAddress("Wheels only", BY_GAME(0x96914B, 0xA10B70, 0x95CD78));

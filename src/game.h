@@ -9,27 +9,6 @@ private:
     static inline bool m_bDisableReplay;
     static inline bool m_bMissionTimer;
 
-#ifdef GTASA
-    static inline bool m_bForbiddenArea = true; // wanted level when going outside playable aea
-    static inline bool m_bSolidWater; // walk on water hack
-    static inline bool m_bScreenShot;
-    static inline bool m_bKeepStuff;
-    static inline ResourceStore m_StatData{ "stat", eResourceType::TYPE_TEXT };
-
-    static inline std::vector<std::string> m_DayNames =
-    {
-        "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
-    };
-
-    struct m_RandomCheats
-    {
-        static inline bool m_bEnabled;
-        static inline bool m_bProgressBar = true;
-        static inline std::string m_EnabledCheats[92][2];
-        static inline int m_nInterval = 10;
-        static inline CJson m_Json = CJson("cheat name");
-        static inline uint m_nTimer;
-    };
     struct m_Freecam
     {
         static inline bool m_bEnabled;
@@ -52,14 +31,32 @@ private:
         static inline float m_fBacStamina = 0.0f;
     };
 
+#ifdef GTASA
+    static inline bool m_bForbiddenArea = true; // wanted level when going outside playable aea
+    static inline bool m_bSolidWater; // walk on water hack
+    static inline bool m_bScreenShot;
+    static inline bool m_bKeepStuff;
+    static inline ResourceStore m_StatData{ "stat", eResourceType::TYPE_TEXT };
+
+    static inline std::vector<std::string> m_DayNames =
+    {
+        "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
+    };
+
+    struct m_RandomCheats
+    {
+        static inline bool m_bEnabled;
+        static inline bool m_bProgressBar = true;
+        static inline std::string m_EnabledCheats[92][2];
+        static inline int m_nInterval = 10;
+        static inline CJson m_Json = CJson("cheat name");
+        static inline uint m_nTimer;
+    };
 #endif
 
     static void RealTimeClock();
-#ifdef GTASA
-    // TODO: Update freecam with aap's code
     static void FreeCam();
     static void ClearFreecamStuff();
-#endif
 
 public:
     static inline bool m_bFreezeTime;

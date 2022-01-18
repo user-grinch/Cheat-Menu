@@ -87,6 +87,19 @@ Game::Game()
         CPlayerPed* pPlayer = FindPlayerPed();
         int hplayer = CPools::GetPedRef(pPlayer);
 
+        if (m_HardMode::m_bEnabled)
+        {
+            if (pPlayer->m_fHealth > 50.0f)
+                pPlayer->m_fHealth = 50.0f;
+
+            pPlayer->m_fArmour = 0.0f;
+
+#ifdef GTASA
+            CStats::SetStatValue(STAT_MAX_HEALTH, 350.0f);
+            CStats::SetStatValue(STAT_STAMINA, 0.0f);
+#endif
+        }
+
 #ifdef GTASA
         if (m_bScreenShot)
         {
@@ -95,16 +108,6 @@ Game::Game()
                 Command<Commands::TAKE_PHOTO>();
                 SetHelpMessage("Screenshot taken", false, false, false);
             }
-        }
-
-        if (m_HardMode::m_bEnabled)
-        {
-            if (pPlayer->m_fHealth > 50.0f)
-                pPlayer->m_fHealth = 50.0f;
-
-            pPlayer->m_fArmour = 0.0f;
-            CStats::SetStatValue(STAT_MAX_HEALTH, 350.0f);
-            CStats::SetStatValue(STAT_STAMINA, 0.0f);
         }
 
         static int m_nSolidWaterObj;
@@ -141,6 +144,8 @@ Game::Game()
             }
         }
 
+#endif
+
         if (freeCam.Pressed())
         {
             if (m_Freecam::m_bEnabled)
@@ -158,7 +163,6 @@ Game::Game()
         {
             FreeCam();
         }
-#endif
 
         // improve this later
         static uint syncTimer;
@@ -220,50 +224,56 @@ void SetPlayerMission(std::string& rootkey, std::string& name, std::string& id)
     }
 }
 
-#ifdef GTASA
 void Game::FreeCam()
 {
-    int delta = (CTimer::m_snTimeInMillisecondsNonClipped -
-                 CTimer::m_snPreviousTimeInMillisecondsNonClipped);
+    int delta = (CTimer::m_snTimeInMilliseconds - CTimer::m_snPreviousTimeInMilliseconds);
 
     int ratio = 1 / (1 + (delta * m_Freecam::m_nMul));
     int speed = m_Freecam::m_nMul + m_Freecam::m_nMul * ratio * delta;
 
     if (!m_Freecam::m_bInitDone)
     {
-        CPlayerPed* player = FindPlayerPed(-1);
+        CPlayerPed* player = FindPlayerPed();
         Command<Commands::SET_EVERYONE_IGNORE_PLAYER>(0, true);
 
-        m_Freecam::m_bHudState = patch::Get<BYTE>(0xBA6769); // hud
-        m_Freecam::m_bRadarState = patch::Get<BYTE>(0xBA676C); // radar
-        patch::Set<BYTE>(0xBA6769, 0); // hud
-        patch::Set<BYTE>(0xBA676C, 2); // radar
+        m_Freecam::m_bHudState = patch::Get<BYTE>(BY_GAME(0xBA6769, 0x86963A, NULL)); // hud
+        patch::Set<BYTE>(BY_GAME(0xBA6769, 0x86963A, NULL), 0); // hud
+        m_Freecam::m_bRadarState = patch::Get<BYTE>(BY_GAME(0xBA676C, 0xA10AB6, NULL)); // radar
 
-        CVector player_pos = player->GetPosition();
+        CVector playerPos = player->GetPosition();
         CPad::GetPad(0)->DisablePlayerControls = true;
 
-        Command<Commands::CREATE_RANDOM_CHAR>(player_pos.x, player_pos.y, player_pos.z, &m_Freecam::m_nPed);
+        Command<Commands::CREATE_RANDOM_CHAR>(playerPos.x, playerPos.y, playerPos.z, &m_Freecam::m_nPed);
         m_Freecam::m_pPed = CPools::GetPed(m_Freecam::m_nPed);
-        m_Freecam::m_pPed->m_bIsVisible = false;
-
-        Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(m_Freecam::m_nPed, true);
-        Command<Commands::SET_CHAR_COLLISION>(m_Freecam::m_nPed, false);
-        Command<Commands::SET_LOAD_COLLISION_FOR_CHAR_FLAG>(m_Freecam::m_nPed, false);
 
         m_Freecam::m_fTotalMouse.x = player->GetHeading() + 89.6f;
         m_Freecam::m_fTotalMouse.y = 0;
+        playerPos.z -= 20;
 
-        m_Freecam::m_bInitDone = true;
-        player_pos.z -= 20;
-        m_Freecam::m_pPed->SetPosn(player_pos);
+        Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(m_Freecam::m_nPed, true);
+        Command<Commands::SET_LOAD_COLLISION_FOR_CHAR_FLAG>(m_Freecam::m_nPed, false);
 
+#ifdef GTASA
+        m_Freecam::m_pPed->m_bIsVisible = false;
+        Command<Commands::SET_CHAR_COLLISION>(m_Freecam::m_nPed, false);
+        m_Freecam::m_pPed->SetPosn(playerPos);
         TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_Freecam::m_fFOV, 1000, true);
         Command<Commands::CAMERA_PERSIST_FOV>(true);
+        patch::Set<BYTE>(0xBA676C, 2); // disable radar
+#else
+        m_Freecam::m_pPed->m_nFlags.bIsVisible = false;
+        m_Freecam::m_pPed->m_nFlags.bUseCollision = false;
+        m_Freecam::m_pPed->SetPosition(playerPos);
+        patch::Set<BYTE>(0xA10AB6, 1); // disable radar
+#endif
+
+        m_Freecam::m_bInitDone = true;
     }
 
     CVector pos = m_Freecam::m_pPed->GetPosition();
 
-    Command<Commands::GET_PC_MOUSE_MOVEMENT>(&m_Freecam::m_fMouse.x, &m_Freecam::m_fMouse.y);
+    m_Freecam::m_fMouse.x = CPad::NewMouseControllerState.X;
+    m_Freecam::m_fMouse.y = CPad::NewMouseControllerState.Y;
     m_Freecam::m_fTotalMouse.x = m_Freecam::m_fTotalMouse.x - m_Freecam::m_fMouse.x / 250;
     m_Freecam::m_fTotalMouse.y = m_Freecam::m_fTotalMouse.y + m_Freecam::m_fMouse.y / 3;
 
@@ -279,10 +289,15 @@ void Game::FreeCam()
 
     if (freeCamTeleportPlayer.Pressed())
     {
-        CPlayerPed* player = FindPlayerPed(-1);
+        CPlayerPed* player = FindPlayerPed();
         CVector pos = m_Freecam::m_pPed->GetPosition();
-        CEntity* player_entity = FindPlayerEntity(-1);
-        pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, nullptr, &player_entity) + 0.5f;
+
+#ifdef GTASA
+        CEntity* playerEntity = FindPlayerEntity(-1);
+        pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, nullptr, &playerEntity) + 0.5f;
+#else
+        pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, nullptr) + 0.5f;
+#endif
         Command<Commands::SET_CHAR_COORDINATES>(CPools::GetPedRef(player), pos.x, pos.y, pos.z);
 
         // disble them again cause they get enabled
@@ -330,6 +345,7 @@ void Game::FreeCam()
         pos.y += speed * sin(angle * 3.14159f / 180.0f);
     }
 
+#ifdef GTASA
     if (CPad::NewMouseControllerState.wheelUp)
     {
         if (m_Freecam::m_fFOV > 10.0f)
@@ -356,6 +372,10 @@ void Game::FreeCam()
     Command<Commands::ATTACH_CAMERA_TO_CHAR>(m_Freecam::m_nPed, 0.0, 0.0, 20.0, 90.0, 180, m_Freecam::m_fTotalMouse.y, 0.0, 2);
     m_Freecam::m_pPed->SetPosn(pos);
     CIplStore::AddIplsNeededAtPosn(pos);
+#else
+    m_Freecam::m_pPed->m_placement.SetHeading(m_Freecam::m_fTotalMouse.x);
+    m_Freecam::m_pPed->SetPosition(pos);
+#endif
 }
 
 void Game::ClearFreecamStuff()
@@ -363,15 +383,17 @@ void Game::ClearFreecamStuff()
     m_Freecam::m_bInitDone = false;
     Command<Commands::SET_EVERYONE_IGNORE_PLAYER>(0, false);
     patch::Set<BYTE>(BY_GAME(0xBA6769, 0x86963A, NULL), m_Freecam::m_bHudState); // hud
-    patch::Set<BYTE>(0xBA676C, m_Freecam::m_bRadarState); // radar
+    patch::Set<BYTE>(BY_GAME(0xBA676C, 0xA10AB6, NULL), m_Freecam::m_bRadarState); // radar
     CPad::GetPad(0)->DisablePlayerControls = false;
 
     Command<Commands::DELETE_CHAR>(m_Freecam::m_nPed);
     m_Freecam::m_pPed = nullptr;
+
+#ifdef GTASA
     Command<Commands::CAMERA_PERSIST_FOV>(false);
+#endif
     Command<Commands::RESTORE_CAMERA_JUMPCUT>();
 }
-#endif
 
 void Game::Draw()
 {
@@ -479,7 +501,6 @@ of LS without completing missions"))
             {
                 Command<Commands::FREEZE_ONSCREEN_TIMER>(m_bMissionTimer);
             }
-#ifdef GTASA
             if (Ui::CheckboxWithHint("Hard mode", &m_HardMode::m_bEnabled, "Makes the game more challanging to play. \n\
 Lowers armour, health, stamina etc."))
             {
@@ -489,19 +510,28 @@ Lowers armour, health, stamina etc."))
                 {
                     m_HardMode::m_fBacArmour = player->m_fArmour;
                     m_HardMode::m_fBacHealth = player->m_fHealth;
+
+#ifdef GTASA
                     m_HardMode::m_fBacMaxHealth = CStats::GetStatValue(STAT_MAX_HEALTH);
                     m_HardMode::m_fBacStamina = CStats::GetStatValue(STAT_STAMINA);
+#else
+                    m_HardMode::m_fBacMaxHealth = 100.0f;
+#endif
                     player->m_fHealth = 50.0f;
                 }
                 else
                 {
                     player->m_fArmour = m_HardMode::m_fBacArmour;
+
+#ifdef GTASA
                     CStats::SetStatValue(STAT_STAMINA, m_HardMode::m_fBacStamina);
                     CStats::SetStatValue(STAT_MAX_HEALTH, m_HardMode::m_fBacMaxHealth);
+#endif
                     player->m_fHealth = m_HardMode::m_fBacHealth;
-                    CWeaponInfo::LoadWeaponData();
                 }
             }
+#ifdef GTASA
+
             if (Ui::CheckboxWithHint("Keep stuff", &m_bKeepStuff, "Keep stuff after arrest/death"))
             {
                 Command<Commands::SWITCH_ARREST_PENALTIES>(m_bKeepStuff);
