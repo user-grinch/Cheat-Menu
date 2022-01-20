@@ -4,6 +4,8 @@
 #include "ui.h"
 #include "updater.h"
 #include "d3dhook.h"
+#include "../depend/imgui/imgui_internal.h"
+#include "util.h"
 
 void CheatMenu::DrawWindow()
 {
@@ -35,28 +37,13 @@ void CheatMenu::DrawWindow()
                     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
                                         ImVec2(ImGui::GetWindowWidth() / 85, ImGui::GetWindowHeight() / 200));
 
-                    if (Updater::IsUpdateAvailable())
-                    {
-                        ShowUpdateScreen();
-                    }
-                    else
-                    {
-                        Ui::DrawHeaders(header);
-
-                        if (Ui::m_HeaderId == -1)
-                        {
-                            ShowWelcomeScreen();
-                        }
-                    }
+                    ProcessMenuPages();
 
                     if (m_bSizeChangedExternal)
-                    {
                         m_bSizeChangedExternal = false;
-                    }
                     else
-                    {
                         m_fMenuSize = ImGui::GetWindowSize();
-                    }
+
                     gConfig.SetValue("window.sizeX", m_fMenuSize.x);
                     gConfig.SetValue("window.sizeY", m_fMenuSize.y);
 
@@ -75,6 +62,108 @@ void CheatMenu::DrawWindow()
     DrawOverlay();
 }
 
+void CheatMenu::ProcessMenuPages()
+{
+    static void* pCallback;
+    ImVec2 size = Ui::GetSize(3, false);
+    ImGuiStyle &style = ImGui::GetStyle();
+
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+    ImGui::PushFont(FontMgr::GetFont("header"));
+    m_nMenuPage = Updater::IsUpdateAvailable() ? eMenuPages::UPDATE : m_nMenuPage;
+    
+    // Check once if it's anniversary day
+    static bool aniCheckDone;
+    if (!aniCheckDone)
+    {
+        SYSTEMTIME st;
+        GetSystemTime(&st);
+
+        if (st.wMonth == 3 && st.wDay == 28)
+        {
+            /*
+            *   We don't want to be annoying and
+            *   show anniversary screen on every game start
+            */
+            bool flag = gConfig.GetValue("window.anniversaryShown", false);
+
+            if (!flag)
+            {
+                gConfig.SetValue("window.anniversaryShown", true);
+                m_nMenuPage = eMenuPages::ANNIVERSARY;
+            }
+        }
+        aniCheckDone = true;
+    }
+
+    ImDrawList *pDrawList = ImGui::GetWindowDrawList();
+    for (size_t i = 0; i < m_headerList.size(); ++i)
+    {
+        /*
+        * For Welcome & Update pages
+        * They don't need to add item in the header list
+        */
+        if (m_headerList[i].skipHeader)
+        {
+            if (m_nMenuPage == m_headerList[i].page)
+                pCallback = m_headerList[i].pFunc;
+
+            continue;
+        }
+
+        const char* text = m_headerList[i].name.c_str();
+
+        ImVec4 color;
+        if (m_headerList[i].page == m_nMenuPage)
+        {
+            color = style.Colors[ImGuiCol_ButtonActive];
+            pCallback = m_headerList[i].pFunc;
+        }
+        else
+            color = style.Colors[ImGuiCol_Button];
+
+        if (ImGui::InvisibleButton(text, size))
+        {
+            m_nMenuPage = m_headerList[i].page;
+            size_t curPage = static_cast<size_t>(m_headerList[i].page);
+            gConfig.SetValue("window.idnum", curPage);
+            pCallback = m_headerList[i].pFunc;
+            Updater::ResetUpdaterState();
+        }
+
+        if (ImGui::IsItemHovered())
+            color = style.Colors[ImGuiCol_ButtonHovered];
+
+        /*
+        * Window rounding flags
+        * TODO: hardcoded atm
+        */
+        ImDrawFlags flags = ImDrawFlags_RoundCornersNone;
+        if (i == 0) flags = ImDrawFlags_RoundCornersTopLeft;
+        if (i == 2) flags = ImDrawFlags_RoundCornersTopRight;
+        if (i == 6) flags = ImDrawFlags_RoundCornersBottomLeft;
+        if (i == 8) flags = ImDrawFlags_RoundCornersBottomRight;
+
+        ImVec2 min = ImGui::GetItemRectMin();
+        ImVec2 max = ImGui::GetItemRectMax();
+        ImVec2 size = ImGui::CalcTextSize(text);
+        pDrawList->AddRectFilled(min, max, ImGui::GetColorU32(color), style.FrameRounding, flags);
+        ImGui::RenderTextClipped(min + style.FramePadding, max - style.FramePadding, text, NULL, &size, style.ButtonTextAlign);
+
+        if (i % 3 != 2)
+            ImGui::SameLine();
+    }
+    ImGui::PopFont();
+    ImGui::PopStyleVar();
+    ImGui::Dummy(ImVec2(0, 10));
+
+    if (pCallback != nullptr && ImGui::BeginChild("HEADERCONTENT"))
+    {
+        static_cast<void(*)()>(pCallback)();
+        ImGui::EndChild();
+    }
+}
+
 CheatMenu::CheatMenu()
 {
     if (!D3dHook::InjectHook(DrawWindow))
@@ -85,7 +174,7 @@ CheatMenu::CheatMenu()
     ApplyStyle();
 
     // Load menu settings
-    Ui::m_HeaderId = gConfig.GetValue("window.idnum", -1);
+    m_nMenuPage = (eMenuPages)gConfig.GetValue("window.idnum", (size_t)eMenuPages::WELCOME);
     m_fMenuSize.x = gConfig.GetValue("window.sizeX", screen::GetScreenWidth() / 4.0f);
     m_fMenuSize.y = gConfig.GetValue("window.sizeY", screen::GetScreenHeight() / 1.2f);
     srand(CTimer::m_snTimeInMilliseconds);
@@ -128,9 +217,79 @@ CheatMenu::~CheatMenu()
     D3dHook::RemoveHook();
 }
 
-void CheatMenu::ShowWelcomeScreen()
+/*
+* YIKES YOU AREN"T SUPPOSED TO FIND THIS YOU KNOW!!!
+* Probably a good easter egg for the upcoming anniversary ;)
+*/
+void CheatMenu::ShowAnniversaryPage()
 {
-    ImGui::BeginChild("WelcomeScreen");
+    Ui::CenterdText("Happy Anniversary!");
+    ImGui::NewLine();
+
+    ImGui::TextWrapped("On this day, in 2019, the first public version of menu was released in MixMods Forum." 
+" It's been a blast working on it and I've learned a lot in the process.\n\nThanks to you and everyone who used or" 
+" contributed to the modification in any form or shape.");
+
+    ImGui::NewLine();
+    ImGui::TextWrapped("Feel free to star the GitHub repo or join the discord server and provide feedback, ideas, or suggestions.");
+    ImGui::NewLine();
+
+    if (ImGui::Button("Discord server", ImVec2(Ui::GetSize(2))))
+    {
+        ShellExecute(nullptr, "open", DISCORD_INVITE, nullptr, nullptr, SW_SHOWNORMAL);
+    }
+
+    ImGui::SameLine();
+
+    if (ImGui::Button("GitHub repo", ImVec2(Ui::GetSize(2))))
+    {
+        ShellExecute(nullptr, "open", GITHUB_LINK, nullptr, nullptr, SW_SHOWNORMAL);
+    }
+
+    ImGui::NewLine();
+
+    static bool showHistory = false;
+    ImGui::Checkbox("Show backstory", &showHistory);
+
+    if (showHistory)
+    {
+        ImGui::BeginChild("BACKSTORY");
+        ImGui::TextWrapped("I wanted to share the backstory behind the initial idea or plan behind the menu."
+" This is gonna be long so feel free to skip it if you're not interested.");
+        ImGui::NewLine();
+
+        ImGui::TextWrapped("The original idea of the menu comes way back from 2016! The inspiration for the menu"
+" is from the 'CheatMenu by UNRATED69'. I wanted something that had some more features and worked with SAxVCxLC."
+" But there not being any other CheatMenu's back then, I wanted to make something myself but lacked the knowledge to do so.");
+        ImGui::NewLine();
+
+        ImGui::TextWrapped("In 2018, I finally got an opportunity to learn CLEO or GTA3Script after Junior released"
+" his tutorial. I started from basics but it soon became apparent that due to the limitations of CLEO, creating menus were"
+"really tedious.");
+
+        ImGui::NewLine();
+        ImGui::TextWrapped("Later that year I found Moonloader, which had ImGui support. Meaning I could make menus"
+" without brainfucking myself (kudos to everyone who writes 100s of lines in CLEO). I recall starting working on"
+" the menu in October/November that same year.");
+
+        ImGui::NewLine();
+        ImGui::TextWrapped("I had high hopes the mod would succeed and the menu was nowhere near the state I wanted"
+" it to be. But over a hot conversation with KKJJ, I finally decided to add the absolute bare minimum of features and"
+" see what happens. And to my surprise, it even surpassed all of my expectations and became my most popular mod to this day.");
+
+        ImGui::NewLine();
+        ImGui::TextWrapped("A part of me is already cringing telling the story but it is what it is. I've learned"
+" a lot working on this mod and I'm grateful. If you made it through all this way, kudos, you're awesome.");
+
+        ImGui::NewLine();
+        ImGui::TextWrapped("Again, thanks to you and everyone who used or helped me along the way. Enjoy ;)");
+
+        ImGui::EndChild();
+    }
+}   
+
+void CheatMenu::ShowWelcomePage()
+{
     ImGui::NewLine();
 
     Ui::CenterdText("Welcome to Cheat Menu");
@@ -155,45 +314,33 @@ void CheatMenu::ShowWelcomeScreen()
     ImGui::TextWrapped("If you find bugs or have suggestions, you can let me know on discord :)");
     ImGui::Dummy(ImVec2(0, 30));
     Ui::CenterdText("Copyright Grinch_ 2019-2022. All rights reserved.");
-    ImGui::EndChild();
 }
 
-void CheatMenu::ShowUpdateScreen()
+void CheatMenu::ShowUpdatePage()
 {
-    ImGui::BeginChild("UPdateScreen");
     std::string ver = Updater::GetUpdateVersion();
     ImGui::Dummy(ImVec2(0, 20));
-    Ui::CenterdText("A new version of the mod is available.");
+    Ui::CenterdText("A new version of the menu is available.");
     Ui::CenterdText(std::string("Current version: ") + MENU_VERSION);
     Ui::CenterdText("Latest version: " + ver);
     ImGui::Dummy(ImVec2(0, 10));
-    ImGui::TextWrapped("In order to keep using the menu, you need to update to the latest version."
-                       " This is to ensure everything is using the most up-to-date version.");
+    ImGui::TextWrapped("It's highly recommanded to update to the latest version."
+                       " Newer versions may contain new features and bug fixes.");
     ImGui::Dummy(ImVec2(0, 10));
-    ImGui::TextWrapped("To know what changes are made or to download, click on the \"Download page\" button."
+    ImGui::TextWrapped("To know what changes are made or to download, click on the 'Download page' button."
                        " Follow the instructions there. If you're still having issues, let me know on discord.");
 
     ImGui::Dummy(ImVec2(0, 5));
-    if (ImGui::Button("Discord server", ImVec2(Ui::GetSize(3))))
-    {
+    if (ImGui::Button("Discord server", ImVec2(Ui::GetSize(2))))
         ShellExecute(NULL, "open", DISCORD_INVITE, NULL, NULL, SW_SHOWNORMAL);
-    }
 
     ImGui::SameLine();
 
-    if (ImGui::Button("Download page", Ui::GetSize(3)))
+    if (ImGui::Button("Download page", Ui::GetSize(2)))
     {
         ShellExecute(NULL, "open", std::string("https://github.com/user-grinch/Cheat-Menu/releases/tag/" +
                                                ver).c_str(), NULL, NULL, SW_SHOWNORMAL);
     }
-
-    ImGui::SameLine();
-
-    if (ImGui::Button("Hide page", Ui::GetSize(3)))
-    {
-        Updater::ResetUpdaterState();
-    }
-    ImGui::EndChild();
 }
 
 void CheatMenu::ApplyStyle()

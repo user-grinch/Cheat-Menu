@@ -19,7 +19,6 @@ public:
     static void ClearCharTasksVehCheck(CPed* ped);
     static int GetLargestGangInZone();
 #endif
-
     static void SetCarForwardSpeed(CVehicle *pVeh, float speed);
     static CPed* GetClosestPed();
     static CVehicle* GetClosestVehicle();

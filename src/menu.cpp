@@ -348,7 +348,7 @@ void Menu::ProcessCommands()
 #endif
 }
 
-void Menu::Draw()
+void Menu::ShowPage()
 {
     ImGui::Spacing();
     if (ImGui::Button("Reset config", ImVec2(Ui::GetSize(2))))

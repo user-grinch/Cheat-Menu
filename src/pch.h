@@ -74,7 +74,6 @@
 #include "resourcestore.h"
 #include "fontmgr.h"
 
-using CallbackTable = std::vector<std::pair<std::string, void(*)()>>;
 using namespace plugin;
 
 enum eRenderer

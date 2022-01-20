@@ -100,5 +100,5 @@ public:
 #endif
     static std::string GetNameFromModel(int model);
     static int GetModelFromName(const char* name);
-    static void Draw();
+    static void ShowPage();
 };

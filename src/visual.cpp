@@ -346,7 +346,7 @@ bool Visual::TimeCycColorEdit4(const char* label, T* r, T* g, T* b, T* a, ImGuiC
     return rtn;
 }
 
-void Visual::Draw()
+void Visual::ShowPage()
 {
     if (ImGui::BeginTabBar("Visual", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {

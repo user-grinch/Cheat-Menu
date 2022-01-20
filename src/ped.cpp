@@ -166,7 +166,7 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
     }
 }
 
-void Ped::Draw()
+void Ped::ShowPage()
 {
     if (ImGui::BeginTabBar("Ped", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {

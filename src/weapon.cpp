@@ -225,7 +225,7 @@ void Weapon::GiveWeaponToPlayer(std::string& rootkey, std::string& name, std::st
 }
 #endif
 
-void Weapon::Draw()
+void Weapon::ShowPage()
 {
     CPlayerPed* pPlayer = FindPlayerPed();
     uint hplayer = CPools::GetPedRef(pPlayer);

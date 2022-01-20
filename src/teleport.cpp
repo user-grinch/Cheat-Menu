@@ -188,7 +188,7 @@ void Teleport::RemoveTeleportEntry(std::string& category, std::string& key, std:
     }
 }
 
-void Teleport::Draw()
+void Teleport::ShowPage()
 {
     if (ImGui::BeginTabBar("Teleport", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {

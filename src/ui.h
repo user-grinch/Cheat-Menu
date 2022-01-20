@@ -48,7 +48,6 @@ public:
                                      const char* hint = nullptr);
     static bool CheckboxBitFlag(const char* label, uint flag, const char* hint = nullptr);
     static bool CheckboxWithHint(const char* label, bool* state, const char* hint = nullptr, bool is_disabled = false);
-    static void DrawHeaders(CallbackTable& data);
 
     static void DrawJSON(ResourceStore& data,
                          std::function<void(std::string&, std::string&, std::string&)> func_left_click,

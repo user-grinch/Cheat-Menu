@@ -53,5 +53,5 @@ public:
 #endif
 
     Weapon();
-    static void Draw();
+    static void ShowPage();
 };

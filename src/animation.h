@@ -48,5 +48,5 @@ private:
 
 public:
     Animation();
-    static void Draw();
+    static void ShowPage();
 };

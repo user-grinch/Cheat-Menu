@@ -41,5 +41,5 @@ private:
 
 public:
     Visual();
-    static void Draw();
+    static void ShowPage();
 };

@@ -53,5 +53,5 @@ private:
 
 public:
     Player();
-    static void Draw();
+    static void ShowPage();
 };

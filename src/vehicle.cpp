@@ -558,7 +558,7 @@ int Vehicle::GetModelFromName(const char* name)
     }
 }
 
-void Vehicle::Draw()
+void Vehicle::ShowPage()
 {
     ImGui::Spacing();
     CPlayerPed* pPlayer = FindPlayerPed();

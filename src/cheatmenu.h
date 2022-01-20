@@ -22,21 +22,45 @@
 class CheatMenu : Animation, Game, Menu, Ped, Player, Teleport, Vehicle, Visual, Weapon
 {
 private:
+    enum class eMenuPages
+    {
+        ANIMATION, ANNIVERSARY, GAME, MENU, NONE, PED, PLAYER, TELEPORT, UPDATE, VEHICLE, VISUAL, WEAPON, WELCOME
+    };
+    struct HeaderData
+    {
+        std::string name;
+        void *pFunc;
+        eMenuPages page;
+        bool skipHeader = false;
+    };
+    
+    static inline eMenuPages m_nMenuPage = eMenuPages::WELCOME;
     static inline bool m_bShowMenu = false;
     static inline ImVec2 m_fMenuSize = ImVec2(screen::GetScreenWidth() / 4, screen::GetScreenHeight() / 1.2);
     static inline bool m_bSizeChangedExternal = false;
 
-    static inline CallbackTable header
-    {
-        {"Teleport", &Teleport::Draw}, {"Player", &Player::Draw}, {"Ped", &Ped::Draw},
-        {"Animation", &Animation::Draw}, {"Vehicle", &Vehicle::Draw}, {"Weapon", &Weapon::Draw},
-        {"Game", &Game::Draw}, {"Visual", &Visual::Draw}, {"Menu", &Menu::Draw}
-    };
-
     static void ApplyStyle();
     static void DrawWindow();
-    static void ShowUpdateScreen();
-    static void ShowWelcomeScreen();
+    static void ShowAnniversaryPage();
+    static void ShowUpdatePage();
+    static void ShowWelcomePage();
+    static void ProcessMenuPages();
+
+    static inline std::vector<HeaderData> m_headerList
+    {
+        {"Teleport", &Teleport::ShowPage, eMenuPages::TELEPORT}, 
+        {"Player", &Player::ShowPage, eMenuPages::PLAYER}, 
+        {"Ped", &Ped::ShowPage, eMenuPages::PED}, 
+        {"Animation", &Animation::ShowPage, eMenuPages::ANIMATION}, 
+        {"Vehicle", &Vehicle::ShowPage, eMenuPages::VEHICLE},
+        {"Weapon", &Weapon::ShowPage, eMenuPages::WEAPON},
+        {"Game", &Game::ShowPage, eMenuPages::GAME}, 
+        {"Visual", &Visual::ShowPage, eMenuPages::VISUAL}, 
+        {"Menu", &Menu::ShowPage, eMenuPages::MENU}, 
+        {"Welcome", &ShowWelcomePage, eMenuPages::WELCOME, true},
+        {"Update", &ShowUpdatePage, eMenuPages::UPDATE, true},
+        {"Anniversary", &ShowAnniversaryPage, eMenuPages::ANNIVERSARY, true}
+    };
 
 public:
     CheatMenu();

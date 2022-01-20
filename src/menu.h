@@ -1,4 +1,5 @@
 #pragma once
+#include "pch.h"
 
 class Menu
 {
@@ -45,7 +46,7 @@ public:
     };
 
     Menu();
-    static void Draw();
+    static void ShowPage();
     static void DrawOverlay();
     static void DrawShortcutsWindow();
     static void ProcessCommands();

@@ -360,7 +360,7 @@ void Player::ChangePlayerModel(std::string& cat, std::string& key, std::string& 
 }
 #endif
 
-void Player::Draw()
+void Player::ShowPage()
 {
     CPlayerPed* pPlayer = FindPlayerPed();
     int hplayer = CPools::GetPedRef(pPlayer);

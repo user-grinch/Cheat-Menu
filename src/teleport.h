@@ -39,5 +39,5 @@ public:
     Teleport();
 
     static void TeleportPlayer(bool get_marker = false, CVector pos = CVector(0, 0, 0), int interior_id = 0);
-    static void Draw();
+    static void ShowPage();
 };

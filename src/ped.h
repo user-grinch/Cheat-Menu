@@ -59,5 +59,5 @@ public:
 
     Ped();
     ~Ped();
-    static void Draw();
+    static void ShowPage();
 };

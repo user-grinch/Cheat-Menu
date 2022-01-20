@@ -63,6 +63,6 @@ public:
     static inline bool m_bSyncTime;
 
     Game();
-    static void Draw();
+    static void ShowPage();
 
 };

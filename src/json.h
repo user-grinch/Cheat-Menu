@@ -75,7 +75,7 @@ public:
     	Example: "Menu.Window.X"
     */
     template <typename T>
-    void SetValue(std::string&& key, T& val)
+    void SetValue(std::string&& key, const T& val)
     {
         std::stringstream ss(key);
         std::string line;
@@ -100,7 +100,7 @@ public:
     }
 
     template <>
-    void SetValue(std::string&& key, std::string& val)
+    void SetValue(std::string&& key, const std::string& val)
     {
         std::stringstream ss(key);
         std::string line;

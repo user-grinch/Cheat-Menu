@@ -245,7 +245,7 @@ Animation::Animation()
 #endif
 }
 
-void Animation::Draw()
+void Animation::ShowPage()
 {
     if (ImGui::BeginTabBar("Animation", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {

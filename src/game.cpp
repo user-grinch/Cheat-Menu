@@ -400,9 +400,9 @@ void Game::ClearFreecamStuff()
     patch::Set<BYTE>(BY_GAME(0xBA676C, 0xA10AB6, NULL), m_Freecam::m_bRadarState); // radar
 
 #ifdef GTA3
-        CPad::GetPad(0)->m_bDisablePlayerControls = false;
+    CPad::GetPad(0)->m_bDisablePlayerControls = false;
 #else
-        CPad::GetPad(0)->DisablePlayerControls = false;
+    CPad::GetPad(0)->DisablePlayerControls = false;
 #endif
 
     Command<Commands::DELETE_CHAR>(m_Freecam::m_nPed);
@@ -414,7 +414,7 @@ void Game::ClearFreecamStuff()
     Command<Commands::RESTORE_CAMERA_JUMPCUT>();
 }
 
-void Game::Draw()
+void Game::ShowPage()
 {
     ImGui::Spacing();
     CPlayerPed* pPlayer = FindPlayerPed();

@@ -63,12 +63,12 @@ void MenuThread(void* param)
 
 
     // Checking for updates once a day
-    time_t now = time(0);
-    struct tm  tstruct = *localtime(&now);
-    if (gConfig.GetValue("config.update_date", 0) != tstruct.tm_mday)
+    SYSTEMTIME st;
+    GetSystemTime(&st);
+    if (gConfig.GetValue("config.update_date", 0) != st.wDay)
     {
         Updater::CheckUpdate();
-        gConfig.SetValue("config.update_date", tstruct.tm_mday);
+        gConfig.SetValue("config.update_date", st.wDay);
     }
 
     while (true)
