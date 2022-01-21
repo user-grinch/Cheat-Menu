@@ -11,7 +11,7 @@ void Util::SetCarForwardSpeed(CVehicle *pVeh, float speed)
     pVeh->m_vecMoveSpeed.y = speedFactor * inVec.y;
     pVeh->m_vecMoveSpeed.z = speedFactor * inVec.z;
 #else
-    Command<Commands::SET_CAR_FORWARD_SPEED>(CPools::GetVehicleRef(pVeh), 0);
+    Command<Commands::SET_CAR_FORWARD_SPEED>(CPools::GetVehicleRef(pVeh), speed);
 #endif
 }
 

@@ -100,7 +100,7 @@ void CheatMenu::ProcessMenuPages()
     for (size_t i = 0; i < m_headerList.size(); ++i)
     {
         /*
-        * For Welcome & Update pages
+        * For welcome & update pages
         * They don't need to add item in the header list
         */
         if (m_headerList[i].skipHeader)
@@ -126,7 +126,7 @@ void CheatMenu::ProcessMenuPages()
         {
             m_nMenuPage = m_headerList[i].page;
             size_t curPage = static_cast<size_t>(m_headerList[i].page);
-            gConfig.SetValue("window.idnum", curPage);
+            gConfig.SetValue("window.page", curPage);
             pCallback = m_headerList[i].pFunc;
             Updater::ResetUpdaterState();
         }
@@ -174,7 +174,7 @@ CheatMenu::CheatMenu()
     ApplyStyle();
 
     // Load menu settings
-    m_nMenuPage = (eMenuPages)gConfig.GetValue("window.idnum", (size_t)eMenuPages::WELCOME);
+    m_nMenuPage = (eMenuPages)gConfig.GetValue("window.page", (size_t)eMenuPages::WELCOME);
     m_fMenuSize.x = gConfig.GetValue("window.sizeX", screen::GetScreenWidth() / 4.0f);
     m_fMenuSize.y = gConfig.GetValue("window.sizeY", screen::GetScreenHeight() / 1.2f);
     srand(CTimer::m_snTimeInMilliseconds);
