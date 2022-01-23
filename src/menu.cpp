@@ -606,9 +606,36 @@ void Menu::ShowPage()
                 ImGui::Dummy(ImVec2(0, 10));
                 ImGui::TextWrapped("If you find bugs or have suggestions, let me know on discord.");
                 ImGui::Dummy(ImVec2(0, 10));
-                ImGui::TextWrapped("Thanks to Junior-Djjr");
-                ImGui::Dummy(ImVec2(0, 30));
                 Ui::CenterdText("Copyright Grinch_ 2019-2022. All rights reserved");
+
+                ImGui::Dummy(ImVec2(0, 30));
+                static ImGuiTableFlags flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY;
+                if (ImGui::BeginTable("Hall of Fame", 2, flags))
+                {
+                    ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, 100);
+                    ImGui::TableSetupColumn("Credits");
+                    ImGui::TableHeadersRow();
+                    
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("Codenulls");
+                    ImGui::TableNextColumn();
+                    ImGui::Text("III & VC animation code");
+
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("DKPac22");
+                    ImGui::TableNextColumn();
+                    ImGui::Text("Vehicle texturing code");
+
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("Junior-Djjr");
+                    ImGui::TableNextColumn();
+                    ImGui::Text("Code & suggestions");
+                    
+                    ImGui::EndTable();
+                }
 
                 ImGui::EndChild();
             }

@@ -12,6 +12,7 @@ void Teleport::FetchRadarSpriteData()
 {
     uint cur_timer = CTimer::m_snTimeInMilliseconds;
     static uint timer = cur_timer;
+    static int maxSprites = *(uint*)0x5D5870;
 
     // Update the radar list each 5 seconds
     if (cur_timer - timer < 5000)
@@ -20,9 +21,7 @@ void Teleport::FetchRadarSpriteData()
     }
 
     m_tpData.m_pJson->m_Data.erase("Radar");
-
-    // 175 is the max number of sprites, FLA can increase this limit, might need to update this
-    for (int i = 0; i != 175; ++i)
+    for (int i = 0; i != maxSprites; ++i)
     {
         CVector pos = CRadar::ms_RadarTrace[i].m_vPosition;
         uchar sprite = CRadar::ms_RadarTrace[i].m_nBlipSprite;

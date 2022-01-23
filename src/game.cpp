@@ -11,7 +11,6 @@
 
 static bool bSaveGameFlag = false;
 
-// Thanks to aap
 void Game::RealTimeClock()
 {
     time_t tmp = time(nullptr);
@@ -22,9 +21,9 @@ void Game::RealTimeClock()
     if (now->tm_yday != lastday)
     {
         CStats::SetStatValue(0x86, CStats::GetStatValue(0x86) + 1.0f);
+        lastday = now->tm_yday;
     }
 
-    lastday = now->tm_yday;
     CClock::ms_nGameClockMonth = now->tm_mon + 1;
     CClock::ms_nGameClockDays = now->tm_mday;
     CClock::CurrentDay = now->tm_wday + 1;

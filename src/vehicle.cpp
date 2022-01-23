@@ -12,63 +12,6 @@
 #include "paint.h"
 #endif
 
-void Vehicle::FixVehicle(CVehicle *pVeh)
-{
-#ifdef GTASA
-    pVeh->Fix();
-#else
-    switch (pVeh->m_nVehicleClass)
-    {
-    case VEHICLE_AUTOMOBILE:
-    {
-        reinterpret_cast<CAutomobile *>(pVeh)->Fix();
-        break;
-    }
-#ifdef GTAVC
-    case VEHICLE_BIKE:
-    {
-        reinterpret_cast<CBike *>(pVeh)->Fix();
-        break;
-    }
-#endif
-    }
-#endif
-    pVeh->m_fHealth = 1000.0f;
-}
-
-void FlipVehicle()
-{
-    CPlayerPed* pPlayer = FindPlayerPed();
-#ifdef GTASA
-    if (pPlayer->m_nPedFlags.bInVehicle)
-    {
-        int hveh = CPools::GetVehicleRef(pPlayer->m_pVehicle);
-        float roll;
-
-        Command<Commands::GET_CAR_ROLL>(hveh, &roll);
-        roll += 180;
-        Command<Commands::SET_CAR_ROLL>(hveh, roll);
-        Command<Commands::SET_CAR_ROLL>(hveh, roll); // z rot fix
-    }
-#elif GTAVC
-    if (pPlayer->m_bInVehicle)
-    {
-        float x,y,z;
-        pPlayer->m_pVehicle->m_placement.GetOrientation(x, y, z);
-        y += 135.0f;
-        pPlayer->m_pVehicle->m_placement.SetOrientation(x, y, z);
-    }
-#else
-    if (pPlayer->m_bInVehicle)
-    {
-        float x,y,z;
-        pPlayer->m_pVehicle->GetOrientation(x, y, z);
-        y += 135.0f;
-        pPlayer->m_pVehicle->SetOrientation(x, y, z);
-    }
-#endif
-}
-
 Vehicle::Vehicle()
 {
 #ifdef GTASA
@@ -85,18 +28,18 @@ Vehicle::Vehicle()
         CPlayerPed* pPlayer = FindPlayerPed();
         CVehicle* pVeh = BY_GAME(FindPlayerVehicle(-1, false), FindPlayerVehicle(), FindPlayerVehicle());
 
-        if (pPlayer && pVeh)
+        if (pPlayer && Util::IsInVehicle())
         {
             int hveh = CPools::GetVehicleRef(pVeh);
 
             if (flipVeh.Pressed())
             {
-                FlipVehicle();
+                Util::FlipVehicle(pVeh);
             }
 
             if (fixVeh.Pressed())
             {
-                FixVehicle(pVeh);
+                Util::FixVehicle(pVeh);
                 SetHelpMessage("Vehicle fixed", false, false, false);
             }
 
@@ -575,19 +518,16 @@ void Vehicle::ShowPage()
 
     ImGui::SameLine();
 
-    if (ImGui::Button("Fix vehicle", ImVec2(Ui::GetSize(3))))
+    if (ImGui::Button("Fix vehicle", ImVec2(Ui::GetSize(3))) && Util::IsInVehicle())
     {
-        if (pPlayer && pVeh)
-        {
-            FixVehicle(pVeh);
-        }
+        Util::FixVehicle(pVeh);
     }
 
     ImGui::SameLine();
 
-    if (ImGui::Button("Flip vehicle", ImVec2(Ui::GetSize(3))))
+    if (ImGui::Button("Flip vehicle", ImVec2(Ui::GetSize(3))) && Util::IsInVehicle())
     {
-        FlipVehicle();
+        Util::FlipVehicle(pVeh);
     }
 
     ImGui::Spacing();

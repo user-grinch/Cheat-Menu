@@ -2,6 +2,63 @@
 #include "util.h"
 #include "psapi.h"
 
+bool Util::IsInVehicle(CPed *pPed)
+{
+    if (!pPed)
+    {
+        return false;
+    }
+
+    return BY_GAME(pPed->m_nPedFlags.bInVehicle, pPed->m_bInVehicle, pPed->m_bInVehicle);
+}
+
+void Util::FixVehicle(CVehicle *pVeh)
+{
+#ifdef GTASA
+    pVeh->Fix();
+#else
+    switch (pVeh->m_nVehicleClass)
+    {
+    case VEHICLE_AUTOMOBILE:
+    {
+        reinterpret_cast<CAutomobile*>(pVeh)->Fix();
+        break;
+    }
+#ifdef GTAVC
+    case VEHICLE_BIKE:
+    {
+        reinterpret_cast<CBike *>(pVeh)->Fix();
+        break;
+    }
+#endif
+    }
+#endif
+    pVeh->m_fHealth = 1000.0f;
+}
+
+void Util::FlipVehicle(CVehicle *pVeh)
+{
+#ifdef GTASA
+    int hveh = CPools::GetVehicleRef(pVeh);
+    float roll;
+
+    Command<Commands::GET_CAR_ROLL>(hveh, &roll);
+    roll += 180;
+    Command<Commands::SET_CAR_ROLL>(hveh, roll);
+    Command<Commands::SET_CAR_ROLL>(hveh, roll); // z rot fix
+#elif GTAVC
+    float x,y,z;
+    pVeh->m_placement.GetOrientation(x, y, z);
+    y += 135.0f;
+    pVeh->m_placement.SetOrientation(x, y, z);
+#else
+    float x,y,z;
+    pVeh->GetOrientation(x, y, z);
+    y += 135.0f;
+    pVeh->SetOrientation(x, y, z);
+#endif
+}
+
 void Util::SetCarForwardSpeed(CVehicle *pVeh, float speed)
 {
 #ifdef GTA3
@@ -58,18 +115,18 @@ std::string Util::GetLocationName(CVector* pos)
 }
 
 #ifdef GTASA
-void Util::ClearCharTasksVehCheck(CPed* ped)
+void Util::ClearCharTasksVehCheck(CPed* pPed)
 {
-    uint hped = CPools::GetPedRef(ped);
+    uint hped = CPools::GetPedRef(pPed);
     uint hveh = NULL;
     bool veh_engine = true;
     float speed;
 
-    if (ped->m_nPedFlags.bInVehicle)
+    if (IsInVehicle(pPed))
     {
-        hveh = CPools::GetVehicleRef(ped->m_pVehicle);
-        veh_engine = ped->m_pVehicle->m_nVehicleFlags.bEngineOn;
-        speed = ped->m_pVehicle->m_vecMoveSpeed.Magnitude() * 50.0f;
+        hveh = CPools::GetVehicleRef(pPed->m_pVehicle);
+        veh_engine = pPed->m_pVehicle->m_nVehicleFlags.bEngineOn;
+        speed = pPed->m_pVehicle->m_vecMoveSpeed.Magnitude() * 50.0f;
     }
 
     Command<Commands::CLEAR_CHAR_TASKS_IMMEDIATELY>(hped);
@@ -77,7 +134,7 @@ void Util::ClearCharTasksVehCheck(CPed* ped)
     if (hveh)
     {
         Command<Commands::TASK_WARP_CHAR_INTO_CAR_AS_DRIVER>(hped, hveh);
-        ped->m_pVehicle->m_nVehicleFlags.bEngineOn = veh_engine;
+        pPed->m_pVehicle->m_nVehicleFlags.bEngineOn = veh_engine;
         Command<Commands::SET_CAR_FORWARD_SPEED>(hveh, speed);
     }
 }

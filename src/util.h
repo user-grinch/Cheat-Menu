@@ -2,6 +2,11 @@
 #include "tchar.h"
 #include "pdh.h"
 
+
+/*
+*   Contains utility functions 
+*   for all 3 games
+*/
 class Util
 {
 private:
@@ -16,16 +21,20 @@ public:
     Util(Util&) = delete;
 
 #ifdef GTASA
-    static void ClearCharTasksVehCheck(CPed* ped);
     static int GetLargestGangInZone();
+    static void ClearCharTasksVehCheck(CPed* ped);
+    static bool IsOnMission();
 #endif
-    static void SetCarForwardSpeed(CVehicle *pVeh, float speed);
+
+    static void FlipVehicle(CVehicle *pVeh);
+    static void FixVehicle(CVehicle *pVeh);
     static CPed* GetClosestPed();
     static CVehicle* GetClosestVehicle();
     static void GetCPUUsageInit();
     static double GetCurrentCPUUsage();
     static std::string GetLocationName(CVector* pos);
     static bool IsOnCutscene();
-    static bool IsOnMission();
+    static bool IsInVehicle(CPed *pPed = FindPlayerPed());
     static void RainbowValues(int& r, int& g, int& b, float speed);
+    static void SetCarForwardSpeed(CVehicle *pVeh, float speed);
 };

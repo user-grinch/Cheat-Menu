@@ -82,12 +82,11 @@ private:
 #endif
 
 private:
-    static void FixVehicle(CVehicle *pVeh);
+
 #ifdef GTASA
     static void AddComponent(const std::string& component, bool display_message = true);
     static void RemoveComponent(const std::string& component, bool display_message = true);
     static int GetRandomTrainIdForModel(int model);
-    static void GenerateHandlingDataFile(int phandling);
 #endif
 
 public:
