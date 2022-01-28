@@ -22,6 +22,6 @@ public:
         TODO: Implement something that also parses modloader data
     */
     static void FetchHandlingID(std::map<int, std::string>& storeMap);
-    static void GenerateHandlingFile(int pHandling, std::map<int, std::string>& storeMap);
+    static void GenerateHandlingFile(tHandlingData *pHandling, std::map<int, std::string>& storeMap);
 };
 

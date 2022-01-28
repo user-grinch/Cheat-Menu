@@ -37,6 +37,7 @@ private:
 
     static void PlayAnimation(std::string& rootKey, std::string& anim, std::string& ifp);
     static void RemoveAnimation(std::string& rootKey, std::string& anim, std::string& ifp);
+    
 #ifdef GTASA
     static void PlayCutscene(std::string& rootKey, std::string& cutsceneId, std::string& interior);
 #elif GTAVC

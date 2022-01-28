@@ -2,60 +2,57 @@
 #include "filehandler.h"
 
 // TODO: Clean up this mess, use structures instead?
-void FileHandler::GenerateHandlingFile(int pHandling, std::map<int, std::string>& storeMap)
+void FileHandler::GenerateHandlingFile(tHandlingData *pHandling, std::map<int, std::string>& storeMap)
 {
     FILE* fp = fopen("handling.txt", "w");
 
     std::string handlingId = storeMap[FindPlayerPed()->m_pVehicle->m_nModelIndex];
-    float fMass = patch::Get<float>(pHandling + 0x4);
-    float fTurnMass = patch::Get<float>(pHandling + 0xC);
-    float fDragMult = patch::Get<float>(pHandling + 0x10);
-    float CentreOfMassX = patch::Get<float>(pHandling + 0x14);
-    float CentreOfMassY = patch::Get<float>(pHandling + 0x18);
-    float CentreOfMassZ = patch::Get<float>(pHandling + 0x1C);
-    int nPercentSubmerged = patch::Get<int>(pHandling + 0x20);
-    float fTractionMultiplier = patch::Get<float>(pHandling + 0x28);
-    float fTractionLoss = patch::Get<float>(pHandling + 0xA4);
-    float TractionBias = patch::Get<float>(pHandling + 0xA8);
-    float fEngineAcceleration = patch::Get<float>(pHandling + 0x7C) * 12500;
-    float fEngineInertia = patch::Get<float>(pHandling + 0x80);
-    int nDriveType = patch::Get<BYTE>(pHandling + 0x74);
-    int nEngineType = patch::Get<BYTE>(pHandling + 0x75);
-    float BrakeDeceleration = patch::Get<float>(pHandling + 0x94) * 2500;
-    float BrakeBias = patch::Get<float>(pHandling + 0x98);
-    int ABS = patch::Get<BYTE>(pHandling + 0x9C);
-    float SteeringLock = patch::Get<float>(pHandling + 0xA0);
-    float SuspensionForceLevel = patch::Get<float>(pHandling + 0xAC);
-    float SuspensionDampingLevel = patch::Get<float>(pHandling + 0xB0);
-    float SuspensionHighSpdComDamp = patch::Get<float>(pHandling + 0xB4);
-    float Suspension_upper_limit = patch::Get<float>(pHandling + 0xB8);
-    float Suspension_lower_limit = patch::Get<float>(pHandling + 0xBC);
-    float Suspension_bias = patch::Get<float>(pHandling + 0xC0);
-    float Suspension_anti_dive_multiplier = patch::Get<float>(pHandling + 0xC4);
-    float fCollisionDamageMultiplier = patch::Get<float>(pHandling + 0xC8) * 0.338;
-    int nMonetaryValue = patch::Get<int>(pHandling + 0xD8);
-    int MaxVelocity = patch::Get<float>(pHandling + 0x84);
-    MaxVelocity = MaxVelocity * 206 + (MaxVelocity - 0.918668) * 1501;
-    int modelFlags = patch::Get<int>(pHandling + 0xCC);
-    int handlingFlags = patch::Get<int>(pHandling + 0xD0);
-    int front_lights = patch::Get<BYTE>(pHandling + 0xDC);
-    int rear_lights = patch::Get<BYTE>(pHandling + 0xDD);
-    int vehicle_anim_group = patch::Get<BYTE>(pHandling + 0xDE);
-    int nNumberOfGears = patch::Get<BYTE>(pHandling + 0x76);
-    float fSeatOffsetDistance = patch::Get<float>(pHandling + 0xD4);
+    float mass = pHandling->m_fMass;
+    float turnMass = pHandling->m_fTurnMass;
+    float dragMult = pHandling->m_fDragMult;
+    CVector centreOfMass = pHandling->m_vecCentreOfMass;
+    int percentSubmerged = pHandling->m_nPercentSubmerged;
+    float tractionMultiplier = pHandling->m_fTractionMultiplier;
+    float tractionLoss = pHandling->m_fTractionLoss;
+    float tractionBias = pHandling->m_fTractionBias;
+    float engineAcceleration = pHandling->m_transmissionData.m_fEngineAcceleration * 12500;
+    float engineInertia = pHandling->m_transmissionData.m_fEngineInertia;
+    int driveType = pHandling->m_transmissionData.m_nDriveType;
+    int engineType = pHandling->m_transmissionData.m_nEngineType;
+    float brakeDeceleration = pHandling->m_fBrakeDeceleration * 2500;
+    float brakeBias = pHandling->m_fBrakeBias;
+    int abs = pHandling->m_bABS;
+    float steeringLock = pHandling->m_fSteeringLock;
+    float susForceLevel = pHandling->m_fSuspensionForceLevel;
+    float susDampingLevel = pHandling->m_fSuspensionDampingLevel;
+    float susHighSpdComDamp = pHandling->m_fSuspensionHighSpdComDamp;
+    float susUpperLimit = pHandling->m_fSuspensionUpperLimit;
+    float susLowerLimit = pHandling->m_fSuspensionLowerLimit;
+    float susBias = pHandling->m_fSuspensionBiasBetweenFrontAndRear;
+    float antiDiveMul = pHandling->m_fSuspensionAntiDiveMultiplier;
+    float cdm = pHandling->m_fCollisionDamageMultiplier / (2000.0f * (1.0 / mass));
+    int monetaryValue = pHandling->m_nMonetaryValue;
+    int maxVelocity = pHandling->m_transmissionData.m_fMaxGearVelocity / *(float*)0xC2B9BC;
+    int modelFlags = pHandling->m_nModelFlags;
+    int handlingFlags = pHandling->m_nHandlingFlags;
+    int frontLight = pHandling->m_nFrontLights;
+    int rearLight = pHandling->m_nRearLights;
+    int animGrp = pHandling->m_nAnimGroup;
+    int numGears = pHandling->m_transmissionData.m_nNumberOfGears;
+    float seatOffsetDistance = pHandling->m_fSeatOffsetDistance;
 
     // TODO: make this more readable
     fprintf(
         fp,
-        "\n%s\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%d\t%.5g\t%.5g\t%.5g\t%d\t%d\t%.5g\t%.5g\t%c\t%c\t%.5g\t%.5g\t%d\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%d\t%d\t%d\t%d\t%d\t%d",
-        handlingId.c_str(), fMass, fTurnMass, fDragMult, CentreOfMassX, CentreOfMassY, CentreOfMassZ, nPercentSubmerged,
-        fTractionMultiplier, fTractionLoss, TractionBias, nNumberOfGears,
-        MaxVelocity, fEngineAcceleration, fEngineInertia, nDriveType, nEngineType, BrakeDeceleration, BrakeBias, ABS,
-        SteeringLock, SuspensionForceLevel, SuspensionDampingLevel,
-        SuspensionHighSpdComDamp, Suspension_upper_limit, Suspension_lower_limit, Suspension_bias,
-        Suspension_anti_dive_multiplier, fSeatOffsetDistance,
-        fCollisionDamageMultiplier, nMonetaryValue, modelFlags, handlingFlags, front_lights, rear_lights,
-        vehicle_anim_group);
+        "\n%s\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%d\t%.5g\t%.5g\t%.5g\t%d\t%d\t%.5g\t%.5g\t%c\t%c\t%.5g\t%.5g\t%d\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%.5g\t%d\t%x\t%x\t%d\t%d\t%d",
+        handlingId.c_str(), mass, turnMass, dragMult, centreOfMass.x, centreOfMass.y, centreOfMass.z, percentSubmerged,
+        tractionMultiplier, tractionLoss, tractionBias, numGears,
+        maxVelocity, engineAcceleration, engineInertia, driveType, engineType, brakeDeceleration, brakeBias, abs,
+        steeringLock, susForceLevel, susDampingLevel,
+        susHighSpdComDamp, susUpperLimit, susLowerLimit, susBias,
+        antiDiveMul, seatOffsetDistance,
+        cdm, monetaryValue, modelFlags, handlingFlags, frontLight, rearLight,
+        animGrp);
 
     fclose(fp);
 }

@@ -609,8 +609,7 @@ void Menu::ShowPage()
                 Ui::CenterdText("Copyright Grinch_ 2019-2022. All rights reserved");
 
                 ImGui::Dummy(ImVec2(0, 30));
-                static ImGuiTableFlags flags = ImGuiTableFlags_RowBg | ImGuiTableFlags_ScrollY;
-                if (ImGui::BeginTable("Hall of Fame", 2, flags))
+                if (ImGui::BeginTable("Hall of Fame", 2, ImGuiTableFlags_ScrollY))
                 {
                     ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, 100);
                     ImGui::TableSetupColumn("Credits");
@@ -626,13 +625,31 @@ void Menu::ShowPage()
                     ImGui::TableNextColumn();
                     ImGui::Text("DKPac22");
                     ImGui::TableNextColumn();
-                    ImGui::Text("Vehicle texturing code");
+                    ImGui::Text("Plugin SDK, vehicle texture code");
 
                     ImGui::TableNextRow();
                     ImGui::TableNextColumn();
                     ImGui::Text("Junior-Djjr");
                     ImGui::TableNextColumn();
                     ImGui::Text("Code & suggestions");
+
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("Ocornut");
+                    ImGui::TableNextColumn();
+                    ImGui::Text("ImGui");
+
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("Rebzzel");
+                    ImGui::TableNextColumn();
+                    ImGui::Text("Keiro");
+
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("TsudaKageyu");
+                    ImGui::TableNextColumn();
+                    ImGui::Text("MinHook");
                     
                     ImGui::EndTable();
                 }

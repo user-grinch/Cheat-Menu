@@ -44,7 +44,7 @@ private:
     static void ShowAnniversaryPage();
     static void ShowUpdatePage();
     static void ShowWelcomePage();
-    static void ProcessMenuPages();
+    static void ProcessPages();
 
     static inline std::vector<HeaderData> m_headerList
     {

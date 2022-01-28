@@ -37,7 +37,7 @@ void CheatMenu::DrawWindow()
                     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
                                         ImVec2(ImGui::GetWindowWidth() / 85, ImGui::GetWindowHeight() / 200));
 
-                    ProcessMenuPages();
+                    ProcessPages();
 
                     if (m_bSizeChangedExternal)
                         m_bSizeChangedExternal = false;
@@ -62,7 +62,7 @@ void CheatMenu::DrawWindow()
     DrawOverlay();
 }
 
-void CheatMenu::ProcessMenuPages()
+void CheatMenu::ProcessPages()
 {
     static void* pCallback;
     ImVec2 size = Ui::GetSize(3, false);

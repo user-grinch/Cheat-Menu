@@ -57,7 +57,7 @@ private:
     };
 
 #ifdef GTASA
-    static inline std::vector<std::string>(m_HandlingFlagNames) = // 32 flags
+    static inline std::vector<std::string> m_HandlingFlagNames = // 32 flags
     {
         "1G_BOOST", "2G_BOOST", "NPC_ANTI_ROLL", "NPC_NEUTRAL_HANDL", "NO_HANDBRAKE", "STEER_REARWHEELS",
         "HB_REARWHEEL_STEER", "ALT_STEER_OPT",
@@ -69,7 +69,7 @@ private:
         "Unused 4"
     };
 
-    static inline std::vector<std::string>(m_ModelFlagNames) = // 32 flags
+    static inline std::vector<std::string> m_ModelFlagNames = // 32 flags
     {
         "IS_VAN", "IS_BUS", "IS_LOW", "IS_BIG", "REVERSE_BONNET", "HANGING_BOOT", "TAILGATE_BOOT", "NOSWING_BOOT",
         "NO_DOORS", "TANDEM_SEATS",
