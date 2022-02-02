@@ -82,7 +82,13 @@ BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
 {
     if (nReason == DLL_PROCESS_ATTACH)
     {
-        if (GetGameVersion() == BY_GAME(GAME_10US_HOODLUM, GAME_10EN, GAME_10EN))
+        uint gameVer = GetGameVersion();
+
+#ifdef GTASA
+        if (gameVer == GAME_10US_HOODLUM || gameVer == GAME_10US_COMPACT)
+#else
+        if (gameVer == BY_GAME(NULL, GAME_10EN, GAME_10EN))
+#endif
         {
             CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&MenuThread, nullptr, NULL, nullptr);
         }

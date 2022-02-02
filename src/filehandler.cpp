@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "filehandler.h"
 
-// TODO: Clean up this mess, use structures instead?
+#ifdef GTASA
 void FileHandler::GenerateHandlingFile(tHandlingData *pHandling, std::map<int, std::string>& storeMap)
 {
     FILE* fp = fopen("handling.txt", "w");
@@ -56,6 +56,58 @@ void FileHandler::GenerateHandlingFile(tHandlingData *pHandling, std::map<int, s
 
     fclose(fp);
 }
+
+void FileHandler::FetchHandlingID(std::map<int, std::string>& storeMap)
+{
+    std::string m_FilePath = GAME_PATH((char*)"/data/vehicles.ide");
+    if (!std::filesystem::exists(m_FilePath))
+    {
+        gLog << "Vehicle.ide not found";
+        return;
+    }
+
+    std::ifstream file(m_FilePath);
+    std::string line;
+    while (getline(file, line))
+    {
+        /*
+        	Format: model, modelname, txdname, type, handlingId, ...
+        	Skip if first thing isn't model id
+        */
+        if (line[0] <= '0' || line[0] >= '9')
+        {
+            continue;
+        }
+
+        // running inside try block to handle user errors, mostly commas
+        try
+        {
+            std::string temp;
+            std::stringstream ss(line);
+
+            // get model
+            getline(ss, temp, ',');
+            int model = std::stoi(temp);
+
+            // get modelname, txd, type, handlingId
+            getline(ss, temp, ',');
+            getline(ss, temp, ',');
+            getline(ss, temp, ',');
+            getline(ss, temp, ',');
+
+            temp.erase(std::remove_if(temp.begin(), temp.end(), isspace), temp.end());
+
+            storeMap[model] = temp;
+        }
+        catch (...)
+        {
+            gLog << "Error parsing vehicles.ide, " << line << std::endl;
+        }
+    }
+
+    file.close();
+}
+#endif
 
 void FileHandler::FetchColorData(std::vector<std::vector<float>>& storeVec)
 {
@@ -125,57 +177,6 @@ void FileHandler::FetchColorData(std::vector<std::vector<float>>& storeVec)
             {
                 gLog << "Error parsing carcols.dat, " << line << std::endl;
             }
-        }
-    }
-
-    file.close();
-}
-
-void FileHandler::FetchHandlingID(std::map<int, std::string>& storeMap)
-{
-    std::string m_FilePath = GAME_PATH((char*)"/data/vehicles.ide");
-    if (!std::filesystem::exists(m_FilePath))
-    {
-        gLog << "Vehicle.ide not found";
-        return;
-    }
-
-    std::ifstream file(m_FilePath);
-    std::string line;
-    while (getline(file, line))
-    {
-        /*
-        	Format: model, modelname, txdname, type, handlingId, ...
-        	Skip if first thing isn't model id
-        */
-        if (line[0] <= '0' || line[0] >= '9')
-        {
-            continue;
-        }
-
-        // running inside try block to handle user errors, mostly commas
-        try
-        {
-            std::string temp;
-            std::stringstream ss(line);
-
-            // get model
-            getline(ss, temp, ',');
-            int model = std::stoi(temp);
-
-            // get modelname, txd, type, handlingId
-            getline(ss, temp, ',');
-            getline(ss, temp, ',');
-            getline(ss, temp, ',');
-            getline(ss, temp, ',');
-
-            temp.erase(std::remove_if(temp.begin(), temp.end(), isspace), temp.end());
-
-            storeMap[model] = temp;
-        }
-        catch (...)
-        {
-            gLog << "Error parsing vehicles.ide, " << line << std::endl;
         }
     }
 

@@ -41,7 +41,7 @@ Let me know if you mind more.
 
 ## Things to do on crash
 1. Delete the `CheatMenu/json/config.json` file and try again.
-2. If it's happening after installing a recent mod try removing it. A list of incompatibile mods are [here](https://github.com/user-grinch/Cheat-Menu/issues/48).
+2. If it's happening after installing a recent mod try removing it.
 3. Try on a fresh installation of the game.
 4. If still doesn't fix your issue, go ahead and report it.
 
