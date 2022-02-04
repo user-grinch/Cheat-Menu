@@ -66,6 +66,8 @@ You can either open a issue here or directly contact me on discord (Recommended)
 3. [MinHook](https://github.com/TsudaKageyu/minhook)
 4. [Plugin SDK](https://github.com/DK22Pac/plugin-sdk)
 
+All credits are given in Menu/About tab.
+
 ## Images
 <details>
   <summary>Show Images</summary>
@@ -92,7 +94,7 @@ You can either open a issue here or directly contact me on discord (Recommended)
 
 ## How to add ___ to CheatMenu (SA Only)
 
-*Be careful about editing 'json' files, especially commas! Check [here](https://en.wikipedia.org/wiki/JSON)*
+*Be careful about editing 'json' files, especially commas! Check [here](https://en.wikipedia.org/wiki/JSON). Use [Magic TXD](https://gtaforums.com/topic/851436-relopensrc-magictxd/) to open **.txd** files*
 
 ### Player Skins (Recommended)
 *If you just want more player skins without much hassel use this*

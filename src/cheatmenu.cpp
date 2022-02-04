@@ -226,33 +226,10 @@ void CheatMenu::ShowAnniversaryPage()
     Ui::CenterdText("Happy Anniversary!");
     ImGui::NewLine();
 
-    ImGui::TextWrapped("On this day, in 2019, the first public version of menu was released in MixMods Forum." 
-" It's been a blast working on it and I've learned a lot in the process.\n\nThanks to you and everyone who used or" 
-" contributed to the modification in any form or shape.");
-
-    ImGui::NewLine();
-    ImGui::TextWrapped("Feel free to star the GitHub repo or join the discord server and provide feedback, ideas, or suggestions.");
-    ImGui::NewLine();
-
-    if (ImGui::Button("Discord server", ImVec2(Ui::GetSize(2))))
-    {
-        ShellExecute(nullptr, "open", DISCORD_INVITE, nullptr, nullptr, SW_SHOWNORMAL);
-    }
-
-    ImGui::SameLine();
-
-    if (ImGui::Button("GitHub repo", ImVec2(Ui::GetSize(2))))
-    {
-        ShellExecute(nullptr, "open", GITHUB_LINK, nullptr, nullptr, SW_SHOWNORMAL);
-    }
-
-    ImGui::NewLine();
-
-    static bool showHistory = false;
-    ImGui::Checkbox("Show backstory", &showHistory);
-
+    static bool showHistory;
     if (showHistory)
     {
+        ImGui::Checkbox("Show backstory", &showHistory);
         ImGui::BeginChild("BACKSTORY");
         ImGui::TextWrapped("I wanted to share the backstory behind the initial idea or plan behind the menu."
 " This is gonna be long so feel free to skip it if you're not interested.");
@@ -265,11 +242,11 @@ void CheatMenu::ShowAnniversaryPage()
 
         ImGui::TextWrapped("In 2018, I finally got an opportunity to learn CLEO or GTA3Script after Junior released"
 " his tutorial. I started from basics but it soon became apparent that due to the limitations of CLEO, creating menus were"
-"really tedious.");
+" really tedious.");
 
         ImGui::NewLine();
         ImGui::TextWrapped("Later that year I found Moonloader, which had ImGui support. Meaning I could make menus"
-" without brainfucking myself (kudos to everyone who writes 100s of lines in CLEO). I recall starting working on"
+" without brain fucking myself (kudos to everyone who writes 100s of lines in CLEO). I recall starting working on"
 " the menu in October/November that same year.");
 
         ImGui::NewLine();
@@ -285,6 +262,32 @@ void CheatMenu::ShowAnniversaryPage()
         ImGui::TextWrapped("Again, thanks to you and everyone who used or helped me along the way. Enjoy ;)");
 
         ImGui::EndChild();
+    }
+    else
+    {
+        ImGui::TextWrapped("On this day, in 2019, the first public version of menu was released in MixMods Forum." 
+    " It's been a blast working on it and I've learned a lot in the process.\n\nThanks to you and everyone who used or" 
+    " contributed to the modification in any form or shape.");
+
+        ImGui::NewLine();
+        ImGui::TextWrapped("Feel free to star the GitHub repo or join the discord server and provide feedback, ideas, or suggestions.");
+        ImGui::NewLine();
+
+        if (ImGui::Button("Discord server", ImVec2(Ui::GetSize(2))))
+        {
+            ShellExecute(nullptr, "open", DISCORD_INVITE, nullptr, nullptr, SW_SHOWNORMAL);
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button("GitHub repo", ImVec2(Ui::GetSize(2))))
+        {
+            ShellExecute(nullptr, "open", GITHUB_LINK, nullptr, nullptr, SW_SHOWNORMAL);
+        }
+
+        ImGui::NewLine();
+
+        ImGui::Checkbox("Show backstory", &showHistory);
     }
 }   
 

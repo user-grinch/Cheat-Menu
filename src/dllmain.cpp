@@ -61,7 +61,6 @@ void MenuThread(void* param)
 
     CheatMenu menu;
 
-
     // Checking for updates once a day
     SYSTEMTIME st;
     GetSystemTime(&st);
@@ -73,8 +72,8 @@ void MenuThread(void* param)
 
     while (true)
     {
-        Sleep(5000);
         Updater::Process();
+        Sleep(5000);
     }
 }
 
