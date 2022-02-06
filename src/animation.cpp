@@ -40,6 +40,36 @@ void Animation::PlayCutscene(std::string& rootKey, std::string& cutsceneId, std:
     Command<Commands::SET_AREA_VISIBLE>(pPlayer->m_nAreaCode);
 }
 
+void Animation::PlayParticle(std::string& rootKey, std::string& particle, std::string& dummy)
+{
+    CPlayerPed* pPlayer = FindPlayerPed();
+    if (!pPlayer)
+    {
+        return;
+    }
+    CVector pos = pPlayer->GetPosition();
+
+    int handle;
+    Command<Commands::CREATE_FX_SYSTEM>(particle.c_str(), pos.x, pos.y, pos.z, 1, &handle);
+    Command<Commands::PLAY_FX_SYSTEM>(handle);
+    m_Particle::m_nParticleList.push_back(handle);
+}
+
+
+void Animation::RemoveParticle(std::string& ifp, std::string& particle, std::string& dummy)
+{
+    if (ifp == "Custom")
+    {
+        m_Particle::m_Data.m_pJson->m_Data["Custom"].erase(particle);
+        m_Particle::m_Data.m_pJson->WriteToDisk();
+        SetHelpMessage("Particle removed", false, false, false);
+    }
+    else
+    {
+        SetHelpMessage("You can only remove custom particles", false, false, false);
+    }
+}
+
 #elif GTAVC
 // Thanks to codenulls(https://github.com/codenulls/)
 
@@ -269,7 +299,6 @@ void Animation::ShowPage()
 #endif
                 }
             }
-
             ImGui::Spacing();
 
             ImGui::Columns(2, nullptr, false);
@@ -288,6 +317,19 @@ void Animation::ShowPage()
             }
             else
             {
+                if (ImGui::CollapsingHeader("Add new"))
+                {
+                    ImGui::InputTextWithHint("IFP name", "ped", m_nIfpBuffer, INPUT_BUFFER_SIZE);
+                    ImGui::InputTextWithHint("Anim name", "cower", m_nAnimBuffer, INPUT_BUFFER_SIZE);
+                    ImGui::Spacing();
+                    if (ImGui::Button("Add animation", Ui::GetSize()))
+                    {
+                        m_AnimData.m_pJson->m_Data["Custom"][m_nAnimBuffer] = ("0, " + std::string(m_nIfpBuffer));
+                        m_AnimData.m_pJson->WriteToDisk();
+                    }
+                }
+                ImGui::Spacing();
+
                 if (ImGui::BeginChild("Anims Child"))
                 {
                     ImGui::Spacing();
@@ -295,49 +337,9 @@ void Animation::ShowPage()
                     ImGui::EndChild();
                 }
             }
-
-            ImGui::EndTabItem();
-        }
-        if (ImGui::BeginTabItem("Custom"))
-        {
-            ImGui::InputTextWithHint("IFP name", "ped", m_nIfpBuffer, INPUT_BUFFER_SIZE);
-            ImGui::InputTextWithHint("Anim name", "cower", m_nAnimBuffer, INPUT_BUFFER_SIZE);
-            ImGui::Spacing();
-            if (ImGui::Button("Add animation", Ui::GetSize()))
-            {
-                m_AnimData.m_pJson->m_Data["Custom"][m_nAnimBuffer] = ("0, " + std::string(m_nIfpBuffer));
-                m_AnimData.m_pJson->WriteToDisk();
-            }
             ImGui::EndTabItem();
         }
 #ifdef GTASA
-        if (ImGui::BeginTabItem("Misc"))
-        {
-            ImGui::Spacing();
-            if (Ui::ListBox("Fighting style", m_FightingStyleList, m_nFightingStyle))
-            {
-                Command<Commands::GIVE_MELEE_ATTACK_TO_CHAR>(hPlayer, m_nFightingStyle + 4, 6);
-                SetHelpMessage("Fighting anim set", false, false, false);
-            }
-            if (Ui::ListBoxStr("Walking style", m_WalkingStyleList, m_nWalkingStyle))
-            {
-                if (m_nWalkingStyle == "default")
-                {
-                    patch::Set<DWORD>(0x609A4E, 0x4D48689);
-                    patch::Set<WORD>(0x609A52, 0);
-                }
-                else
-                {
-                    patch::Nop(0x609A4E, 6);
-                    Command<Commands::REQUEST_ANIMATION>(m_nWalkingStyle.c_str());
-                    Command<Commands::LOAD_ALL_MODELS_NOW>();
-                    Command<Commands::SET_ANIM_GROUP_FOR_CHAR>(hPlayer, m_nWalkingStyle.c_str());
-                    Command<Commands::REMOVE_ANIMATION>(m_nWalkingStyle.c_str());
-                }
-                SetHelpMessage("Walking anim set", false, false, false);
-            }
-            ImGui::EndTabItem();
-        }
         if (ImGui::BeginTabItem("Cutscene"))
         {
             ImGui::Spacing();
@@ -362,6 +364,75 @@ void Animation::ShowPage()
                 ImGui::Spacing();
                 Ui::DrawJSON(m_Cutscene::m_Data, PlayCutscene, nullptr);
                 ImGui::EndChild();
+            }
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Particle##TABBAR"))
+        {
+            ImGui::Spacing();
+            if (ImGui::Button("Remove all", Ui::GetSize(2)))
+            {
+                for (int& p : m_Particle::m_nParticleList)
+                {
+                    Command<Commands::KILL_FX_SYSTEM>(p);
+                }
+                m_Particle::m_nParticleList.clear();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Remove latest", Ui::GetSize(2)))
+            {
+                Command<Commands::KILL_FX_SYSTEM>(m_Particle::m_nParticleList.back()); // stop if anything is running
+                m_Particle::m_nParticleList.pop_back();
+            }
+            ImGui::Spacing();
+            if (Ui::CheckboxBitFlag("Invisible player", pPlayer->m_nPedFlags.bDontRender))
+            {
+                pPlayer->m_nPedFlags.bDontRender = (pPlayer->m_nPedFlags.bDontRender == 1) ? 0 : 1;
+            }
+            ImGui::Spacing();
+            if (ImGui::CollapsingHeader("Add new"))
+            {
+                ImGui::InputTextWithHint("Particle name", "kkjj_on_fire", m_Particle::m_NameBuffer, INPUT_BUFFER_SIZE);
+                ImGui::Spacing();
+                if (ImGui::Button("Add animation", Ui::GetSize()))
+                {
+                    m_Particle::m_Data.m_pJson->m_Data["Custom"][m_Particle::m_NameBuffer] = "Dummy";
+                    m_Particle::m_Data.m_pJson->WriteToDisk();
+                }
+            }
+            ImGui::Spacing();
+            if (ImGui::BeginChild("Anims Child"))
+            {
+                ImGui::Spacing();
+                Ui::DrawJSON(m_Particle::m_Data, PlayParticle, RemoveParticle);
+                ImGui::EndChild();
+            }
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem("Style"))
+        {
+             ImGui::Spacing();
+            if (Ui::ListBox("Fighting style", m_FightingStyleList, m_nFightingStyle))
+            {
+                Command<Commands::GIVE_MELEE_ATTACK_TO_CHAR>(hPlayer, m_nFightingStyle + 4, 6);
+                SetHelpMessage("Fighting anim set", false, false, false);
+            }
+            if (Ui::ListBoxStr("Walking style", m_WalkingStyleList, m_nWalkingStyle))
+            {
+                if (m_nWalkingStyle == "default")
+                {
+                    patch::Set<DWORD>(0x609A4E, 0x4D48689);
+                    patch::Set<WORD>(0x609A52, 0);
+                }
+                else
+                {
+                    patch::Nop(0x609A4E, 6);
+                    Command<Commands::REQUEST_ANIMATION>(m_nWalkingStyle.c_str());
+                    Command<Commands::LOAD_ALL_MODELS_NOW>();
+                    Command<Commands::SET_ANIM_GROUP_FOR_CHAR>(hPlayer, m_nWalkingStyle.c_str());
+                    Command<Commands::REMOVE_ANIMATION>(m_nWalkingStyle.c_str());
+                }
+                SetHelpMessage("Walking anim set", false, false, false);
             }
             ImGui::EndTabItem();
         }

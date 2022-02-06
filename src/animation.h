@@ -33,12 +33,21 @@ private:
         "fatman", "jogger", "drunkman", "blindman", "swat", "woman", "shopping", "busywoman",
         "sexywoman", "pro", "oldwoman", "fatwoman", "jogwoman", "oldfatwoman", "skate"
     };
+
+    // Particle player
+    struct m_Particle
+    {
+        static inline ResourceStore m_Data{ "particle", eResourceType::TYPE_TEXT };
+        static inline char m_NameBuffer[INPUT_BUFFER_SIZE];
+        static inline std::vector<int> m_nParticleList;
+    };
 #endif
 
     static void PlayAnimation(std::string& rootKey, std::string& anim, std::string& ifp);
     static void RemoveAnimation(std::string& rootKey, std::string& anim, std::string& ifp);
-    
+    static void RemoveParticle(std::string& ifp, std::string& anim, std::string& ifpRepeat);
 #ifdef GTASA
+    static void PlayParticle(std::string& rootKey, std::string& particle, std::string& dummy);
     static void PlayCutscene(std::string& rootKey, std::string& cutsceneId, std::string& interior);
 #elif GTAVC
     static bool _LoadAnimationBlock(const char* szBlockName);
