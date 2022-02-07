@@ -260,31 +260,30 @@ void Teleport::ShowPage()
         {
 #ifdef GTASA
             FetchRadarSpriteData();
-#endif
+#endif  
+            ImGui::Spacing();
+            if (ImGui::CollapsingHeader("Add new"))
+            {
+                ImGui::Spacing();
+                ImGui::InputTextWithHint("Location", "Groove Street", m_nLocationBuffer, IM_ARRAYSIZE(m_nInputBuffer));
+                ImGui::InputTextWithHint("Coordinates", "x, y, z", m_nInputBuffer, IM_ARRAYSIZE(m_nInputBuffer));
+                ImGui::Spacing();
+                if (ImGui::Button("Add location", Ui::GetSize()))
+                {
+                    m_tpData.m_pJson->m_Data["Custom"][m_nLocationBuffer] = ("0, " + std::string(m_nInputBuffer));
+
+    #ifdef GTASA
+                    // Clear the Radar coordinates
+                    m_tpData.m_pJson->m_Data.erase("Radar");
+                    m_tpData.m_pJson->m_Data["Radar"] = {};
+    #endif
+
+                    m_tpData.m_pJson->WriteToDisk();
+                }
+            }
 
             ImGui::Spacing();
             Ui::DrawJSON(m_tpData, TeleportToLocation,RemoveTeleportEntry);
-            ImGui::EndTabItem();
-        }
-
-        if (ImGui::BeginTabItem("Custom"))
-        {
-            ImGui::Spacing();
-            ImGui::InputTextWithHint("Location", "Groove Street", m_nLocationBuffer, IM_ARRAYSIZE(m_nInputBuffer));
-            ImGui::InputTextWithHint("Coordinates", "x, y, z", m_nInputBuffer, IM_ARRAYSIZE(m_nInputBuffer));
-            ImGui::Spacing();
-            if (ImGui::Button("Add location", Ui::GetSize()))
-            {
-                m_tpData.m_pJson->m_Data["Custom"][m_nLocationBuffer] = ("0, " + std::string(m_nInputBuffer));
-
-#ifdef GTASA
-                // Clear the Radar coordinates
-                m_tpData.m_pJson->m_Data.erase("Radar");
-                m_tpData.m_pJson->m_Data["Radar"] = {};
-#endif
-
-                m_tpData.m_pJson->WriteToDisk();
-            }
             ImGui::EndTabItem();
         }
         ImGui::EndTabBar();

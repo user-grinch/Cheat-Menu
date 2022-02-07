@@ -682,6 +682,15 @@ Lowers armour, health, stamina etc."))
                 {
                     Call<0x438F50>();
                 }
+
+                ImGui::Spacing();
+                static int weatherID = 0;
+                if (ImGui::InputInt("Weather ID", &weatherID))
+                {
+                    CWeather::OldWeatherType = weatherID;
+                    CWeather::NewWeatherType = weatherID;
+                }
+                Ui::ShowTooltip("Sets weather by IDs (0-255). Don't touch unless you know what you're doing!");
 #else
                 if (ImGui::Button("Sunny", Ui::GetSize(3)))
                 {

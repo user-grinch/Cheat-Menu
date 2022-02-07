@@ -437,7 +437,7 @@ void Visual::ShowPage()
             }
 
             Ui::CheckboxAddress("Show hud", 0xBA6769);
-            Ui::CheckboxAddressEx("Unfog map", 0xBA372C, 0x50, 0x0);
+            Ui::CheckboxAddressEx("Unfog map", 0xBA372C, 0x50, 0x0, "Removes fog from Main Menu Map");
 #elif GTAVC
             Ui::CheckboxAddress("Hide radar", 0xA10AB6);
             Ui::CheckboxWithHint("Lock weather", &m_bLockWeather);
@@ -549,8 +549,10 @@ void Visual::ShowPage()
             if (ImGui::BeginChild("VisualsChild"))
             {
 #ifdef GTASA
-                ImGui::TextWrapped(
-                    "These options won't work if you got any mods that drastically change the game hud. i.e. Mobile Hud, GTA 5 Hud, VHud etc.");
+                ImGui::Spacing();
+                ImGui::SameLine();
+                ImGui::TextWrapped("Incompatible mods");
+                Ui::ShowTooltip("1. vHud\n2. GTA 5 Hud\n3. MobileHud\n\nAnd others that change HUD drastically");
                 ImGui::Spacing();
                 Ui::ColorPickerAddress("Armourbar color", *(int*)0x5890FC, ImVec4(225, 225, 225, 255));
                 Ui::EditAddress<float>("Armourbar posX", 0x866B78, -999, 94, 999);
