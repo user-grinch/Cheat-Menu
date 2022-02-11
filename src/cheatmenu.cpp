@@ -179,6 +179,7 @@ CheatMenu::CheatMenu()
     m_fMenuSize.y = gConfig.GetValue("window.sizeY", screen::GetScreenHeight() / 1.2f);
     srand(CTimer::m_snTimeInMilliseconds);
 
+    Locale::Init("CheatMenu/locale/");
     Events::processScriptsEvent += []()
     {
         if (!BY_GAME(FrontEndMenuManager.m_bMenuActive, FrontendMenuManager.m_bMenuVisible, FrontEndMenuManager.m_bMenuActive))

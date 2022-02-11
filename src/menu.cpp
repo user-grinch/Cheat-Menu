@@ -350,21 +350,37 @@ void Menu::ProcessCommands()
 
 void Menu::ShowPage()
 {
-    ImGui::Spacing();
-    if (ImGui::Button("Reset config", ImVec2(Ui::GetSize(2))))
-    {
-        gConfig.m_Data.clear();
-        SetHelpMessage("Config has been reset. Restart the game for it to take effect.", false, false, false);
-    }
-    ImGui::SameLine();
-    if (ImGui::Button("Reset size", ImVec2(Ui::GetSize(2))))
-    {
-        CheatMenu::ResetMenuSize();
-    }
-
-    ImGui::Spacing();
     if (ImGui::BeginTabBar("Menu", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {
+        if (ImGui::BeginTabItem("Config"))
+        {
+            ImGui::Spacing();
+            if (ImGui::Button("Reset config", ImVec2(Ui::GetSize(2))))
+            {
+                gConfig.m_Data.clear();
+                SetHelpMessage("Config has been reset. Restart the game for it to take effect.", false, false, false);
+            }
+            ImGui::SameLine();
+            if (ImGui::Button("Reset size", ImVec2(Ui::GetSize(2))))
+            {
+                CheatMenu::ResetMenuSize();
+            }
+            ImGui::Spacing();
+
+            static int selected = 0;
+            if (Ui::ListBox("Language", Locale::GetLocaleList(), selected))
+            {
+                if (Locale::SetLocale(selected) == Locale::eReturnCodes::SUCCESS)
+                {
+                    SetHelpMessage(Locale::GetText("Menu.LanguageChangeSuccess", "Language changed successfully!").c_str(), false, false, false);
+                }
+                else
+                {
+                    SetHelpMessage(Locale::GetText("Menu.LanguageChangeFailed", "Failed to change language").c_str(), false, false, false);
+                }
+            }
+            ImGui::EndTabItem();
+        }
         if (ImGui::BeginTabItem("Overlay"))
         {
             ImGui::Spacing();

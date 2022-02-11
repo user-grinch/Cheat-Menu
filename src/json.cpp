@@ -1,14 +1,17 @@
 #include "pch.h"
 #include "json.h"
 
-CJson::CJson(const char* name)
+CJson::CJson(const char* name, bool pathPredefined)
 {
     if (name == "" || !std::filesystem::is_directory(PLUGIN_PATH((char*)"CheatMenu")))
     {
         return;
     }
 
-    m_FilePath = PLUGIN_PATH((char*)"/CheatMenu/json/") + std::string(name) + ".json";
+    if (!pathPredefined)
+    {
+        m_FilePath = PLUGIN_PATH((char*)"/CheatMenu/json/") + std::string(name) + ".json";
+    }
 
     if (std::filesystem::exists(m_FilePath))
     {

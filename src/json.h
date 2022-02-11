@@ -47,8 +47,7 @@ public:
         }
     }
 
-    template <>
-    std::string GetValue(std::string&& key, std::string&& defaultVal)
+    std::string GetValueStr(const std::string& key, const std::string& defaultVal)
     {
         try
         {
@@ -119,5 +118,5 @@ public:
     	Saves json data to disk
     */
     void WriteToDisk();
-    CJson(const char* text = "");
+    CJson(const char* text, bool pathPredefined = false);
 };

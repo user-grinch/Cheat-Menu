@@ -1,5 +1,7 @@
 #include "pch.h"
 CJson gConfig = CJson("config");
+eRenderer gRenderer = Render_Unknown;
+std::ofstream gLog = std::ofstream("CheatMenu.log");
 
 Hotkey aimSkinChanger;
 Hotkey freeCam;
