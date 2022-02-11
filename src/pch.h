@@ -76,6 +76,9 @@
 #include "fontmgr.h"
 #include "locale.h"
 
+#define TEXT(x) Locale::GetText(x, "Unknown").c_str()
+#define TEXT_S(x) Locale::GetText(x,"Unknown").c_str()
+
 using namespace plugin;
 
 enum eRenderer
@@ -90,7 +93,7 @@ extern std::ofstream gLog;
 extern CJson gConfig;
 
 // Fix function clashes
-static void SetHelpMessage(const char *message, bool b1, bool b2, bool b3)
+static void SetHelpMessage(const char *message, bool b1 = false, bool b2 = false, bool b3 = false)
 {
 #if GTASA
     CHud::SetHelpMessage(message, b1, b2, b3);

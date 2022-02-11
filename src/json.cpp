@@ -8,7 +8,11 @@ CJson::CJson(const char* name, bool pathPredefined)
         return;
     }
 
-    if (!pathPredefined)
+    if (pathPredefined)
+    {
+        m_FilePath = name;
+    }
+    else
     {
         m_FilePath = PLUGIN_PATH((char*)"/CheatMenu/json/") + std::string(name) + ".json";
     }

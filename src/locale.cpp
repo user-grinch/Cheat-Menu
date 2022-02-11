@@ -2,7 +2,7 @@
 #include "locale.h"
 #include <filesystem>
 
-Locale::eReturnCodes Locale::Init(const char* path)
+Locale::eReturnCodes Locale::Init(const char* path, const char* def)
 {
     std::string localePath = path;
     if (localePath.back() != '/')
@@ -51,6 +51,30 @@ Locale::eReturnCodes Locale::Init(const char* path)
         return eReturnCodes::NO_LOCALE_FOUND;
     }
 
+
+    // Look for default language and set it
+    std::vector<std::string>& vec = Locale::GetLocaleList();
+
+    size_t index = 0;
+    for (std::string& locale : vec)
+    {
+        if (locale == def)
+        {
+            Locale::SetLocale(index);
+            break;
+        }
+
+        index++;
+    }
+
+    if(!m_pJson)
+    {
+#ifdef _GTA_
+        gLog << "Failed to load default language." << std::endl;
+#endif
+        return eReturnCodes::DEF_LOCALE_NOT_FOUND;
+    }
+
     return eReturnCodes::SUCCESS;
 }
 
@@ -59,14 +83,9 @@ std::vector<std::string>& Locale::GetLocaleList()
     return m_locales;
 }
 
-std::string Locale::GetText(std::string&& key, std::string&& defaultValue)
+size_t Locale::GetCurrentLocaleIndex()
 {
-    if (m_pJson == nullptr)
-    {
-        return defaultValue;
-    }
-
-    return m_pJson->GetValueStr(key, defaultValue);
+    return localeIndex;
 }
 
 Locale::eReturnCodes Locale::SetLocale(int index)
@@ -85,7 +104,8 @@ Locale::eReturnCodes Locale::SetLocale(int index)
     std::string localeFile = m_locales[index];
     localeFile += ".json";
     std::string localePath = m_path + localeFile;
-    m_pJson = new CJson(localePath.c_str());
+    m_pJson = new CJson(localePath.c_str(), true);
+    localeIndex = index;
     return eReturnCodes::SUCCESS;
 }
 

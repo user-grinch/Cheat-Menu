@@ -36,7 +36,7 @@ private:
         static inline float fPosY;
         static inline int mTotalRam = 0;
         static inline float textColor[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-    };
+    };  
 
 public:
     struct m_Commands

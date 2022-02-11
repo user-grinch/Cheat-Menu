@@ -14,6 +14,7 @@ private:
     static inline std::vector<std::string> m_locales;
     static inline std::string m_path;
     static inline CJson *m_pJson = nullptr;
+    static inline size_t localeIndex;
 
 public:
 
@@ -23,6 +24,7 @@ public:
         NO_LOCALE_FOUND = 1,        // Failed to find language files
         INVALID_INDEX = 2,          // Invalid langauge index for GetLocaleList()
         SUCCESS = 3,          
+        DEF_LOCALE_NOT_FOUND = 3,          
     };
 
     Locale() = delete;
@@ -33,10 +35,11 @@ public:
         Loads json files from the locale directory
         Calling it multiple times will unload previous data
     */
-    static eReturnCodes Init(const char* path);
+    static eReturnCodes Init(const char* path, const char* def = "English");
 
     // Returns a vector of available languages
     static std::vector<std::string>& GetLocaleList();
+    static size_t GetCurrentLocaleIndex();
 
     /*
         Returns the string for the given key for the language specified
@@ -45,7 +48,15 @@ public:
         You need to call SetLanguage once before calling this function
         By default, the language is set to "en"
     */
-    static std::string GetText(std::string&& key, std::string&& defaultValue);
+    static inline std::string GetText(std::string&& key, std::string&& defaultValue = "")
+    {
+        if (m_pJson == nullptr)
+        {
+            return defaultValue;
+        }
+
+        return m_pJson->GetValueStr(key, defaultValue);
+    }
 
     /*
         Sets the language to use

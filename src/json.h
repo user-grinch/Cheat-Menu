@@ -20,7 +20,7 @@ public:
     // specialize since typeid(std::string) doesn't work
 
     template <typename T>
-    T GetValue(std::string&& key, T&& defaultVal)
+    T inline GetValue(std::string&& key, T&& defaultVal)
     {
         try
         {
@@ -47,7 +47,7 @@ public:
         }
     }
 
-    std::string GetValueStr(const std::string& key, const std::string& defaultVal)
+    std::string inline GetValueStr(const std::string& key, const std::string& defaultVal)
     {
         try
         {
@@ -74,7 +74,7 @@ public:
     	Example: "Menu.Window.X"
     */
     template <typename T>
-    void SetValue(std::string&& key, const T& val)
+    void inline SetValue(std::string&& key, const T& val)
     {
         std::stringstream ss(key);
         std::string line;
@@ -99,7 +99,7 @@ public:
     }
 
     template <>
-    void SetValue(std::string&& key, const std::string& val)
+    void inline SetValue(std::string&& key, const std::string& val)
     {
         std::stringstream ss(key);
         std::string line;
