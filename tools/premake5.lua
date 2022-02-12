@@ -95,7 +95,9 @@ project "CheatMenuIII"
         "../src/visual.cpp",
         "../src/filehandler.h", 
         "../src/filehandler.cpp",
-        "../src/dllmain.cpp"
+        "../src/dllmain.cpp",
+        "../src/locale.h",
+        "../src/locale.cpp"
     }
     includedirs {
         PSDK_DIR .. "/plugin_III/",
@@ -187,7 +189,9 @@ project "CheatMenuVC"
         "../src/filehandler.cpp",
         "../src/hotkeys.h", 
         "../src/hotkeys.cpp",
-        "../src/dllmain.cpp"
+        "../src/dllmain.cpp",
+        "../src/locale.h",
+        "../src/locale.cpp"
     }
     includedirs {
         PSDK_DIR .. "/plugin_vc/",

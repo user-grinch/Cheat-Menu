@@ -368,13 +368,19 @@ void Menu::ShowPage()
             ImGui::Spacing();
 
             static int selected = Locale::GetCurrentLocaleIndex();
-            if (Ui::ListBox(TEXT("Menu.Language"), Locale::GetLocaleList(), selected))
+            static std::vector<std::string>& vec = Locale::GetLocaleList();
+
+            if (vec.size() > 0)
             {
-                if (Locale::SetLocale(selected) != Locale::eReturnCodes::SUCCESS)
+                if (Ui::ListBox(TEXT("Menu.Language"), vec, selected))
                 {
-                    SetHelpMessage(TEXT("Menu.LanguageChangeFailed"));
+                    if (Locale::SetLocale(selected) != Locale::eReturnCodes::SUCCESS)
+                    {
+                        SetHelpMessage(TEXT("Menu.LanguageChangeFailed"));
+                    }
                 }
             }
+            
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem(TEXT("Menu.Overlay")))
