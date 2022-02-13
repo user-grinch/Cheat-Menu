@@ -1,7 +1,41 @@
 {
     "Main" :
     {
-        "TranslatorName" : "Grinch_"
+        "TranslatorName" : "Grinch_",
+        "TranslationLanguage" : "English",
+        "TranslationLanguageDisclaimer" : "Translated to English by Grinch_"
+    },
+    "Teleport" :
+    {
+        "TargetBlipText" : "Target blip not found. You need to place it on the map first",
+        "InvalidLocation" : "Invalid location",
+        "LocationRemoved" : "Location removed",
+        "CustomLocationRemoveOnly" : "You can only remove custom location",
+        "InsertCoord" : "Insert coordinates",
+        "QuickTeleport" : "Quick teleport",
+        "QuickTeleportHint" : "Teleport to the location of your radar\ntarget blip using ",
+        "Coordinates" : "Coordinates",
+        "TeleportToCoord" : "Teleport to coordinates",
+        "InvalidCoord" : "Invalid coordinates",
+        "TeleportMarker" : "Teleport to marker",
+        "TeleportCenter" : "Teleport to center",
+        "Location" : "Location",
+        "LocationHint" : "Groove Street",
+        "AddLocation" : "Add location"
+    },
+    "Window" :
+    {
+        "TeleportPage" : "Teleport",
+        "PlayerPage" : "Player",
+        "PedPage" : "Ped",
+        "VehiclePage" : "Vehicle",
+        "WeaponPage" : "Weapon",
+        "AnimationPage" : "Animation",
+        "GamePage" : "Game",
+        "VisualPage" : "Visual",
+        "MenuPage" : "Menu",
+        "Search" : "Search",
+        "AddNew" : "Add new"
     },
     "Menu" :
     {

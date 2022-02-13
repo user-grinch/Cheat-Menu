@@ -38,6 +38,7 @@ private:
     static inline bool m_bShowMenu = false;
     static inline ImVec2 m_fMenuSize = ImVec2(screen::GetScreenWidth() / 4, screen::GetScreenHeight() / 1.2);
     static inline bool m_bSizeChangedExternal = false;
+    static inline std::vector<HeaderData> m_headerList;
 
     static void ApplyStyle();
     static void DrawWindow();
@@ -45,22 +46,6 @@ private:
     static void ShowUpdatePage();
     static void ShowWelcomePage();
     static void ProcessPages();
-
-    static inline std::vector<HeaderData> m_headerList
-    {
-        {"Teleport", &Teleport::ShowPage, eMenuPages::TELEPORT}, 
-        {"Player", &Player::ShowPage, eMenuPages::PLAYER}, 
-        {"Ped", &Ped::ShowPage, eMenuPages::PED}, 
-        {"Animation", &Animation::ShowPage, eMenuPages::ANIMATION}, 
-        {"Vehicle", &Vehicle::ShowPage, eMenuPages::VEHICLE},
-        {"Weapon", &Weapon::ShowPage, eMenuPages::WEAPON},
-        {"Game", &Game::ShowPage, eMenuPages::GAME}, 
-        {"Visual", &Visual::ShowPage, eMenuPages::VISUAL}, 
-        {"Menu", &Menu::ShowPage, eMenuPages::MENU}, 
-        {"Welcome", &ShowWelcomePage, eMenuPages::WELCOME, true},
-        {"Update", &ShowUpdatePage, eMenuPages::UPDATE, true},
-        {"Anniversary", &ShowAnniversaryPage, eMenuPages::ANNIVERSARY, true}
-    };
 
 public:
     CheatMenu();

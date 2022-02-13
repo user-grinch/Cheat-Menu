@@ -76,8 +76,8 @@
 #include "fontmgr.h"
 #include "locale.h"
 
-#define TEXT(x) Locale::GetText(x, "Unknown##"x).c_str()
-#define TEXT_S(x) Locale::GetText(x,"Unknown##"x).c_str()
+#define TEXT(x) Locale::GetText(x, "Unknown").c_str()
+#define TEXT_S(x) Locale::GetText(x,"Unknown")
 
 using namespace plugin;
 

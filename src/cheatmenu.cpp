@@ -180,6 +180,23 @@ CheatMenu::CheatMenu()
     srand(CTimer::m_snTimeInMilliseconds);
 
     Locale::Init("CheatMenu/locale/");
+
+    CheatMenu::m_headerList = 
+    {
+        {TEXT_S("Window.TeleportPage"), &Teleport::ShowPage, eMenuPages::TELEPORT}, 
+        {TEXT_S("Window.PlayerPage"), &Player::ShowPage, eMenuPages::PLAYER}, 
+        {TEXT_S("Window.PedPage"), &Ped::ShowPage, eMenuPages::PED}, 
+        {TEXT_S("Window.AnimationPage"), &Animation::ShowPage, eMenuPages::ANIMATION}, 
+        {TEXT_S("Window.VehiclePage"), &Vehicle::ShowPage, eMenuPages::VEHICLE},
+        {TEXT_S("Window.WeaponPage"), &Weapon::ShowPage, eMenuPages::WEAPON},
+        {TEXT_S("Window.GamePage"), &Game::ShowPage, eMenuPages::GAME}, 
+        {TEXT_S("Window.VisualPage"), &Visual::ShowPage, eMenuPages::VISUAL}, 
+        {TEXT_S("Window.MenuPage"), &Menu::ShowPage, eMenuPages::MENU}, 
+        {"Welcome", &ShowWelcomePage, eMenuPages::WELCOME, true},
+        {"Update", &ShowUpdatePage, eMenuPages::UPDATE, true},
+        {"Anniversary", &ShowAnniversaryPage, eMenuPages::ANNIVERSARY, true}
+    };
+
     Events::processScriptsEvent += []()
     {
         if (!BY_GAME(FrontEndMenuManager.m_bMenuActive, FrontendMenuManager.m_bMenuVisible, FrontEndMenuManager.m_bMenuActive))
