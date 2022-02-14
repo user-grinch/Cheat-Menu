@@ -23,7 +23,7 @@ void Animation::PlayCutscene(std::string& rootKey, std::string& cutsceneId, std:
 {
     if (Util::IsOnCutscene())
     {
-        SetHelpMessage("Another cutscene is running", false, false, false);
+        SetHelpMessage(TEXT("Animation.CutsceneRunning"), false, false, false);
         return;
     }
 
@@ -62,11 +62,11 @@ void Animation::RemoveParticle(std::string& ifp, std::string& particle, std::str
     {
         m_Particle::m_Data.m_pJson->m_Data["Custom"].erase(particle);
         m_Particle::m_Data.m_pJson->WriteToDisk();
-        SetHelpMessage("Particle removed", false, false, false);
+        SetHelpMessage(TEXT("Animation.ParticleRemoved"));
     }
     else
     {
-        SetHelpMessage("You can only remove custom particles", false, false, false);
+        SetHelpMessage(TEXT("Animation.CustomParticlesOnly"));
     }
 }
 
@@ -285,10 +285,10 @@ void Animation::ShowPage()
 
         ImGui::Spacing();
 
-        if (ImGui::BeginTabItem("Animation##TABBAR"))
+        if (ImGui::BeginTabItem(TEXT("Animation.AnimationTab")))
         {
             ImGui::Spacing();
-            if (ImGui::Button("Stop animation", Ui::GetSize()))
+            if (ImGui::Button(TEXT("Animation.StopAnimation"), Ui::GetSize()))
             {
                 if (hPlayer)
                 {
@@ -302,27 +302,27 @@ void Animation::ShowPage()
             ImGui::Spacing();
 
             ImGui::Columns(2, nullptr, false);
-            Ui::CheckboxWithHint("Loop", &m_Loop, "Keep playing the animation on repeat");
-            Ui::CheckboxWithHint("Secondary", &m_bSecondary, "Player can move while playing the animation");
+            Ui::CheckboxWithHint(TEXT("Animation.LoopCheckbox"), &m_Loop, TEXT("Animation.LoopCheckboxText"));
+            Ui::CheckboxWithHint(TEXT("Animation.SecondaryCheckbox"), &m_bSecondary, TEXT("Animation.SecondaryCheckboxText"));
             ImGui::NextColumn();
 #ifdef GTASA
-            Ui::CheckboxWithHint("Ped anim", &m_PedAnim, "Play animation on other peds.\nSelect with weapon target.");
+            Ui::CheckboxWithHint(TEXT("Animation.PedAnim"), &m_PedAnim, TEXT("Animation.PedAnimText"));
 #endif
             ImGui::Columns(1);
             ImGui::Spacing();
 
             if (m_PedAnim && !m_pTarget)
             {
-                ImGui::TextWrapped("No player target found. Aim a ped with a weapon to select it for animation player.");
+                ImGui::TextWrapped(TEXT("Animation.NoTarget"));
             }
             else
             {
-                if (ImGui::CollapsingHeader("Add new"))
+                if (ImGui::CollapsingHeader(TEXT("Window.AddNew")))
                 {
-                    ImGui::InputTextWithHint("IFP name", "ped", m_nIfpBuffer, INPUT_BUFFER_SIZE);
-                    ImGui::InputTextWithHint("Anim name", "cower", m_nAnimBuffer, INPUT_BUFFER_SIZE);
+                    ImGui::InputTextWithHint(TEXT("Animation.IFPName"), "ped", m_nIfpBuffer, INPUT_BUFFER_SIZE);
+                    ImGui::InputTextWithHint(TEXT("Animation.AnimName"), "cower", m_nAnimBuffer, INPUT_BUFFER_SIZE);
                     ImGui::Spacing();
-                    if (ImGui::Button("Add animation", Ui::GetSize()))
+                    if (ImGui::Button(TEXT("Animation.AddAnimation"), Ui::GetSize()))
                     {
                         m_AnimData.m_pJson->m_Data["Custom"][m_nAnimBuffer] = ("0, " + std::string(m_nIfpBuffer));
                         m_AnimData.m_pJson->WriteToDisk();
@@ -340,10 +340,10 @@ void Animation::ShowPage()
             ImGui::EndTabItem();
         }
 #ifdef GTASA
-        if (ImGui::BeginTabItem("Cutscene"))
+        if (ImGui::BeginTabItem(TEXT("Animation.CutsceneTab")))
         {
             ImGui::Spacing();
-            if (ImGui::Button("Stop cutscene", Ui::GetSize()))
+            if (ImGui::Button(TEXT("Animation.StopCutscene"), Ui::GetSize()))
             {
                 if (m_Cutscene::m_bRunning)
                 {
@@ -367,10 +367,10 @@ void Animation::ShowPage()
             }
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem("Particle##TABBAR"))
+        if (ImGui::BeginTabItem(TEXT("Animation.ParticleTab")))
         {
             ImGui::Spacing();
-            if (ImGui::Button("Remove all", Ui::GetSize(2)))
+            if (ImGui::Button(TEXT("Animation.RemoveAll"), Ui::GetSize(2)))
             {
                 for (int& p : m_Particle::m_nParticleList)
                 {
@@ -379,22 +379,22 @@ void Animation::ShowPage()
                 m_Particle::m_nParticleList.clear();
             }
             ImGui::SameLine();
-            if (ImGui::Button("Remove latest", Ui::GetSize(2)))
+            if (ImGui::Button(TEXT("Animation.RemoveLatest"), Ui::GetSize(2)))
             {
                 Command<Commands::KILL_FX_SYSTEM>(m_Particle::m_nParticleList.back()); // stop if anything is running
                 m_Particle::m_nParticleList.pop_back();
             }
             ImGui::Spacing();
-            if (Ui::CheckboxBitFlag("Invisible player", pPlayer->m_nPedFlags.bDontRender))
+            if (Ui::CheckboxBitFlag(TEXT("Animation.InvisiblePlayer"), pPlayer->m_nPedFlags.bDontRender))
             {
                 pPlayer->m_nPedFlags.bDontRender = (pPlayer->m_nPedFlags.bDontRender == 1) ? 0 : 1;
             }
             ImGui::Spacing();
-            if (ImGui::CollapsingHeader("Add new"))
+            if (ImGui::CollapsingHeader(TEXT("Window.AddNew")))
             {
-                ImGui::InputTextWithHint("Particle name", "kkjj_on_fire", m_Particle::m_NameBuffer, INPUT_BUFFER_SIZE);
+                ImGui::InputTextWithHint(TEXT("Animation.ParticleName"), "kkjj_on_fire", m_Particle::m_NameBuffer, INPUT_BUFFER_SIZE);
                 ImGui::Spacing();
-                if (ImGui::Button("Add animation", Ui::GetSize()))
+                if (ImGui::Button(TEXT("Animation.AddParticle"), Ui::GetSize()))
                 {
                     m_Particle::m_Data.m_pJson->m_Data["Custom"][m_Particle::m_NameBuffer] = "Dummy";
                     m_Particle::m_Data.m_pJson->WriteToDisk();
@@ -409,15 +409,15 @@ void Animation::ShowPage()
             }
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem("Style"))
+        if (ImGui::BeginTabItem(TEXT("Animation.Styles")))
         {
              ImGui::Spacing();
-            if (Ui::ListBox("Fighting style", m_FightingStyleList, m_nFightingStyle))
+            if (Ui::ListBox(TEXT("Animation.FightingStyle"), m_FightingStyleList, m_nFightingStyle))
             {
                 Command<Commands::GIVE_MELEE_ATTACK_TO_CHAR>(hPlayer, m_nFightingStyle + 4, 6);
-                SetHelpMessage("Fighting anim set", false, false, false);
+                SetHelpMessage(TEXT("Animation.FightingStyleSet"));
             }
-            if (Ui::ListBoxStr("Walking style", m_WalkingStyleList, m_nWalkingStyle))
+            if (Ui::ListBoxStr(TEXT("Animation.WalkingStyle"), m_WalkingStyleList, m_nWalkingStyle))
             {
                 if (m_nWalkingStyle == "default")
                 {
@@ -432,7 +432,7 @@ void Animation::ShowPage()
                     Command<Commands::SET_ANIM_GROUP_FOR_CHAR>(hPlayer, m_nWalkingStyle.c_str());
                     Command<Commands::REMOVE_ANIMATION>(m_nWalkingStyle.c_str());
                 }
-                SetHelpMessage("Walking anim set", false, false, false);
+                SetHelpMessage(TEXT("Animation.WalkingStyleSet"));
             }
             ImGui::EndTabItem();
         }
@@ -447,10 +447,10 @@ void Animation::RemoveAnimation(std::string& ifp, std::string& anim, std::string
     {
         m_AnimData.m_pJson->m_Data["Custom"].erase(anim);
         m_AnimData.m_pJson->WriteToDisk();
-        SetHelpMessage("Animation removed", false, false, false);
+        SetHelpMessage(TEXT("Animation.AnimationRemoved"));
     }
     else
     {
-        SetHelpMessage("You can only remove custom anims", false, false, false);
+        SetHelpMessage(TEXT("Animation.CustomAnimsOnly"));
     }
 }
