@@ -350,17 +350,17 @@ void Visual::ShowPage()
 {
     if (ImGui::BeginTabBar("Visual", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {
-        if (ImGui::BeginTabItem("Checkboxes"))
+        if (ImGui::BeginTabItem(TEXT("Window.CheckboxTab")))
         {
             ImGui::Spacing();
             ImGui::Columns(2, nullptr, false);
 
 #ifdef GTASA
-            Ui::CheckboxAddress("Armour border", 0x589123);
-            Ui::CheckboxAddress("Armour percentage", 0x589125);
-            Ui::CheckboxAddress("Breath border", 0x589207);
-            Ui::CheckboxAddress("Breath percentage", 0x589209);
-            if (Ui::CheckboxWithHint("Disable hydrant splash", &m_bDisableHydrant))
+            Ui::CheckboxAddress(TEXT("Visual.ArmourBorder"), 0x589123);
+            Ui::CheckboxAddress(TEXT("Visual.ArmourPercentage"), 0x589125);
+            Ui::CheckboxAddress(TEXT("Visual.BreathBorder"), 0x589207);
+            Ui::CheckboxAddress(TEXT("Visual.BreathPercentage"), 0x589209);
+            if (Ui::CheckboxWithHint(TEXT("Visual.DisableHydrant"), &m_bDisableHydrant))
             {
                 if (m_bDisableHydrant)
                 {
@@ -372,24 +372,24 @@ void Visual::ShowPage()
                     plugin::patch::SetRaw(0x4A0D70, (char*)"\xE9\x94\x3F\xF6\xFF", 5);
                 }
             }
-            Ui::CheckboxAddress("Gray radar", 0xA444A4);
-            Ui::CheckboxAddress("Health border", 0x589353);
-            Ui::CheckboxAddress("Health percentage", 0x589355);
-            if (Ui::CheckboxWithHint("Hide area names", &CHud::bScriptDontDisplayAreaName))
+            Ui::CheckboxAddress(TEXT("Visual.GrayRadar"), 0xA444A4);
+            Ui::CheckboxAddress(TEXT("Visual.HealthBorder"), 0x589353);
+            Ui::CheckboxAddress(TEXT("Visual.HealthPercentage"), 0x589355);
+            if (Ui::CheckboxWithHint(TEXT("Visual.HideAreaNames"), &CHud::bScriptDontDisplayAreaName))
             {
                 Command<Commands::DISPLAY_ZONE_NAMES>(!CHud::bScriptDontDisplayAreaName);
             }
 
             ImGui::NextColumn();
 
-            if (Ui::CheckboxWithHint("Hide veh names", &CHud::bScriptDontDisplayVehicleName))
+            if (Ui::CheckboxWithHint(TEXT("Visual.HideVehNames"), &CHud::bScriptDontDisplayVehicleName))
             {
                 Command<Commands::DISPLAY_CAR_NAMES>(!CHud::bScriptDontDisplayVehicleName);
             }
 
-            Ui::CheckboxAddressEx("Hide wanted level", 0x58DD1B, 0x90, 1);
+            Ui::CheckboxAddressEx(TEXT("Visual.HideWantedLevel"), 0x58DD1B, 0x90, 1);
 
-            if (Ui::CheckboxWithHint("Invisible water", &m_bInvisibleWater))
+            if (Ui::CheckboxWithHint(TEXT("Visual.InvisibleWater"), &m_bInvisibleWater))
             {
                 if (!m_bNoWater)
                 {
@@ -407,8 +407,8 @@ void Visual::ShowPage()
                     }
                 }
             }
-            Ui::CheckboxWithHint("Lock weather", &m_bLockWeather);
-            if (Ui::CheckboxWithHint("No water", &m_bNoWater))
+            Ui::CheckboxWithHint(TEXT("Visual.LockWeather"), &m_bLockWeather);
+            if (Ui::CheckboxWithHint(TEXT("Visual.NoWater"), &m_bNoWater))
             {
                 if (m_bNoWater)
                 {
@@ -431,25 +431,25 @@ void Visual::ShowPage()
             }
 
             bool radar_state = (patch::Get<BYTE>(0xBA676C) != 2);
-            if (Ui::CheckboxWithHint("Show radar", &radar_state))
+            if (Ui::CheckboxWithHint(TEXT("Visual.ShowRadar"), &radar_state))
             {
                 patch::Set<BYTE>(0xBA676C, radar_state == true ? 0 : 2);
             }
 
-            Ui::CheckboxAddress("Show hud", 0xBA6769);
-            Ui::CheckboxAddressEx("Unfog map", 0xBA372C, 0x50, 0x0, "Removes fog from Main Menu Map");
+            Ui::CheckboxAddress(TEXT("Visual.ShowHud"), 0xBA6769);
+            Ui::CheckboxAddressEx(TEXT("Visual.UnfogMap"), 0xBA372C, 0x50, 0x0, TEXT("Visual.UnforMapText"));
 #elif GTAVC
-            Ui::CheckboxAddress("Hide radar", 0xA10AB6);
-            Ui::CheckboxWithHint("Lock weather", &m_bLockWeather);
-            Ui::CheckboxAddress("Show hud", 0x86963A);
+            Ui::CheckboxAddress(TEXT("Visual.HideRadar"), 0xA10AB6);
+            Ui::CheckboxWithHint(TEXT("Visual.Lockweather"), &m_bLockWeather);
+            Ui::CheckboxAddress(TEXT("Visual.ShowHud"), 0x86963A);
 
             ImGui::NextColumn();
 
-            Ui::CheckboxAddress("Green scanlines", 0xA10B69);
-            Ui::CheckboxAddress("White scanlines", 0xA10B68);
+            Ui::CheckboxAddress(TEXT("Visual.GreenScanlines"), 0xA10B69);
+            Ui::CheckboxAddress(TEXT("Visual.WhiteScanlines"), 0xA10B68);
 #else
             static bool hideHud, hideRadar;
-            if (Ui::CheckboxWithHint("Hide hud", &hideHud))
+            if (Ui::CheckboxWithHint(TEXT("Visual.HideHud"), &hideHud))
             {
                 if (hideHud)
                 {
@@ -460,7 +460,7 @@ void Visual::ShowPage()
                     patch::SetRaw(0x48E420, (char*)"\xE8\x7B\x6E\x07\x00", 5);
                 }
             }
-            if (Ui::CheckboxWithHint("Hide radar", &hideRadar))
+            if (Ui::CheckboxWithHint(TEXT("Visual.HideRadar"), &hideRadar))
             {
                 if (hideHud)
                 {
@@ -471,12 +471,12 @@ void Visual::ShowPage()
                     patch::SetRaw(0x50838D, (char*)"\xE8\x6E\xBE\xF9\xFF", 5);
                 }
             }
-            Ui::CheckboxWithHint("Lock weather", &m_bLockWeather);
+            Ui::CheckboxWithHint(TEXT("Visual.LockWeather"), &m_bLockWeather);
 #endif
             ImGui::Columns(1);
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem("Menus"))
+        if (ImGui::BeginTabItem(TEXT("Window.MenusTab")))
         {
 #ifdef GTASA
             static bool init_patches = false;
@@ -551,50 +551,56 @@ void Visual::ShowPage()
 #ifdef GTASA
                 ImGui::Spacing();
                 ImGui::SameLine();
-                ImGui::TextWrapped("Incompatible mods");
-                Ui::ShowTooltip("1. vHud\n2. GTA 5 Hud\n3. MobileHud\n\nAnd others that change HUD drastically");
+                ImGui::TextWrapped(TEXT("Visual.IncompatibleMods"));
+                Ui::ShowTooltip(TEXT("Visual.IncompatibleModsText"));
                 ImGui::Spacing();
-                Ui::ColorPickerAddress("Armourbar color", *(int*)0x5890FC, ImVec4(225, 225, 225, 255));
-                Ui::EditAddress<float>("Armourbar posX", 0x866B78, -999, 94, 999);
-                Ui::EditAddress<float>("Armourbar posY", 0x862D38, -999, 48, 999);
-                Ui::ColorPickerAddress("Breathbar color", *(int*)0x5891EB, ImVec4(172, 203, 241, 255));
-                Ui::EditAddress<float>("Breathbar posX", *(int*)0x58F11F, -999, 94, 999);
-                Ui::EditAddress<float>("Breathbar posY", *(int*)0x58F100, -999, 62, 999);
-                Ui::ColorPickerAddress("Clock color", *(int*)0x58EBD1, ImVec4(255, 255, 255, 255));
-                Ui::EditAddress<float>("Clock posX", *(int*)0x58EC16, -999, 32, 999);
-                Ui::EditAddress<float>("Clock posY", *(int*)0x58EC04, -999, 22, 999);
-                Ui::ColorPickerAddress("Healthbar color", *(int*)0x589331, ImVec4(180, 25, 29, 255));
-                Ui::EditAddress<float>("Healthbar posX", 0x86535C, -999, 141, 999);
-                Ui::EditAddress<float>("Healthbar posY", 0x866CA8, -999, 77, 999);
-                Ui::ColorPickerAddress("Draw menu title border color", 0xBAB240, ImVec4(0, 0, 0, 255));
-                Ui::ColorPickerAddress("Money color", 0xBAB230, ImVec4(54, 104, 44, 255));
-                Ui::EditAddress<float>("Money posX", *(int*)0x58F5FC, -999, 32, 999);
-                Ui::EditAddress<float>("Money posY", 0x866C88, -999, 89, 999);
+                Ui::ColorPickerAddress(TEXT("Visual.ArmourbarColor"), *(int*)0x5890FC, ImVec4(225, 225, 225, 255));
+                Ui::EditAddress<float>(TEXT("Visual.ArmourbarPosX"), 0x866B78, -999, 94, 999);
+                Ui::EditAddress<float>(TEXT("Visual.ArmourbarPosY"), 0x862D38, -999, 48, 999);
+                Ui::ColorPickerAddress(TEXT("Visual.BreathbarColor"), *(int*)0x5891EB, ImVec4(172, 203, 241, 255));
+                Ui::EditAddress<float>(TEXT("Visual.BreathbarPosX"), *(int*)0x58F11F, -999, 94, 999);
+                Ui::EditAddress<float>(TEXT("Visual.BreathbarPosY"), *(int*)0x58F100, -999, 62, 999);
+                Ui::ColorPickerAddress(TEXT("Visual.ClockColor"), *(int*)0x58EBD1, ImVec4(255, 255, 255, 255));
+                Ui::EditAddress<float>(TEXT("Visual.ClockPosX"), *(int*)0x58EC16, -999, 32, 999);
+                Ui::EditAddress<float>(TEXT("Visual.ClockPosY"), *(int*)0x58EC04, -999, 22, 999);
+                Ui::ColorPickerAddress(TEXT("Visual.HealthbarColor"), *(int*)0x589331, ImVec4(180, 25, 29, 255));
+                Ui::EditAddress<float>(TEXT("Visual.HealthbarPosX"), 0x86535C, -999, 141, 999);
+                Ui::EditAddress<float>(TEXT("Visual.HealthbarPosY"), 0x866CA8, -999, 77, 999);
+                Ui::ColorPickerAddress(TEXT("Visual.DrawMenuTitle"), 0xBAB240, ImVec4(0, 0, 0, 255));
+                Ui::ColorPickerAddress(TEXT("Visual.MoneyColor"), 0xBAB230, ImVec4(54, 104, 44, 255));
+                Ui::EditAddress<float>(TEXT("Visual.MoneyPosX"), *(int*)0x58F5FC, -999, 32, 999);
+                Ui::EditAddress<float>(TEXT("Visual.MoneyPosY"), 0x866C88, -999, 89, 999);
                 static std::vector<Ui::NamedValue> font_outline
                 {
-                    {"No outline", 0}, {"Thin outline", 1}, {"Default outline", 2}
+                    {TEXT("Visual.NoOutline"), 0}, {TEXT("Visual.ThinOutline"), 1}, {TEXT("Visual.DefaultOutline"), 2}
                 };
-                Ui::EditRadioButtonAddressEx("Money font outline", 0x58F58D, font_outline);
-                static std::vector<Ui::NamedValue> style{ {"Style 1", 1}, {"Style 2", 2}, {"Default style", 3} };
-                Ui::EditRadioButtonAddressEx("Money font style", 0x58F57F, style);
-                Ui::EditAddress<float>("Radar Height", *(int*)0x5834F6, 0, 76, 999);
-                Ui::EditAddress<float>("Radar Width", *(int*)0x5834C2, 0, 94, 999);
-                Ui::EditAddress<float>("Radar posX", *(int*)0x5834D4, -999, 40, 999);
-                Ui::EditAddress<float>("Radar posY", *(int*)0x583500, -999, 104, 999);
-                Ui::EditAddress<int>("Radar zoom", 0xA444A3, 0, 0, 170);
-                Ui::ColorPickerAddress("Radio station color", 0xBAB24C, ImVec4(150, 150, 150, 255));
-                static std::vector<Ui::NamedValue> star_border{ {"No border", 0}, {"Default", 1}, {"Bold border", 2} };
-                Ui::EditRadioButtonAddressEx("Wanted star border", 0x58DD41, star_border);
-                Ui::EditAddress<float>("Wanted posX", *(int*)0x58DD0F, -999, 29, 999);
-                Ui::EditAddress<float>("Wanted posY", *(int*)0x58DDFC, -999, 114, 999);
-                Ui::EditAddress<float>("Weapon ammo posX", *(int*)0x58FA02, -999, 32, 999);
-                Ui::EditAddress<float>("Weapon ammo posY", *(int*)0x58F9E6, -999, 43, 999);
-                Ui::EditAddress<float>("Weapon icon posX", *(int*)0x58F927, -999, 32, 999);
-                Ui::EditAddress<float>("Weapon icon posY", *(int*)0x58F913, -999, 20, 999);
+                Ui::EditRadioButtonAddressEx(TEXT("MoneyFontOutline"), 0x58F58D, font_outline);
+                static std::vector<Ui::NamedValue> style
+                { 
+                    {TEXT("Style1"), 1}, {TEXT("Style2"), 2}, {TEXT("DefaultStyle"), 3} 
+                };
+                Ui::EditRadioButtonAddressEx(TEXT("MoneyFontStyle"), 0x58F57F, style);
+                Ui::EditAddress<float>(TEXT("RadarHeight"), *(int*)0x5834F6, 0, 76, 999);
+                Ui::EditAddress<float>(TEXT("RadarWidth"), *(int*)0x5834C2, 0, 94, 999);
+                Ui::EditAddress<float>(TEXT("RadarPosX"), *(int*)0x5834D4, -999, 40, 999);
+                Ui::EditAddress<float>(TEXT("RadarPosY"), *(int*)0x583500, -999, 104, 999);
+                Ui::EditAddress<int>(TEXT("RadarZoom"), 0xA444A3, 0, 0, 170);
+                Ui::ColorPickerAddress(TEXT("RadioStationColor"), 0xBAB24C, ImVec4(150, 150, 150, 255));
+                static std::vector<Ui::NamedValue> star_border
+                { 
+                    {TEXT("NoBorder"), 0}, {TEXT("DefaultBorder"), 1}, {TEXT("BoldBorder"), 2} 
+                };
+                Ui::EditRadioButtonAddressEx(TEXT("WantedStarBorder"), 0x58DD41, star_border);
+                Ui::EditAddress<float>(TEXT("WantedPosX"), *(int*)0x58DD0F, -999, 29, 999);
+                Ui::EditAddress<float>(TEXT("WantedPosY"), *(int*)0x58DDFC, -999, 114, 999);
+                Ui::EditAddress<float>(TEXT("WeaponAmmoPosX"), *(int*)0x58FA02, -999, 32, 999);
+                Ui::EditAddress<float>(TEXT("WeaponAmmoPosY"), *(int*)0x58F9E6, -999, 43, 999);
+                Ui::EditAddress<float>(TEXT("WeaponIconPosX"), *(int*)0x58F927, -999, 32, 999);
+                Ui::EditAddress<float>(TEXT("WeaponIconPosY"), *(int*)0x58F913, -999, 20, 999);
 #elif GTAVC
-                Ui::EditAddress<float>("Radar posX", 0x68FD2C, -999, 40, 999);
-                Ui::EditAddress<float>("Radar posY", 0x68FD34, -999, 104, 999);
-                Ui::EditAddress<BYTE>("Radar width", 0x68FD28, -999, 20, 999);
+                Ui::EditAddress<float>(TEXT("RadarPosX"), 0x68FD2C, -999, 40, 999);
+                Ui::EditAddress<float>(TEXT("RadarPosY"), 0x68FD34, -999, 104, 999);
+                Ui::EditAddress<BYTE>(TEXT("RadarWidth"), 0x68FD28, -999, 20, 999);
 #endif
 
                 ImGui::EndChild();
@@ -604,33 +610,33 @@ void Visual::ShowPage()
         }
 
 #ifdef GTASA
-        if (m_nTimecycHour == 8 ? ImGui::BeginTabItem("Timecyc") : ImGui::BeginTabItem("Timecyc 24h"))
+        if (m_nTimecycHour == 8 ? ImGui::BeginTabItem(TEXT("Visual.TimecycTab")) : ImGui::BeginTabItem(TEXT("Visual.Timecyc24hTab")))
 #else
-        if (ImGui::BeginTabItem("Timecyc"))
+        if (ImGui::BeginTabItem(TEXT("Visual.TimecycTab")))
 #endif
         {
             ImGui::Spacing();
-            if (ImGui::Button("Generate timecyc file", Ui::GetSize(2)))
+            if (ImGui::Button(TEXT("Visual.GenerateFile"), Ui::GetSize(2)))
             {
                 GenerateTimecycFile();
-                SetHelpMessage("File generated", false, false, false);
+                SetHelpMessage(TEXT("Visual.FileGenerated"));
             }
             ImGui::SameLine();
-            if (ImGui::Button("Reset timecyc", Ui::GetSize(2)))
+            if (ImGui::Button(TEXT("Visual.ResetTimecyc"), Ui::GetSize(2)))
             {
                 CTimeCycle::Initialise();
-                SetHelpMessage("Timecyc reset", false, false, false);
+                SetHelpMessage(TEXT("Visual.TimecycReset"), false, false, false);
             }
             ImGui::Spacing();
 
             int weather = CWeather::OldWeatherType;
-            if (Ui::ListBox("Current weather", m_WeatherNames, weather))
+            if (Ui::ListBox(TEXT("Visual.CurrentWeather"), m_WeatherNames, weather))
             {
                 CWeather::OldWeatherType = weather;
             }
 
             weather = CWeather::NewWeatherType;
-            if (Ui::ListBox("Next weather", m_WeatherNames, weather))
+            if (Ui::ListBox(TEXT("Visual.NextWeather"), m_WeatherNames, weather))
             {
                 CWeather::NewWeatherType = weather;
             }
@@ -644,14 +650,14 @@ void Visual::ShowPage()
                 ImGui::BeginDisabled(Game::m_bSyncTime);
             }
 
-            if (ImGui::InputInt("Hour", &hour) & !Game::m_bSyncTime)
+            if (ImGui::InputInt(TEXT("Visual.Hour"), &hour) & !Game::m_bSyncTime)
             {
                 if (hour < 0) hour = 23;
                 if (hour > 23) hour = 0;
                 CClock::ms_nGameClockHours = hour;
             }
 
-            if (ImGui::InputInt("Minute", &minute) & !Game::m_bSyncTime)
+            if (ImGui::InputInt(TEXT("Visual.Minute"), &minute) & !Game::m_bSyncTime)
             {
                 if (minute < 0) minute = 59;
                 if (minute > 59) minute = 0;
@@ -661,10 +667,10 @@ void Visual::ShowPage()
             if (Game::m_bSyncTime)
             {
                 ImGui::EndDisabled();
-                Ui::ShowTooltip("Sync system time is enabled.\n(Game/Sync system time)");
+                Ui::ShowTooltip(TEXT("Visual.SyncTimeEnabled"));
             }
 
-            if (ImGui::Checkbox("Freeze game time", &Game::m_bFreezeTime))
+            if (ImGui::Checkbox(TEXT("Visual.FreezeGameTime"), &Game::m_bFreezeTime))
             {
                 if (Game::m_bFreezeTime)
                 {
@@ -679,47 +685,47 @@ void Visual::ShowPage()
             ImGui::Spacing();
             if (ImGui::BeginTabBar("Timecyc subtab", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
             {
-                if (ImGui::BeginTabItem("Colors"))
+                if (ImGui::BeginTabItem(TEXT("Visual.ColorsTab")))
                 {
                     ImGui::BeginChild("TimecycColors");
                     ImGui::Spacing();
 
-                    TimeCycColorEdit3("Ambient", m_nAmbientRed, m_nAmbientGreen, m_nAmbientBlue);
+                    TimeCycColorEdit3(TEXT("Visual.Ambient"), m_nAmbientRed, m_nAmbientGreen, m_nAmbientBlue);
 #ifndef GTA3
-                    TimeCycColorEdit3("Ambient obj", m_nAmbientRed_Obj, m_nAmbientGreen_Obj, m_nAmbientBlue_Obj);
+                    TimeCycColorEdit3(TEXT("Visual.AmbientObj"), m_nAmbientRed_Obj, m_nAmbientGreen_Obj, m_nAmbientBlue_Obj);
 #endif
 
 #ifdef GTASA
-                    TimeCycColorEdit3("Fluffy clouds", m_nFluffyCloudsBottomRed, m_nFluffyCloudsBottomGreen,
+                    TimeCycColorEdit3(TEXT("Visual.FluffyClouds"), m_nFluffyCloudsBottomRed, m_nFluffyCloudsBottomGreen,
                                       m_nFluffyCloudsBottomBlue);
 #elif GTAVC
-                    TimeCycColorEdit3("Ambient bl", m_nAmbientBlRed, m_nAmbientBlGreen, m_nAmbientBlBlue);
-                    TimeCycColorEdit3("Ambient obj bl", m_nAmbientBlRed_Obj, m_nAmbientBlGreen_Obj,
+                    TimeCycColorEdit3(TEXT("Visual.AmbientBl"), m_nAmbientBlRed, m_nAmbientBlGreen, m_nAmbientBlBlue);
+                    TimeCycColorEdit3(TEXT("Visual.AmbientObjBl"), m_nAmbientBlRed_Obj, m_nAmbientBlGreen_Obj,
                                       m_nAmbientBlBlue_Obj);
-                    TimeCycColorEdit3("Blur", m_nBlurRed, m_nBlurGreen, m_nBlurBlue);
+                    TimeCycColorEdit3(TEXT("Visual.Blur"), m_nBlurRed, m_nBlurGreen, m_nBlurBlue);
 #endif
 
 #ifndef GTASA
-                    TimeCycColorEdit3("Clouds bottom", m_nBottomCloudsRed, m_nBottomCloudsGreen, m_nBottomCloudsBlue);
-                    TimeCycColorEdit3("Clouds low", m_nLowCloudsRed, m_nLowCloudsGreen, m_nLowCloudsBlue);
-                    TimeCycColorEdit3("Clouds top", m_nTopCloudsRed, m_nTopCloudsGreen, m_nTopCloudsBlue);
-                    TimeCycColorEdit3("Directional light", m_nDirRed, m_nDirGreen, m_nDirBlue);
+                    TimeCycColorEdit3(TEXT("Visual.CloudsBottom"), m_nBottomCloudsRed, m_nBottomCloudsGreen, m_nBottomCloudsBlue);
+                    TimeCycColorEdit3(TEXT("Visual.CloudsLow"), m_nLowCloudsRed, m_nLowCloudsGreen, m_nLowCloudsBlue);
+                    TimeCycColorEdit3(TEXT("Visual.CloudsTop"), m_nTopCloudsRed, m_nTopCloudsGreen, m_nTopCloudsBlue);
+                    TimeCycColorEdit3(TEXT("Visual.DirectionalLight"), m_nDirRed, m_nDirGreen, m_nDirBlue);
 #endif
 
 #ifdef GTASA
-                    TimeCycColorEdit4("PostFx 1", m_fPostFx1Red, m_fPostFx1Green, m_fPostFx1Blue, m_fPostFx1Alpha);
-                    TimeCycColorEdit4("PostFx 2", m_fPostFx2Red, m_fPostFx2Green, m_fPostFx2Blue, m_fPostFx1Alpha);
+                    TimeCycColorEdit4(TEXT("Visual.PostFX1"), m_fPostFx1Red, m_fPostFx1Green, m_fPostFx1Blue, m_fPostFx1Alpha);
+                    TimeCycColorEdit4(TEXT("Visual.PostFX2"), m_fPostFx2Red, m_fPostFx2Green, m_fPostFx2Blue, m_fPostFx1Alpha);
 #elif GTA3
-                    TimeCycColorEdit4("PostFx", m_fPostFxRed, m_fPostFxGreen, m_fPostFxBlue, m_fPostFxAlpha);
+                    TimeCycColorEdit4(TEXT("Visual.PostFX1"), m_fPostFxRed, m_fPostFxGreen, m_fPostFxBlue, m_fPostFxAlpha);
 #endif
 
-                    TimeCycColorEdit3("Sky bottom", m_nSkyBottomRed, m_nSkyBottomGreen, m_nSkyBottomBlue);
-                    TimeCycColorEdit3("Sun core", m_nSunCoreRed, m_nSunCoreGreen, m_nSunCoreBlue);
-                    TimeCycColorEdit3("Sun corona", m_nSunCoronaRed, m_nSunCoronaGreen, m_nSunCoronaBlue);
-                    TimeCycColorEdit3("Sky top", m_nSkyTopRed, m_nSkyTopGreen, m_nSkyTopBlue);
+                    TimeCycColorEdit3(TEXT("Visual.SkyBottom"), m_nSkyBottomRed, m_nSkyBottomGreen, m_nSkyBottomBlue);
+                    TimeCycColorEdit3(TEXT("Visual.SunCore"), m_nSunCoreRed, m_nSunCoreGreen, m_nSunCoreBlue);
+                    TimeCycColorEdit3(TEXT("Visual.SunCorona"), m_nSunCoronaRed, m_nSunCoronaGreen, m_nSunCoronaBlue);
+                    TimeCycColorEdit3(TEXT("Visual.SkyTop"), m_nSkyTopRed, m_nSkyTopGreen, m_nSkyTopBlue);
 
 #ifndef GTA3
-                    TimeCycColorEdit4("Water", m_fWaterRed, m_fWaterGreen, m_fWaterBlue, m_fWaterAlpha);
+                    TimeCycColorEdit4(TEXT("Visual.Water"), m_fWaterRed, m_fWaterGreen, m_fWaterBlue, m_fWaterAlpha);
 #endif
                     ImGui::EndChild();
                     ImGui::EndTabItem();
@@ -730,31 +736,31 @@ void Visual::ShowPage()
                     ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 2);
 
 #ifdef GTASA
-                    TimecycSlider("Cloud alpha", m_fCloudAlpha, 0, 255);
-                    TimecycSlider("Directional mult", m_nDirectionalMult, 0, 255);
+                    TimecycSlider(TEXT("Visual.CloudAlpha"), m_fCloudAlpha, 0, 255);
+                    TimecycSlider(TEXT("Visual.DirectionalMult"), m_nDirectionalMult, 0, 255);
 #endif
-                    TimecycSlider("Far clip", m_fFarClip, 0, 5000);
-                    TimecycSlider("Fog start", m_fFogStart, 0, 5000);
+                    TimecycSlider(TEXT("Visual.FarClip"), m_fFarClip, 0, 5000);
+                    TimecycSlider(TEXT("Visual.FogStart"), m_fFogStart, 0, 5000);
 #ifdef GTASA
-                    TimecycSlider("High light min intensity", m_nHighLightMinIntensity, 0, 255);
+                    TimecycSlider(TEXT("Visual.LightIntensity"), m_nHighLightMinIntensity, 0, 255);
 #endif
-                    TimecycSlider("Light on ground brightness", m_fLightsOnGroundBrightness, 0, 255);
-                    TimecycSlider("Light shadow strength", m_nLightShadowStrength, 0, 255);
+                    TimecycSlider(TEXT("Visual.LightBrightness"), m_fLightsOnGroundBrightness, 0, 255);
+                    TimecycSlider(TEXT("Visual.LightShadowStrength"), m_nLightShadowStrength, 0, 255);
 
 #ifndef GTA3
-                    TimecycSlider("Pole shadow strength", m_nPoleShadowStrength, 0, 255);
+                    TimecycSlider(TEXT("Visual.PoleShadowStrength"), m_nPoleShadowStrength, 0, 255);
 #endif
-                    TimecycSlider("Shadow strength", m_nShadowStrength, 0, 255);
-                    TimecycSlider("Sprite brightness", m_fSpriteBrightness, 0, 127);
-                    TimecycSlider("Sprite size", m_fSpriteSize, 0, 127);
-                    TimecycSlider("Sun size", m_fSunSize, 0, 127);
+                    TimecycSlider(TEXT("Visual.ShadowStrength"), m_nShadowStrength, 0, 255);
+                    TimecycSlider(TEXT("Visual.SpriteBrightness"), m_fSpriteBrightness, 0, 127);
+                    TimecycSlider(TEXT("Visual.SpriteSize"), m_fSpriteSize, 0, 127);
+                    TimecycSlider(TEXT("Visual.SunSize"), m_fSunSize, 0, 127);
 
 #ifdef GTA3
-                    TimecycSlider("Tree shadow strength", m_nTreeShadowStrength, 0, 255);
+                    TimecycSlider(TEXT("Visual.TreeShadowStrength"), m_nTreeShadowStrength, 0, 255);
 #endif
 
 #ifdef GTASA
-                    TimecycSlider("Water fog alpha", m_nWaterFogAlpha, 0, 255);
+                    TimecycSlider(TEXT("Visual.WaterFogAlpha"), m_nWaterFogAlpha, 0, 255);
 #endif
                     ImGui::PopItemWidth();
 
