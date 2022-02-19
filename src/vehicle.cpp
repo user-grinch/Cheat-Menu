@@ -106,7 +106,6 @@ Vehicle::Vehicle()
             }
 
 #ifdef GTASA
-            pPlayer->m_nPedFlags.CantBeKnockedOffBike = m_bDontFallBike ? 1 : 2;
 
             if (m_UnlimitedNitro::m_bEnabled
                     && BY_GAME(pVeh->m_nVehicleSubClass, pVeh->m_nVehicleClass, NULL) == VEHICLE_AUTOMOBILE)
@@ -613,10 +612,30 @@ void Vehicle::ShowPage()
             // }
 #endif
             ImGui::NextColumn();
-#ifdef GTASA
-            Ui::CheckboxWithHint("Don't fall off bike", &m_bDontFallBike);
-#endif
 #ifndef GTA3
+            if (Ui::CheckboxWithHint("Don't fall off bike", &m_bDontFallBike))
+            {
+                if (m_bDontFallBike)
+                {
+#ifdef GTASA
+                    pPlayer->m_nPedFlags.CantBeKnockedOffBike = 1;
+#elif GTAVC
+                    
+                    patch::SetRaw(0x614C4E, (void*)"\x8B\x8D\x00\x00\x00\x00", 6);
+                    patch::SetRaw(0x614CC5, (void*)"\x8B\x85\x00\x00\x00\x00", 6);
+#endif
+                }
+                else
+                {
+#ifdef GTASA
+                    pPlayer->m_nPedFlags.CantBeKnockedOffBike = 2;
+#elif GTAVC
+                    
+                    patch::SetRaw(0x614C4E, (void*)"\x8B\x8D\xA8\x01\x00\x00", 6);
+                    patch::SetRaw(0x614CC5, (void*)"\x8B\x85\xAC\x01\x00\x00", 6);
+#endif
+                }
+            }
             Ui::CheckboxAddress("Drive on water", BY_GAME(0x969152, 0xA10B81, NULL));
 #endif
 #ifdef GTASA

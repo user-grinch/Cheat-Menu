@@ -69,5 +69,5 @@ public:
 
         index is the index of the language in the GetLocaleList() list
     */
-    static eReturnCodes SetLocale(int index);
+    static eReturnCodes SetLocale(size_t index);
 };

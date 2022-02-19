@@ -88,7 +88,7 @@ size_t Locale::GetCurrentLocaleIndex()
     return localeIndex;
 }
 
-Locale::eReturnCodes Locale::SetLocale(int index)
+Locale::eReturnCodes Locale::SetLocale(size_t index)
 {
     if(m_pJson)
     {
