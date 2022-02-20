@@ -104,7 +104,7 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
         }
         CEntity* pPlayerEntity = FindPlayerEntity(-1);
         pos = targetBlip.m_vPosition;
-        pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, nullptr, &pPlayerEntity) + 50.f;
+        pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, nullptr, &pPlayerEntity) + 500.f;
 
         m_Teleport::m_fPos = pos;
         m_Teleport::m_nTimer = CTimer::m_snTimeInMilliseconds;
@@ -123,11 +123,6 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
     CStreaming::LoadAllRequestedModels(false);
 
 #ifdef GTASA
-
-    if (CModelInfo::IsTrainModel(pVeh->m_nModelIndex))
-    {
-
-    }
 
     if (pVeh && pPlayer->m_nPedFlags.bInVehicle)
     {
