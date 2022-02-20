@@ -5,9 +5,21 @@
 
 void MenuThread(void* param)
 {
-    // wait for game init
-    Sleep(3000);
+    /* 
+        Wait for game init
+        // Sleep(3000);
+        Doing it like this doesn't prevent from attaching a debugger
+    */ 
+    static bool gameStarted = false;
+    Events::processScriptsEvent +=[]{
+        gameStarted = true;
+    };
 
+    while (!gameStarted)
+    {
+        Sleep(500);
+    }
+    
     /*
     	Had to put this in place since some people put the folder in root
     	directory and the asi in modloader. Why??
@@ -15,7 +27,7 @@ void MenuThread(void* param)
     if (!std::filesystem::is_directory(PLUGIN_PATH((char*)"CheatMenu")))
     {
         gLog << "Error: CheatMenu folder not found. You need to put both \"CheatMenu.asi\" & \"CheatMenu\" folder in the same directory" << std::endl;
-        MessageBox(RsGlobal.ps->window, "CheatMenu folder not found. You need to put both \"CheatMenu.asi\" & \"CheatMenu\" folder in the same directory", "CheatMenu", MB_ICONERROR);
+        MessageBox(NULL, "CheatMenu folder not found. You need to put both \"CheatMenu.asi\" & \"CheatMenu\" folder in the same directory", "CheatMenu", MB_ICONERROR);
         return;
     }
 
@@ -26,7 +38,7 @@ void MenuThread(void* param)
     if (!GetModuleHandle(BY_GAME("SilentPatchSA.asi","SilentPatchVC.asi","SilentPatchIII.asi")))
     {
         gLog << "Error: SilentPatch not found. Please install it from here https://gtaforums.com/topic/669045-silentpatch/" << std::endl;
-        int msgID = MessageBox(RsGlobal.ps->window, "SilentPatch not found. Do you want to install Silent Patch? (Game restart required)", "CheatMenu", MB_OKCANCEL | MB_DEFBUTTON1);
+        int msgID = MessageBox(NULL, "SilentPatch not found. Do you want to install Silent Patch? (Game restart required)", "CheatMenu", MB_OKCANCEL | MB_DEFBUTTON1);
 
         if (msgID == IDOK)
         {
@@ -43,7 +55,7 @@ void MenuThread(void* param)
     if (GetModuleHandle("SAMP.dll") || GetModuleHandle("SAMP.asi"))
     {
         gLog << "Error: CheatMenu doesn't support SAMP" << std::endl;
-        MessageBox(RsGlobal.ps->window, "SAMP detected. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
+        MessageBox(NULL, "SAMP detected. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
         return;
     }
     CFastman92limitAdjuster::Init();
@@ -51,7 +63,7 @@ void MenuThread(void* param)
     if (GetModuleHandle("vcmp-proxy.dll") || GetModuleHandle("vcmp-proxy.asi"))
     {
         gLog << "Error: CheatMenu doesn't support VCMP" << std::endl;
-        MessageBox(RsGlobal.ps->window, "VCMP detected. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
+        MessageBox(NULL, "VCMP detected. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
         return;
     }
 #endif

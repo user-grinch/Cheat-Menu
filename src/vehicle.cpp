@@ -88,6 +88,7 @@ Vehicle::Vehicle()
                 pVeh->m_nFlags.bFireProof = true;
                 pVeh->m_nFlags.bCollisionProof = true;
                 pVeh->m_nFlags.bMeleeProof = true;
+                pVeh->m_nFlags.bImmuneToNonPlayerDamage = true;
 #else
                 pVeh->m_nEntityFlags.bBulletProof = true;
                 pVeh->m_nEntityFlags.bExplosionProof = true;
@@ -576,6 +577,7 @@ void Vehicle::ShowPage()
                     pVeh->m_nFlags.bFireProof = false;
                     pVeh->m_nFlags.bCollisionProof = false;
                     pVeh->m_nFlags.bMeleeProof = false;
+                    pVeh->m_nFlags.bImmuneToNonPlayerDamage = false;
 #else
                     pVeh->m_nEntityFlags.bBulletProof = false;
                     pVeh->m_nEntityFlags.bExplosionProof = false;

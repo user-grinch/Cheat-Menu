@@ -574,33 +574,33 @@ void Visual::ShowPage()
                 {
                     {TEXT("Visual.NoOutline"), 0}, {TEXT("Visual.ThinOutline"), 1}, {TEXT("Visual.DefaultOutline"), 2}
                 };
-                Ui::EditRadioButtonAddressEx(TEXT("MoneyFontOutline"), 0x58F58D, font_outline);
+                Ui::EditRadioButtonAddressEx(TEXT("Visual.MoneyFontOutline"), 0x58F58D, font_outline);
                 static std::vector<Ui::NamedValue> style
                 { 
-                    {TEXT("Style1"), 1}, {TEXT("Style2"), 2}, {TEXT("DefaultStyle"), 3} 
+                    {TEXT("Visual.Style1"), 1}, {TEXT("Visual.Style2"), 2}, {TEXT("Visual.DefaultStyle"), 3} 
                 };
-                Ui::EditRadioButtonAddressEx(TEXT("MoneyFontStyle"), 0x58F57F, style);
-                Ui::EditAddress<float>(TEXT("RadarHeight"), *(int*)0x5834F6, 0, 76, 999);
-                Ui::EditAddress<float>(TEXT("RadarWidth"), *(int*)0x5834C2, 0, 94, 999);
-                Ui::EditAddress<float>(TEXT("RadarPosX"), *(int*)0x5834D4, -999, 40, 999);
-                Ui::EditAddress<float>(TEXT("RadarPosY"), *(int*)0x583500, -999, 104, 999);
-                Ui::EditAddress<int>(TEXT("RadarZoom"), 0xA444A3, 0, 0, 170);
-                Ui::ColorPickerAddress(TEXT("RadioStationColor"), 0xBAB24C, ImVec4(150, 150, 150, 255));
+                Ui::EditRadioButtonAddressEx(TEXT("Visual.MoneyFontStyle"), 0x58F57F, style);
+                Ui::EditAddress<float>(TEXT("Visual.RadarHeight"), *(int*)0x5834F6, 0, 76, 999);
+                Ui::EditAddress<float>(TEXT("Visual.RadarWidth"), *(int*)0x5834C2, 0, 94, 999);
+                Ui::EditAddress<float>(TEXT("Visual.RadarPosX"), *(int*)0x5834D4, -999, 40, 999);
+                Ui::EditAddress<float>(TEXT("Visual.RadarPosY"), *(int*)0x583500, -999, 104, 999);
+                Ui::EditAddress<int>(TEXT("Visual.RadarZoom"), 0xA444A3, 0, 0, 170);
+                Ui::ColorPickerAddress(TEXT("Visual.RadioStationColor"), 0xBAB24C, ImVec4(150, 150, 150, 255));
                 static std::vector<Ui::NamedValue> star_border
                 { 
-                    {TEXT("NoBorder"), 0}, {TEXT("DefaultBorder"), 1}, {TEXT("BoldBorder"), 2} 
+                    {TEXT("Visual.NoBorder"), 0}, {TEXT("Visual.DefaultBorder"), 1}, {TEXT("Visual.BoldBorder"), 2} 
                 };
-                Ui::EditRadioButtonAddressEx(TEXT("WantedStarBorder"), 0x58DD41, star_border);
-                Ui::EditAddress<float>(TEXT("WantedPosX"), *(int*)0x58DD0F, -999, 29, 999);
-                Ui::EditAddress<float>(TEXT("WantedPosY"), *(int*)0x58DDFC, -999, 114, 999);
-                Ui::EditAddress<float>(TEXT("WeaponAmmoPosX"), *(int*)0x58FA02, -999, 32, 999);
-                Ui::EditAddress<float>(TEXT("WeaponAmmoPosY"), *(int*)0x58F9E6, -999, 43, 999);
-                Ui::EditAddress<float>(TEXT("WeaponIconPosX"), *(int*)0x58F927, -999, 32, 999);
-                Ui::EditAddress<float>(TEXT("WeaponIconPosY"), *(int*)0x58F913, -999, 20, 999);
+                Ui::EditRadioButtonAddressEx(TEXT("Visual.WantedStarBorder"), 0x58DD41, star_border);
+                Ui::EditAddress<float>(TEXT("Visual.WantedPosX"), *(int*)0x58DD0F, -999, 29, 999);
+                Ui::EditAddress<float>(TEXT("Visual.WantedPosY"), *(int*)0x58DDFC, -999, 114, 999);
+                Ui::EditAddress<float>(TEXT("Visual.WeaponAmmoPosX"), *(int*)0x58FA02, -999, 32, 999);
+                Ui::EditAddress<float>(TEXT("Visual.WeaponAmmoPosY"), *(int*)0x58F9E6, -999, 43, 999);
+                Ui::EditAddress<float>(TEXT("Visual.WeaponIconPosX"), *(int*)0x58F927, -999, 32, 999);
+                Ui::EditAddress<float>(TEXT("Visual.WeaponIconPosY"), *(int*)0x58F913, -999, 20, 999);
 #elif GTAVC
-                Ui::EditAddress<float>(TEXT("RadarPosX"), 0x68FD2C, -999, 40, 999);
-                Ui::EditAddress<float>(TEXT("RadarPosY"), 0x68FD34, -999, 104, 999);
-                Ui::EditAddress<BYTE>(TEXT("RadarWidth"), 0x68FD28, -999, 20, 999);
+                Ui::EditAddress<float>(TEXT("Visual.RadarPosX"), 0x68FD2C, -999, 40, 999);
+                Ui::EditAddress<float>(TEXT("Visual.RadarPosY"), 0x68FD34, -999, 104, 999);
+                Ui::EditAddress<BYTE>(TEXT("Visual.RadarWidth"), 0x68FD28, -999, 20, 999);
 #endif
 
                 ImGui::EndChild();
