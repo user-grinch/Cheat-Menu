@@ -57,7 +57,9 @@ public:
     static inline ResourceStore m_PedData {"ped", eResourceType::TYPE_TEXT};
 #endif
 
-    Ped();
-    ~Ped();
+    Ped() = delete;
+    Ped(const Ped&) = delete;
+
+    static void Init();
     static void ShowPage();
 };

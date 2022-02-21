@@ -62,7 +62,9 @@ public:
     static inline bool m_bFreezeTime;
     static inline bool m_bSyncTime;
 
-    Game();
-    static void ShowPage();
+    Game() = delete;
+    Game(const Game&) = delete;
 
+    static void Init();
+    static void ShowPage();
 };

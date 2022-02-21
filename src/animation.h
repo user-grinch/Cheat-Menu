@@ -57,6 +57,9 @@ private:
 #endif
 
 public:
-    Animation();
+    Animation() = delete;
+    Animation(const Animation&) = delete;
+
+    static void Init();
     static void ShowPage();
 };

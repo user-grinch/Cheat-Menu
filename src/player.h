@@ -21,7 +21,6 @@ private:
     static inline ResourceStore m_ClothData { "clothes", eResourceType::TYPE_IMAGE, ImVec2(70, 100)};
     struct m_CustomSkins
     {
-        static inline std::string m_Path = paths::GetGameDirPathA() + std::string("\\modloader\\Custom Skins\\");;
         static inline ImGuiTextFilter m_Filter;
         static inline std::vector<std::string> m_List;
     };
@@ -52,6 +51,9 @@ private:
 #endif
 
 public:
-    Player();
+    Player() = delete;
+    Player(const Player&) = delete;
+
+    static void Init();
     static void ShowPage();
 };

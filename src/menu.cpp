@@ -12,7 +12,7 @@
 #include "vehicle.h"
 #endif
 
-Menu::Menu()
+void Menu::Init()
 {
     // TODO: use structs
     // Load config data

@@ -52,6 +52,9 @@ public:
     static void GiveWeaponToPlayer(std::string& rootkey, std::string& model, std::string& name);
 #endif
 
-    Weapon();
+    Weapon() = delete;
+    Weapon(const Weapon&) = delete;
+
+    static void Init();
     static void ShowPage();
 };

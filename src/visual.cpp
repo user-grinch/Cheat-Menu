@@ -17,7 +17,7 @@
 #define TOTAL_WEATHERS 4
 #endif
 
-Visual::Visual()
+void Visual::Init()
 {
 #ifdef GTASA
     if (GetModuleHandle("timecycle24.asi"))

@@ -40,6 +40,9 @@ private:
     static void TimecycSlider(const char* label, T* data, int min, int max);
 
 public:
-    Visual();
+    Visual() = delete;
+    Visual(const Visual&) = delete;
+
+    static void Init();
     static void ShowPage();
 };

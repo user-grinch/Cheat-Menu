@@ -82,7 +82,7 @@ void Player::TopDownCameraView()
 }
 #endif
 
-Player::Player()
+void Player::Init()
 {
 #ifdef GTASA
 //	Fix player model being broken after rebuild
@@ -91,27 +91,33 @@ Player::Player()
 #endif
 
     // Custom skins setup
-    if (GetModuleHandle("modloader.asi"))
+    std::string path = GAME_PATH((char*)"modloader/");
+    if (GetModuleHandle("modloader.asi") && std::filesystem::is_directory(path))
     {
 #ifdef GTASA
-        if (std::filesystem::is_directory(m_CustomSkins::m_Path))
+        path += "CustomSkins/";
+        if (std::filesystem::is_directory(path))
         {
-            for (auto& p : std::filesystem::recursive_directory_iterator(m_CustomSkins::m_Path))
+            for (auto& p : std::filesystem::recursive_directory_iterator(path))
             {
                 if (p.path().extension() == ".dff")
                 {
                     std::string file_name = p.path().stem().string();
 
                     if (file_name.size() < 9)
+                    {
                         m_CustomSkins::m_List.push_back(file_name);
+                    }
                     else
+                    {
                         gLog << "Custom Skin longer than 8 characters " << file_name << std::endl;
+                    }
                 }
             }
         }
         else
         {
-            std::filesystem::create_directory(m_CustomSkins::m_Path);
+            std::filesystem::create_directory(path);
         }
 #endif
 
@@ -805,7 +811,7 @@ void Player::ShowPage()
                         Ui::FilterWithHint("Search", m_ClothData.m_Filter,
                                            std::string("Total skins: " + std::to_string(m_CustomSkins::m_List.size()))
                                            .c_str());
-                        Ui::ShowTooltip("Place your dff & txd files inside 'modloader/Custom Skins'");
+                        Ui::ShowTooltip("Place your dff & txd files inside 'modloader/CustomSkins'");
                         ImGui::Spacing();
                         ImGui::TextWrapped(
                             "Note: Your txd & dff names can't exceed 8 characters. Don't change names while the game is running.");
@@ -827,7 +833,7 @@ void Player::ShowPage()
                             "Custom skin allows to change player skins without replacing any existing game ped skins.\n\
 Steps to enable 'Custom Skins',\n\n\
 1. Download & install modloader\n\
-2. Create a folder inside 'modloader' folder with the name 'Custom Skins'\n\
+2. Create a folder inside 'modloader' folder with the name 'CustomSkins'\n\
 3. Download ped skins online ( .dff & .txd files) and put them inside.\n\
 4. Restart your game.\n\n\n\
 Limitations:\n\

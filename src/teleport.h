@@ -1,5 +1,4 @@
 #pragma once
-#include <vector>
 #include "pch.h"
 
 class Teleport
@@ -36,8 +35,10 @@ private:
     static void RemoveTeleportEntry(std::string& rootkey, std::string& key, std::string& val);
 
 public:
-    Teleport();
+    Teleport() = delete;
+    Teleport(const Teleport&) = delete;
 
+    static void Init();
     static void TeleportPlayer(bool get_marker = false, CVector pos = CVector(0, 0, 0), int interior_id = 0);
     static void ShowPage();
 };

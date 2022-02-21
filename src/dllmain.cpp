@@ -71,7 +71,7 @@ void MenuThread(void* param)
     gLog << "Starting...\nVersion: " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: "
          GITHUB_LINK "\n" << std::endl;
 
-    CheatMenu menu;
+    CheatMenu::Init();
 
     // Checking for updates once a day
     SYSTEMTIME st;

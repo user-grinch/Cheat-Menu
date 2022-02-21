@@ -90,13 +90,16 @@ private:
 #endif
 
 public:
-    Vehicle();
-    ~Vehicle();
+    Vehicle() = delete;
+    Vehicle(const Vehicle&) = delete;
+
 #ifdef GTASA
     static void SpawnVehicle(std::string& name);
 #else
     static void SpawnVehicle(std::string& rootkey, std::string& vehName, std::string& model);
 #endif
+
+    static void Init();
     static std::string GetNameFromModel(int model);
     static int GetModelFromName(const char* name);
     static void ShowPage();

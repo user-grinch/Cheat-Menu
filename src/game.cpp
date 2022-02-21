@@ -34,7 +34,7 @@ void Game::RealTimeClock()
     CClock::ms_nGameClockSeconds = now->tm_sec;
 }
 
-Game::Game()
+void Game::Init()
 {
 #ifdef GTASA
     // Generate enabled cheats vector

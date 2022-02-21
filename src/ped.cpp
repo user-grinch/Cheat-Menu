@@ -9,7 +9,7 @@
 #include <ePedBones.h>
 #endif
 
-Ped::Ped()
+void Ped::Init()
 {
 #ifdef GTASA
     if (GetModuleHandle("ExGangWars.asi"))
@@ -50,15 +50,6 @@ Ped::Ped()
         }
     };
 #endif
-}
-
-Ped::~Ped()
-{
-    for (CPed* ped : m_SpawnPed::m_List)
-    {
-        CWorld::Remove(ped);
-        ped->Remove();
-    }
 }
 
 #ifdef GTASA

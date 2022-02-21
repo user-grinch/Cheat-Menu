@@ -221,10 +221,10 @@ void Animation::PlayAnimation(std::string& ifp, std::string& anim, std::string& 
 #endif
 }
 
-Animation::Animation()
+void Animation::Init()
 {
 #ifdef GTASA
-    Events::processScriptsEvent += [this]
+    Events::processScriptsEvent += []
     {
         CPlayerPed* pPlayer = FindPlayerPed();
         if (m_Cutscene::m_bRunning)

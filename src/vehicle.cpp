@@ -14,7 +14,7 @@
 #include "paint.h"
 #endif
 
-Vehicle::Vehicle()
+void Vehicle::Init()
 {
 #ifdef GTASA
     FileHandler::FetchHandlingID(m_VehicleIDE);
@@ -24,7 +24,7 @@ Vehicle::Vehicle()
 
     FileHandler::FetchColorData(m_CarcolsColorData);
 
-    Events::processScriptsEvent += [this]
+    Events::processScriptsEvent += []
     {
         uint timer = CTimer::m_snTimeInMilliseconds;
         CPlayerPed* pPlayer = FindPlayerPed();
@@ -190,13 +190,6 @@ Vehicle::Vehicle()
         }
 #endif
     };
-}
-
-Vehicle::~Vehicle()
-{
-#ifdef GTASA
-    Neon::RemoveHooks();
-#endif
 }
 
 #ifdef GTASA

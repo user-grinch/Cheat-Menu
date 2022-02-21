@@ -40,7 +40,7 @@ void Teleport::FetchRadarSpriteData()
 }
 #endif
 
-Teleport::Teleport()
+void Teleport::Init()
 {
     m_bQuickTeleport = gConfig.GetValue("quick_teleport", false);
 

@@ -1,11 +1,21 @@
 #include "pch.h"
-#include "cheatMenu.h"
 #include "version.h"
 #include "ui.h"
 #include "updater.h"
 #include "d3dhook.h"
 #include "../depend/imgui/imgui_internal.h"
 #include "util.h"
+
+#include "animation.h"
+#include "cheatmenu.h"
+#include "game.h"
+#include "menu.h"
+#include "ped.h"
+#include "player.h"
+#include "teleport.h"
+#include "vehicle.h"
+#include "visual.h"
+#include "weapon.h"
 
 void CheatMenu::DrawWindow()
 {
@@ -24,7 +34,7 @@ void CheatMenu::DrawWindow()
     else
     {
         bRunning = true;
-        if (m_bShowMenu || BY_GAME(m_Commands::m_bShowMenu, true, true))
+        if (m_bShowMenu || BY_GAME(Menu::m_Commands::m_bShowMenu, true, true))
         {
             if (m_bShowMenu)
             {
@@ -54,12 +64,12 @@ void CheatMenu::DrawWindow()
 #ifdef GTASA
             else
             {
-                DrawShortcutsWindow();
+                Menu::DrawShortcutsWindow();
             }
 #endif
         }
     }
-    DrawOverlay();
+    Menu::DrawOverlay();
 }
 
 void CheatMenu::ProcessPages()
@@ -164,7 +174,7 @@ void CheatMenu::ProcessPages()
     }
 }
 
-CheatMenu::CheatMenu()
+void CheatMenu::Init()
 {
     if (!D3dHook::InjectHook(DrawWindow))
     {
@@ -197,6 +207,17 @@ CheatMenu::CheatMenu()
         {"Anniversary", &ShowAnniversaryPage, eMenuPages::ANNIVERSARY, true}
     };
 
+    // Init menu parts
+    Animation::Init();
+    Game::Init();
+    Menu::Init();
+    Player::Init();
+    Ped::Init();
+    Teleport::Init();
+    Vehicle::Init();
+    Visual::Init();
+    Weapon::Init();
+
     Events::processScriptsEvent += []()
     {
         if (!BY_GAME(FrontEndMenuManager.m_bMenuActive, FrontendMenuManager.m_bMenuVisible, FrontEndMenuManager.m_bMenuActive))
@@ -208,12 +229,12 @@ CheatMenu::CheatMenu()
 
             if (commandWindow.Pressed())
             {
-                if (m_Commands::m_bShowMenu)
+                if (Menu::m_Commands::m_bShowMenu)
                 {
-                    ProcessCommands();
-                    strcpy(m_Commands::m_nInputBuffer, "");
+                    Menu::ProcessCommands();
+                    strcpy(Menu::m_Commands::m_nInputBuffer, "");
                 }
-                m_Commands::m_bShowMenu = !m_Commands::m_bShowMenu;
+                Menu::m_Commands::m_bShowMenu = !Menu::m_Commands::m_bShowMenu;
             }
 
             bool mouseState = D3dHook::GetMouseState();
@@ -228,11 +249,6 @@ CheatMenu::CheatMenu()
             }
         }
     };
-}
-
-CheatMenu::~CheatMenu()
-{
-    D3dHook::RemoveHook();
 }
 
 /*

@@ -45,7 +45,10 @@ public:
         static inline char m_nInputBuffer[INPUT_BUFFER_SIZE] = "";
     };
 
-    Menu();
+    Menu() = delete;
+    Menu(const Menu&) = delete;
+
+    static void Init();
     static void ShowPage();
     static void DrawOverlay();
     static void DrawShortcutsWindow();

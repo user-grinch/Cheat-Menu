@@ -9,17 +9,9 @@
 */
 
 #pragma once
-#include "animation.h"
-#include "game.h"
-#include "menu.h"
-#include "ped.h"
-#include "player.h"
-#include "teleport.h"
-#include "vehicle.h"
-#include "visual.h"
-#include "weapon.h"
+#include "pch.h"
 
-class CheatMenu : Animation, Game, Menu, Ped, Player, Teleport, Vehicle, Visual, Weapon
+class CheatMenu
 {
 private:
     enum class eMenuPages
@@ -48,8 +40,9 @@ private:
     static void ProcessPages();
 
 public:
-    CheatMenu();
-    ~CheatMenu();
+    CheatMenu() = delete;
+    CheatMenu(const CheatMenu&) = delete;
 
+    static void Init();
     static void ResetMenuSize();
 };

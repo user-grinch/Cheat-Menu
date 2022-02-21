@@ -4,7 +4,7 @@
 #include "util.h"
 #include "CWeaponInfo.h"
 
-Weapon::Weapon()
+void Weapon::Init()
 {
     Events::processScriptsEvent += []
     {
