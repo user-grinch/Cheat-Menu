@@ -231,7 +231,7 @@ void Weapon::ShowPage()
     uint hplayer = CPools::GetPedRef(pPlayer);
 
     ImGui::Spacing();
-    if (ImGui::Button("Drop weapon", Ui::GetSize(3)))
+    if (ImGui::Button(TEXT("Weapon.DropWeapon"), Ui::GetSize(3)))
     {
         float x, y, z;
         Command<Commands::GET_OFFSET_FROM_CHAR_IN_WORLD_COORDS>(hplayer, 0.0, 3.0, 0.0, &x, &y, &z);
@@ -260,13 +260,13 @@ void Weapon::ShowPage()
         }
     }
     ImGui::SameLine();
-    if (ImGui::Button("Remove all", Ui::GetSize(3)))
+    if (ImGui::Button(TEXT("Weapon.DropAll"), Ui::GetSize(3)))
     {
         pPlayer->ClearWeapons();
     }
 
     ImGui::SameLine();
-    if (ImGui::Button("Remove current", Ui::GetSize(3)))
+    if (ImGui::Button(TEXT("Weapon.DropCurrent"), Ui::GetSize(3)))
     {
 #ifdef GTASA
         Command<Commands::REMOVE_WEAPON_FROM_CHAR>(hplayer, pPlayer->m_aWeapons[pPlayer->m_nActiveWeaponSlot].m_nType);
@@ -280,19 +280,18 @@ void Weapon::ShowPage()
 
     if (ImGui::BeginTabBar("Ped", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {
-        if (ImGui::BeginTabItem("Checkboxes"))
+        if (ImGui::BeginTabItem(TEXT("Window.CheckboxTab")))
         {
             ImGui::Spacing();
             ImGui::BeginChild("CheckboxesChild");
             ImGui::Spacing();
             ImGui::SameLine();
-            ImGui::Text("Info");
-            Ui::ShowTooltip("Weapon tweaks apply globally\nto every ped weapon type");
+            ImGui::Text(TEXT("Window.Info"));
+            Ui::ShowTooltip(TEXT("Weapon.WeaponTweaksText"));
             ImGui::Columns(2, 0, false);
 #ifdef GTASA
-            Ui::CheckboxWithHint("Fast aim", &m_bAutoAim, "Enables aim assist on keyboard\n\nQ = left    E = right\n\nPress Q and E to switch targets.\nMoving mouse removes the target!");
-            if (Ui::CheckboxWithHint("Dual wield", &m_bDualWeild,
-                                     "Dual wield pistol, shawoff, uzi, tec9\n(Other weapons don't work)"))
+            Ui::CheckboxWithHint(TEXT("Weapon.FastAim"), &m_bAutoAim, TEXT("Weapon.FastAimText"));
+            if (Ui::CheckboxWithHint(TEXT("Weapon.DualWeild"), &m_bDualWeild,TEXT("Weapon.DualWeildText")))
             {
                 if (!m_bDualWeild)
                 {
@@ -300,26 +299,26 @@ void Weapon::ShowPage()
                 }
             }
 #endif
-            if (Ui::CheckboxWithHint("Huge damage", &m_bHugeDamage, "Also enable 'Long range' if weapon range is short"))
+            if (Ui::CheckboxWithHint(TEXT("Weapon.HugeDamage"), &m_bHugeDamage, TEXT("Weapon.HugeDamageText")))
             {
                 if (!m_bHugeDamage)
                 {
                     CWeaponInfo::LoadWeaponData();
                 }
             }
-            if (Ui::CheckboxWithHint("Fast reload", &m_bFastReload))
+            if (Ui::CheckboxWithHint(TEXT("Weapon.FastReload"), &m_bFastReload))
             {
                 Command<Commands::SET_PLAYER_FAST_RELOAD>(hplayer, m_bFastReload);
             }
 
 #ifdef GTASA
-            Ui::CheckboxAddress("Infinite ammo", 0x969178);
+            Ui::CheckboxAddress(TEXT("Weapon.InfiniteAmmo"), 0x969178);
             ImGui::NextColumn();
 #else
             ImGui::NextColumn();
-            Ui::CheckboxWithHint("Infinite ammo", &m_bInfiniteAmmo);
+            Ui::CheckboxWithHint(TEXT("Weapon.InfiniteAmmo"), &m_bInfiniteAmmo);
 #endif
-            if (Ui::CheckboxWithHint("Long range", &m_bLongRange))
+            if (Ui::CheckboxWithHint(TEXT("Weapon.LongRange"), &m_bLongRange))
             {
                 if (!m_bLongRange)
                 {
@@ -327,21 +326,21 @@ void Weapon::ShowPage()
                 }
             }
 #ifdef GTASA
-            if (Ui::CheckboxWithHint("Move when aiming", &m_bMoveAim))
+            if (Ui::CheckboxWithHint(TEXT("Weapon.MoveWhenAiming"), &m_bMoveAim))
             {
                 if (!m_bMoveAim)
                 {
                     CWeaponInfo::LoadWeaponData();
                 }
             }
-            if (Ui::CheckboxWithHint("Move when firing", &m_bMoveFire))
+            if (Ui::CheckboxWithHint(TEXT("Weapon.MoveWhenFiring"), &m_bMoveFire))
             {
                 if (!m_bMoveFire)
                 {
                     CWeaponInfo::LoadWeaponData();
                 }
             }
-            if (Ui::CheckboxWithHint("Rapid fire", &m_bRapidFire))
+            if (Ui::CheckboxWithHint(TEXT("Weapon.RapidFire"), &m_bRapidFire))
             {
                 if (!m_bRapidFire)
                 {
@@ -353,10 +352,10 @@ void Weapon::ShowPage()
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem("Spawn"))
+        if (ImGui::BeginTabItem(TEXT("Window.SpawnTab")))
         {
             ImGui::Spacing();
-            if (ImGui::InputInt("Ammo", &m_nAmmoCount))
+            if (ImGui::InputInt(TEXT("Weapon.Ammo"), &m_nAmmoCount))
             {
                 m_nAmmoCount = (m_nAmmoCount < 0) ? 0 : m_nAmmoCount;
                 m_nAmmoCount = (m_nAmmoCount > 99999) ? 99999 : m_nAmmoCount;
@@ -378,21 +377,21 @@ void Weapon::ShowPage()
             ImGui::EndTabItem();
         }
 #ifdef GTASA
-        if (ImGui::BeginTabItem("Gang weapon editor"))
+        if (ImGui::BeginTabItem(TEXT("Weapon.GangWeaponEditor")))
         {
             ImGui::Spacing();
-            Ui::ListBox("Select gang", m_GangList, m_nSelectedGang);
+            Ui::ListBox(TEXT("Weapon.SelectGang"), m_GangList, m_nSelectedGang);
 
             ImGui::Columns(3, 0, false);
-            ImGui::RadioButton("Weap 1", &m_nSelectedWeapon, 0);
+            ImGui::RadioButton(TEXT("Weapon.Weapon1"), &m_nSelectedWeapon, 0);
             ImGui::NextColumn();
-            ImGui::RadioButton("Weap 2", &m_nSelectedWeapon, 1);
+            ImGui::RadioButton(TEXT("Weapon.Weapon2"), &m_nSelectedWeapon, 1);
             ImGui::NextColumn();
-            ImGui::RadioButton("Weap 3", &m_nSelectedWeapon, 2);
+            ImGui::RadioButton(TEXT("Weapon.Weapon3"), &m_nSelectedWeapon, 2);
             ImGui::Columns(1);
 
             ImGui::Spacing();
-            ImGui::Text("Current weapon: %s",
+            ImGui::Text(TEXT("Weapon.CurrentWeapon"),
                         m_WeaponData.m_pJson->m_Data[std::to_string(m_nGangWeaponList[m_nSelectedGang][m_nSelectedWeapon])].get<
                         std::string>().c_str());
             ImGui::Spacing();

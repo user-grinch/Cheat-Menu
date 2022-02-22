@@ -374,7 +374,11 @@ void Menu::ShowPage()
             {
                 if (Ui::ListBox(TEXT("Menu.Language"), vec, selected))
                 {
-                    if (Locale::SetLocale(selected) != Locale::eReturnCodes::SUCCESS)
+                    if (Locale::SetLocale(selected) == Locale::eReturnCodes::SUCCESS)
+                    {
+                        CheatMenu::GenHeaderList();
+                    }
+                    else
                     {
                         SetHelpMessage(TEXT("Menu.LanguageChangeFailed"));
                     }
