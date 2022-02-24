@@ -105,7 +105,7 @@ void Game::Init()
             if (quickSceenShot.Pressed())
             {
                 Command<Commands::TAKE_PHOTO>();
-                SetHelpMessage("Screenshot taken", false, false, false);
+                SetHelpMessage(TEXT("Game.ScreenshotTaken"));
             }
         }
 
@@ -219,7 +219,7 @@ void SetPlayerMission(std::string& rootkey, std::string& name, std::string& id)
     }
     else
     {
-        SetHelpMessage("Can't start mission now", false, false, false);
+        SetHelpMessage(TEXT("Game.MissionStartFailed"));
     }
 }
 
@@ -313,7 +313,7 @@ void Game::FreeCam()
         CHud::bScriptDontDisplayRadar = true;
 #endif
         CHud::m_Wants_To_Draw_Hud = false;
-        SetHelpMessage("Player telported", false, false, false);
+        SetHelpMessage(TEXT("Game.PlayerTeleported"));
     }
 
     if (KeyPressed(VK_RCONTROL))
@@ -420,7 +420,7 @@ void Game::ShowPage()
     int hplayer = CPools::GetPedRef(pPlayer);
 
 #ifdef GTASA
-    if (ImGui::Button("Save game (might cause game bugs)", Ui::GetSize()))
+    if (ImGui::Button(TEXT("Game.SaveGame"), Ui::GetSize()))
     {
         FrontEndMenuManager.m_bActivateMenuNextFrame = true;
         bSaveGameFlag = true;
@@ -430,11 +430,11 @@ void Game::ShowPage()
 
     if (ImGui::BeginTabBar("Game", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {
-        if (ImGui::BeginTabItem("Checkboxes"))
+        if (ImGui::BeginTabItem(TEXT("Windo.CheckboxTab")))
         {
             ImGui::Spacing();
             ImGui::Columns(2, nullptr, false);
-            if (ImGui::Checkbox("Disable cheats", &m_bDisableCheats))
+            if (ImGui::Checkbox(TEXT("Game.DsiableCheats"), &m_bDisableCheats))
             {
                 if (m_bDisableCheats)
                 {
@@ -465,7 +465,7 @@ void Game::ShowPage()
 #endif
                 }
             }
-            if (ImGui::Checkbox("Disable F1 & F3 replay", &m_bDisableReplay))
+            if (ImGui::Checkbox(TEXT("Game.DisableReplay"), &m_bDisableReplay))
             {
                 if (m_bDisableReplay)
                 {
@@ -477,10 +477,9 @@ void Game::ShowPage()
                 }
             }
 
-            Ui::CheckboxAddress("Faster clock", BY_GAME(0x96913B, 0xA10B87, 0x95CDBB));
+            Ui::CheckboxAddress(TEXT("Game.FasterClock"), BY_GAME(0x96913B, 0xA10B87, 0x95CDBB));
 #ifdef GTASA
-            if (Ui::CheckboxWithHint("Forbidden area wl", &m_bForbiddenArea, "Wanted levels that appears outside \
-of LS without completing missions"))
+            if (Ui::CheckboxWithHint(TEXT("Game.ForbiddenWantedLevel"), &m_bForbiddenArea, TEXT("Game.ForbiddenWantedLevelText")))
             {
                 if (m_bForbiddenArea)
                 {
@@ -491,16 +490,16 @@ of LS without completing missions"))
                     patch::Set<BYTE>(0x441770, 0xC3, false);
                 }
             }
-            Ui::CheckboxAddress("Free pay n spray", 0x96C009);
+            Ui::CheckboxAddress(TEXT("Game.FreePNS"), 0x96C009);
 #endif
 
 #ifdef GTAVC
             ImGui::NextColumn();
 #endif
 #ifdef GTASA
-            Ui::CheckboxAddress("Freeze game", 0xA10B48);
+            Ui::CheckboxAddress(TEXT("Game.FreezeGame"), 0xA10B48);
 #endif
-            if (ImGui::Checkbox("Freeze game time", &m_bFreezeTime))
+            if (ImGui::Checkbox(TEXT("Game.FreezeGameTime"), &m_bFreezeTime))
             {
                 if (m_bFreezeTime)
                 {
@@ -519,8 +518,7 @@ of LS without completing missions"))
             {
                 Command<Commands::FREEZE_ONSCREEN_TIMER>(m_bMissionTimer);
             }
-            if (Ui::CheckboxWithHint("Hard mode", &m_HardMode::m_bEnabled, "Makes the game more challanging to play. \n\
-Lowers armour, health, stamina etc."))
+            if (Ui::CheckboxWithHint(TEXT("Game.HardMode"), &m_HardMode::m_bEnabled, TEXT("Game.HardModeText")))
             {
                 CPlayerPed* player = FindPlayerPed();
 
@@ -550,18 +548,17 @@ Lowers armour, health, stamina etc."))
             }
 #ifdef GTASA
 
-            if (Ui::CheckboxWithHint("Keep stuff", &m_bKeepStuff, "Keep stuff after arrest/death"))
+            if (Ui::CheckboxWithHint(TEXT("Game.KeepStuff"), &m_bKeepStuff, TEXT("Game.KeepStuffText")))
             {
                 Command<Commands::SWITCH_ARREST_PENALTIES>(m_bKeepStuff);
                 Command<Commands::SWITCH_DEATH_PENALTIES>(m_bKeepStuff);
             }
-            Ui::CheckboxWithHint("Screenshot shortcut", &m_bScreenShot,
+            Ui::CheckboxWithHint(TEXT("Game.Screenshot"), &m_bScreenShot,
                                  (("Take screenshot using ") + quickSceenShot.GetNameString()
                                   + "\nSaved inside 'GTA San Andreas User Files\\Gallery'").c_str());
-            Ui::CheckboxWithHint("Solid water", &m_bSolidWater,
-                                 "Player can walk on water\nTurn this off if you want to swim.");
+            Ui::CheckboxWithHint(TEXT("Game.SolidWater"), &m_bSolidWater, TEXT("Game.SolidWaterText"));
 #endif
-            if (ImGui::Checkbox("Sync system time", &m_bSyncTime))
+            if (ImGui::Checkbox(TEXT("Game.SyncSystemTime"), &m_bSyncTime))
             {
                 if (m_bSyncTime)
                 {
@@ -576,13 +573,13 @@ Lowers armour, health, stamina etc."))
             ImGui::Columns(1);
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem("Menus"))
+        if (ImGui::BeginTabItem(TEXT("Game.MenusTab")))
         {
 #ifdef GTASA
-            if (ImGui::CollapsingHeader("Current day"))
+            if (ImGui::CollapsingHeader(TEXT("Game.CurrentDay")))
             {
                 int day = CClock::CurrentDay - 1;
-                if (Ui::ListBox("Select day", m_DayNames, day))
+                if (Ui::ListBox(TEXT("Game.SelectDay"), m_DayNames, day))
                 {
                     CClock::CurrentDay = day + 1;
                 }
@@ -591,13 +588,12 @@ Lowers armour, health, stamina etc."))
                 ImGui::Separator();
             }
 #endif
-            Ui::EditAddress<int>("Days passed", BY_GAME(0xB79038, 0x97F1F4, 0x8F2BB8), 0, 9999);
-            Ui::EditReference("FPS limit", BY_GAME(RsGlobal.frameLimit, RsGlobal.maxFPS, RsGlobal.maxFPS), 1, 30, 60);
+            Ui::EditAddress<int>(TEXT("Game.DaysPassed"), BY_GAME(0xB79038, 0x97F1F4, 0x8F2BB8), 0, 9999);
+            Ui::EditReference(("Game.FPSLimit"), BY_GAME(RsGlobal.frameLimit, RsGlobal.maxFPS, RsGlobal.maxFPS), 1, 30, 60);
 #ifdef GTASA
-            if (ImGui::CollapsingHeader("Free cam"))
+            if (ImGui::CollapsingHeader(TEXT("Game.Freecam")))
             {
-                if (Ui::CheckboxWithHint("Enable", &m_Freecam::m_bEnabled, "Forward: I\tBackward: K\
-\nLeft: J\t\t  Right: L\n\nSlower: RCtrl\tFaster: RShift\n\nZoom: Mouse wheel"))
+                if (Ui::CheckboxWithHint(TEXT("Game.Enable"), &m_Freecam::m_bEnabled, TEXT("Game.EnableText")))
                 {
                     if (!m_Freecam::m_bEnabled)
                     {
@@ -606,30 +602,30 @@ Lowers armour, health, stamina etc."))
                 }
                 ImGui::Spacing();
 
-                ImGui::SliderFloat("Field of view", &m_Freecam::m_fFOV, 5.0f, 120.0f);
-                ImGui::SliderInt("Movement Speed", &m_Freecam::m_nMul, 1, 10);
+                ImGui::SliderFloat(TEXT("Game.FieldOfView"), &m_Freecam::m_fFOV, 5.0f, 120.0f);
+                ImGui::SliderInt(TEXT("Game.Movement Speed"), &m_Freecam::m_nMul, 1, 10);
                 ImGui::Spacing();
-                ImGui::TextWrapped("Press Enter to teleport player to camera location");
+                ImGui::TextWrapped(TEXT("Game.FreecamTip"));
                 ImGui::Spacing();
                 ImGui::Separator();
             }
 #endif
-            Ui::EditReference("Game speed", CTimer::ms_fTimeScale, 1, 1, 10);
-            Ui::EditFloat("Gravity", BY_GAME(0x863984, 0x68F5F0, 0x5F68D4), -1.0f, 0.008f, 1.0f, 1.0f, 0.01f);
+            Ui::EditReference(TEXT("Game.GameSpeed"), CTimer::ms_fTimeScale, 1, 1, 10);
+            Ui::EditFloat(TEXT("Game.Gravity"), BY_GAME(0x863984, 0x68F5F0, 0x5F68D4), -1.0f, 0.008f, 1.0f, 1.0f, 0.01f);
 
-            if (ImGui::CollapsingHeader("Set time"))
+            if (ImGui::CollapsingHeader(TEXT("Game.SetTime")))
             {
                 int hour = CClock::ms_nGameClockHours;
                 int minute = CClock::ms_nGameClockMinutes;
 
-                if (ImGui::InputInt("Hour", &hour))
+                if (ImGui::InputInt(TEXT("Game.Hour"), &hour))
                 {
                     if (hour < 0) hour = 23;
                     if (hour > 23) hour = 0;
                     CClock::ms_nGameClockHours = hour;
                 }
 
-                if (ImGui::InputInt("Minute", &minute))
+                if (ImGui::InputInt(TEXT("Game.Minute"), &minute))
                 {
                     if (minute < 0) minute = 59;
                     if (minute > 59) minute = 0;
@@ -642,88 +638,88 @@ Lowers armour, health, stamina etc."))
 #ifdef GTASA
             static std::vector<Ui::NamedMemory> themes
             {
-                {"Beach", 0x969159}, {"Country", 0x96917D}, {"Fun house", 0x969176}, {"Ninja", 0x96915C}
+                {TEXT("Game.Beach"), 0x969159}, {TEXT("Game.Country"), 0x96917D}, {TEXT("Game.FunHouse"), 0x969176}, {TEXT("Game.Ninja"), 0x96915C}
             };
-            Ui::EditRadioButtonAddress("Themes", themes);
+            Ui::EditRadioButtonAddress(TEXT("Game.Themes"), themes);
 #endif
-            if (ImGui::CollapsingHeader("Weather"))
+            if (ImGui::CollapsingHeader(TEXT("Game.Weather")))
             {
 #ifdef GTASA
-                if (ImGui::Button("Foggy", Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.Foggy"), Ui::GetSize(3)))
                 {
                     Call<0x438F80>();
                 }
 
                 ImGui::SameLine();
-                if (ImGui::Button("Overcast", Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.Overcast"), Ui::GetSize(3)))
                 {
                     Call<0x438F60>();
                 }
 
                 ImGui::SameLine();
-                if (ImGui::Button("Rainy", Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.Rainy"), Ui::GetSize(3)))
                 {
                     Call<0x438F70>();
                 }
 
-                if (ImGui::Button("Sandstorm", Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.Sandstorm"), Ui::GetSize(3)))
                 {
                     Call<0x439590>();
                 }
 
                 ImGui::SameLine();
-                if (ImGui::Button("Thunderstorm", Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.Thunderstorm"), Ui::GetSize(3)))
                 {
                     Call<0x439570>();
                 }
 
                 ImGui::SameLine();
-                if (ImGui::Button("Very sunny", Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.VerySunny"), Ui::GetSize(3)))
                 {
                     Call<0x438F50>();
                 }
 
                 ImGui::Spacing();
                 static int weatherID = 0;
-                if (ImGui::InputInt("Weather ID", &weatherID))
+                if (ImGui::InputInt(TEXT("Game.WeatherID"), &weatherID))
                 {
                     CWeather::OldWeatherType = weatherID;
                     CWeather::NewWeatherType = weatherID;
                 }
-                Ui::ShowTooltip("Sets weather by IDs (0-255). Don't touch unless you know what you're doing!");
+                Ui::ShowTooltip(TEXT("Game.WeatherIDText"));
 #else
-                if (ImGui::Button("Sunny", Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.Sunny"), Ui::GetSize(3)))
                 {
                     CWeather::ForceWeatherNow(0);
                 }
                 ImGui::SameLine();
-                if (ImGui::Button("Cloudy", Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.Cloudy"), Ui::GetSize(3)))
                 {
                     CWeather::ForceWeatherNow(1);
                 }
                 ImGui::SameLine();
-                if (ImGui::Button("Rainy", Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.Rainy"), Ui::GetSize(3)))
                 {
                     CWeather::ForceWeatherNow(2);
                 }
 
-                if (ImGui::Button("Foggy", Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.Foggy"), Ui::GetSize(3)))
                 {
                     CWeather::ForceWeatherNow(3);
                 }
 #ifdef GTAVC
                 ImGui::SameLine();
-                if (ImGui::Button("Extra sunny", Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.ExtraSunny"), Ui::GetSize(3)))
                 {
                     CWeather::ForceWeatherNow(4);
                 }
                 ImGui::SameLine();
-                if (ImGui::Button("Hurricane", Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.Hurricane"), Ui::GetSize(3)))
                 {
                     CWeather::ForceWeatherNow(5);
                 }
 
-                if (ImGui::Button("Extra colors", Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.ExtraColors"), Ui::GetSize(3)))
                 {
                     CWeather::ForceWeatherNow(6);
                 }
@@ -734,28 +730,23 @@ Lowers armour, health, stamina etc."))
             }
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem("Missions"))
+        if (ImGui::BeginTabItem(TEXT("Game.Missions")))
         {
             ImGui::Spacing();
 
             static bool bMissionLoaderWarningShown;
             if (!bMissionLoaderWarningShown)
             {
-                ImGui::TextWrapped("Mission loader may cause,\n\
-1. Game crashes\n\
-2. Break save games\n\
-3. Break game progression\n\
-4. Random bugs & glitches\n\n\
-It's recommanded not to save after using the mission loader. Use it at your own risk!");
+                ImGui::TextWrapped(TEXT("Game.MissionLoaderTip"));
                 ImGui::Spacing();
-                if (ImGui::Button("Show mission loader", ImVec2(Ui::GetSize())))
+                if (ImGui::Button(TEXT("Game.ShowLoader"), ImVec2(Ui::GetSize())))
                 {
                     bMissionLoaderWarningShown = true;
                 }
             }
             else
             {
-                if (ImGui::Button("Fail current mission", ImVec2(Ui::GetSize())))
+                if (ImGui::Button(TEXT("Game.FailMission"), ImVec2(Ui::GetSize())))
                 {
                     if (!Util::IsOnCutscene())
                     {
@@ -770,7 +761,7 @@ It's recommanded not to save after using the mission loader. Use it at your own 
             ImGui::EndTabItem();
         }
 #ifdef GTASA
-        if (ImGui::BeginTabItem("Stats"))
+        if (ImGui::BeginTabItem(TEXT("Game.Stats")))
         {
             // similar to Ui::DrawJSON()
             ImGui::Spacing();
@@ -778,7 +769,7 @@ It's recommanded not to save after using the mission loader. Use it at your own 
             ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() / 2 - 5);
             Ui::ListBoxStr("##Categories", m_StatData.m_Categories, m_StatData.m_Selected);
             ImGui::SameLine();
-            Ui::FilterWithHint("##Filter", m_StatData.m_Filter, "Search");
+            Ui::FilterWithHint("##Filter", m_StatData.m_Filter, TEXT("Window.Search"));
             ImGui::PopItemWidth();
 
             ImGui::Spacing();
@@ -801,24 +792,24 @@ It's recommanded not to save after using the mission loader. Use it at your own 
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem("Random cheats"))
+        if (ImGui::BeginTabItem(TEXT("Game.RandomCheats")))
         {
             ImGui::Spacing();
             ImGui::Columns(2, NULL, false);
-            ImGui::Checkbox("Enable", &m_RandomCheats::m_bEnabled);
+            ImGui::Checkbox(TEXT("Game.Enable"), &m_RandomCheats::m_bEnabled);
             ImGui::NextColumn();
-            ImGui::Checkbox("Progress bar", &m_RandomCheats::m_bProgressBar);
+            ImGui::Checkbox(TEXT("Game.ProgressBar"), &m_RandomCheats::m_bProgressBar);
             ImGui::Columns(1);
             ImGui::Spacing();
 
             ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 2);
 
-            ImGui::SliderInt("Activate cheat timer", &m_RandomCheats::m_nInterval, 5, 60);
-            Ui::ShowTooltip("Time for the next cheat activation.");
+            ImGui::SliderInt(TEXT("Game.ActivateTimer"), &m_RandomCheats::m_nInterval, 5, 60);
+            Ui::ShowTooltip(TEXT("Game.ActivateTimerText"));
 
             ImGui::PopItemWidth();
 
-            ImGui::TextWrapped("Select cheats");
+            ImGui::TextWrapped(TEXT("Game.SelectCheats"));
             ImGui::Separator();
             if (ImGui::BeginChild("Cheats list"))
             {
