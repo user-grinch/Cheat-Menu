@@ -430,11 +430,11 @@ void Game::ShowPage()
 
     if (ImGui::BeginTabBar("Game", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {
-        if (ImGui::BeginTabItem(TEXT("Windo.CheckboxTab")))
+        if (ImGui::BeginTabItem(TEXT("Window.CheckboxTab")))
         {
             ImGui::Spacing();
             ImGui::Columns(2, nullptr, false);
-            if (ImGui::Checkbox(TEXT("Game.DsiableCheats"), &m_bDisableCheats))
+            if (ImGui::Checkbox(TEXT("Game.DisableCheats"), &m_bDisableCheats))
             {
                 if (m_bDisableCheats)
                 {
@@ -573,7 +573,7 @@ void Game::ShowPage()
             ImGui::Columns(1);
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT("Game.MenusTab")))
+        if (ImGui::BeginTabItem(TEXT("Window.MenusTab")))
         {
 #ifdef GTASA
             if (ImGui::CollapsingHeader(TEXT("Game.CurrentDay")))
