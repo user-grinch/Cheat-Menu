@@ -506,7 +506,21 @@ void Player::ShowPage()
 #endif
             Ui::CheckboxAddress(TEXT("Player.NoFee"), (int)&pInfo->m_bGetOutOfJailFree);
             Ui::CheckboxWithHint(TEXT("Player.RespawnDieLoc"), &m_KeepPosition::m_bEnabled, TEXT("Player.RespawnDieLocTip"));
-
+            
+#ifdef GTASA
+            static bool sprintInt = false;
+            if (Ui::CheckboxWithHint(TEXT("Player.SprintEverywhere"), &sprintInt, TEXT("Player.SprintEverywhereTip")))
+            {
+                if (sprintInt)
+                {
+                    patch::SetRaw(0x688610, (char*)"\x90\x90", 2);
+                }
+                else
+                {
+                    patch::SetRaw(0x688610, (char*)"\x75\x40", 2);
+                }
+            }
+#endif
             ImGui::Columns(1);
 
             ImGui::NewLine();

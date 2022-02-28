@@ -60,7 +60,7 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
 {
     if (m_SpawnPed::m_List.size() == SPAWN_PED_LIMIT)
     {
-        SetHelpMessage("Max limit reached", false, false, false);
+        SetHelpMessage(TEXT("Ped.MaxLimit"));
         return;
     }
 
@@ -100,7 +100,7 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
         if (cat == "Special") // Special model
         {
 #ifdef GTA3
-            SetHelpMessage("Spawning special peds isn't implemented yet.", false, false, false);
+            SetHelpMessage(TEXT("Player.SpecialNotImplement"));
             return;
 #else
             Command<Commands::LOAD_SPECIAL_CHARACTER>(currentSlot, model.c_str());
@@ -161,61 +161,61 @@ void Ped::ShowPage()
 {
     if (ImGui::BeginTabBar("Ped", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {
-        if (ImGui::BeginTabItem("Checkboxes"))
+        if (ImGui::BeginTabItem(TEXT("Window.CheckboxTab")))
         {
             ImGui::Spacing();
             ImGui::BeginChild("CheckboxesChild");
             ImGui::Columns(2, 0, false);
 #ifdef GTASA
-            Ui::CheckboxWithHint("Big head effect", &m_bBigHead);
-            Ui::CheckboxAddress("Elvis everywhere", 0x969157);
-            Ui::CheckboxAddress("Everyone is armed", 0x969140);
-            Ui::CheckboxAddress("Gangs control streets", 0x96915B);
-            Ui::CheckboxAddress("Gangs everywhere", 0x96915A);
-            Ui::CheckboxWithHint("Gang wars", &CGangWars::bGangWarsActive);
+            Ui::CheckboxWithHint(TEXT("Ped.BigHead"), &m_bBigHead);
+            Ui::CheckboxAddress(TEXT("Ped.ElvisEverywhere"), 0x969157);
+            Ui::CheckboxAddress(TEXT("Ped.EveryoneArmed"), 0x969140);
+            Ui::CheckboxAddress(TEXT("Ped.GangsControl"), 0x96915B);
+            Ui::CheckboxAddress(TEXT("Ped.GangsEverywhere"), 0x96915A);
+            Ui::CheckboxWithHint(TEXT("Ped.GangWars"), &CGangWars::bGangWarsActive);
 
             ImGui::NextColumn();
 
-            Ui::CheckboxAddress("Peds mayhem", 0x96913E);
-            Ui::CheckboxAddress("Peds attack with rockets", 0x969158);
-            Ui::CheckboxAddress("Peds riot", 0x969175);
-            Ui::CheckboxAddress("Slut magnet", 0x96915D);
-            Ui::CheckboxWithHint("Thin body effect", &m_bThinBody);
+            Ui::CheckboxAddress(TEXT("Ped.PedsMayhem"), 0x96913E);
+            Ui::CheckboxAddress(TEXT("Ped.PedsAtkRocket"), 0x969158);
+            Ui::CheckboxAddress(TEXT("Ped.PedsRiot"), 0x969175);
+            Ui::CheckboxAddress(TEXT("Ped.SlutMagnet"), 0x96915D);
+            Ui::CheckboxWithHint(TEXT("Ped.ThinBody"), &m_bThinBody);
 #elif GTAVC
-            Ui::CheckboxAddress("No prostitutes", 0xA10B99);
-            Ui::CheckboxAddress("Slut magnet", 0xA10B5F);
+            Ui::CheckboxAddress(TEXT("Ped.NoProstitutes"), 0xA10B99);
+            Ui::CheckboxAddress(TEXT("Ped.SlutMagnet"), 0xA10B5F);
             ImGui::NextColumn();
-            Ui::CheckboxAddress("Weapons for all", 0xA10AB3);
+            Ui::CheckboxAddress(TEXT("Ped.WeaponAll"), 0xA10AB3);
 #else
             // Bad idea lol
             static bool pedsMayhem;
-            if (Ui::CheckboxWithHint("Peds mayhem", &pedsMayhem))
+            if (Ui::CheckboxWithHint(TEXT("Ped.PedsMayhem"), &pedsMayhem))
             {
                 Call<0x4911C0>();
             }
             static bool everyoneAttacksPlayer;
-            if (Ui::CheckboxWithHint("Everyone attacks players", &everyoneAttacksPlayer))
+            if (Ui::CheckboxWithHint(TEXT("Ped.EveryoneAtk"), &everyoneAttacksPlayer))
             {
                 Call<0x491270>();
             }
             ImGui::NextColumn();
-            Ui::CheckboxAddress("Nasty limbs", 0x95CD44);
-            Ui::CheckboxAddress("Weapons for all", 0x95CCF6);
+            Ui::CheckboxAddress(TEXT("Ped.NastyLimbs"), 0x95CD44);
+            Ui::CheckboxAddress(TEXT("Ped.WeaponAll"), 0x95CCF6);
 #endif
             ImGui::Columns(1);
             ImGui::EndChild();
 
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem("Menus"))
+        if (ImGui::BeginTabItem(TEXT("Window.MenusTab")))
         {
             ImGui::Spacing();
             ImGui::BeginChild("MenusChild");
 
 #ifdef GTASA
-            if (ImGui::CollapsingHeader("Gang wars"))
+            if (ImGui::CollapsingHeader(TEXT("Ped.GangWars")))
             {
-                if (ImGui::Button("Start gang war", ImVec2(Ui::GetSize(2))))
+                if (ImGui::Button(TEXT("Ped.StartWar"), ImVec2(Ui::GetSize(2))))
                 {
                     if (Util::GetLargestGangInZone() == 1)
                     {
@@ -228,13 +228,13 @@ void Ped::ShowPage()
                     CGangWars::bGangWarsActive = true;
                 }
                 ImGui::SameLine();
-                if (ImGui::Button("End gang war", ImVec2(Ui::GetSize(2))))
+                if (ImGui::Button(TEXT("Ped.EndWar"), ImVec2(Ui::GetSize(2))))
                 {
                     CGangWars::EndGangWar(true);
                 }
 
                 ImGui::Dummy(ImVec2(0, 20));
-                ImGui::TextWrapped("Gang zone density:");
+                ImGui::TextWrapped(TEXT("Ped.ZoneDensity"));
                 ImGui::Spacing();
 
                 ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 2);
@@ -259,9 +259,9 @@ void Ped::ShowPage()
 
                 if (!m_bExGangWarsInstalled)
                 {
-                    ImGui::TextWrapped("You'll need ExGangWars plugin to display some turf colors");
+                    ImGui::TextWrapped(TEXT("Ped.ExGangWarsTip"));
                     ImGui::Spacing();
-                    if (ImGui::Button("Download ExGangWars", Ui::GetSize(1)))
+                    if (ImGui::Button(TEXT("Ped.DownloadExGangWars"), Ui::GetSize(1)))
                     {
                         ShellExecute(NULL, "open", "https://gtaforums.com/topic/682194-extended-gang-wars/", NULL, NULL,
                                      SW_SHOWNORMAL);
@@ -272,26 +272,26 @@ void Ped::ShowPage()
                 ImGui::Separator();
             }
 #endif
-            Ui::EditReference<float>("Pedestrian density multiplier", CPopulation::PedDensityMultiplier, 0, 1, 10);
+            Ui::EditReference<float>(TEXT("Ped.PedDensityMul"), CPopulation::PedDensityMultiplier, 0, 1, 10);
 #ifdef GTASA
-            if (ImGui::CollapsingHeader("Recruit anyone"))
+            if (ImGui::CollapsingHeader(TEXT("Ped.RecruitAnyone")))
             {
                 static std::vector<Ui::NamedMemory> selectWeapon
                 {
                     {"9mm", 0x96917C}, {"AK47", 0x96917D}, {"Rockets", 0x96917E}
                 };
-                Ui::RadioButtonAddress("Select weapon", selectWeapon);
+                Ui::RadioButtonAddress(TEXT("Ped.SelectWeapon"), selectWeapon);
                 ImGui::Spacing();
                 ImGui::Separator();
             }
 #endif
 
-            if (ImGui::CollapsingHeader("Remove peds in radius"))
+            if (ImGui::CollapsingHeader(TEXT("Ped.RemovePedsRadius")))
             {
                 static int removeRadius = 5;
-                ImGui::InputInt("Radius", &removeRadius);
+                ImGui::InputInt(TEXT("Ped.Radius"), &removeRadius);
                 ImGui::Spacing();
-                if (ImGui::Button("Remove peds", Ui::GetSize(1)))
+                if (ImGui::Button(TEXT("Ped.RemovePeds"), Ui::GetSize(1)))
                 {
                     CPlayerPed* player = FindPlayerPed();
                     for (CPed* ped : CPools::ms_pPedPool)
@@ -309,10 +309,10 @@ void Ped::ShowPage()
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem("Spawn"))
+        if (ImGui::BeginTabItem(TEXT("Window.SpawnTab")))
         {
             ImGui::Spacing();
-            if (ImGui::Button("Remove frozen peds", Ui::GetSize(1)))
+            if (ImGui::Button(TEXT("Ped.RemoveFrozen"), Ui::GetSize(1)))
             {
                 for (CPed* ped : m_SpawnPed::m_List)
                 {
@@ -326,7 +326,7 @@ void Ped::ShowPage()
             {
                 ImGui::Spacing();
 
-                if (ImGui::BeginTabItem("Spawner"))
+                if (ImGui::BeginTabItem(TEXT("Ped.SpawnerTab")))
                 {
                     ImGui::Spacing();
 #ifdef GTASA
@@ -340,19 +340,19 @@ void Ped::ShowPage()
 #endif
                     ImGui::EndTabItem();
                 }
-                if (ImGui::BeginTabItem("Config"))
+                if (ImGui::BeginTabItem(TEXT("Ped.ConfigTab")))
                 {
                     ImGui::Spacing();
                     ImGui::BeginChild("PedCOnfig");
                     ImGui::Columns(2, 0, false);
-                    Ui::CheckboxWithHint("Don't move", &m_SpawnPed::m_bPedMove);
+                    Ui::CheckboxWithHint(TEXT("Ped.NoMove"), &m_SpawnPed::m_bPedMove);
                     ImGui::NextColumn();
-                    Ui::CheckboxWithHint("Ped bleed", &m_SpawnPed::m_bPedBleed);
+                    Ui::CheckboxWithHint(TEXT("Ped.PedBleed"), &m_SpawnPed::m_bPedBleed);
                     ImGui::Columns(1);
 
                     ImGui::Spacing();
-                    ImGui::SliderInt("Accuracy", &m_SpawnPed::m_nAccuracy, 0.0, 100.0);
-                    if (ImGui::InputInt("Health", &m_SpawnPed::m_nPedHealth))
+                    ImGui::SliderInt(TEXT("Ped.Accuracy"), &m_SpawnPed::m_nAccuracy, 0.0, 100.0);
+                    if (ImGui::InputInt(TEXT("Ped.Health"), &m_SpawnPed::m_nPedHealth))
                     {
                         if (m_SpawnPed::m_nPedHealth > 1000)
                         {
@@ -364,10 +364,10 @@ void Ped::ShowPage()
                             m_SpawnPed::m_nPedHealth = 0;
                         }
                     }
-                    Ui::ListBox("Ped type", m_SpawnPed::m_PedTypeList, m_SpawnPed::m_nSelectedPedType);
+                    Ui::ListBox(TEXT("Ped.PedType"), m_SpawnPed::m_PedTypeList, m_SpawnPed::m_nSelectedPedType);
 
                     ImGui::Spacing();
-                    ImGui::Text("Selected weapon: %s", m_SpawnPed::m_nWeaponName.c_str());
+                    ImGui::Text(TEXT("Ped.SelectedWeapon"), m_SpawnPed::m_nWeaponName.c_str());
                     ImGui::Spacing();
 #ifdef GTASA
                     Ui::DrawImages(Weapon::m_WeaponData,
