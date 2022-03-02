@@ -503,7 +503,7 @@ void Vehicle::ShowPage()
     int hplayer = CPools::GetPedRef(pPlayer);
     CVehicle *pVeh = pPlayer->m_pVehicle;
 
-    if (ImGui::Button("Blow up cars", ImVec2(Ui::GetSize(3))))
+    if (ImGui::Button(TEXT("Vehicle.BlowCar"), ImVec2(Ui::GetSize(3))))
     {
         for (CVehicle *pVeh : CPools::ms_pVehiclePool)
         {
@@ -513,14 +513,14 @@ void Vehicle::ShowPage()
 
     ImGui::SameLine();
 
-    if (ImGui::Button("Fix vehicle", ImVec2(Ui::GetSize(3))) && Util::IsInVehicle())
+    if (ImGui::Button(TEXT("Vehcile.FixCar"), ImVec2(Ui::GetSize(3))) && Util::IsInVehicle())
     {
         Util::FixVehicle(pVeh);
     }
 
     ImGui::SameLine();
 
-    if (ImGui::Button("Flip vehicle", ImVec2(Ui::GetSize(3))) && Util::IsInVehicle())
+    if (ImGui::Button(TEXT("Vehicle.FlipCar"), ImVec2(Ui::GetSize(3))) && Util::IsInVehicle())
     {
         Util::FlipVehicle(pVeh);
     }
@@ -534,26 +534,25 @@ void Vehicle::ShowPage()
 
         ImGui::Spacing();
 
-        if (ImGui::BeginTabItem("Checkboxes"))
+        if (ImGui::BeginTabItem(TEXT("Window.CheckboxTab")))
         {
             ImGui::Spacing();
             ImGui::BeginChild("CheckboxesChild");
             ImGui::Columns(2, 0, false);
 #ifdef GTASA
-            Ui::CheckboxAddress("Aim while driving", 0x969179);
-            Ui::CheckboxAddress("All cars have nitro", 0x969165);
+            Ui::CheckboxAddress(TEXT("Vehicle.AimDrive"), 0x969179);
+            Ui::CheckboxAddress(TEXT("Vehicle.AllNitro"), 0x969165);
 #endif
 
 #ifndef GTA3
-            Ui::CheckboxAddress("Aggressive drivers", BY_GAME(0x96914F,0xA10B47, NULL));
-            Ui::CheckboxAddress("All taxis have nitro", BY_GAME(0x96918B,0xA10B3A, NULL));
-            Ui::CheckboxWithHint("Bikes fly", &m_bBikeFly);
-            Ui::CheckboxAddress("Boats fly", BY_GAME(0x969153, 0xA10B11, NULL));
+            Ui::CheckboxAddress(TEXT("Vehicle.AggroDriver"), BY_GAME(0x96914F,0xA10B47, NULL));
+            Ui::CheckboxAddress(TEXT("Vehicle.AllTaxiNitro"), BY_GAME(0x96918B,0xA10B3A, NULL));
+            Ui::CheckboxWithHint(TEXT("Vehicle.BikeFly"), &m_bBikeFly);
+            Ui::CheckboxAddress(TEXT("Vehicle.BoatFly"), BY_GAME(0x969153, 0xA10B11, NULL));
 #endif
-            Ui::CheckboxAddress("Cars fly", BY_GAME(0x969160, 0xA10B28, 0x95CD75));
-            Ui::CheckboxWithHint("Cars heavy", &m_bVehHeavy);
-            if (Ui::CheckboxWithHint("Damage proof", &m_bNoDamage,
-                                     "Every vehicle entered will be damage proof\nBullet, Collision, Explosion, Fire, Meele etc"))
+            Ui::CheckboxAddress(TEXT("Vehicle.CarFly"), BY_GAME(0x969160, 0xA10B28, 0x95CD75));
+            Ui::CheckboxWithHint(TEXT("Vehicle.CarHeavy"), &m_bVehHeavy);
+            if (Ui::CheckboxWithHint(TEXT("Vehicle.DmgProof"), &m_bNoDamage, TEXT("Vehicle.DmgProofTip")))
             {
                 if (pVeh && !m_bNoDamage)
                 {
@@ -581,8 +580,8 @@ void Vehicle::ShowPage()
                 }
             }
 #ifdef GTASA
-            Ui::CheckboxAddress("Decreased traffic", 0x96917A);
-            // if (Ui::CheckboxWithHint("Disable collisions", &m_bDisableColDetection))
+            Ui::CheckboxAddress(TEXT("Vehicle.LessTraffic"), 0x96917A);
+            // if (Ui::CheckboxWithHint(TEXT("Vehicle.NoColl"), &m_bDisableColDetection))
             // {
             // 	if (m_bDisableColDetection)
             // 	{
@@ -608,7 +607,7 @@ void Vehicle::ShowPage()
 #endif
             ImGui::NextColumn();
 #ifndef GTA3
-            if (Ui::CheckboxWithHint("Don't fall off bike", &m_bDontFallBike))
+            if (Ui::CheckboxWithHint(TEXT("Vehicle.StayOnBike"), &m_bDontFallBike))
             {
                 if (m_bDontFallBike)
                 {
@@ -631,70 +630,69 @@ void Vehicle::ShowPage()
 #endif
                 }
             }
-            Ui::CheckboxAddress("Drive on water", BY_GAME(0x969152, 0xA10B81, NULL));
+            Ui::CheckboxAddress(TEXT("Vehicle.DriveWater"), BY_GAME(0x969152, 0xA10B81, NULL));
 #endif
 #ifdef GTASA
-            Ui::CheckboxAddressEx("Lock train camera", 0x52A52F, 171, 6);
-            Ui::CheckboxAddress("Float away when hit", 0x969166);
+            Ui::CheckboxAddressEx(TEXT("Vehicle.LockTrainCam"), 0x52A52F, 171, 6);
+            Ui::CheckboxAddress(TEXT("Vehicle.FloatOnHit"), 0x969166);
 #endif
 #ifndef GTA3
-            Ui::CheckboxAddress("Green traffic lights", BY_GAME(0x96914E, 0xA10ADC, NULL));
+            Ui::CheckboxAddress(TEXT("Vehicle.GreenLights"), BY_GAME(0x96914E, 0xA10ADC, NULL));
 #endif
 #ifdef GTASA
-            Ui::CheckboxAddress("Perfect handling", 0x96914C);
-            Ui::CheckboxAddress("Tank mode", 0x969164);
+            Ui::CheckboxAddress(TEXT("Vehicle.PerfectHandling"), 0x96914C);
+            Ui::CheckboxAddress(TEXT("Vehicle.TankMode"), 0x969164);
 
-            Ui::CheckboxWithHint("Unlimited nitro", &m_UnlimitedNitro::m_bEnabled, "Nitro will activate when left clicked\n\
-\nEnabling this would disable\nAll cars have nitro\nAll taxis have nitro");
+            Ui::CheckboxWithHint(TEXT("Vehicle.InfNitro"), &m_UnlimitedNitro::m_bEnabled, TEXT("Vehicle.InfNitroTip"));
 #elif GTA3
-            Ui::CheckboxAddress("Perfect handling", 0x95CD66);
+            Ui::CheckboxAddress(TEXT("Vehicle.PerfectHandling"), 0x95CD66);
 #endif
-            Ui::CheckboxWithHint("Watertight car", &m_bVehWatertight, "Peds inside won't drown if the vehicle\nis submerged in water");
-            Ui::CheckboxAddress("Wheels only", BY_GAME(0x96914B, 0xA10B70, 0x95CD78));
+            Ui::CheckboxWithHint(TEXT("Vehicle.Watertight"), &m_bVehWatertight, TEXT("Vehicle.WatertightTip"));
+            Ui::CheckboxAddress(TEXT("Vehicle.OnlyWheels"), BY_GAME(0x96914B, 0xA10B70, 0x95CD78));
             ImGui::Columns(1);
 
             if (is_driver)
             {
                 ImGui::NewLine();
-                ImGui::TextWrapped("For current vehicle,");
+                ImGui::TextWrapped(TEXT("Vehicle.ForCurVeh"));
 
                 ImGui::Columns(2, 0, false);
 
                 bool state = false;
 #ifdef GTASA
                 state = pVeh->m_nVehicleFlags.bAlwaysSkidMarks;
-                if (Ui::CheckboxWithHint("Always skid marks", &state, nullptr))
+                if (Ui::CheckboxWithHint(TEXT("Vehicle.SkidMarks"), &state, nullptr))
                     pVeh->m_nVehicleFlags.bAlwaysSkidMarks = state;
 #endif
 
                 state = BY_GAME(pVeh->m_nPhysicalFlags.bBulletProof, pVeh->m_nFlags.bBulletProof, pVeh->m_nEntityFlags.bBulletProof);
-                if (Ui::CheckboxWithHint("Bullet proof", &state, nullptr, m_bNoDamage))
+                if (Ui::CheckboxWithHint(TEXT("Vehicle.BulletProof"), &state, nullptr, m_bNoDamage))
                 {
                     BY_GAME(pVeh->m_nPhysicalFlags.bBulletProof, pVeh->m_nFlags.bBulletProof, pVeh->m_nEntityFlags.bBulletProof) = state;
                 }
 
                 state = BY_GAME(pVeh->m_nPhysicalFlags.bCollisionProof, pVeh->m_nFlags.bCollisionProof, pVeh->m_nEntityFlags.bCollisionProof);
-                if (Ui::CheckboxWithHint("Collision proof", &state, nullptr, m_bNoDamage))
+                if (Ui::CheckboxWithHint(TEXT("Vehicle.ColProof"), &state, nullptr, m_bNoDamage))
                 {
                     BY_GAME(pVeh->m_nPhysicalFlags.bCollisionProof, pVeh->m_nFlags.bCollisionProof, pVeh->m_nEntityFlags.bCollisionProof) = state;
                 }
 
 #ifdef GTASA
                 state = pVeh->m_nVehicleFlags.bDisableParticles;
-                if (Ui::CheckboxWithHint("Disable particles", &state, nullptr))
+                if (Ui::CheckboxWithHint(TEXT("Vehicle.NoParticles"), &state, nullptr))
                 {
                     pVeh->m_nVehicleFlags.bDisableParticles = state;
                 }
 
                 state = pVeh->m_nVehicleFlags.bVehicleCanBeTargetted;
-                if (Ui::CheckboxWithHint("Driver targetable", &state, "Driver can be targeted"))
+                if (Ui::CheckboxWithHint(TEXT("Vehicle.DriverTarget"), &state))
                 {
                     pVeh->m_nVehicleFlags.bVehicleCanBeTargetted = state;
                 }
 #endif
 
                 state = BY_GAME(!pVeh->m_nVehicleFlags.bEngineBroken, true, true) || pVeh->m_nVehicleFlags.bEngineOn;
-                if (Ui::CheckboxWithHint("Engine on", &state, nullptr, !is_driver))
+                if (Ui::CheckboxWithHint(TEXT("Vehicle.EngineOn"), &state, nullptr, !is_driver))
                 {
 #ifdef GTASA
                     pVeh->m_nVehicleFlags.bEngineBroken = !state;
@@ -703,13 +701,13 @@ void Vehicle::ShowPage()
                 }
 
                 state = BY_GAME(pVeh->m_nPhysicalFlags.bExplosionProof, pVeh->m_nFlags.bExplosionProof, pVeh->m_nEntityFlags.bExplosionProof);
-                if (Ui::CheckboxWithHint("Explosion proof", &state, nullptr, m_bNoDamage))
+                if (Ui::CheckboxWithHint(TEXT("Vehicle.ExplosionProof"), &state, nullptr, m_bNoDamage))
                 {
                     BY_GAME(pVeh->m_nPhysicalFlags.bExplosionProof, pVeh->m_nFlags.bExplosionProof, pVeh->m_nEntityFlags.bExplosionProof) = state;
                 }
 
                 state = BY_GAME(pVeh->m_nPhysicalFlags.bFireProof, pVeh->m_nFlags.bFireProof, pVeh->m_nEntityFlags.bFireProof);
-                if (Ui::CheckboxWithHint("Fire proof", &state, nullptr, m_bNoDamage))
+                if (Ui::CheckboxWithHint(TEXT("Vehicle.FireProof"), &state, nullptr, m_bNoDamage))
                 {
                     BY_GAME(pVeh->m_nPhysicalFlags.bFireProof, pVeh->m_nFlags.bFireProof, pVeh->m_nEntityFlags.bFireProof) = state;
                 }
@@ -718,26 +716,26 @@ void Vehicle::ShowPage()
 
 #ifdef GTASA
                 state = pVeh->m_nVehicleFlags.bVehicleCanBeTargettedByHS;
-                if (Ui::CheckboxWithHint("HS targetable", &state, "Heat Seaker missile can target this"))
+                if (Ui::CheckboxWithHint(TEXT("Vehicle.HSTarget"), &state, TEXT("Vehicle.HSTargetTip")))
                 {
                     pVeh->m_nVehicleFlags.bVehicleCanBeTargettedByHS = state;
                 }
 #endif
 
                 state = !BY_GAME(pVeh->m_bIsVisible, pVeh->m_nFlags.bIsVisible, pVeh->m_nEntityFlags.bIsVisible);
-                if (Ui::CheckboxWithHint("Invisible car", &state, nullptr, !is_driver))
+                if (Ui::CheckboxWithHint(TEXT("Vehicle.InvisCar"), &state, nullptr, !is_driver))
                 {
                     BY_GAME(pVeh->m_bIsVisible, pVeh->m_nFlags.bIsVisible, pVeh->m_nEntityFlags.bIsVisible) = !state;
                 }
 
                 state = BY_GAME(!pVeh->ms_forceVehicleLightsOff, pVeh->m_nVehicleFlags.bLightsOn, pVeh->m_nVehicleFlags.bLightsOn);
-                if (Ui::CheckboxWithHint("Lights on", &state, nullptr, !is_driver))
+                if (Ui::CheckboxWithHint(TEXT("Vehicle.LightsOn"), &state, nullptr, !is_driver))
                 {
                     BY_GAME(pVeh->ms_forceVehicleLightsOff, pVeh->m_nVehicleFlags.bLightsOn, pVeh->m_nVehicleFlags.bLightsOn) = state;
                 }
 
                 state = BY_GAME(pVeh->m_nDoorLock, pVeh->m_nLockStatus, pVeh->m_nDoorLock) == CARLOCK_LOCKED_PLAYER_INSIDE;
-                if (Ui::CheckboxWithHint("Lock doors", &state, nullptr, !is_driver))
+                if (Ui::CheckboxWithHint(TEXT("Vehicle.LockDoor"), &state, nullptr, !is_driver))
                 {
                     if (state)
                     {
@@ -750,27 +748,29 @@ void Vehicle::ShowPage()
                 }
 
                 state = BY_GAME(pVeh->m_nPhysicalFlags.bMeeleProof, pVeh->m_nFlags.bMeleeProof, pVeh->m_nEntityFlags.bMeleeProof);
-                if (Ui::CheckboxWithHint("Melee proof", &state, nullptr, m_bNoDamage))
+                if (Ui::CheckboxWithHint(TEXT("Vehicle.MeleeProof"), &state, nullptr, m_bNoDamage))
                 {
                     BY_GAME(pVeh->m_nPhysicalFlags.bMeeleProof, pVeh->m_nFlags.bMeleeProof, pVeh->m_nEntityFlags.bMeleeProof) = state;
                 }
 
 #ifdef GTASA
                 state = pVeh->m_nVehicleFlags.bPetrolTankIsWeakPoint;
-                if (Ui::CheckboxWithHint("Petrol tank blow", &state, "Vehicle will blow up if petrol tank is shot"))
+                if (Ui::CheckboxWithHint(TEXT("Vehicle.PentrolTank"), &state, TEXT("Vehicle.PetrolTankTip")))
                 {
                     pVeh->m_nVehicleFlags.bPetrolTankIsWeakPoint = state;
                 }
 
                 state = pVeh->m_nVehicleFlags.bSirenOrAlarm;
-                if (Ui::CheckboxWithHint("Siren", &state))
+                if (Ui::CheckboxWithHint(TEXT("Vehicle.Siren"), &state))
                 {
                     pVeh->m_nVehicleFlags.bSirenOrAlarm = state;
                 }
 
                 state = pVeh->m_nVehicleFlags.bTakeLessDamage;
-                if (Ui::CheckboxWithHint("Take less dmg", &state, nullptr))
+                if (Ui::CheckboxWithHint(TEXT("Vehicle.LessDmg"), &state, nullptr))
+                {
                     pVeh->m_nVehicleFlags.bTakeLessDamage = state;
+                }
 #endif
 
                 ImGui::Columns(1);
@@ -779,15 +779,15 @@ void Vehicle::ShowPage()
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem("Menus"))
+        if (ImGui::BeginTabItem(TEXT("Window.MenusTab")))
         {
             ImGui::Spacing();
             ImGui::BeginChild("MenusChild");
 
 #ifdef GTASA
-            Ui::EditAddress<float>("Density multiplier", 0x8A5B20, 0, 1, 10);
+            Ui::EditAddress<float>(TEXT("Vehicle.DensityMul"), 0x8A5B20, 0, 1, 10);
 #endif
-            if (ImGui::CollapsingHeader("Enter nearest vehicle as"))
+            if (ImGui::CollapsingHeader(TEXT("Vehicle.EnterNearVeh")))
             {
                 int hplayer = CPools::GetPedRef(pPlayer);
                 CVehicle* pClosestVeh = Util::GetClosestVehicle();
@@ -804,11 +804,11 @@ void Vehicle::ShowPage()
 
                     ImGui::Text(GetNameFromModel(pClosestVeh->m_nModelIndex).c_str());
                     ImGui::NextColumn();
-                    ImGui::Text("Total seats: %d", (seats + 1));
+                    ImGui::Text(TEXT("Vehicle.TotalSeats"), (seats + 1));
                     ImGui::Columns(1);
 
                     ImGui::Spacing();
-                    if (ImGui::Button("Driver", ImVec2(Ui::GetSize(2))))
+                    if (ImGui::Button(TEXT("Vehicle.Driver"), ImVec2(Ui::GetSize(2))))
                     {
                         Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, pClosestVeh);
                     }
@@ -821,7 +821,7 @@ void Vehicle::ShowPage()
                             ImGui::SameLine();
                         }
 
-                        if (ImGui::Button((std::string("Passenger ") + std::to_string(i + 1)).c_str(),
+                        if (ImGui::Button((std::string(TEXT("Vehicle.Passenger")) + std::to_string(i + 1)).c_str(),
                                           ImVec2(Ui::GetSize(2))))
                         {
 #ifdef GTASA
@@ -835,17 +835,17 @@ void Vehicle::ShowPage()
                 }
                 else
                 {
-                    ImGui::Text("No nearby vehicles");
+                    ImGui::Text(TEXT("Vehicle.NoNearVeh"));
                 }
 
                 ImGui::Spacing();
                 ImGui::Separator();
             }
-            if (ImGui::CollapsingHeader("Remove vehicles in radius"))
+            if (ImGui::CollapsingHeader(TEXT("Vehicle.RemoveVehRadius")))
             {
-                ImGui::InputInt("Radius", &m_nVehRemoveRadius);
+                ImGui::InputInt(TEXT("Vehicle.Radius"), &m_nVehRemoveRadius);
                 ImGui::Spacing();
-                if (ImGui::Button("Remove vehicles", Ui::GetSize(1)))
+                if (ImGui::Button(TEXT("Vehicle.RemoveVeh"), Ui::GetSize(1)))
                 {
                     CPlayerPed* player = FindPlayerPed();
                     for (CVehicle* pVeh : CPools::ms_pVehiclePool)
@@ -862,22 +862,23 @@ void Vehicle::ShowPage()
             }
 
 #ifndef GTA3
-            if (ImGui::CollapsingHeader("Traffic options"))
+            if (ImGui::CollapsingHeader(TEXT("Vehicle.TrafficOpt")))
             {
 
-                static std::vector<Ui::NamedMemory> color
+                std::vector<Ui::NamedMemory> color
                 {
-                    {"Black", BY_GAME(0x969151, 0xA10B82, NULL)},
-                    {"Pink", BY_GAME(0x969150, 0xA10B26, NULL)}
+                    {TEXT("Vehicle.Black"), BY_GAME(0x969151, 0xA10B82, NULL)},
+                    {TEXT("Vehicle.Pink"), BY_GAME(0x969150, 0xA10B26, NULL)}
                 };
-                Ui::RadioButtonAddress("Color", color);
+                Ui::RadioButtonAddress(TEXT("Vehicle.Color"), color);
                 ImGui::Spacing();
 #ifdef GTASA
-                static std::vector<Ui::NamedMemory> type
+                std::vector<Ui::NamedMemory> type
                 {
-                    {"Cheap", 0x96915E}, {"Country", 0x96917B}, {"Fast", 0x96915F}
+                    {TEXT("Vehicle.Cheap"), 0x96915E}, {TEXT("Vehicle.Country"), 0x96917B}, 
+                    {TEXT("Vehicle.Fast"), 0x96915F}
                 };
-                Ui::RadioButtonAddress("Type", type);
+                Ui::RadioButtonAddress(TEXT("Vehicle.Type"), type);
 #endif
                 ImGui::Spacing();
                 ImGui::Separator();
@@ -889,15 +890,15 @@ void Vehicle::ShowPage()
                 int hVeh = CPools::GetVehicleRef(pVeh);
 
 #ifdef GTASA
-                Ui::EditFloat("Dirt level", (int)pVeh + 0x4B0, 0, 7.5, 15);
-                if (pVeh->m_nVehicleClass == VEHICLE_AUTOMOBILE && ImGui::CollapsingHeader("Doors"))
+                Ui::EditFloat(TEXT("Vehicle.DirtLvl"), (int)pVeh + 0x4B0, 0, 7.5, 15);
+                if (pVeh->m_nVehicleClass == VEHICLE_AUTOMOBILE && ImGui::CollapsingHeader(TEXT("Vehicle.Doors")))
                 {
                     ImGui::Columns(2, 0, false);
-                    ImGui::RadioButton("Damage", &m_nDoorMenuButton, 0);
-                    ImGui::RadioButton("Fix", &m_nDoorMenuButton, 1);
+                    ImGui::RadioButton(TEXT("Vehicle.Damage"), &m_nDoorMenuButton, 0);
+                    ImGui::RadioButton(TEXT("Vehicle.Fix"), &m_nDoorMenuButton, 1);
                     ImGui::NextColumn();
-                    ImGui::RadioButton("Open", &m_nDoorMenuButton, 2);
-                    ImGui::RadioButton("Pop", &m_nDoorMenuButton, 3);
+                    ImGui::RadioButton(TEXT("Vehicle.Open"), &m_nDoorMenuButton, 2);
+                    ImGui::RadioButton(TEXT("Vehicle.Pop"), &m_nDoorMenuButton, 3);
                     ImGui::Columns(1);
                     ImGui::Spacing();
 
@@ -905,7 +906,7 @@ void Vehicle::ShowPage()
                     int doors = seats == 4 ? 6 : 4;
                     int hveh = CPools::GetVehicleRef(pVeh);
 
-                    if (ImGui::Button("All", ImVec2(Ui::GetSize())))
+                    if (ImGui::Button(TEXT("Vehicle.All"), ImVec2(Ui::GetSize())))
                     {
                         for (int i = 0; i < doors; ++i)
                         {
@@ -962,24 +963,24 @@ void Vehicle::ShowPage()
                     ImGui::Separator();
                 }
 #endif
-                if (ImGui::CollapsingHeader("Set speed"))
+                if (ImGui::CollapsingHeader(TEXT("Vehicle.SetSpeed")))
                 {
-                    Ui::CheckboxWithHint("Lock speed", &m_bLockSpeed);
+                    Ui::CheckboxWithHint(TEXT("Vehicle.LockSpeed"), &m_bLockSpeed);
                     ImGui::Spacing();
-                    ImGui::InputFloat("Set", &m_fLockSpeed);
+                    ImGui::InputFloat(TEXT("Vehicle.Set"), &m_fLockSpeed);
                     ImGui::Spacing();
 
                     m_fLockSpeed = m_fLockSpeed > 100 ? 100 : m_fLockSpeed;
                     m_fLockSpeed = m_fLockSpeed < 0 ? 0 : m_fLockSpeed;
 
-                    if (ImGui::Button("Set speed##brn", ImVec2(Ui::GetSize(2))))
+                    if (ImGui::Button(TEXT("Vehicle.Set"), ImVec2(Ui::GetSize(2))))
                     {
                         Util::SetCarForwardSpeed(pVeh, m_fLockSpeed);
                     }
 
                     ImGui::SameLine();
 
-                    if (ImGui::Button("Instant stop##brn", ImVec2(Ui::GetSize(2))))
+                    if (ImGui::Button(TEXT("Vehicle.InstantStop"), ImVec2(Ui::GetSize(2))))
                     {
                         Util::SetCarForwardSpeed(pVeh, 0.0f);
                     }
@@ -988,20 +989,20 @@ void Vehicle::ShowPage()
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem("Spawn"))
+        if (ImGui::BeginTabItem(TEXT("Window.SpawnTab")))
         {
             ImGui::Spacing();
             ImGui::Columns(2, 0, false);
-            Ui::CheckboxWithHint("Spawn inside", &m_Spawner::m_bSpawnInside, "Spawn inside vehicle as driver");
+            Ui::CheckboxWithHint(TEXT("Vehicle.SpawnInside"), &m_Spawner::m_bSpawnInside);
             ImGui::NextColumn();
-            Ui::CheckboxWithHint("Spawn aircraft in air", &m_Spawner::m_bSpawnInAir);
+            Ui::CheckboxWithHint(TEXT("Vehicle.SpawnInAir"), &m_Spawner::m_bSpawnInAir);
             ImGui::Columns(1);
 
 
             ImGui::Spacing();
 #ifdef GTASA
             ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() - 2.5);
-            ImGui::InputTextWithHint("##LicenseText", "License plate text", m_Spawner::m_nLicenseText, 9);
+            ImGui::InputTextWithHint("##LicenseText", TEXT("Vehicle.PlateText"), m_Spawner::m_nLicenseText, 9);
 
             Ui::DrawImages(m_Spawner::m_VehData, SpawnVehicle, nullptr,
                            [](std::string str)
@@ -1018,22 +1019,22 @@ void Vehicle::ShowPage()
         {
             CVehicle* veh = FindPlayerPed()->m_pVehicle;
             int hveh = CPools::GetVehicleRef(veh);
-            if (ImGui::BeginTabItem("Color"))
+            if (ImGui::BeginTabItem(TEXT("Vehicle.Color")))
             {
 #ifdef GTASA
                 Paint::GenerateNodeList(veh, m_Paint::m_vecNames);
 
                 ImGui::Spacing();
-                if (ImGui::Button("Reset color", ImVec2(Ui::GetSize())))
+                if (ImGui::Button(TEXT("Vehicle.ResetColor"), ImVec2(Ui::GetSize())))
                 {
                     Paint::ResetNodeColor(veh, m_Paint::m_Selected);
-                    SetHelpMessage("Color reset", false, false, false);
+                    SetHelpMessage(TEXT("Vehicle.ResetColorMSG"), false, false, false);
                 }
                 ImGui::Spacing();
 
-                Ui::ListBoxStr("Component", m_Paint::m_vecNames, m_Paint::m_Selected);
+                Ui::ListBoxStr(TEXT("Vehicle.Component"), m_Paint::m_vecNames, m_Paint::m_Selected);
 
-                if (ImGui::ColorEdit3("Color picker", m_Paint::m_fColorPicker))
+                if (ImGui::ColorEdit3(TEXT("Vehicle.ColorPicker"), m_Paint::m_fColorPicker))
                 {
                     uchar r = m_Paint::m_fColorPicker[0] * 255;
                     uchar g = m_Paint::m_fColorPicker[1] * 255;
@@ -1046,21 +1047,21 @@ void Vehicle::ShowPage()
                 ImGui::Columns(2, NULL, false);
 
 #ifdef GTASA
-                ImGui::Checkbox("Material filter", &m_Paint::m_bMatFilter);
-                ImGui::RadioButton("Primary", &m_Paint::m_nRadioButton, 1);
-                ImGui::RadioButton("Secondary", &m_Paint::m_nRadioButton, 2);
+                ImGui::Checkbox(TEXT("Vehicle.MatFilter"), &m_Paint::m_bMatFilter);
+                ImGui::RadioButton(TEXT("Vehicle.Primary"), &m_Paint::m_nRadioButton, 1);
+                ImGui::RadioButton(TEXT("Vehicle.Secondary"), &m_Paint::m_nRadioButton, 2);
                 ImGui::NextColumn();
                 ImGui::NewLine();
-                ImGui::RadioButton("Tertiary", &m_Paint::m_nRadioButton, 3);
-                ImGui::RadioButton("Quaternary", &m_Paint::m_nRadioButton, 4);
+                ImGui::RadioButton(TEXT("Vehicle.Tertiary"), &m_Paint::m_nRadioButton, 3);
+                ImGui::RadioButton(TEXT("Vehicle.Quaternary"), &m_Paint::m_nRadioButton, 4);
 #else
-                ImGui::RadioButton("Primary", &m_Paint::m_nRadioButton, 1);
+                ImGui::RadioButton(TEXT("Vehicle.Primary"), &m_Paint::m_nRadioButton, 1);
                 ImGui::NextColumn();
-                ImGui::RadioButton("Secondary", &m_Paint::m_nRadioButton, 2);
+                ImGui::RadioButton(TEXT("Vehicle.Secondary"), &m_Paint::m_nRadioButton, 2);
 #endif
                 ImGui::Spacing();
                 ImGui::Columns(1);
-                ImGui::Text("Select color preset:");
+                ImGui::Text(TEXT("Vehicle.SelectPreset"));
                 ImGui::Spacing();
 
                 int count = (int)m_CarcolsColorData.size();
@@ -1091,33 +1092,32 @@ void Vehicle::ShowPage()
 #ifdef GTASA
             if (gRenderer != Render_DirectX11)
             {
-                if (ImGui::BeginTabItem("Neons"))
+                if (ImGui::BeginTabItem(TEXT("Vehicle.NeonsTab")))
                 {
                     ImGui::Spacing();
-                    if (ImGui::Button("Remove neon", ImVec2(Ui::GetSize())))
+                    if (ImGui::Button(TEXT("Vehicle.RemoveNeon"), ImVec2(Ui::GetSize())))
                     {
                         Neon::Remove(veh);
-                        SetHelpMessage("Neon removed", false, false, false);
+                        SetHelpMessage(TEXT("Vehicle.RemoveNeonMSG"), false, false, false);
                     }
 
                     ImGui::Spacing();
                     ImGui::Columns(2, NULL, false);
 
                     bool pulsing = Neon::IsPulsingEnabled(veh);
-                    if (Ui::CheckboxWithHint("Pulsing neons", &pulsing))
+                    if (Ui::CheckboxWithHint(TEXT("Vehicle.PulsingNeon"), &pulsing))
                     {
                         Neon::SetPulsing(veh, pulsing);
                     }
 
-                    Ui::CheckboxWithHint("Rainbow neons", &m_Neon::m_bRainbowEffect, "Rainbow effect to neon lights");
+                    Ui::CheckboxWithHint(TEXT("Vehicle.RainbowNeon"), &m_Neon::m_bRainbowEffect, TEXT("Vehicle.RainbowNeonMSG"));
                     ImGui::NextColumn();
-                    Ui::CheckboxWithHint("Traffic neons", &m_Neon::m_bApplyOnTraffic, "Adds neon lights to traffic vehicles.\n\
-	Only some vehicles will have them.");
+                    Ui::CheckboxWithHint(TEXT("Vehicle.TrafficNeon"), &m_Neon::m_bApplyOnTraffic, TEXT("Vehicle.TrafficNeonMSG"));
                     ImGui::Columns(1);
 
                     ImGui::Spacing();
 
-                    if (ImGui::ColorEdit3("Color picker", m_Neon::m_fColorPicker))
+                    if (ImGui::ColorEdit3(TEXT("Vehicle.ColorPicker"), m_Neon::m_fColorPicker))
                     {
                         Neon::Install(veh, m_Neon::m_fColorPicker[0] * 255, m_Neon::m_fColorPicker[1] * 255,
                                       m_Neon::m_fColorPicker[2] * 255);
@@ -1125,7 +1125,7 @@ void Vehicle::ShowPage()
 
 
                     ImGui::Spacing();
-                    ImGui::Text("Select neon preset:");
+                    ImGui::Text(TEXT("Vehicle.SelectPreset"));
 
                     int count = (int)m_CarcolsColorData.size();
                     ImVec2 size = Ui::GetSize();
@@ -1152,19 +1152,19 @@ void Vehicle::ShowPage()
                     ImGui::EndChild();
                     ImGui::EndTabItem();
                 }
-                if (ImGui::BeginTabItem("Textures"))
+                if (ImGui::BeginTabItem(TEXT("Vehicle.TextureTab")))
                 {
                     Paint::GenerateNodeList(veh, m_Paint::m_vecNames);
 
                     ImGui::Spacing();
-                    if (ImGui::Button("Reset texture", ImVec2(Ui::GetSize())))
+                    if (ImGui::Button(TEXT("Vehicle.ResetTexture"), ImVec2(Ui::GetSize())))
                     {
                         Paint::ResetNodeTexture(veh, m_Paint::m_Selected);
-                        SetHelpMessage("Texture reset", false, false, false);
+                        SetHelpMessage(TEXT("Vehicle.ResetTextureMSG"), false, false, false);
                     }
                     ImGui::Spacing();
 
-                    Ui::ListBoxStr("Component", m_Paint::m_vecNames, m_Paint::m_Selected);
+                    Ui::ListBoxStr(TEXT("Vehicle.Component"), m_Paint::m_vecNames, m_Paint::m_Selected);
                     ImGui::Spacing();
 
                     int maxpjob, curpjob;
@@ -1174,7 +1174,7 @@ void Vehicle::ShowPage()
                     {
                         Command<Commands::GET_CURRENT_VEHICLE_PAINTJOB>(hveh, &curpjob);
 
-                        if (ImGui::InputInt("Paintjob", &curpjob))
+                        if (ImGui::InputInt(TEXT("Vehicle.Paintjob"), &curpjob))
                         {
                             if (curpjob > maxpjob)
                                 curpjob = -1;
@@ -1189,7 +1189,7 @@ void Vehicle::ShowPage()
 
                     ImGui::Spacing();
                     ImGui::SameLine();
-                    ImGui::Checkbox("Material filter", &m_Paint::m_bMatFilter);
+                    ImGui::Checkbox(TEXT("Vehicle.MatFilter"), &m_Paint::m_bMatFilter);
                     ImGui::Spacing();
                     Ui::DrawImages(Paint::m_TextureData,
                                    [](std::string& str)
@@ -1206,7 +1206,7 @@ void Vehicle::ShowPage()
                     ImGui::EndTabItem();
                 }
             }
-            if (ImGui::BeginTabItem("Tune"))
+            if (ImGui::BeginTabItem(TEXT("Vehicle.TuneTab")))
             {
                 ImGui::Spacing();
                 Ui::DrawImages(m_TuneData,
@@ -1230,7 +1230,7 @@ void Vehicle::ShowPage()
 
                 ImGui::EndTabItem();
             }
-            if (ImGui::BeginTabItem("Handling"))
+            if (ImGui::BeginTabItem(TEXT("Vehicle.HandlingTab")))
             {
                 ImGui::Spacing();
 
