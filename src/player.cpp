@@ -578,7 +578,7 @@ void Player::ShowPage()
         {
             ImGui::BeginChild("PlayerMenus");
 
-            Ui::EditReference(TEXT("Player.Armour"), pPlayer->m_fArmour, 0, 100, 150);
+            Ui::EditReference(TEXT("Player.Armour"), pPlayer->m_fArmour, 0, 100, pInfo->m_nMaxArmour);
 #ifdef GTASA
             if (ImGui::CollapsingHeader(TEXT("Player.Body")))
             {
@@ -627,6 +627,8 @@ void Player::ShowPage()
             Ui::EditReference(TEXT("Player.Health"), pPlayer->m_fHealth, 0, 100, BY_GAME(static_cast<int>(pPlayer->m_fMaxHealth), 100, 100));
 #ifdef GTASA
             Ui::EditStat(TEXT("Player.LungCapacity"), STAT_LUNG_CAPACITY);
+
+            Ui::EditReference(TEXT("Player.MaxArmour"), pInfo->m_nMaxArmour, 0, 100, 255);
             Ui::EditStat(TEXT("Player.MaxHealth"), STAT_MAX_HEALTH, 0, 569, 1450);
             Ui::EditAddress<int>(TEXT("Player.Money"), 0xB7CE50, -99999999, 0, 99999999);
 #else
