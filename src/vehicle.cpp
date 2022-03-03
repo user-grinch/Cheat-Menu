@@ -1239,23 +1239,23 @@ void Vehicle::ShowPage()
                 int handlingID = patch::Get<WORD>((int)pInfo + 74, false); //  CBaseModelInfo + 74 = handlingID
                 tHandlingData *pHandlingData = reinterpret_cast<tHandlingData*>(0xC2B9DC + (handlingID * 224)); // sizeof(tHandlingData) = 224
 
-                if (ImGui::Button("Reset handling", ImVec2(Ui::GetSize(3))))
+                if (ImGui::Button(TEXT("Vehicle.ResetHandling"), ImVec2(Ui::GetSize(3))))
                 {
                     gHandlingDataMgr.LoadHandlingData();
-                    SetHelpMessage("Handling reset", false, false, false);
+                    SetHelpMessage(TEXT("Vehicle.ResetHandlingMSG"), false, false, false);
                 }
 
                 ImGui::SameLine();
 
-                if (ImGui::Button("Save to file", ImVec2(Ui::GetSize(3))))
+                if (ImGui::Button(TEXT("Vehicle.SaveFile"), ImVec2(Ui::GetSize(3))))
                 {
                     FileHandler::GenerateHandlingFile(pHandlingData, m_VehicleIDE);
-                    SetHelpMessage("Handling saved", false, false, false);
+                    SetHelpMessage(TEXT("Vehicle.SaveFileMSG"), false, false, false);
                 }
 
                 ImGui::SameLine();
 
-                if (ImGui::Button("Read more", ImVec2(Ui::GetSize(3))))
+                if (ImGui::Button(TEXT("Vehicle.ReadMore"), ImVec2(Ui::GetSize(3))))
                 {
                     ShellExecute(NULL, "open", "https://projectcerbera.com/gta/sa/tutorials/handling", NULL, NULL,
                                                     SW_SHOWNORMAL);
@@ -1265,81 +1265,89 @@ void Vehicle::ShowPage()
 
                 ImGui::BeginChild("HandlingChild");
 
-                static std::vector<Ui::NamedValue> abs{ {"On", 1}, {"Off", 0} };
-                Ui::EditRadioButtonAddressEx("Abs", (int)&pHandlingData->m_bABS, abs);
+                std::vector<Ui::NamedValue> abs{ {TEXT("Vehicle.On"), 1}, {TEXT("Vehicle.Off"), 0} };
+                Ui::EditRadioButtonAddressEx(TEXT("Vehicle.Abs"), (int)&pHandlingData->m_bABS, abs);
 
-                Ui::EditFloat("Anti dive multiplier", (int)&pHandlingData->m_fSuspensionAntiDiveMultiplier, 0.0f, 0.0f, 1.0f);
-                Ui::EditFloat("Brake bias", (int)&pHandlingData->m_fBrakeBias, 0.0f, 0.0f, 1.0f);
+                Ui::EditFloat(TEXT("Vehicle.ADM"), (int)&pHandlingData->m_fSuspensionAntiDiveMultiplier, 0.0f, 0.0f, 1.0f);
+                Ui::EditAddress<BYTE>(TEXT("Vehicle.AnimGroup"), (int)&pHandlingData->m_nAnimGroup, 0, 0, 20);
+                Ui::EditFloat(TEXT("Vehicle.BrakeBias"), (int)&pHandlingData->m_fBrakeBias, 0.0f, 0.0f, 1.0f);
 
                 // Brake deceleration calculation
                 float BrakeDeceleration = pHandlingData->m_fBrakeDeceleration * 2500;
-                Ui::EditFloat("Brake deceleration", (int)&pHandlingData->m_fBrakeDeceleration, 0.0f, 0.0f, 20.0f, 2500.0f);
+                Ui::EditFloat(TEXT("Vehicle.BrakeDecel"), (int)&pHandlingData->m_fBrakeDeceleration, 0.0f, 0.0f, 20.0f, 2500.0f);
                 pHandlingData->m_fBrakeDeceleration = BrakeDeceleration / 2500;
 
-                Ui::EditFloat("Centre of mass X", (int)&pHandlingData->m_vecCentreOfMass.x, -10.0f, -10.0f, 10.0f);
-                Ui::EditFloat("Centre of mass Y", (int)&pHandlingData->m_vecCentreOfMass.y, -10.0f, -10.0f, 10.0f);
-                Ui::EditFloat("Centre of mass Z", (int)&pHandlingData->m_vecCentreOfMass.z, -10.0f, -10.0f, 10.0f);
+                Ui::EditFloat(TEXT("Vehicle.CemterMassX"), (int)&pHandlingData->m_vecCentreOfMass.x, -10.0f, -10.0f, 10.0f);
+                Ui::EditFloat(TEXT("Vehicle.CemterMassY"), (int)&pHandlingData->m_vecCentreOfMass.y, -10.0f, -10.0f, 10.0f);
+                Ui::EditFloat(TEXT("Vehicle.CemterMassZ"), (int)&pHandlingData->m_vecCentreOfMass.z, -10.0f, -10.0f, 10.0f);
 
                 // CDM calculations
                 float factor = (1.0 / pHandlingData->m_fMass);
                 float fCDM = pHandlingData->m_fCollisionDamageMultiplier / (2000.0f * factor);
-                Ui::EditFloat("Collision damage multiplier", (int)&fCDM, 0.0f, 0.0f, 1.0f, 0.3381f);
+                Ui::EditFloat(TEXT("Vehicle.CDM"), (int)&fCDM, 0.0f, 0.0f, 1.0f, 0.3381f);
                 pHandlingData->m_fCollisionDamageMultiplier = factor * fCDM * 2000.0f;
 
-                Ui::EditFloat("Damping level", (int)&pHandlingData->m_fSuspensionDampingLevel, -10.0f, -10.0f, 10.0f); // test later
-                Ui::EditFloat("Drag mult", (int)&pHandlingData->m_fDragMult, 0.0f, 0.0f, 30.0f);
+                Ui::EditFloat(TEXT("Vehicle.DampingLvl"), (int)&pHandlingData->m_fSuspensionDampingLevel, -10.0f, -10.0f, 10.0f); // test later
+                Ui::EditFloat(TEXT("Vehicle.DragMult"), (int)&pHandlingData->m_fDragMult, 0.0f, 0.0f, 30.0f);
 
-                static std::vector<Ui::NamedValue> drive_type
+                std::vector<Ui::NamedValue> drive_type
                 {
-                    {"Front wheel drive", 70}, {"Rear wheel drive", 82}, {"Four wheel drive", 52}
+                    {TEXT("Vehicle.FrontWheelDrive"), 70}, 
+                    {TEXT("Vehicle.RearWheelDrive"), 82}, 
+                    {TEXT("Vehicle.FourWheelDrive"), 52}
                 };
-                Ui::EditRadioButtonAddressEx("Drive type", (int)&pHandlingData->m_transmissionData.m_nDriveType, drive_type);
+                Ui::EditRadioButtonAddressEx(TEXT("Vehicle.DriveType"), (int)&pHandlingData->m_transmissionData.m_nDriveType, drive_type);
 
                 // Engine acceleration calculation
                 float fEngineAcceleration = pHandlingData->m_transmissionData.m_fEngineAcceleration * 12500;
-                Ui::EditFloat("Engine acceleration", (int)&fEngineAcceleration, 0.0f, 0.0f, 49.0f, 12500.0f);
+                Ui::EditFloat(TEXT("Vehicle.EngineAccel"), (int)&fEngineAcceleration, 0.0f, 0.0f, 49.0f, 12500.0f);
                 pHandlingData->m_transmissionData.m_fEngineAcceleration = fEngineAcceleration / 12500;
 
 
-                Ui::EditFloat("Engine inertia", (int)&pHandlingData->m_transmissionData.m_fEngineInertia, 0.1f, 0.1f, 400.0f);
+                Ui::EditFloat(TEXT("Vehicle.EngineInertia"), (int)&pHandlingData->m_transmissionData.m_fEngineInertia, 0.1f, 0.1f, 400.0f);
 
-                static std::vector<Ui::NamedValue> engine_type{ {"Petrol", 80}, {"Diseal", 68}, {"Electric", 69} };
-                Ui::EditRadioButtonAddressEx("Engine type", (int)&pHandlingData->m_transmissionData.m_nEngineType, engine_type);
+                std::vector<Ui::NamedValue> engine_type
+                { 
+                    {TEXT("Vehicle.Petrol"), 80}, {TEXT("Vehicle.Diseal"), 68}, {TEXT("Vehicle.Electric"), 69} 
+                };
+                Ui::EditRadioButtonAddressEx(TEXT("Vehicle.EngineType"), (int)&pHandlingData->m_transmissionData.m_nEngineType, engine_type);
 
-                std::vector<Ui::NamedValue> front_lights{ {"Long", 0}, {"Small", 1}, {"Big", 2}, {"Tall", 3} };
-                Ui::EditRadioButtonAddressEx("Front lights", (int)&pHandlingData->m_nFrontLights, front_lights);
+                std::vector<Ui::NamedValue> lights
+                { 
+                    {TEXT("Vehicle.Long"), 0}, {TEXT("Vehicle.Small"), 1}, 
+                    {TEXT("Vehicle.Big"), 2}, {TEXT("Vehicle.Tall"), 3} 
+                };
+                Ui::EditRadioButtonAddressEx(TEXT("Vehicle.FrontLights"), (int)&pHandlingData->m_nFrontLights, lights);
 
-                Ui::EditFloat("Force level", (int)&pHandlingData->m_fSuspensionForceLevel, -10.0f, -10.0f, 10.0f); // test later
+                Ui::EditFloat(TEXT("Vehicle.ForceLevel"), (int)&pHandlingData->m_fSuspensionForceLevel, -10.0f, -10.0f, 10.0f); // test later
 
-                Ui::EditBits("Handling flags", (int)&pHandlingData->m_nHandlingFlags, m_HandlingFlagNames);
+                Ui::EditBits(TEXT("Vehicle.HandlingFlags"), (int)&pHandlingData->m_nHandlingFlags, m_HandlingFlagNames);
 
-                Ui::EditFloat("High speed damping", (int)&pHandlingData->m_fSuspensionDampingLevel, -10.0f, -10.0f, 10.0f); // test later
-                Ui::EditFloat("Lower limit", (int)&pHandlingData->m_fSuspensionLowerLimit, -10.0f, -10.0f, 10.0f); // test later
-                Ui::EditFloat("Mass", (int)&pHandlingData->m_fMass, 1.0f, 1.0f, 50000.0f);
+                Ui::EditFloat(TEXT("Vehicle.HighSpeedDamping"), (int)&pHandlingData->m_fSuspensionDampingLevel, -10.0f, -10.0f, 10.0f); // test later
+                Ui::EditFloat(TEXT("Vehicle.LowerKimit"), (int)&pHandlingData->m_fSuspensionLowerLimit, -10.0f, -10.0f, 10.0f); // test later
+                Ui::EditFloat(TEXT("Vehicle.Mass"), (int)&pHandlingData->m_fMass, 1.0f, 1.0f, 50000.0f);
 
                 // Max Velocity calculation
                 int MaxVelocity = pHandlingData->m_transmissionData.m_fMaxGearVelocity / *(float*)0xC2B9BC;
-                Ui::EditFloat("Max velocity", (int)&MaxVelocity, 1.0f, 1.0f, 1000.0f);
+                Ui::EditFloat(TEXT("Vehicle.MaxVelocity"), (int)&MaxVelocity, 1.0f, 1.0f, 1000.0f);
                 pHandlingData->m_transmissionData.m_fMaxGearVelocity = MaxVelocity * (*(float*)0xC2B9BC);
 
-                Ui::EditBits("Model flags", (int)&pHandlingData->m_nModelFlags, m_ModelFlagNames);
+                Ui::EditBits(TEXT("Vehicle.ModelFlags"), (int)&pHandlingData->m_nModelFlags, m_ModelFlagNames);
 
-                Ui::EditAddress<int>("Monetary value", (int)&pHandlingData->m_nMonetaryValue, 1, 1, 100000);
-                Ui::EditAddress<BYTE>("Number of gears", (int)&pHandlingData->m_transmissionData.m_nNumberOfGears, 1, 1, 10);
-                Ui::EditAddress<BYTE>("Percent submerged", (int)&pHandlingData->m_nPercentSubmerged, 10, 10, 120);
+                Ui::EditAddress<int>(TEXT("Vehicle.MonValue"), (int)&pHandlingData->m_nMonetaryValue, 1, 1, 100000);
+                Ui::EditAddress<BYTE>(TEXT("Vehicle.NumGears"), (int)&pHandlingData->m_transmissionData.m_nNumberOfGears, 1, 1, 10);
+                Ui::EditAddress<BYTE>(TEXT("Vehicle.PercentSubmerged"), (int)&pHandlingData->m_nPercentSubmerged, 10, 10, 120);
 
-                static std::vector<Ui::NamedValue> rear_lights{ {"Long", 0}, {"Small", 1}, {"Big", 2}, {"Tall", 3} };
-                Ui::EditRadioButtonAddressEx("Rear lights", (int)&pHandlingData->m_nRearLights, rear_lights);
+                Ui::EditRadioButtonAddressEx(TEXT("Vehicle.RearLights"), (int)&pHandlingData->m_nRearLights, lights);
 
-                Ui::EditFloat("Seat offset distance", (int)&pHandlingData->m_fSeatOffsetDistance, 0.0f, 0.0f, 1.0f);
-                Ui::EditFloat("Steering lock", (int)&pHandlingData->m_fSteeringLock, 10.0f, 10.0f, 50.0f);
-                Ui::EditFloat("Suspension bias", (int)&pHandlingData->m_fSuspensionBiasBetweenFrontAndRear, 0.0f, 0.0f, 1.0f);
-                Ui::EditFloat("Traction bias", (int)&pHandlingData->m_fTractionBias, 0.0f, 0.0f, 1.0f);
-                Ui::EditFloat("Traction loss", (int)&pHandlingData->m_fTractionLoss, 0.0f, 0.0f, 1.0f);
-                Ui::EditFloat("Traction multiplier", (int)&pHandlingData->m_fTractionMultiplier, 0.5f, 0.5f, 2.0f);
-                Ui::EditFloat("Turn mass", (int)&pHandlingData->m_fTurnMass, 20.0f, 20.0f, 1000.0f); // test later
-                Ui::EditFloat("Upper limit", (int)&pHandlingData->m_fSuspensionUpperLimit, -1.0f, -1.0f, 1.0f);
-                Ui::EditAddress<BYTE>("Vehicle anim group", (int)&pHandlingData->m_nAnimGroup, 0, 0, 20);
+                Ui::EditFloat(TEXT("Vehicle.SeatOffset"), (int)&pHandlingData->m_fSeatOffsetDistance, 0.0f, 0.0f, 1.0f);
+                Ui::EditFloat(TEXT("Vehicle.SteeringLock"), (int)&pHandlingData->m_fSteeringLock, 10.0f, 10.0f, 50.0f);
+                Ui::EditFloat(TEXT("Vehicle.SuspensionBias"), (int)&pHandlingData->m_fSuspensionBiasBetweenFrontAndRear, 0.0f, 0.0f, 1.0f);
+                Ui::EditFloat(TEXT("Vehicle.TractionBias"), (int)&pHandlingData->m_fTractionBias, 0.0f, 0.0f, 1.0f);
+                Ui::EditFloat(TEXT("Vehicle.TractionLoss"), (int)&pHandlingData->m_fTractionLoss, 0.0f, 0.0f, 1.0f);
+                Ui::EditFloat(TEXT("Vehicle.TractionMul"), (int)&pHandlingData->m_fTractionMultiplier, 0.5f, 0.5f, 2.0f);
+                Ui::EditFloat(TEXT("Vehicle.TurnMass"), (int)&pHandlingData->m_fTurnMass, 20.0f, 20.0f, 1000.0f); // test later
+                Ui::EditFloat(TEXT("Vehicle.UpperLimit"), (int)&pHandlingData->m_fSuspensionUpperLimit, -1.0f, -1.0f, 1.0f);
 
                 ImGui::EndChild();
 

@@ -53,21 +53,6 @@ Install [Crash info](https://www.mixmods.com.br/2021/06/crashinfo.html) & reprod
 
 You can either open a issue here or directly contact me on discord (Recommended).
 
-
-## Required to build
-1. [Build Tools 2022](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)
-2. [DirectX9 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=6812)
-4. [Plugin SDK](https://github.com/DK22Pac/plugin-sdk)
-5. [Premake5](https://premake.github.io/) - Comes with already.
-
-## Projects used
-1. [ImGui](https://github.com/ocornut/imgui)
-2. [Kiero](https://github.com/Rebzzel/kiero)
-3. [MinHook](https://github.com/TsudaKageyu/minhook)
-4. [Plugin SDK](https://github.com/DK22Pac/plugin-sdk)
-
-All credits are given in Menu/About tab.
-
 ## Images
 <details>
   <summary>Show Images</summary>
@@ -91,6 +76,26 @@ All credits are given in Menu/About tab.
   <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/18.png">
   <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/19.png">
 </details>
+
+## Submit Translations
+*How to translate Cheat Menu to another language*
+
+The translations are loaded from `CheatMenu/locale/*.json` files. Make a copy of the `English.json` file and translate the texts there to your language. Rename the file to `your_language.json` and make a pull request. 
+
+
+## Required to build
+1. [Build Tools 2022](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)
+2. [DirectX9 SDK](https://www.microsoft.com/en-us/download/details.aspx?id=6812)
+4. [Plugin SDK](https://github.com/DK22Pac/plugin-sdk)
+5. [Premake5](https://premake.github.io/) - Comes with already.
+
+## Projects used
+1. [ImGui](https://github.com/ocornut/imgui)
+2. [Kiero](https://github.com/Rebzzel/kiero)
+3. [MinHook](https://github.com/TsudaKageyu/minhook)
+4. [Plugin SDK](https://github.com/DK22Pac/plugin-sdk)
+
+All credits are given in Menu/About tab.
 
 ## How to add ___ to CheatMenu (SA Only)
 
