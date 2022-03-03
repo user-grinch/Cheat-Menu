@@ -14,6 +14,7 @@ private:
     static inline std::vector<std::string> m_locales;
     static inline std::string m_path;
     static inline CJson *m_pJson = nullptr;
+    static inline CJson *m_pCallbackJson = nullptr;
     static inline size_t localeIndex;
 
 public:
@@ -35,7 +36,7 @@ public:
         Loads json files from the locale directory
         Calling it multiple times will unload previous data
     */
-    static eReturnCodes Init(const char* path, const char* def = "English");
+    static eReturnCodes Init(const char* path, const char* def = "English", const char* callback = "");
 
     // Returns a vector of available languages
     static std::vector<std::string>& GetLocaleList();
@@ -60,7 +61,14 @@ public:
         // But VS Code complains about it so..
         defaultValue += "##" + key;
 #endif
-        return m_pJson->GetValueStr(key, defaultValue);
+        std::string rtn = m_pJson->GetValueStr(key, defaultValue);
+
+        if (rtn == defaultValue)
+        {
+            return m_pCallbackJson->GetValueStr(key, defaultValue);
+        }
+
+        return rtn;
     }
 
     /*

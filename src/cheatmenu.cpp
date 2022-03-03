@@ -208,7 +208,7 @@ void CheatMenu::Init()
     m_fMenuSize.y = gConfig.GetValue("window.sizeY", screen::GetScreenHeight() / 1.2f);
     srand(CTimer::m_snTimeInMilliseconds);
 
-    Locale::Init("CheatMenu/locale/");
+    Locale::Init("CheatMenu/locale/", "English", "English");
 
     CheatMenu::GenHeaderList();
 
