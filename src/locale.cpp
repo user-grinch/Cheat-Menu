@@ -2,7 +2,7 @@
 #include "locale.h"
 #include <filesystem>
 
-Locale::eReturnCodes Locale::Init(const char* path, const char* def, const char* callback)
+Locale::eReturnCodes Locale::Init(const char* path, const char* def, const char* fallback)
 {
     std::string localePath = path;
     if (localePath.back() != '/')
@@ -42,7 +42,7 @@ Locale::eReturnCodes Locale::Init(const char* path, const char* def, const char*
 #endif
             m_locales.push_back(fileName);
 
-            if (!strcmp(callback, fileName.c_str()))
+            if (!strcmp(fallback, fileName.c_str()))
             {
                 std::string localePath = m_path + fileName + ".json";
 

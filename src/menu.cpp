@@ -671,6 +671,12 @@ void Menu::ShowPage()
                     ImGui::Text("TsudaKageyu");
                     ImGui::TableNextColumn();
                     ImGui::Text("MinHook");
+
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text(TEXT("Menu.TranslatorName"));
+                    ImGui::TableNextColumn();
+                    ImGui::Text(TEXT("Menu.Translator"));
                     
                     ImGui::EndTable();
                 }

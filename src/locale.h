@@ -36,7 +36,7 @@ public:
         Loads json files from the locale directory
         Calling it multiple times will unload previous data
     */
-    static eReturnCodes Init(const char* path, const char* def = "English", const char* callback = "");
+    static eReturnCodes Init(const char* path, const char* def = "English", const char* fallback = "");
 
     // Returns a vector of available languages
     static std::vector<std::string>& GetLocaleList();

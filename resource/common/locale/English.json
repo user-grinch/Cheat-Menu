@@ -98,6 +98,7 @@
     "WeatherIDText": "Sets weather by IDs (0-255). Don't touch unless you know what you're doing!"
   },
   "Main": {
+    "Translator" : "Translator",
     "TranslationLanguage": "English",
     "TranslationLanguageDisclaimer": "Translated to English by Grinch_",
     "TranslatorName": "Grinch_"
