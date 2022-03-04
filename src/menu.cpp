@@ -486,7 +486,7 @@ void Menu::ShowPage()
                 gConfig.SetValue("hotkey.quick_screenshot.key1", quickSceenShot.m_key1);
                 gConfig.SetValue("hotkey.quick_screenshot.key2", quickSceenShot.m_key2);
             }
-            if (freeCam.DrawUI(TEXT("Menu.Freecam")))
+            if (freeCam.DrawUI(TEXT("Menu.FreecamKey")))
             {
                 gConfig.SetValue("hotkey.freecam.key1", freeCam.m_key1);
                 gConfig.SetValue("hotkey.freecam.key2", freeCam.m_key2);
@@ -674,9 +674,9 @@ void Menu::ShowPage()
 
                     ImGui::TableNextRow();
                     ImGui::TableNextColumn();
-                    ImGui::Text(TEXT("Menu.TranslatorName"));
+                    ImGui::Text(TEXT("Main.TranslatorName"));
                     ImGui::TableNextColumn();
-                    ImGui::Text(TEXT("Menu.Translator"));
+                    ImGui::Text(TEXT("Main.Translator"));
                     
                     ImGui::EndTable();
                 }

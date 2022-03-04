@@ -437,7 +437,7 @@ void Visual::ShowPage()
             }
 
             Ui::CheckboxAddress(TEXT("Visual.ShowHud"), 0xBA6769);
-            Ui::CheckboxAddressEx(TEXT("Visual.UnfogMap"), 0xBA372C, 0x50, 0x0, TEXT("Visual.UnforMapText"));
+            Ui::CheckboxAddressEx(TEXT("Visual.UnfogMap"), 0xBA372C, 0x50, 0x0, TEXT("Visual.UnfogMapText"));
 #elif GTAVC
             Ui::CheckboxAddress(TEXT("Visual.HideRadar"), 0xA10AB6);
             Ui::CheckboxWithHint(TEXT("Visual.Lockweather"), &m_bLockWeather);

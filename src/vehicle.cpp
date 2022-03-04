@@ -513,7 +513,7 @@ void Vehicle::ShowPage()
 
     ImGui::SameLine();
 
-    if (ImGui::Button(TEXT("Vehcile.FixCar"), ImVec2(Ui::GetSize(3))) && Util::IsInVehicle())
+    if (ImGui::Button(TEXT("Vehicle.FixCar"), ImVec2(Ui::GetSize(3))) && Util::IsInVehicle())
     {
         Util::FixVehicle(pVeh);
     }

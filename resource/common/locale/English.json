@@ -67,7 +67,7 @@
     "KeepStuff": "Keep stuff",
     "KeepStuffText": "Keep stuff after arrest/death",
     "Minute": "Minute",
-    "MissionLoaderTip": "Mission loader may cause,\n\n1. Game crashes\n\n2. Break save games\n\n3. Break game progression\n\n4. Random bugs & glitches\n\n\nIt's recommanded not to save after using the mission loader. Use it at your own risk!",
+    "MissionLoaderTip": "Mission loader may cause,\n\n1. Game crashes\n2. Break save games\n3. Break game progression\n4. Random bugs & glitches\n\nIt's recommanded not to save after using the mission loader. Use it at your own risk!",
     "Missions": "Missions",
     "MissionStartFailed": "Can't start mission now",
     "MovementSpeed": "Movement speed",
@@ -549,6 +549,8 @@
     "WantedStarBorder": "Wanted star border",
     "Water": "Water",
     "WaterFogAlpha": "Water fog alpha",
+    "WeaponAmmoPosX": "Weapon icon posX",
+    "WeaponAmmoPosY": "Weapon icon posY",
     "WeaponIconPosX": "Weapon icon posX",
     "WeaponIconPosY": "Weapon icon posY",
     "WhiteScanlines": "White scanlines"
