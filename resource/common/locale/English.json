@@ -66,6 +66,10 @@
     "Hurricane": "Hurricane",
     "KeepStuff": "Keep stuff",
     "KeepStuffText": "Keep stuff after arrest/death",
+    "MaxVehSkills": "Max vehicle skills",
+    "MaxVehSkillsText": "Maxed out all vehicle skills",
+    "MaxWepSkills": "Max weapon skills",
+    "MaxWepSkillsText": "Maxed out all weapon skills",
     "Minute": "Minute",
     "MissionLoaderTip": "Mission loader may cause,\n\n1. Game crashes\n2. Break save games\n3. Break game progression\n4. Random bugs & glitches\n\nIt's recommanded not to save after using the mission loader. Use it at your own risk!",
     "Missions": "Missions",
@@ -98,9 +102,9 @@
     "WeatherIDText": "Sets weather by IDs (0-255). Don't touch unless you know what you're doing!"
   },
   "Main": {
-    "Translator" : "Translator",
     "TranslationLanguage": "English",
     "TranslationLanguageDisclaimer": "Translated to English by Grinch_",
+    "Translator": "Translator",
     "TranslatorName": "Grinch_"
   },
   "Menu": {

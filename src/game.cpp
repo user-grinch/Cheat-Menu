@@ -766,6 +766,27 @@ void Game::ShowPage()
             // similar to Ui::DrawJSON()
             ImGui::Spacing();
 
+            if (ImGui::Button(TEXT("Game.MaxWepSkills"), Ui::GetSize(2)))
+            {
+                for (size_t i = 69; i != 80; ++i)
+                {
+                    CStats::SetStatValue(i, 1000);
+                }
+                CHud::GetRidOfAllHudMessages(true);
+                SetHelpMessage(TEXT("Game.MaxWepSkillsText"));
+            }
+            ImGui::SameLine();
+            if (ImGui::Button(TEXT("Game.MaxVehSkills"), Ui::GetSize(2)))
+            {
+                CStats::SetStatValue(160, 1000);
+                CStats::SetStatValue(223, 1000);
+                CStats::SetStatValue(229, 1000);
+                CStats::SetStatValue(230, 1000);
+                CHud::GetRidOfAllHudMessages(true);
+                SetHelpMessage(TEXT("Game.MaxVehSkillsText"));
+            }
+
+            ImGui::Spacing();
             ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() / 2 - 5);
             Ui::ListBoxStr("##Categories", m_StatData.m_Categories, m_StatData.m_Selected);
             ImGui::SameLine();
@@ -773,7 +794,6 @@ void Game::ShowPage()
             ImGui::PopItemWidth();
 
             ImGui::Spacing();
-
             ImGui::BeginChild("STATCHILD");
             for (auto root : m_StatData.m_pJson->m_Data.items())
             {
