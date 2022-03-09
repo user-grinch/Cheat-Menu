@@ -770,7 +770,7 @@ void Game::ShowPage()
             {
                 for (size_t i = 69; i != 80; ++i)
                 {
-                    CStats::SetStatValue(i, 1000);
+                    CStats::SetStatValue((unsigned short)i, 1000);
                 }
                 CHud::GetRidOfAllHudMessages(true);
                 SetHelpMessage(TEXT("Game.MaxWepSkillsText"));

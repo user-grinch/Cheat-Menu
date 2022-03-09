@@ -385,6 +385,11 @@ void CheatMenu::ShowUpdatePage()
     }
 }
 
+bool CheatMenu::IsMenuShown()
+{
+    return m_bShowMenu;
+}
+
 void CheatMenu::ApplyStyle()
 {
     ImGuiStyle* style = &ImGui::GetStyle();

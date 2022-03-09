@@ -2,6 +2,7 @@
 #include "cheatmenu.h"
 #include "updater.h"
 #include "version.h"
+#include "rpc.h"
 
 void MenuThread(void* param)
 {
@@ -85,7 +86,8 @@ void MenuThread(void* param)
     while (true)
     {
         Updater::Process();
-        Sleep(5000);
+        RPC::Process();
+        Sleep(1000);
     }
 }
 

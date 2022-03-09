@@ -5,6 +5,7 @@
 #include "util.h"
 #include "updater.h"
 #include "cheatmenu.h"
+#include "rpc.h"
 
 #ifdef GTASA
 #include "teleport.h"
@@ -31,7 +32,7 @@ void Menu::Init()
     m_Overlay::textColor[1] = gConfig.GetValue("overlay.text_color.g", 1.0f);
     m_Overlay::textColor[2] = gConfig.GetValue("overlay.text_color.b", 1.0f);
     m_Overlay::textColor[3] = gConfig.GetValue("overlay.text_color.a", 1.0f);
-
+    m_bDiscordRPC = gConfig.GetValue("menu.discord_rpc", false);
 
     // Hotkeys
     aimSkinChanger.m_key1 = gConfig.GetValue("hotkey.aim_skin_changer.key1", VK_RETURN);
@@ -76,6 +77,11 @@ void Menu::Init()
     GlobalMemoryStatusEx(&memInfo);
 
     m_Overlay::mTotalRam = static_cast<int>(memInfo.ullTotalPhys * 1e-6); // Bytes -> MegaBytes
+
+    if (m_bDiscordRPC)
+    {
+        RPC::Init();
+    }
 }
 
 void Menu::DrawOverlay()
@@ -384,6 +390,24 @@ void Menu::ShowPage()
                     }
                 }
             }
+
+            ImGui::Spacing();
+
+            ImGui::Columns(2);
+            if (ImGui::Checkbox(TEXT("Menu.DiscordRPC"), &m_bDiscordRPC))
+            {
+                if (m_bDiscordRPC)
+                {
+                    RPC::Init();
+                }
+                else
+                {
+                    RPC::Shutdown();
+                }
+                gConfig.SetValue("menu.discord_rpc", m_bDiscordRPC);
+            }
+            ImGui::NextColumn();
+            ImGui::Columns(1);
             
             ImGui::EndTabItem();
         }

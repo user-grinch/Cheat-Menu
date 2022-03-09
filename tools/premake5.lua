@@ -30,16 +30,28 @@ workspace "CheatMenu"
     location "../build"
     targetdir "../build/bin"
 
-project "Depend"
+    links { 
+        "d3d9",
+        "d3d11",
+        "Pdh",
+        "urlmon",
+        "depend",
+        "discord_game_sdk"
+    }
+
+project "depend"
     kind "StaticLib"
 
     files { 
-        "../depned/**.h", 
+        "../depend/**.h", 
         "../depend/**.hpp", 
         "../depend/**.c", 
         "../depend/**.cpp" 
     }
-    libdirs (PSDK_DIR .. "/output/lib")
+    libdirs {
+        PSDK_DIR .. "/output/lib",
+        "../depend/lib"
+    }
 
     filter "configurations:Debug"
         defines { "DEBUG", "IS_PLATFORM_WIN" }
@@ -108,7 +120,6 @@ project "CheatMenuIII"
     libdirs (PSDK_DIR .. "/output/lib")
     
     defines { 
-        "NDEBUG", 
         "IS_PLATFORM_WIN" ,
         "_CRT_SECURE_NO_WARNINGS",
         "_CRT_NON_CONFORMING_SWPRINTFS",
@@ -123,24 +134,14 @@ project "CheatMenuIII"
     filter "configurations:Debug"
         symbols "On"
         links { 
-            "Depend",
-            "d3d9",
-            "d3d11",
-            "XInput9_1_0",
-            "Pdh",
-            "urlmon",
+            "depend",
             "plugin_III_d.lib" 
         }
 
     filter "configurations:Release"
         optimize "On"
         links { 
-            "Depend",
-            "d3d9",
-            "d3d11",
-            "XInput9_1_0",
-            "Pdh",
-            "urlmon",
+            "depend",
             "plugin_III.lib" 
         }
 
@@ -202,7 +203,6 @@ project "CheatMenuVC"
     libdirs (PSDK_DIR .. "/output/lib")
     
     defines { 
-        "NDEBUG", 
         "IS_PLATFORM_WIN" ,
         "_CRT_SECURE_NO_WARNINGS",
         "_CRT_NON_CONFORMING_SWPRINTFS",
@@ -217,24 +217,14 @@ project "CheatMenuVC"
     filter "configurations:Debug"
         symbols "On"
         links { 
-            "Depend",
-            "d3d9",
-            "d3d11",
-            "XInput9_1_0",
-            "Pdh",
-            "urlmon",
+            "depend",
             "plugin_vc_d.lib" 
         }
 
     filter "configurations:Release"
         optimize "On"
         links { 
-            "Depend",
-            "d3d9",
-            "d3d11",
-            "XInput9_1_0",
-            "Pdh",
-            "urlmon",
+            "depend",
             "plugin_vc.lib" 
         }
 
@@ -253,10 +243,12 @@ project "CheatMenuSA"
         PSDK_DIR .. "/shared/",
         PSDK_DIR .. "/shared/game/"
     }
-    libdirs (PSDK_DIR .. "/output/lib")
+    libdirs {
+        PSDK_DIR .. "/output/lib",
+        "../depend/lib"
+    }
     
     defines { 
-        "NDEBUG", 
         "IS_PLATFORM_WIN" ,
         "_CRT_SECURE_NO_WARNINGS",
         "_CRT_NON_CONFORMING_SWPRINTFS",
@@ -271,24 +263,14 @@ project "CheatMenuSA"
     filter "configurations:Debug"
         symbols "On"
         links { 
-            "Depend",
-            "d3d9",
-            "d3d11",
-            "XInput9_1_0",
-            "Pdh",
-            "urlmon",
-            "plugin_d.lib" 
+            "depend",
+            "plugin_d.lib",
         }
 
     filter "configurations:Release"
         optimize "On"
         links { 
-            "Depend",
-            "d3d9",
-            "d3d11",
-            "XInput9_1_0",
-            "Pdh",
-            "urlmon",
-            "plugin.lib" 
+            "depend",
+            "plugin.lib",
         }
         

@@ -44,6 +44,7 @@ public:
     CheatMenu(const CheatMenu&) = delete;
 
     static void Init();
+    static bool IsMenuShown();
     static void ResetMenuSize();
     static void GenHeaderList();
 };

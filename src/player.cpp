@@ -578,7 +578,7 @@ void Player::ShowPage()
         {
             ImGui::BeginChild("PlayerMenus");
 
-            Ui::EditReference(TEXT("Player.Armour"), pPlayer->m_fArmour, 0, 100, pInfo->m_nMaxArmour);
+            Ui::EditReference(TEXT("Player.Armour"), pPlayer->m_fArmour, 0, 100, BY_GAME(pInfo->m_nMaxArmour, pInfo->m_nMaxArmour, 100));
 #ifdef GTASA
             if (ImGui::CollapsingHeader(TEXT("Player.Body")))
             {

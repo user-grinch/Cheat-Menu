@@ -117,6 +117,7 @@
     "Config": "Config",
     "CopyrightDisclaimer": "Copyright Grinch_ 2019-2022. All rights reserved.",
     "Credits": "Credits",
+    "DiscordRPC" : "Discord rich presence",
     "DiscordServer": "Discord server",
     "FixVehKey": "Fix current vehicle",
     "FlipVehKey": "Flip current vehicle",
@@ -605,5 +606,15 @@
     "VehiclePage": "Vehicle",
     "VisualPage": "Visual",
     "WeaponPage": "Weapon"
+  },
+  "RPC" :
+  {
+    "Walking" : "Walking",
+    "Driving" : "Driving",
+    "In" : "in",
+    "DoingMission" : "Doing missions",
+    "BrowsingCheatMenu" : "Browsing CheatMenu",
+    "InsideMenus" : "Inside Menus",
+    "PlayingFor" : "Playing for {}:{}:{}"
   }
 }
