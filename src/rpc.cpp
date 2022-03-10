@@ -17,13 +17,43 @@ char asciitolower(char in)
 
 void RPC::Shutdown()
 {
+    if (f_ShutDown)
+    {
+        CallDyn<>(int(f_ShutDown));
+    }
 }
 
 void RPC::Init()
 {
-    discord::ClientId Id = BY_GAME(951199292981403669, 951448264195059712, 951457540573655080);
-    discord::Result result = discord::Core::Create(Id, DiscordCreateFlags_Default, &pCore);
-    bInit = result == discord::Result::Ok;
+    std::string Id = BY_GAME("951199292981403669", "951448264195059712", "951457540573655080");
+
+    if (!hDll)
+    {
+        hDll = NULL;
+        f_Init = NULL;
+        f_Update = NULL;
+        f_ShutDown = NULL;
+
+        hDll = LoadLibrary(PLUGIN_PATH((char*)"CheatMenu/dlls/discord-rpc.dll"));
+
+        if (hDll)
+        {
+            f_Init = GetProcAddress(hDll, "Discord_Initialize");
+            f_Update = GetProcAddress(hDll, "Discord_UpdatePresence");
+            f_ShutDown = GetProcAddress(hDll, "Discord_Shutdown");
+        }
+    }
+
+    if (f_Init)
+    {
+        CallDyn<const char*, int, int, int>((int)f_Init, Id.c_str(), NULL, NULL, NULL);
+        drpc.startTimestamp = time(0);
+        bInit = true;
+    }
+    else
+    {
+        gLog << "Failed to init discord rpc" << std::endl;
+    }
 }
 
 void RPC::Process()
@@ -36,7 +66,6 @@ void RPC::Process()
     static std::string detailsText, stateText, smallImg, smallImgText, largeImg, largeImgText;
     static size_t curImage = Random(1, 5);
     static size_t timer = CTimer::m_snTimeInMilliseconds;
-    static size_t startTime = CTimer::m_snTimeInMilliseconds;
     
     CPlayerInfo *pInfo = &CWorld::Players[CWorld::PlayerInFocus];
     CPlayerPed *pPed = pInfo->m_pPed;
@@ -76,11 +105,11 @@ void RPC::Process()
             smallImgText = std::format("{} {} {}", TEXT("RPC.Walking"), TEXT("RPC.In"), Util::GetLocationName(&pPed->GetPosition()));
         }
 
-        size_t seconds = (curTimer - startTime) / 1000;
-        size_t minutes = (seconds / 60) % 60;
-        size_t hours = (minutes / 60) % 60;
-        stateText = std::format(TEXT("RPC.PlayingFor"), hours, minutes, seconds);
-        
+        if (BY_GAME(Util::IsOnMission(), false, false))
+        {
+            stateText = TEXT("RPC.DoingMission");
+        }
+
         if (CheatMenu::IsMenuShown())
         {
             stateText = TEXT("RPC.BrowsingCheatMenu");
@@ -99,24 +128,17 @@ void RPC::Process()
         largeImgText = std::format("{}: {} - {}: {}", TEXT("Player.Armour"), pPed->m_fArmour, TEXT("Player.Health"), int(pPed->m_fHealth));
         largeImg = std::format("{}{}", BY_GAME("sa", "vc", "3"), curImage);
         
-        discord::Activity activity{};
-        activity.SetDetails(detailsText.c_str());
-        activity.SetState(stateText.c_str());
-        activity.GetAssets().SetSmallImage(smallImg.c_str());
-        activity.GetAssets().SetSmallText(smallImgText.c_str());
-        activity.GetAssets().SetLargeImage(largeImg.c_str());
-        activity.GetAssets().SetLargeText(largeImgText.c_str());
+        drpc.details = detailsText.c_str();
+        drpc.state = stateText.c_str();
+        drpc.smallImageKey = smallImg.c_str();
+        drpc.smallImageText = smallImgText.c_str();
+        drpc.largeImageKey = largeImg.c_str();
+        drpc.largeImageText = largeImgText.c_str();
 
-        activity.SetType(discord::ActivityType::Playing);
-        pCore->ActivityManager().UpdateActivity(activity, 
-        [](discord::Result result) 
+        if (f_Update)
         {
-            if (result != discord::Result::Ok)
-            {
-                gLog << "Failed to set discord activity!" << std::endl;
-            }
-        });
-        pCore->RunCallbacks();
+            CallDyn<DiscordRichPresence*>(int(f_Update), &drpc);
+        }
 
         if (curTimer - timer > 5*60000)
         {

@@ -39,13 +39,7 @@ workspace "CheatMenu"
         "d3d9",
         "d3d11",
         "Pdh",
-        "urlmon",
-        "delayimp",
-        "discord_game_sdk"
-    }
-
-    linkoptions { 
-        "/DELAYLOAD:discord_game_sdk.dll" 
+        "urlmon"
     }
 
 project "depend"

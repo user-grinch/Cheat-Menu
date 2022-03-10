@@ -103,7 +103,6 @@ BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
         if (gameVer == BY_GAME(NULL, GAME_10EN, GAME_10EN))
 #endif
         {
-            SetDllDirectory(PLUGIN_PATH((char*)"CheatMenu/dlls/"));
             CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&MenuThread, nullptr, NULL, nullptr);
         }
         else

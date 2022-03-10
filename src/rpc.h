@@ -1,12 +1,34 @@
 #pragma once
-#include "../depend/discord/discord.h"
+#include <cstdint>
 
 class RPC
 {
 private:
-    static inline discord::Core* pCore;
-    static inline bool bInit = false;
-
+    typedef struct 
+    {
+		const char* state;
+		const char* details;
+		int64_t startTimestamp;
+		int64_t endTimestamp;
+		const char* largeImageKey;
+		const char* largeImageText;
+		const char* smallImageKey;
+		const char* smallImageText;
+		const char* partyId;
+		int partySize;
+		int partyMax;
+		const char* matchSecret;
+		const char* joinSecret;
+		const char* spectateSecret;
+		int8_t instance;
+	} DiscordRichPresence;
+    
+    static inline FARPROC f_Init, f_ShutDown, f_Update;
+    static inline DiscordRichPresence drpc;
+    static inline HMODULE hDll = NULL;
+    static inline bool bInit;
+    static void Discord_Initialize(const char* applicationId, int handlers, int autoRegister, const char* optionalSteamId);
+	static void Discord_UpdatePresence(const DiscordRichPresence* presence);
 public:
     RPC() = delete;
     RPC(RPC&) = delete;
