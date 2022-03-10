@@ -8,7 +8,10 @@
 char asciitolower(char in) 
 {
     if (in <= 'Z' && in >= 'A')
+    {
         return in - ('Z' - 'z');
+    }
+    
     return in;
 }
 
@@ -18,7 +21,8 @@ void RPC::Shutdown()
 
 void RPC::Init()
 {
-    discord::Result result = discord::Core::Create(951199292981403669, DiscordCreateFlags_Default, &pCore);
+    discord::ClientId Id = BY_GAME(951199292981403669, 951448264195059712, 951457540573655080);
+    discord::Result result = discord::Core::Create(Id, DiscordCreateFlags_Default, &pCore);
     bInit = result == discord::Result::Ok;
 }
 
@@ -30,8 +34,8 @@ void RPC::Process()
     }
 
     static std::string detailsText, stateText, smallImg, smallImgText, largeImg, largeImgText;
-    static size_t curImage = 1;
-    static size_t timer = 0;
+    static size_t curImage = Random(1, 5);
+    static size_t timer = CTimer::m_snTimeInMilliseconds;
     static size_t startTime = CTimer::m_snTimeInMilliseconds;
     
     CPlayerInfo *pInfo = &CWorld::Players[CWorld::PlayerInFocus];
@@ -92,7 +96,7 @@ void RPC::Process()
             stateText = TEXT("RPC.Busted");
         }
 
-        largeImgText = std::format("{}: {} / {} {}: {} / {}", TEXT("Player.Armour"), pPed->m_fArmour, BY_GAME(pInfo->m_nMaxArmour, pInfo->m_nMaxArmour, 100), TEXT("Player.Health"), int(pPed->m_fHealth), BY_GAME(int(pPed->m_fMaxHealth), 100, 100));
+        largeImgText = std::format("{}: {} - {}: {}", TEXT("Player.Armour"), pPed->m_fArmour, TEXT("Player.Health"), int(pPed->m_fHealth));
         largeImg = std::format("{}{}", BY_GAME("sa", "vc", "3"), curImage);
         
         discord::Activity activity{};
@@ -114,7 +118,7 @@ void RPC::Process()
         });
         pCore->RunCallbacks();
 
-        if (curTimer - timer > 60000)
+        if (curTimer - timer > 5*60000)
         {
             curImage++;
 
