@@ -24,7 +24,7 @@ void RPC::Init()
 
 void RPC::Process()
 {
-    if (!Menu::m_bDiscordRPC)
+    if (!(Menu::m_bDiscordRPC && bInit))
     {
         return;
     }
@@ -40,7 +40,12 @@ void RPC::Process()
     if (pPed)
     {
         size_t curTimer = CTimer::m_snTimeInMilliseconds;
+
+#ifdef GTASA
+        size_t wantedLevel = pPed->GetWantedLevel();
+#else
         size_t wantedLevel = pPed->m_pWanted->m_nWantedLevel;
+#endif
         if (wantedLevel > 0)
         {
             detailsText = std::format("{}: ", TEXT("Player.WantedLevel"));
@@ -67,27 +72,27 @@ void RPC::Process()
             smallImgText = std::format("{} {} {}", TEXT("RPC.Walking"), TEXT("RPC.In"), Util::GetLocationName(&pPed->GetPosition()));
         }
 
-        size_t seconds = curTimer - startTime;
+        size_t seconds = (curTimer - startTime) / 1000;
         size_t minutes = (seconds / 60) % 60;
         size_t hours = (minutes / 60) % 60;
         stateText = std::format(TEXT("RPC.PlayingFor"), hours, minutes, seconds);
         
-        if (BY_GAME(Util::IsOnMission(), false, false))
-        {
-            stateText = TEXT("RPC.DoingMission");
-        }
-
         if (CheatMenu::IsMenuShown())
         {
             stateText = TEXT("RPC.BrowsingCheatMenu");
         }
-
-        if (BY_GAME(FrontEndMenuManager.m_bMenuActive, FrontendMenuManager.m_bMenuVisible, FrontEndMenuManager.m_bMenuActive))
+        
+        if (Command<Commands::IS_CHAR_DEAD>(CPools::GetPedRef(pPed)))
         {
-            stateText = TEXT("RPC.InsideMenus");
+            stateText = TEXT("RPC.Wasted");
+        }
+        
+        if (BY_GAME(pPed->m_nPedFlags.bIsBeingArrested, false, false))
+        {
+            stateText = TEXT("RPC.Busted");
         }
 
-        largeImgText = std::format("{}: {} / {} {}: {} / {}", TEXT("Player.Armour"), pPed->m_fArmour, BY_GAME(pInfo->m_nMaxArmour, pInfo->m_nMaxArmour, 100), TEXT("Player.Health"), pPed->m_fHealth, BY_GAME(pPed->m_fMaxHealth, 100, 100));
+        largeImgText = std::format("{}: {} / {} {}: {} / {}", TEXT("Player.Armour"), pPed->m_fArmour, BY_GAME(pInfo->m_nMaxArmour, pInfo->m_nMaxArmour, 100), TEXT("Player.Health"), int(pPed->m_fHealth), BY_GAME(int(pPed->m_fMaxHealth), 100, 100));
         largeImg = std::format("{}{}", BY_GAME("sa", "vc", "3"), curImage);
         
         discord::Activity activity{};
@@ -109,11 +114,11 @@ void RPC::Process()
         });
         pCore->RunCallbacks();
 
-        if (curTimer - timer > 10000)
+        if (curTimer - timer > 60000)
         {
             curImage++;
 
-            if (curImage > totalLargeImages)
+            if (curImage > 5) // Must upload images to discord servers
             {
                 curImage = 1;
             }

@@ -30,12 +30,16 @@ workspace "CheatMenu"
     location "../build"
     targetdir "../build/bin"
 
+    libdirs {
+        PSDK_DIR .. "/output/lib",
+        "../depend/lib"
+    }
+
     links { 
         "d3d9",
         "d3d11",
         "Pdh",
         "urlmon",
-        "depend",
         "discord_game_sdk"
     }
 
@@ -47,10 +51,6 @@ project "depend"
         "../depend/**.hpp", 
         "../depend/**.c", 
         "../depend/**.cpp" 
-    }
-    libdirs {
-        PSDK_DIR .. "/output/lib",
-        "../depend/lib"
     }
 
     filter "configurations:Debug"
@@ -109,7 +109,9 @@ project "CheatMenuIII"
         "../src/filehandler.cpp",
         "../src/dllmain.cpp",
         "../src/locale.h",
-        "../src/locale.cpp"
+        "../src/locale.cpp",
+        "../src/rpc.h",
+        "../src/rpc.cpp"
     }
     includedirs {
         PSDK_DIR .. "/plugin_III/",
@@ -192,7 +194,9 @@ project "CheatMenuVC"
         "../src/hotkeys.cpp",
         "../src/dllmain.cpp",
         "../src/locale.h",
-        "../src/locale.cpp"
+        "../src/locale.cpp",
+        "../src/rpc.h",
+        "../src/rpc.cpp"
     }
     includedirs {
         PSDK_DIR .. "/plugin_vc/",

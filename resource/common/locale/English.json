@@ -117,7 +117,7 @@
     "Config": "Config",
     "CopyrightDisclaimer": "Copyright Grinch_ 2019-2022. All rights reserved.",
     "Credits": "Credits",
-    "DiscordRPC" : "Discord rich presence",
+    "DiscordRPC": "Discord rich presence",
     "DiscordServer": "Discord server",
     "FixVehKey": "Fix current vehicle",
     "FlipVehKey": "Flip current vehicle",
@@ -275,6 +275,17 @@
     "TotalSkins": "Total skins: ",
     "WantedLevel": "Wanted level",
     "WorkSkinOnly": "Only contains the skins that works"
+  },
+  "RPC": {
+    "BrowsingCheatMenu": "Browsing CheatMenu",
+    "Busted": "Busted!",
+    "DoingMission": "Doing {}",
+    "Driving": "Driving",
+    "In": "in",
+    "InsideMenus": "Inside Menus",
+    "PlayingFor": "Playing for {}:{}:{}",
+    "Walking": "Walking",
+    "Wasted": "Wasted!"
   },
   "Teleport": {
     "AddLocation": "Add location",
@@ -606,15 +617,5 @@
     "VehiclePage": "Vehicle",
     "VisualPage": "Visual",
     "WeaponPage": "Weapon"
-  },
-  "RPC" :
-  {
-    "Walking" : "Walking",
-    "Driving" : "Driving",
-    "In" : "in",
-    "DoingMission" : "Doing missions",
-    "BrowsingCheatMenu" : "Browsing CheatMenu",
-    "InsideMenus" : "Inside Menus",
-    "PlayingFor" : "Playing for {}:{}:{}"
   }
 }

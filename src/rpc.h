@@ -6,7 +6,6 @@ class RPC
 private:
     static inline discord::Core* pCore;
     static inline bool bInit = false;
-    static inline size_t totalLargeImages = 5;
 
 public:
     RPC() = delete;
