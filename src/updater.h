@@ -25,6 +25,13 @@ public:
     static std::string GetUpdateVersion();
     static bool IsUpdateAvailable();
 
+    /*
+        Just downloading file from a click counter site
+        Redirects to the versioninfo.json file of github
+        This probably shouldn't impose any privacy concerns?
+    */
+    static void IncrementDailyUsageCounter();
+
     // Needs to run in it's own thread to prevent the game from freezing
     static void Process();
     static void ResetUpdaterState();

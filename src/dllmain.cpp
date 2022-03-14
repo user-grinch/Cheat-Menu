@@ -80,6 +80,7 @@ void MenuThread(void* param)
     if (gConfig.GetValue("config.update_date", 0) != st.wDay)
     {
         Updater::CheckUpdate();
+        Updater::IncrementDailyUsageCounter();
         gConfig.SetValue("config.update_date", st.wDay);
     }
 

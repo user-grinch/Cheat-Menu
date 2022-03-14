@@ -31,8 +31,7 @@ workspace "CheatMenu"
     targetdir "../build/bin"
 
     libdirs {
-        PSDK_DIR .. "/output/lib",
-        "../depend/lib"
+        PSDK_DIR .. "/output/lib"
     }
 
     links { 

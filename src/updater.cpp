@@ -25,6 +25,11 @@ void Updater::CheckUpdate()
     }
 }
 
+void Updater::IncrementDailyUsageCounter()
+{
+    URLDownloadToFile(NULL, "https://cntr.click/XL6Z7a7", "", 0, NULL);
+}
+
 void Updater::Process()
 {
     if (Updater::curState != States::CHECKING)

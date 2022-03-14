@@ -27,8 +27,7 @@ private:
     static inline DiscordRichPresence drpc;
     static inline HMODULE hDll = NULL;
     static inline bool bInit;
-    static void Discord_Initialize(const char* applicationId, int handlers, int autoRegister, const char* optionalSteamId);
-	static void Discord_UpdatePresence(const DiscordRichPresence* presence);
+	
 public:
     RPC() = delete;
     RPC(RPC&) = delete;

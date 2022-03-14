@@ -393,7 +393,7 @@ void Menu::ShowPage()
 
             ImGui::Spacing();
 
-            ImGui::Columns(2);
+            ImGui::Columns(2, NULL, false);
             if (ImGui::Checkbox(TEXT("Menu.DiscordRPC"), &m_bDiscordRPC))
             {
                 if (m_bDiscordRPC)
