@@ -27,7 +27,7 @@ void Updater::CheckUpdate()
 
 void Updater::IncrementDailyUsageCounter()
 {
-    URLDownloadToFile(NULL, "https://cntr.click/XL6Z7a7", "", 0, NULL);
+    URLDownloadToFile(NULL, "https://github.com/user-grinch/Cheat-Menu/releases/download/3.1/counter.info", "", 0, NULL);
 }
 
 void Updater::Process()
