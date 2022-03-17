@@ -15,7 +15,6 @@ static inline void PlayerModelBrokenFix()
         Call<0x5A81E0>(0, pPlayer->m_pPlayerData->m_pPedClothesDesc, 0xBC1C78, false);
 }
 
-
 /*
 	Taken from gta chaos mod by Lordmau5
 	https://github.com/gta-chaos-mod/Trilogy-ASI-Script
@@ -420,6 +419,29 @@ void Player::ShowPage()
 #endif
             Ui::CheckboxAddress(TEXT("Player.FreeHealthcare"), BY_GAME((int)&pInfo->m_bFreeHealthCare,
                                 (int)&pInfo->m_bFreeHealthCare, (int)&pInfo->m_bGetOutOfHospitalFree));
+
+            if (Ui::CheckboxWithHint(TEXT("Player.FreezeWL"), &m_bFreezeWantedLevel))
+            {
+                static unsigned int chaosLvl;
+                if (m_bFreezeWantedLevel)
+                {
+#ifdef GTASA
+                    chaosLvl = pPlayer->GetWanted()->m_nChaosLevel;
+#else
+                    chaosLvl = pPlayer->m_pWanted->m_nChaosLevel;
+#endif
+                    patch::SetUChar(BY_GAME(0x561C90, 0x4D2110, 0x4AD900), 0xC3);
+                }
+                else
+                {
+#ifdef GTASA
+                    pPlayer->GetWanted()->m_nChaosLevel = chaosLvl;
+#else
+                    pPlayer->m_pWanted->m_nChaosLevel = chaosLvl;
+#endif
+                    patch::SetUChar(BY_GAME(0x561C90, 0x4D2110, 0x4AD900), BY_GAME(0x51, 0x8B, 0xA1));
+                }
+            }
 
             if (Ui::CheckboxWithHint(TEXT("Player.GodMode"), &m_bGodMode))
             {
