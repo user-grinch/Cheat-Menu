@@ -23,7 +23,7 @@ void Animation::PlayCutscene(std::string& rootKey, std::string& cutsceneId, std:
 {
     if (Util::IsOnCutscene())
     {
-        SetHelpMessage(TEXT("Animation.CutsceneRunning"), false, false, false);
+        SetHelpMessage(TEXT("Animation.CutsceneRunning"));
         return;
     }
 

@@ -683,6 +683,15 @@ void Game::ShowPage()
                 static int weatherID = 0;
                 if (ImGui::InputInt(TEXT("Game.WeatherID"), &weatherID))
                 {
+                    if (weatherID < 0)
+                    {
+                        weatherID = 255;
+                    }
+
+                    if (weatherID > 255)
+                    {
+                        weatherID = 0;
+                    }
                     CWeather::OldWeatherType = weatherID;
                     CWeather::NewWeatherType = weatherID;
                 }

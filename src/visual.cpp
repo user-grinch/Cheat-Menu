@@ -625,7 +625,7 @@ void Visual::ShowPage()
             if (ImGui::Button(TEXT("Visual.ResetTimecyc"), Ui::GetSize(2)))
             {
                 CTimeCycle::Initialise();
-                SetHelpMessage(TEXT("Visual.TimecycReset"), false, false, false);
+                SetHelpMessage(TEXT("Visual.TimecycReset"));
             }
             ImGui::Spacing();
 

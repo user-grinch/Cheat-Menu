@@ -93,7 +93,7 @@ void CheatMenu::ProcessPages()
         {
             /*
             *   We don't want to be annoying and
-            *   show anniversary screen on every game start
+            *   show anniversary screen on game start
             */
             bool flag = gConfig.GetValue("window.anniversaryShown", false);
 
@@ -200,18 +200,16 @@ void CheatMenu::Init()
         return;
     }
 
-    ApplyStyle();
-
     // Load menu settings
     m_nMenuPage = (eMenuPages)gConfig.GetValue("window.page", (size_t)eMenuPages::WELCOME);
     m_fMenuSize.x = gConfig.GetValue("window.sizeX", screen::GetScreenWidth() / 4.0f);
     m_fMenuSize.y = gConfig.GetValue("window.sizeY", screen::GetScreenHeight() / 1.2f);
     srand(CTimer::m_snTimeInMilliseconds);
 
+    ApplyStyle();
     Locale::Init("CheatMenu/locale/", "English", "English");
-
-    CheatMenu::GenHeaderList();
-
+    GenHeaderList();
+    
     // Init menu parts
     Animation::Init();
     Game::Init();

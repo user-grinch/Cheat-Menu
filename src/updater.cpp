@@ -43,7 +43,7 @@ void Updater::Process()
 
     if (res == E_OUTOFMEMORY || res == INET_E_DOWNLOAD_FAILURE)
     {
-        SetHelpMessage("Failed to check for updates", false, false, false);
+        SetHelpMessage(TEXT("Updater.Failed"));
         return;
     }
 
@@ -61,12 +61,12 @@ void Updater::Process()
 
     if (latestVer > MENU_VERSION_NUMBER)
     {
-        SetHelpMessage("Update found", false, false, false);
+        SetHelpMessage(TEXT("Updater.Found"));
         curState = States::FOUND;
     }
     else
     {
-        SetHelpMessage("No update found.", false, false, false);
+        SetHelpMessage(TEXT("Updater.NotFound"));
         Updater::curState = States::IDLE;
     }
 }

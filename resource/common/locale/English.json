@@ -125,6 +125,7 @@
     "GitHubRepo": "GitHub repo",
     "GodModeKey": "Toggle god mode",
     "Hotkeys": "Hotkeys",
+    "InvalidValue": "Invalid value",
     "Language": "Language",
     "LanguageChangeFailed": "Failed to change language!",
     "Name": "Name",
@@ -459,6 +460,12 @@
     "UpperLimit": "Upper limit",
     "Watertight": "Watertight car",
     "WatertightTip": "Peds inside won't drown if the vehicle\nis submerged in water"
+  },
+  "Updater":
+  {
+    "Failed" : "Failed to check for updates",
+    "Found" : "Update found",
+    "NotFound" : "No update found"
   },
   "Visual": {
     "Ambient": "Ambient",

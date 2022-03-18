@@ -26,9 +26,11 @@ public:
     static bool IsUpdateAvailable();
 
     /*
-        Just downloading file from a click counter site
-        Redirects to the versioninfo.json file of github
-        This probably shouldn't impose any privacy concerns?
+        Just downloading counter.info file from GitHub repository
+        Initial plan was to add google analytics but people will freak 
+        out about that (though every site has it in some form)
+        
+        Pretty barebones but this shouldn't raise any concerns (i hope)
     */
     static void IncrementDailyUsageCounter();
 

@@ -262,7 +262,7 @@ void Menu::ProcessCommands()
         }
         catch (...)
         {
-            SetHelpMessage("Invalid value", false, false, false);
+            SetHelpMessage(TEXT("Menu.InvalidValue"));
         }
     }
 
@@ -279,7 +279,7 @@ void Menu::ProcessCommands()
         }
         catch (...)
         {
-            SetHelpMessage("Invalid value", false, false, false);
+            SetHelpMessage(TEXT("Menu.InvalidValue"));
         }
     }
 
@@ -304,7 +304,7 @@ void Menu::ProcessCommands()
         }
         catch (...)
         {
-            SetHelpMessage("Invalid location", false, false, false);
+            SetHelpMessage("Invalid location");
         }
     }
 
@@ -317,7 +317,7 @@ void Menu::ProcessCommands()
         {
             std::string weapon = "-1";
             Weapon::GiveWeaponToPlayer(weapon);
-            SetHelpMessage("Weapon given", false, false, false);
+            SetHelpMessage("Weapon given");
         }
         else
         {
@@ -328,10 +328,10 @@ void Menu::ProcessCommands()
             if (wep_name != "" && pweaponinfo->m_nModelId1 != -1)
             {
                 Weapon::GiveWeaponToPlayer(weapon_name);
-                SetHelpMessage("Weapon given", false, false, false);
+                SetHelpMessage("Weapon given");
             }
             else
-                SetHelpMessage("Invalid command", false, false, false);
+                SetHelpMessage("Invalid command");
         }
 
         return;
@@ -346,10 +346,10 @@ void Menu::ProcessCommands()
         {
             std::string smodel = std::to_string(model);
             Vehicle::SpawnVehicle(smodel);
-            SetHelpMessage("Vehicle spawned", false, false, false);
+            SetHelpMessage("Vehicle spawned");
         }
         else
-            SetHelpMessage("Invalid command", false, false, false);
+            SetHelpMessage("Invalid command");
     }
 #endif
 }
