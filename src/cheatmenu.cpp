@@ -268,16 +268,16 @@ void CheatMenu::ShowAnniversaryPage()
     {
         ImGui::Checkbox("Show backstory", &showHistory);
         ImGui::BeginChild("BACKSTORY");
-        ImGui::TextWrapped("I wanted to share the backstory behind the initial idea or plan behind the menu."
+        ImGui::TextWrapped("I wanted to share the backstory behind the initial idea or planning behind the menu."
 " This is gonna be long so feel free to skip it if you're not interested.");
         ImGui::NewLine();
 
         ImGui::TextWrapped("The original idea of the menu comes way back from 2016! The inspiration for the menu"
-" is from the 'CheatMenu by UNRATED69'. I wanted something that had some more features and worked with SAxVCxLC."
-" But there not being any other CheatMenu's back then, I wanted to make something myself but lacked the knowledge to do so.");
+" is from the 'CLEO CheatMenu by UNRATED69'. I wanted something that had more features and worked with SAxVCxLC."
+" But there wasn't any other CheatMenu's back then. So, I wanted to create one myself but lacked the knowledge to do so.");
         ImGui::NewLine();
 
-        ImGui::TextWrapped("In 2018, I finally got an opportunity to learn CLEO or GTA3Script after Junior released"
+        ImGui::TextWrapped("In 2018, I finally got an opportunity to learn CLEO or GTA3Script after Junior-Djjr released"
 " his tutorial. I started from basics but it soon became apparent that due to the limitations of CLEO, creating menus were"
 " really tedious.");
 
