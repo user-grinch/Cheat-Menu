@@ -307,9 +307,9 @@ void WarpPlayerIntoVehicle(CVehicle *pVeh, int seatId)
 #endif
 
 #ifdef GTASA
-void Vehicle::SpawnVehicle(std::string& smodel)
+void Vehicle::SpawnVehicle(const std::string& smodel)
 #else
-void Vehicle::SpawnVehicle(std::string& rootkey, std::string& vehName, std::string& smodel)
+void Vehicle::SpawnVehicle(const std::string& rootkey, const std::string& vehName, const std::string& smodel)
 #endif
 {
     CPlayerPed* player = FindPlayerPed();
@@ -1000,10 +1000,12 @@ void Vehicle::ShowPage()
 
             ImGui::Spacing();
 
+            int width = ImGui::GetWindowContentRegionWidth() - ImGui::GetStyle().ItemSpacing.x;
 #ifdef GTASA
-            int width = (ImGui::GetWindowContentRegionWidth() - ImGui::GetStyle().ItemSpacing.x)/2;
-            ImGui::SetNextItemWidth(width);
+            width /= 2;
 #endif
+
+            ImGui::SetNextItemWidth(width);
             static char smodel[8];
             if (ImGui::InputTextWithHint("##SpawnID", TEXT("Vehicle.IDSpawnText"), smodel, 8, ImGuiInputTextFlags_EnterReturnsTrue))
             {
@@ -1013,7 +1015,11 @@ void Vehicle::ShowPage()
                     if (CModelInfo::IsCarModel(model))
                     {
                         std::string str = std::string(smodel);
+#ifdef GTASA
                         SpawnVehicle(str);
+#else
+                        SpawnVehicle("", "", str);
+#endif
                     }
                     else
                     {
