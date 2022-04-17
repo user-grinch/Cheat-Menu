@@ -115,19 +115,25 @@
     "CheckUpdate": "Check update",
     "Commands": "Commands",
     "Config": "Config",
+    "Coords": "Coords: %.2f, %.2f, %.2f",
     "CopyrightDisclaimer": "Copyright Grinch_ 2019-2022. All rights reserved.",
+    "CPUUsage": "CPU usage: %.2f%%",
     "Credits": "Credits",
     "DiscordRPC": "Discord rich presence",
     "DiscordServer": "Discord server",
     "FixVehKey": "Fix current vehicle",
     "FlipVehKey": "Flip current vehicle",
+    "Frames": "Frames: %d",
     "FreecamKey": "Toggle freecam",
     "GitHubRepo": "GitHub repo",
     "GodModeKey": "Toggle god mode",
     "Hotkeys": "Hotkeys",
+    "InvalidComamnd": "Invalid Command",
+    "InvalidLocation": "Invalid location",
     "InvalidValue": "Invalid value",
     "Language": "Language",
     "LanguageChangeFailed": "Failed to change language!",
+    "Location": "Location: %s",
     "Name": "Name",
     "NoBG": "No background",
     "OpenCMDKey": "Open/ close command window",
@@ -141,6 +147,7 @@
     "QuickVehSpawnerCMDText": "Spawn vehicles by typing their model names.\nExample: veh (veh_name)",
     "QuickWepSpawnerCMD": "Quick weapon spawner",
     "QuickWepSpawnerCMDText": "Spawn weapons by typing their model names.\nExample: wep (wep_name)",
+    "RAMUsage": "RAM usage: %.2f%%",
     "ResetConfig": "Reset config",
     "ResetConfigMSG": "Config has been reset. Restart the game for it to take effect.",
     "ResetSize": "Reset size",
@@ -163,9 +170,13 @@
     "Usage": "Usage",
     "UsageText": "Left-click selects hotkey.\nLeft clicking outside deselects.\nRight click disables hotkey.",
     "VehEngineKey": "Toggle vehicle engine",
+    "VehHealth": "Veh Health: %.f",
+    "VehicleSpawned": "Vehicle spawned",
+    "VehSpeed": "Veh Health: %d",
     "VehStartKey": "Vehicle instant start",
     "VehStopKey": "Vehicle instant start",
-    "Version": "Version"
+    "Version": "Version",
+    "WeaponSpawned": "Weapon spawned"
   },
   "Ped": {
     "Accuracy": "Accuracy",
@@ -234,7 +245,7 @@
     "Fat": "Fat",
     "FireProof": "Fire proof",
     "FreeHealthcare": "Free healthcare",
-    "FreezeWL" : "Freeze wanted level",
+    "FreezeWL": "Freeze wanted level",
     "GodDisabled": "God mode disabled",
     "GodEnabled": "God mode enabled",
     "GodMode": "God mode",
@@ -306,6 +317,11 @@
     "TeleportMarker": "Teleport to marker",
     "TeleportToCoord": "Teleport to coordinates"
   },
+  "Updater": {
+    "Failed": "Failed to check for updates",
+    "Found": "Update found",
+    "NotFound": "No update found"
+  },
   "Vehicle": {
     "Abs": "Abs",
     "ADM": "Anti dive multiplier",
@@ -372,9 +388,11 @@
     "HighSpeedDamping": "High speed damping",
     "HSTarget": "HS targetable",
     "HSTargetTip": "Heat Seaker missile can target this",
+    "IDSpawnText": "Spawn with ID (Enter)",
     "InfNitro": "Unlimited nitro",
     "InfNitroTip": "Nitro will activate when left clicked\n\n\nEnabling this would disable\nAll cars have nitro\nAll taxis have nitro",
     "InstantStop": "Instant stop",
+    "InvalidID": "Invalid model ID",
     "InvisCar": "Invisible car",
     "LessDmg": "Take less damage",
     "LessTraffic": "Decreased traffic",
@@ -460,12 +478,6 @@
     "UpperLimit": "Upper limit",
     "Watertight": "Watertight car",
     "WatertightTip": "Peds inside won't drown if the vehicle\nis submerged in water"
-  },
-  "Updater":
-  {
-    "Failed" : "Failed to check for updates",
-    "Found" : "Update found",
-    "NotFound" : "No update found"
   },
   "Visual": {
     "Ambient": "Ambient",

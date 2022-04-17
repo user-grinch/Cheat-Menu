@@ -163,40 +163,40 @@ void Menu::DrawOverlay()
 
             if (m_Overlay::bCoord)
             {
-                ImGui::Text("Coord: %.2f, %.2f, %.2f", pos.x, pos.y, pos.z);
+                ImGui::Text(TEXT("Menu.Coords"), pos.x, pos.y, pos.z);
             }
 
             if (m_Overlay::bCpuUsage)
             {
-                ImGui::Text("CPU usage: %.2f%%", m_Overlay::fCpuUsage);
+                ImGui::Text(TEXT("Menu.CPUUsage"), m_Overlay::fCpuUsage);
             }
 
             if (m_Overlay::bFPS)
             {
-                ImGui::Text("Frames: %d", m_Overlay::mFPS);
+                ImGui::Text(TEXT("Menu.Frames"), m_Overlay::mFPS);
             }
 
             if (m_Overlay::bLocName)
             {
-                ImGui::Text("Location: %s", Util::GetLocationName(&pos).c_str());
+                ImGui::Text(TEXT("Menu.Location"), Util::GetLocationName(&pos).c_str());
             }
 
             if (m_Overlay::bMemUsage)
             {
-                ImGui::Text("RAM usage: %.2f%%", m_Overlay::fMemUsage);
+                ImGui::Text(TEXT("Menu.RAMUsage"), m_Overlay::fMemUsage);
             }
 
             if (pPlayer->m_pVehicle && pPlayer->m_pVehicle->m_pDriver == pPlayer)
             {
                 if (m_Overlay::bVehHealth)
                 {
-                    ImGui::Text("Veh Health: %.f", pPlayer->m_pVehicle->m_fHealth);
+                    ImGui::Text(TEXT("Menu.VehHealth"), pPlayer->m_pVehicle->m_fHealth);
                 }
 
                 if (m_Overlay::bVehSpeed)
                 {
                     int speed = pPlayer->m_pVehicle->m_vecMoveSpeed.Magnitude() * 50.0f; // 02E3 - GET_CAR_SPEED
-                    ImGui::Text("Veh Speed: %d", speed);
+                    ImGui::Text(TEXT("Menu.VehSpeed"), speed);
                 }
             }
 
@@ -304,7 +304,7 @@ void Menu::ProcessCommands()
         }
         catch (...)
         {
-            SetHelpMessage("Invalid location");
+            SetHelpMessage(TEXT("Menu.InvalidLocation"));
         }
     }
 
@@ -317,7 +317,7 @@ void Menu::ProcessCommands()
         {
             std::string weapon = "-1";
             Weapon::GiveWeaponToPlayer(weapon);
-            SetHelpMessage("Weapon given");
+            SetHelpMessage(TEXT("Menu.WeaponSpawned"));
         }
         else
         {
@@ -328,10 +328,10 @@ void Menu::ProcessCommands()
             if (wep_name != "" && pweaponinfo->m_nModelId1 != -1)
             {
                 Weapon::GiveWeaponToPlayer(weapon_name);
-                SetHelpMessage("Weapon given");
+                SetHelpMessage(TEXT("Menu.WeaponSpawned"));
             }
             else
-                SetHelpMessage("Invalid command");
+                SetHelpMessage(TEXT("Menu.InvalidComamnd"));
         }
 
         return;
@@ -346,10 +346,10 @@ void Menu::ProcessCommands()
         {
             std::string smodel = std::to_string(model);
             Vehicle::SpawnVehicle(smodel);
-            SetHelpMessage("Vehicle spawned");
+            SetHelpMessage(TEXT("Menu.VehicleSpawned"));
         }
         else
-            SetHelpMessage("Invalid command");
+            SetHelpMessage(TEXT("Menu.InvalidComamnd"));
     }
 #endif
 }

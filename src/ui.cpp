@@ -416,7 +416,7 @@ void Ui::DrawJSON(ResourceStore& data,
                   std::function<void(std::string&, std::string&, std::string&)> func_left_click,
                   std::function<void(std::string&, std::string&, std::string&)> func_right_click)
 {
-    ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() / 2 - 5);
+    ImGui::PushItemWidth((ImGui::GetWindowContentRegionWidth() - ImGui::GetStyle().ItemSpacing.x)/2);
     ListBoxStr("##Categories", data.m_Categories, data.m_Selected);
     ImGui::SameLine();
 
@@ -573,7 +573,7 @@ void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLe
         imgPopup.function = nullptr;
     }
 
-    ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() / 2 - 5);
+    ImGui::PushItemWidth((ImGui::GetWindowContentRegionWidth() - ImGui::GetStyle().ItemSpacing.x)/2);
     if (customNames)
     {
         ListBoxCustomNames("##Categories", store.m_Categories, store.m_Selected, customNames, length);

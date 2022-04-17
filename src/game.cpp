@@ -796,7 +796,7 @@ void Game::ShowPage()
             }
 
             ImGui::Spacing();
-            ImGui::PushItemWidth(ImGui::GetContentRegionAvailWidth() / 2 - 5);
+            ImGui::PushItemWidth((ImGui::GetWindowContentRegionWidth() - ImGui::GetStyle().ItemSpacing.x)/2);
             Ui::ListBoxStr("##Categories", m_StatData.m_Categories, m_StatData.m_Selected);
             ImGui::SameLine();
             Ui::FilterWithHint("##Filter", m_StatData.m_Filter, TEXT("Window.Search"));

@@ -998,10 +998,36 @@ void Vehicle::ShowPage()
             Ui::CheckboxWithHint(TEXT("Vehicle.SpawnInAir"), &m_Spawner::m_bSpawnInAir);
             ImGui::Columns(1);
 
-
             ImGui::Spacing();
+
 #ifdef GTASA
-            ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() - 2.5);
+            int width = (ImGui::GetWindowContentRegionWidth() - ImGui::GetStyle().ItemSpacing.x)/2;
+            ImGui::SetNextItemWidth(width);
+#endif
+            static char smodel[8];
+            if (ImGui::InputTextWithHint("##SpawnID", TEXT("Vehicle.IDSpawnText"), smodel, 8, ImGuiInputTextFlags_EnterReturnsTrue))
+            {
+                try{
+                    int model = std::stoi(smodel);
+
+                    if (CModelInfo::IsCarModel(model))
+                    {
+                        std::string str = std::string(smodel);
+                        SpawnVehicle(str);
+                    }
+                    else
+                    {
+                        SetHelpMessage(TEXT("Vehicle.InvalidID"));
+                    }
+                }
+                catch(...)
+                {
+                    SetHelpMessage(TEXT("Vehicle.InvalidID"));
+                }
+            }
+#ifdef GTASA
+            ImGui::SameLine();
+            ImGui::SetNextItemWidth(width);
             ImGui::InputTextWithHint("##LicenseText", TEXT("Vehicle.PlateText"), m_Spawner::m_nLicenseText, 9);
 
             Ui::DrawImages(m_Spawner::m_VehData, SpawnVehicle, nullptr,
