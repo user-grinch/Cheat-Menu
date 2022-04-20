@@ -602,7 +602,7 @@ void Menu::ShowPage()
                 if (ImGui::CollapsingHeader(TEXT("Menu.QuickWepSpawnerCMD")))
                 {
                     ImGui::Spacing();
-                    ImGui::TextWrapped(TEXT("Menu.QuickWepSpawnerCMDTxt"));
+                    ImGui::TextWrapped(TEXT("Menu.QuickWepSpawnerCMDText"));
                     ImGui::Spacing();
                     ImGui::Separator();
                 }

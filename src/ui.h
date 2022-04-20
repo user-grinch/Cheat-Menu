@@ -81,7 +81,7 @@ public:
 
     static void RadioButtonAddress(const char* label, std::vector<NamedMemory>& named_mem);
     static void RadioButtonAddressEx(const char* label, int addr, std::vector<NamedValue>& named_val);
-    static bool RoundedImageButton(ImTextureID user_texture_id, ImVec2& size, const char* hover_text, int frame_padding, const ImVec4& bg_col, const ImVec4& tint_col);
+    static bool RoundedImageButton(ImTextureID user_texture_id, ImVec2& size, const char* hover_text);
     static void ColorPickerAddress(const char* label, int base_addr, ImVec4&& default_color);
     static void ShowTooltip(const char* text);
 };

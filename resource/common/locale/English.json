@@ -234,7 +234,7 @@
     "CustomSkinsDirTip": "Place your dff & txd files inside 'modloader/CustomSkins'",
     "CustomSkinsTab": "Custom skins",
     "CustomSkinsTip": "Note: Your txd & dff names can't exceed 8 characters. Don't change names while the game is running.",
-    "CustomSkinTutorial": "Custom skin allows to change player skins without replacing any existing game ped skins.\n\nSteps to enable 'Custom Skins',\n\n\n1. Download & install modloader\n\n2. Create a folder inside 'modloader' folder with the name 'CustomSkins'\n\n3. Download ped skins online ( .dff & .txd files) and put them inside.\n\n4. Restart your game.\n\n\n\nLimitations:\n\n1. Your .dff & .txd file names must not exceed 8 characters.\n\n2. Do not rename them while the game is running\n\n\nDoing so will crash your game.",
+    "CustomSkinTutorial": "Custom skin allows to change player skins without replacing any existing game ped skins.\n\nSteps to enable 'Custom Skins',\n\n1. Download & install modloader\n2. Create a folder inside 'modloader' folder with the name 'CustomSkins'\n3. Download ped skins online ( .dff & .txd files) and put them inside.\n4. Restart your game.\n\nLimitations:\n\n1. Your .dff & .txd file names must not exceed 8 characters.\n2. Do not rename them while the game is running\n\nDoing so will crash your game.",
     "CycleJump": "Higher cycle jumps",
     "DownloadModloader": "Download modloader",
     "DrunkEffect": "Drunk effect",

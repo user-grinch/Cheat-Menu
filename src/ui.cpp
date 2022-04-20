@@ -49,7 +49,7 @@ bool Ui::DrawTitleBar()
     return pressed;
 }
 
-bool Ui::RoundedImageButton(ImTextureID user_texture_id, ImVec2& size, const char* hover_text, int frame_padding, const ImVec4& bg_col, const ImVec4& tint_col)
+bool Ui::RoundedImageButton(ImTextureID user_texture_id, ImVec2& size, const char* hover_text)
 {
     ImGuiContext& g = *GImGui;
     ImGuiWindow* window = g.CurrentWindow;
@@ -61,62 +61,42 @@ bool Ui::RoundedImageButton(ImTextureID user_texture_id, ImVec2& size, const cha
     const ImGuiID id = window->GetID("#image");
     ImGui::PopID();
 
-    ImVec2 padding = (frame_padding >= 0) ? ImVec2((float)frame_padding, (float)frame_padding) : g.Style.FramePadding;
-
-    if (window->SkipItems)
-        return false;
-
-    const ImRect bb(window->DC.CursorPos, window->DC.CursorPos + size + padding * 2);
+    ImRect bb(window->DC.CursorPos, window->DC.CursorPos + size);
     ImGui::ItemSize(bb);
     if (!ImGui::ItemAdd(bb, id))
         return false;
 
-    bool hovered, held;
-    bool pressed = ImGui::ButtonBehavior(bb, id, &hovered, &held);
-
-    // Render
-    const ImU32 col = ImGui::GetColorU32((held && hovered) ? ImGuiCol_ButtonActive : hovered ? ImGuiCol_ButtonHovered : ImGuiCol_Button);
-    ImGui::RenderNavHighlight(bb, id);
-    ImGui::RenderFrame(bb.Min, bb.Max, col, true, ImClamp((float)ImMin(padding.x, padding.y), 0.0f, g.Style.FrameRounding));
-    if (bg_col.w > 0.0f)
-        window->DrawList->AddRectFilled(bb.Min + padding, bb.Max - padding, ImGui::GetColorU32(bg_col));
-
-    window->DrawList->AddImageRounded(user_texture_id, bb.Min + padding, bb.Max - padding, ImVec2(0, 0), ImVec2(1, 1), ImGui::GetColorU32(tint_col), 5.0f);
+    window->DrawList->AddImageRounded(user_texture_id, bb.Min, bb.Max, ImVec2(0, 0), ImVec2(1, 1), ImGui::GetColorU32(ImVec4(1, 1, 1, 1)), 5.0f);
 
     if (ImGui::IsItemHovered())
     {
-        ImDrawList* drawlist = ImGui::GetWindowDrawList();
-
-        // Drawing selected overlay
-        ImVec2 btnMin = ImGui::GetItemRectMin();
-        ImVec2 btnMax = ImGui::GetItemRectMax();
-        drawlist->AddRectFilled(btnMin, btnMax, ImGui::GetColorU32(ImGuiCol_ModalWindowDimBg), 8.0f);
+        window->DrawList->AddRectFilled(bb.Min, bb.Max, ImGui::GetColorU32(ImGuiCol_ModalWindowDimBg), 5.6f);
 
         // Calculating and drawing text over the image
         ImVec2 textSize = ImGui::CalcTextSize(hover_text);
         if (textSize.x < size.x)
         {
             float offsetX = (ImGui::GetItemRectSize().x - textSize.x) / 2;
-            drawlist->AddText(ImVec2(btnMin.x + offsetX, btnMin.y + 10), ImGui::GetColorU32(ImGuiCol_Text), hover_text);
+            window->DrawList->AddText(ImVec2(bb.Min.x + offsetX, bb.Min.y + 10), ImGui::GetColorU32(ImGuiCol_Text), hover_text);
         }
         else
         {
-            std::string buff = "";
+            std::string buf = "";
             std::stringstream ss(hover_text);
             short count = 1;
 
-            while (ss >> buff)
+            while (ss >> buf)
             {
-                textSize = ImGui::CalcTextSize(buff.c_str());
+                textSize = ImGui::CalcTextSize(buf.c_str());
                 float offsetX = (ImGui::GetItemRectSize().x - textSize.x) / 2;
-                drawlist->AddText(ImVec2(btnMin.x + offsetX, btnMin.y + 10 * count),
-                                  ImGui::GetColorU32(ImGuiCol_Text), buff.c_str());
+                window->DrawList->AddText(ImVec2(bb.Min.x + offsetX, bb.Min.y + 10 * count),
+                                  ImGui::GetColorU32(ImGuiCol_Text), buf.c_str());
                 ++count;
             }
         }
     }
 
-    return pressed;
+    return ImGui::IsItemClicked(0);
 }
 
 bool Ui::ListBox(const char* label, std::vector<std::string>& all_items, int& selected)
@@ -553,6 +533,7 @@ void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLe
                     std::function<std::string(std::string&)> getName, std::function<bool(std::string&)> verifyFunc,
                     const char** customNames, size_t length)
 {
+    ImGuiStyle& style =  ImGui::GetStyle();
     /*
     	Trying to scale images based on resolutions
     	Native 1366x768
@@ -563,7 +544,8 @@ void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLe
 
     int imageCount = 1;
     int imagesInRow = static_cast<int>(ImGui::GetWindowContentRegionWidth() / m_ImageSize.x);
-    m_ImageSize.x = ImGui::GetWindowContentRegionWidth() / imagesInRow - static_cast<int>(ImGuiStyleVar_ItemSpacing) * 0.65f;
+    m_ImageSize.x = ImGui::GetWindowContentRegionWidth() - style.ItemSpacing.x * (imagesInRow-1);
+    m_ImageSize.x /= imagesInRow;
 
     ImGui::Spacing();
 
@@ -573,7 +555,7 @@ void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLe
         imgPopup.function = nullptr;
     }
 
-    ImGui::PushItemWidth((ImGui::GetWindowContentRegionWidth() - ImGui::GetStyle().ItemSpacing.x)/2);
+    ImGui::PushItemWidth((ImGui::GetWindowContentRegionWidth() - style.ItemSpacing.x)/2);
     if (customNames)
     {
         ListBoxCustomNames("##Categories", store.m_Categories, store.m_Selected, customNames, length);
@@ -620,7 +602,7 @@ void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLe
             }
             else
             {
-                if (Ui::RoundedImageButton(store.m_ImagesList[i]->m_pTexture, m_ImageSize, modelName.c_str(), 0, ImVec4(0, 0, 0, 0), ImVec4(1, 1, 1, 1)))
+                if (Ui::RoundedImageButton(store.m_ImagesList[i]->m_pTexture, m_ImageSize, modelName.c_str()))
                 {
                     onLeftClick(text);
                 }
@@ -637,7 +619,7 @@ void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLe
             {
                 if (imageCount % imagesInRow != 0)
                 {
-                    ImGui::SameLine(0.0, ImGui::GetStyle().ItemInnerSpacing.x);
+                    ImGui::SameLine(0.0, style.ItemInnerSpacing.x);
                 }
             }
             imageCount++;
