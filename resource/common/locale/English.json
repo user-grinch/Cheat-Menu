@@ -597,7 +597,7 @@
     "DropAll": "Drop all",
     "DropCurrent": "Drop current",
     "DropWeapon": "Drop weapon",
-    "DualWeild": "Dual weild",
+    "DualWeild": "Dual wield",
     "DualWeildText": "Dual wield pistol, shawoff, uzi, tec9\n(Other weapons don't work)",
     "FastAim": "Fast aim",
     "FastAimText": "Enables aim assist on keyboard\n\nQ = left    E = right\n\nPress Q and E to switch targets.\nMoving mouse removes the target!",
