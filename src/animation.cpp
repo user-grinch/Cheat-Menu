@@ -178,7 +178,7 @@ void Animation::_PlayAnimation(RpClump* pClump, int animGroup, int animID, float
 #endif
 
 
-void Animation::PlayAnimation(std::string& ifp, std::string& anim, std::string& value)
+void Animation::PlayAnimation(std::string& root, std::string& anim, std::string& ifp)
 {
     CPed *pPed = m_PedAnim ? m_pTarget : FindPlayerPed();
 
@@ -215,7 +215,7 @@ void Animation::PlayAnimation(std::string& ifp, std::string& anim, std::string& 
     if (pPed)
     {
         int groupID, animID;
-        sscanf(value.c_str(), "%d$%d,", &groupID, &animID);
+        sscanf(ifp.c_str(), "%d$%d,", &groupID, &animID);
         _PlayAnimation(pPed->m_pRwClump, groupID, animID, 4.0f);
     }
 #endif
@@ -324,7 +324,7 @@ void Animation::ShowPage()
                     ImGui::Spacing();
                     if (ImGui::Button(TEXT("Animation.AddAnimation"), Ui::GetSize()))
                     {
-                        m_AnimData.m_pJson->m_Data["Custom"][m_nAnimBuffer] = ("0, " + std::string(m_nIfpBuffer));
+                        m_AnimData.m_pJson->m_Data["Custom"][m_nAnimBuffer] = std::string(m_nIfpBuffer);
                         m_AnimData.m_pJson->WriteToDisk();
                     }
                 }

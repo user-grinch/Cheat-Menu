@@ -341,6 +341,7 @@ void Vehicle::SpawnVehicle(const std::string& rootkey, const std::string& vehNam
         }
         else
         {
+            
             Command<Commands::DELETE_CAR>(hveh);
         }
 #else

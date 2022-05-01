@@ -4,9 +4,9 @@
 class Ped
 {
 private:
+    static inline bool m_bBigHead;
 #ifdef GTASA
     static inline bool m_bExGangWarsInstalled;
-    static inline bool m_bBigHead;
     static inline bool m_bThinBody;
     static inline std::vector<std::string> m_GangList =
     {

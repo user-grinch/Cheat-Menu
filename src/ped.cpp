@@ -16,25 +16,25 @@ void Ped::Init()
     {
         m_bExGangWarsInstalled = true;
     }
+#endif
 
     /*
-    	Taken from gta chaos mod by Lordmau5
-    	https://github.com/gta-chaos-mod/Trilogy-ASI-Script
-
+    	Taken from gta chaos mod by Lordmau5 & _AG
     	TODO: Implement in VC too
     */
+#ifdef GTASA
     Events::pedRenderEvent += [](CPed *ped)
     {
 
-        if (m_bBigHead || m_bThinBody)
+        if (m_bBigHead)// || m_bThinBody)
         {
-            auto animHier = GetAnimHierarchyFromSkinClump (ped->m_pRwClump);
+            auto animHier = GetAnimHierarchyFromSkinClump(ped->m_pRwClump);
             auto matrices = RpHAnimHierarchyGetMatrixArray (animHier);
 
             RwV3d scale = {0.7f, 0.7f, 0.7f};
             if (m_bThinBody)
             {
-                for (int i = 1; i <= 52; i++)
+                for (int i = 1; i <= 54; i++)
                 {
                     RwMatrixScale (&matrices[RpHAnimIDGetIndex (animHier, i)], &scale, rwCOMBINEPRECONCAT);
                 }
@@ -42,10 +42,37 @@ void Ped::Init()
             scale = {3.0f, 3.0f, 3.0f};
             if (m_bBigHead)
             {
-                for (int i = BONE_NECK; i <= BONE_HEAD; i++)
+                for (int i = 5; i <= 8; i++)
                 {
                     RwMatrixScale (&matrices[RpHAnimIDGetIndex (animHier, i)], &scale, rwCOMBINEPRECONCAT);
                 }
+            }
+        }
+    };
+#elif GTA3
+    CdeclEvent <AddressList<0x4CFE12, H_CALL>, PRIORITY_AFTER, ArgPickN<CPed*, 0>, void(CPed*)> onPreRender;
+    
+    onPreRender += [](CPed* ped) 
+    {
+        if (!m_bBigHead)
+        {
+            return;
+        }
+        
+        RwFrame* frame = ped->m_apFrames[2]->m_pFrame;
+
+        if (frame) 
+        {
+            RwMatrix* headMatrix = RwFrameGetMatrix(frame);
+
+            if (headMatrix) 
+            {
+                CMatrix mat;
+                mat.m_pAttachMatrix = NULL;
+                mat.Attach(headMatrix, false);
+                mat.SetScale(3.0f);
+                mat.SetTranslateOnly(0.4f, 0.0f, 0.0f);
+                mat.UpdateRW();
             }
         }
     };
@@ -166,8 +193,10 @@ void Ped::ShowPage()
             ImGui::Spacing();
             ImGui::BeginChild("CheckboxesChild");
             ImGui::Columns(2, 0, false);
-#ifdef GTASA
+#ifndef GTAVC
             Ui::CheckboxWithHint(TEXT("Ped.BigHead"), &m_bBigHead);
+#endif
+#ifdef GTASA
             Ui::CheckboxAddress(TEXT("Ped.ElvisEverywhere"), 0x969157);
             Ui::CheckboxAddress(TEXT("Ped.EveryoneArmed"), 0x969140);
             Ui::CheckboxAddress(TEXT("Ped.GangsControl"), 0x96915B);
