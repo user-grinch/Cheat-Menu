@@ -22,7 +22,7 @@ void CheatMenu::DrawWindow()
     ImGuiIO& io = ImGui::GetIO();
     static bool bRunning = true;
 
-    if (BY_GAME(FrontEndMenuManager.m_bMenuActive, FrontendMenuManager.m_bMenuVisible, FrontEndMenuManager.m_bMenuActive))
+    if (FrontEndMenuManager.m_bMenuActive)
     {
         if (bRunning)
         {
@@ -223,7 +223,7 @@ void CheatMenu::Init()
 
     Events::processScriptsEvent += []()
     {
-        if (!BY_GAME(FrontEndMenuManager.m_bMenuActive, FrontendMenuManager.m_bMenuVisible, FrontEndMenuManager.m_bMenuActive))
+        if (!FrontEndMenuManager.m_bMenuActive)
         {
             if (menuOpen.Pressed())
             {
@@ -310,14 +310,12 @@ void CheatMenu::ShowAnniversaryPage()
         ImGui::TextWrapped("Feel free to star the GitHub repo or join the discord server and provide feedback, ideas, or suggestions.");
         ImGui::NewLine();
 
-        if (ImGui::Button("Discord server", ImVec2(Ui::GetSize(2))))
+        if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Ui::GetSize(3))))
         {
             ShellExecute(nullptr, "open", DISCORD_INVITE, nullptr, nullptr, SW_SHOWNORMAL);
         }
-
         ImGui::SameLine();
-
-        if (ImGui::Button("GitHub repo", ImVec2(Ui::GetSize(2))))
+        if (ImGui::Button(TEXT("Menu.GitHubRepo"), ImVec2(Ui::GetSize(3))))
         {
             ShellExecute(nullptr, "open", GITHUB_LINK, nullptr, nullptr, SW_SHOWNORMAL);
         }
@@ -332,51 +330,48 @@ void CheatMenu::ShowWelcomePage()
 {
     ImGui::NewLine();
 
-    Ui::CenterdText("Welcome to Cheat Menu");
-    Ui::CenterdText("Author: Grinch_");
+    Ui::CenterdText(TEXT("Menu.WelcomeMSG"));
+    Ui::CenterdText(std::format("{}: Grinch_",TEXT("Menu.Author")));
 
     ImGui::NewLine();
-    ImGui::TextWrapped("Please ensure you have the latest version from GitHub.");
+    ImGui::TextWrapped(TEXT("Menu.EnsureLatest"));
     ImGui::NewLine();
-    if (ImGui::Button("Discord server", ImVec2(Ui::GetSize(2))))
+    if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Ui::GetSize(2))))
     {
         ShellExecute(nullptr, "open", DISCORD_INVITE, nullptr, nullptr, SW_SHOWNORMAL);
     }
-
     ImGui::SameLine();
-
-    if (ImGui::Button("GitHub repo", ImVec2(Ui::GetSize(2))))
+    if (ImGui::Button(TEXT("Menu.GitHubRepo"), ImVec2(Ui::GetSize(2))))
     {
         ShellExecute(nullptr, "open", GITHUB_LINK, nullptr, nullptr, SW_SHOWNORMAL);
     }
-
     ImGui::NewLine();
-    ImGui::TextWrapped("If you find bugs or have suggestions, you can let me know on discord :)");
+    ImGui::TextWrapped(TEXT("Menu.BugDisclaimer"));
     ImGui::Dummy(ImVec2(0, 30));
-    Ui::CenterdText("Copyright Grinch_ 2019-2022. All rights reserved.");
+    Ui::CenterdText(TEXT("Menu.CopyrightDisclaimer"));
 }
 
 void CheatMenu::ShowUpdatePage()
 {
     std::string ver = Updater::GetUpdateVersion();
     ImGui::Dummy(ImVec2(0, 20));
-    Ui::CenterdText("A new version of the menu is available.");
-    Ui::CenterdText(std::string("Current version: ") + MENU_VERSION);
-    Ui::CenterdText("Latest version: " + ver);
+    Ui::CenterdText(TEXT("Menu.NewVersion"));
+    Ui::CenterdText(std::format("{}: {}", TEXT("Menu.CurrentVersion"), MENU_VERSION));
+    Ui::CenterdText(TEXT("Menu.LatestVersion") + ver);
     ImGui::Dummy(ImVec2(0, 10));
-    ImGui::TextWrapped("It's highly recommanded to update to the latest version."
-                       " Newer versions may contain new features and bug fixes.");
+    ImGui::TextWrapped(TEXT("Menu.UpdaterInfo1"));
     ImGui::Dummy(ImVec2(0, 10));
-    ImGui::TextWrapped("To know what changes are made or to download, click on the 'Download page' button."
-                       " Follow the instructions there. If you're still having issues, let me know on discord.");
+    ImGui::TextWrapped(TEXT("Menu.UpdaterInfo2"));
 
     ImGui::Dummy(ImVec2(0, 5));
-    if (ImGui::Button("Discord server", ImVec2(Ui::GetSize(2))))
-        ShellExecute(NULL, "open", DISCORD_INVITE, NULL, NULL, SW_SHOWNORMAL);
+    if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Ui::GetSize(2))))
+    {
+        ShellExecute(nullptr, "open", DISCORD_INVITE, nullptr, nullptr, SW_SHOWNORMAL);
+    }
 
     ImGui::SameLine();
 
-    if (ImGui::Button("Download page", Ui::GetSize(2)))
+    if (ImGui::Button(TEXT("Menu.DownloadPage"), Ui::GetSize(2)))
     {
         ShellExecute(NULL, "open", std::string("https://github.com/user-grinch/Cheat-Menu/releases/tag/" +
                                                ver).c_str(), NULL, NULL, SW_SHOWNORMAL);

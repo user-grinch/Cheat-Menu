@@ -13,7 +13,7 @@ void Weapon::Init()
 #ifdef GTASA
         if (m_bAutoAim)
         {
-            if (CPad::NewMouseControllerState.X == 0 && CPad::NewMouseControllerState.Y == 0)
+            if (CPad::NewMouseControllerState.x == 0 && CPad::NewMouseControllerState.y == 0)
             {
                 if (KeyPressed(2))
                 {
@@ -28,15 +28,10 @@ void Weapon::Init()
 #endif
 
 
-        uchar slot = BY_GAME(player->m_nActiveWeaponSlot, player->m_nActiveWeaponSlot, player->m_nCurrentWeapon);
+        uchar slot = player->m_nCurrentWeapon;
         if (m_nCurrentWeaponSlot != slot)
         {
-
-#ifdef GTA3
             eWeaponType weaponType = player->m_aWeapons[slot].m_eWeaponType;
-#else
-            eWeaponType weaponType = player->m_aWeapons[slot].m_nType;
-#endif
 
 #ifdef GTASA
             CWeaponInfo* pWeaponInfo = CWeaponInfo::GetWeaponInfo(weaponType, player->GetWeaponSkill(weaponType));
@@ -116,29 +111,27 @@ static void ClearPlayerWeapon(eWeaponType weaponType)
     {
         CWeapon *pWeapon = &pPlayer->m_aWeapons[weaponSlot];
 
-#ifdef GTA3
+
         if (pWeapon->m_eWeaponType == weaponType)
         {
             if (pPlayer->m_nCurrentWeapon == weaponSlot)
             {
+#ifdef GTA3
                 Command<Commands::SET_CURRENT_PLAYER_WEAPON>(0, WEAPONTYPE_UNARMED);
-            }
-            // This doesn't work for melee weapons aka bats, chainsaw etc
-            pWeapon->m_eWeaponState = WEAPONSTATE_OUT_OF_AMMO;
-            pWeapon->m_nAmmoTotal = 0;
-            pWeapon->m_nAmmoInClip = 0;
-        }
 #else
-        if (pWeapon->m_nType == weaponType)
-        {
-            if (pPlayer->m_nActiveWeaponSlot == weaponSlot)
-            {
                 CWeaponInfo *pWeaponInfo = CWeaponInfo::GetWeaponInfo(WEAPONTYPE_UNARMED);
                 pPlayer->SetCurrentWeapon(pWeaponInfo->m_WeaponSlot);
-            }
-            pWeapon->Shutdown();
-        }
 #endif
+            }
+#ifdef GTA3
+                // This doesn't work for melee weapons aka bats, chainsaw etc
+                pWeapon->m_eWeaponState = WEAPONSTATE_OUT_OF_AMMO;
+                pWeapon->m_nAmmoTotal = 0;
+                pWeapon->m_nAmmoInClip = 0;
+#else
+                pWeapon->Shutdown();
+#endif
+        }
     }
 }
 
@@ -236,12 +229,7 @@ void Weapon::ShowPage()
         float x, y, z;
         Command<Commands::GET_OFFSET_FROM_CHAR_IN_WORLD_COORDS>(hplayer, 0.0, 3.0, 0.0, &x, &y, &z);
 
-#ifdef GTA3
         eWeaponType weaponType = pPlayer->m_aWeapons[pPlayer->m_nCurrentWeapon].m_eWeaponType;
-#else
-        eWeaponType weaponType = pPlayer->m_aWeapons[pPlayer->m_nActiveWeaponSlot].m_nType;
-#endif
-
         if (weaponType)
         {
             int model = 0, pickup = 0;
@@ -269,9 +257,7 @@ void Weapon::ShowPage()
     if (ImGui::Button(TEXT("Weapon.DropCurrent"), Ui::GetSize(3)))
     {
 #ifdef GTASA
-        Command<Commands::REMOVE_WEAPON_FROM_CHAR>(hplayer, pPlayer->m_aWeapons[pPlayer->m_nActiveWeaponSlot].m_nType);
-#elif GTAVC
-        ClearPlayerWeapon(pPlayer->m_aWeapons[pPlayer->m_nActiveWeaponSlot].m_nType);
+        Command<Commands::REMOVE_WEAPON_FROM_CHAR>(hplayer, pPlayer->m_aWeapons[pPlayer->m_nCurrentWeapon].m_eWeaponType);
 #else
         ClearPlayerWeapon(pPlayer->m_aWeapons[pPlayer->m_nCurrentWeapon].m_eWeaponType);
 #endif

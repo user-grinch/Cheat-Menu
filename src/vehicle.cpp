@@ -80,7 +80,7 @@ void Vehicle::Init()
                 pVeh->m_nPhysicalFlags.bExplosionProof = true;
                 pVeh->m_nPhysicalFlags.bFireProof = true;
                 pVeh->m_nPhysicalFlags.bCollisionProof = true;
-                pVeh->m_nPhysicalFlags.bMeeleProof = true;
+                pVeh->m_nPhysicalFlags.bMeleeProof = true;
                 pVeh->m_nVehicleFlags.bCanBeDamaged = true;
 #elif GTAVC
                 pVeh->m_nFlags.bBulletProof = true;
@@ -90,11 +90,11 @@ void Vehicle::Init()
                 pVeh->m_nFlags.bMeleeProof = true;
                 pVeh->m_nFlags.bImmuneToNonPlayerDamage = true;
 #else
-                pVeh->m_nEntityFlags.bBulletProof = true;
-                pVeh->m_nEntityFlags.bExplosionProof = true;
-                pVeh->m_nEntityFlags.bFireProof = true;
-                pVeh->m_nEntityFlags.bCollisionProof = true;
-                pVeh->m_nEntityFlags.bMeleeProof = true;
+                pVeh->m_nFlags.bBulletProof = true;
+                pVeh->m_nFlags.bExplosionProof = true;
+                pVeh->m_nFlags.bFireProof = true;
+                pVeh->m_nFlags.bCollisionProof = true;
+                pVeh->m_nFlags.bMeleeProof = true;
 #endif
             }
 
@@ -107,9 +107,7 @@ void Vehicle::Init()
             }
 
 #ifdef GTASA
-
-            if (m_UnlimitedNitro::m_bEnabled
-                    && BY_GAME(pVeh->m_nVehicleSubClass, pVeh->m_nVehicleClass, NULL) == VEHICLE_AUTOMOBILE)
+            if (m_UnlimitedNitro::m_bEnabled && pVeh->m_nVehicleSubClass == VEHICLE_AUTOMOBILE)
             {
                 patch::Set<BYTE>(0x969165, 0, true); // All cars have nitro
                 patch::Set<BYTE>(0x96918B, 0, true); // All taxis have nitro
@@ -207,7 +205,9 @@ void Vehicle::AddComponent(const std::string& component, const bool display_mess
         CStreaming::SetModelIsDeletable(icomp);
 
         if (display_message)
+        {
             SetHelpMessage("Component added");
+        }
     }
     catch (...)
     {
@@ -278,8 +278,8 @@ void WarpPlayerIntoVehicle(CVehicle *pVeh, int seatId)
     pPlayer->RegisterReference((CEntity**)&pPlayer->m_pVehicle);
     pPlayer->m_pObjectiveVehicle = pVeh;
     pPlayer->RegisterReference((CEntity**)&pPlayer->m_pObjectiveVehicle);
-    pPlayer->m_dwAction = ePedAction::Driving;
-    pPlayer->m_dwObjective = OBJECTIVE_NO_OBJ;
+    pPlayer->m_ePedState = ePedState::PEDSTATE_DRIVING;
+    pPlayer->m_nObjective = OBJECTIVE_NO_OBJ;
     patch::Set<BYTE>(0x7838CD, 1); // player got in car flag
     Call<0x41D370>(pVeh); // CCarCtrl::RegisterVehicleOfInterest
 
@@ -317,8 +317,7 @@ void Vehicle::SpawnVehicle(const std::string& rootkey, const std::string& vehNam
 
     int imodel = std::stoi(smodel);
     CVehicle* veh = nullptr;
-
-    int interior = BY_GAME(player->m_nAreaCode, player->m_nInterior, 0);
+    int interior = BY_GAME(player->m_nAreaCode, player->m_nAreaCode, NULL);
 
     CVector pos = player->GetPosition();
     float speed = 0;
@@ -331,7 +330,6 @@ void Vehicle::SpawnVehicle(const std::string& rootkey, const std::string& vehNam
         pos = pveh->GetPosition();
 
         Command<Commands::GET_CAR_SPEED>(hveh, &speed);
-
         Command<Commands::WARP_CHAR_FROM_CAR_TO_COORD>(hplayer, pos.x, pos.y, pos.z);
 
 #ifdef GTASA
@@ -459,9 +457,9 @@ void Vehicle::SpawnVehicle(const std::string& rootkey, const std::string& vehNam
             veh->SetOrientation(x, y, z);
 #endif
         }
-        BY_GAME(veh->m_nDoorLock, veh->m_nLockStatus, veh->m_nDoorLock) = CARLOCK_UNLOCKED;
+        veh->m_nDoorLock = DOORLOCK_UNLOCKED;
 #ifndef GTA3
-        BY_GAME(veh->m_nAreaCode, veh->m_nInterior, NULL) = interior;
+        BY_GAME(veh->m_nAreaCode, veh->m_nAreaCode, NULL) = interior;
 #endif
         Command<Commands::MARK_CAR_AS_NO_LONGER_NEEDED>(CPools::GetVehicleRef(veh));
         CStreaming::SetModelIsDeletable(imodel);
@@ -562,7 +560,7 @@ void Vehicle::ShowPage()
                     pVeh->m_nPhysicalFlags.bExplosionProof = false;
                     pVeh->m_nPhysicalFlags.bFireProof = false;
                     pVeh->m_nPhysicalFlags.bCollisionProof = false;
-                    pVeh->m_nPhysicalFlags.bMeeleProof = false;
+                    pVeh->m_nPhysicalFlags.bMeleeProof = false;
                     pVeh->m_nVehicleFlags.bCanBeDamaged = false;
 #elif GTAVC
                     pVeh->m_nFlags.bBulletProof = false;
@@ -572,11 +570,11 @@ void Vehicle::ShowPage()
                     pVeh->m_nFlags.bMeleeProof = false;
                     pVeh->m_nFlags.bImmuneToNonPlayerDamage = false;
 #else
-                    pVeh->m_nEntityFlags.bBulletProof = false;
-                    pVeh->m_nEntityFlags.bExplosionProof = false;
-                    pVeh->m_nEntityFlags.bFireProof = false;
-                    pVeh->m_nEntityFlags.bCollisionProof = false;
-                    pVeh->m_nEntityFlags.bMeleeProof = false;
+                    pVeh->m_nFlags.bBulletProof = false;
+                    pVeh->m_nFlags.bExplosionProof = false;
+                    pVeh->m_nFlags.bFireProof = false;
+                    pVeh->m_nFlags.bCollisionProof = false;
+                    pVeh->m_nFlags.bMeleeProof = false;
 #endif
                 }
             }
@@ -666,16 +664,16 @@ void Vehicle::ShowPage()
                     pVeh->m_nVehicleFlags.bAlwaysSkidMarks = state;
 #endif
 
-                state = BY_GAME(pVeh->m_nPhysicalFlags.bBulletProof, pVeh->m_nFlags.bBulletProof, pVeh->m_nEntityFlags.bBulletProof);
+                state = BY_GAME(pVeh->m_nPhysicalFlags.bBulletProof, pVeh->m_nFlags.bBulletProof, pVeh->m_nFlags.bBulletProof);
                 if (Ui::CheckboxWithHint(TEXT("Vehicle.BulletProof"), &state, nullptr, m_bNoDamage))
                 {
-                    BY_GAME(pVeh->m_nPhysicalFlags.bBulletProof, pVeh->m_nFlags.bBulletProof, pVeh->m_nEntityFlags.bBulletProof) = state;
+                    BY_GAME(pVeh->m_nPhysicalFlags.bBulletProof, pVeh->m_nFlags.bBulletProof, pVeh->m_nFlags.bBulletProof) = state;
                 }
 
-                state = BY_GAME(pVeh->m_nPhysicalFlags.bCollisionProof, pVeh->m_nFlags.bCollisionProof, pVeh->m_nEntityFlags.bCollisionProof);
+                state = BY_GAME(pVeh->m_nPhysicalFlags.bCollisionProof, pVeh->m_nFlags.bCollisionProof, pVeh->m_nFlags.bCollisionProof);
                 if (Ui::CheckboxWithHint(TEXT("Vehicle.ColProof"), &state, nullptr, m_bNoDamage))
                 {
-                    BY_GAME(pVeh->m_nPhysicalFlags.bCollisionProof, pVeh->m_nFlags.bCollisionProof, pVeh->m_nEntityFlags.bCollisionProof) = state;
+                    BY_GAME(pVeh->m_nPhysicalFlags.bCollisionProof, pVeh->m_nFlags.bCollisionProof, pVeh->m_nFlags.bCollisionProof) = state;
                 }
 
 #ifdef GTASA
@@ -701,16 +699,16 @@ void Vehicle::ShowPage()
                     pVeh->m_nVehicleFlags.bEngineOn = state;
                 }
 
-                state = BY_GAME(pVeh->m_nPhysicalFlags.bExplosionProof, pVeh->m_nFlags.bExplosionProof, pVeh->m_nEntityFlags.bExplosionProof);
+                state = BY_GAME(pVeh->m_nPhysicalFlags.bExplosionProof, pVeh->m_nFlags.bExplosionProof, pVeh->m_nFlags.bExplosionProof);
                 if (Ui::CheckboxWithHint(TEXT("Vehicle.ExplosionProof"), &state, nullptr, m_bNoDamage))
                 {
-                    BY_GAME(pVeh->m_nPhysicalFlags.bExplosionProof, pVeh->m_nFlags.bExplosionProof, pVeh->m_nEntityFlags.bExplosionProof) = state;
+                    BY_GAME(pVeh->m_nPhysicalFlags.bExplosionProof, pVeh->m_nFlags.bExplosionProof, pVeh->m_nFlags.bExplosionProof) = state;
                 }
 
-                state = BY_GAME(pVeh->m_nPhysicalFlags.bFireProof, pVeh->m_nFlags.bFireProof, pVeh->m_nEntityFlags.bFireProof);
+                state = BY_GAME(pVeh->m_nPhysicalFlags.bFireProof, pVeh->m_nFlags.bFireProof, pVeh->m_nFlags.bFireProof);
                 if (Ui::CheckboxWithHint(TEXT("Vehicle.FireProof"), &state, nullptr, m_bNoDamage))
                 {
-                    BY_GAME(pVeh->m_nPhysicalFlags.bFireProof, pVeh->m_nFlags.bFireProof, pVeh->m_nEntityFlags.bFireProof) = state;
+                    BY_GAME(pVeh->m_nPhysicalFlags.bFireProof, pVeh->m_nFlags.bFireProof, pVeh->m_nFlags.bFireProof) = state;
                 }
 
                 ImGui::NextColumn();
@@ -723,10 +721,10 @@ void Vehicle::ShowPage()
                 }
 #endif
 
-                state = !BY_GAME(pVeh->m_bIsVisible, pVeh->m_nFlags.bIsVisible, pVeh->m_nEntityFlags.bIsVisible);
+                state = !BY_GAME(pVeh->m_bIsVisible, pVeh->m_nFlags.bIsVisible, pVeh->m_nFlags.bIsVisible);
                 if (Ui::CheckboxWithHint(TEXT("Vehicle.InvisCar"), &state, nullptr, !is_driver))
                 {
-                    BY_GAME(pVeh->m_bIsVisible, pVeh->m_nFlags.bIsVisible, pVeh->m_nEntityFlags.bIsVisible) = !state;
+                    BY_GAME(pVeh->m_bIsVisible, pVeh->m_nFlags.bIsVisible, pVeh->m_nFlags.bIsVisible) = !state;
                 }
 
                 state = BY_GAME(!pVeh->ms_forceVehicleLightsOff, pVeh->m_nVehicleFlags.bLightsOn, pVeh->m_nVehicleFlags.bLightsOn);
@@ -735,23 +733,16 @@ void Vehicle::ShowPage()
                     BY_GAME(pVeh->ms_forceVehicleLightsOff, pVeh->m_nVehicleFlags.bLightsOn, pVeh->m_nVehicleFlags.bLightsOn) = state;
                 }
 
-                state = BY_GAME(pVeh->m_nDoorLock, pVeh->m_nLockStatus, pVeh->m_nDoorLock) == CARLOCK_LOCKED_PLAYER_INSIDE;
+                state = pVeh->m_nDoorLock == DOORLOCK_LOCKED_PLAYER_INSIDE;
                 if (Ui::CheckboxWithHint(TEXT("Vehicle.LockDoor"), &state, nullptr, !is_driver))
                 {
-                    if (state)
-                    {
-                        BY_GAME(pVeh->m_nDoorLock, pVeh->m_nLockStatus, pVeh->m_nDoorLock) = CARLOCK_LOCKED_PLAYER_INSIDE;
-                    }
-                    else
-                    {
-                        BY_GAME(pVeh->m_nDoorLock, pVeh->m_nLockStatus, pVeh->m_nDoorLock) = CARLOCK_UNLOCKED;
-                    }
+                    pVeh->m_nDoorLock = state ? DOORLOCK_LOCKED_PLAYER_INSIDE : DOORLOCK_UNLOCKED;
                 }
 
-                state = BY_GAME(pVeh->m_nPhysicalFlags.bMeeleProof, pVeh->m_nFlags.bMeleeProof, pVeh->m_nEntityFlags.bMeleeProof);
+                state = BY_GAME(pVeh->m_nPhysicalFlags.bMeleeProof, pVeh->m_nFlags.bMeleeProof, pVeh->m_nFlags.bMeleeProof);
                 if (Ui::CheckboxWithHint(TEXT("Vehicle.MeleeProof"), &state, nullptr, m_bNoDamage))
                 {
-                    BY_GAME(pVeh->m_nPhysicalFlags.bMeeleProof, pVeh->m_nFlags.bMeleeProof, pVeh->m_nEntityFlags.bMeleeProof) = state;
+                    BY_GAME(pVeh->m_nPhysicalFlags.bMeleeProof, pVeh->m_nFlags.bMeleeProof, pVeh->m_nFlags.bMeleeProof) = state;
                 }
 
 #ifdef GTASA
@@ -795,11 +786,8 @@ void Vehicle::ShowPage()
 
                 if (pClosestVeh)
                 {
-#ifdef GTA3
-                    int seats = pClosestVeh->m_nNumMaxPassengers;
-#else
                     int seats = pClosestVeh->m_nMaxPassengers;
-#endif
+
                     ImGui::Spacing();
                     ImGui::Columns(2, 0, false);
 

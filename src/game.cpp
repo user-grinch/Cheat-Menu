@@ -240,12 +240,7 @@ void Game::FreeCam()
         m_Freecam::m_bRadarState = patch::Get<BYTE>(BY_GAME(0xBA676C, 0xA10AB6, NULL)); // radar
 
         CVector playerPos = player->GetPosition();
-
-#ifdef GTA3
-        CPad::GetPad(0)->m_bDisablePlayerControls = true;
-#else
         CPad::GetPad(0)->DisablePlayerControls = true;
-#endif
 
         Command<Commands::CREATE_RANDOM_CHAR>(playerPos.x, playerPos.y, playerPos.z, &m_Freecam::m_nPed);
         m_Freecam::m_pPed = CPools::GetPed(m_Freecam::m_nPed);
@@ -270,8 +265,8 @@ void Game::FreeCam()
         m_Freecam::m_pPed->SetPosition(playerPos);
         patch::Set<BYTE>(0xA10AB6, 1); // disable radar
 #else
-        m_Freecam::m_pPed->m_nEntityFlags.bIsVisible = false;
-        m_Freecam::m_pPed->m_nEntityFlags.bUsesCollision = false;
+        m_Freecam::m_pPed->m_nFlags.bIsVisible = false;
+        m_Freecam::m_pPed->m_nFlags.bUsesCollision = false;
         m_Freecam::m_pPed->SetPosition(playerPos.x, playerPos.y, playerPos.z);
 #endif
 
@@ -280,8 +275,8 @@ void Game::FreeCam()
 
     CVector pos = m_Freecam::m_pPed->GetPosition();
 
-    m_Freecam::m_fMouse.x = CPad::NewMouseControllerState.X;
-    m_Freecam::m_fMouse.y = CPad::NewMouseControllerState.Y;
+    m_Freecam::m_fMouse.x = CPad::NewMouseControllerState.x;
+    m_Freecam::m_fMouse.y = CPad::NewMouseControllerState.y;
     m_Freecam::m_fTotalMouse.x = m_Freecam::m_fTotalMouse.x - m_Freecam::m_fMouse.x / 250;
     m_Freecam::m_fTotalMouse.y = m_Freecam::m_fTotalMouse.y + m_Freecam::m_fMouse.y / 3;
 
@@ -398,11 +393,7 @@ void Game::ClearFreecamStuff()
     patch::Set<BYTE>(BY_GAME(0xBA6769, 0x86963A, NULL), m_Freecam::m_bHudState); // hud
     patch::Set<BYTE>(BY_GAME(0xBA676C, 0xA10AB6, NULL), m_Freecam::m_bRadarState); // radar
 
-#ifdef GTA3
-    CPad::GetPad(0)->m_bDisablePlayerControls = false;
-#else
     CPad::GetPad(0)->DisablePlayerControls = false;
-#endif
 
     Command<Commands::DELETE_CHAR>(m_Freecam::m_nPed);
     m_Freecam::m_pPed = nullptr;
@@ -481,14 +472,7 @@ void Game::ShowPage()
 #ifdef GTASA
             if (Ui::CheckboxWithHint(TEXT("Game.ForbiddenWantedLevel"), &m_bForbiddenArea, TEXT("Game.ForbiddenWantedLevelText")))
             {
-                if (m_bForbiddenArea)
-                {
-                    patch::Set<BYTE>(0x441770, 0x83, false);
-                }
-                else
-                {
-                    patch::Set<BYTE>(0x441770, 0xC3, false);
-                }
+                patch::Set<BYTE>(0x441770, m_bForbiddenArea ? 0x83 : 0xC3, false);
             }
             Ui::CheckboxAddress(TEXT("Game.FreePNS"), 0x96C009);
 #endif
@@ -589,7 +573,7 @@ void Game::ShowPage()
             }
 #endif
             Ui::EditAddress<int>(TEXT("Game.DaysPassed"), BY_GAME(0xB79038, 0x97F1F4, 0x8F2BB8), 0, 9999);
-            Ui::EditReference(TEXT("Game.FPSLimit"), BY_GAME(RsGlobal.frameLimit, RsGlobal.maxFPS, RsGlobal.maxFPS), 1, 30, 60);
+            Ui::EditReference(TEXT("Game.FPSLimit"), RsGlobal.frameLimit, 1, 30, 60);
 #ifdef GTASA
             if (ImGui::CollapsingHeader(TEXT("Game.Freecam")))
             {

@@ -188,7 +188,7 @@ void D3dHook::ProcessMouse()
             {
                 bMouseDisabled = true;
 #ifdef GTA3
-                pad->m_bDisablePlayerControls = true;
+                pad->DisablePlayerControls = true;
 #else
                 pad->DisablePlayerControls = true;
 #endif
@@ -197,7 +197,7 @@ void D3dHook::ProcessMouse()
             {
                 bMouseDisabled = false;
 #ifdef GTA3
-                pad->m_bDisablePlayerControls = false;
+                pad->DisablePlayerControls = false;
 #else
                 pad->DisablePlayerControls = false;
 #endif
@@ -229,8 +229,8 @@ void D3dHook::ProcessMouse()
 #endif
         }
 
-        CPad::NewMouseControllerState.X = 0;
-        CPad::NewMouseControllerState.Y = 0;
+        CPad::NewMouseControllerState.x = 0;
+        CPad::NewMouseControllerState.y = 0;
 #ifdef GTA3
         CPad::GetPad(0)->ClearMouseHistory();
 #else

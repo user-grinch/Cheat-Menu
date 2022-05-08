@@ -23,7 +23,7 @@ void Teleport::FetchRadarSpriteData()
     m_tpData.m_pJson->m_Data.erase("Radar");
     for (int i = 0; i != maxSprites; ++i)
     {
-        CVector pos = CRadar::ms_RadarTrace[i].m_vPosition;
+        CVector pos = CRadar::ms_RadarTrace[i].m_vecPos;
         uchar sprite = CRadar::ms_RadarTrace[i].m_nBlipSprite;
         auto sprite_name = m_SpriteJson.m_Data[std::to_string(sprite)].get<std::string>();
         std::string key_name = sprite_name + ", " + Util::GetLocationName(&pos);
@@ -103,7 +103,7 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
             return;
         }
         CEntity* pPlayerEntity = FindPlayerEntity(-1);
-        pos = targetBlip.m_vPosition;
+        pos = targetBlip.m_vecPos;
         pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, nullptr, &pPlayerEntity) + 500.f;
 
         m_Teleport::m_fPos = pos;
@@ -163,7 +163,7 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
     if (pVeh && pPlayer->m_pVehicle)
     {
 #ifdef GTAVC
-        pPlayer->m_nInterior = interior_id;
+        pPlayer->m_nAreaCode = interior_id;
 #endif
         pVeh->Teleport(pos);
     }
@@ -174,7 +174,7 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
 #endif
 
 #if defined GTASA || defined GTAVC
-    BY_GAME(pPlayer->m_nAreaCode, pPlayer->m_nInterior, NULL) = interior_id;
+    pPlayer->m_nAreaCode = interior_id;
     Command<Commands::SET_AREA_VISIBLE>(interior_id);
 #endif
 }

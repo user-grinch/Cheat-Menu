@@ -12,7 +12,8 @@ void MenuThread(void* param)
         Doing it like this doesn't prevent from attaching a debugger
     */ 
     static bool gameStarted = false;
-    Events::processScriptsEvent +=[]{
+    Events::processScriptsEvent +=[]
+    {
         gameStarted = true;
     };
 
@@ -108,8 +109,8 @@ BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
         }
         else
         {
-            gLog << "Error: Unknown game version. GTA " <<  BY_GAME("SA v1.0 US Hoodlum", "VC v1.0 EN", "III v1.0 EN") << " is required." << std::endl;
-            MessageBox(HWND_DESKTOP, "Unknown game version. GTA " BY_GAME("SA v1.0 US Hoodlum", "VC v1.0 EN", "III v1.0 EN") " is required.", "CheatMenu", MB_ICONERROR);
+            gLog << "Error: Unknown game version. GTA " <<  BY_GAME("SA v1.0 US Hoodlum or Compact", "VC v1.0 EN", "III v1.0 EN") << " is required." << std::endl;
+            MessageBox(HWND_DESKTOP, "Unknown game version. GTA " BY_GAME("SA v1.0 US Hoodlum or Compact", "VC v1.0 EN", "III v1.0 EN") " is required.", "CheatMenu", MB_ICONERROR);
         }
     }
 

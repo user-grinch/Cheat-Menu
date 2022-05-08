@@ -165,11 +165,7 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
             Command<Commands::MARK_CHAR_AS_NO_LONGER_NEEDED>(hplayer);
         }
         ped->m_nPedFlags.bPedIsBleeding = m_SpawnPed::m_bPedBleed;
-#ifdef GTA3
-        ped->m_nWepAccuracy = m_SpawnPed::m_nAccuracy;
-#else
         ped->m_nWeaponAccuracy = m_SpawnPed::m_nAccuracy;
-#endif
         ped->m_fHealth = m_SpawnPed::m_nPedHealth;
 #ifdef GTASA
         if (m_SpawnPed::m_nWeaponId != 0)

@@ -12,7 +12,9 @@ static inline void PlayerModelBrokenFix()
     CPlayerPed* pPlayer = FindPlayerPed();
 
     if (pPlayer->m_nModelIndex == 0)
+    {
         Call<0x5A81E0>(0, pPlayer->m_pPlayerData->m_pPedClothesDesc, 0xBC1C78, false);
+    }
 }
 
 /*
@@ -181,7 +183,7 @@ void Player::Init()
             player->m_nPhysicalFlags.bCollisionProof = 1;
             player->m_nPhysicalFlags.bExplosionProof = 1;
             player->m_nPhysicalFlags.bFireProof = 1;
-            player->m_nPhysicalFlags.bMeeleProof  = 1;
+            player->m_nPhysicalFlags.bMeleeProof  = 1;
 #elif GTAVC
             player->m_nFlags.bBulletProof = 1;
             player->m_nFlags.bCollisionProof = 1;
@@ -189,11 +191,11 @@ void Player::Init()
             player->m_nFlags.bFireProof = 1;
             player->m_nFlags.bMeleeProof = 1;
 #else
-            player->m_nEntityFlags.bBulletProof = m_bGodMode;
-            player->m_nEntityFlags.bCollisionProof = m_bGodMode;
-            player->m_nEntityFlags.bExplosionProof = m_bGodMode;
-            player->m_nEntityFlags.bFireProof = m_bGodMode;
-            player->m_nEntityFlags.bMeleeProof = m_bGodMode;
+            player->m_nFlags.bBulletProof = m_bGodMode;
+            player->m_nFlags.bCollisionProof = m_bGodMode;
+            player->m_nFlags.bExplosionProof = m_bGodMode;
+            player->m_nFlags.bFireProof = m_bGodMode;
+            player->m_nFlags.bMeleeProof = m_bGodMode;
 #endif
         }
 
@@ -230,7 +232,7 @@ void Player::Init()
                 player->m_nPhysicalFlags.bCollisionProof = 0;
                 player->m_nPhysicalFlags.bExplosionProof = 0;
                 player->m_nPhysicalFlags.bFireProof = 0;
-                player->m_nPhysicalFlags.bMeeleProof = 0;
+                player->m_nPhysicalFlags.bMeleeProof = 0;
 #elif GTAVC
                 player->m_nFlags.bBulletProof = 0;
                 player->m_nFlags.bCollisionProof = 0;
@@ -238,11 +240,11 @@ void Player::Init()
                 player->m_nFlags.bFireProof = 0;
                 player->m_nFlags.bMeleeProof = 0;
 #else
-                player->m_nEntityFlags.bBulletProof = m_bGodMode;
-                player->m_nEntityFlags.bCollisionProof = m_bGodMode;
-                player->m_nEntityFlags.bExplosionProof = m_bGodMode;
-                player->m_nEntityFlags.bFireProof = m_bGodMode;
-                player->m_nEntityFlags.bMeleeProof = m_bGodMode;
+                player->m_nFlags.bBulletProof = m_bGodMode;
+                player->m_nFlags.bCollisionProof = m_bGodMode;
+                player->m_nFlags.bExplosionProof = m_bGodMode;
+                player->m_nFlags.bFireProof = m_bGodMode;
+                player->m_nFlags.bMeleeProof = m_bGodMode;
 #endif
                 m_bGodMode = false;
             }
@@ -417,8 +419,7 @@ void Player::ShowPage()
             }
             ImGui::EndDisabled();
 #endif
-            Ui::CheckboxAddress(TEXT("Player.FreeHealthcare"), BY_GAME((int)&pInfo->m_bFreeHealthCare,
-                                (int)&pInfo->m_bFreeHealthCare, (int)&pInfo->m_bGetOutOfHospitalFree));
+            Ui::CheckboxAddress(TEXT("Player.FreeHealthcare"), (int)&pInfo->m_bFreeHealthCare);
 
             if (Ui::CheckboxWithHint(TEXT("Player.FreezeWL"), &m_bFreezeWantedLevel))
             {
@@ -451,7 +452,7 @@ void Player::ShowPage()
                 pPlayer->m_nPhysicalFlags.bCollisionProof = m_bGodMode;
                 pPlayer->m_nPhysicalFlags.bExplosionProof = m_bGodMode;
                 pPlayer->m_nPhysicalFlags.bFireProof = m_bGodMode;
-                pPlayer->m_nPhysicalFlags.bMeeleProof = m_bGodMode;
+                pPlayer->m_nPhysicalFlags.bMeleeProof = m_bGodMode;
 #elif GTAVC
                 pPlayer->m_nFlags.bBulletProof = m_bGodMode;
                 pPlayer->m_nFlags.bCollisionProof = m_bGodMode;
@@ -459,11 +460,11 @@ void Player::ShowPage()
                 pPlayer->m_nFlags.bFireProof = m_bGodMode;
                 pPlayer->m_nFlags.bMeleeProof = m_bGodMode;
 #else
-                pPlayer->m_nEntityFlags.bBulletProof = m_bGodMode;
-                pPlayer->m_nEntityFlags.bCollisionProof = m_bGodMode;
-                pPlayer->m_nEntityFlags.bExplosionProof = m_bGodMode;
-                pPlayer->m_nEntityFlags.bFireProof = m_bGodMode;
-                pPlayer->m_nEntityFlags.bMeleeProof = m_bGodMode;
+                pPlayer->m_nFlags.bBulletProof = m_bGodMode;
+                pPlayer->m_nFlags.bCollisionProof = m_bGodMode;
+                pPlayer->m_nFlags.bExplosionProof = m_bGodMode;
+                pPlayer->m_nFlags.bFireProof = m_bGodMode;
+                pPlayer->m_nFlags.bMeleeProof = m_bGodMode;
 #endif
             }
             Ui::CheckboxWithHint(TEXT("Player.HealthRegen"), &m_bHealthRegen, TEXT("Player.HealthRegenTip"));
@@ -472,11 +473,11 @@ void Player::ShowPage()
             Ui::CheckboxAddress(TEXT("Player.InfO2"), 0x96916E);
             if (Ui::CheckboxBitFlag(TEXT("Player.InvisPlayer"), pPlayer->m_nPedFlags.bDontRender))
             {
-                pPlayer->m_nPedFlags.bDontRender = (pPlayer->m_nPedFlags.bDontRender == 1) ? 0 : 1;
+                pPlayer->m_nPedFlags.bDontRender != pPlayer->m_nPedFlags.bDontRender;
             }
             Ui::CheckboxAddress(TEXT("Player.InfSprint"), 0xB7CEE4);
 #else
-            Ui::CheckboxAddress(TEXT("Player.InfSprint"), BY_GAME(NULL, (int)&pInfo->m_bNeverGetsTired, (int)&pInfo->m_bInfiniteSprint));
+            Ui::CheckboxAddress(TEXT("Player.InfSprint"), (int)&pInfo->m_bInfiniteSprint);
 #endif
 
             ImGui::NextColumn();
@@ -484,7 +485,7 @@ void Player::ShowPage()
 #ifdef GTASA
             if (Ui::CheckboxBitFlag(TEXT("Player.LockControl"), pad->bPlayerSafe))
             {
-                pad->bPlayerSafe = (pad->bPlayerSafe == 1) ? 0 : 1;
+                pad->bPlayerSafe != pad->bPlayerSafe;
             }
             Ui::CheckboxAddressEx(TEXT("Player.MaxAppeal"), 0x969180, 1, 0);
             Ui::CheckboxAddress(TEXT("Player.MegaJump"), 0x96916C);
@@ -551,45 +552,45 @@ void Player::ShowPage()
             ImGui::Columns(2, 0, false);
 
             bool state = BY_GAME(pPlayer->m_nPhysicalFlags.bBulletProof, pPlayer->m_nFlags.bBulletProof,
-                                 pPlayer->m_nEntityFlags.bBulletProof);
+                                 pPlayer->m_nFlags.bBulletProof);
             if (Ui::CheckboxWithHint(TEXT("Player.BulletProof"), &state, nullptr, m_bGodMode))
             {
                 BY_GAME(pPlayer->m_nPhysicalFlags.bBulletProof, pPlayer->m_nFlags.bBulletProof,
-                        pPlayer->m_nEntityFlags.bBulletProof) = state;
+                        pPlayer->m_nFlags.bBulletProof) = state;
             }
 
             state = BY_GAME(pPlayer->m_nPhysicalFlags.bCollisionProof, pPlayer->m_nFlags.bCollisionProof,
-                            pPlayer->m_nEntityFlags.bCollisionProof);
+                            pPlayer->m_nFlags.bCollisionProof);
             if (Ui::CheckboxWithHint(TEXT("Player.CollisionProof"), &state, nullptr, m_bGodMode))
             {
                 BY_GAME(pPlayer->m_nPhysicalFlags.bCollisionProof, pPlayer->m_nFlags.bCollisionProof,
-                        pPlayer->m_nEntityFlags.bCollisionProof) = state;
+                        pPlayer->m_nFlags.bCollisionProof) = state;
             }
 
             state = BY_GAME(pPlayer->m_nPhysicalFlags.bExplosionProof, pPlayer->m_nFlags.bExplosionProof,
-                            pPlayer->m_nEntityFlags.bExplosionProof);
+                            pPlayer->m_nFlags.bExplosionProof);
             if (Ui::CheckboxWithHint(TEXT("Player.ExplosionProof"), &state, nullptr, m_bGodMode))
             {
                 BY_GAME(pPlayer->m_nPhysicalFlags.bExplosionProof, pPlayer->m_nFlags.bExplosionProof,
-                        pPlayer->m_nEntityFlags.bExplosionProof) = state;
+                        pPlayer->m_nFlags.bExplosionProof) = state;
             }
 
             ImGui::NextColumn();
 
             state = BY_GAME(pPlayer->m_nPhysicalFlags.bFireProof, pPlayer->m_nFlags.bFireProof,
-                            pPlayer->m_nEntityFlags.bFireProof);
+                            pPlayer->m_nFlags.bFireProof);
             if (Ui::CheckboxWithHint(TEXT("Player.FireProof"), &state, nullptr, m_bGodMode))
             {
                 BY_GAME(pPlayer->m_nPhysicalFlags.bFireProof, pPlayer->m_nFlags.bFireProof,
-                        pPlayer->m_nEntityFlags.bFireProof) = state;
+                        pPlayer->m_nFlags.bFireProof) = state;
             }
 
-            state = BY_GAME(pPlayer->m_nPhysicalFlags.bMeeleProof, pPlayer->m_nFlags.bMeleeProof,
-                            pPlayer->m_nEntityFlags.bMeleeProof);
+            state = BY_GAME(pPlayer->m_nPhysicalFlags.bMeleeProof, pPlayer->m_nFlags.bMeleeProof,
+                            pPlayer->m_nFlags.bMeleeProof);
             if (Ui::CheckboxWithHint(TEXT("Player.MeeleProof"), &state, nullptr, m_bGodMode))
             {
-                BY_GAME(pPlayer->m_nPhysicalFlags.bMeeleProof, pPlayer->m_nFlags.bMeleeProof,
-                        pPlayer->m_nEntityFlags.bMeleeProof) = state;
+                BY_GAME(pPlayer->m_nPhysicalFlags.bMeleeProof, pPlayer->m_nFlags.bMeleeProof,
+                        pPlayer->m_nFlags.bMeleeProof) = state;
             }
 
             ImGui::EndChild();
@@ -882,7 +883,7 @@ void Player::ShowPage()
             ImGui::Spacing();
 #ifdef GTA3
             ImGui::TextWrapped(TEXT("Player.SkinChangeFrozen"));
-            CPad::GetPad(0)->m_bDisablePlayerControls = true;
+            CPad::GetPad(0)->DisablePlayerControls = true;
 #else
             ImGui::TextWrapped(TEXT("Player.WorkSkinOnly"));
 #endif
