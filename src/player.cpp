@@ -419,7 +419,7 @@ void Player::ShowPage()
             }
             ImGui::EndDisabled();
 #endif
-            Ui::CheckboxAddress(TEXT("Player.FreeHealthcare"), (int)&pInfo->m_bFreeHealthCare);
+            Ui::CheckboxAddress(TEXT("Player.FreeHealthcare"), (int)&pInfo->m_bGetOutOfHospitalFree);
 
             if (Ui::CheckboxWithHint(TEXT("Player.FreezeWL"), &m_bFreezeWantedLevel))
             {

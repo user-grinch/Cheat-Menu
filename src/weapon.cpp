@@ -28,7 +28,7 @@ void Weapon::Init()
 #endif
 
 
-        uchar slot = player->m_nCurrentWeapon;
+        uchar slot = player->m_nActiveWeaponSlot;
         if (m_nCurrentWeaponSlot != slot)
         {
             eWeaponType weaponType = player->m_aWeapons[slot].m_eWeaponType;
@@ -229,7 +229,7 @@ void Weapon::ShowPage()
         float x, y, z;
         Command<Commands::GET_OFFSET_FROM_CHAR_IN_WORLD_COORDS>(hplayer, 0.0, 3.0, 0.0, &x, &y, &z);
 
-        eWeaponType weaponType = pPlayer->m_aWeapons[pPlayer->m_nCurrentWeapon].m_eWeaponType;
+        eWeaponType weaponType = pPlayer->m_aWeapons[pPlayer->m_nActiveWeaponSlot].m_eWeaponType;
         if (weaponType)
         {
             int model = 0, pickup = 0;
@@ -257,7 +257,7 @@ void Weapon::ShowPage()
     if (ImGui::Button(TEXT("Weapon.DropCurrent"), Ui::GetSize(3)))
     {
 #ifdef GTASA
-        Command<Commands::REMOVE_WEAPON_FROM_CHAR>(hplayer, pPlayer->m_aWeapons[pPlayer->m_nCurrentWeapon].m_eWeaponType);
+        Command<Commands::REMOVE_WEAPON_FROM_CHAR>(hplayer, pPlayer->m_aWeapons[pPlayer->m_nActiveWeaponSlot].m_eWeaponType);
 #else
         ClearPlayerWeapon(pPlayer->m_aWeapons[pPlayer->m_nCurrentWeapon].m_eWeaponType);
 #endif

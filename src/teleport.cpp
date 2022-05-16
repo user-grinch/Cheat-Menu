@@ -24,7 +24,7 @@ void Teleport::FetchRadarSpriteData()
     for (int i = 0; i != maxSprites; ++i)
     {
         CVector pos = CRadar::ms_RadarTrace[i].m_vecPos;
-        uchar sprite = CRadar::ms_RadarTrace[i].m_nBlipSprite;
+        uchar sprite = CRadar::ms_RadarTrace[i].m_nRadarSprite;
         auto sprite_name = m_SpriteJson.m_Data[std::to_string(sprite)].get<std::string>();
         std::string key_name = sprite_name + ", " + Util::GetLocationName(&pos);
 
@@ -97,7 +97,7 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
     {
         tRadarTrace targetBlip = CRadar::ms_RadarTrace[LOWORD(FrontEndMenuManager.m_nTargetBlipIndex)];
 
-        if (targetBlip.m_nBlipSprite != RADAR_SPRITE_WAYPOINT)
+        if (targetBlip.m_nRadarSprite != RADAR_SPRITE_WAYPOINT)
         {
             SetHelpMessage(TEXT("Teleport.TargetBlipText"));
             return;

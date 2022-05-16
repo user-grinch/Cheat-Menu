@@ -573,7 +573,7 @@ void Game::ShowPage()
             }
 #endif
             Ui::EditAddress<int>(TEXT("Game.DaysPassed"), BY_GAME(0xB79038, 0x97F1F4, 0x8F2BB8), 0, 9999);
-            Ui::EditReference(TEXT("Game.FPSLimit"), RsGlobal.frameLimit, 1, 30, 60);
+            Ui::EditReference(TEXT("Game.FPSLimit"), RsGlobal.maxFPS, 1, 30, 60);
 #ifdef GTASA
             if (ImGui::CollapsingHeader(TEXT("Game.Freecam")))
             {

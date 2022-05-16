@@ -457,7 +457,7 @@ void Vehicle::SpawnVehicle(const std::string& rootkey, const std::string& vehNam
             veh->SetOrientation(x, y, z);
 #endif
         }
-        veh->m_nDoorLock = DOORLOCK_UNLOCKED;
+        veh->m_eDoorLock = DOORLOCK_UNLOCKED;
 #ifndef GTA3
         BY_GAME(veh->m_nAreaCode, veh->m_nAreaCode, NULL) = interior;
 #endif
@@ -733,10 +733,10 @@ void Vehicle::ShowPage()
                     BY_GAME(pVeh->ms_forceVehicleLightsOff, pVeh->m_nVehicleFlags.bLightsOn, pVeh->m_nVehicleFlags.bLightsOn) = state;
                 }
 
-                state = pVeh->m_nDoorLock == DOORLOCK_LOCKED_PLAYER_INSIDE;
+                state = pVeh->m_eDoorLock == DOORLOCK_LOCKED_PLAYER_INSIDE;
                 if (Ui::CheckboxWithHint(TEXT("Vehicle.LockDoor"), &state, nullptr, !is_driver))
                 {
-                    pVeh->m_nDoorLock = state ? DOORLOCK_LOCKED_PLAYER_INSIDE : DOORLOCK_UNLOCKED;
+                    pVeh->m_eDoorLock = state ? DOORLOCK_LOCKED_PLAYER_INSIDE : DOORLOCK_UNLOCKED;
                 }
 
                 state = BY_GAME(pVeh->m_nPhysicalFlags.bMeleeProof, pVeh->m_nFlags.bMeleeProof, pVeh->m_nFlags.bMeleeProof);
