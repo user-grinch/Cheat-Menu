@@ -367,15 +367,8 @@ void Weapon::ShowPage()
         {
             ImGui::Spacing();
             Ui::ListBox(TEXT("Weapon.SelectGang"), m_GangList, m_nSelectedGang);
-
-            ImGui::Columns(3, 0, false);
-            ImGui::RadioButton(TEXT("Weapon.Weapon1"), &m_nSelectedWeapon, 0);
-            ImGui::NextColumn();
-            ImGui::RadioButton(TEXT("Weapon.Weapon2"), &m_nSelectedWeapon, 1);
-            ImGui::NextColumn();
-            ImGui::RadioButton(TEXT("Weapon.Weapon3"), &m_nSelectedWeapon, 2);
-            ImGui::Columns(1);
-
+            std::vector<std::string> vec = {TEXT("Weapon.Weapon1"), TEXT("Weapon.Weapon2"), TEXT("Weapon.Weapon3")};
+            Ui::ListBox(TEXT("Ped.SelectWeapon"), vec, m_nSelectedWeapon);
             ImGui::Spacing();
             ImGui::Text(TEXT("Weapon.CurrentWeapon"),
                         m_WeaponData.m_pJson->m_Data[std::to_string(m_nGangWeaponList[m_nSelectedGang][m_nSelectedWeapon])].get<

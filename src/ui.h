@@ -75,9 +75,9 @@ public:
 
     static ImVec2 GetSize(short count = 1, bool spacing = true);
 
-    static bool ListBox(const char* label, std::vector<std::string>& all_items, int& selected);
-    static bool ListBoxStr(const char* label, std::vector<std::string>& all_items, std::string& selected);
-    static bool ListBoxCustomNames(const char* label, std::vector<std::string>& all_items, std::string& selected, const char* custom_names[] = nullptr, size_t length = 0);
+    static bool ListBox(const char* label, const std::vector<std::string>& all_items, int& selected);
+    static bool ListBoxStr(const char* label, const std::vector<std::string>& all_items, std::string& selected);
+    static bool ListBoxCustomNames(const char* label, std::string& selected, const char* custom_names[] = nullptr, size_t length = 0);
 
     static void RadioButtonAddress(const char* label, std::vector<NamedMemory>& named_mem);
     static void RadioButtonAddressEx(const char* label, int addr, std::vector<NamedValue>& named_val);

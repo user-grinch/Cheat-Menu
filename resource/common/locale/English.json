@@ -619,9 +619,9 @@
     "MoveWhenFiring": "Move when firing",
     "RapidFire": "Rapid fire",
     "SelectGang": "Select gang",
-    "Weapon1": "Weap 1",
-    "Weapon2": "Weap 2",
-    "Weapon3": "Weap 3",
+    "Weapon1": "Weapon 1",
+    "Weapon2": "Weapon 2",
+    "Weapon3": "Weapon 3",
     "WeaponTweaksText": "Weapon tweaks apply globally\nto every ped weapon type"
   },
   "Window": {

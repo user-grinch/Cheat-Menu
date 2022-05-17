@@ -56,11 +56,12 @@ public:
             return defaultValue;
         }
 
-#ifdef _GTA_
-        // Wanted to do this in the macro TEXT/ TEXT_S
-        // But VS Code complains about it so..
-        defaultValue += "##" + key;
-#endif
+        // Return keyname if no default value is provided
+        if (defaultValue == "")
+        {
+            defaultValue = "#" + key;
+        }
+
         std::string rtn = m_pJson->GetValueStr(key, defaultValue);
 
         if (rtn == defaultValue)

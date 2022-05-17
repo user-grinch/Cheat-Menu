@@ -99,7 +99,7 @@ bool Ui::RoundedImageButton(ImTextureID user_texture_id, ImVec2& size, const cha
     return ImGui::IsItemClicked(0);
 }
 
-bool Ui::ListBox(const char* label, std::vector<std::string>& all_items, int& selected)
+bool Ui::ListBox(const char* label, const std::vector<std::string>& all_items, int& selected)
 {
     bool rtn = false;
     if (ImGui::BeginCombo(label, all_items[selected].c_str()))
@@ -120,7 +120,7 @@ bool Ui::ListBox(const char* label, std::vector<std::string>& all_items, int& se
     return rtn;
 }
 
-bool Ui::ListBoxStr(const char* label, std::vector<std::string>& all_items, std::string& selected)
+bool Ui::ListBoxStr(const char* label, const std::vector<std::string>& all_items, std::string& selected)
 {
     bool rtn = false;
     if (ImGui::BeginCombo(label, selected.c_str()))
@@ -139,7 +139,7 @@ bool Ui::ListBoxStr(const char* label, std::vector<std::string>& all_items, std:
     return rtn;
 }
 
-bool Ui::ListBoxCustomNames(const char* label, std::vector<std::string>& all_items, std::string& selected, const char* customNames[], size_t length)
+bool Ui::ListBoxCustomNames(const char* label, std::string& selected, const char* customNames[], size_t length)
 {
     bool rtn = false;
     std::string display_selected = (selected == "All") ? selected : customNames[std::stoi(selected)];
@@ -558,7 +558,7 @@ void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLe
     ImGui::PushItemWidth((ImGui::GetWindowContentRegionWidth() - style.ItemSpacing.x)/2);
     if (customNames)
     {
-        ListBoxCustomNames("##Categories", store.m_Categories, store.m_Selected, customNames, length);
+        ListBoxCustomNames("##Categories", store.m_Selected, customNames, length);
     }
     else
     {
