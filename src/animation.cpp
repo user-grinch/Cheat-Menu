@@ -150,7 +150,7 @@ bool Animation::_LoadAnimationBlock(const char* szBlockName)
 
 void Animation::_PlayAnimation(RpClump* pClump, int animGroup, int animID, float blend)
 {
-    CAnimBlendAssociation* pAnimStaticAssoc = CAnimManager::GetAnimAssociation((AssocGroupId)animGroup, (AnimationId)animID);
+    CAnimBlendAssociation* pAnimStaticAssoc = CAnimManager::GetAnimAssociation(animGroup, animID);
     CAnimBlendAssociation* pAnimAssoc = RpAnimBlendClumpGetFirstAssociation(pClump);
     while (pAnimAssoc)
     {
@@ -162,7 +162,7 @@ void Animation::_PlayAnimation(RpClump* pClump, int animGroup, int animID, float
         }
         pAnimAssoc = RpAnimBlendGetNextAssociation(pAnimAssoc);
     }
-    pAnimAssoc = CAnimManager::BlendAnimation(pClump, (AssocGroupId)animGroup, (AnimationId)animID, blend);
+    pAnimAssoc = CAnimManager::BlendAnimation(pClump, animGroup, animID, blend);
     pAnimAssoc->m_nFlags = 0x1 | 0x20;
 
     if (m_Loop)

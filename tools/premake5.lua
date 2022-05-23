@@ -128,6 +128,10 @@ project "CheatMenuIII"
         "PLUGIN_SGV_10US"
     }
 
+    linkoptions { 
+        "/FORCE:MULTIPLE"
+    }
+
     pchheader "pch.h"
     pchsource "../src/pch.cpp"
 

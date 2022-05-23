@@ -28,7 +28,7 @@ void Weapon::Init()
 #endif
 
 
-        uchar slot = player->m_nActiveWeaponSlot;
+        uchar slot = BY_GAME(player->m_nActiveWeaponSlot, player->m_nSelectedWepSlot, player->m_nSelectedWepSlot);
         if (m_nCurrentWeaponSlot != slot)
         {
             eWeaponType weaponType = player->m_aWeapons[slot].m_eWeaponType;
@@ -229,7 +229,7 @@ void Weapon::ShowPage()
         float x, y, z;
         Command<Commands::GET_OFFSET_FROM_CHAR_IN_WORLD_COORDS>(hplayer, 0.0, 3.0, 0.0, &x, &y, &z);
 
-        eWeaponType weaponType = pPlayer->m_aWeapons[pPlayer->m_nActiveWeaponSlot].m_eWeaponType;
+        eWeaponType weaponType = pPlayer->m_aWeapons[BY_GAME(pPlayer->m_nActiveWeaponSlot, pPlayer->m_nSelectedWepSlot, pPlayer->m_nSelectedWepSlot)].m_eWeaponType;
         if (weaponType)
         {
             int model = 0, pickup = 0;
