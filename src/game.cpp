@@ -321,9 +321,9 @@ void Game::FreeCam()
         speed *= 2;
     }
 
-    if (KeyPressed(VK_KEY_I) || KeyPressed(VK_KEY_K))
+    if (freeCamForward.Pressed() || freeCamBackward.Pressed())
     {
-        if (KeyPressed(VK_KEY_K))
+        if (freeCamForward.Pressed())
         {
             speed *= -1;
         }
@@ -335,9 +335,9 @@ void Game::FreeCam()
         pos.z += speed * 2 * sin(m_Freecam::m_fTotalMouse.y / 3 * 3.14159f / 180.0f);
     }
 
-    if (KeyPressed(VK_KEY_J) || KeyPressed(VK_KEY_L))
+    if (freeCamLeft.Pressed() || freeCamRight.Pressed())
     {
-        if (KeyPressed(VK_KEY_J))
+        if (freeCamLeft.Pressed())
         {
             speed *= -1;
         }

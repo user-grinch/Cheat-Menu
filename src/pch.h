@@ -110,6 +110,10 @@ static void SetHelpMessage(const char *message, bool b1 = false, bool b2 = false
 
 extern Hotkey aimSkinChanger;
 extern Hotkey freeCam;
+extern Hotkey freeCamForward;
+extern Hotkey freeCamBackward;
+extern Hotkey freeCamLeft;
+extern Hotkey freeCamRight;
 extern Hotkey commandWindow;
 extern Hotkey fixVeh;
 extern Hotkey flipVeh;

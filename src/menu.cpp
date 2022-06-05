@@ -41,6 +41,18 @@ void Menu::Init()
     freeCam.m_key1 = gConfig.GetValue("hotkey.freecam.key1", VK_F6);
     freeCam.m_key2 = gConfig.GetValue("hotkey.freecam.key2", VK_F6);
 
+    freeCamForward.m_key1 = gConfig.GetValue("hotkey.freeCamForward.key1", VK_KEY_I);
+    freeCamForward.m_key2 = gConfig.GetValue("hotkey.freeCamForward.key2", VK_KEY_I);
+
+    freeCamBackward.m_key1 = gConfig.GetValue("hotkey.freeCamBackward.key1", VK_KEY_K);
+    freeCamBackward.m_key2 = gConfig.GetValue("hotkey.freeCamBackward.key2", VK_KEY_K);
+
+    freeCamLeft.m_key1 = gConfig.GetValue("hotkey.freeCamLeft.key1", VK_KEY_J);
+    freeCamLeft.m_key2 = gConfig.GetValue("hotkey.freeCamLeft.key2", VK_KEY_J);
+
+    freeCamRight.m_key1 = gConfig.GetValue("hotkey.freeCamRight.key1", VK_KEY_L);
+    freeCamRight.m_key2 = gConfig.GetValue("hotkey.freeCamRight.key2", VK_KEY_L);
+
     quickSceenShot.m_key1 = gConfig.GetValue("hotkey.quick_screenshot.key1", VK_F5);
     quickSceenShot.m_key2 = gConfig.GetValue("hotkey.quick_screenshot.key2", VK_F5);
 
@@ -514,6 +526,26 @@ void Menu::ShowPage()
             {
                 gConfig.SetValue("hotkey.freecam.key1", freeCam.m_key1);
                 gConfig.SetValue("hotkey.freecam.key2", freeCam.m_key2);
+            }
+            if (freeCamForward.DrawUI(TEXT("Menu.FreecamForwardKey")))
+            {
+                gConfig.SetValue("hotkey.freeCamForward.key1", freeCamForward.m_key1);
+                gConfig.SetValue("hotkey.freeCamForward.key2", freeCamForward.m_key2);
+            }
+            if (freeCamBackward.DrawUI(TEXT("Menu.FreecamBackwardKey")))
+            {
+                gConfig.SetValue("hotkey.freeCamBackward.key1", freeCamBackward.m_key1);
+                gConfig.SetValue("hotkey.freeCamBackward.key2", freeCamBackward.m_key2);
+            }
+            if (freeCamLeft.DrawUI(TEXT("Menu.FreecamLeftKey")))
+            {
+                gConfig.SetValue("hotkey.freeCamLeft.key1", freeCamLeft.m_key1);
+                gConfig.SetValue("hotkey.freeCamLeft.key2", freeCamLeft.m_key2);
+            }
+            if (freeCamRight.DrawUI(TEXT("Menu.FreecamRightKey")))
+            {
+                gConfig.SetValue("hotkey.freeCamRight.key1", freeCamRight.m_key1);
+                gConfig.SetValue("hotkey.freeCamRight.key2", freeCamRight.m_key2);
             }
             if (quickTeleport.DrawUI(TEXT("Menu.QuickTPKey")))
             {

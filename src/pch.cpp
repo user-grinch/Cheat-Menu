@@ -5,6 +5,10 @@ CJson gConfig = CJson("config");
 
 Hotkey aimSkinChanger;
 Hotkey freeCam;
+Hotkey freeCamForward;
+Hotkey freeCamBackward;
+Hotkey freeCamLeft;
+Hotkey freeCamRight;
 Hotkey commandWindow;
 Hotkey fixVeh;
 Hotkey flipVeh;
