@@ -290,7 +290,7 @@ void Game::FreeCam()
         m_Freecam::m_fTotalMouse.y = -150;
     }
 
-    if (freeCamTeleportPlayer.Pressed())
+    if (KeyPressed(VK_RETURN))
     {
         CPlayerPed* player = FindPlayerPed();
         CVector pos = m_Freecam::m_pPed->GetPosition();
@@ -321,9 +321,9 @@ void Game::FreeCam()
         speed *= 2;
     }
 
-    if (freeCamForward.Pressed() || freeCamBackward.Pressed())
+    if (freeCamForward.PressedBasic() || freeCamBackward.PressedBasic())
     {
-        if (freeCamForward.Pressed())
+        if (freeCamBackward.PressedBasic())
         {
             speed *= -1;
         }
@@ -335,9 +335,9 @@ void Game::FreeCam()
         pos.z += speed * 2 * sin(m_Freecam::m_fTotalMouse.y / 3 * 3.14159f / 180.0f);
     }
 
-    if (freeCamLeft.Pressed() || freeCamRight.Pressed())
+    if (freeCamLeft.PressedBasic() || freeCamRight.PressedBasic())
     {
-        if (freeCamLeft.Pressed())
+        if (freeCamLeft.PressedBasic())
         {
             speed *= -1;
         }

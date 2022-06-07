@@ -1,5 +1,4 @@
 #pragma once
-#include <cstdint>
 
 class RPC
 {
@@ -8,8 +7,8 @@ private:
     {
 		const char* state;
 		const char* details;
-		int64_t startTimestamp;
-		int64_t endTimestamp;
+		long long startTimestamp;
+		long long endTimestamp;
 		const char* largeImageKey;
 		const char* largeImageText;
 		const char* smallImageKey;
@@ -20,7 +19,7 @@ private:
 		const char* matchSecret;
 		const char* joinSecret;
 		const char* spectateSecret;
-		int8_t instance;
+		char instance;
 	} DiscordRichPresence;
     
     static inline FARPROC f_Init, f_ShutDown, f_Update;

@@ -34,55 +34,6 @@ void Menu::Init()
     m_Overlay::textColor[3] = gConfig.GetValue("overlay.text_color.a", 1.0f);
     m_bDiscordRPC = gConfig.GetValue("menu.discord_rpc", false);
 
-    // Hotkeys
-    aimSkinChanger.m_key1 = gConfig.GetValue("hotkey.aim_skin_changer.key1", VK_RETURN);
-    aimSkinChanger.m_key2 = gConfig.GetValue("hotkey.aim_skin_changer.key2", VK_RETURN);
-
-    freeCam.m_key1 = gConfig.GetValue("hotkey.freecam.key1", VK_F6);
-    freeCam.m_key2 = gConfig.GetValue("hotkey.freecam.key2", VK_F6);
-
-    freeCamForward.m_key1 = gConfig.GetValue("hotkey.freeCamForward.key1", VK_KEY_I);
-    freeCamForward.m_key2 = gConfig.GetValue("hotkey.freeCamForward.key2", VK_KEY_I);
-
-    freeCamBackward.m_key1 = gConfig.GetValue("hotkey.freeCamBackward.key1", VK_KEY_K);
-    freeCamBackward.m_key2 = gConfig.GetValue("hotkey.freeCamBackward.key2", VK_KEY_K);
-
-    freeCamLeft.m_key1 = gConfig.GetValue("hotkey.freeCamLeft.key1", VK_KEY_J);
-    freeCamLeft.m_key2 = gConfig.GetValue("hotkey.freeCamLeft.key2", VK_KEY_J);
-
-    freeCamRight.m_key1 = gConfig.GetValue("hotkey.freeCamRight.key1", VK_KEY_L);
-    freeCamRight.m_key2 = gConfig.GetValue("hotkey.freeCamRight.key2", VK_KEY_L);
-
-    quickSceenShot.m_key1 = gConfig.GetValue("hotkey.quick_screenshot.key1", VK_F5);
-    quickSceenShot.m_key2 = gConfig.GetValue("hotkey.quick_screenshot.key2", VK_F5);
-
-    quickTeleport.m_key1 = gConfig.GetValue("hotkey.quick_tp.key1", VK_KEY_X);
-    quickTeleport.m_key2 = gConfig.GetValue("hotkey.quick_tp.key2", VK_KEY_Y);
-
-    menuOpen.m_key1 = gConfig.GetValue("hotkey.menu_open.key1", VK_LCONTROL);
-    menuOpen.m_key2 = gConfig.GetValue("hotkey.menu_open.key2", VK_KEY_M);
-
-    commandWindow.m_key1 = gConfig.GetValue("hotkey.command_window.key1", VK_LMENU);
-    commandWindow.m_key2 = gConfig.GetValue("hotkey.command_window.key2", VK_KEY_C);
-
-    flipVeh.m_key1 = gConfig.GetValue("hotkey.flip_veh.key1", VK_NONE);
-    flipVeh.m_key2 = gConfig.GetValue("hotkey.flip_veh.key2", VK_NONE);
-
-    fixVeh.m_key1 = gConfig.GetValue("hotkey.fix_veh.key1", VK_NONE);
-    fixVeh.m_key2 = gConfig.GetValue("hotkey.fix_veh.key2", VK_NONE);
-
-    godMode.m_key1 = gConfig.GetValue("hotkey.god_mode.key1", VK_NONE);
-    godMode.m_key2 = gConfig.GetValue("hotkey.god_mode.key2", VK_NONE);
-
-    vehEngine.m_key1 = gConfig.GetValue("hotkey.veh_engine.key1", VK_NONE);
-    vehEngine.m_key2 = gConfig.GetValue("hotkey.veh_engine.key2", VK_NONE);
-
-    vehInstantStart.m_key1 = gConfig.GetValue("hotkey.veh_instant_start.key1", VK_NONE);
-    vehInstantStart.m_key2 = gConfig.GetValue("hotkey.veh_instant_start.key2", VK_NONE);
-
-    vehInstantStop.m_key1 = gConfig.GetValue("hotkey.veh_instant_stop.key1", VK_NONE);
-    vehInstantStop.m_key2 = gConfig.GetValue("hotkey.veh_instant_stop.key2", VK_NONE);
-
     Util::GetCPUUsageInit();
     MEMORYSTATUSEX memInfo;
     memInfo.dwLength = sizeof(MEMORYSTATUSEX);
@@ -499,97 +450,28 @@ void Menu::ShowPage()
             Ui::ShowTooltip(TEXT("Menu.UsageText"));
             ImGui::Spacing();
             ImGui::BeginChild("Hotkeys");
-            if (menuOpen.DrawUI(TEXT("Menu.OpenMenuKey")))
-            {
-                gConfig.SetValue("hotkey.menu_open.key1", menuOpen.m_key1);
-                gConfig.SetValue("hotkey.menu_open.key2", menuOpen.m_key2);
-            }
-            if (commandWindow.DrawUI(TEXT("Menu.OpenCMDKey")))
-            {
-                gConfig.SetValue("hotkey.command_window.key1", commandWindow.m_key1);
-                gConfig.SetValue("hotkey.command_window.key2", commandWindow.m_key2);
-            }
+            menuOpen.DrawUI(TEXT("Menu.OpenMenuKey"));
+            commandWindow.DrawUI(TEXT("Menu.OpenCMDKey"));
 
             ImGui::Dummy(ImVec2(0, 10));
 
-            if (aimSkinChanger.DrawUI(TEXT("Menu.SkinChangerKey")))
-            {
-                gConfig.SetValue("hotkey.aim_skin_changer.key1", aimSkinChanger.m_key1);
-                gConfig.SetValue("hotkey.aim_skin_changer.key2", aimSkinChanger.m_key2);
-            }
-            if (quickSceenShot.DrawUI(TEXT("Menu.QuickSSKey")))
-            {
-                gConfig.SetValue("hotkey.quick_screenshot.key1", quickSceenShot.m_key1);
-                gConfig.SetValue("hotkey.quick_screenshot.key2", quickSceenShot.m_key2);
-            }
-            if (freeCam.DrawUI(TEXT("Menu.FreecamKey")))
-            {
-                gConfig.SetValue("hotkey.freecam.key1", freeCam.m_key1);
-                gConfig.SetValue("hotkey.freecam.key2", freeCam.m_key2);
-            }
-            if (freeCamForward.DrawUI(TEXT("Menu.FreecamForwardKey")))
-            {
-                gConfig.SetValue("hotkey.freeCamForward.key1", freeCamForward.m_key1);
-                gConfig.SetValue("hotkey.freeCamForward.key2", freeCamForward.m_key2);
-            }
-            if (freeCamBackward.DrawUI(TEXT("Menu.FreecamBackwardKey")))
-            {
-                gConfig.SetValue("hotkey.freeCamBackward.key1", freeCamBackward.m_key1);
-                gConfig.SetValue("hotkey.freeCamBackward.key2", freeCamBackward.m_key2);
-            }
-            if (freeCamLeft.DrawUI(TEXT("Menu.FreecamLeftKey")))
-            {
-                gConfig.SetValue("hotkey.freeCamLeft.key1", freeCamLeft.m_key1);
-                gConfig.SetValue("hotkey.freeCamLeft.key2", freeCamLeft.m_key2);
-            }
-            if (freeCamRight.DrawUI(TEXT("Menu.FreecamRightKey")))
-            {
-                gConfig.SetValue("hotkey.freeCamRight.key1", freeCamRight.m_key1);
-                gConfig.SetValue("hotkey.freeCamRight.key2", freeCamRight.m_key2);
-            }
-            if (quickTeleport.DrawUI(TEXT("Menu.QuickTPKey")))
-            {
-                gConfig.SetValue("hotkey.quick_tp.key1", quickTeleport.m_key1);
-                gConfig.SetValue("hotkey.quick_tp.key2", quickTeleport.m_key2);
-            }       
+            aimSkinChanger.DrawUI(TEXT("Menu.SkinChangerKey"));
+            quickSceenShot.DrawUI(TEXT("Menu.QuickSSKey"));
+            freeCam.DrawUI(TEXT("Menu.FreecamKey"));
+            freeCamForward.DrawUI(TEXT("Menu.FreecamForwardKey"));
+            freeCamBackward.DrawUI(TEXT("Menu.FreecamBackwardKey"));
+            freeCamLeft.DrawUI(TEXT("Menu.FreecamLeftKey"));
+            freeCamRight.DrawUI(TEXT("Menu.FreecamRightKey"));
+            quickTeleport.DrawUI(TEXT("Menu.QuickTPKey"));
 
             ImGui::Dummy(ImVec2(0, 10));
 
-            if (fixVeh.DrawUI(TEXT("Menu.FixVehKey")))
-            {
-                gConfig.SetValue("hotkey.fix_veh.key1", fixVeh.m_key1);
-                gConfig.SetValue("hotkey.fix_veh.key2", fixVeh.m_key2);
-            }
-
-            if (flipVeh.DrawUI(TEXT("Menu.FlipVehKey")))
-            {
-                gConfig.SetValue("hotkey.flip_veh.key1", flipVeh.m_key1);
-                gConfig.SetValue("hotkey.flip_veh.key2", flipVeh.m_key2);
-            }
-
-            if (godMode.DrawUI(TEXT("Menu.GodModeKey")))
-            {
-                gConfig.SetValue("hotkey.god_mode.key1", godMode.m_key1);
-                gConfig.SetValue("hotkey.god_mode.key2", godMode.m_key2);
-            }
-
-            if (vehEngine.DrawUI(TEXT("Menu.VehEngineKey")))
-            {
-                gConfig.SetValue("hotkey.veh_engine.key1", vehEngine.m_key1);
-                gConfig.SetValue("hotkey.veh_engine.key2", vehEngine.m_key2);
-            }
-
-            if (vehInstantStart.DrawUI(TEXT("Menu.VehStartKey")))
-            {
-                gConfig.SetValue("hotkey.veh_instant_start.key1", vehInstantStart.m_key1);
-                gConfig.SetValue("hotkey.veh_instant_start.key2", vehInstantStart.m_key2);
-            }
-
-            if (vehInstantStop.DrawUI(TEXT("Menu.VehStopKey")))
-            {
-                gConfig.SetValue("hotkey.veh_instant_stop.key1", vehInstantStop.m_key1);
-                gConfig.SetValue("hotkey.veh_instant_stop.key2", vehInstantStop.m_key2);
-            }
+            fixVeh.DrawUI(TEXT("Menu.FixVehKey"));
+            flipVeh.DrawUI(TEXT("Menu.FlipVehKey"));
+            godMode.DrawUI(TEXT("Menu.GodModeKey"));
+            vehEngine.DrawUI(TEXT("Menu.VehEngineKey"));
+            vehInstantStart.DrawUI(TEXT("Menu.VehStartKey"));
+            vehInstantStop.DrawUI(TEXT("Menu.VehStopKey"));
 
             ImGui::Dummy(ImVec2(0, 10));
 

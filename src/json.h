@@ -20,7 +20,7 @@ public:
     // specialize since typeid(std::string) doesn't work
 
     template <typename T>
-    T inline GetValue(std::string&& key, T&& defaultVal)
+    T inline GetValue(std::string&& key, const T& defaultVal)
     {
         try
         {

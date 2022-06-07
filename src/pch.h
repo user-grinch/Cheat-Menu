@@ -117,7 +117,6 @@ extern Hotkey freeCamRight;
 extern Hotkey commandWindow;
 extern Hotkey fixVeh;
 extern Hotkey flipVeh;
-extern Hotkey freeCamTeleportPlayer;
 extern Hotkey godMode;
 extern Hotkey menuOpen;
 extern Hotkey quickSceenShot;
