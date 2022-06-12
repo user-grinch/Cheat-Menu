@@ -35,11 +35,24 @@ public:
     Neon() = delete;
     Neon(Neon&) = delete;
 
+    // Injects necessary hooks into the game
     static void InjectHooks();
-    static void Install(CVehicle* veh, int red, int green, int blue);
+
+    // Installs neons with color
+    static void Install(CVehicle* veh, int r, int g, int b);
+
+    // Is neon installer for particular vehicle
     static bool IsInstalled(CVehicle* veh);
+
+    // Is neon pulsing enabled for vehicle
     static bool IsPulsingEnabled(CVehicle* veh);
+
+    // Set neon pulsing state
     static void SetPulsing(CVehicle* veh, bool state);
+
+    // Removes the neon game hooks
     static void RemoveHooks();
+
+    // Removes neon from vehicle
     static void Remove(CVehicle* veh);
 };

@@ -1,6 +1,10 @@
 #pragma once
 #include "pch.h"
 
+/*
+*   DirectX Hooking Class
+*   Supports DX9 & DX11
+*/
 class D3dHook
 {
 private:
@@ -14,7 +18,6 @@ private:
     static inline f_Reset oReset;
     static inline bool mouseShown;
     static inline void* pCallbackFunc = nullptr;
-
 
     static void CALLBACK ProcessFrame(void* ptr);
     static LRESULT CALLBACK hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);

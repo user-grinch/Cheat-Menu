@@ -1,16 +1,10 @@
-/*
-    Author: Grinch_
-    Copyright Grinch_ 2019-2022. All rights reserved.
-    Required:
-        DirectX 9 SDK
-        Plugin SDK
-        Build Tools 2022 (v143)
-        Windows SDK
-*/
-
 #pragma once
 #include "pch.h"
 
+/*
+*   Main CheatMenu Class
+*   Handles rendering, resizing, page handling etc.
+*/
 class CheatMenu
 {
 private:
@@ -26,17 +20,24 @@ private:
         bool skipHeader = false;
     };
     
-    static inline eMenuPages m_nMenuPage = eMenuPages::WELCOME;
+    static inline eMenuPages m_nMenuPage = eMenuPages::WELCOME; // current visible menu page
     static inline bool m_bShowMenu = false;
     static inline ImVec2 m_fMenuSize = ImVec2(screen::GetScreenWidth() / 4, screen::GetScreenHeight() / 1.2);
-    static inline bool m_bSizeChangedExternal = false;
+    static inline bool m_bSizeChangedExternal = false; // Was menu size change requested
     static inline std::vector<HeaderData> m_headerList;
 
+    // Applies imgui theme to the menu
     static void ApplyStyle();
+
+    // Draws the window ui each frame
+    // Also handles drawing overlay & command window
     static void DrawWindow();
+
     static void ShowAnniversaryPage();
     static void ShowUpdatePage();
     static void ShowWelcomePage();
+
+    // Does all the processing required to handle menu pages
     static void ProcessPages();
 
 public:
@@ -46,5 +47,8 @@ public:
     static void Init();
     static bool IsMenuShown();
     static void ResetMenuSize();
+
+    // Generates menu headers
+    // Needs to be called after language change or adding new headers
     static void GenHeaderList();
 };

@@ -5,7 +5,10 @@
 #include "vehicle.h"
 #include "cheatmenu.h"
 
-char asciitolower(char in) 
+// discord server ids
+const char* id = BY_GAME("951199292981403669", "951448264195059712", "951457540573655080");
+
+static char asciitolower(char in) 
 {
     if (in <= 'Z' && in >= 'A')
     {
@@ -19,13 +22,20 @@ void RPC::Shutdown()
 {
     if (f_ShutDown)
     {
-        CallDyn<>(int(f_ShutDown));
+        CallDyn<>(reinterpret_cast<int>(f_ShutDown));
     }
 }
 
 void RPC::Init()
 {
-    std::string Id = BY_GAME("951199292981403669", "951448264195059712", "951457540573655080");
+    const char* dllPath = PLUGIN_PATH((char*)"CheatMenu/dlls/discord-rpc.dll");
+
+    // check if the dll exits
+    if (!std::filesystem::exists(dllPath))
+    {
+        gLog << TEXT("Menu.DiscordRPCNoDll") << std::endl;
+        return;
+    }
 
     if (!hDll)
     {
@@ -34,7 +44,7 @@ void RPC::Init()
         f_Update = NULL;
         f_ShutDown = NULL;
 
-        hDll = LoadLibrary(PLUGIN_PATH((char*)"CheatMenu/dlls/discord-rpc.dll"));
+        hDll = LoadLibrary(dllPath);
 
         if (hDll)
         {
@@ -46,13 +56,13 @@ void RPC::Init()
 
     if (f_Init)
     {
-        CallDyn<const char*, int, int, int>((int)f_Init, Id.c_str(), NULL, NULL, NULL);
+        CallDyn<const char*, int, int, int>((int)f_Init, id, NULL, NULL, NULL);
         drpc.startTimestamp = time(0);
         bInit = true;
     }
     else
     {
-        gLog << "Failed to init discord rpc" << std::endl;
+        gLog << TEXT("Menu.DiscordRPCInitFailed") << std::endl;
     }
 }
 

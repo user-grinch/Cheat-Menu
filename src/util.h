@@ -2,10 +2,8 @@
 #include "tchar.h"
 #include "pdh.h"
 
-
 /*
 *   Contains utility functions 
-*   for all 3 games
 */
 class Util
 {

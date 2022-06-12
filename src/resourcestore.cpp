@@ -5,8 +5,7 @@
 ResourceStore::ResourceStore(const char* text, eResourceType type, ImVec2 imageSize)
     : m_ImageSize(imageSize)
 {
-    if (type == eResourceType::TYPE_TEXT
-            || type == eResourceType::TYPE_BOTH)
+    if (type == eResourceType::TYPE_TEXT || type == eResourceType::TYPE_BOTH)
     {
         m_pJson = std::make_unique<CJson>(text);
 
@@ -20,12 +19,14 @@ ResourceStore::ResourceStore(const char* text, eResourceType type, ImVec2 imageS
         }
     }
 
-    if (type == eResourceType::TYPE_IMAGE
-            || type == eResourceType::TYPE_BOTH)
+    if (type == eResourceType::TYPE_IMAGE || type == eResourceType::TYPE_BOTH)
     {
         /*
             Textures need to be loaded from main thread
             Loading it directly here doesn't work
+            TODO: 
+                Maybe enabling a dx9 flag fixes this?
+                Switch to initScriptsEvent
         */
         Events::processScriptsEvent += [text, this]()
         {
@@ -38,7 +39,8 @@ ResourceStore::ResourceStore(const char* text, eResourceType type, ImVec2 imageS
     }
 }
 
-static void* GetTextureFromRaster(RwTexture* pTexture)
+// Get dx9 texture object from RwTexture*
+static IDirect3DTexture9** GetTextureFromRaster(RwTexture* pTexture)
 {
     RwRasterEx* raster = (RwRasterEx*)(&pTexture->raster->parent);
 

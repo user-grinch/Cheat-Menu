@@ -79,7 +79,7 @@ void CheatMenu::ProcessPages()
     ImGuiStyle &style = ImGui::GetStyle();
 
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-    ImGui::PushFont(FontMgr::GetFont("header"));
+    ImGui::PushFont(FontMgr::Get("header"));
     m_nMenuPage = Updater::IsUpdateAvailable() ? eMenuPages::UPDATE : m_nMenuPage;
     
     // Check once if it's anniversary day
@@ -93,7 +93,7 @@ void CheatMenu::ProcessPages()
         {
             /*
             *   We don't want to be annoying and
-            *   show anniversary screen on game start
+            *   show anniversary screen on every game start
             */
             bool flag = gConfig.GetValue("window.anniversaryShown", false);
 
@@ -116,7 +116,9 @@ void CheatMenu::ProcessPages()
         if (m_headerList[i].skipHeader)
         {
             if (m_nMenuPage == m_headerList[i].page)
+            {
                 pCallback = m_headerList[i].pFunc;
+            }
 
             continue;
         }
@@ -161,7 +163,9 @@ void CheatMenu::ProcessPages()
         ImGui::RenderTextClipped(min + style.FramePadding, max - style.FramePadding, text, NULL, &size, style.ButtonTextAlign);
 
         if (i % 3 != 2)
+        {
             ImGui::SameLine();
+        }
     }
     ImGui::PopFont();
     ImGui::PopStyleVar();
@@ -195,6 +199,12 @@ void CheatMenu::GenHeaderList()
 
 void CheatMenu::Init()
 {
+    if (!std::filesystem::exists(PLUGIN_PATH((char*)"CheatMenu")))
+    {
+        gLog << TEXT("Menu.CheatMenuNoDir") << std::endl;
+        return;
+    }
+
     if (!D3dHook::InjectHook(DrawWindow))
     {
         return;
@@ -255,7 +265,7 @@ void CheatMenu::Init()
 }
 
 /*
-* YIKES YOU AREN"T SUPPOSED TO FIND THIS YOU KNOW!!!
+* YIKES YOU AREN"T SUPPOSED TO FIND THIS!!!
 * Probably a good easter egg for the upcoming anniversary ;)
 */
 void CheatMenu::ShowAnniversaryPage()

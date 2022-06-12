@@ -259,13 +259,13 @@ void Neon::SetPulsing(CVehicle* pVeh, bool state)
     m_VehNeon.Get(pVeh).m_bPulsing = state;
 }
 
-void Neon::Install(CVehicle* pVeh, int red, int green, int blue)
+void Neon::Install(CVehicle* pVeh, int r, int g, int b)
 {
     CRGBA& color = m_VehNeon.Get(pVeh).m_Color;
 
-    color.r = red;
-    color.g = green;
-    color.b = blue;
+    color.r = r;
+    color.g = g;
+    color.b = b;
     color.a = 255;
 
     m_VehNeon.Get(pVeh).m_bNeonInstalled = true;

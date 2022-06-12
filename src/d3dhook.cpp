@@ -60,7 +60,7 @@ void D3dHook::ProcessFrame(void* ptr)
         ImVec2 size(screen::GetScreenWidth(), screen::GetScreenHeight());
         if (fScreenSize.x != size.x && fScreenSize.y != size.y)
         {
-            FontMgr::ReloadFonts();
+            FontMgr::ReloadAll();
 
             if (gRenderer == Render_DirectX9)
             {
@@ -139,9 +139,9 @@ void D3dHook::ProcessFrame(void* ptr)
         ImGui_ImplWin32_EnableDpiAwareness();
 
         // Loading fonts
-        io.FontDefault = FontMgr::LoadFont("text", 1.0f);
-        FontMgr::LoadFont("title", 2.0f);
-        FontMgr::LoadFont("header", 1.25f);
+        io.FontDefault = FontMgr::Load("text", 1.0f);
+        FontMgr::Load("title", 2.0f);
+        FontMgr::Load("header", 1.25f);
 
         io.IniFilename = nullptr;
         io.LogFilename = nullptr;

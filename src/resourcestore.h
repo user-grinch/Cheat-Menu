@@ -4,10 +4,6 @@
 #include "../depend/imgui/imgui.h"
 #include "d3d9.h"
 
-/*
-	Global resource handler class
-	Handles both image and json resources
-*/
 struct RwD3D9Raster
 {
     union
@@ -47,10 +43,14 @@ enum eResourceType
     TYPE_BOTH,
 };
 
-using TextureResourceList = std::vector<std::unique_ptr<TextureResource>>;
+/*
+	Global Resource Handler Class
+	Handles loading & unloading both text (json) & image files
+*/
 class ResourceStore
 {
 private:
+    // Loads a image texture from it's path
     void LoadTextureResource(std::string&& path);
 
 public:
@@ -58,7 +58,7 @@ public:
     std::vector<std::string> m_Categories = {"All"};
     std::string m_Selected = "All";
     std::unique_ptr<CJson> m_pJson;
-    TextureResourceList m_ImagesList;
+    std::vector<std::unique_ptr<TextureResource>> m_ImagesList;
     ImVec2 m_ImageSize;
     bool m_bTexturesLoaded = false;
 

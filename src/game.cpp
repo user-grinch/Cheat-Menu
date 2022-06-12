@@ -290,7 +290,7 @@ void Game::FreeCam()
         m_Freecam::m_fTotalMouse.y = -150;
     }
 
-    if (KeyPressed(VK_RETURN))
+    if (freeCamTeleport.Pressed())
     {
         CPlayerPed* player = FindPlayerPed();
         CVector pos = m_Freecam::m_pPed->GetPosition();

@@ -71,7 +71,6 @@
 
 #include "json.h"
 #include "hotkeys.h"
-#include "vkeys.h"
 #include "resourcestore.h"
 #include "fontmgr.h"
 #include "locale.h"
@@ -114,6 +113,7 @@ extern Hotkey freeCamForward;
 extern Hotkey freeCamBackward;
 extern Hotkey freeCamLeft;
 extern Hotkey freeCamRight;
+extern Hotkey freeCamTeleport;
 extern Hotkey commandWindow;
 extern Hotkey fixVeh;
 extern Hotkey flipVeh;

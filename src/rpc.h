@@ -1,9 +1,13 @@
 #pragma once
 
+/*
+*	Discord Rich Presence Class
+*	Handles connection with discord
+*/
 class RPC
 {
 private:
-    typedef struct 
+    struct DiscordRichPresence
     {
 		const char* state;
 		const char* details;
@@ -20,7 +24,7 @@ private:
 		const char* joinSecret;
 		const char* spectateSecret;
 		char instance;
-	} DiscordRichPresence;
+	};
     
     static inline FARPROC f_Init, f_ShutDown, f_Update;
     static inline DiscordRichPresence drpc;

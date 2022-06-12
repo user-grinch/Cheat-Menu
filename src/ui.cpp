@@ -11,7 +11,7 @@ bool Ui::DrawTitleBar()
     ImGuiWindow* window = g.CurrentWindow;
     ImGuiID id = window->GetID("#CLOSE");
 
-    ImGui::PushFont(FontMgr::GetFont("title"));
+    ImGui::PushFont(FontMgr::Get("title"));
     CenterdText(MENU_TITLE);
 
     if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_RootWindow | ImGuiHoveredFlags_ChildWindows
@@ -792,10 +792,14 @@ void Ui::EditBits(const char* label, const int address, const std::vector<std::s
             bool state = *mem_val & mask;
 
             if (ImGui::Checkbox(names[i].c_str(), &state))
+            {
                 *mem_val ^= mask;
+            }
 
             if (i + 1 == 32 / 2)
+            {
                 ImGui::NextColumn();
+            }
         }
         ImGui::Columns(1);
 
