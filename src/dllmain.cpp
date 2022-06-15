@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "cheatmenu.h"
 #include "updater.h"
-#include "version.h"
 #include "rpc.h"
 
 void MenuThread(void* param)
@@ -28,7 +27,7 @@ void MenuThread(void* param)
     */
     if (!std::filesystem::is_directory(PLUGIN_PATH((char*)"CheatMenu")))
     {
-        gLog << "Error: CheatMenu folder not found. You need to put both \"CheatMenu.asi\" & \"CheatMenu\" folder in the same directory" << std::endl;
+        Log::Print<eLogLevel::Error>("CheatMenu folder not found. You need to put both \"CheatMenu.asi\" & \"CheatMenu\" folder in the same directory");
         MessageBox(NULL, "CheatMenu folder not found. You need to put both \"CheatMenu.asi\" & \"CheatMenu\" folder in the same directory", "CheatMenu", MB_ICONERROR);
         return;
     }
@@ -39,7 +38,7 @@ void MenuThread(void* param)
     */
     if (!GetModuleHandle(BY_GAME("SilentPatchSA.asi","SilentPatchVC.asi","SilentPatchIII.asi")))
     {
-        gLog << "Error: SilentPatch not found. Please install it from here https://gtaforums.com/topic/669045-silentpatch/" << std::endl;
+        Log::Print<eLogLevel::Error>("SilentPatch not found. Please install it from here https://gtaforums.com/topic/669045-silentpatch/");
         int msgID = MessageBox(NULL, "SilentPatch not found. Do you want to install Silent Patch? (Game restart required)", "CheatMenu", MB_OKCANCEL | MB_DEFBUTTON1);
 
         if (msgID == IDOK)
@@ -56,7 +55,7 @@ void MenuThread(void* param)
 #ifdef GTASA
     if (GetModuleHandle("SAMP.dll") || GetModuleHandle("SAMP.asi"))
     {
-        gLog << "Error: CheatMenu doesn't support SAMP" << std::endl;
+        Log::Print<eLogLevel::Error>("CheatMenu doesn't support SAMP");
         MessageBox(NULL, "SAMP detected. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
         return;
     }
@@ -64,14 +63,13 @@ void MenuThread(void* param)
 #elif GTAVC
     if (GetModuleHandle("vcmp-proxy.dll") || GetModuleHandle("vcmp-proxy.asi"))
     {
-        gLog << "Error: CheatMenu doesn't support VCMP" << std::endl;
+        Log::Print<eLogLevel::Error>("CheatMenu doesn't support VCMP");
         MessageBox(NULL, "VCMP detected. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
         return;
     }
 #endif
 
-    gLog << "Starting...\nVersion: " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: "
-         GITHUB_LINK "\n" << std::endl;
+    Log::Print<eLogLevel::None>("\nVersion: " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: " GITHUB_LINK "\n");
 
     CheatMenu::Init();
 
@@ -109,7 +107,7 @@ BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
         }
         else
         {
-            gLog << "Error: Unknown game version. GTA " <<  BY_GAME("SA v1.0 US Hoodlum or Compact", "VC v1.0 EN", "III v1.0 EN") << " is required." << std::endl;
+            Log::Print<eLogLevel::Error>("Unknown game version. GTA " BY_GAME("SA v1.0 US Hoodlum or Compact", "VC v1.0 EN", "III v1.0 EN") " is required.");
             MessageBox(HWND_DESKTOP, "Unknown game version. GTA " BY_GAME("SA v1.0 US Hoodlum or Compact", "VC v1.0 EN", "III v1.0 EN") " is required.", "CheatMenu", MB_ICONERROR);
         }
     }

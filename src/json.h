@@ -117,6 +117,6 @@ public:
     /*
     	Saves json data to disk
     */
-    void WriteToDisk();
+    void Save();
     CJson(const char* text, bool pathPredefined = false);
 };

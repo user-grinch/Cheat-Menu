@@ -211,7 +211,7 @@ void Vehicle::AddComponent(const std::string& component, const bool display_mess
     }
     catch (...)
     {
-        gLog << "Failed to component to vehicle " << component << std::endl;
+        Log::Print<eLogLevel::Warn>("Failed to add component to vehicle {}", component);
     }
 }
 
@@ -233,7 +233,7 @@ void Vehicle::RemoveComponent(const std::string& component, const bool display_m
     }
     catch (...)
     {
-        gLog << "Failed to remove component from vehicle " << component << std::endl;
+        Log::Print<eLogLevel::Warn>("Failed to remove component from vehicle {}", component);
     }
 }
 

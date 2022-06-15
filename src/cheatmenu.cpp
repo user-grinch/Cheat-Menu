@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "version.h"
 #include "ui.h"
 #include "updater.h"
 #include "d3dhook.h"
@@ -26,7 +25,7 @@ void CheatMenu::DrawWindow()
     {
         if (bRunning)
         {
-            gConfig.WriteToDisk();
+            gConfig.Save();
             bRunning = false;
             D3dHook::SetMouseState(false);
         }
@@ -201,7 +200,7 @@ void CheatMenu::Init()
 {
     if (!std::filesystem::exists(PLUGIN_PATH((char*)"CheatMenu")))
     {
-        gLog << TEXT("Menu.CheatMenuNoDir") << std::endl;
+        Log::Print<eLogLevel::Error>(TEXT("Menu.CheatMenuNoDir"));
         return;
     }
 
@@ -255,7 +254,7 @@ void CheatMenu::Init()
             {
                 if (mouseState) // Only write when the menu closes
                 {
-                    gConfig.WriteToDisk();
+                    gConfig.Save();
                 }
 
                 D3dHook::SetMouseState(m_bShowMenu);

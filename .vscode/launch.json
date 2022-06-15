@@ -8,10 +8,10 @@
             "name": "Launch SA",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "F:/GTASanAndreas/gta_sa.exe",
+            "program": "E:/GTASanAndreas/gta_sa.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "F:/GTASanAndreas/",
+            "cwd": "E:/GTASanAndreas/",
             "environment": [],
             "console": "internalConsole"
         },

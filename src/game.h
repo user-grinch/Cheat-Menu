@@ -36,7 +36,7 @@ private:
     static inline bool m_bSolidWater; // walk on water hack
     static inline bool m_bScreenShot;
     static inline bool m_bKeepStuff;
-    static inline ResourceStore m_StatData{ "stat", eResourceType::TYPE_TEXT };
+    static inline ResourceStore m_StatData{ "stats", eResourceType::TYPE_TEXT };
 
     static inline std::vector<std::string> m_DayNames =
     {
@@ -49,7 +49,7 @@ private:
         static inline bool m_bProgressBar = true;
         static inline std::string m_EnabledCheats[92][2];
         static inline int m_nInterval = 10;
-        static inline CJson m_Json = CJson("cheat name");
+        static inline DataStore m_pData {"cheats"};
         static inline uint m_nTimer;
     };
 #endif

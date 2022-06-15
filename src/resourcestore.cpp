@@ -1,20 +1,19 @@
-#include "pch.h"
-#include "CFileLoader.h"
 #include "extensions/Paths.h"
+#include "pch.h"
 
 ResourceStore::ResourceStore(const char* text, eResourceType type, ImVec2 imageSize)
     : m_ImageSize(imageSize)
 {
     if (type == eResourceType::TYPE_TEXT || type == eResourceType::TYPE_BOTH)
     {
-        m_pJson = std::make_unique<CJson>(text);
+        m_pData = std::make_unique<DataStore>(text);
 
         if (type == eResourceType::TYPE_TEXT)
         {
             // Generate categories
-            for (auto element : m_pJson->m_Data.items())
+            for (auto [k, v] : m_pData->Items())
             {
-                m_Categories.push_back(element.key());
+                m_Categories.push_back(std::string(k.str()));
             }
         }
     }
@@ -47,10 +46,21 @@ static IDirect3DTexture9** GetTextureFromRaster(RwTexture* pTexture)
     return (&raster->m_pRenderResource->texture);
 }
 
+RwTexDictionary* LoadTexDictionary(char const* filename) {
+    return plugin::CallAndReturnDynGlobal<RwTexDictionary*, char const*>(0x5B3860, filename);
+}
+
 void ResourceStore::LoadTextureResource(std::string&& name)
 {
     std::string fullPath = PLUGIN_PATH((char*)"CheatMenu\\") + name + ".txd";
-    RwTexDictionary* pRwTexDictionary = CFileLoader::LoadTexDictionary(fullPath.c_str());
+
+    if (!std::filesystem::exists(fullPath))
+    {
+        //Log::PrintWarn("Failed to load {}", fullPath);
+        return;
+    }
+
+    RwTexDictionary* pRwTexDictionary = LoadTexDictionary(fullPath.c_str());
 
     if (pRwTexDictionary)
     {

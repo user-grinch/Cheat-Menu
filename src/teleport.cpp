@@ -20,22 +20,15 @@ void Teleport::FetchRadarSpriteData()
         return;
     }
 
-    m_tpData.m_pJson->m_Data.erase("Radar");
+    m_tpData.m_pData->RemoveTable("Radar");
     for (int i = 0; i != maxSprites; ++i)
     {
         CVector pos = CRadar::ms_RadarTrace[i].m_vecPos;
-        uchar sprite = CRadar::ms_RadarTrace[i].m_nRadarSprite;
-        auto sprite_name = m_SpriteJson.m_Data[std::to_string(sprite)].get<std::string>();
-        std::string key_name = sprite_name + ", " + Util::GetLocationName(&pos);
-
-        m_tpData.m_pJson->m_Data["Radar"][key_name] = "0, " + std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " +
-                std::to_string(pos.z);
-
-        /*
-        	"Radar" : {
-        		"key_name" : "0, x, y, z",
-        	}
-        */
+        std::string sprite = std::to_string(CRadar::ms_RadarTrace[i].m_nRadarSprite);
+        std::string keyName = m_SpriteData.Get<std::string>(sprite.c_str(), "Unknown");
+        keyName += ", " + Util::GetLocationName(&pos);
+        std::string key = "Radar." + keyName;
+        m_tpData.m_pData->Set(key.c_str(), std::format("0, {}, {}, {}", pos.x, pos.y, pos.z));
     }
 }
 #endif
@@ -198,9 +191,9 @@ void Teleport::RemoveTeleportEntry(std::string& category, std::string& key, std:
 {
     if (category == "Custom")
     {
-        m_tpData.m_pJson->m_Data["Custom"].erase(key);
+        m_tpData.m_pData->RemoveKey("Custom", key.c_str());
         SetHelpMessage(TEXT("Teleport.LocationRemoved"));
-        m_tpData.m_pJson->WriteToDisk();
+        m_tpData.m_pData->Save();
     }
     else
     {
@@ -291,15 +284,15 @@ void Teleport::ShowPage()
                 ImGui::Spacing();
                 if (ImGui::Button(TEXT("Teleport.AddLocation"), Ui::GetSize()))
                 {
-                    m_tpData.m_pJson->m_Data["Custom"][m_nLocationBuffer] = ("0, " + std::string(m_nInputBuffer));
+                    std::string key = std::string("Custom.") + m_nLocationBuffer;
+                    m_tpData.m_pData->Set(key.c_str(), ("0, " + std::string(m_nInputBuffer)));
 
     #ifdef GTASA
                     // Clear the Radar coordinates
-                    m_tpData.m_pJson->m_Data.erase("Radar");
-                    m_tpData.m_pJson->m_Data["Radar"] = {};
+                    m_tpData.m_pData->RemoveTable("Radar");
     #endif
 
-                    m_tpData.m_pJson->WriteToDisk();
+                    m_tpData.m_pData->Save();
                 }
             }
 

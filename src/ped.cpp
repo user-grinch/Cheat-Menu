@@ -91,7 +91,7 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
         return;
     }
 
-    if (BY_GAME(m_PedData.m_pJson->m_Data.contains(model), true, true))
+    if (BY_GAME(m_PedData.m_pData->Contains(model.c_str()), true, true))
     {
         CPlayerPed* player = FindPlayerPed();
         CVector pos = player->GetPosition();
@@ -102,13 +102,17 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
         static size_t currentSlot = 1;
 
 #ifdef GTASA
-        if (m_SpecialPedJson.m_Data.contains(model))
+        if (m_SpecialPedData.Contains(model.c_str()))
         {
             std::string name;
-            if (m_SpecialPedJson.m_Data.contains(model))
-                name = m_SpecialPedJson.m_Data[model].get<std::string>().c_str();
+            if (m_SpecialPedData.Contains(model.c_str()))
+            {
+                name = m_SpecialPedData.Get(model.c_str(), "Unknown");
+            }
             else
+            {
                 name = model;
+            }
 
             CStreaming::RequestSpecialChar(currentSlot, name.c_str(), PRIORITY_REQUEST);
             CStreaming::LoadAllRequestedModels(true);
@@ -358,7 +362,7 @@ void Ped::ShowPage()
                     Ui::DrawImages(m_PedData, SpawnPed, nullptr,
                                    [](std::string str)
                     {
-                        return m_PedData.m_pJson->m_Data[str].get<std::string>();
+                            return m_PedData.m_pData->Get(str.c_str(), "Unknown");
                     });
 #else
                     Ui::DrawJSON(m_PedData, SpawnPed, nullptr);
@@ -403,7 +407,7 @@ void Ped::ShowPage()
                     nullptr,
                     [](std::string str)
                     {
-                        m_SpawnPed::m_nWeaponName = Weapon::m_WeaponData.m_pJson->m_Data[str].get<std::string>();
+                        m_SpawnPed::m_nWeaponName = Weapon::m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
                         return m_SpawnPed::m_nWeaponName;
                     },
                     [](std::string str)

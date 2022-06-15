@@ -62,7 +62,7 @@ void FileHandler::FetchHandlingID(std::map<int, std::string>& storeMap)
     std::string m_FilePath = GAME_PATH((char*)"/data/vehicles.ide");
     if (!std::filesystem::exists(m_FilePath))
     {
-        gLog << "Vehicle.ide not found";
+        Log::Print<eLogLevel::Warn>("Vehicle.ide not found");
         return;
     }
 
@@ -101,7 +101,7 @@ void FileHandler::FetchHandlingID(std::map<int, std::string>& storeMap)
         }
         catch (...)
         {
-            gLog << "Error parsing vehicles.ide, " << line << std::endl;
+            Log::Print<eLogLevel::Warn>("Failed parsing vehicles.ide, {}", line);
         }
     }
 
@@ -114,7 +114,7 @@ void FileHandler::FetchColorData(std::vector<std::vector<float>>& storeVec)
     std::string m_FilePath = GAME_PATH((char*)"/data/carcols.dat");
     if (!std::filesystem::exists(m_FilePath))
     {
-        gLog << "Carcols.dat not found";
+        Log::Print<eLogLevel::Warn>("Carcols.dat not found");
         return;
     }
 
@@ -175,7 +175,7 @@ void FileHandler::FetchColorData(std::vector<std::vector<float>>& storeVec)
             }
             catch (...)
             {
-                gLog << "Error parsing carcols.dat, " << line << std::endl;
+                Log::Print<eLogLevel::Warn>("Failed parsing carcols.dat, {}", line);
             }
         }
     }

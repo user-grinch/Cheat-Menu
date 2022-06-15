@@ -27,7 +27,7 @@ CJson::CJson(const char* name, bool pathPredefined)
         }
         catch (...)
         {
-            gLog << "Error trying to read " << m_FilePath << std::endl;
+            //gLog << "Error trying to read " << m_FilePath << std::endl;
             m_Data = "{}"_json;
         }
     }
@@ -37,16 +37,16 @@ CJson::CJson(const char* name, bool pathPredefined)
 
         if (m_FilePath.find("config"))
         {
-            gLog << "Creating config.json file" << std::endl;
+            //gLog << "Creating config.json file" << std::endl;
         }
         else
         {
-            gLog << "Failed to locate file " << m_FilePath << std::endl;
+            //gLog << "Failed to locate file " << m_FilePath << std::endl;
         }
     }
 }
 
-void CJson::WriteToDisk()
+void CJson::Save()
 {
     std::ofstream file(m_FilePath);
     file << m_Data.dump(4, ' ', false, nlohmann::json::error_handler_t::replace) << std::endl;

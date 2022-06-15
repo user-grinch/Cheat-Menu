@@ -2,7 +2,6 @@
 #include "util.h"
 #include "ui.h"
 #include "../depend/imgui/imgui_internal.h"
-#include "version.h"
 
 // Really messy code, cleanup someday
 bool Ui::DrawTitleBar()
@@ -423,30 +422,28 @@ void Ui::DrawJSON(ResourceStore& data,
 
 
     ImGui::BeginChild(1);
-    for (auto root : data.m_pJson->m_Data.items())
+    for (auto [k, v] : data.m_pData->Items())
     {
-        if (root.key() == data.m_Selected || data.m_Selected == "All")
+        if (k.str() == data.m_Selected || data.m_Selected == "All")
         {
-            for (auto _data : root.value().items())
+            for (auto [k2, v2] : v.as_table()->ref<DataStore::Table>())
             {
-                std::string name = _data.key();
-                if (data.m_Filter.PassFilter(name.c_str()))
+                std::string dataKey = std::string(k2.str());
+                if (data.m_Filter.PassFilter(dataKey.c_str()))
                 {
-                    if (ImGui::MenuItem(name.c_str()) && func_left_click != nullptr)
+                    std::string rootKey = std::string(k.str());
+                    std::string dataVal = v2.value_or<std::string>("Unkonwn");
+                    if (ImGui::MenuItem(dataKey.c_str()) && func_left_click != nullptr)
                     {
-                        std::string root_key = root.key();
-                        std::string data_key = _data.key();
-                        std::string data_val = _data.value();
-
-                        func_left_click(root_key, data_key, data_val);
+                        func_left_click(rootKey, dataKey, dataVal);
                     }
 
                     if (ImGui::IsItemClicked(1) && func_right_click != nullptr)
                     {
                         jsonPopup.function = func_right_click;
-                        jsonPopup.root = root.key();
-                        jsonPopup.key = name;
-                        jsonPopup.value = _data.value();
+                        jsonPopup.root = rootKey;
+                        jsonPopup.key = dataKey;
+                        jsonPopup.value = dataVal;
                     }
                 }
             }

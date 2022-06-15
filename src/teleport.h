@@ -7,12 +7,12 @@ private:
     static inline bool m_bInsertCoord;
     static inline bool m_bQuickTeleport;
     static inline char m_nInputBuffer[INPUT_BUFFER_SIZE];
-    static inline ResourceStore m_tpData{ "teleport", eResourceType::TYPE_TEXT };
+    static inline ResourceStore m_tpData{ "locations", eResourceType::TYPE_TEXT };
     static inline char m_nLocationBuffer[INPUT_BUFFER_SIZE];
     static inline uint m_nQuickTeleportTimer;
 
 #ifdef GTASA
-    static inline CJson m_SpriteJson = CJson("radar sprite");
+    static inline DataStore m_SpriteData {"sprites"};
 #endif
 
     struct m_Teleport

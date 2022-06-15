@@ -19,7 +19,7 @@ Locale::eReturnCodes Locale::Init(const char* path, const char* def, const char*
     if (!std::filesystem::exists(m_path))
     {
 #ifdef _GTA_
-        gLog << "Locale directory doesn't exist" << std::endl;
+        Log::Print<eLogLevel::Error>("Locale directory doesn't exist");
 #endif
         return eReturnCodes::DIR_NOT_FOUND;
     }
@@ -30,7 +30,7 @@ Locale::eReturnCodes Locale::Init(const char* path, const char* def, const char*
         We won't load them here, we'll load them when we need them
     */
 #ifdef _GTA_
-    gLog << "Loading languages..." << std::endl;
+    Log::Print<eLogLevel::Info>("Loading languages...");
 #endif
     for (auto& entry : std::filesystem::directory_iterator(m_path))
     {
@@ -38,7 +38,7 @@ Locale::eReturnCodes Locale::Init(const char* path, const char* def, const char*
         {
             std::string fileName = entry.path().stem().string();
 #ifdef _GTA_
-            gLog << "Found locale: " << fileName << std::endl;
+            Log::Print<eLogLevel::Info>("Found locale: {}", fileName);
 #endif
             m_locales.push_back(fileName);
 
@@ -59,7 +59,7 @@ Locale::eReturnCodes Locale::Init(const char* path, const char* def, const char*
     if (sizeof(m_locales) == 0)
     {
 #ifdef _GTA_
-        gLog << "No language files found" << std::endl;
+        Log::Print<eLogLevel::Error>("No language files found");
 #endif
         return eReturnCodes::NO_LOCALE_FOUND;
     }
@@ -80,10 +80,10 @@ Locale::eReturnCodes Locale::Init(const char* path, const char* def, const char*
         index++;
     }
 
-    if(!m_pJson)
+    if(!m_pData)
     {
 #ifdef _GTA_
-        gLog << "Failed to load default language." << std::endl;
+        Log::Print<eLogLevel::Error>("Failed to load default language.");
 #endif
         return eReturnCodes::DEF_LOCALE_NOT_FOUND;
     }
@@ -103,10 +103,10 @@ size_t Locale::GetCurrentLocaleIndex()
 
 Locale::eReturnCodes Locale::SetLocale(size_t index)
 {
-    if(m_pJson)
+    if(m_pData)
     {
-        delete m_pJson;
-        m_pJson = nullptr;
+        delete m_pData;
+        m_pData = nullptr;
     }
 
     if (index < 0 || index >= m_locales.size())
@@ -117,7 +117,7 @@ Locale::eReturnCodes Locale::SetLocale(size_t index)
     std::string localeFile = m_locales[index];
     localeFile += ".json";
     std::string localePath = m_path + localeFile;
-    m_pJson = new CJson(localePath.c_str(), true);
+    m_pData = new CJson(localePath.c_str(), true);
     localeIndex = index;
     return eReturnCodes::SUCCESS;
 }

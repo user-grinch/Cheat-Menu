@@ -5,7 +5,7 @@ class Animation
 {
 private:
     // Animation player
-    static inline ResourceStore m_AnimData{ "animation", eResourceType::TYPE_TEXT };
+    static inline ResourceStore m_AnimData{ "animations", eResourceType::TYPE_TEXT };
     static inline char m_nAnimBuffer[INPUT_BUFFER_SIZE];
     static inline char m_nIfpBuffer[INPUT_BUFFER_SIZE];
     static inline bool m_Loop; // loop animation
@@ -17,7 +17,7 @@ private:
     // Cutscene player
     struct m_Cutscene
     {
-        static inline ResourceStore m_Data{ "cutscene", eResourceType::TYPE_TEXT };
+        static inline ResourceStore m_Data{ "cutscenes", eResourceType::TYPE_TEXT };
         static inline std::string m_SceneName;
         static inline int m_nInterior; // player interior backup
         static inline bool m_bRunning;
@@ -37,7 +37,7 @@ private:
     // Particle player
     struct m_Particle
     {
-        static inline ResourceStore m_Data{ "particle", eResourceType::TYPE_TEXT };
+        static inline ResourceStore m_Data{ "particles", eResourceType::TYPE_TEXT };
         static inline char m_NameBuffer[INPUT_BUFFER_SIZE];
         static inline std::vector<int> m_nParticleList;
     };

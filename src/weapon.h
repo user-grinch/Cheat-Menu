@@ -42,12 +42,12 @@ private:
 
 public:
 #ifdef GTASA
-    static inline ResourceStore m_WeaponData { "weapon", eResourceType::TYPE_BOTH, ImVec2(65, 65) };
+    static inline ResourceStore m_WeaponData { "weapons", eResourceType::TYPE_BOTH, ImVec2(65, 65) };
 
     static void GiveWeaponToPlayer(std::string& weapon_type);
     static void SetGangWeapon(std::string& weapon_type);
 #else
-    static inline ResourceStore m_WeaponData { "weapon", eResourceType::TYPE_TEXT };
+    static inline ResourceStore m_WeaponData { "weapons", eResourceType::TYPE_TEXT };
 
     static void GiveWeaponToPlayer(std::string& rootkey, std::string& model, std::string& name);
 #endif

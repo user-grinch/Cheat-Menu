@@ -1,21 +1,6 @@
 #pragma once
 #pragma warning(disable:4503 4244 4005)
 
-#define INPUT_BUFFER_SIZE 64
-#define SPAWN_PED_LIMIT 20
-#define DISCORD_INVITE "https://discord.gg/ZzW7kmf"
-#define GITHUB_LINK "https://github.com/user-grinch/Cheat-Menu"
-#define IMGUI_DEFINE_MATH_OPERATORS
-#define _GTA_
-
-#ifdef GTASA
-#define BY_GAME(sa, vc, iii) sa
-#elif GTAVC
-#define BY_GAME(sa, vc, iii) vc
-#elif GTA3
-#define BY_GAME(sa, vc, iii) iii
-#endif
-
 #include <d3d9.h>
 #include <d3d11.h>
 #include <d3d11Shader.h>
@@ -69,6 +54,9 @@
 #include "../depend/fla/IDaccess.h"
 #include "../depend/imgui/imgui.h"
 
+#include "defines.h"
+#include "log.h"
+#include "datastore.h"
 #include "json.h"
 #include "hotkeys.h"
 #include "resourcestore.h"
@@ -88,7 +76,6 @@ enum eRenderer
 };
 
 extern eRenderer gRenderer;
-extern std::ofstream gLog;
 extern CJson gConfig;
 
 // Fix function clashes

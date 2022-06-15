@@ -1,6 +1,6 @@
 #include <string>
 #include <rw/rwcore.h>
-#include "json.h"
+#include "datastore.h"
 #include "../depend/imgui/imgui.h"
 #include "d3d9.h"
 
@@ -57,7 +57,7 @@ public:
     ImGuiTextFilter m_Filter = "";
     std::vector<std::string> m_Categories = {"All"};
     std::string m_Selected = "All";
-    std::unique_ptr<CJson> m_pJson;
+    std::unique_ptr<DataStore> m_pData;
     std::vector<std::unique_ptr<TextureResource>> m_ImagesList;
     ImVec2 m_ImageSize;
     bool m_bTexturesLoaded = false;

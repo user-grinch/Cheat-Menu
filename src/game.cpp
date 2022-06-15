@@ -38,15 +38,16 @@ void Game::Init()
 {
 #ifdef GTASA
     // Generate enabled cheats vector
-    for (auto element : m_RandomCheats::m_Json.m_Data.items())
+    for (auto [k, v] : m_RandomCheats::m_pData.Items())
     {
         /*
         [
         	cheat_id = [ cheat_name, state (true/false) ]
         ]
         */
-        m_RandomCheats::m_EnabledCheats[std::stoi(element.key())][0] = element.value().get<std::string>();
-        m_RandomCheats::m_EnabledCheats[std::stoi(element.key())][1] = "true";
+        std::string key { k.str() };
+        m_RandomCheats::m_EnabledCheats[std::stoi(key)][0] = v.value_or<std::string>("Unknown");
+        m_RandomCheats::m_EnabledCheats[std::stoi(key)][1] = "true";
     }
 
     Events::drawMenuBackgroundEvent += []()
@@ -788,16 +789,16 @@ void Game::ShowPage()
 
             ImGui::Spacing();
             ImGui::BeginChild("STATCHILD");
-            for (auto root : m_StatData.m_pJson->m_Data.items())
+            for (auto [k, v] : m_StatData.m_pData->Items())
             {
-                if (root.key() == m_StatData.m_Selected || m_StatData.m_Selected == "All")
+                if (k.str() == m_StatData.m_Selected || m_StatData.m_Selected == "All")
                 {
-                    for (auto _data : root.value().items())
+                    for (auto [k2, v2] : v.as_table()->ref<DataStore::Table>())
                     {
-                        std::string name = _data.value().get<std::string>();
+                        std::string name = v2.value_or<std::string>("Unknown");
                         if (m_StatData.m_Filter.PassFilter(name.c_str()))
                         {
-                            Ui::EditStat(name.c_str(), std::stoi(_data.key()));
+                            Ui::EditStat(name.c_str(), std::stoi(std::string(k2.str())));
                         }
                     }
                 }

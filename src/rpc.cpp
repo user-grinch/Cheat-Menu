@@ -33,7 +33,7 @@ void RPC::Init()
     // check if the dll exits
     if (!std::filesystem::exists(dllPath))
     {
-        gLog << TEXT("Menu.DiscordRPCNoDll") << std::endl;
+        Log::Print<eLogLevel::Error>(TEXT("Menu.DiscordRPCNoDll"));
         return;
     }
 
@@ -62,7 +62,7 @@ void RPC::Init()
     }
     else
     {
-        gLog << TEXT("Menu.DiscordRPCInitFailed") << std::endl;
+        Log::Print<eLogLevel::Error>(TEXT("Menu.DiscordRPCInitFailed"));
     }
 }
 

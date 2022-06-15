@@ -60,8 +60,8 @@ void Animation::RemoveParticle(std::string& ifp, std::string& particle, std::str
 {
     if (ifp == "Custom")
     {
-        m_Particle::m_Data.m_pJson->m_Data["Custom"].erase(particle);
-        m_Particle::m_Data.m_pJson->WriteToDisk();
+        m_Particle::m_Data.m_pData->RemoveKey("Custom", particle.c_str());
+        m_Particle::m_Data.m_pData->Save();
         SetHelpMessage(TEXT("Animation.ParticleRemoved"));
     }
     else
@@ -324,8 +324,9 @@ void Animation::ShowPage()
                     ImGui::Spacing();
                     if (ImGui::Button(TEXT("Animation.AddAnimation"), Ui::GetSize()))
                     {
-                        m_AnimData.m_pJson->m_Data["Custom"][m_nAnimBuffer] = std::string(m_nIfpBuffer);
-                        m_AnimData.m_pJson->WriteToDisk();
+                        std::string key = std::string("Custom.") + m_nAnimBuffer;
+                        m_AnimData.m_pData->Set(key.c_str(), std::string(m_nIfpBuffer));
+                        m_AnimData.m_pData->Save();
                     }
                 }
                 ImGui::Spacing();
@@ -396,8 +397,9 @@ void Animation::ShowPage()
                 ImGui::Spacing();
                 if (ImGui::Button(TEXT("Animation.AddParticle"), Ui::GetSize()))
                 {
-                    m_Particle::m_Data.m_pJson->m_Data["Custom"][m_Particle::m_NameBuffer] = "Dummy";
-                    m_Particle::m_Data.m_pJson->WriteToDisk();
+                    std::string key = std::string("Custom.") + m_Particle::m_NameBuffer;
+                    m_AnimData.m_pData->Set(key.c_str(), std::string("Dummy"));
+                    m_Particle::m_Data.m_pData->Save();
                 }
             }
             ImGui::Spacing();
@@ -445,8 +447,8 @@ void Animation::RemoveAnimation(std::string& ifp, std::string& anim, std::string
 {
     if (ifp == "Custom")
     {
-        m_AnimData.m_pJson->m_Data["Custom"].erase(anim);
-        m_AnimData.m_pJson->WriteToDisk();
+        m_AnimData.m_pData->RemoveKey("Custom", anim.c_str());
+        m_AnimData.m_pData->Save();
         SetHelpMessage(TEXT("Animation.AnimationRemoved"));
     }
     else

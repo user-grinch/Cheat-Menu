@@ -1,6 +1,5 @@
 #include "pch.h"
 eRenderer gRenderer = Render_Unknown;
-std::ofstream gLog = std::ofstream("CheatMenu.log");
 CJson gConfig = CJson("config");
 
 Hotkey aimSkinChanger {VK_RETURN, VK_RETURN, "AimSkinChanger"};

@@ -111,7 +111,7 @@ void Player::Init()
                     }
                     else
                     {
-                        gLog << "Custom Skin longer than 8 characters " << file_name << std::endl;
+                        Log::Print<eLogLevel::Error>("Custom Skin longer than 8 characters {}", file_name);
                     }
                 }
             }
@@ -306,16 +306,20 @@ void Player::ChangePlayerModel(std::string& model)
     bool custom_skin = std::find(m_CustomSkins::m_List.begin(), m_CustomSkins::m_List.end(), model) !=
                        m_CustomSkins::m_List.end();
 
-    if (Ped::m_PedData.m_pJson->m_Data.contains(model) || custom_skin)
+    if (Ped::m_PedData.m_pData->Contains(model.c_str()) || custom_skin)
     {
         CPlayerPed* player = FindPlayerPed();
-        if (Ped::m_SpecialPedJson.m_Data.contains(model) || custom_skin)
+        if (Ped::m_SpecialPedData.Contains(model.c_str()) || custom_skin)
         {
             std::string name;
-            if (Ped::m_SpecialPedJson.m_Data.contains(model))
-                name = Ped::m_SpecialPedJson.m_Data[model].get<std::string>().c_str();
+            if (Ped::m_SpecialPedData.Contains(model.c_str()))
+            {
+                name = Ped::m_SpecialPedData.Get(model.c_str(), "Unknown");
+            }
             else
+            {
                 name = model;
+            }
 
             CStreaming::RequestSpecialChar(1, name.c_str(), PRIORITY_REQUEST);
             CStreaming::LoadAllRequestedModels(true);
@@ -835,7 +839,7 @@ void Player::ShowPage()
                     Ui::DrawImages(Ped::m_PedData, ChangePlayerModel, nullptr,
                                    [](std::string str)
                     {
-                        return Ped::m_PedData.m_pJson->m_Data[str].get<std::string>();
+                        return Ped::m_PedData.m_pData->Get(str.c_str(), "Unknown");
                     });
                     ImGui::EndTabItem();
                 }

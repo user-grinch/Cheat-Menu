@@ -13,7 +13,7 @@ class Locale
 private:
     static inline std::vector<std::string> m_locales;
     static inline std::string m_path;
-    static inline CJson *m_pJson = nullptr;
+    static inline CJson *m_pData = nullptr;
     static inline CJson *m_pCallbackJson = nullptr;
     static inline size_t localeIndex;
 
@@ -51,7 +51,7 @@ public:
     */
     static inline std::string GetText(std::string&& key, std::string&& defaultValue = "")
     {
-        if (m_pJson == nullptr)
+        if (m_pData == nullptr)
         {
             return defaultValue;
         }
@@ -62,7 +62,7 @@ public:
             defaultValue = "#" + key;
         }
 
-        std::string rtn = m_pJson->GetValueStr(key, defaultValue);
+        std::string rtn = m_pData->GetValueStr(key, defaultValue);
 
         if (rtn == defaultValue)
         {

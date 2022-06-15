@@ -350,7 +350,7 @@ void Weapon::ShowPage()
             Ui::DrawImages(m_WeaponData, GiveWeaponToPlayer, nullptr,
                            [](std::string str)
             {
-                return m_WeaponData.m_pJson->m_Data[str].get<std::string>();
+                return m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
             },
             [](std::string str)
             {
@@ -370,14 +370,14 @@ void Weapon::ShowPage()
             std::vector<std::string> vec = {TEXT("Weapon.Weapon1"), TEXT("Weapon.Weapon2"), TEXT("Weapon.Weapon3")};
             Ui::ListBox(TEXT("Ped.SelectWeapon"), vec, m_nSelectedWeapon);
             ImGui::Spacing();
-            ImGui::Text(TEXT("Weapon.CurrentWeapon"),
-                        m_WeaponData.m_pJson->m_Data[std::to_string(m_nGangWeaponList[m_nSelectedGang][m_nSelectedWeapon])].get<
-                        std::string>().c_str());
+
+            std::string key = std::to_string(m_nGangWeaponList[m_nSelectedGang][m_nSelectedWeapon]);
+            ImGui::Text(TEXT("Weapon.CurrentWeapon"), m_WeaponData.m_pData->Get(key.c_str(), "Unknown"));
             ImGui::Spacing();
             Ui::DrawImages(m_WeaponData, SetGangWeapon, nullptr,
                            [](std::string str)
             {
-                return m_WeaponData.m_pJson->m_Data[str].get<std::string>();
+                    return m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
             },
             [](std::string str)
             {

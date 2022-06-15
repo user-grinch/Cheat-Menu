@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "updater.h"
-#include "version.h"
 
 bool Updater::IsUpdateAvailable()
 {
