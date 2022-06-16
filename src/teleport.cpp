@@ -10,12 +10,12 @@ tRadarTrace* CRadar::ms_RadarTrace = reinterpret_cast<tRadarTrace*>(patch::GetPo
 
 void Teleport::FetchRadarSpriteData()
 {
-    uint cur_timer = CTimer::m_snTimeInMilliseconds;
-    static uint timer = cur_timer;
     static int maxSprites = *(uint*)0x5D5870;
+    uint timer = CTimer::m_snTimeInMilliseconds;
+    static uint lastUpdated = timer;
 
     // Update the radar list each 5 seconds
-    if (cur_timer - timer < 5000)
+    if (timer - lastUpdated < 5000)
     {
         return;
     }
@@ -30,12 +30,13 @@ void Teleport::FetchRadarSpriteData()
         std::string key = "Radar." + keyName;
         m_tpData.m_pData->Set(key.c_str(), std::format("0, {}, {}, {}", pos.x, pos.y, pos.z));
     }
+    lastUpdated = timer;
 }
 #endif
 
 void Teleport::Init()
 {
-    m_bQuickTeleport = gConfig.Get("quick_teleport", false);
+    m_bQuickTeleport = gConfig.Get("Features.QuickTeleport", false);
 
     Events::processScriptsEvent += []
     {
@@ -219,7 +220,7 @@ void Teleport::ShowPage()
                                         std::string(TEXT_S("Teleport.QuickTeleportHint") 
                                                     + quickTeleport.GetNameString()).c_str()))
                 {
-                    gConfig.Set("quick_teleport", m_bQuickTeleport);
+                    gConfig.Set("Features.QuickTeleport", m_bQuickTeleport);
                 }
 #endif
                 ImGui::Columns(1);
@@ -297,7 +298,7 @@ void Teleport::ShowPage()
             }
 
             ImGui::Spacing();
-            Ui::DrawJSON(m_tpData, TeleportToLocation,RemoveTeleportEntry);
+            Ui::DrawJSON(m_tpData, TeleportToLocation, RemoveTeleportEntry);
             ImGui::EndTabItem();
         }
         ImGui::EndTabBar();

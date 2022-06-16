@@ -76,11 +76,11 @@ void MenuThread(void* param)
     // Checking for updates once a day
     SYSTEMTIME st;
     GetSystemTime(&st);
-    if (gConfig.Get("config.update_date", 0) != st.wDay)
+    if (gConfig.Get("Menu.LastUpdateChecked", 0) != st.wDay)
     {
         Updater::CheckUpdate();
         Updater::IncrementDailyUsageCounter();
-        gConfig.Set("config.update_date", st.wDay);
+        gConfig.Set("Menu.LastUpdateChecked", st.wDay);
     }
 
     while (true)

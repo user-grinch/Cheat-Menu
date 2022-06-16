@@ -88,7 +88,7 @@ void Player::Init()
 #ifdef GTASA
 //	Fix player model being broken after rebuild
     patch::RedirectCall(0x5A834D, &PlayerModelBrokenFix);
-    m_bAimSkinChanger = gConfig.Get("aim_skin_changer", false);
+    m_bAimSkinChanger = gConfig.Get("Features.AimSkinChanger", false);
 #endif
 
     // Custom skins setup
@@ -766,7 +766,7 @@ void Player::ShowPage()
 
             if (Ui::CheckboxWithHint(TEXT("Player.AimSkinChanger"), &m_bAimSkinChanger, TEXT("Player.AimSkinChangerTip") + aimSkinChanger.Pressed()))
             {
-                gConfig.Set("aim_skin_changer", m_bAimSkinChanger);
+                gConfig.Set("Features.AimSkinChanger", m_bAimSkinChanger);
             }
             if (ImGui::BeginTabBar("AppearanceTabBar"))
             {
