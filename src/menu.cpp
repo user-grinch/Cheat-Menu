@@ -16,22 +16,22 @@ void Menu::Init()
 {
     // TODO: use structs
     // Load config data
-    m_Overlay::bCoord = gConfig.GetValue("overlay.coord", false);
-    m_Overlay::bCpuUsage = gConfig.GetValue("overlay.cpu_usage", false);
-    m_Overlay::bFPS = gConfig.GetValue("overlay.fps", false);
-    m_Overlay::bLocName = gConfig.GetValue("overlay.loc_name", false);
-    m_Overlay::bTransparent = gConfig.GetValue("overlay.transparent", false);
-    m_Overlay::bMemUsage = gConfig.GetValue("overlay.mem_usage", false);
-    m_Overlay::bVehHealth = gConfig.GetValue("overlay.veh_health", false);
-    m_Overlay::bVehSpeed = gConfig.GetValue("overlay.veh_speed", false);
-    m_Overlay::mSelectedPos = (DisplayPos)gConfig.GetValue("overlay.selected_pos", (int)DisplayPos::BOTTOM_RIGHT);
-    m_Overlay::fPosX = gConfig.GetValue("overlay.pox", 0);
-    m_Overlay::fPosY = gConfig.GetValue("overlay.posy", 0);
-    m_Overlay::textColor[0] = gConfig.GetValue("overlay.text_color.r", 1.0f);
-    m_Overlay::textColor[1] = gConfig.GetValue("overlay.text_color.g", 1.0f);
-    m_Overlay::textColor[2] = gConfig.GetValue("overlay.text_color.b", 1.0f);
-    m_Overlay::textColor[3] = gConfig.GetValue("overlay.text_color.a", 1.0f);
-    m_bDiscordRPC = gConfig.GetValue("menu.discord_rpc", false);
+    m_Overlay::bCoord = gConfig.Get("Overlay.ShowCoordinates", false);
+    m_Overlay::bCpuUsage = gConfig.Get("Overlay.ShowCPUUsage", false);
+    m_Overlay::bFPS = gConfig.Get("Overlay.ShowFPS", false);
+    m_Overlay::bLocName = gConfig.Get("Overlay.ShowLocationName", false);
+    m_Overlay::bTransparent = gConfig.Get("Overlay.Transparent", false);
+    m_Overlay::bMemUsage = gConfig.Get("Overlay.ShowMemoryUsage", false);
+    m_Overlay::bVehHealth = gConfig.Get("Overlay.ShowVehicleName", false);
+    m_Overlay::bVehSpeed = gConfig.Get("Overlay.ShowVehicleSpeed", false);
+    m_Overlay::mSelectedPos = (DisplayPos)gConfig.Get("Overlay.SelectedPosition", (int)DisplayPos::BOTTOM_RIGHT);
+    m_Overlay::fPosX = gConfig.Get("Overlay.PosX", 0);
+    m_Overlay::fPosY = gConfig.Get("Overlay.PosY", 0);
+    m_Overlay::textColor[0] = gConfig.Get("Overlay.TextColor.Red", 1.0f);
+    m_Overlay::textColor[1] = gConfig.Get("Overlay.TextColor.Green", 1.0f);
+    m_Overlay::textColor[2] = gConfig.Get("Overlay.TextColor.Blue", 1.0f);
+    m_Overlay::textColor[3] = gConfig.Get("Overlay.TextColor.Alpha", 1.0f);
+    m_bDiscordRPC = gConfig.Get("Menu.DiscordRPC", false);
 
     Util::GetCPUUsageInit();
     MEMORYSTATUSEX memInfo;
@@ -63,8 +63,8 @@ void Menu::DrawOverlay()
         {
             if (m_Overlay::fPosX != NULL && m_Overlay::fPosY != NULL)
             {
-                gConfig.SetValue("overlay.posx", m_Overlay::fPosX);
-                gConfig.SetValue("overlay.posy", m_Overlay::fPosY);
+                gConfig.Set("Overlay.PosX", m_Overlay::fPosX);
+                gConfig.Set("Overlay.PosY", m_Overlay::fPosY);
                 ImGui::SetNextWindowPos(ImVec2(m_Overlay::fPosX, m_Overlay::fPosY), ImGuiCond_Once);
             }
         }
@@ -323,13 +323,7 @@ void Menu::ShowPage()
         if (ImGui::BeginTabItem(TEXT("Menu.Config")))
         {
             ImGui::Spacing();
-            if (ImGui::Button(TEXT("Menu.ResetConfig"), ImVec2(Ui::GetSize(2))))
-            {
-                gConfig.m_Data.clear();
-                SetHelpMessage(TEXT("Menu.ResetConfigMSG"));
-            }
-            ImGui::SameLine();
-            if (ImGui::Button(TEXT("Menu.ResetSize"), ImVec2(Ui::GetSize(2))))
+            if (ImGui::Button(TEXT("Menu.ResetSize"), ImVec2(Ui::GetSize(1))))
             {
                 CheatMenu::ResetMenuSize();
             }
@@ -366,7 +360,7 @@ void Menu::ShowPage()
                 {
                     RPC::Shutdown();
                 }
-                gConfig.SetValue("menu.discord_rpc", m_bDiscordRPC);
+                gConfig.Set("Menu.DiscordRPC", m_bDiscordRPC);
             }
             ImGui::NextColumn();
             ImGui::Columns(1);
@@ -380,17 +374,17 @@ void Menu::ShowPage()
             ImGui::SameLine();
             if (Ui::ListBox(TEXT("Menu.Position"), m_Overlay::posNames, (int&)m_Overlay::mSelectedPos))
             {
-                gConfig.SetValue("overlay.selected_pos", m_Overlay::mSelectedPos);
+                gConfig.Set<int>("Overlay.SelectedPosition", static_cast<int>(m_Overlay::mSelectedPos));
             }
 
             ImGui::Spacing();
             ImGui::SameLine();
             if (ImGui::ColorEdit4(TEXT("Menu.TextColor"), m_Overlay::textColor))
             {
-                gConfig.SetValue("overlay.text_color.r", m_Overlay::textColor[0]);
-                gConfig.SetValue("overlay.text_color.g", m_Overlay::textColor[1]);
-                gConfig.SetValue("overlay.text_color.b", m_Overlay::textColor[2]);
-                gConfig.SetValue("overlay.text_color.a", m_Overlay::textColor[3]);
+                gConfig.Set("Overlay.TextColor.Red", m_Overlay::textColor[0]);
+                gConfig.Set("Overlay.TextColor.Green", m_Overlay::textColor[1]);
+                gConfig.Set("Overlay.TextColor.Blue", m_Overlay::textColor[2]);
+                gConfig.Set("Overlay.TextColor.Alpha", m_Overlay::textColor[3]);
             }
 
             ImGui::Spacing();
@@ -398,44 +392,44 @@ void Menu::ShowPage()
             ImGui::Columns(2, nullptr, false);
             if (ImGui::Checkbox(TEXT("Menu.NoBG"), &m_Overlay::bTransparent))
             {
-                gConfig.SetValue("overlay.transparent", m_Overlay::bTransparent);
+                gConfig.Set("Overlay.Transparent", m_Overlay::bTransparent);
             }
 
             if (ImGui::Checkbox(TEXT("Menu.ShowCoords"), &m_Overlay::bCoord))
             {
-                gConfig.SetValue("overlay.coord", m_Overlay::bCoord);
+                gConfig.Set("Overlay.ShowCoordinates", m_Overlay::bCoord);
             }
 
             if (ImGui::Checkbox(TEXT("Menu.ShowCPU"), &m_Overlay::bCpuUsage))
             {
-                gConfig.SetValue("overlay.cpu_usage", m_Overlay::bCpuUsage);
+                gConfig.Set("Overlay.ShowCPUUsage", m_Overlay::bCpuUsage);
             }
 
             if (ImGui::Checkbox(TEXT("Menu.ShowFPS"), &m_Overlay::bFPS))
             {
-                gConfig.SetValue("overlay.fps", m_Overlay::bFPS);
+                gConfig.Set("Overlay.ShowFPS", m_Overlay::bFPS);
             }
 
             ImGui::NextColumn();
 
             if (ImGui::Checkbox(TEXT("Menu.ShowLocation"), &m_Overlay::bLocName))
             {
-                gConfig.SetValue("overlay.loc_name", m_Overlay::bLocName);
+                gConfig.Set("Overlay.ShowLocationName", m_Overlay::bLocName);
             }
 
             if (ImGui::Checkbox(TEXT("Menu.ShowRAM"), &m_Overlay::bMemUsage))
             {
-                gConfig.SetValue("overlay.mem_usage", m_Overlay::bMemUsage);
+                gConfig.Set("Overlay.ShowMemoryUsage", m_Overlay::bMemUsage);
             }
 
             if (ImGui::Checkbox(TEXT("Menu.ShowVehHealth"), &m_Overlay::bVehHealth))
             {
-                gConfig.SetValue("overlay.veh_health", m_Overlay::bVehHealth);
+                gConfig.Set("Overlay.ShowVehicleHealth", m_Overlay::bVehHealth);
             }
 
             if (ImGui::Checkbox(TEXT("Menu.ShowVehSpeed"), &m_Overlay::bVehSpeed))
             {
-                gConfig.SetValue("overlay.veh_speed", m_Overlay::bVehSpeed);
+                gConfig.Set("Overlay.ShowVehicleSpeed", m_Overlay::bVehSpeed);
             }
 
             ImGui::Columns(1);

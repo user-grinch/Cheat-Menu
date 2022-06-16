@@ -69,18 +69,18 @@ void MenuThread(void* param)
     }
 #endif
 
-    Log::Print<eLogLevel::None>("\nVersion: " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: " GITHUB_LINK "\n");
+    Log::Print<eLogLevel::None>("Version: " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: " GITHUB_LINK "\n");
 
     CheatMenu::Init();
 
     // Checking for updates once a day
     SYSTEMTIME st;
     GetSystemTime(&st);
-    if (gConfig.GetValue("config.update_date", 0) != st.wDay)
+    if (gConfig.Get("config.update_date", 0) != st.wDay)
     {
         Updater::CheckUpdate();
         Updater::IncrementDailyUsageCounter();
-        gConfig.SetValue("config.update_date", st.wDay);
+        gConfig.Set("config.update_date", st.wDay);
     }
 
     while (true)

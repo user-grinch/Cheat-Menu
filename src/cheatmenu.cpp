@@ -53,8 +53,8 @@ void CheatMenu::DrawWindow()
                     else
                         m_fMenuSize = ImGui::GetWindowSize();
 
-                    gConfig.SetValue("window.sizeX", m_fMenuSize.x);
-                    gConfig.SetValue("window.sizeY", m_fMenuSize.y);
+                    gConfig.Set("Window.SizeX", m_fMenuSize.x);
+                    gConfig.Set("Window.SizeY", m_fMenuSize.y);
 
                     ImGui::PopStyleVar(2);
                     ImGui::End();
@@ -94,11 +94,11 @@ void CheatMenu::ProcessPages()
             *   We don't want to be annoying and
             *   show anniversary screen on every game start
             */
-            bool flag = gConfig.GetValue("window.anniversaryShown", false);
+            bool flag = gConfig.Get("Window.AnniversaryShown", false);
 
             if (!flag)
             {
-                gConfig.SetValue("window.anniversaryShown", true);
+                gConfig.Set("Window.AnniversaryShown", true);
                 m_nMenuPage = eMenuPages::ANNIVERSARY;
             }
         }
@@ -137,7 +137,7 @@ void CheatMenu::ProcessPages()
         {
             m_nMenuPage = m_headerList[i].page;
             size_t curPage = static_cast<size_t>(m_headerList[i].page);
-            gConfig.SetValue("window.page", curPage);
+            gConfig.Set("Window.CurrentPage", curPage);
             pCallback = m_headerList[i].pFunc;
             Updater::ResetUpdaterState();
         }
@@ -210,9 +210,9 @@ void CheatMenu::Init()
     }
 
     // Load menu settings
-    m_nMenuPage = (eMenuPages)gConfig.GetValue("window.page", (size_t)eMenuPages::WELCOME);
-    m_fMenuSize.x = gConfig.GetValue("window.sizeX", screen::GetScreenWidth() / 4.0f);
-    m_fMenuSize.y = gConfig.GetValue("window.sizeY", screen::GetScreenHeight() / 1.2f);
+    m_nMenuPage = (eMenuPages)gConfig.Get("Window.CurrentPage", (size_t)eMenuPages::WELCOME);
+    m_fMenuSize.x = gConfig.Get("Window.SizeX", screen::GetScreenWidth() / 4.0f);
+    m_fMenuSize.y = gConfig.Get("Window.SizeY", screen::GetScreenHeight() / 1.2f);
     srand(CTimer::m_snTimeInMilliseconds);
 
     ApplyStyle();

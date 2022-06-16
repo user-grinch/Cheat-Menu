@@ -34,7 +34,7 @@ Locale::eReturnCodes Locale::Init(const char* path, const char* def, const char*
 #endif
     for (auto& entry : std::filesystem::directory_iterator(m_path))
     {
-        if (entry.path().extension() == ".json")
+        if (entry.path().extension() == ".toml")
         {
             std::string fileName = entry.path().stem().string();
 #ifdef _GTA_
@@ -44,14 +44,14 @@ Locale::eReturnCodes Locale::Init(const char* path, const char* def, const char*
 
             if (!strcmp(fallback, fileName.c_str()))
             {
-                std::string localePath = m_path + fileName + ".json";
+                std::string localePath = m_path + fileName;
 
-                if(m_pCallbackJson)
+                if(m_pCallbackData)
                 {
-                    delete m_pCallbackJson;
-                    m_pCallbackJson = nullptr;
+                    delete m_pCallbackData;
+                    m_pCallbackData = nullptr;
                 }
-                m_pCallbackJson = new CJson(localePath.c_str(), true);
+                m_pCallbackData = new DataStore(localePath.c_str(), true);
             }
         }
     }
@@ -113,12 +113,32 @@ Locale::eReturnCodes Locale::SetLocale(size_t index)
     {
         return eReturnCodes::INVALID_INDEX;
     }
-
-    std::string localeFile = m_locales[index];
-    localeFile += ".json";
-    std::string localePath = m_path + localeFile;
-    m_pData = new CJson(localePath.c_str(), true);
+    std::string localePath = m_path + m_locales[index];
+    m_pData = new DataStore(localePath.c_str(), true);
     localeIndex = index;
     return eReturnCodes::SUCCESS;
+}
+
+std::string Locale::GetText(std::string&& key, std::string&& defaultValue)
+{
+    if (m_pData == nullptr)
+    {
+        return defaultValue;
+    }
+
+    // Return keyname if no default value is provided
+    if (defaultValue == "")
+    {
+        defaultValue = "#" + key;
+    }
+
+    std::string rtn = m_pData->Get(key.c_str(), defaultValue);
+
+    if (rtn == defaultValue)
+    {
+        return m_pCallbackData->Get(key.c_str(), defaultValue);
+    }
+
+    return rtn;
 }
 

@@ -1,20 +1,20 @@
 #pragma once
 #include <vector>
 #include <string>
-#include "json.h"
+#include "datastore.h"
 
 /*
     A custom i18n library
     Loads strings from a json file
-    Requires the CJson class
+    Requires the DataStore class
 */
 class Locale
 {
 private:
     static inline std::vector<std::string> m_locales;
     static inline std::string m_path;
-    static inline CJson *m_pData = nullptr;
-    static inline CJson *m_pCallbackJson = nullptr;
+    static inline DataStore *m_pData = nullptr;
+    static inline DataStore *m_pCallbackData = nullptr;
     static inline size_t localeIndex;
 
 public:
@@ -49,28 +49,7 @@ public:
         You need to call SetLanguage once before calling this function
         By default, the language is set to "en"
     */
-    static inline std::string GetText(std::string&& key, std::string&& defaultValue = "")
-    {
-        if (m_pData == nullptr)
-        {
-            return defaultValue;
-        }
-
-        // Return keyname if no default value is provided
-        if (defaultValue == "")
-        {
-            defaultValue = "#" + key;
-        }
-
-        std::string rtn = m_pData->GetValueStr(key, defaultValue);
-
-        if (rtn == defaultValue)
-        {
-            return m_pCallbackJson->GetValueStr(key, defaultValue);
-        }
-
-        return rtn;
-    }
+    static std::string GetText(std::string&& key, std::string&& defaultValue = "");
 
     /*
         Sets the language to use

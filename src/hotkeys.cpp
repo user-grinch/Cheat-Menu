@@ -179,8 +179,8 @@ Hotkey::Hotkey(int key1, int key2, const std::string& configPath)
 {
     if (m_ConfigPath != "")
     {
-        m_key1 = gConfig.GetValue(m_ConfigPath + ".1", m_key1);
-        m_key2 = gConfig.GetValue(m_ConfigPath + ".2", m_key2);
+        m_key1 = gConfig.Get((m_ConfigPath + ".Key1").c_str(), m_key1);
+        m_key2 = gConfig.Get((m_ConfigPath + ".Key2").c_str(), m_key2);
     }
 }
 
@@ -232,8 +232,8 @@ bool Hotkey::DrawUI(const char* label)
         // Save the hotkeys in config file
         if (m_ConfigPath != "")
         {
-            gConfig.SetValue(m_ConfigPath + "1", m_key1);
-            gConfig.SetValue(m_ConfigPath + "2", m_key2);
+            gConfig.Set((m_ConfigPath + ".Key1").c_str(), m_key1);
+            gConfig.Set((m_ConfigPath + ".Key2").c_str(), m_key2);
         }
     }
 

@@ -143,7 +143,7 @@
     "InvalidValue": "Invalid value",
     "Language": "Language",
     "LanguageChangeFailed": "Failed to change language!",
-    "LatestVersion" : "Latest version",
+    "LatestVersion" : "Latest version: ",
     "Location": "Location: %s",
     "Name": "Name",
     "NewVersion" : "A new version of the menu is available.",

@@ -88,7 +88,7 @@ void Player::Init()
 #ifdef GTASA
 //	Fix player model being broken after rebuild
     patch::RedirectCall(0x5A834D, &PlayerModelBrokenFix);
-    m_bAimSkinChanger = gConfig.GetValue("aim_skin_changer", false);
+    m_bAimSkinChanger = gConfig.Get("aim_skin_changer", false);
 #endif
 
     // Custom skins setup
@@ -477,7 +477,7 @@ void Player::ShowPage()
             Ui::CheckboxAddress(TEXT("Player.InfO2"), 0x96916E);
             if (Ui::CheckboxBitFlag(TEXT("Player.InvisPlayer"), pPlayer->m_nPedFlags.bDontRender))
             {
-                pPlayer->m_nPedFlags.bDontRender != pPlayer->m_nPedFlags.bDontRender;
+                pPlayer->m_nPedFlags.bDontRender = !pPlayer->m_nPedFlags.bDontRender;
             }
             Ui::CheckboxAddress(TEXT("Player.InfSprint"), 0xB7CEE4);
 #else
@@ -489,7 +489,7 @@ void Player::ShowPage()
 #ifdef GTASA
             if (Ui::CheckboxBitFlag(TEXT("Player.LockControl"), pad->bPlayerSafe))
             {
-                pad->bPlayerSafe != pad->bPlayerSafe;
+                pad->bPlayerSafe = !pad->bPlayerSafe;
             }
             Ui::CheckboxAddressEx(TEXT("Player.MaxAppeal"), 0x969180, 1, 0);
             Ui::CheckboxAddress(TEXT("Player.MegaJump"), 0x96916C);
@@ -766,7 +766,7 @@ void Player::ShowPage()
 
             if (Ui::CheckboxWithHint(TEXT("Player.AimSkinChanger"), &m_bAimSkinChanger, TEXT("Player.AimSkinChangerTip") + aimSkinChanger.Pressed()))
             {
-                gConfig.SetValue("aim_skin_changer", m_bAimSkinChanger);
+                gConfig.Set("aim_skin_changer", m_bAimSkinChanger);
             }
             if (ImGui::BeginTabBar("AppearanceTabBar"))
             {

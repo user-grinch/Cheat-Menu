@@ -37,7 +37,7 @@ void Updater::Process()
     }
 
     const char* link = "https://api.github.com/repos/user-grinch/Cheat-Menu/tags";
-    char* path = PLUGIN_PATH((char*)"CheatMenu/json/versioninfo.json");
+    char* path = PLUGIN_PATH((char*)"CheatMenu/data/versioninfo.json");
     HRESULT res = URLDownloadToFile(NULL, link, path, 0, NULL);
 
     if (res == E_OUTOFMEMORY || res == INET_E_DOWNLOAD_FAILURE)
@@ -46,17 +46,26 @@ void Updater::Process()
         return;
     }
 
-    CJson verinfo = CJson("versioninfo");
-
-    // fetch the version number
-    if (verinfo.m_Data.empty())
+    // Extract the version number
+    FILE *pFile= fopen(path, "r");
+    if (pFile != NULL)
     {
-        latestVer = MENU_VERSION_NUMBER;
+        char buf[64];
+        float version = 0.0f;
+        while (fgets(buf, 64, pFile) != NULL)
+        {
+            sscanf(buf, "[{\"name\": \"%f\",", &version);
+            if (version != 0.0f)
+            {
+                std::stringstream ss;
+                ss << std::fixed << std::setprecision(2) << version;
+                latestVer = ss.str();
+                break;
+            }
+        }
+        fclose(pFile);
     }
-    else
-    {
-        latestVer = verinfo.m_Data.items().begin().value()["name"].get<std::string>();
-    }
+    remove(path);
 
     if (latestVer > MENU_VERSION_NUMBER)
     {

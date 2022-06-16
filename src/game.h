@@ -4,7 +4,7 @@
 class Game
 {
 private:
-    static inline ResourceStore m_MissionData{ "mission", eResourceType::TYPE_TEXT };
+    static inline ResourceStore m_MissionData{ "missions", eResourceType::TYPE_TEXT };
     static inline bool m_bDisableCheats;
     static inline bool m_bDisableReplay;
     static inline bool m_bMissionTimer;

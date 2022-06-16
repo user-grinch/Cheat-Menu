@@ -1,7 +1,8 @@
 #pragma once
 #define TOML_EXCEPTIONS 0
-#include "../depend/toml.hpp"
+#include "../depend/toml_addon.hpp"
 #include <memory>
+
 
 /*
     DataStore Class
@@ -18,44 +19,63 @@ private:
 public:
     typedef toml::table Table;
 
-    DataStore(const char* fileName, bool isConfig = false) noexcept;
+    DataStore(const char* fileName, bool isPathPredefined = false) noexcept;
 
     // Returns data from store structure
+    std::string Get(const char* key, const char* defaultVal) noexcept
+    {
+        if (pTable)
+        {
+            return (*pTable).at_path(key).value_or(defaultVal);
+        }
+        return defaultVal;
+    }
+
     template<typename T>
     T Get(const char* key, const T& defaultVal) noexcept
     {
         if (pTable)
         {
-            return (*pTable)[key].value_or(defaultVal);
+            return (*pTable).at_path(key).value_or(defaultVal);
         }
         return defaultVal;
     }
+    
 
-    std::string Get(const char* key, std::string&& defaultVal) noexcept
+    // Adds data to the structure
+    template <typename T>
+    void Set(const char* key, T&& value)
     {
-        if (pTable)
-        {
-            return (*pTable)[key].value_or(defaultVal);
-        }
-        return defaultVal;
-    }
+        std::stringstream ss(key);
+        std::vector<std::string> paths;
 
-    // Sets data in store structure
-    template<typename T>
-    void Set(const char* key, const T& value) noexcept
-    {
-        if (pTable)
+        while(ss.good())
         {
-            (*pTable)[key] = value;
+            std::string s1 = "";
+            getline(ss, s1, '.');
+            if (s1 != "")
+            {
+                paths.push_back(std::move(s1));
+            }
         }
-    }
 
-    void Set(const char* key, std::string&& value) noexcept
-    {
-        if (pTable)
+        // assign the value
+        toml::table tbl;
+        int startIndex = paths.size()-1;
+        for (int i = startIndex; i >= 0; --i)
         {
-            (*pTable)[key].ref<std::string>() = value;
+            if (i == startIndex)
+            {
+                tbl.insert_or_assign(paths[i], std::move(value));
+            }
+            else
+            {
+                toml::table temp;
+                temp.insert_or_assign(paths[i], std::move(tbl));
+                tbl = std::move(temp);
+            }
         }
+        merge_left(*pTable, std::move(tbl));
     }
 
     // If store contains element

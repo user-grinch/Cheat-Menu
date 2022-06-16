@@ -1,10 +1,16 @@
 #include "datastore.h"
 #include "pch.h"
 
-DataStore::DataStore(const char* fileName, bool isConfig) noexcept
+DataStore::DataStore(const char* fileName, bool isPathPredefined) noexcept
 {
-    // Output config file in the same directory as the asi
-    path = PLUGIN_PATH((char*)(isConfig ? "/" : "/CheatMenu/data/")) + std::string(fileName) + fileExt;
+    if (isPathPredefined)
+    {
+       path = std::string(fileName) + fileExt; 
+    }
+    else
+    {
+        path = PLUGIN_PATH((char*)"/CheatMenu/data/") + std::string(fileName) + fileExt;
+    }
 
     if (std::filesystem::exists(path))
     {
@@ -21,7 +27,7 @@ DataStore::DataStore(const char* fileName, bool isConfig) noexcept
     {
         pTable = std::make_unique<toml::table>();
 
-        if (isConfig)
+        if (fileName == FILE_NAME)
         {
             Log::Print<eLogLevel::Info>("Creating {}{}", fileName, fileExt);
         }
@@ -59,7 +65,7 @@ void DataStore::RemoveKey(const char* key, const char* entry) noexcept
 {
     if (pTable)
     {
-        (*pTable)[key].as_table()->erase(entry);
+        (*pTable).at_path(key).as_table()->erase(entry);
     }
 }
 

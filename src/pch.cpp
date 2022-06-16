@@ -1,6 +1,6 @@
 #include "pch.h"
 eRenderer gRenderer = Render_Unknown;
-CJson gConfig = CJson("config");
+DataStore gConfig = DataStore(FILE_NAME, true);
 
 Hotkey aimSkinChanger {VK_RETURN, VK_RETURN, "AimSkinChanger"};
 Hotkey freeCam {VK_F6, VK_F6, "Freecam.Toggle"};

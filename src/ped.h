@@ -52,9 +52,9 @@ private:
 public:
 #ifdef GTASA
     static inline DataStore m_SpecialPedData {"special_peds"};
-    static inline ResourceStore m_PedData{"ped", eResourceType::TYPE_BOTH, ImVec2(65, 110)};
+    static inline ResourceStore m_PedData{"peds", eResourceType::TYPE_BOTH, ImVec2(65, 110)};
 #else
-    static inline ResourceStore m_PedData {"ped", eResourceType::TYPE_TEXT};
+    static inline ResourceStore m_PedData {"peds", eResourceType::TYPE_TEXT};
 #endif
 
     Ped() = delete;

@@ -35,7 +35,7 @@ void Teleport::FetchRadarSpriteData()
 
 void Teleport::Init()
 {
-    m_bQuickTeleport = gConfig.GetValue("quick_teleport", false);
+    m_bQuickTeleport = gConfig.Get("quick_teleport", false);
 
     Events::processScriptsEvent += []
     {
@@ -219,7 +219,7 @@ void Teleport::ShowPage()
                                         std::string(TEXT_S("Teleport.QuickTeleportHint") 
                                                     + quickTeleport.GetNameString()).c_str()))
                 {
-                    gConfig.SetValue("quick_teleport", m_bQuickTeleport);
+                    gConfig.Set("quick_teleport", m_bQuickTeleport);
                 }
 #endif
                 ImGui::Columns(1);

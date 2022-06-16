@@ -57,7 +57,6 @@
 #include "defines.h"
 #include "log.h"
 #include "datastore.h"
-#include "json.h"
 #include "hotkeys.h"
 #include "resourcestore.h"
 #include "fontmgr.h"
@@ -76,7 +75,7 @@ enum eRenderer
 };
 
 extern eRenderer gRenderer;
-extern CJson gConfig;
+extern DataStore gConfig;
 
 // Fix function clashes
 static void SetHelpMessage(const char *message, bool b1 = false, bool b2 = false, bool b3 = false)
