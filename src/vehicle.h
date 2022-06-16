@@ -44,7 +44,7 @@ private:
 #ifdef GTASA
         static inline ResourceStore m_VehData { "vehicles", eResourceType::TYPE_IMAGE, ImVec2(100, 75)};
 #else
-        static inline ResourceStore m_VehData {"vehicle", eResourceType::TYPE_TEXT};
+        static inline ResourceStore m_VehData {"vehicles", eResourceType::TYPE_TEXT};
 #endif
         static inline bool m_bSpawnInside = true;
         static inline bool m_bSpawnInAir = true;

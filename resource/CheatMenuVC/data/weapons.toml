@@ -1,0 +1,56 @@
+##############################################################################
+# Weapon Data
+# Example,
+# 
+# [Category Name]
+# "name" = "id"
+##############################################################################
+
+[Melee]
+Brassknuckle = "259"
+Screwdriver = "260"
+Golfclub = "261"
+Nitestick = "262"
+Knifecur = "263"
+Bat = "264"
+Hammer = "265"
+Cleaver = "266"
+Machete = "267"
+Katana = "268"
+Chainsaw = "269"
+
+[Projectile]
+Grenade = "270"
+Teargas = "271"
+Molotov = "272"
+"Rocket launcher" = "287"
+"Flame thrower" = "288"
+
+[Shotgun]
+Buddyshot = "279"
+Shotgspa = "278"
+
+["Machine gun"]
+M4 = "280"
+Tec9 = "281"
+Uzi = "282"
+Colt45 = "274"
+
+[Sniper]
+Sniper = "285"
+Laser = "286"
+
+[Heavy]
+Ingramsl = "283"
+Mp5lng = "284"
+Minigun = "290"
+M60 = "289"
+
+[Misc]
+Cellphone = "258"
+Python = "275"
+Ruger = "276"
+Chromegun = "277"
+Bomb = "291"
+Camera = "292"
+Fingers = "293"

@@ -1,0 +1,54 @@
+##############################################################################
+# Location Data
+# Example,
+# 
+# [Category Name]
+# "name" = "interior_id, posX, posY, posZ"
+##############################################################################
+
+[Ammunation]
+"Washington Ammunation" = "0, -65, -1479, 10"
+"Washington Beach Ammunation" = "0, 200, -474, 11"
+
+[Custom]
+Test = "0, -825, 1168, 10"
+
+[Misc]
+"1102 Safe House" = "0, 95, -808, 10"
+"Air Reserve Fort" = "0, -1731, -307, 14"
+"Bikers Bar" = "0, -598, 655, 11"
+"Construction Site" = "0, 266, -235, 12"
+"Diaz Hotel" = "0, 469, 32, 29"
+"Downtown hidden safe house" = "0, -560, 702, 20"
+"Downtown safe house" = "0, -832, 1304, 11"
+"Escober International Airport" = "0, -1432, -805, 14"
+"Inter Global Films" = "0, 0, 961, 10"
+"Kaufman Cabs" = "0, -1001, 196, 11"
+"Ken Rosenberg & Co" = "0, 117, -824, 10"
+"Leaf links Golf & Country Club" = "0, 103, 248, 21"
+"Little Havana Bank" = "0, -889, -338, 11"
+"Little Havana Police Station" = "0, -849, -669, 11"
+"Love fist studio" = "0, -872, 1159, 11"
+"Maibu Club" = "0, 496, -84, 10"
+"Ocean view hotel" = "0, 230, -1277, 12"
+"Oceanview Hostipal" = "0, -111, -974, 10"
+"Phils Place" = "0, -1099, 337, 11"
+"Prawn Island" = "0, 9, 1102, 16"
+Shipdocks = "0, -696, -1300, 11"
+"Starfish Island Mansion" = "0, -382, -537, 17"
+"Sunshine Autos" = "0, -1008, -872, 12"
+"The Cherry Popper" = "0, -874, -571, 11"
+"The North Point Mall" = "0, 379, 992, 18"
+"Vice City Fire Department" = "0, -696, 923, 11"
+"Vice City Police Department" = "0, 398, -471, 11"
+"Vice Point Superstore" = "0, 449, 785, 12"
+"Vice Port Mainland" = "0, -246, -1327, 8"
+"Washington Ave" = "0, -194, -1387, 4"
+"Washington Mall" = "0, 3, -937, 16"
+
+["Pay n Spray"]
+"Little Haiti Pay n Spray" = "0, -865, -121, 11"
+"Ocean Beach Car Wash" = "0, 53, -1045, 10"
+"Oceanview Pay n Spray" = "0, -15, -1258, 10"
+"Vice Point Pay n Spray" = "0, 330, 429, 11"
+"Vice Port Pay n Spray" = "0, -912, -1269, 11"

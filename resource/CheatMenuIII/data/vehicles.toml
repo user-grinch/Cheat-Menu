@@ -1,0 +1,73 @@
+##############################################################################
+# Vehicle Data
+# Example,
+# 
+# [Category Name]
+# "name" = "id"
+##############################################################################
+
+["Law enforcements"]
+Police = "116"
+Enforcer = "117"
+Rhino = "122"
+Fbicar = "107"
+Barracks = "123"
+
+[Aircraft]
+Dodo = "126"
+
+[Worker]
+Firetruk = "97"
+Ambulan = "106"
+Taxi = "110"
+Mrwhoop = "113"
+Bus = "121"
+Cabbie = "128"
+Borgnine = "148"
+Flatbed = "145"
+Yankee = "146"
+Coach = "127"
+Trash = "98"
+
+[Boats]
+Speeder = "142"
+Reefer = "143"
+Predator = "120"
+
+[Misc]
+Landstal = "90"
+Idaho = "91"
+Stinger = "92"
+Linerun = "93"
+Peren = "94"
+Sentinel = "95"
+Patriot = "96"
+Stretch = "99"
+Manana = "100"
+Infernus = "101"
+Blista = "102"
+Pony = "103"
+Mule = "104"
+Cheetah = "105"
+Moonbeam = "108"
+Esperant = "109"
+Kuruma = "111"
+Bobcat = "112"
+Bfinject = "114"
+Corpse = "115"
+Securica = "118"
+Banshee = "119"
+Stallion = "129"
+Rumpo = "130"
+Rcbandit = "131"
+Bellyup = "132"
+Mrwongs = "133"
+Mafia = "134"
+Yardie = "135"
+Yakuza = "136"
+Diablos = "137"
+Columb = "138"
+Hoods = "139"
+Panlant = "144"
+Toyz = "149"
+Ghost = "150"

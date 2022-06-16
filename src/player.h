@@ -40,7 +40,7 @@ private:
         "Glasses", "Hats", "Extras"
     };
 #else
-    static inline ResourceStore skinData { BY_GAME(NULL, "skin", "ped"), eResourceType::TYPE_TEXT };
+    static inline ResourceStore skinData { BY_GAME(NULL, "skins", "peds"), eResourceType::TYPE_TEXT };
 #endif
 
 #ifdef GTASA

@@ -1,0 +1,146 @@
+##############################################################################
+# Mission Data
+# Example,
+# 
+# [Category Name]
+# "name" = "id"
+##############################################################################
+
+["Arrival to Vice City"]
+Initial = "0 "
+Intro = "1 "
+"An Old Friend" = "2 "
+
+["Ken Rosenberg"]
+"The Party" = "3 "
+"Back Alley Brawl" = "4 "
+"Jury Fury" = "5 "
+Riot = "6 "
+
+["Mr. Black"]
+"Road Kill" = "67"
+"Waste the Wife" = "68"
+Autocide = "69"
+"Check Out at the Check In" = "70"
+"Loose Ends" = "71"
+
+["Avery Carrington"]
+"Four Iron" = "18"
+"Demolition Man" = "19"
+"Two Bit Hit" = "20"
+
+["Juan Cortez"]
+"Treacherous Swine" = "7 "
+"Mall Shootout" = "8 "
+"Guardian Angels" = "9 "
+"Sir, Yes Sir!" = "10"
+"All Hands On Deck!" = "11"
+
+["Ricardo Diaz"]
+"The Chase" = "12"
+"Phnom Penh '86" = "13"
+"The Fastest Boat" = "14"
+"Supply & Demand" = "15"
+"Rub Out" = "16"
+
+["Umberto Robina"]
+"Stunt Boat Challenge" = "56"
+"Cannon Fodder" = "57"
+"Naval Engagement" = "58"
+"Trojan Voodoo" = "59"
+
+["Auntie Poulet"]
+"Juju Scramble" = "60"
+"Bombs Away!" = "61"
+"Dirty Lickin's" = "62"
+
+["Kent Paul"]
+"Death Row" = "17"
+
+["Tommy Vercetti"]
+Shakedown = "31"
+"Bar Brawl" = "32"
+"Cop Land" = "33"
+"Cap the Collector" = "51"
+"Keep your Friends Close..." = "52"
+
+["Love Fist"]
+"Love Juice" = "63"
+"Psycho Killer" = "64"
+
+["Mitch Baker"]
+"Alloy Wheels of Steel" = "53"
+"Messing with the Man" = "54"
+"Hog Tied" = "55"
+"Publicity Tour" = "65"
+
+["Malibu Club"]
+"No Escape?" = "21"
+"The Shootist" = "22"
+"The Driver" = "23"
+"The Job" = "24"
+
+["InterGlobal Studios"]
+"Recruitment Drive" = "27"
+"Dildo Dodo" = "28"
+"Martha's Mug Shot" = "29"
+G-spotlight = "30"
+
+["Kaufman Cabs"]
+"V.I.P." = "72"
+"Friendly Rivalry" = "73"
+Cabmaggedon = "74"
+
+["Print Works"]
+"Spilling the Beans" = "34"
+"Hit the Courier" = "35"
+
+[Misc]
+"Cherry Popper Distribution" = "83"
+"Sunshine Autos" = "37"
+"Checkpoint Charlie" = "96"
+"Printworks Buy" = "36"
+"Interglobal Films Buy" = "38"
+"Cherry Popper Icecreams Buy" = "39"
+"Kaufman Cabs Buy" = "40"
+"Malibu Club Buy" = "41"
+"The Boatyard Buy" = "42"
+"Pole Position Club Buy" = "43"
+"El Swanko Casa Buy" = "44"
+"Links View Apartment Buy" = "45"
+"Hyman Condo Buy" = "46"
+"Ocean Heighs Aprt. Buy" = "47"
+"1102 Washington Street Buy" = "48"
+"Vice Point Buy" = "49"
+"Skumole Shack Buy" = "50"
+"Weapon Range" = "66"
+"TAXI DRIVER" = "75"
+PARAMEDIC = "76"
+FIREFIGHTER = "77"
+VIGILANTE = "78"
+HOTRING = "79"
+BLOODRING = "80"
+DIRTRING = "81"
+"PIZZA BOY" = "92"
+
+["Phil Cassidy"]
+"Gun Runner" = "25"
+"Boomshine Saigon" = "26"
+
+["Offroad races"]
+"Trial by Dirt" = "88"
+"Test Track" = "89"
+"PCJ Playground" = "90"
+"Cone Crazy" = "91"
+
+["RC Missions"]
+"RC Raider Pickup" = "93"
+"RC Bandit Race" = "94"
+"RC Baron Race" = "95"
+
+["Sparrow missions"]
+"Sunshine Autos Races" = "82"
+"Downtown Chopper Checkpoint" = "84"
+"Ocean Beach Chopper Checkpoint" = "85"
+"Vice Point Chopper Checkpoint" = "86"
+"Little Haiti Chopper Checkpoint" = "87"

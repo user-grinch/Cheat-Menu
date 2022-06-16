@@ -1,0 +1,133 @@
+##############################################################################
+# Vehicle Data
+# Example,
+# 
+# [Category Name]
+# "name" = "id"
+##############################################################################
+
+[Boat]
+Rio = "136"
+Predator = "160"
+Squalo = "176"
+Speeder = "182"
+Reefer = "183"
+Tropic = "184"
+Skimmer = "190"
+Coastg = "202"
+Dinghy = "203"
+Marquis = "214"
+Jetmax = "223"
+
+[Bike]
+Angel = "166"
+Pizzaboy = "178"
+Pcj600 = "191"
+Faggio = "192"
+Freeway = "193"
+Sanchez = "198"
+
+[Heli]
+Maverick = "217"
+Vcnmav = "218"
+
+[Transport]
+Taxi = "150"
+Cabbie = "168"
+Caddy = "187"
+Zebra = "188"
+Bus = "161"
+Coach = "167"
+Kaufman = "216"
+
+[Worker]
+Pony = "143"
+Mule = "144"
+Bobcat = "152"
+Yankee = "186"
+Walton = "208"
+Boxville = "228"
+Benson = "229"
+
+[Executive]
+Stinger = "132"
+Infernus = "141"
+Cheetah = "145"
+Bfinject = "154"
+Banshee = "159"
+
+["RC Cars"]
+"Rc Bandit" = "171"
+"Rc Baron" = "194"
+"Rc Raider" = "195"
+"Rc Goblin" = "231"
+
+[Law]
+Police = "156"
+Rhino = "162"
+Barracks = "163"
+Hunter = "155"
+Fbicar = "147"
+Enforcer = "157"
+"Fbi Ranch" = "220"
+
+[Special]
+Firetruk = "137"
+Ambulan = "146"
+Mrwhoop = "153"
+Trash = "138"
+Topfun = "189"
+Sandking = "225"
+Lovefist = "201"
+
+[Sports]
+Hotring = "224"
+Hotrina = "232"
+Hotrinb = "233"
+Bloodra = "234"
+Bloodrb = "235"
+
+[Misc]
+Landstal = "130"
+Idaho = "131"
+Linerun = "133"
+Peren = "134"
+Sentinel = "135"
+Stretch = "139"
+Manana = "140"
+Voodoo = "142"
+Moonbeam = "148"
+Esperant = "149"
+Washing = "151"
+Securica = "158"
+Cuban = "164"
+Stallion = "169"
+Rumpo = "170"
+Romero = "172"
+Packer = "173"
+Sentxs = "174"
+Admiral = "175"
+Seaspar = "177"
+Gangbur = "179"
+Flatbed = "185"
+Glendale = "196"
+Oceanic = "197"
+Sparrow = "199"
+Patriot = "200"
+Hermes = "204"
+Sabre = "205"
+Sabretur = "206"
+Pheonix = "207"
+Regina = "209"
+Comet = "210"
+Deluxo = "211"
+Burrito = "212"
+Spand = "213"
+Baggage = "215"
+Rancher = "219"
+Virgo = "221"
+Greenwoo = "222"
+Blistac = "226"
+Polmav = "227"
+Mesa = "230"
+Vicechee = "236"

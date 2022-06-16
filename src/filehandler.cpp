@@ -59,126 +59,144 @@ void FileHandler::GenerateHandlingFile(tHandlingData *pHandling, std::map<int, s
 
 void FileHandler::FetchHandlingID(std::map<int, std::string>& storeMap)
 {
-    std::string m_FilePath = GAME_PATH((char*)"/data/vehicles.ide");
-    if (!std::filesystem::exists(m_FilePath))
+    const char* path = GAME_PATH((char*)"/data/vehicles.ide");
+    if (!std::filesystem::exists(path))
     {
         Log::Print<eLogLevel::Warn>("Vehicle.ide not found");
         return;
     }
 
-    std::ifstream file(m_FilePath);
-    std::string line;
-    while (getline(file, line))
+    FILE *pFile= fopen(path, "r");
+    if (pFile != NULL)
     {
-        /*
-        	Format: model, modelname, txdname, type, handlingId, ...
-        	Skip if first thing isn't model id
-        */
-        if (line[0] <= '0' || line[0] >= '9')
+        static const uint8_t bufSize = 128;
+        char buf[bufSize];
+        while (fgets(buf, bufSize, pFile) != NULL)
         {
-            continue;
+            if (buf[0] == 'e' && buf[1] == 'n' && buf[2] == 'd')
+            {
+                break;
+            }
+
+            if (buf[0] < '0' || buf[0] > '9')
+            {
+                continue;
+            }
+            
+            // replace comma and remove tabs
+            uint8_t sz = bufSize;
+            for(uint8_t i = 0; i < sz; ++i)
+            {
+                if (buf[i] == ',')
+                {
+                    buf[i] = ' ';
+                    continue;
+                }
+
+                if (buf[i] == ' ' || buf[i] == '\t' )
+                {
+                    for(uint8_t j = i; j < sz; ++j)
+                    {
+                        buf[j] = buf[j+1];
+                    }
+                    --sz;
+                }
+            }
+
+            int id;
+            char model[32], txd[32], type[32], handling[32];
+            if (sscanf(buf, "%d %s %s %s %s", &id, model, txd, type, handling) == 5)
+            {
+               // storeMap[id] = std::string(handling);
+            }
         }
-
-        // running inside try block to handle user errors, mostly commas
-        try
-        {
-            std::string temp;
-            std::stringstream ss(line);
-
-            // get model
-            getline(ss, temp, ',');
-            int model = std::stoi(temp);
-
-            // get modelname, txd, type, handlingId
-            getline(ss, temp, ',');
-            getline(ss, temp, ',');
-            getline(ss, temp, ',');
-            getline(ss, temp, ',');
-
-            temp.erase(std::remove_if(temp.begin(), temp.end(), isspace), temp.end());
-
-            storeMap[model] = temp;
-        }
-        catch (...)
-        {
-            Log::Print<eLogLevel::Warn>("Failed parsing vehicles.ide, {}", line);
-        }
+       fclose(pFile);
     }
 
-    file.close();
+    // std::ifstream file(m_FilePath);
+    // std::string line;
+    // while (getline(file, line))
+    // {
+    //     /*
+    //     	Format: model, modelname, txdname, type, handlingId, ...
+    //     	Skip if first thing isn't model id
+    //     */
+    //     if (line[0] <= '0' || line[0] >= '9')
+    //     {
+    //         continue;
+    //     }
+
+    //     // running inside try block to handle user errors, mostly commas
+    //     try
+    //     {
+    //         std::string temp;
+    //         std::stringstream ss(line);
+
+    //         // get model
+    //         getline(ss, temp, ',');
+    //         int model = std::stoi(temp);
+
+    //         // get modelname, txd, type, handlingId
+    //         getline(ss, temp, ',');
+    //         getline(ss, temp, ',');
+    //         getline(ss, temp, ',');
+    //         getline(ss, temp, ',');
+
+    //         temp.erase(std::remove_if(temp.begin(), temp.end(), isspace), temp.end());
+
+    //         storeMap[model] = temp;
+    //     }
+    //     catch (...)
+    //     {
+    //         Log::Print<eLogLevel::Warn>("Failed parsing vehicles.ide, {}", line);
+    //     }
+    // }
+
+    // file.close();
 }
 #endif
 
 void FileHandler::FetchColorData(std::vector<std::vector<float>>& storeVec)
 {
-    std::string m_FilePath = GAME_PATH((char*)"/data/carcols.dat");
-    if (!std::filesystem::exists(m_FilePath))
+    const char* path = GAME_PATH((char*)"/data/carcols.dat");
+    if (!std::filesystem::exists(path))
     {
         Log::Print<eLogLevel::Warn>("Carcols.dat not found");
         return;
     }
 
-    std::ifstream file(m_FilePath);
-    std::string line;
-    bool isCar, isCol;
-    int count = 0;
-
-    while (getline(file, line))
+    FILE *pFile= fopen(path, "r");
+    if (pFile != NULL)
     {
-        // skip commented & empty lines
-        if (line[0] == '#' || line == "")
+        static const uint8_t bufSize = 16;
+        char buf[bufSize];
+        while (fgets(buf, bufSize, pFile) != NULL)
         {
-            continue;
-        }
-
-        // section blocks
-        if (line[0] == 'c' && line[1] == 'a' && line[2] == 'r')
-        {
-            isCar = true;
-            continue;
-        }
-
-        if (line[0] == 'c' && line[1] == 'o' && line[2] == 'l')
-        {
-            isCol = true;
-            continue;
-        }
-
-        if (line[0] == 'e' && line[1] == 'n' && line[2] == 'd')
-        {
-            isCar = false;
-            isCol = false;
-            continue;
-        }
-
-        if (isCol)
-        {
-            try
+            if (buf[0] == '#' || buf[0] == '\n')
             {
-                std::string temp;
-                std::stringstream ss(line);
+                continue;
+            }
 
-                // fix one instance where . is used instead of ,
-                std::replace(temp.begin(), temp.end(), '.', ',');
+            if (buf[0] == 'e' && buf[1] == 'n' && buf[2] == 'd')
+            {
+                break;
+            }
 
-                // Format: red, green, blue
-                int r,g,b;
-                getline(ss, temp, ',');
-                r = std::stoi(temp);
-                getline(ss, temp, ',');
-                g = std::stoi(temp);
-                getline(ss, temp, ',');
-                b = std::stoi(temp);
+            // replace comma and dots with spaces
+            for(uint8_t i = 0; i < bufSize; ++i)
+            {
+                if (buf[i] == ',' || buf[i] == '.')
+                {
+                    buf[i] = ' ';
+                }
+            }
 
+            int r = 0, g = 0, b = 0; 
+            if (sscanf(buf, "%d %d %d", &r, &g, &b) == 3)
+            {
                 storeVec.push_back({r / 255.0f, g / 255.0f, b / 255.0f});
-                ++count;
-            }
-            catch (...)
-            {
-                Log::Print<eLogLevel::Warn>("Failed parsing carcols.dat, {}", line);
             }
         }
+        fclose(pFile);
     }
-
-    file.close();
 }

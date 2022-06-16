@@ -1,0 +1,106 @@
+##############################################################################
+# Mission Data
+# Example,
+# 
+# [Category Name]
+# "name" = "id"
+##############################################################################
+
+[Misc]
+"Patriot Playground" = "7"
+"A Ride In The Park" = "8"
+"Gripped!" = "9 "
+"Multistorey Mayhem" = "10"
+Paramedic = "11"
+Firefighter = "12"
+Vigilante = "13"
+"Taxi Driver" = "14"
+"The Exchange" = "79"
+
+["Asuka Kasen"]
+"Sayonara Salvatore" = "44"
+"Under Surveillance" = "45"
+"Paparazzi Purge" = "46"
+"Payday For Ray" = "47"
+"Two-Faced Tanner" = "48"
+Bait = "71"
+"Espresso-2-Go!" = "72"
+"S.A.M." = "73"
+
+["Kenji Kasen"]
+"Kanbu Bust-Out" = "49"
+"Grand Theft Auto" = "50"
+"Deal Steal" = "51"
+Shima = "52"
+"Smack Down" = "53"
+
+["Ray Machowski"]
+"Silence The Sneak" = "54"
+"Arms Shortage" = "55"
+"Evidence Dash" = "56"
+"Gone Fishing" = "57"
+"Plaster Blaster" = "58"
+"Marked Man" = "59"
+
+["Donald Love"]
+Liberator = "60"
+"Waka-Gashira Wipeout!" = "61"
+"A Drop In The Ocean" = "62"
+"Grand Theft Aero" = "67"
+"Escort Service" = "68"
+Decoy = "69"
+"Love's Disappearance" = "70"
+
+["Toni Cipriani"]
+"Taking Out The Laundry" = "30"
+"The Pick-Up" = "31"
+"Salvatore's Called A Meeting" = "32"
+"Triads And Tribulations" = "33"
+"Blow Fish" = "34"
+
+["Luigi Goterelli"]
+"Give Me Liberty and Luigi's Girls" = "19"
+"Don't Spank My Bitch Up" = "20"
+"Drive Misty For Me" = "21"
+"Pump-Action Pimp" = "22"
+"The Fuzz Ball" = "23"
+
+["Marty Chonks"]
+"The Crook" = "15"
+"The Thieves" = "16"
+"The Wife" = "17"
+"Her Lover" = "18"
+
+["Salvatore Leone"]
+Chaperone = "35"
+"Cutting The Grass" = "36"
+"Bomb Da Base: Act I" = "37"
+"Bomb Da Base: Act II" = "38"
+"Last Requests" = "39"
+
+["Joey Leone"]
+"Mike Lips Last Lunch" = "24"
+"Farewell 'Chunky' Lee Chong" = "25"
+"Van Heist" = "26"
+"Cipriani's Chauffeur" = "27"
+"Dead Skunk In The Trunk" = "28"
+"The Getaway" = "29"
+
+["El Burro"]
+Turismo = "40"
+"I Scream, You Scream" = "41"
+"Trial By Fire" = "42"
+"Big'N'Veiny" = "43"
+
+["King Courtney"]
+"Bling-Bling Scramble" = "63"
+"Uzi Rider" = "64"
+"Gangcar Round-Up" = "65"
+"Kingdom Come" = "66"
+
+[D-Ice]
+"Uzi Money" = "74"
+Toyminator = "75"
+"Rigged To Blow" = "76"
+"Bullion Run" = "77"
+Rumble = "78"
