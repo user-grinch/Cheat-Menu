@@ -37,7 +37,7 @@ void Updater::Process()
     }
 
     const char* link = "https://api.github.com/repos/user-grinch/Cheat-Menu/tags";
-    char* path = PLUGIN_PATH((char*)"CheatMenu/data/versioninfo.json");
+    char* path = PLUGIN_PATH((char*)FILE_NAME "/data/versioninfo.json");
     HRESULT res = URLDownloadToFile(NULL, link, path, 0, NULL);
 
     if (res == E_OUTOFMEMORY || res == INET_E_DOWNLOAD_FAILURE)

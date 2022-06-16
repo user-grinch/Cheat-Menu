@@ -52,7 +52,7 @@ RwTexDictionary* LoadTexDictionary(char const* filename) {
 
 void ResourceStore::LoadTextureResource(std::string&& name)
 {
-    std::string fullPath = PLUGIN_PATH((char*)"CheatMenu\\") + name + ".txd";
+    std::string fullPath = PLUGIN_PATH((char*)FILE_NAME "\\") + name + ".txd";
 
     if (!std::filesystem::exists(fullPath))
     {

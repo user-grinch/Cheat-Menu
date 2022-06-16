@@ -28,7 +28,7 @@ void RPC::Shutdown()
 
 void RPC::Init()
 {
-    const char* dllPath = PLUGIN_PATH((char*)"CheatMenu/dlls/discord-rpc.dll");
+    const char* dllPath = PLUGIN_PATH((char*)FILE_NAME "/dlls/discord-rpc.dll");
 
     // check if the dll exits
     if (!std::filesystem::exists(dllPath))

@@ -40,7 +40,7 @@ If you have those mentioned versions installed follow the steps below,
 Let me know if you mind more.
 
 ## Things to do on crash
-1. Delete the `CheatMenu/json/config.json` file and try again.
+1. Delete the `CheatMenuXX.toml` config file and try again.
 2. If it's happening after installing a recent mod try removing it.
 3. Try on a fresh installation of the game.
 4. If still doesn't fix your issue, go ahead and report it.
@@ -80,7 +80,7 @@ You can either open a issue here or directly contact me on discord (Recommended)
 ## Submit Translations
 *How to translate Cheat Menu to another language*
 
-The translations are loaded from `CheatMenu/locale/*.json` files. Make a copy of the `English.json` file and translate the texts there to your language. Rename the file to `your_language.json` and make a pull request. 
+The translations are loaded from `CheatMenuXX/locale/*.toml` files. Make a copy of the `English.toml` file and translate the texts there to your language. Rename the file to `your_language.toml` and make a pull request. 
 
 
 ## Required to build
@@ -99,7 +99,7 @@ All credits are given in Menu/About tab.
 
 ## How to add ___ to CheatMenu (SA Only)
 
-*Be careful about editing 'json' files, especially commas! Check [here](https://en.wikipedia.org/wiki/JSON). Use [Magic TXD](https://gtaforums.com/topic/851436-relopensrc-magictxd/) to open **.txd** files*
+*Use [Magic TXD](https://gtaforums.com/topic/851436-relopensrc-magictxd/) to open **.txd** files*
 
 ### Player Skins (Recommended)
 *If you just want more player skins without much hassel use this*
@@ -113,27 +113,27 @@ All credits are given in Menu/About tab.
 *If you want to add both peds & skin then follow this*
 
 1. Add peds to your game following a tutorial.
-2. Then create a image of your ped and put it in *CheatMenu\peds.txd*.
+2. Then create a image of your ped and put it in *CheatMenuXX\peds.txd*.
 3. The image name should be the model name of the ped.
-4. Open this file *CheatMenu\json\ped.json* and add an entry for your ped there. <br/>
+4. Open this file *CheatMenuXX\data\peds.toml* and add an entry for your ped there. <br/>
    **Format:  "PedModel" : "PedName"**
    
 ### Vehicles
 1. Add vehicles to your game following [this](https://www.mixmods.com.br/2015/12/tutorial-adicionar-carros-sem-substituir.html) tutorial first. (Use translator)
-2. Then create an image of your vehicle in and put it in *CheatMenu\vehicles.txd*.
+2. Then create an image of your vehicle in and put it in *CheatMenuXX\vehicles.txd*.
 3. The image name should be the model id of the vehicle.
 
 ### Vehicle Tunes
 1. Add tunes to your game following a [tutorial](https://gtaforums.com/topic/481926-tutorial-how-to-add-tuning-parts/).
-2. Then create a image of your tune part and put it in *CheatMenu\components.txd*.
+2. Then create a image of your tune part and put it in *CheatMenuXX\components.txd*.
 
 ### Vehicle Paintjobs
-1. Put your paintjob images *CheatMenu\textures.txd.
+1. Put your paintjob images *CheatMenuXX\textures.txd.
 2. You can use any name for these images.
 
 ### Weapons
 1. Add weapons to your game following [this](https://www.mixmods.com.br/2016/05/tutorial-adicionar-armas-sem-substituir.html) tutorial first. (Use translator)
-2. Then create an image of your vehicle and put it *CheatMenu\weapons.txd*.
+2. Then create an image of your vehicle and put it *CheatMenuXX\weapons.txd*.
 3. The image name should be the weapon id (not model!) of the weapon.
-4. Open this file *CheatMenu\json\weapon.json* and add an entry for your weapon there.<br/>
+4. Open this file *CheatMenuXX\data\weapons.toml* and add an entry for your weapon there.<br/>
    **Format:  "WeaponID" : "WeaponName"**

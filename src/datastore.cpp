@@ -9,7 +9,7 @@ DataStore::DataStore(const char* fileName, bool isPathPredefined) noexcept
     }
     else
     {
-        path = PLUGIN_PATH((char*)"/CheatMenu/data/") + std::string(fileName) + fileExt;
+        path = PLUGIN_PATH((char*)FILE_NAME "/data/") + std::string(fileName) + fileExt;
     }
 
     if (std::filesystem::exists(path))

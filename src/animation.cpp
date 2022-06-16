@@ -178,7 +178,7 @@ void Animation::_PlayAnimation(RpClump* pClump, int animGroup, int animID, float
 #endif
 
 
-void Animation::PlayAnimation(std::string& root, std::string& anim, std::string& ifp)
+void Animation::PlayAnimation(std::string& ifp, std::string& anim, std::string& _)
 {
     CPed *pPed = m_PedAnim ? m_pTarget : FindPlayerPed();
 

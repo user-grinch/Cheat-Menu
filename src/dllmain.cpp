@@ -25,10 +25,11 @@ void MenuThread(void* param)
     	Had to put this in place since some people put the folder in root
     	directory and the asi in modloader. Why??
     */
-    if (!std::filesystem::is_directory(PLUGIN_PATH((char*)"CheatMenu")))
+    if (!std::filesystem::is_directory(PLUGIN_PATH((char*)FILE_NAME)))
     {
-        Log::Print<eLogLevel::Error>("CheatMenu folder not found. You need to put both \"CheatMenu.asi\" & \"CheatMenu\" folder in the same directory");
-        MessageBox(NULL, "CheatMenu folder not found. You need to put both \"CheatMenu.asi\" & \"CheatMenu\" folder in the same directory", "CheatMenu", MB_ICONERROR);
+        std::string msg = std::format("{} folder not found. You need to put both '{}.asi' & '{}' folder in the same directory", FILE_NAME, FILE_NAME, FILE_NAME);
+        Log::Print<eLogLevel::Error>(msg.c_str());
+        MessageBox(NULL, msg.c_str(), FILE_NAME, MB_ICONERROR);
         return;
     }
 
@@ -39,7 +40,7 @@ void MenuThread(void* param)
     if (!GetModuleHandle(BY_GAME("SilentPatchSA.asi","SilentPatchVC.asi","SilentPatchIII.asi")))
     {
         Log::Print<eLogLevel::Error>("SilentPatch not found. Please install it from here https://gtaforums.com/topic/669045-silentpatch/");
-        int msgID = MessageBox(NULL, "SilentPatch not found. Do you want to install Silent Patch? (Game restart required)", "CheatMenu", MB_OKCANCEL | MB_DEFBUTTON1);
+        int msgID = MessageBox(NULL, "SilentPatch not found. Do you want to install Silent Patch? (Game restart required)", FILE_NAME, MB_OKCANCEL | MB_DEFBUTTON1);
 
         if (msgID == IDOK)
         {
@@ -55,16 +56,16 @@ void MenuThread(void* param)
 #ifdef GTASA
     if (GetModuleHandle("SAMP.dll") || GetModuleHandle("SAMP.asi"))
     {
-        Log::Print<eLogLevel::Error>("CheatMenu doesn't support SAMP");
-        MessageBox(NULL, "SAMP detected. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
+        Log::Print<eLogLevel::Error>(FILE_NAME " doesn't support SAMP");
+        MessageBox(NULL, "SAMP detected. Exiting " FILE_NAME, FILE_NAME, MB_ICONERROR);
         return;
     }
     CFastman92limitAdjuster::Init();
 #elif GTAVC
     if (GetModuleHandle("vcmp-proxy.dll") || GetModuleHandle("vcmp-proxy.asi"))
     {
-        Log::Print<eLogLevel::Error>("CheatMenu doesn't support VCMP");
-        MessageBox(NULL, "VCMP detected. Exiting CheatMenu.", "CheatMenu", MB_ICONERROR);
+        Log::Print<eLogLevel::Error>(FILE_NAME " doesn't support VCMP");
+        MessageBox(NULL, "VCMP detected. Exiting " FILE_NAME, FILE_NAME, MB_ICONERROR);
         return;
     }
 #endif
@@ -108,7 +109,7 @@ BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
         else
         {
             Log::Print<eLogLevel::Error>("Unknown game version. GTA " BY_GAME("SA v1.0 US Hoodlum or Compact", "VC v1.0 EN", "III v1.0 EN") " is required.");
-            MessageBox(HWND_DESKTOP, "Unknown game version. GTA " BY_GAME("SA v1.0 US Hoodlum or Compact", "VC v1.0 EN", "III v1.0 EN") " is required.", "CheatMenu", MB_ICONERROR);
+            MessageBox(HWND_DESKTOP, "Unknown game version. GTA " BY_GAME("SA v1.0 US Hoodlum or Compact", "VC v1.0 EN", "III v1.0 EN") " is required.", FILE_NAME, MB_ICONERROR);
         }
     }
 

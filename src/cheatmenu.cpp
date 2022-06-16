@@ -198,7 +198,7 @@ void CheatMenu::GenHeaderList()
 
 void CheatMenu::Init()
 {
-    if (!std::filesystem::exists(PLUGIN_PATH((char*)"CheatMenu")))
+    if (!std::filesystem::exists(PLUGIN_PATH((char*)FILE_NAME)))
     {
         Log::Print<eLogLevel::Error>(TEXT("Menu.CheatMenuNoDir"));
         return;
@@ -216,7 +216,7 @@ void CheatMenu::Init()
     srand(CTimer::m_snTimeInMilliseconds);
 
     ApplyStyle();
-    Locale::Init("CheatMenu/locale/", "English", "English");
+    Locale::Init(FILE_NAME "/locale/", "English", "English");
     GenHeaderList();
     
     // Init menu parts

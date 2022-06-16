@@ -34,13 +34,9 @@ rd /S /Q %archivePath% /Q
 
 @REM Copy the files to a temp folder
 @REM straight xcopy doesn't seem to work on my system, broken registry?
-%systemroot%\System32\xcopy /s %asiPath% "pack\" /K /D /H /Y 
-%systemroot%\System32\xcopy /s %folderpath% "pack\CheatMenu\" /K /D /H /Y 
-%systemroot%\System32\xcopy /s "..\resource\common\" "pack\CheatMenu\" /K /D /H /Y
-
-@REM Remove the config and versioninfo files since we don't want to distribute them
-del "pack\CheatMenu\json\config.json" /Q
-del "pack\CheatMenu\json\versioninfo.json" /Q
+xcopy /s %asiPath% "pack\" /K /D /H /Y 
+xcopy /s %folderpath% "pack\%~1\" /K /D /H /Y 
+xcopy /s "..\resource\common\" "pack\%~1\" /K /D /H /Y
 
 @REM Guessing we have 7zip installed already, well I have 
 "C:\Program Files\7-Zip\7z.exe" a -t7z %archivePath% ".\pack\*"
