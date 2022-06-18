@@ -28,31 +28,27 @@ void Animation::PlayCutscene(std::string& rootKey, std::string& cutsceneId, std:
     }
 
     CPlayerPed* pPlayer = FindPlayerPed();
-    if (!pPlayer)
+    if (pPlayer)
     {
-        return;
+        m_Cutscene::m_SceneName = cutsceneId;
+        Command<Commands::LOAD_CUTSCENE>(cutsceneId.c_str());
+        m_Cutscene::m_nInterior = pPlayer->m_nAreaCode;
+        pPlayer->m_nAreaCode = std::stoi(interior);
+        Command<Commands::SET_AREA_VISIBLE>(pPlayer->m_nAreaCode);
     }
-
-    m_Cutscene::m_SceneName = cutsceneId;
-    Command<Commands::LOAD_CUTSCENE>(cutsceneId.c_str());
-    m_Cutscene::m_nInterior = pPlayer->m_nAreaCode;
-    pPlayer->m_nAreaCode = std::stoi(interior);
-    Command<Commands::SET_AREA_VISIBLE>(pPlayer->m_nAreaCode);
 }
 
 void Animation::PlayParticle(std::string& rootKey, std::string& particle, std::string& dummy)
 {
     CPlayerPed* pPlayer = FindPlayerPed();
-    if (!pPlayer)
+    if (pPlayer)
     {
-        return;
+        CVector pos = pPlayer->GetPosition();
+        int handle;
+        Command<Commands::CREATE_FX_SYSTEM>(particle.c_str(), pos.x, pos.y, pos.z, 1, &handle);
+        Command<Commands::PLAY_FX_SYSTEM>(handle);
+        m_Particle::m_nParticleList.push_back(handle);
     }
-    CVector pos = pPlayer->GetPosition();
-
-    int handle;
-    Command<Commands::CREATE_FX_SYSTEM>(particle.c_str(), pos.x, pos.y, pos.z, 1, &handle);
-    Command<Commands::PLAY_FX_SYSTEM>(handle);
-    m_Particle::m_nParticleList.push_back(handle);
 }
 
 

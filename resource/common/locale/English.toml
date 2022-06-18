@@ -216,6 +216,8 @@ TeleportCMDText = """
 Teleports player to specified coordinates.
 Example: tp x y z"""
 TextColor = "Text color"
+TextOnlyMode = "Text only"
+TextOnlyModeHint = "Disables all images and shows only text"
 Usage = "Usage"
 UpdaterInfo1 = "It's highly recommanded to update to the latest version. Newer version contains new features and bug fixes."
 UpdaterInfo2 = "To know what changes are made or to download, click on the 'Download page' button. Follow the instructions there. If you're still having issues, let me know on discord."

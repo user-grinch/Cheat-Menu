@@ -2,6 +2,7 @@
 #include "util.h"
 #include "ui.h"
 #include "../depend/imgui/imgui_internal.h"
+#include "menu.h"
 
 // Really messy code, cleanup someday
 bool Ui::DrawTitleBar()
@@ -544,6 +545,12 @@ void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLe
     m_ImageSize.x = ImGui::GetWindowContentRegionWidth() - style.ItemSpacing.x * (imagesInRow-1);
     m_ImageSize.x /= imagesInRow;
 
+    bool showImages = !Menu::m_bTextOnlyMode;
+    if (gRenderer == Render_DirectX11)
+    {
+        showImages = false;
+    }
+
     ImGui::Spacing();
 
     // Hide the popup if right clicked again
@@ -568,7 +575,7 @@ void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLe
     ImGui::Spacing();
 
     ImGui::BeginChild("DrawImages");
-    if (gRenderer == Render_DirectX9)
+    if (showImages)
     {
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(3, 3));
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(3, 3));
@@ -590,16 +597,17 @@ void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLe
             	Couldn't figure out how to laod images for Dx11
             	Using texts for now
             */
-            if (gRenderer == Render_DirectX11)
+            if (showImages)
             {
-                if (ImGui::MenuItem(modelName.c_str()))
+                if (Ui::RoundedImageButton(store.m_ImagesList[i]->m_pTexture, m_ImageSize, modelName.c_str()))
                 {
                     onLeftClick(text);
                 }
+                
             }
             else
             {
-                if (Ui::RoundedImageButton(store.m_ImagesList[i]->m_pTexture, m_ImageSize, modelName.c_str()))
+                if (ImGui::MenuItem(modelName.c_str()))
                 {
                     onLeftClick(text);
                 }
@@ -612,7 +620,7 @@ void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLe
                 imgPopup.value = modelName;
             }
 
-            if (gRenderer != Render_DirectX11)
+            if (showImages)
             {
                 if (imageCount % imagesInRow != 0)
                 {
@@ -623,7 +631,7 @@ void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLe
         }
     }
 
-    if (gRenderer == Render_DirectX9)
+    if (showImages)
     {
         ImGui::PopStyleVar(4);
     }

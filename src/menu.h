@@ -45,7 +45,8 @@ public:
         static inline char m_nInputBuffer[INPUT_BUFFER_SIZE] = "";
     };
     static inline bool m_bDiscordRPC;
-
+    static inline bool m_bTextOnlyMode; 
+    
     Menu() = delete;
     Menu(const Menu&) = delete;
 

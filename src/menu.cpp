@@ -32,6 +32,7 @@ void Menu::Init()
     m_Overlay::textColor[2] = gConfig.Get("Overlay.TextColor.Blue", 1.0f);
     m_Overlay::textColor[3] = gConfig.Get("Overlay.TextColor.Alpha", 1.0f);
     m_bDiscordRPC = gConfig.Get("Menu.DiscordRPC", false);
+    m_bTextOnlyMode = gConfig.Get("Menu.TextOnlyMode", false);
 
     Util::GetCPUUsageInit();
     MEMORYSTATUSEX memInfo;
@@ -363,6 +364,12 @@ void Menu::ShowPage()
                 gConfig.Set("Menu.DiscordRPC", m_bDiscordRPC);
             }
             ImGui::NextColumn();
+
+            if (gRenderer == Render_DirectX9
+            && Ui::CheckboxWithHint(TEXT("Menu.TextOnlyMode"), &m_bTextOnlyMode, TEXT("Menu.TextOnlyModeHint")))
+            {
+                gConfig.Set("Menu.TextOnlyMode", m_bTextOnlyMode);
+            }
             ImGui::Columns(1);
             
             ImGui::EndTabItem();
