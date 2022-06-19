@@ -78,7 +78,6 @@ void CheatMenu::ProcessPages()
     ImGuiStyle &style = ImGui::GetStyle();
 
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-    ImGui::PushFont(FontMgr::Get("header"));
     m_nMenuPage = Updater::IsUpdateAvailable() ? eMenuPages::UPDATE : m_nMenuPage;
     
     // Check once if it's anniversary day
@@ -166,7 +165,6 @@ void CheatMenu::ProcessPages()
             ImGui::SameLine();
         }
     }
-    ImGui::PopFont();
     ImGui::PopStyleVar();
     ImGui::Dummy(ImVec2(0, 10));
 

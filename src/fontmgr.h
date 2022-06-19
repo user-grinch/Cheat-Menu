@@ -26,6 +26,9 @@ public:
     // Loads a font into memory
     static ImFont* Load(const char* fontName, float fontMul = 1.0f);
 
+    // Get the glyph ranges for our needed fonts
+    static const ImWchar* GetGlyphRanges();
+    
     // Unloads all the loaded fonts from fontmgr
     // ImGui::GetIO().Default font must be loaded after unloading all fonts
     static void UnloadAll();

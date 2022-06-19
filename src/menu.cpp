@@ -328,6 +328,7 @@ void Menu::ShowPage()
             {
                 CheatMenu::ResetMenuSize();
             }
+
             ImGui::Spacing();
 
             static int selected = Locale::GetCurrentLocaleIndex();
