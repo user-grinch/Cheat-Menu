@@ -39,6 +39,6 @@ xcopy /s %folderpath% "pack\%~1\" /K /D /H /Y
 xcopy /s "..\resource\common\" "pack\%~1\" /K /D /H /Y
 
 @REM Guessing we have 7zip installed already, well I have 
-"C:\Program Files\7-Zip\7z.exe" a -t7z %archivePath% ".\pack\*" -mx=9 -v7M
+"C:\Program Files\7-Zip\7z.exe" a -t7z %archivePath% ".\pack\*" -mx=9
 
 @REM  ------------------------------------------------------

@@ -6,4 +6,4 @@ echo[
 call "tools\Setup.bat"
 MsBuild CheatMenu.sln /property:Configuration=Release /t:CheatMenuSA
 del %SA_DIR%"\CheatMenuSA.asi" /Q
-%systemroot%\System32\xcopy /s "bin\CheatMenuSA.asi" %SA_DIR% /K /D /H /Y 
+xcopy /s "bin\CheatMenuSA.asi" %SA_DIR% /K /D /H /Y 

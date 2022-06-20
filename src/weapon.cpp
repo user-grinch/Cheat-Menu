@@ -372,7 +372,7 @@ void Weapon::ShowPage()
             ImGui::Spacing();
 
             std::string key = std::to_string(m_nGangWeaponList[m_nSelectedGang][m_nSelectedWeapon]);
-            ImGui::Text(TEXT("Weapon.CurrentWeapon"), m_WeaponData.m_pData->Get(key.c_str(), "Unknown"));
+            ImGui::Text(TEXT("Weapon.CurrentWeapon"), m_WeaponData.m_pData->Get(key.c_str(), "Unknown").c_str());
             ImGui::Spacing();
             Ui::DrawImages(m_WeaponData, SetGangWeapon, nullptr,
                            [](std::string str)

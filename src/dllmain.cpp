@@ -70,7 +70,7 @@ void MenuThread(void* param)
     }
 #endif
 
-    Log::Print<eLogLevel::None>("Version: " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: " GITHUB_LINK "\n");
+    Log::Print<eLogLevel::None>("Stating " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: " GITHUB_LINK "\n");
 
     CheatMenu::Init();
 
