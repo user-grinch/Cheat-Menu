@@ -139,8 +139,8 @@ void D3dHook::ProcessFrame(void* ptr)
         ImGui_ImplWin32_EnableDpiAwareness();
 
         // Loading fonts
-        io.FontDefault = FontMgr::Load("text", 1.1f);
-        FontMgr::Load("title", 2.0f);
+        io.FontDefault = FontMgr::Load("text", "C:/Windows/Fonts/ARIALUNI.TTF", 1.15f);
+        FontMgr::Load("title", PLUGIN_PATH((char*)FILE_NAME "/fonts/title.ttf"), 2.0f);
 
         io.IniFilename = nullptr;
         io.LogFilename = nullptr;

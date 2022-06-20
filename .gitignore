@@ -1,6 +1,7 @@
 archives/
 build/
 tools/pack/
+archive/
 .gitignore
 CheatMenuVC.7z
 CheatMenuIII.7z
