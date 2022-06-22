@@ -150,17 +150,30 @@ void Paint::NodeWrapperRecursive(RwFrame* frame, CVehicle* pVeh, std::function<v
     return;
 }
 
-void Paint::GenerateNodeList(CVehicle* pVeh, std::vector<std::string>& names_vec)
+void Paint::GenerateNodeList(CVehicle* pVeh, std::vector<std::string>& names_vec, std::string& selected)
 {
+    static int vehModel = 0;
+    if (vehModel == pVeh->m_nModelIndex)
+    {
+        return;
+    }
+
+    // reset to default
+    names_vec.clear();
+    names_vec.push_back("Default");
+    selected = "Default";
+
     RwFrame* frame = (RwFrame*)pVeh->m_pRwClump->object.parent;
 
     NodeWrapperRecursive(frame, pVeh, [&](RwFrame* frame)
     {
         const std::string name = GetFrameNodeName(frame);
-
         if (!(std::find(names_vec.begin(), names_vec.end(), name) != names_vec.end()))
+        {
             names_vec.push_back(name);
+        }
     });
+    vehModel = pVeh->m_nModelIndex;
 }
 
 void Paint::SetNodeColor(CVehicle* pVeh, std::string node_name, CRGBA color, bool filter_mat)

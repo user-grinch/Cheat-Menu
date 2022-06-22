@@ -35,4 +35,5 @@ public:
     static bool IsInVehicle(CPed *pPed = FindPlayerPed());
     static void RainbowValues(int& r, int& g, int& b, float speed);
     static void SetCarForwardSpeed(CVehicle *pVeh, float speed);
+    static float RoundFloat(float val);
 };

@@ -77,7 +77,7 @@ public:
     static inline ResourceStore m_TextureData { "textures", eResourceType::TYPE_IMAGE, ImVec2(100, 80) };
 
     static void InjectHooks();
-    static void GenerateNodeList(CVehicle* pVeh, std::vector<std::string>& names_vec);
+    static void GenerateNodeList(CVehicle* pVeh, std::vector<std::string>& names_vec, std::string& selected);
     static void SetNodeColor(CVehicle* pVeh, std::string node_name, CRGBA color, bool filter_mat = false);
     static void SetNodeTexture(CVehicle* pVeh, std::string node_name, std::string texturename, bool filter_mat = false);
     static void ResetNodeColor(CVehicle* veh, std::string node_name);

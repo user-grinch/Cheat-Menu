@@ -1,6 +1,12 @@
 #include "pch.h"
 #include "util.h"
 #include "psapi.h"
+#include <math.h>
+
+float Util::RoundFloat(float val)
+{
+    return roundf(val * 100) / 100;
+}
 
 bool Util::IsInVehicle(CPed *pPed)
 {

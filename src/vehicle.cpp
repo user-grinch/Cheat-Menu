@@ -1043,7 +1043,7 @@ void Vehicle::ShowPage()
             if (ImGui::BeginTabItem(TEXT("Vehicle.Color")))
             {
 #ifdef GTASA
-                Paint::GenerateNodeList(veh, m_Paint::m_vecNames);
+                Paint::GenerateNodeList(veh, m_Paint::m_vecNames, m_Paint::m_Selected);
 
                 ImGui::Spacing();
                 if (ImGui::Button(TEXT("Vehicle.ResetColor"), ImVec2(Ui::GetSize())))
@@ -1115,6 +1115,7 @@ void Vehicle::ShowPage()
             {
                 if (ImGui::BeginTabItem(TEXT("Vehicle.NeonsTab")))
                 {
+                    int model = veh->m_nModelIndex;
                     ImGui::Spacing();
                     if (ImGui::Button(TEXT("Vehicle.RemoveNeon"), ImVec2(Ui::GetSize())))
                     {
@@ -1140,8 +1141,11 @@ void Vehicle::ShowPage()
 
                     if (ImGui::ColorEdit3(TEXT("Vehicle.ColorPicker"), m_Neon::m_fColorPicker))
                     {
-                        Neon::Install(veh, m_Neon::m_fColorPicker[0] * 255, m_Neon::m_fColorPicker[1] * 255,
-                                      m_Neon::m_fColorPicker[2] * 255);
+                        int r = static_cast<int>(m_Neon::m_fColorPicker[0] * 255);
+                        int g = static_cast<int>(m_Neon::m_fColorPicker[1] * 255);
+                        int b = static_cast<int>(m_Neon::m_fColorPicker[2] * 255);
+
+                        Neon::Install(veh, r, g, b);
                     }
 
 
@@ -1158,10 +1162,14 @@ void Vehicle::ShowPage()
 
                     for (int color_id = 0; color_id < count; ++color_id)
                     {
-                        if (Ui::ColorButton(color_id, m_CarcolsColorData[color_id], ImVec2(btnSize, btnSize)))
+                        auto& color = m_CarcolsColorData[color_id];
+                        if (Ui::ColorButton(color_id, color, ImVec2(btnSize, btnSize)))
                         {
-                            std::vector<float>& color = m_CarcolsColorData[color_id];
-                            Neon::Install(veh, color[0] * 255, color[1] * 255, color[2] * 255);
+                            int r = static_cast<int>(color[0] * 255);
+                            int g = static_cast<int>(color[1] * 255);
+                            int b = static_cast<int>(color[2] * 255);
+
+                            Neon::Install(veh, r, g, b);
                         }
 
                         if ((color_id + 1) % btnsInRow != 0)
@@ -1175,7 +1183,7 @@ void Vehicle::ShowPage()
                 }
                 if (ImGui::BeginTabItem(TEXT("Vehicle.TextureTab")))
                 {
-                    Paint::GenerateNodeList(veh, m_Paint::m_vecNames);
+                    Paint::GenerateNodeList(veh, m_Paint::m_vecNames, m_Paint::m_Selected);
 
                     ImGui::Spacing();
                     if (ImGui::Button(TEXT("Vehicle.ResetTexture"), ImVec2(Ui::GetSize())))
@@ -1188,29 +1196,41 @@ void Vehicle::ShowPage()
                     Ui::ListBoxStr(TEXT("Vehicle.Component"), m_Paint::m_vecNames, m_Paint::m_Selected);
                     ImGui::Spacing();
 
+                    ImGui::Columns(2, NULL, false);
+                    ImGui::Checkbox(TEXT("Vehicle.MatFilter"), &m_Paint::m_bMatFilter);
+                    ImGui::NextColumn();
                     int maxpjob, curpjob;
                     Command<Commands::GET_NUM_AVAILABLE_PAINTJOBS>(hveh, &maxpjob);
 
                     if (maxpjob > 0)
                     {
                         Command<Commands::GET_CURRENT_VEHICLE_PAINTJOB>(hveh, &curpjob);
-
-                        if (ImGui::InputInt(TEXT("Vehicle.Paintjob"), &curpjob))
+                        
+                        if (ImGui::ArrowButton("Left", ImGuiDir_Left))
                         {
-                            if (curpjob > maxpjob)
-                                curpjob = -1;
+                            curpjob -= 1;
                             if (curpjob < -1)
-                                curpjob = maxpjob - 1;
-
+                            {
+                               curpjob = maxpjob - 1; 
+                            }
+                            Command<Commands::GIVE_VEHICLE_PAINTJOB>(hveh, curpjob);
+                        }
+                        ImGui::SameLine();
+                        ImGui::Text("%s: %d",TEXT("Vehicle.Paintjob"), curpjob+2);
+                        ImGui::SameLine();
+                        if (ImGui::ArrowButton("Right", ImGuiDir_Right))
+                        {
+                            curpjob += 1;
+                            if (curpjob > maxpjob)
+                            {
+                               curpjob =  -1; 
+                            }
                             Command<Commands::GIVE_VEHICLE_PAINTJOB>(hveh, curpjob);
                         }
 
                         ImGui::Spacing();
                     }
-
-                    ImGui::Spacing();
-                    ImGui::SameLine();
-                    ImGui::Checkbox(TEXT("Vehicle.MatFilter"), &m_Paint::m_bMatFilter);
+                    ImGui::Columns(1);
                     ImGui::Spacing();
                     Ui::DrawImages(Paint::m_TextureData,
                                    [](std::string& str)
