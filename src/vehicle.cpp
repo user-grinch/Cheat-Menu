@@ -24,6 +24,10 @@ void Vehicle::Init()
 
     FileHandler::FetchColorData(m_CarcolsColorData);
 
+    // Get config data
+    m_Spawner::m_bSpawnInAir = gConfig.Get("Features.SpawnAircraftInAir", true);
+    m_Spawner::m_bSpawnInside = gConfig.Get("Features.SpawnInsideVehicle", true);
+
     Events::processScriptsEvent += []
     {
         uint timer = CTimer::m_snTimeInMilliseconds;
@@ -579,7 +583,21 @@ void Vehicle::ShowPage()
                 }
             }
 #ifdef GTASA
+            Ui::CheckboxAddressEx(TEXT("Vehicle.LockTrainCam"), 0x52A52F, 171, 6);
             Ui::CheckboxAddress(TEXT("Vehicle.LessTraffic"), 0x96917A);
+            if (Ui::CheckboxWithHint(TEXT("Vehicle.NoDerail"), &m_bNoDerail))
+            {
+                if (m_bNoDerail)
+                {
+                    patch::Set<uint32_t>(0x6F8C2A, 0x00441F0F, true); // nop dword ptr [eax+eax*1+00h]
+                    patch::Set<uint8_t>(0x6F8C2E, 0x00, true);
+                    patch::Set<uint16_t>(0x6F8C41, 0xE990, true); // jmp near
+                }
+                else
+                {
+                    patch::SetRaw(0x6F8C2A, (void*)"\x8A\x46\x36\xA8\xF8\xD8\x8E", 7);
+                }
+            }
             // if (Ui::CheckboxWithHint(TEXT("Vehicle.NoColl"), &m_bDisableColDetection))
             // {
             // 	if (m_bDisableColDetection)
@@ -632,7 +650,6 @@ void Vehicle::ShowPage()
             Ui::CheckboxAddress(TEXT("Vehicle.DriveWater"), BY_GAME(0x969152, 0xA10B81, NULL));
 #endif
 #ifdef GTASA
-            Ui::CheckboxAddressEx(TEXT("Vehicle.LockTrainCam"), 0x52A52F, 171, 6);
             Ui::CheckboxAddress(TEXT("Vehicle.FloatOnHit"), 0x969166);
 #endif
 #ifndef GTA3
@@ -643,6 +660,25 @@ void Vehicle::ShowPage()
             Ui::CheckboxAddress(TEXT("Vehicle.TankMode"), 0x969164);
 
             Ui::CheckboxWithHint(TEXT("Vehicle.InfNitro"), &m_UnlimitedNitro::m_bEnabled, TEXT("Vehicle.InfNitroTip"));
+            if (Ui::CheckboxWithHint(TEXT("Vehicle.FlipNoBurn"), &m_bVehFlipNoBurn, TEXT("Vehicle.FlipNoBurnTip")))
+            {
+                // MixSets (Link2012)
+                if (m_bVehFlipNoBurn)
+                {
+                    // Patch ped vehicles damage when flipped
+                    patch::SetRaw(0x6A776B, (void*)"\xD8\xDD\x00\x00\x00\x00", 6); // fstp st0, nop 4
+
+                    // Patch player vehicle damage when flipped
+                    patch::SetRaw(0x570E7F, (void*)"\xD8\xDD\x00\x00\x00\x00", 6); // fstp st0, nop 4
+                }
+                else
+                {
+                    // restore patches
+                    patch::SetRaw(0x6A776B, (void*)"\xD9\x9E\xC0\x04\x00\x00", 6);
+                    patch::SetRaw(0x570E7F, (void*)"\xD9\x99\xC0\x04\x00\x00", 6); // fstp dword ptr [ecx+4C0h]
+                }
+            }
+
 #elif GTA3
             Ui::CheckboxAddress(TEXT("Vehicle.PerfectHandling"), 0x95CD66);
 #endif
@@ -982,9 +1018,15 @@ void Vehicle::ShowPage()
         {
             ImGui::Spacing();
             ImGui::Columns(2, 0, false);
-            Ui::CheckboxWithHint(TEXT("Vehicle.SpawnInside"), &m_Spawner::m_bSpawnInside);
+            if (Ui::CheckboxWithHint(TEXT("Vehicle.SpawnInside"), &m_Spawner::m_bSpawnInside))
+            {
+                gConfig.Set("Features.SpawnInsideVehicle", m_Spawner::m_bSpawnInside);
+            }
             ImGui::NextColumn();
-            Ui::CheckboxWithHint(TEXT("Vehicle.SpawnInAir"), &m_Spawner::m_bSpawnInAir);
+            if( Ui::CheckboxWithHint(TEXT("Vehicle.SpawnInAir"), &m_Spawner::m_bSpawnInAir))
+            {
+                gConfig.Set("Features.SpawnAircraftInAir", m_Spawner::m_bSpawnInAir);
+            }
             ImGui::Columns(1);
 
             ImGui::Spacing();

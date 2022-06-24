@@ -357,28 +357,6 @@ bool Ui::CheckboxAddressVar(const char* label, bool val, int addr, const char* h
     return rtn;
 }
 
-bool Ui::CheckboxAddressVarEx(const char* label, bool val, int addr, int enabled_val, int disabled_val,
-                              const char* hint)
-{
-    bool rtn = false;
-    bool state = val;
-    if (CheckboxWithHint(label, &state, hint))
-    {
-        if (state)
-        {
-            patch::SetRaw(addr, &enabled_val, 1, false);
-        }
-        else
-        {
-            patch::SetRaw(addr, &disabled_val, 1, false);
-        }
-
-        rtn = true;
-    }
-
-    return rtn;
-}
-
 bool Ui::CheckboxBitFlag(const char* label, uint flag, const char* hint)
 {
     bool rtn = false;

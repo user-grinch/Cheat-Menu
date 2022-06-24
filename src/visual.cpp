@@ -360,6 +360,8 @@ void Visual::ShowPage()
             Ui::CheckboxAddress(TEXT("Visual.ArmourPercentage"), 0x589125);
             Ui::CheckboxAddress(TEXT("Visual.BreathBorder"), 0x589207);
             Ui::CheckboxAddress(TEXT("Visual.BreathPercentage"), 0x589209);
+            Ui::CheckboxAddress(TEXT("Visual.CCTVEffect"), 0xC402C5);
+            Ui::CheckboxAddress(TEXT("Visual.DarknessFilter"), 0xC402C4);
             if (Ui::CheckboxWithHint(TEXT("Visual.DisableHydrant"), &m_bDisableHydrant))
             {
                 if (m_bDisableHydrant)
@@ -372,9 +374,14 @@ void Visual::ShowPage()
                     plugin::patch::SetRaw(0x4A0D70, (char*)"\xE9\x94\x3F\xF6\xFF", 5);
                 }
             }
+            Ui::CheckboxAddress(TEXT("Visual.FogEffect"), 0xC402C6);
+            Ui::CheckboxAddress(TEXT("Visual.GrainEffect"), 0xC402B4);
             Ui::CheckboxAddress(TEXT("Visual.GrayRadar"), 0xA444A4);
             Ui::CheckboxAddress(TEXT("Visual.HealthBorder"), 0x589353);
             Ui::CheckboxAddress(TEXT("Visual.HealthPercentage"), 0x589355);
+
+            Ui::CheckboxAddress(TEXT("Visual.HeatHazeEffect"), 0xC402BA);
+
             if (Ui::CheckboxWithHint(TEXT("Visual.HideAreaNames"), &CHud::bScriptDontDisplayAreaName))
             {
                 Command<Commands::DISPLAY_ZONE_NAMES>(!CHud::bScriptDontDisplayAreaName);
@@ -388,7 +395,7 @@ void Visual::ShowPage()
             }
 
             Ui::CheckboxAddressEx(TEXT("Visual.HideWantedLevel"), 0x58DD1B, 0x90, 1);
-
+            Ui::CheckboxAddress(TEXT("Visual.InfraredVision"), 0xC402B9);
             if (Ui::CheckboxWithHint(TEXT("Visual.InvisibleWater"), &m_bInvisibleWater))
             {
                 if (!m_bNoWater)
@@ -408,6 +415,34 @@ void Visual::ShowPage()
                 }
             }
             Ui::CheckboxWithHint(TEXT("Visual.LockWeather"), &m_bLockWeather);
+            Ui::CheckboxAddress(TEXT("Visual.NightVision"), 0xC402B8);
+            if (Ui::CheckboxWithHint(TEXT("Visual.NoMoneyZeros"), &m_bNoMoneyZeros))
+            {
+                static const char *pos = "$%d", *neg = "-$%d";
+                if(m_bNoMoneyZeros)
+                {
+                    patch::Set<const char*>(0x58F4C8, pos, true); //positive
+		            patch::Set<const char*>(0x58F50A, neg, true); //negative
+                }
+                else
+                {
+                    patch::SetRaw(0x58F4C8, (void*)"\x94\x6C\x86\x00", 4);
+                    patch::SetRaw(0x58F50A, (void*)"\x8C\x6C\x86\x00", 4);
+                }
+            }
+            if (Ui::CheckboxWithHint(TEXT("Visual.NoParticles"), &m_bNoPartciles))
+            {
+                if(m_bNoPartciles)
+                {
+                    patch::Set<uint32_t>(0x4AA440, 0x000020C2, true);
+                }
+                else
+                {
+                    patch::Set<uint32_t>(0x4AA440, 0x5608EC83, true);
+                }
+            }
+            Ui::CheckboxAddress(TEXT("Visual.NoPostFX"), 0xC402CF);
+           
             if (Ui::CheckboxWithHint(TEXT("Visual.NoWater"), &m_bNoWater))
             {
                 if (m_bNoWater)
@@ -437,6 +472,7 @@ void Visual::ShowPage()
             }
 
             Ui::CheckboxAddress(TEXT("Visual.ShowHud"), 0xBA6769);
+            Ui::CheckboxAddress(TEXT("Visual.UnderwaterEffect"), 0xC402D3);
             Ui::CheckboxAddressEx(TEXT("Visual.UnfogMap"), 0xBA372C, 0x50, 0x0, TEXT("Visual.UnfogMapText"));
 #elif GTAVC
             Ui::CheckboxAddress(TEXT("Visual.HideRadar"), 0xA10AB6);

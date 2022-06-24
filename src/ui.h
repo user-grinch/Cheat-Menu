@@ -44,8 +44,8 @@ public:
     static bool CheckboxAddressEx(const char* label, int addr = NULL, int enabled_val = 1, int disabled_val = 0,
                                   const char* hint = nullptr);
     static bool CheckboxAddressVar(const char* label, bool val, int addr, const char* hint = nullptr);
-    static bool CheckboxAddressVarEx(const char* label, bool val, int addr, int enabled_val, int disabled_val,
-                                     const char* hint = nullptr);
+    template <typename T>
+    static bool CheckboxAddressVarEx(const char* label, int addr, T enabled_val, T disabled_val, const char* hint = nullptr);
     static bool CheckboxBitFlag(const char* label, uint flag, const char* hint = nullptr);
     static bool CheckboxWithHint(const char* label, bool* state, const char* hint = nullptr, bool is_disabled = false);
 
@@ -86,6 +86,27 @@ public:
     static void ShowTooltip(const char* text);
 };
 
+template <typename T>
+bool Ui::CheckboxAddressVarEx(const char* label, int addr, T enabled_val, T disabled_val, const char* hint)
+{
+    bool rtn = false;
+    bool state = (patch::Get<T>(addr) == enabled_val);
+    if (CheckboxWithHint(label, &state, hint))
+    {
+        if (state)
+        {
+            patch::Set<T>(addr, enabled_val, false);
+        }
+        else
+        {
+            patch::Set<T>(addr, disabled_val, false);
+        }
+
+        rtn = true;
+    }
+
+    return rtn;
+}
 template <typename T>
 void Ui::EditAddress(const char* label, const int address, const int min, const int def, const int max)
 {

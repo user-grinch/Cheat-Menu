@@ -532,7 +532,17 @@ void Game::ShowPage()
                 }
             }
 #ifdef GTASA
-
+            if (Ui::CheckboxWithHint(TEXT("Game.NoWaterPhysics"), &m_bNoWaterPhysics))
+            {
+                if (m_bNoWaterPhysics)
+                {
+                    patch::Set<uint8_t>(0x6C2759, 1, true);
+                }
+                else
+                {
+                    patch::Set<uint8_t>(0x6C2759, 0, true);
+                }
+            }
             if (Ui::CheckboxWithHint(TEXT("Game.KeepStuff"), &m_bKeepStuff, TEXT("Game.KeepStuffText")))
             {
                 Command<Commands::SWITCH_ARREST_PENALTIES>(m_bKeepStuff);
@@ -626,6 +636,20 @@ void Game::ShowPage()
                 {TEXT("Game.Beach"), 0x969159}, {TEXT("Game.Country"), 0x96917D}, {TEXT("Game.FunHouse"), 0x969176}, {TEXT("Game.Ninja"), 0x96915C}
             };
             Ui::EditRadioButtonAddress(TEXT("Game.Themes"), themes);
+
+            if (ImGui::CollapsingHeader(TEXT("Game.TotalMinutesDay")))
+            {
+                static int min = 24;
+                if (ImGui::InputInt(TEXT("Game.Minute"), &min))
+                {
+                    int val = min * 41.666666667f;
+                    patch::Set<uint32_t>(0x5BA35F, val, true);
+                    patch::Set<uint32_t>(0x53BDEC, val, true);
+                }
+                
+                ImGui::Spacing();
+                ImGui::Separator();
+            }
 #endif
             if (ImGui::CollapsingHeader(TEXT("Game.Weather")))
             {

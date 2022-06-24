@@ -27,6 +27,9 @@ private:
 
 #ifdef GTASA
     static inline bool m_bDisableColDetection;
+    static inline bool m_bVehFlipNoBurn;
+    static inline bool m_bMoreTrainCams;
+    static inline bool m_bNoDerail;
     static inline std::map<int, std::string> m_VehicleIDE;
     struct m_Neon
     {

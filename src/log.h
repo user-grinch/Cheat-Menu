@@ -31,11 +31,11 @@ public:
     Log() = delete;
     Log(Log&) = delete;
 
-    static void SetName(const char* logName) noexcept;
+    static inline void SetName(const char* logName) noexcept;
 
     // Prints to log with current log level
     template <eLogLevel T, typename... Args>
-    static void Print(std::string&& fmt, Args&&... args) noexcept
+    static inline void Print(std::string&& fmt, Args&&... args) noexcept
     {
         SetLogLevel(T);
         if(!pLog)
@@ -51,7 +51,7 @@ public:
     }
 
     template <eLogLevel T>
-    static void Print(const char* text) noexcept
+    static inline void Print(const char* text) noexcept
     {
         SetLogLevel(T);
         if (!pLog)
