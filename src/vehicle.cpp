@@ -1073,7 +1073,7 @@ void Vehicle::ShowPage()
                 return GetNameFromModel(std::stoi(str));
             });
 #else
-            Ui::DrawJSON(m_Spawner::m_VehData, SpawnVehicle, nullptr);
+            Ui::DrawList(Spawner::m_VehData, SpawnVehicle, nullptr);
 #endif
             ImGui::EndTabItem();
         }
@@ -1118,9 +1118,9 @@ void Vehicle::ShowPage()
                 ImGui::RadioButton(TEXT("Vehicle.Tertiary"), &PaintData::m_nRadioButton, 3);
                 ImGui::RadioButton(TEXT("Vehicle.Quaternary"), &PaintData::m_nRadioButton, 4);
 #else
-                ImGui::RadioButton(TEXT("Vehicle.Primary"), &m_PaintData::m_nRadioButton, 1);
+                ImGui::RadioButton(TEXT("Vehicle.Primary"), &PaintData::m_nRadioButton, 1);
                 ImGui::NextColumn();
-                ImGui::RadioButton(TEXT("Vehicle.Secondary"), &m_PaintData::m_nRadioButton, 2);
+                ImGui::RadioButton(TEXT("Vehicle.Secondary"), &PaintData::m_nRadioButton, 2);
 #endif
                 ImGui::Spacing();
                 ImGui::Columns(1);

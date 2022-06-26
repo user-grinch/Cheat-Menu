@@ -137,7 +137,7 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
             Command<Commands::LOAD_SPECIAL_CHARACTER>(currentSlot, model.c_str());
             Command<Commands::LOAD_ALL_MODELS_NOW>();
 
-            Command<Commands::CREATE_CHAR>(m_SpawnPed::m_nSelectedPedType + 4, 108+currentSlot, pos.x, pos.y, pos.z + 1, &hplayer);
+            Command<Commands::CREATE_CHAR>(SpawnPed::m_nSelectedPedType + 4, 108+currentSlot, pos.x, pos.y, pos.z + 1, &hplayer);
             Command<Commands::UNLOAD_SPECIAL_CHARACTER>(currentSlot);
 
             ++currentSlot;
@@ -365,7 +365,7 @@ void Ped::ShowPage()
                             return m_PedData.m_pData->Get(str.c_str(), "Unknown");
                     });
 #else
-                    Ui::DrawJSON(m_PedData, SpawnPed, nullptr);
+                    Ui::DrawList(m_PedData, SpawnPed, nullptr);
 #endif
                     ImGui::EndTabItem();
                 }
@@ -416,11 +416,11 @@ void Ped::ShowPage()
                     }
                                   );
 #else
-                    Ui::DrawJSON(Weapon::m_WeaponData,
+                    Ui::DrawList(Weapon::m_WeaponData,
                                  [](std::string& root, std::string& key, std::string& id)
                     {
-                        m_SpawnPed::m_nWeaponId = std::stoi(id);
-                        m_SpawnPed::m_nWeaponName = key;
+                        SpawnPed::m_nWeaponId = std::stoi(id);
+                        SpawnPed::m_nWeaponName = key;
                     },
                     nullptr);
 #endif

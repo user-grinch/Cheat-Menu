@@ -261,14 +261,14 @@ void Game::FreeCam()
         Command<Commands::CAMERA_PERSIST_FOV>(true);
         patch::Set<BYTE>(0xBA676C, 2); // disable radar
 #elif GTAVC
-        m_Freecam::m_pPed->m_nFlags.bIsVisible = false;
-        m_Freecam::m_pPed->m_nFlags.bUseCollision = false;
-        m_Freecam::m_pPed->SetPosition(playerPos);
+        Freecam::m_pPed->m_nFlags.bIsVisible = false;
+        Freecam::m_pPed->m_nFlags.bUseCollision = false;
+        Freecam::m_pPed->SetPosition(playerPos);
         patch::Set<BYTE>(0xA10AB6, 1); // disable radar
 #else
-        m_Freecam::m_pPed->m_nFlags.bIsVisible = false;
-        m_Freecam::m_pPed->m_nFlags.bUsesCollision = false;
-        m_Freecam::m_pPed->SetPosition(playerPos.x, playerPos.y, playerPos.z);
+        Freecam::m_pPed->m_nFlags.bIsVisible = false;
+        Freecam::m_pPed->m_nFlags.bUsesCollision = false;
+        Freecam::m_pPed->SetPosition(playerPos.x, playerPos.y, playerPos.z);
 #endif
 
         Freecam::m_bInitDone = true;
@@ -379,11 +379,11 @@ void Game::FreeCam()
     Freecam::m_pPed->SetPosn(pos);
     CIplStore::AddIplsNeededAtPosn(pos);
 #elif GTAVC
-    m_Freecam::m_pPed->m_placement.SetHeading(m_Freecam::m_fTotalMouse.x);
-    m_Freecam::m_pPed->SetPosition(pos);
+    Freecam::m_pPed->m_placement.SetHeading(Freecam::m_fTotalMouse.x);
+    Freecam::m_pPed->SetPosition(pos);
 #else
-    m_Freecam::m_pPed->SetHeading(m_Freecam::m_fTotalMouse.x);
-    m_Freecam::m_pPed->SetPosition(pos.x, pos.y, pos.z);
+    Freecam::m_pPed->SetHeading(Freecam::m_fTotalMouse.x);
+    Freecam::m_pPed->SetPosition(pos.x, pos.y, pos.z);
 #endif
 }
 
@@ -516,7 +516,7 @@ void Game::ShowPage()
                     HardMode::m_fBacMaxHealth = CStats::GetStatValue(STAT_MAX_HEALTH);
                     HardMode::m_fBacStamina = CStats::GetStatValue(STAT_STAMINA);
 #else
-                    m_HardMode::m_fBacMaxHealth = 100.0f;
+                    HardMode::m_fBacMaxHealth = 100.0f;
 #endif
                     player->m_fHealth = 50.0f;
                 }
@@ -781,7 +781,7 @@ void Game::ShowPage()
 #ifdef GTASA
         if (ImGui::BeginTabItem(TEXT("Game.Stats")))
         {
-            // similar to Ui::DrawJSON()
+            // similar to Ui::DrawList()
             ImGui::Spacing();
 
             if (ImGui::Button(TEXT("Game.MaxWepSkills"), Ui::GetSize(2)))

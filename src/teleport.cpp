@@ -40,30 +40,30 @@ void Teleport::Init()
 
     Events::processScriptsEvent += []
     {
-        if ((QuicKTP::m_bEnabled == true) && ((CTimer::m_snTimeInMilliseconds - QuicKTP::m_nTimer) > 500))
+        if ((QuickTP::m_bEnabled == true) && ((CTimer::m_snTimeInMilliseconds - QuickTP::m_nTimer) > 500))
         {
             CPlayerPed* player = FindPlayerPed();
 
 #ifdef GTASA
             CEntity* player_entity = FindPlayerEntity(-1);
-            QuicKTP::m_fPos.z = CWorld::FindGroundZFor3DCoord(QuicKTP::m_fPos.x, QuicKTP::m_fPos.y,
-                    QuicKTP::m_fPos.z + 100.0f, nullptr, &player_entity) + 1.0f;
+            QuickTP::m_fPos.z = CWorld::FindGroundZFor3DCoord(QuickTP::m_fPos.x, QuickTP::m_fPos.y,
+                    QuickTP::m_fPos.z + 100.0f, nullptr, &player_entity) + 1.0f;
 #else
-            m_Teleport::m_fPos.z = CWorld::FindGroundZFor3DCoord(m_Teleport::m_fPos.x, m_Teleport::m_fPos.y,
-                    m_Teleport::m_fPos.z + 100.0f, nullptr) + 1.0f;
+            QuickTP::m_fPos.z = CWorld::FindGroundZFor3DCoord(QuickTP::m_fPos.x, QuickTP::m_fPos.y,
+                    QuickTP::m_fPos.z + 100.0f, nullptr) + 1.0f;
 #endif
             CVehicle* pVeh = player->m_pVehicle;
 
             if (pVeh && BY_GAME(player->m_nPedFlags.bInVehicle, player->m_pVehicle, player->m_pVehicle))
             {
-                BY_GAME(pVeh->Teleport(QuicKTP::m_fPos, false), pVeh->Teleport(QuicKTP::m_fPos), player->Teleport(QuicKTP::m_fPos));
+                BY_GAME(pVeh->Teleport(QuickTP::m_fPos, false), pVeh->Teleport(QuickTP::m_fPos), player->Teleport(QuickTP::m_fPos));
             }
             else
             {
-                BY_GAME(player->Teleport(QuicKTP::m_fPos, false), player->Teleport(QuicKTP::m_fPos), player->Teleport(QuicKTP::m_fPos));
+                BY_GAME(player->Teleport(QuickTP::m_fPos, false), player->Teleport(QuickTP::m_fPos), player->Teleport(QuickTP::m_fPos));
             }
 
-            QuicKTP::m_bEnabled = false;
+            QuickTP::m_bEnabled = false;
             Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(player), false);
             Command<Commands::RESTORE_CAMERA_JUMPCUT>();
             TheCamera.Fade(0, 1);
@@ -100,9 +100,9 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
         pos = targetBlip.m_vecPos;
         pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, nullptr, &pPlayerEntity) + 500.f;
 
-        QuicKTP::m_fPos = pos;
-        QuicKTP::m_nTimer = CTimer::m_snTimeInMilliseconds;
-        QuicKTP::m_bEnabled = true;
+        QuickTP::m_fPos = pos;
+        QuickTP::m_nTimer = CTimer::m_snTimeInMilliseconds;
+        QuickTP::m_bEnabled = true;
         TheCamera.Fade(0, 0);
         Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(pPlayer), true);
     }

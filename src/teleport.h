@@ -15,7 +15,7 @@ private:
     static inline DataStore m_SpriteData {"sprites"};
 #endif
 
-    struct QuicKTP
+    struct QuickTP
     {
         static inline bool m_bEnabled;
         static inline CVector m_fPos = { -1, -1, -1 };

@@ -358,7 +358,7 @@ void Weapon::ShowPage()
             }
                           );
 #else
-            Ui::DrawJSON(m_WeaponData, GiveWeaponToPlayer, nullptr);
+            Ui::DrawList(m_WeaponData, GiveWeaponToPlayer, nullptr);
 #endif
             ImGui::EndTabItem();
         }
