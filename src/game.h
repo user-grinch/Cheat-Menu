@@ -9,7 +9,7 @@ private:
     static inline bool m_bDisableReplay;
     static inline bool m_bMissionTimer;
 
-    struct m_Freecam
+    struct Freecam
     {
         static inline bool m_bEnabled;
         static inline int m_nMul = 1;
@@ -22,7 +22,7 @@ private:
         static inline BYTE m_bHudState;
         static inline BYTE m_bRadarState;
     };
-    struct m_HardMode
+    struct HardMode
     {
         static inline bool m_bEnabled;
         static inline float m_fBacHealth = 0.0f;
@@ -44,7 +44,7 @@ private:
         "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
     };
 
-    struct m_RandomCheats
+    struct RandomCheats
     {
         static inline bool m_bEnabled;
         static inline bool m_bProgressBar = true;

@@ -49,7 +49,7 @@ public:
     static bool CheckboxBitFlag(const char* label, uint flag, const char* hint = nullptr);
     static bool CheckboxWithHint(const char* label, bool* state, const char* hint = nullptr, bool is_disabled = false);
 
-    static void DrawJSON(ResourceStore& data,
+    static void DrawList(ResourceStore& data,
                          std::function<void(std::string&, std::string&, std::string&)> func_left_click,
                          std::function<void(std::string&, std::string&, std::string&)> func_right_click);
     static void DrawImages(ResourceStore &store, std::function<void(std::string&)> on_left_click,

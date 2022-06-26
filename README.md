@@ -82,6 +82,8 @@ You can either open a issue here or directly contact me on discord (Recommended)
 
 The translations are loaded from `CheatMenuXX/locale/*.toml` files. Make a copy of the `English.toml` file and translate the texts there to your language. Rename the file to `your_language.toml` and make a pull request. 
 
+If you're language isn't supported ( Appears `???` in the menu. Check [here](https://github.com/user-grinch/Cheat-Menu/tree/rewrite/tools/subset/in.txt) for supported languages), open a [issue](https://github.com/user-grinch/Cheat-Menu/issues) asking for support.
+
 
 ## Required to build
 1. [Build Tools 2022](https://visualstudio.microsoft.com/downloads/#build-tools-for-visual-studio-2022)

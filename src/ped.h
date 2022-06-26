@@ -15,7 +15,7 @@ private:
     };
 #endif
 
-    struct m_SpawnPed
+    struct SpawnPed
     {
         static inline std::vector<CPed*> m_List;
         static inline int m_nAccuracy = 50;

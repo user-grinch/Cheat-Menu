@@ -85,7 +85,7 @@ void Ped::SpawnPed(std::string& model)
 void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
 #endif
 {
-    if (m_SpawnPed::m_List.size() == SPAWN_PED_LIMIT)
+    if (SpawnPed::m_List.size() == SPAWN_PED_LIMIT)
     {
         SetHelpMessage(TEXT("Ped.MaxLimit"));
         return;
@@ -117,7 +117,7 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
             CStreaming::RequestSpecialChar(currentSlot, name.c_str(), PRIORITY_REQUEST);
             CStreaming::LoadAllRequestedModels(true);
 
-            Command<Commands::CREATE_CHAR>(m_SpawnPed::m_nSelectedPedType + 4, 290 + currentSlot, pos.x, pos.y, pos.z + 1, &hplayer);
+            Command<Commands::CREATE_CHAR>(SpawnPed::m_nSelectedPedType + 4, 290 + currentSlot, pos.x, pos.y, pos.z + 1, &hplayer);
             CStreaming::SetSpecialCharIsDeletable(290 + currentSlot);
 
             // SA has 10 slots
@@ -154,31 +154,31 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
             CStreaming::RequestModel(iModel, eStreamingFlags::PRIORITY_REQUEST);
             CStreaming::LoadAllRequestedModels(false);
 
-            Command<Commands::CREATE_CHAR>(m_SpawnPed::m_nSelectedPedType + 4, iModel, pos.x, pos.y, pos.z + 1, &hplayer);
+            Command<Commands::CREATE_CHAR>(SpawnPed::m_nSelectedPedType + 4, iModel, pos.x, pos.y, pos.z + 1, &hplayer);
             CStreaming::SetModelIsDeletable(iModel);
         }
 
         ped = CPools::GetPed(hplayer);
 
-        if (m_SpawnPed::m_bPedMove)
+        if (SpawnPed::m_bPedMove)
         {
-            m_SpawnPed::m_List.push_back(ped);
+            SpawnPed::m_List.push_back(ped);
         }
         else
         {
             Command<Commands::MARK_CHAR_AS_NO_LONGER_NEEDED>(hplayer);
         }
-        ped->m_nPedFlags.bPedIsBleeding = m_SpawnPed::m_bPedBleed;
-        ped->m_nWeaponAccuracy = m_SpawnPed::m_nAccuracy;
-        ped->m_fHealth = m_SpawnPed::m_nPedHealth;
+        ped->m_nPedFlags.bPedIsBleeding = SpawnPed::m_bPedBleed;
+        ped->m_nWeaponAccuracy = SpawnPed::m_nAccuracy;
+        ped->m_fHealth = SpawnPed::m_nPedHealth;
 #ifdef GTASA
-        if (m_SpawnPed::m_nWeaponId != 0)
+        if (SpawnPed::m_nWeaponId != 0)
         {
             int model = 0;
-            Command<Commands::GET_WEAPONTYPE_MODEL>(m_SpawnPed::m_nWeaponId, &model);
+            Command<Commands::GET_WEAPONTYPE_MODEL>(SpawnPed::m_nWeaponId, &model);
             CStreaming::RequestModel(model, PRIORITY_REQUEST);
             CStreaming::LoadAllRequestedModels(false);
-            Command<Commands::GIVE_WEAPON_TO_CHAR>(hplayer, m_SpawnPed::m_nWeaponId, 999);
+            Command<Commands::GIVE_WEAPON_TO_CHAR>(hplayer, SpawnPed::m_nWeaponId, 999);
         }
 #endif
     }
@@ -343,12 +343,12 @@ void Ped::ShowPage()
             ImGui::Spacing();
             if (ImGui::Button(TEXT("Ped.RemoveFrozen"), Ui::GetSize(1)))
             {
-                for (CPed* ped : m_SpawnPed::m_List)
+                for (CPed* ped : SpawnPed::m_List)
                 {
                     CWorld::Remove(ped);
                     ped->Remove();
                 }
-                m_SpawnPed::m_List.clear();
+                SpawnPed::m_List.clear();
             }
             ImGui::Spacing();
             if (ImGui::BeginTabBar("SpawnPedBar"))
@@ -374,41 +374,41 @@ void Ped::ShowPage()
                     ImGui::Spacing();
                     ImGui::BeginChild("PedCOnfig");
                     ImGui::Columns(2, 0, false);
-                    Ui::CheckboxWithHint(TEXT("Ped.NoMove"), &m_SpawnPed::m_bPedMove);
+                    Ui::CheckboxWithHint(TEXT("Ped.NoMove"), &SpawnPed::m_bPedMove);
                     ImGui::NextColumn();
-                    Ui::CheckboxWithHint(TEXT("Ped.PedBleed"), &m_SpawnPed::m_bPedBleed);
+                    Ui::CheckboxWithHint(TEXT("Ped.PedBleed"), &SpawnPed::m_bPedBleed);
                     ImGui::Columns(1);
 
                     ImGui::Spacing();
-                    ImGui::SliderInt(TEXT("Ped.Accuracy"), &m_SpawnPed::m_nAccuracy, 0.0, 100.0);
-                    if (ImGui::InputInt(TEXT("Ped.Health"), &m_SpawnPed::m_nPedHealth))
+                    ImGui::SliderInt(TEXT("Ped.Accuracy"), &SpawnPed::m_nAccuracy, 0.0, 100.0);
+                    if (ImGui::InputInt(TEXT("Ped.Health"), &SpawnPed::m_nPedHealth))
                     {
-                        if (m_SpawnPed::m_nPedHealth > 1000)
+                        if (SpawnPed::m_nPedHealth > 1000)
                         {
-                            m_SpawnPed::m_nPedHealth = 1000;
+                            SpawnPed::m_nPedHealth = 1000;
                         }
 
-                        if (m_SpawnPed::m_nPedHealth < 0)
+                        if (SpawnPed::m_nPedHealth < 0)
                         {
-                            m_SpawnPed::m_nPedHealth = 0;
+                            SpawnPed::m_nPedHealth = 0;
                         }
                     }
-                    Ui::ListBox(TEXT("Ped.PedType"), m_SpawnPed::m_PedTypeList, m_SpawnPed::m_nSelectedPedType);
+                    Ui::ListBox(TEXT("Ped.PedType"), SpawnPed::m_PedTypeList, SpawnPed::m_nSelectedPedType);
 
                     ImGui::Spacing();
-                    ImGui::Text(TEXT("Ped.SelectedWeapon"), m_SpawnPed::m_nWeaponName.c_str());
+                    ImGui::Text(TEXT("Ped.SelectedWeapon"), SpawnPed::m_nWeaponName.c_str());
                     ImGui::Spacing();
 #ifdef GTASA
                     Ui::DrawImages(Weapon::m_WeaponData,
                                    [](std::string str)
                     {
-                        m_SpawnPed::m_nWeaponId = std::stoi(str);
+                        SpawnPed::m_nWeaponId = std::stoi(str);
                     },
                     nullptr,
                     [](std::string str)
                     {
-                        m_SpawnPed::m_nWeaponName = Weapon::m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
-                        return m_SpawnPed::m_nWeaponName;
+                        SpawnPed::m_nWeaponName = Weapon::m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
+                        return SpawnPed::m_nWeaponName;
                     },
                     [](std::string str)
                     {

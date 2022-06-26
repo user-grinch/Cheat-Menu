@@ -370,7 +370,7 @@ bool Ui::CheckboxBitFlag(const char* label, uint flag, const char* hint)
     return rtn;
 }
 
-void Ui::DrawJSON(ResourceStore& data,
+void Ui::DrawList(ResourceStore& data,
                   std::function<void(std::string&, std::string&, std::string&)> func_left_click,
                   std::function<void(std::string&, std::string&, std::string&)> func_right_click)
 {

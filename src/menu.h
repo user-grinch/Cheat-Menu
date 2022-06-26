@@ -14,7 +14,7 @@ private:
         BOTTOM_RIGHT
     };
 
-    struct m_Overlay
+    struct Overlay
     {
         static inline bool bCoord;
         static inline bool bFPS;
@@ -39,7 +39,7 @@ private:
     };  
 
 public:
-    struct m_Commands
+    struct Commands
     {
         static inline bool m_bShowMenu;
         static inline char m_nInputBuffer[INPUT_BUFFER_SIZE] = "";

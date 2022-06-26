@@ -15,7 +15,7 @@ private:
 
 #ifdef GTASA
     // Cutscene player
-    struct m_Cutscene
+    struct Cutscene
     {
         static inline ResourceStore m_Data{ "cutscenes", eResourceType::TYPE_TEXT };
         static inline std::string m_SceneName;
@@ -35,7 +35,7 @@ private:
     };
 
     // Particle player
-    struct m_Particle
+    struct Particle
     {
         static inline ResourceStore m_Data{ "particles", eResourceType::TYPE_TEXT };
         static inline char m_NameBuffer[INPUT_BUFFER_SIZE];

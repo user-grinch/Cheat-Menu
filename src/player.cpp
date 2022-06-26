@@ -25,7 +25,7 @@ void Player::TopDownCameraView()
 {
     CPlayerPed *player = FindPlayerPed ();
     CVector     pos    = player->GetPosition ();
-    float       curOffset = m_TopDownCamera::m_fOffset;
+    float       curOffset = TopDownCamera::m_fOffset;
 
     // drunk effect causes issues
     Command<eScriptCommands::COMMAND_SET_PLAYER_DRUNKENNESS> (0, 0);
@@ -107,7 +107,7 @@ void Player::Init()
 
                     if (file_name.size() < 9)
                     {
-                        m_CustomSkins::m_List.push_back(file_name);
+                        CustomSkins::m_List.push_back(file_name);
                     }
                     else
                     {
@@ -155,22 +155,22 @@ void Player::Init()
             }
         }
 
-        if (m_KeepPosition::m_bEnabled)
+        if (KeepPosition::m_bEnabled)
         {
             if (Command<Commands::IS_CHAR_DEAD>(hplayer))
             {
-                m_KeepPosition::m_fPos = player->GetPosition();
+                KeepPosition::m_fPos = player->GetPosition();
             }
             else
             {
                 CVector cur_pos = player->GetPosition();
 
-                if (m_KeepPosition::m_fPos.x != 0 && m_KeepPosition::m_fPos.x != cur_pos.x
-                        && m_KeepPosition::m_fPos.y != 0 && m_KeepPosition::m_fPos.y != cur_pos.y)
+                if (KeepPosition::m_fPos.x != 0 && KeepPosition::m_fPos.x != cur_pos.x
+                        && KeepPosition::m_fPos.y != 0 && KeepPosition::m_fPos.y != cur_pos.y)
                 {
-                    BY_GAME(player->Teleport(m_KeepPosition::m_fPos, false)
-                            , player->Teleport(m_KeepPosition::m_fPos), player->Teleport(m_KeepPosition::m_fPos));
-                    m_KeepPosition::m_fPos = CVector(0, 0, 0);
+                    BY_GAME(player->Teleport(KeepPosition::m_fPos, false)
+                            , player->Teleport(KeepPosition::m_fPos), player->Teleport(KeepPosition::m_fPos));
+                    KeepPosition::m_fPos = CVector(0, 0, 0);
                 }
             }
         }
@@ -200,12 +200,12 @@ void Player::Init()
         }
 
 #ifdef GTASA
-        if (m_bDrunkEffect && !m_TopDownCamera::m_bEnabled)
+        if (m_bDrunkEffect && !TopDownCamera::m_bEnabled)
         {
             Command<eScriptCommands::COMMAND_SET_PLAYER_DRUNKENNESS> (0, 100);
         }
 
-        if (m_TopDownCamera::m_bEnabled)
+        if (TopDownCamera::m_bEnabled)
         {
             TopDownCameraView();
         }
@@ -303,8 +303,8 @@ void Player::ChangePlayerCloth(std::string& name)
 #ifdef GTASA
 void Player::ChangePlayerModel(std::string& model)
 {
-    bool custom_skin = std::find(m_CustomSkins::m_List.begin(), m_CustomSkins::m_List.end(), model) !=
-                       m_CustomSkins::m_List.end();
+    bool custom_skin = std::find(CustomSkins::m_List.begin(), CustomSkins::m_List.end(), model) !=
+                       CustomSkins::m_List.end();
 
     if (Ped::m_PedData.m_pData->Contains(model.c_str()) || custom_skin)
     {
@@ -409,7 +409,7 @@ void Player::ShowPage()
 #ifdef GTASA
             Ui::CheckboxAddress(TEXT("Player.BountyYourself"), 0x96913F);
 
-            ImGui::BeginDisabled(m_TopDownCamera::m_bEnabled);
+            ImGui::BeginDisabled(TopDownCamera::m_bEnabled);
             if (Ui::CheckboxWithHint(TEXT("Player.DrunkEffect"), &m_bDrunkEffect))
             {
                 if (!m_bDrunkEffect)
@@ -532,7 +532,7 @@ void Player::ShowPage()
             }
 #endif
             Ui::CheckboxAddress(TEXT("Player.NoFee"), (int)&pInfo->m_bGetOutOfJailFree);
-            Ui::CheckboxWithHint(TEXT("Player.RespawnDieLoc"), &m_KeepPosition::m_bEnabled, TEXT("Player.RespawnDieLocTip"));
+            Ui::CheckboxWithHint(TEXT("Player.RespawnDieLoc"), &KeepPosition::m_bEnabled, TEXT("Player.RespawnDieLocTip"));
             
 #ifdef GTASA
             static bool sprintInt = false;
@@ -672,12 +672,12 @@ void Player::ShowPage()
             Ui::EditStat(TEXT("Player.Stamina"), STAT_STAMINA);
             if (ImGui::CollapsingHeader(TEXT("Player.TopDownCamera")))
             {
-                if (ImGui::Checkbox(TEXT("Window.Enabled"), &m_TopDownCamera::m_bEnabled))
+                if (ImGui::Checkbox(TEXT("Window.Enabled"), &TopDownCamera::m_bEnabled))
                 {
                     Command<Commands::RESTORE_CAMERA_JUMPCUT>();
                 }
                 ImGui::Spacing();
-                ImGui::SliderFloat(TEXT("Player.CameraZoom"), &m_TopDownCamera::m_fOffset, 20.0f, 60.0f);
+                ImGui::SliderFloat(TEXT("Player.CameraZoom"), &TopDownCamera::m_fOffset, 20.0f, 60.0f);
                 ImGui::Spacing();
                 ImGui::Separator();
             }
@@ -850,15 +850,15 @@ void Player::ShowPage()
                     if (m_bModloaderInstalled)
                     {
                         Ui::FilterWithHint(TEXT("Window.Search"), m_ClothData.m_Filter,
-                                           std::string(TEXT("Player.TotalSkins") + std::to_string(m_CustomSkins::m_List.size()))
+                                           std::string(TEXT("Player.TotalSkins") + std::to_string(CustomSkins::m_List.size()))
                                            .c_str());
                         Ui::ShowTooltip(TEXT("Player.CustomSkinsDirTip"));
                         ImGui::Spacing();
                         ImGui::TextWrapped(TEXT("Player.CustomSkinsTip"));
                         ImGui::Spacing();
-                        for (std::string name : m_CustomSkins::m_List)
+                        for (std::string name : CustomSkins::m_List)
                         {
-                            if (m_CustomSkins::m_Filter.PassFilter(name.c_str()))
+                            if (CustomSkins::m_Filter.PassFilter(name.c_str()))
                             {
                                 if (ImGui::MenuItem(name.c_str()))
                                 {

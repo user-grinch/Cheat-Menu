@@ -16,7 +16,7 @@ private:
     static inline bool m_bLockSpeed;
     static inline float m_fLockSpeed;
     static inline std::vector<std::vector<float>> m_CarcolsColorData;
-    struct m_Paint
+    struct PaintData
     {
         static inline bool m_bMatFilter = true;
         static inline int m_nRadioButton = 1;
@@ -31,7 +31,7 @@ private:
     static inline bool m_bMoreTrainCams;
     static inline bool m_bNoDerail;
     static inline std::map<int, std::string> m_VehicleIDE;
-    struct m_Neon
+    struct NeonData
     {
         static inline float m_fColorPicker[3] { 0, 0, 0 };
         static inline bool m_bRainbowEffect;
@@ -42,7 +42,7 @@ private:
     static inline ResourceStore m_TuneData { "components", eResourceType::TYPE_IMAGE, ImVec2(100, 80) };
 #endif
 
-    struct m_Spawner
+    struct Spawner
     {
 #ifdef GTASA
         static inline ResourceStore m_VehData { "vehicles", eResourceType::TYPE_IMAGE, ImVec2(100, 75)};
@@ -53,7 +53,7 @@ private:
         static inline bool m_bSpawnInAir = true;
         static inline char m_nLicenseText[9];
     };
-    struct m_UnlimitedNitro
+    struct UnlimitedNitro
     {
         static inline bool m_bEnabled;
         static inline bool m_bCompAdded;

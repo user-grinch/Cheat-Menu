@@ -7,7 +7,7 @@ private:
     static inline bool m_bHealthRegen;
     static inline bool m_bGodMode;
     static inline bool m_bModloaderInstalled;
-    struct m_KeepPosition
+    struct KeepPosition
     {
         static inline bool m_bEnabled = false;
         static inline CVector m_fPos;
@@ -20,13 +20,13 @@ private:
     static inline bool m_bFastSprint;
     static inline int m_nUiBodyState;
     static inline ResourceStore m_ClothData { "clothes", eResourceType::TYPE_IMAGE, ImVec2(70, 100)};
-    struct m_CustomSkins
+    struct CustomSkins
     {
         static inline ImGuiTextFilter m_Filter;
         static inline std::vector<std::string> m_List;
     };
 
-    struct m_TopDownCamera
+    struct TopDownCamera
     {
         static inline bool m_bEnabled = false;
         static inline float m_fOffset = 40.0f;

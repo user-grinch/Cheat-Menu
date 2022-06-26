@@ -30,9 +30,9 @@ void Animation::PlayCutscene(std::string& rootKey, std::string& cutsceneId, std:
     CPlayerPed* pPlayer = FindPlayerPed();
     if (pPlayer)
     {
-        m_Cutscene::m_SceneName = cutsceneId;
+        Cutscene::m_SceneName = cutsceneId;
         Command<Commands::LOAD_CUTSCENE>(cutsceneId.c_str());
-        m_Cutscene::m_nInterior = pPlayer->m_nAreaCode;
+        Cutscene::m_nInterior = pPlayer->m_nAreaCode;
         pPlayer->m_nAreaCode = std::stoi(interior);
         Command<Commands::SET_AREA_VISIBLE>(pPlayer->m_nAreaCode);
     }
@@ -47,7 +47,7 @@ void Animation::PlayParticle(std::string& rootKey, std::string& particle, std::s
         int handle;
         Command<Commands::CREATE_FX_SYSTEM>(particle.c_str(), pos.x, pos.y, pos.z, 1, &handle);
         Command<Commands::PLAY_FX_SYSTEM>(handle);
-        m_Particle::m_nParticleList.push_back(handle);
+        Particle::m_nParticleList.push_back(handle);
     }
 }
 
@@ -56,8 +56,8 @@ void Animation::RemoveParticle(std::string& ifp, std::string& particle, std::str
 {
     if (ifp == "Custom")
     {
-        m_Particle::m_Data.m_pData->RemoveKey("Custom", particle.c_str());
-        m_Particle::m_Data.m_pData->Save();
+        Particle::m_Data.m_pData->RemoveKey("Custom", particle.c_str());
+        Particle::m_Data.m_pData->Save();
         SetHelpMessage(TEXT("Animation.ParticleRemoved"));
     }
     else
@@ -223,7 +223,7 @@ void Animation::Init()
     Events::processScriptsEvent += []
     {
         CPlayerPed* pPlayer = FindPlayerPed();
-        if (m_Cutscene::m_bRunning)
+        if (Cutscene::m_bRunning)
         {
             if (Command<Commands::HAS_CUTSCENE_FINISHED>())
             {
@@ -232,18 +232,18 @@ void Animation::Init()
                     return;
                 }
 
-                pPlayer->m_nAreaCode = m_Cutscene::m_nInterior;
+                pPlayer->m_nAreaCode = Cutscene::m_nInterior;
                 Command<Commands::SET_AREA_VISIBLE>(pPlayer->m_nAreaCode);
-                m_Cutscene::m_nInterior = 0;
+                Cutscene::m_nInterior = 0;
                 TheCamera.Fade(0, 1);
             }
         }
         else
         {
-            if (m_Cutscene::m_SceneName != "" && Command<Commands::HAS_CUTSCENE_LOADED>())
+            if (Cutscene::m_SceneName != "" && Command<Commands::HAS_CUTSCENE_LOADED>())
             {
                 Command<Commands::START_CUTSCENE>();
-                m_Cutscene::m_bRunning = true;
+                Cutscene::m_bRunning = true;
             }
         }
 
@@ -330,7 +330,7 @@ void Animation::ShowPage()
                 if (ImGui::BeginChild("Anims Child"))
                 {
                     ImGui::Spacing();
-                    Ui::DrawJSON(m_AnimData, PlayAnimation, RemoveAnimation);
+                    Ui::DrawList(m_AnimData, PlayAnimation, RemoveAnimation);
                     ImGui::EndChild();
                 }
             }
@@ -342,15 +342,15 @@ void Animation::ShowPage()
             ImGui::Spacing();
             if (ImGui::Button(TEXT("Animation.StopCutscene"), Ui::GetSize()))
             {
-                if (m_Cutscene::m_bRunning)
+                if (Cutscene::m_bRunning)
                 {
                     Command<Commands::CLEAR_CUTSCENE>();
-                    m_Cutscene::m_bRunning = false;
-                    m_Cutscene::m_SceneName = "";
+                    Cutscene::m_bRunning = false;
+                    Cutscene::m_SceneName = "";
                     CPlayerPed* player = FindPlayerPed();
-                    player->m_nAreaCode = m_Cutscene::m_nInterior;
+                    player->m_nAreaCode = Cutscene::m_nInterior;
                     Command<Commands::SET_AREA_VISIBLE>(player->m_nAreaCode);
-                    m_Cutscene::m_nInterior = 0;
+                    Cutscene::m_nInterior = 0;
                     TheCamera.Fade(0, 1);
                 }
             }
@@ -359,7 +359,7 @@ void Animation::ShowPage()
             if (ImGui::BeginChild("Cutscene Child"))
             {
                 ImGui::Spacing();
-                Ui::DrawJSON(m_Cutscene::m_Data, PlayCutscene, nullptr);
+                Ui::DrawList(Cutscene::m_Data, PlayCutscene, nullptr);
                 ImGui::EndChild();
             }
             ImGui::EndTabItem();
@@ -369,17 +369,17 @@ void Animation::ShowPage()
             ImGui::Spacing();
             if (ImGui::Button(TEXT("Animation.RemoveAll"), Ui::GetSize(2)))
             {
-                for (int& p : m_Particle::m_nParticleList)
+                for (int& p : Particle::m_nParticleList)
                 {
                     Command<Commands::KILL_FX_SYSTEM>(p);
                 }
-                m_Particle::m_nParticleList.clear();
+                Particle::m_nParticleList.clear();
             }
             ImGui::SameLine();
             if (ImGui::Button(TEXT("Animation.RemoveLatest"), Ui::GetSize(2)))
             {
-                Command<Commands::KILL_FX_SYSTEM>(m_Particle::m_nParticleList.back()); // stop if anything is running
-                m_Particle::m_nParticleList.pop_back();
+                Command<Commands::KILL_FX_SYSTEM>(Particle::m_nParticleList.back()); // stop if anything is running
+                Particle::m_nParticleList.pop_back();
             }
             ImGui::Spacing();
             if (Ui::CheckboxBitFlag(TEXT("Animation.InvisiblePlayer"), pPlayer->m_nPedFlags.bDontRender))
@@ -389,20 +389,20 @@ void Animation::ShowPage()
             ImGui::Spacing();
             if (ImGui::CollapsingHeader(TEXT("Window.AddNew")))
             {
-                ImGui::InputTextWithHint(TEXT("Animation.ParticleName"), "kkjj_on_fire", m_Particle::m_NameBuffer, INPUT_BUFFER_SIZE);
+                ImGui::InputTextWithHint(TEXT("Animation.ParticleName"), "kkjj_on_fire", Particle::m_NameBuffer, INPUT_BUFFER_SIZE);
                 ImGui::Spacing();
                 if (ImGui::Button(TEXT("Animation.AddParticle"), Ui::GetSize()))
                 {
-                    std::string key = std::string("Custom.") + m_Particle::m_NameBuffer;
+                    std::string key = std::string("Custom.") + Particle::m_NameBuffer;
                     m_AnimData.m_pData->Set(key.c_str(), std::string("Dummy"));
-                    m_Particle::m_Data.m_pData->Save();
+                    Particle::m_Data.m_pData->Save();
                 }
             }
             ImGui::Spacing();
             if (ImGui::BeginChild("Anims Child"))
             {
                 ImGui::Spacing();
-                Ui::DrawJSON(m_Particle::m_Data, PlayParticle, RemoveParticle);
+                Ui::DrawList(Particle::m_Data, PlayParticle, RemoveParticle);
                 ImGui::EndChild();
             }
             ImGui::EndTabItem();

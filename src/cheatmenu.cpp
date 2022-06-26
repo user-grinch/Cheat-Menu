@@ -33,7 +33,7 @@ void CheatMenu::DrawWindow()
     else
     {
         bRunning = true;
-        if (m_bShowMenu || BY_GAME(Menu::m_Commands::m_bShowMenu, true, true))
+        if (m_bShowMenu || BY_GAME(Menu::Commands::m_bShowMenu, true, true))
         {
             if (m_bShowMenu)
             {
@@ -239,12 +239,12 @@ void CheatMenu::Init()
 
             if (commandWindow.Pressed())
             {
-                if (Menu::m_Commands::m_bShowMenu)
+                if (Menu::Commands::m_bShowMenu)
                 {
                     Menu::ProcessCommands();
-                    strcpy(Menu::m_Commands::m_nInputBuffer, "");
+                    strcpy(Menu::Commands::m_nInputBuffer, "");
                 }
-                Menu::m_Commands::m_bShowMenu = !Menu::m_Commands::m_bShowMenu;
+                Menu::Commands::m_bShowMenu = !Menu::Commands::m_bShowMenu;
             }
 
             bool mouseState = D3dHook::GetMouseState();

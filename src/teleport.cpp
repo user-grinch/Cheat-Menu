@@ -40,14 +40,14 @@ void Teleport::Init()
 
     Events::processScriptsEvent += []
     {
-        if ((m_Teleport::m_bEnabled == true) && ((CTimer::m_snTimeInMilliseconds - m_Teleport::m_nTimer) > 500))
+        if ((QuicKTP::m_bEnabled == true) && ((CTimer::m_snTimeInMilliseconds - QuicKTP::m_nTimer) > 500))
         {
             CPlayerPed* player = FindPlayerPed();
 
 #ifdef GTASA
             CEntity* player_entity = FindPlayerEntity(-1);
-            m_Teleport::m_fPos.z = CWorld::FindGroundZFor3DCoord(m_Teleport::m_fPos.x, m_Teleport::m_fPos.y,
-                    m_Teleport::m_fPos.z + 100.0f, nullptr, &player_entity) + 1.0f;
+            QuicKTP::m_fPos.z = CWorld::FindGroundZFor3DCoord(QuicKTP::m_fPos.x, QuicKTP::m_fPos.y,
+                    QuicKTP::m_fPos.z + 100.0f, nullptr, &player_entity) + 1.0f;
 #else
             m_Teleport::m_fPos.z = CWorld::FindGroundZFor3DCoord(m_Teleport::m_fPos.x, m_Teleport::m_fPos.y,
                     m_Teleport::m_fPos.z + 100.0f, nullptr) + 1.0f;
@@ -56,14 +56,14 @@ void Teleport::Init()
 
             if (pVeh && BY_GAME(player->m_nPedFlags.bInVehicle, player->m_pVehicle, player->m_pVehicle))
             {
-                BY_GAME(pVeh->Teleport(m_Teleport::m_fPos, false), pVeh->Teleport(m_Teleport::m_fPos), player->Teleport(m_Teleport::m_fPos));
+                BY_GAME(pVeh->Teleport(QuicKTP::m_fPos, false), pVeh->Teleport(QuicKTP::m_fPos), player->Teleport(QuicKTP::m_fPos));
             }
             else
             {
-                BY_GAME(player->Teleport(m_Teleport::m_fPos, false), player->Teleport(m_Teleport::m_fPos), player->Teleport(m_Teleport::m_fPos));
+                BY_GAME(player->Teleport(QuicKTP::m_fPos, false), player->Teleport(QuicKTP::m_fPos), player->Teleport(QuicKTP::m_fPos));
             }
 
-            m_Teleport::m_bEnabled = false;
+            QuicKTP::m_bEnabled = false;
             Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(player), false);
             Command<Commands::RESTORE_CAMERA_JUMPCUT>();
             TheCamera.Fade(0, 1);
@@ -100,9 +100,9 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
         pos = targetBlip.m_vecPos;
         pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, nullptr, &pPlayerEntity) + 500.f;
 
-        m_Teleport::m_fPos = pos;
-        m_Teleport::m_nTimer = CTimer::m_snTimeInMilliseconds;
-        m_Teleport::m_bEnabled = true;
+        QuicKTP::m_fPos = pos;
+        QuicKTP::m_nTimer = CTimer::m_snTimeInMilliseconds;
+        QuicKTP::m_bEnabled = true;
         TheCamera.Fade(0, 0);
         Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(pPlayer), true);
     }
@@ -298,7 +298,7 @@ void Teleport::ShowPage()
             }
 
             ImGui::Spacing();
-            Ui::DrawJSON(m_tpData, TeleportToLocation, RemoveTeleportEntry);
+            Ui::DrawList(m_tpData, TeleportToLocation, RemoveTeleportEntry);
             ImGui::EndTabItem();
         }
         ImGui::EndTabBar();

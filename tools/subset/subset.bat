@@ -1,0 +1,1 @@
+pyftsubset src.ttf --unicodes-file="in.txt" --output-file="text.ttf"
