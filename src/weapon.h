@@ -4,6 +4,12 @@
 class Weapon
 {
 private:
+    static inline bool m_bFastReload;
+    static inline bool m_bHugeDamage;
+    static inline bool m_bLongRange;
+    static inline int m_nAmmoCount = 99999;
+    static inline int m_nSelectedWeapon;
+
 #ifdef GTASA
     static inline bool m_bAutoAim;
     static inline bool m_bRapidFire;
@@ -24,37 +30,26 @@ private:
         {WEAPON_UNARMED, WEAPON_UNARMED, WEAPON_UNARMED}, // Gang 9
         {WEAPON_UNARMED, WEAPON_UNARMED, WEAPON_UNARMED}, // Gang 10
     };
-
-    static inline std::vector<std::string> m_GangList =
-    {
-        "Ballas", "Grove street families", "Los santos vagos", "San fierro rifa",
-        "Da nang boys", "Mafia", "Mountain cloud triad", "Varrio los aztecas", "Gang9", "Gang10"
-    };
-#else
-    static inline bool m_bInfiniteAmmo;
-#endif
-    static inline bool m_bFastReload;
-    static inline bool m_bHugeDamage;
-    static inline bool m_bLongRange;
-    static inline int m_nAmmoCount = 99999;
-    static inline uchar m_nCurrentWeaponSlot = -1;
-    static inline int m_nSelectedWeapon;
-
-public:
-#ifdef GTASA
     static inline ResourceStore m_WeaponData { "weapons", eResourceType::TYPE_BOTH, ImVec2(65, 65) };
 
-    static void GiveWeaponToPlayer(std::string& weapon_type);
-    static void SetGangWeapon(std::string& weapon_type);
 #else
+    static inline bool m_bInfiniteAmmo;
     static inline ResourceStore m_WeaponData { "weapons", eResourceType::TYPE_TEXT };
 
-    static void GiveWeaponToPlayer(std::string& rootkey, std::string& model, std::string& name);
 #endif
 
+public:
     Weapon() = delete;
     Weapon(const Weapon&) = delete;
 
     static void Init();
     static void ShowPage();
+    
+#ifdef GTASA
+    static void GiveWeaponToPlayer(std::string& weapon_type);
+    static void SetGangWeapon(std::string& weapon_type);
+#else
+    static void GiveWeaponToPlayer(std::string& rootkey, std::string& model, std::string& name);
+#endif
 };
+

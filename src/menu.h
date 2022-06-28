@@ -53,6 +53,6 @@ public:
     static void Init();
     static void ShowPage();
     static void DrawOverlay();
-    static void DrawShortcutsWindow();
+    static void DrawCommandWindow();
     static void ProcessCommands();
 };

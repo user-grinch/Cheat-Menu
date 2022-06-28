@@ -27,9 +27,9 @@ void Weapon::Init()
         }
 #endif
 
-
-        uchar slot = BY_GAME(player->m_nActiveWeaponSlot, player->m_nSelectedWepSlot, player->m_nSelectedWepSlot);
-        if (m_nCurrentWeaponSlot != slot)
+        static uint8_t curWeaponSlot;
+        uint8_t slot = BY_GAME(player->m_nActiveWeaponSlot, player->m_nSelectedWepSlot, player->m_nSelectedWepSlot);
+        if (curWeaponSlot != slot)
         {
             eWeaponType weaponType = player->m_aWeapons[slot].m_eWeaponType;
 
@@ -83,7 +83,7 @@ void Weapon::Init()
                 pWeaponInfo->m_nFlags.bMoveFire = true;
             }
 #endif
-            m_nCurrentWeaponSlot = slot;
+            curWeaponSlot = slot;
         }
     };
 }
@@ -366,9 +366,15 @@ void Weapon::ShowPage()
         if (ImGui::BeginTabItem(TEXT("Weapon.GangWeaponEditor")))
         {
             ImGui::Spacing();
-            Ui::ListBox(TEXT("Weapon.SelectGang"), m_GangList, m_nSelectedGang);
-            std::vector<std::string> vec = {TEXT("Weapon.Weapon1"), TEXT("Weapon.Weapon2"), TEXT("Weapon.Weapon3")};
-            Ui::ListBox(TEXT("Ped.SelectWeapon"), vec, m_nSelectedWeapon);
+            static const char* gangList =
+            {
+                "Ballas\0Grove street families\0Los santos vagos\0San fierro rifa\0Da nang boys\0"
+                "Mafia\0Mountain cloud triad\0Varrio los aztecas\0Gang9\0Gang10\0"
+            };
+            std::string str = std::format("{}\0{}\0{}\0", TEXT("Weapon.Weapon1"), TEXT("Weapon.Weapon2"),
+                                        TEXT("Weapon.Weapon3"));
+            ImGui::Combo(TEXT("Weapon.SelectGang"), &m_nSelectedGang, gangList);
+            ImGui::Combo(TEXT("Ped.SelectWeapon"), &m_nSelectedWeapon, str.c_str());
             ImGui::Spacing();
 
             std::string key = std::to_string(m_nGangWeaponList[m_nSelectedGang][m_nSelectedWeapon]);

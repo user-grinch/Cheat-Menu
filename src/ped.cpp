@@ -7,17 +7,24 @@
 
 #ifdef GTASA
 #include <ePedBones.h>
+
+static const char* pedTypeList = "Civ Male\0Civ Female\0Cop\0Ballas\0Grove Street Families"
+"\0Los Santos Vagos\0San Fierro Rifa\0Da Nang Boys\0Mafia\0Mountain Cloud Triads"
+"\0Varrio Los Aztecas\0Gang 9\0Medic\0Dealer\0Criminal\0Fireman\0Prostitute\0";
+
+#elif GTAVC
+static const char* pedTypeList = "Civ Male\0Civ Female\0Cop (crash)\0Cubans\0Haitians\0Streetwannabe's"
+"\0Diaz' Gang\0Security Guards\0Biker Gang\0Vercetti Gang\0Golfers\0Gang 9\0Emergency\0Fireman"
+"\0Criminal\0Unused\0Prostitute\0Special\0";
+
+#else
+static const char* pedTypeList = L"Civ Male\0Civ Female\0Cop\0Leones\0Triads\0Diablos\0Yakuza\0Yardies\0Colombians\0"
+L"Hoods\0unused\0unused\0Emergency\0Fireman\0Criminal\0unused\0Prostitute\0Special\0";
+
 #endif
 
 void Ped::Init()
 {
-#ifdef GTASA
-    if (GetModuleHandle("ExGangWars.asi"))
-    {
-        m_bExGangWarsInstalled = true;
-    }
-#endif
-
     /*
     	Taken from gta chaos mod by Lordmau5 & _AG
     	TODO: Implement in VC too
@@ -85,7 +92,7 @@ void Ped::SpawnPed(std::string& model)
 void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
 #endif
 {
-    if (SpawnPed::m_List.size() == SPAWN_PED_LIMIT)
+    if (Spawner::m_List.size() == SPAWN_PED_LIMIT)
     {
         SetHelpMessage(TEXT("Ped.MaxLimit"));
         return;
@@ -117,7 +124,7 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
             CStreaming::RequestSpecialChar(currentSlot, name.c_str(), PRIORITY_REQUEST);
             CStreaming::LoadAllRequestedModels(true);
 
-            Command<Commands::CREATE_CHAR>(SpawnPed::m_nSelectedPedType + 4, 290 + currentSlot, pos.x, pos.y, pos.z + 1, &hplayer);
+            Command<Commands::CREATE_CHAR>(Spawner::m_nSelectedPedType + 4, 290 + currentSlot, pos.x, pos.y, pos.z + 1, &hplayer);
             CStreaming::SetSpecialCharIsDeletable(290 + currentSlot);
 
             // SA has 10 slots
@@ -154,31 +161,31 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
             CStreaming::RequestModel(iModel, eStreamingFlags::PRIORITY_REQUEST);
             CStreaming::LoadAllRequestedModels(false);
 
-            Command<Commands::CREATE_CHAR>(SpawnPed::m_nSelectedPedType + 4, iModel, pos.x, pos.y, pos.z + 1, &hplayer);
+            Command<Commands::CREATE_CHAR>(Spawner::m_nSelectedPedType + 4, iModel, pos.x, pos.y, pos.z + 1, &hplayer);
             CStreaming::SetModelIsDeletable(iModel);
         }
 
         ped = CPools::GetPed(hplayer);
 
-        if (SpawnPed::m_bPedMove)
+        if (Spawner::m_bPedMove)
         {
-            SpawnPed::m_List.push_back(ped);
+            Spawner::m_List.push_back(ped);
         }
         else
         {
             Command<Commands::MARK_CHAR_AS_NO_LONGER_NEEDED>(hplayer);
         }
-        ped->m_nPedFlags.bPedIsBleeding = SpawnPed::m_bPedBleed;
-        ped->m_nWeaponAccuracy = SpawnPed::m_nAccuracy;
-        ped->m_fHealth = SpawnPed::m_nPedHealth;
+        ped->m_nPedFlags.bPedIsBleeding = Spawner::m_bPedBleed;
+        ped->m_nWeaponAccuracy = Spawner::m_nAccuracy;
+        ped->m_fHealth = Spawner::m_nPedHealth;
 #ifdef GTASA
-        if (SpawnPed::m_nWeaponId != 0)
+        if (Spawner::m_nWeaponId != 0)
         {
             int model = 0;
-            Command<Commands::GET_WEAPONTYPE_MODEL>(SpawnPed::m_nWeaponId, &model);
+            Command<Commands::GET_WEAPONTYPE_MODEL>(Spawner::m_nWeaponId, &model);
             CStreaming::RequestModel(model, PRIORITY_REQUEST);
             CStreaming::LoadAllRequestedModels(false);
-            Command<Commands::GIVE_WEAPON_TO_CHAR>(hplayer, SpawnPed::m_nWeaponId, 999);
+            Command<Commands::GIVE_WEAPON_TO_CHAR>(hplayer, Spawner::m_nWeaponId, 999);
         }
 #endif
     }
@@ -240,67 +247,6 @@ void Ped::ShowPage()
         {
             ImGui::Spacing();
             ImGui::BeginChild("MenusChild");
-
-#ifdef GTASA
-            if (ImGui::CollapsingHeader(TEXT("Ped.GangWars")))
-            {
-                if (ImGui::Button(TEXT("Ped.StartWar"), ImVec2(Ui::GetSize(2))))
-                {
-                    if (Util::GetLargestGangInZone() == 1)
-                    {
-                        CGangWars::StartDefensiveGangWar();
-                    }
-                    else
-                    {
-                        CGangWars::StartOffensiveGangWar();
-                    }
-                    CGangWars::bGangWarsActive = true;
-                }
-                ImGui::SameLine();
-                if (ImGui::Button(TEXT("Ped.EndWar"), ImVec2(Ui::GetSize(2))))
-                {
-                    CGangWars::EndGangWar(true);
-                }
-
-                ImGui::Dummy(ImVec2(0, 20));
-                ImGui::TextWrapped(TEXT("Ped.ZoneDensity"));
-                ImGui::Spacing();
-
-                ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 2);
-                for (int i = 0; i != 10; ++i)
-                {
-                    CVector pos = FindPlayerPed()->GetPosition();
-                    CZone szone = CZone();
-                    CZone* pZone = &szone;
-
-                    CZoneInfo* zoneInfo = CTheZones::GetZoneInfo(&pos, &pZone);
-                    int density = zoneInfo->m_nGangDensity[i];
-
-                    if (ImGui::SliderInt(m_GangList[i].c_str(), &density, 0, 127))
-                    {
-                        zoneInfo->m_nGangDensity[i] = static_cast<char>(density);
-                        Command<Commands::CLEAR_SPECIFIC_ZONES_TO_TRIGGER_GANG_WAR>();
-                        CGangWars::bGangWarsActive = true;
-                    }
-                }
-                ImGui::PopItemWidth();
-                ImGui::Spacing();
-
-                if (!m_bExGangWarsInstalled)
-                {
-                    ImGui::TextWrapped(TEXT("Ped.ExGangWarsTip"));
-                    ImGui::Spacing();
-                    if (ImGui::Button(TEXT("Ped.DownloadExGangWars"), Ui::GetSize(1)))
-                    {
-                        ShellExecute(NULL, "open", "https://gtaforums.com/topic/682194-extended-gang-wars/", NULL, NULL,
-                                     SW_SHOWNORMAL);
-                    }
-                }
-
-                ImGui::Spacing();
-                ImGui::Separator();
-            }
-#endif
             Ui::EditReference<float>(TEXT("Ped.PedDensityMul"), CPopulation::PedDensityMultiplier, 0, 1, 10);
 #ifdef GTASA
             if (ImGui::CollapsingHeader(TEXT("Ped.RecruitAnyone")))
@@ -343,12 +289,12 @@ void Ped::ShowPage()
             ImGui::Spacing();
             if (ImGui::Button(TEXT("Ped.RemoveFrozen"), Ui::GetSize(1)))
             {
-                for (CPed* ped : SpawnPed::m_List)
+                for (CPed* ped : Spawner::m_List)
                 {
                     CWorld::Remove(ped);
                     ped->Remove();
                 }
-                SpawnPed::m_List.clear();
+                Spawner::m_List.clear();
             }
             ImGui::Spacing();
             if (ImGui::BeginTabBar("SpawnPedBar"))
@@ -374,41 +320,42 @@ void Ped::ShowPage()
                     ImGui::Spacing();
                     ImGui::BeginChild("PedCOnfig");
                     ImGui::Columns(2, 0, false);
-                    Ui::CheckboxWithHint(TEXT("Ped.NoMove"), &SpawnPed::m_bPedMove);
+                    Ui::CheckboxWithHint(TEXT("Ped.NoMove"), &Spawner::m_bPedMove);
                     ImGui::NextColumn();
-                    Ui::CheckboxWithHint(TEXT("Ped.PedBleed"), &SpawnPed::m_bPedBleed);
+                    Ui::CheckboxWithHint(TEXT("Ped.PedBleed"), &Spawner::m_bPedBleed);
                     ImGui::Columns(1);
 
                     ImGui::Spacing();
-                    ImGui::SliderInt(TEXT("Ped.Accuracy"), &SpawnPed::m_nAccuracy, 0.0, 100.0);
-                    if (ImGui::InputInt(TEXT("Ped.Health"), &SpawnPed::m_nPedHealth))
+                    ImGui::SliderInt(TEXT("Ped.Accuracy"), &Spawner::m_nAccuracy, 0.0, 100.0);
+                    if (ImGui::InputInt(TEXT("Ped.Health"), &Spawner::m_nPedHealth))
                     {
-                        if (SpawnPed::m_nPedHealth > 1000)
+                        if (Spawner::m_nPedHealth > 1000)
                         {
-                            SpawnPed::m_nPedHealth = 1000;
+                            Spawner::m_nPedHealth = 1000;
                         }
 
-                        if (SpawnPed::m_nPedHealth < 0)
+                        if (Spawner::m_nPedHealth < 0)
                         {
-                            SpawnPed::m_nPedHealth = 0;
+                            Spawner::m_nPedHealth = 0;
                         }
                     }
-                    Ui::ListBox(TEXT("Ped.PedType"), SpawnPed::m_PedTypeList, SpawnPed::m_nSelectedPedType);
+                    ImGui::Combo(TEXT("Ped.PedType"), &Spawner::m_nSelectedPedType, pedTypeList);
 
+                    static std::string weaponName = "None";
                     ImGui::Spacing();
-                    ImGui::Text(TEXT("Ped.SelectedWeapon"), SpawnPed::m_nWeaponName.c_str());
+                    ImGui::Text(TEXT("Ped.SelectedWeapon"), weaponName.c_str());
                     ImGui::Spacing();
 #ifdef GTASA
                     Ui::DrawImages(Weapon::m_WeaponData,
                                    [](std::string str)
                     {
-                        SpawnPed::m_nWeaponId = std::stoi(str);
+                        Spawner::m_nWeaponId = std::stoi(str);
                     },
                     nullptr,
                     [](std::string str)
                     {
-                        SpawnPed::m_nWeaponName = Weapon::m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
-                        return SpawnPed::m_nWeaponName;
+                        weaponName = Weapon::m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
+                        return weaponName;
                     },
                     [](std::string str)
                     {
@@ -417,10 +364,10 @@ void Ped::ShowPage()
                                   );
 #else
                     Ui::DrawList(Weapon::m_WeaponData,
-                                 [](std::string& root, std::string& key, std::string& id)
+                    [](std::string& root, std::string& key, std::string& id)
                     {
                         SpawnPed::m_nWeaponId = std::stoi(id);
-                        SpawnPed::m_nWeaponName = key;
+                        weaponName = key;
                     },
                     nullptr);
 #endif
@@ -432,6 +379,67 @@ void Ped::ShowPage()
             }
             ImGui::EndTabItem();
         }
+#ifdef GTASA
+        if (ImGui::BeginTabItem(TEXT("Ped.GangWars")))
+        {
+            ImGui::Spacing();
+            if (ImGui::Button(TEXT("Ped.StartWar"), ImVec2(Ui::GetSize(2))))
+            {
+                if (Util::GetLargestGangInZone() == 1)
+                {
+                    CGangWars::StartDefensiveGangWar();
+                }
+                else
+                {
+                    CGangWars::StartOffensiveGangWar();
+                }
+                CGangWars::bGangWarsActive = true;
+            }
+            ImGui::SameLine();
+            if (ImGui::Button(TEXT("Ped.EndWar"), ImVec2(Ui::GetSize(2))))
+            {
+                CGangWars::EndGangWar(true);
+            }
+
+            ImGui::Dummy(ImVec2(0, 20));
+            ImGui::TextWrapped(TEXT("Ped.ZoneDensity"));
+            ImGui::Spacing();
+
+            static const char* m_GangList[] =
+            {
+                "Ballas", "Grove street families", "Los santos vagos", "San fierro rifa",
+                "Da nang boys", "Mafia", "Mountain cloud triad", "Varrio los aztecas", "Gang9", "Gang10"
+            };
+            ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 2);
+            for (int i = 0; i != 10; ++i)
+            {
+                CVector pos = FindPlayerPed()->GetPosition();
+                CZoneInfo* info = CTheZones::GetZoneInfo(&pos, nullptr);
+                int density = info->m_nGangDensity[i];
+                if (ImGui::SliderInt(m_GangList[i], &density, 0, 127))
+                {
+                    info->m_nGangDensity[i] = static_cast<int8_t>(density);
+                    Command<Commands::CLEAR_SPECIFIC_ZONES_TO_TRIGGER_GANG_WAR>();
+                    CGangWars::bGangWarsActive = true;
+                }
+            }
+            ImGui::PopItemWidth();
+            static bool pluginRequired = (GetModuleHandle("ExGangWars.asi") == 0); 
+            if (pluginRequired)
+            {
+                ImGui::Spacing();
+                ImGui::TextWrapped(TEXT("Ped.ExGangWarsTip"));
+                ImGui::Spacing();
+                if (ImGui::Button(TEXT("Ped.DownloadExGangWars"), Ui::GetSize(1)))
+                {
+                    ShellExecute(NULL, "open", "https://gtaforums.com/topic/682194-extended-gang-wars/", NULL, NULL,
+                                    SW_SHOWNORMAL);
+                }
+            }
+
+            ImGui::EndTabItem();
+        }
+#endif
         ImGui::EndTabBar();
     }
 }

@@ -18,7 +18,6 @@ private:
     static inline bool m_bAimSkinChanger;
     static inline bool m_bDrunkEffect;
     static inline bool m_bFastSprint;
-    static inline int m_nUiBodyState;
     static inline ResourceStore m_ClothData { "clothes", eResourceType::TYPE_IMAGE, ImVec2(70, 100)};
     struct CustomSkins
     {
@@ -28,26 +27,17 @@ private:
 
     struct TopDownCamera
     {
+    public:
         static inline bool m_bEnabled = false;
         static inline float m_fOffset = 40.0f;
+
+        static void Process();
     };
 
-    static inline const char* clothNameList[18] =
-    {
-        "Shirts", "Heads", "Trousers", "Shoes", "Tattoos left lower arm", "Tattoos left upper arm",
-        "Tattoos right upper arm", "Tattoos right lower arm", "Tattoos back", "Tattoos left chest",
-        "Tattoos right chest", "Tattoos stomach", "Tattoos lower back", "Necklaces", "Watches",
-        "Glasses", "Hats", "Extras"
-    };
-#else
-    static inline ResourceStore skinData { BY_GAME(NULL, "skins", "peds"), eResourceType::TYPE_TEXT };
-#endif
-
-#ifdef GTASA
     static void ChangePlayerModel(std::string& model);
     static void ChangePlayerCloth(std::string& model);
-    static void TopDownCameraView();
 #else
+    static inline ResourceStore skinData { BY_GAME(NULL, "skins", "peds"), eResourceType::TYPE_TEXT };
     static void ChangePlayerModel(std::string& cat, std::string& name, std::string& id);
 #endif
 

@@ -7,6 +7,14 @@
 #ifdef GTASA
 #include "ped.h"
 
+static inline const char* clothNameList[18] =
+{
+    "Shirts", "Heads", "Trousers", "Shoes", "Tattoos left lower arm", "Tattoos left upper arm",
+    "Tattoos right upper arm", "Tattoos right lower arm", "Tattoos back", "Tattoos left chest",
+    "Tattoos right chest", "Tattoos stomach", "Tattoos lower back", "Necklaces", "Watches",
+    "Glasses", "Hats", "Extras"
+};
+
 static inline void PlayerModelBrokenFix()
 {
     CPlayerPed* pPlayer = FindPlayerPed();
@@ -21,11 +29,11 @@ static inline void PlayerModelBrokenFix()
 	Taken from gta chaos mod by Lordmau5
 	https://github.com/gta-chaos-mod/Trilogy-ASI-Script
 */
-void Player::TopDownCameraView()
+void Player::TopDownCamera::Process()
 {
     CPlayerPed *player = FindPlayerPed ();
     CVector     pos    = player->GetPosition ();
-    float       curOffset = TopDownCamera::m_fOffset;
+    float       curOffset = m_fOffset;
 
     // drunk effect causes issues
     Command<eScriptCommands::COMMAND_SET_PLAYER_DRUNKENNESS> (0, 0);
@@ -207,7 +215,7 @@ void Player::Init()
 
         if (TopDownCamera::m_bEnabled)
         {
-            TopDownCameraView();
+            TopDownCamera::Process();
         }
 
         if (m_bAimSkinChanger && aimSkinChanger.Pressed())
@@ -612,21 +620,22 @@ void Player::ShowPage()
                 if (pPlayer->m_nModelIndex == 0)
                 {
                     ImGui::Columns(3, 0, false);
-                    if (ImGui::RadioButton(TEXT("Player.Fat"), &m_nUiBodyState, 2))
+                    static int bodyState = 0;
+                    if (ImGui::RadioButton(TEXT("Player.Fat"), &bodyState, 2))
                     {
                         CCheat::FatCheat();
                     }
 
                     ImGui::NextColumn();
 
-                    if (ImGui::RadioButton(TEXT("Player.Muscle"), &m_nUiBodyState, 1))
+                    if (ImGui::RadioButton(TEXT("Player.Muscle"), &bodyState, 1))
                     {
                         CCheat::MuscleCheat();
                     }
 
                     ImGui::NextColumn();
 
-                    if (ImGui::RadioButton(TEXT("Player.Skinny"), &m_nUiBodyState, 0))
+                    if (ImGui::RadioButton(TEXT("Player.Skinny"), &bodyState, 0))
                     {
                         CCheat::SkinnyCheat();
                     }

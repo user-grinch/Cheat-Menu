@@ -3,23 +3,24 @@
 #include "ui.h"
 #include "util.h"
 
-#ifndef GTASA
+#ifdef GTA3
+#include <RpAnimBlend.h>
+#include <CAnimationStyleDescriptor.h>
+#include <CAnimManager.h>
+#include "eAnimations.h"
+#include <CAnimBlendAssociation.h>
+
+#elif GTAVC
+
+#include "../depend/kiero/minhook/MinHook.h"
 #include <CAnimationStyleDescriptor.h>
 #include <CAnimManager.h>
 #include "eAnimations.h"
 #include <CAnimBlendAssociation.h>
 #endif
 
-#ifdef GTA3
-#include <RpAnimBlend.h>
-#endif
-
-#ifdef GTAVC
-#include "../depend/kiero/minhook/MinHook.h"
-#endif
-
 #ifdef GTASA
-void Animation::PlayCutscene(std::string& rootKey, std::string& cutsceneId, std::string& interior)
+void Cutscene::Play(std::string& rootKey, std::string& cutsceneId, std::string& interior)
 {
     if (Util::IsOnCutscene())
     {
@@ -30,15 +31,15 @@ void Animation::PlayCutscene(std::string& rootKey, std::string& cutsceneId, std:
     CPlayerPed* pPlayer = FindPlayerPed();
     if (pPlayer)
     {
-        Cutscene::m_SceneName = cutsceneId;
+        m_SceneName = cutsceneId;
         Command<Commands::LOAD_CUTSCENE>(cutsceneId.c_str());
-        Cutscene::m_nInterior = pPlayer->m_nAreaCode;
+        m_nInterior = pPlayer->m_nAreaCode;
         pPlayer->m_nAreaCode = std::stoi(interior);
         Command<Commands::SET_AREA_VISIBLE>(pPlayer->m_nAreaCode);
     }
 }
 
-void Animation::PlayParticle(std::string& rootKey, std::string& particle, std::string& dummy)
+void Particle::Play(std::string& rootKey, std::string& particle, std::string& dummy)
 {
     CPlayerPed* pPlayer = FindPlayerPed();
     if (pPlayer)
@@ -47,12 +48,12 @@ void Animation::PlayParticle(std::string& rootKey, std::string& particle, std::s
         int handle;
         Command<Commands::CREATE_FX_SYSTEM>(particle.c_str(), pos.x, pos.y, pos.z, 1, &handle);
         Command<Commands::PLAY_FX_SYSTEM>(handle);
-        Particle::m_nParticleList.push_back(handle);
+        m_nParticleList.push_back(handle);
     }
 }
 
 
-void Animation::RemoveParticle(std::string& ifp, std::string& particle, std::string& dummy)
+void Particle::Remove(std::string& ifp, std::string& particle, std::string& dummy)
 {
     if (ifp == "Custom")
     {
@@ -67,8 +68,8 @@ void Animation::RemoveParticle(std::string& ifp, std::string& particle, std::str
 }
 
 #elif GTAVC
-// Thanks to codenulls(https://github.com/codenulls/)
 
+// Thanks to codenulls(https://github.com/codenulls/)
 static auto OLD_CStreaming_RemoveModel = (bool(__cdecl*)(int))0x40D6E0;
 static bool NEW_CStreaming_RemoveModel(int modelID)
 {
@@ -81,7 +82,30 @@ static bool NEW_CStreaming_RemoveModel(int modelID)
     return OLD_CStreaming_RemoveModel(modelID);
 }
 
-void Animation::_PlayAnimation(RpClump* pClump, int animGroup, int animID, float blend)
+bool _LoadAnimationBlock(const char* szBlockName)
+{
+    CAnimBlock* pAnimBlock = CAnimManager::GetAnimationBlock(szBlockName);
+    if (pAnimBlock)
+    {
+        if (!pAnimBlock->bLoaded)
+        {
+            int animIndex = ((unsigned char*)pAnimBlock - (unsigned char*)CAnimManager::ms_aAnimBlocks) / 32;
+            CStreaming::RequestModel(7916 + animIndex, 0x20 | MISSION_REQUIRED | PRIORITY_REQUEST);
+            CStreaming::LoadAllRequestedModels(true);
+            if (pAnimBlock->bLoaded)
+            {
+                return true;
+            }
+        }
+        else
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+void _PlayAnim(RpClump* pClump, int animGroup, int animID, float blend, bool loop, bool secondary)
 {
     if (animGroup < CAnimManager::ms_numAnimAssocDefinitions)
     {
@@ -109,42 +133,20 @@ void Animation::_PlayAnimation(RpClump* pClump, int animGroup, int animID, float
     pAnimAssoc = CAnimManager::BlendAnimation(pClump, animGroup, animID, blend);
     pAnimAssoc->m_nFlags = ANIMATION_STARTED | ANIMATION_MOVEMENT;
 
-    if (m_Loop)
+    if (loop)
     {
         pAnimAssoc->m_nFlags |= ANIMATION_LOOPED;
     }
 
-    if (m_bSecondary)
+    if (secondary)
     {
         pAnimAssoc->m_nFlags |= ANIMATION_PARTIAL;
     }
 }
 
-bool Animation::_LoadAnimationBlock(const char* szBlockName)
-{
-    CAnimBlock* pAnimBlock = CAnimManager::GetAnimationBlock(szBlockName);
-    if (pAnimBlock)
-    {
-        if (!pAnimBlock->bLoaded)
-        {
-            int animIndex = ((unsigned char*)pAnimBlock - (unsigned char*)CAnimManager::ms_aAnimBlocks) / 32;
-            CStreaming::RequestModel(7916 + animIndex, 0x20 | MISSION_REQUIRED | PRIORITY_REQUEST);
-            CStreaming::LoadAllRequestedModels(true);
-            if (pAnimBlock->bLoaded)
-            {
-                return true;
-            }
-        }
-        else
-        {
-            return true;
-        }
-    }
-    return false;
-}
 #else
 
-void Animation::_PlayAnimation(RpClump* pClump, int animGroup, int animID, float blend)
+void _PlayAnim(RpClump* pClump, int animGroup, int animID, float blend, bool loop, bool secondary)
 {
     CAnimBlendAssociation* pAnimStaticAssoc = CAnimManager::GetAnimAssociation(animGroup, animID);
     CAnimBlendAssociation* pAnimAssoc = RpAnimBlendClumpGetFirstAssociation(pClump);
@@ -161,23 +163,21 @@ void Animation::_PlayAnimation(RpClump* pClump, int animGroup, int animID, float
     pAnimAssoc = CAnimManager::BlendAnimation(pClump, animGroup, animID, blend);
     pAnimAssoc->m_nFlags = 0x1 | 0x20;
 
-    if (m_Loop)
+    if (loop)
     {
         pAnimAssoc->m_nFlags |= 0x2;
     }
 
-    if (m_bSecondary)
+    if (secondary)
     {
         pAnimAssoc->m_nFlags |= 0x10;
     }
 }
 #endif
 
-
-void Animation::PlayAnimation(std::string& ifp, std::string& anim, std::string& _)
+void Animation::Play(std::string& ifp, std::string& anim, std::string& _)
 {
     CPed *pPed = m_PedAnim ? m_pTarget : FindPlayerPed();
-
     if (!pPed)
     {
         return;
@@ -208,13 +208,24 @@ void Animation::PlayAnimation(std::string& ifp, std::string& anim, std::string& 
     }
 
 #else
-    if (pPed)
-    {
-        int groupID, animID;
-        sscanf(ifp.c_str(), "%d$%d,", &groupID, &animID);
-        _PlayAnimation(pPed->m_pRwClump, groupID, animID, 4.0f);
-    }
+    int groupID, animID;
+    sscanf(ifp.c_str(), "%d$%d,", &groupID, &animID);
+    _PlayAnim(pPed->m_pRwClump, groupID, animID, 4.0f, m_Loop, m_bSecondary);
 #endif
+}
+
+void Animation::Remove(std::string& ifp, std::string& anim, std::string& ifpRepeat)
+{
+    if (ifp == "Custom")
+    {
+        m_AnimData.m_pData->RemoveKey("Custom", anim.c_str());
+        m_AnimData.m_pData->Save();
+        SetHelpMessage(TEXT("Animation.AnimationRemoved"));
+    }
+    else
+    {
+        SetHelpMessage(TEXT("Animation.CustomAnimsOnly"));
+    }
 }
 
 void Animation::Init()
@@ -291,7 +302,7 @@ void Animation::ShowPage()
 #ifdef GTASA
                     Command<Commands::CLEAR_CHAR_TASKS>(hPlayer);
 #else
-                    _PlayAnimation(pPlayer->m_pRwClump, ANIM_GROUP_MAN, ANIM_MAN_IDLE_STANCE, 4.0f);
+                    _PlayAnim(pPlayer->m_pRwClump, ANIM_GROUP_MAN, ANIM_MAN_IDLE_STANCE, 4.0f, m_Loop, m_bSecondary);
 #endif
                 }
             }
@@ -315,13 +326,16 @@ void Animation::ShowPage()
             {
                 if (ImGui::CollapsingHeader(TEXT("Window.AddNew")))
                 {
-                    ImGui::InputTextWithHint(TEXT("Animation.IFPName"), "ped", m_nIfpBuffer, INPUT_BUFFER_SIZE);
-                    ImGui::InputTextWithHint(TEXT("Animation.AnimName"), "cower", m_nAnimBuffer, INPUT_BUFFER_SIZE);
+                    static char animBuf[INPUT_BUFFER_SIZE];
+                    static char ifpBuf[INPUT_BUFFER_SIZE];
+                    
+                    ImGui::InputTextWithHint(TEXT("Animation.IFPName"), "ped", ifpBuf, INPUT_BUFFER_SIZE);
+                    ImGui::InputTextWithHint(TEXT("Animation.AnimName"), "cower", animBuf, INPUT_BUFFER_SIZE);
                     ImGui::Spacing();
                     if (ImGui::Button(TEXT("Animation.AddAnimation"), Ui::GetSize()))
                     {
-                        std::string key = std::string("Custom.") + m_nAnimBuffer;
-                        m_AnimData.m_pData->Set(key.c_str(), std::string(m_nIfpBuffer));
+                        std::string key = std::string("Custom.") + animBuf;
+                        m_AnimData.m_pData->Set(key.c_str(), std::string(ifpBuf));
                         m_AnimData.m_pData->Save();
                     }
                 }
@@ -330,7 +344,7 @@ void Animation::ShowPage()
                 if (ImGui::BeginChild("Anims Child"))
                 {
                     ImGui::Spacing();
-                    Ui::DrawList(m_AnimData, PlayAnimation, RemoveAnimation);
+                    Ui::DrawList(m_AnimData, Play, Remove);
                     ImGui::EndChild();
                 }
             }
@@ -359,7 +373,7 @@ void Animation::ShowPage()
             if (ImGui::BeginChild("Cutscene Child"))
             {
                 ImGui::Spacing();
-                Ui::DrawList(Cutscene::m_Data, PlayCutscene, nullptr);
+                Ui::DrawList(Cutscene::m_Data, Cutscene::Play, nullptr);
                 ImGui::EndChild();
             }
             ImGui::EndTabItem();
@@ -389,11 +403,12 @@ void Animation::ShowPage()
             ImGui::Spacing();
             if (ImGui::CollapsingHeader(TEXT("Window.AddNew")))
             {
-                ImGui::InputTextWithHint(TEXT("Animation.ParticleName"), "kkjj_on_fire", Particle::m_NameBuffer, INPUT_BUFFER_SIZE);
+                static char buf[INPUT_BUFFER_SIZE];
+                ImGui::InputTextWithHint(TEXT("Animation.ParticleName"), "kkjj_on_fire", buf, INPUT_BUFFER_SIZE);
                 ImGui::Spacing();
                 if (ImGui::Button(TEXT("Animation.AddParticle"), Ui::GetSize()))
                 {
-                    std::string key = std::string("Custom.") + Particle::m_NameBuffer;
+                    std::string key = std::string("Custom.") + buf;
                     m_AnimData.m_pData->Set(key.c_str(), std::string("Dummy"));
                     Particle::m_Data.m_pData->Save();
                 }
@@ -402,22 +417,33 @@ void Animation::ShowPage()
             if (ImGui::BeginChild("Anims Child"))
             {
                 ImGui::Spacing();
-                Ui::DrawList(Particle::m_Data, PlayParticle, RemoveParticle);
+                Ui::DrawList(Particle::m_Data, Particle::Play, Particle::Remove);
                 ImGui::EndChild();
             }
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem(TEXT("Animation.Styles")))
         {
-             ImGui::Spacing();
-            if (Ui::ListBox(TEXT("Animation.FightingStyle"), m_FightingStyleList, m_nFightingStyle))
+            ImGui::Spacing();
+
+            static int fightStyle;
+            static const char* fightStyles = "Default\0Boxing\0Kung Fu\0Kick Boxing\0Punch Kick\0";
+            static std::string walkStyle = "default";
+            static std::vector<std::string> walkStyles =
             {
-                Command<Commands::GIVE_MELEE_ATTACK_TO_CHAR>(hPlayer, m_nFightingStyle + 4, 6);
+                "default", "man", "shuffle", "oldman", "gang1", "gang2", "oldfatman",
+                "fatman", "jogger", "drunkman", "blindman", "swat", "woman", "shopping", "busywoman",
+                "sexywoman", "pro", "oldwoman", "fatwoman", "jogwoman", "oldfatwoman", "skate"
+            };
+
+            if (ImGui::Combo(TEXT("Animation.FightingStyle"), &fightStyle, fightStyles))
+            {
+                Command<Commands::GIVE_MELEE_ATTACK_TO_CHAR>(hPlayer, fightStyle + 4, 6);
                 SetHelpMessage(TEXT("Animation.FightingStyleSet"));
             }
-            if (Ui::ListBoxStr(TEXT("Animation.WalkingStyle"), m_WalkingStyleList, m_nWalkingStyle))
+            if (Ui::ListBoxStr(TEXT("Animation.WalkingStyle"), walkStyles, walkStyle))
             {
-                if (m_nWalkingStyle == "default")
+                if (walkStyle == "default")
                 {
                     patch::Set<DWORD>(0x609A4E, 0x4D48689);
                     patch::Set<WORD>(0x609A52, 0);
@@ -425,10 +451,10 @@ void Animation::ShowPage()
                 else
                 {
                     patch::Nop(0x609A4E, 6);
-                    Command<Commands::REQUEST_ANIMATION>(m_nWalkingStyle.c_str());
+                    Command<Commands::REQUEST_ANIMATION>(walkStyle.c_str());
                     Command<Commands::LOAD_ALL_MODELS_NOW>();
-                    Command<Commands::SET_ANIM_GROUP_FOR_CHAR>(hPlayer, m_nWalkingStyle.c_str());
-                    Command<Commands::REMOVE_ANIMATION>(m_nWalkingStyle.c_str());
+                    Command<Commands::SET_ANIM_GROUP_FOR_CHAR>(hPlayer, walkStyle.c_str());
+                    Command<Commands::REMOVE_ANIMATION>(walkStyle.c_str());
                 }
                 SetHelpMessage(TEXT("Animation.WalkingStyleSet"));
             }
@@ -436,19 +462,5 @@ void Animation::ShowPage()
         }
 #endif
         ImGui::EndTabBar();
-    }
-}
-
-void Animation::RemoveAnimation(std::string& ifp, std::string& anim, std::string& ifpRepeat)
-{
-    if (ifp == "Custom")
-    {
-        m_AnimData.m_pData->RemoveKey("Custom", anim.c_str());
-        m_AnimData.m_pData->Save();
-        SetHelpMessage(TEXT("Animation.AnimationRemoved"));
-    }
-    else
-    {
-        SetHelpMessage(TEXT("Animation.CustomAnimsOnly"));
     }
 }

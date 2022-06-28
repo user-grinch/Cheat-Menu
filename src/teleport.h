@@ -11,10 +11,6 @@ private:
     static inline char m_nLocationBuffer[INPUT_BUFFER_SIZE];
     static inline uint m_nQuickTeleportTimer;
 
-#ifdef GTASA
-    static inline DataStore m_SpriteData {"sprites"};
-#endif
-
     struct QuickTP
     {
         static inline bool m_bEnabled;
@@ -22,8 +18,9 @@ private:
         static inline uint m_nTimer;
     };
 
-
 #ifdef GTASA
+    static inline DataStore m_SpriteData {"sprites"};
+
     /*
     	Generates radar sprite coordinates on the fly.
     	Shouldn't get saved in 'teleport.json', needs to be cleared at game shutdown.

@@ -173,7 +173,7 @@ void Menu::DrawOverlay()
     }
 }
 
-void Menu::DrawShortcutsWindow()
+void Menu::DrawCommandWindow()
 {
     int resX = static_cast<int>(screen::GetScreenWidth());
     int resY = static_cast<int>(screen::GetScreenHeight());

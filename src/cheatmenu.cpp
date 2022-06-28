@@ -63,7 +63,7 @@ void CheatMenu::DrawWindow()
 #ifdef GTASA
             else
             {
-                Menu::DrawShortcutsWindow();
+                Menu::DrawCommandWindow();
             }
 #endif
         }
@@ -261,75 +261,27 @@ void CheatMenu::Init()
     };
 }
 
-/*
-* YIKES YOU AREN"T SUPPOSED TO FIND THIS!!!
-* Probably a good easter egg for the upcoming anniversary ;)
-*/
 void CheatMenu::ShowAnniversaryPage()
 {
     Ui::CenterdText("Happy Anniversary!");
     ImGui::NewLine();
 
-    static bool showHistory;
-    if (showHistory)
-    {
-        ImGui::Checkbox("Show backstory", &showHistory);
-        ImGui::BeginChild("BACKSTORY");
-        ImGui::TextWrapped("I wanted to share the backstory behind the initial idea or planning behind the menu."
-" This is gonna be long so feel free to skip it if you're not interested.");
-        ImGui::NewLine();
-
-        ImGui::TextWrapped("The original idea of the menu comes way back from 2016! The inspiration for the menu"
-" is from the 'CLEO CheatMenu by UNRATED69'. I wanted something that had more features and worked with SAxVCxLC."
-" But there wasn't any other CheatMenu's back then. So, I wanted to create one myself but lacked the knowledge to do so.");
-        ImGui::NewLine();
-
-        ImGui::TextWrapped("In 2018, I finally got an opportunity to learn CLEO or GTA3Script after Junior-Djjr released"
-" his tutorial. I started from basics but it soon became apparent that due to the limitations of CLEO, creating menus were"
-" really tedious.");
-
-        ImGui::NewLine();
-        ImGui::TextWrapped("Later that year I found Moonloader, which had ImGui support. Meaning I could make menus"
-" without brain fucking myself (kudos to everyone who writes 100s of lines in CLEO). I recall starting working on"
-" the menu in October/November that same year.");
-
-        ImGui::NewLine();
-        ImGui::TextWrapped("I had high hopes the mod would succeed and the menu was nowhere near the state I wanted"
-" it to be. But over a hot conversation with KKJJ, I finally decided to add the absolute bare minimum of features and"
-" see what happens. And to my surprise, it even surpassed all of my expectations and became my most popular mod to this day.");
-
-        ImGui::NewLine();
-        ImGui::TextWrapped("A part of me is already cringing telling the story but it is what it is. I've learned"
-" a lot working on this mod and I'm grateful. If you made it through all this way, kudos, you're awesome.");
-
-        ImGui::NewLine();
-        ImGui::TextWrapped("Again, thanks to you and everyone who used or helped me along the way. Enjoy ;)");
-
-        ImGui::EndChild();
-    }
-    else
-    {
-        ImGui::TextWrapped("On this day, in 2019, the first public version of menu was released in MixMods Forum." 
+    ImGui::TextWrapped("On this day, in 2019, the first public version of menu was released in MixMods Forum." 
     " It's been a blast working on it and I've learned a lot in the process.\n\nThanks to you and everyone who used or" 
     " contributed to the modification in any form or shape.");
 
-        ImGui::NewLine();
-        ImGui::TextWrapped("Feel free to star the GitHub repo or join the discord server and provide feedback, ideas, or suggestions.");
-        ImGui::NewLine();
+    ImGui::NewLine();
+    ImGui::TextWrapped("Feel free to star the GitHub repo or join the discord server and provide feedback, ideas, or suggestions.");
+    ImGui::NewLine();
 
-        if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Ui::GetSize(3))))
-        {
-            ShellExecute(nullptr, "open", DISCORD_INVITE, nullptr, nullptr, SW_SHOWNORMAL);
-        }
-        ImGui::SameLine();
-        if (ImGui::Button(TEXT("Menu.GitHubRepo"), ImVec2(Ui::GetSize(3))))
-        {
-            ShellExecute(nullptr, "open", GITHUB_LINK, nullptr, nullptr, SW_SHOWNORMAL);
-        }
-
-        ImGui::NewLine();
-
-        ImGui::Checkbox("Show backstory", &showHistory);
+    if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Ui::GetSize(3))))
+    {
+        ShellExecute(nullptr, "open", DISCORD_INVITE, nullptr, nullptr, SW_SHOWNORMAL);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button(TEXT("Menu.GitHubRepo"), ImVec2(Ui::GetSize(3))))
+    {
+        ShellExecute(nullptr, "open", GITHUB_LINK, nullptr, nullptr, SW_SHOWNORMAL);
     }
 }   
 

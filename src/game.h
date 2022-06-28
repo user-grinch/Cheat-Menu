@@ -1,6 +1,43 @@
 #pragma once
 #include "pch.h"
 
+#ifdef GTASA
+class Freecam
+{
+private:
+    static inline bool m_bInitDone;
+    static inline CPed* m_pPed;
+    static inline int m_nPed = -1;
+    static inline BYTE m_bHudState;
+    static inline BYTE m_bRadarState;
+
+public:
+    static inline bool m_bEnabled;
+    static inline int m_nMul = 1;
+    static inline float m_fFOV = 60.0f;
+
+    static void Clear();
+    static void Process();
+};
+
+class RandomCheats
+{
+private:
+    static inline std::string m_EnabledCheats[92][2];
+    static inline DataStore m_pData {"cheats"};
+    static inline uint m_nTimer;
+
+public:
+    static inline bool m_bEnabled;
+    static inline bool m_bProgressBar = true;
+    static inline int m_nInterval = 10;
+
+    static void DrawBar();
+    static void DrawList();
+    static void Process();
+};
+#endif
+
 class Game
 {
 private:
@@ -9,19 +46,6 @@ private:
     static inline bool m_bDisableReplay;
     static inline bool m_bMissionTimer;
 
-    struct Freecam
-    {
-        static inline bool m_bEnabled;
-        static inline int m_nMul = 1;
-        static inline float m_fFOV = 60.0f;
-        static inline bool m_bInitDone;
-        static inline CPed* m_pPed;
-        static inline int m_nPed = -1;
-        static inline CVector m_fMouse;
-        static inline CVector m_fTotalMouse;
-        static inline BYTE m_bHudState;
-        static inline BYTE m_bRadarState;
-    };
     struct HardMode
     {
         static inline bool m_bEnabled;
@@ -38,26 +62,7 @@ private:
     static inline bool m_bScreenShot;
     static inline bool m_bKeepStuff;
     static inline ResourceStore m_StatData{ "stats", eResourceType::TYPE_TEXT };
-
-    static inline std::vector<std::string> m_DayNames =
-    {
-        "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"
-    };
-
-    struct RandomCheats
-    {
-        static inline bool m_bEnabled;
-        static inline bool m_bProgressBar = true;
-        static inline std::string m_EnabledCheats[92][2];
-        static inline int m_nInterval = 10;
-        static inline DataStore m_pData {"cheats"};
-        static inline uint m_nTimer;
-    };
 #endif
-
-    static void RealTimeClock();
-    static void FreeCam();
-    static void ClearFreecamStuff();
 
 public:
     static inline bool m_bFreezeTime;

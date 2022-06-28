@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/logo.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/logo.png">
   </p>
 <p align="center">  
   Press <kbd>Left Ctrl</kbd> + <kbd>M</kbd> to open the menu. Doesn't work in multiplayer
@@ -56,25 +56,25 @@ You can either open a issue here or directly contact me on discord (Recommended)
 ## Images
 <details>
   <summary>Show Images</summary>
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/1.png">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/2.png">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/3.png">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/4.png">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/5.png">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/6.png">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/7.png">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/8.png">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/9.png">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/10.png">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/11.png">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/12.png">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/13.png">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/14.png">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/15.png">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/16.png">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/17.png">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/18.png">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/rewrite/images/19.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/1.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/2.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/3.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/4.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/5.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/6.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/7.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/8.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/9.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/10.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/11.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/12.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/13.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/14.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/15.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/16.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/17.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/18.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/19.png">
 </details>
 
 ## Submit Translations
@@ -82,7 +82,7 @@ You can either open a issue here or directly contact me on discord (Recommended)
 
 The translations are loaded from `CheatMenuXX/locale/*.toml` files. Make a copy of the `English.toml` file and translate the texts there to your language. Rename the file to `your_language.toml` and make a pull request. 
 
-If you're language isn't supported ( Appears `???` in the menu. Check [here](https://github.com/user-grinch/Cheat-Menu/tree/rewrite/tools/subset/in.txt) for supported languages), open a [issue](https://github.com/user-grinch/Cheat-Menu/issues) asking for support.
+If you're language isn't supported ( Appears `???` in the menu. Check [here](https://github.com/user-grinch/Cheat-Menu/tree/master/tools/subset/in.txt) for supported languages), open a [issue](https://github.com/user-grinch/Cheat-Menu/issues) asking for support.
 
 
 ## Required to build
