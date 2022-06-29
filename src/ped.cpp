@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "ped.h"
 #include "ui.h"
+#include "widget.h"
 #include "util.h"
 #include "weapon.h"
 #include <CPopulation.h>
@@ -266,7 +267,7 @@ void Ped::ShowPage()
                 static int removeRadius = 5;
                 ImGui::InputInt(TEXT("Ped.Radius"), &removeRadius);
                 ImGui::Spacing();
-                if (ImGui::Button(TEXT("Ped.RemovePeds"), Ui::GetSize(1)))
+                if (ImGui::Button(TEXT("Ped.RemovePeds"), Widget::CalcSize(1)))
                 {
                     CPlayerPed* player = FindPlayerPed();
                     for (CPed* ped : CPools::ms_pPedPool)
@@ -287,7 +288,7 @@ void Ped::ShowPage()
         if (ImGui::BeginTabItem(TEXT("Window.SpawnTab")))
         {
             ImGui::Spacing();
-            if (ImGui::Button(TEXT("Ped.RemoveFrozen"), Ui::GetSize(1)))
+            if (ImGui::Button(TEXT("Ped.RemoveFrozen"), Widget::CalcSize(1)))
             {
                 for (CPed* ped : Spawner::m_List)
                 {
@@ -301,17 +302,17 @@ void Ped::ShowPage()
             {
                 ImGui::Spacing();
 
-                if (ImGui::BeginTabItem(TEXT("Ped.SpawnerTab")))
+                if (ImGui::BeginTabItem(TEXT("Window.Search")))
                 {
                     ImGui::Spacing();
 #ifdef GTASA
-                    Ui::DrawImages(m_PedData, SpawnPed, nullptr,
-                                   [](std::string str)
+                    Widget::ImageList(m_PedData, SpawnPed, nullptr,
+                    [](std::string& str)
                     {
                             return m_PedData.m_pData->Get(str.c_str(), "Unknown");
                     });
 #else
-                    Ui::DrawList(m_PedData, SpawnPed, nullptr);
+                    Widget::DataList(m_PedData, SpawnPed, nullptr);
 #endif
                     ImGui::EndTabItem();
                 }
@@ -340,30 +341,33 @@ void Ped::ShowPage()
                         }
                     }
                     ImGui::Combo(TEXT("Ped.PedType"), &Spawner::m_nSelectedPedType, pedTypeList);
-
+                    ImGui::EndChild();
+                    ImGui::EndTabItem();
+                }
+                if (ImGui::BeginTabItem(TEXT("Window.WeaponPage")))
+                {
                     static std::string weaponName = "None";
                     ImGui::Spacing();
                     ImGui::Text(TEXT("Ped.SelectedWeapon"), weaponName.c_str());
                     ImGui::Spacing();
 #ifdef GTASA
-                    Ui::DrawImages(Weapon::m_WeaponData,
-                                   [](std::string str)
+                    Widget::ImageList(Weapon::m_WeaponData,
+                    [](std::string& str)
                     {
                         Spawner::m_nWeaponId = std::stoi(str);
+                        weaponName = Weapon::m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
                     },
                     nullptr,
-                    [](std::string str)
+                    [](std::string& str)
                     {
-                        weaponName = Weapon::m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
-                        return weaponName;
+                        return Weapon::m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
                     },
-                    [](std::string str)
+                    [](std::string& str)
                     {
                         return str != "-1"; /*Jetpack*/
-                    }
-                                  );
+                    });
 #else
-                    Ui::DrawList(Weapon::m_WeaponData,
+                    Widget::DataList(Weapon::m_WeaponData,
                     [](std::string& root, std::string& key, std::string& id)
                     {
                         SpawnPed::m_nWeaponId = std::stoi(id);
@@ -371,19 +375,18 @@ void Ped::ShowPage()
                     },
                     nullptr);
 #endif
-                    ImGui::Spacing();
-                    ImGui::EndChild();
                     ImGui::EndTabItem();
                 }
                 ImGui::EndTabBar();
             }
             ImGui::EndTabItem();
         }
+    
 #ifdef GTASA
-        if (ImGui::BeginTabItem(TEXT("Ped.GangWars")))
+        if (ImGui::BeginTabItem(TEXT("Ped.Gangs")))
         {
             ImGui::Spacing();
-            if (ImGui::Button(TEXT("Ped.StartWar"), ImVec2(Ui::GetSize(2))))
+            if (ImGui::Button(TEXT("Ped.StartWar"), ImVec2(Widget::CalcSize(2))))
             {
                 if (Util::GetLargestGangInZone() == 1)
                 {
@@ -396,7 +399,7 @@ void Ped::ShowPage()
                 CGangWars::bGangWarsActive = true;
             }
             ImGui::SameLine();
-            if (ImGui::Button(TEXT("Ped.EndWar"), ImVec2(Ui::GetSize(2))))
+            if (ImGui::Button(TEXT("Ped.EndWar"), ImVec2(Widget::CalcSize(2))))
             {
                 CGangWars::EndGangWar(true);
             }
@@ -430,7 +433,7 @@ void Ped::ShowPage()
                 ImGui::Spacing();
                 ImGui::TextWrapped(TEXT("Ped.ExGangWarsTip"));
                 ImGui::Spacing();
-                if (ImGui::Button(TEXT("Ped.DownloadExGangWars"), Ui::GetSize(1)))
+                if (ImGui::Button(TEXT("Ped.DownloadExGangWars"), Widget::CalcSize(1)))
                 {
                     ShellExecute(NULL, "open", "https://gtaforums.com/topic/682194-extended-gang-wars/", NULL, NULL,
                                     SW_SHOWNORMAL);

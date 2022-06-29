@@ -2,6 +2,7 @@
 #include "menu.h"
 #include "game.h"
 #include "ui.h"
+#include "widget.h"
 #include "util.h"
 #ifdef GTASA
 #include <CIplStore.h>
@@ -410,7 +411,7 @@ void Game::ShowPage()
     int hplayer = CPools::GetPedRef(pPlayer);
 
 #ifdef GTASA
-    if (ImGui::Button(TEXT("Game.SaveGame"), Ui::GetSize()))
+    if (ImGui::Button(TEXT("Game.SaveGame"), Widget::CalcSize()))
     {
         FrontEndMenuManager.m_bActivateMenuNextFrame = true;
         bSaveGameFlag = true;
@@ -652,36 +653,36 @@ void Game::ShowPage()
             if (ImGui::CollapsingHeader(TEXT("Game.Weather")))
             {
 #ifdef GTASA
-                if (ImGui::Button(TEXT("Game.Foggy"), Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.Foggy"), Widget::CalcSize(3)))
                 {
                     Call<0x438F80>();
                 }
 
                 ImGui::SameLine();
-                if (ImGui::Button(TEXT("Game.Overcast"), Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.Overcast"), Widget::CalcSize(3)))
                 {
                     Call<0x438F60>();
                 }
 
                 ImGui::SameLine();
-                if (ImGui::Button(TEXT("Game.Rainy"), Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.Rainy"), Widget::CalcSize(3)))
                 {
                     Call<0x438F70>();
                 }
 
-                if (ImGui::Button(TEXT("Game.Sandstorm"), Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.Sandstorm"), Widget::CalcSize(3)))
                 {
                     Call<0x439590>();
                 }
 
                 ImGui::SameLine();
-                if (ImGui::Button(TEXT("Game.Thunderstorm"), Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.Thunderstorm"), Widget::CalcSize(3)))
                 {
                     Call<0x439570>();
                 }
 
                 ImGui::SameLine();
-                if (ImGui::Button(TEXT("Game.VerySunny"), Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.VerySunny"), Widget::CalcSize(3)))
                 {
                     Call<0x438F50>();
                 }
@@ -702,40 +703,40 @@ void Game::ShowPage()
                     CWeather::OldWeatherType = weatherID;
                     CWeather::NewWeatherType = weatherID;
                 }
-                Ui::ShowTooltip(TEXT("Game.WeatherIDText"));
+                Widget::Tooltip(TEXT("Game.WeatherIDText"));
 #else
-                if (ImGui::Button(TEXT("Game.Sunny"), Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.Sunny"), Widget::CalcSize(3)))
                 {
                     CWeather::ForceWeatherNow(0);
                 }
                 ImGui::SameLine();
-                if (ImGui::Button(TEXT("Game.Cloudy"), Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.Cloudy"), Widget::CalcSize(3)))
                 {
                     CWeather::ForceWeatherNow(1);
                 }
                 ImGui::SameLine();
-                if (ImGui::Button(TEXT("Game.Rainy"), Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.Rainy"), Widget::CalcSize(3)))
                 {
                     CWeather::ForceWeatherNow(2);
                 }
 
-                if (ImGui::Button(TEXT("Game.Foggy"), Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.Foggy"), Widget::CalcSize(3)))
                 {
                     CWeather::ForceWeatherNow(3);
                 }
 #ifdef GTAVC
                 ImGui::SameLine();
-                if (ImGui::Button(TEXT("Game.ExtraSunny"), Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.ExtraSunny"), Widget::CalcSize(3)))
                 {
                     CWeather::ForceWeatherNow(4);
                 }
                 ImGui::SameLine();
-                if (ImGui::Button(TEXT("Game.Hurricane"), Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.Hurricane"), Widget::CalcSize(3)))
                 {
                     CWeather::ForceWeatherNow(5);
                 }
 
-                if (ImGui::Button(TEXT("Game.ExtraColors"), Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Game.ExtraColors"), Widget::CalcSize(3)))
                 {
                     CWeather::ForceWeatherNow(6);
                 }
@@ -755,14 +756,14 @@ void Game::ShowPage()
             {
                 ImGui::TextWrapped(TEXT("Game.MissionLoaderTip"));
                 ImGui::Spacing();
-                if (ImGui::Button(TEXT("Game.ShowLoader"), ImVec2(Ui::GetSize())))
+                if (ImGui::Button(TEXT("Game.ShowLoader"), ImVec2(Widget::CalcSize())))
                 {
                     bMissionLoaderWarningShown = true;
                 }
             }
             else
             {
-                if (ImGui::Button(TEXT("Game.FailMission"), ImVec2(Ui::GetSize())))
+                if (ImGui::Button(TEXT("Game.FailMission"), ImVec2(Widget::CalcSize())))
                 {
                     if (!Util::IsOnCutscene())
                     {
@@ -772,17 +773,17 @@ void Game::ShowPage()
 
                 ImGui::Spacing();
 
-                Ui::DrawList(m_MissionData, SetPlayerMission, nullptr);
+                Widget::DataList(m_MissionData, SetPlayerMission, nullptr);
             }
             ImGui::EndTabItem();
         }
 #ifdef GTASA
         if (ImGui::BeginTabItem(TEXT("Game.Stats")))
         {
-            // similar to Ui::DrawList()
+            // similar to Widget::DataList()
             ImGui::Spacing();
 
-            if (ImGui::Button(TEXT("Game.MaxWepSkills"), Ui::GetSize(2)))
+            if (ImGui::Button(TEXT("Game.MaxWepSkills"), Widget::CalcSize(2)))
             {
                 for (size_t i = 69; i != 80; ++i)
                 {
@@ -792,7 +793,7 @@ void Game::ShowPage()
                 SetHelpMessage(TEXT("Game.MaxWepSkillsText"));
             }
             ImGui::SameLine();
-            if (ImGui::Button(TEXT("Game.MaxVehSkills"), Ui::GetSize(2)))
+            if (ImGui::Button(TEXT("Game.MaxVehSkills"), Widget::CalcSize(2)))
             {
                 CStats::SetStatValue(160, 1000);
                 CStats::SetStatValue(223, 1000);
@@ -806,7 +807,7 @@ void Game::ShowPage()
             ImGui::PushItemWidth((ImGui::GetWindowContentRegionWidth() - ImGui::GetStyle().ItemSpacing.x)/2);
             Ui::ListBoxStr("##Categories", m_StatData.m_Categories, m_StatData.m_Selected);
             ImGui::SameLine();
-            Ui::FilterWithHint("##Filter", m_StatData.m_Filter, TEXT("Window.Search"));
+            Widget::FilterWithHint("##Filter", m_StatData.m_Filter, TEXT("Window.Search"));
             ImGui::PopItemWidth();
 
             ImGui::Spacing();
@@ -841,7 +842,7 @@ void Game::ShowPage()
             ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 2);
 
             ImGui::SliderInt(TEXT("Game.ActivateTimer"), &RandomCheats::m_nInterval, 5, 60);
-            Ui::ShowTooltip(TEXT("Game.ActivateTimerText"));
+            Widget::Tooltip(TEXT("Game.ActivateTimerText"));
 
             ImGui::PopItemWidth();
 

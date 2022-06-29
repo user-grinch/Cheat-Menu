@@ -2,6 +2,7 @@
 #include "player.h"
 #include "menu.h"
 #include "ui.h"
+#include "widget.h"
 #include "util.h"
 
 #ifdef GTASA
@@ -268,39 +269,34 @@ void Player::Init()
 #ifdef GTASA
 void Player::ChangePlayerCloth(std::string& name)
 {
-    std::stringstream ss(name);
-    std::string temp;
+    int bodyPart;
+    char model[16], tex[16];
 
-    getline(ss, temp, '$');
-    int body_part = std::stoi(temp);
-
-    getline(ss, temp, '$');
-    std::string model = temp.c_str();
-
-    getline(ss, temp, '$');
-    std::string texName = temp.c_str();
+    if (sscanf(name.c_str(), "%d$%[^$]$%s", &bodyPart, &model, &tex) != 3)
+    {
+        return;
+    }
 
     CPlayerPed* player = FindPlayerPed();
-
-    if (texName == "cutoffchinosblue")
+    if (!strcmp(tex, "cutoffchinosblue"))
     {
-        player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(-697413025, 744365350, body_part);
+        player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(-697413025, 744365350, bodyPart);
     }
     else
     {
-        if (texName == "sneakerbincblue")
+        if (!strcmp(tex, "sneakerbincblue"))
         {
-            player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(-915574819, 2099005073, body_part);
+            player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(-915574819, 2099005073, bodyPart);
         }
         else
         {
-            if (texName == "12myfac")
+            if (!strcmp(tex, "12myfac"))
             {
-                player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(-1750049245, 1393983095, body_part);
+                player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(-1750049245, 1393983095, bodyPart);
             }
             else
             {
-                player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(texName.c_str(), model.c_str(), body_part);
+                player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(tex, model, bodyPart);
             }
         }
     }
@@ -388,7 +384,7 @@ void Player::ShowPage()
 #endif
     CPlayerInfo *pInfo = &CWorld::Players[CWorld::PlayerInFocus];
 
-    if (ImGui::Button(TEXT("Player.CopyCoordinates"), ImVec2(Ui::GetSize(2))))
+    if (ImGui::Button(TEXT("Player.CopyCoordinates"), ImVec2(Widget::CalcSize(2))))
     {
         CVector pos = pPlayer->GetPosition();
         std::string text = std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z);
@@ -397,7 +393,7 @@ void Player::ShowPage()
         SetHelpMessage(TEXT("Player.CoordCopied"));
     }
     ImGui::SameLine();
-    if (ImGui::Button(TEXT("Player.Suicide"), ImVec2(Ui::GetSize(2))))
+    if (ImGui::Button(TEXT("Player.Suicide"), ImVec2(Widget::CalcSize(2))))
     {
         pPlayer->m_fHealth = 0.0;
     }
@@ -647,7 +643,7 @@ void Player::ShowPage()
                     ImGui::TextWrapped(TEXT("Player.NeedCJSkin"));
                     ImGui::Spacing();
 
-                    if (ImGui::Button(TEXT("Player.ChangeToCJ"), ImVec2(Ui::GetSize(1))))
+                    if (ImGui::Button(TEXT("Player.ChangeToCJ"), ImVec2(Widget::CalcSize(1))))
                     {
                         pPlayer->SetModelIndex(0);
                         Util::ClearCharTasksVehCheck(pPlayer);
@@ -724,7 +720,7 @@ void Player::ShowPage()
                 }
 
                 ImGui::Spacing();
-                if (ImGui::Button(TEXT("Window.Minimum"), Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Window.Minimum"), Widget::CalcSize(3)))
                 {
 #ifdef GTASA
                     pPlayer->CheatWantedLevel(0);
@@ -737,7 +733,7 @@ void Player::ShowPage()
 
                 ImGui::SameLine();
 
-                if (ImGui::Button(TEXT("Window.Default"), Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Window.Default"), Widget::CalcSize(3)))
                 {
 #ifdef GTASA
                     pPlayer->CheatWantedLevel(0);
@@ -750,7 +746,7 @@ void Player::ShowPage()
 
                 ImGui::SameLine();
 
-                if (ImGui::Button(TEXT("Window.Maximum"), Ui::GetSize(3)))
+                if (ImGui::Button(TEXT("Window.Maximum"), Widget::CalcSize(3)))
                 {
 #ifdef GTASA
                     pPlayer->CheatWantedLevel(max_wl);
@@ -783,7 +779,7 @@ void Player::ShowPage()
                 {
                     if (pPlayer->m_nModelIndex == 0)
                     {
-                        Ui::DrawImages(m_ClothData, ChangePlayerCloth, nullptr, [](std::string str)
+                        Widget::ImageList(m_ClothData, ChangePlayerCloth, nullptr, [](std::string& str)
                         {
                             std::stringstream ss(str);
                             std::string temp;
@@ -792,14 +788,14 @@ void Player::ShowPage()
                             getline(ss, temp, '$');
 
                             return temp;
-                        }, nullptr, clothNameList, sizeof(clothNameList) / sizeof(const char*));
+                        });// nullptr, clothNameList, sizeof(clothNameList) / sizeof(const char*));
                     }
                     else
                     {
                         ImGui::TextWrapped(TEXT("Player.NeedCJSkin"));
                         ImGui::Spacing();
 
-                        if (ImGui::Button(TEXT("Player.ChangeToCJ"), ImVec2(Ui::GetSize(1))))
+                        if (ImGui::Button(TEXT("Player.ChangeToCJ"), ImVec2(Widget::CalcSize(1))))
                         {
                             pPlayer->SetModelIndex(0);
                             Util::ClearCharTasksVehCheck(pPlayer);
@@ -815,7 +811,7 @@ void Player::ShowPage()
 
                     ImGui::BeginChild("ClothesRemove");
                     size_t count = 0;
-                    if (ImGui::Button(TEXT("Player.RemoveAll"), ImVec2(Ui::GetSize(2))))
+                    if (ImGui::Button(TEXT("Player.RemoveAll"), ImVec2(Widget::CalcSize(2))))
                     {
                         CPlayerPed* player = FindPlayerPed();
                         for (uint i = 0; i < 18; i++)
@@ -825,9 +821,9 @@ void Player::ShowPage()
                         CClothes::RebuildPlayer(player, false);
                     }
                     ImGui::SameLine();
-                    for (const char* clothName : clothNameList)
+                    for (auto [k, v] : m_ClothData.m_pData->Items())
                     {
-                        if (ImGui::Button(clothName, ImVec2(Ui::GetSize(2))))
+                        if (ImGui::Button(std::string(k.str()).c_str(), ImVec2(Widget::CalcSize(2))))
                         {
                             CPlayerPed* player = FindPlayerPed();
                             player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(0u, 0u, count);
@@ -840,13 +836,14 @@ void Player::ShowPage()
                         }
                         ++count;
                     }
+
                     ImGui::EndChild();
                     ImGui::EndTabItem();
                 }
                 if (ImGui::BeginTabItem(TEXT("Player.PedSkinsTab")))
                 {
-                    Ui::DrawImages(Ped::m_PedData, ChangePlayerModel, nullptr,
-                                   [](std::string str)
+                    Widget::ImageList(Ped::m_PedData, ChangePlayerModel, nullptr,
+                    [](std::string& str)
                     {
                         return Ped::m_PedData.m_pData->Get(str.c_str(), "Unknown");
                     });
@@ -858,10 +855,10 @@ void Player::ShowPage()
 
                     if (m_bModloaderInstalled)
                     {
-                        Ui::FilterWithHint(TEXT("Window.Search"), m_ClothData.m_Filter,
+                        Widget::FilterWithHint(TEXT("Window.Search"), m_ClothData.m_Filter,
                                            std::string(TEXT("Player.TotalSkins") + std::to_string(CustomSkins::m_List.size()))
                                            .c_str());
-                        Ui::ShowTooltip(TEXT("Player.CustomSkinsDirTip"));
+                        Widget::Tooltip(TEXT("Player.CustomSkinsDirTip"));
                         ImGui::Spacing();
                         ImGui::TextWrapped(TEXT("Player.CustomSkinsTip"));
                         ImGui::Spacing();
@@ -880,7 +877,7 @@ void Player::ShowPage()
                     {
                         ImGui::TextWrapped(TEXT("Player.CustomSkinTutorial"));
                         ImGui::Spacing();
-                        if (ImGui::Button(TEXT("Player.DownloadModloader"), ImVec2(Ui::GetSize(1))))
+                        if (ImGui::Button(TEXT("Player.DownloadModloader"), ImVec2(Widget::CalcSize(1))))
                             ShellExecute(NULL, "open", "https://gtaforums.com/topic/669520-mod-loader/", NULL, NULL,
                                          SW_SHOWNORMAL);
                     }
@@ -900,7 +897,7 @@ void Player::ShowPage()
 #else
             ImGui::TextWrapped(TEXT("Player.WorkSkinOnly"));
 #endif
-            Ui::DrawList(skinData, ChangePlayerModel, nullptr);
+            Widget::DataList(skinData, ChangePlayerModel, nullptr);
             ImGui::EndTabItem();
         }
 #endif

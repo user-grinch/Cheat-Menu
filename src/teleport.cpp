@@ -2,6 +2,7 @@
 #include "teleport.h"
 #include "menu.h"
 #include "ui.h"
+#include "widget.h"
 #include "util.h"
 
 #ifdef GTASA
@@ -239,7 +240,7 @@ void Teleport::ShowPage()
 
                 ImGui::Spacing();
 
-                if (ImGui::Button(TEXT("Teleport.TeleportToCoord"), Ui::GetSize(2)))
+                if (ImGui::Button(TEXT("Teleport.TeleportToCoord"), Widget::CalcSize(2)))
                 {
                     CVector pos{0, 0, 10};
 
@@ -256,12 +257,12 @@ void Teleport::ShowPage()
                 }
                 ImGui::SameLine();
 #ifdef GTASA
-                if (ImGui::Button(TEXT("Teleport.TeleportMarker"), Ui::GetSize(2)))
+                if (ImGui::Button(TEXT("Teleport.TeleportMarker"), Widget::CalcSize(2)))
                 {
                     TeleportPlayer(true);
                 }
 #else
-                if (ImGui::Button(TEXT("Teleport.TeleportCenter"), Ui::GetSize(2)))
+                if (ImGui::Button(TEXT("Teleport.TeleportCenter"), Widget::CalcSize(2)))
                 {
                     TeleportPlayer(false, CVector(0, 0, 23));
                 }
@@ -271,7 +272,7 @@ void Teleport::ShowPage()
             ImGui::EndTabItem();
         }
 
-        if (ImGui::BeginTabItem(TEXT("Window.Search")))
+        if (ImGui::BeginTabItem(TEXT("Window.LocationsTab")))
         {
 #ifdef GTASA
             FetchRadarSpriteData();
@@ -283,7 +284,7 @@ void Teleport::ShowPage()
                 ImGui::InputTextWithHint(TEXT("Teleport.Location"), TEXT("Teleport.LocationHint"), m_nLocationBuffer, IM_ARRAYSIZE(m_nInputBuffer));
                 ImGui::InputTextWithHint(TEXT("Teleport.Coordinates"), "x, y, z", m_nInputBuffer, IM_ARRAYSIZE(m_nInputBuffer));
                 ImGui::Spacing();
-                if (ImGui::Button(TEXT("Teleport.AddLocation"), Ui::GetSize()))
+                if (ImGui::Button(TEXT("Teleport.AddLocation"), Widget::CalcSize()))
                 {
                     std::string key = std::string("Custom.") + m_nLocationBuffer;
                     m_tpData.m_pData->Set(key.c_str(), ("0, " + std::string(m_nInputBuffer)));
@@ -298,7 +299,7 @@ void Teleport::ShowPage()
             }
 
             ImGui::Spacing();
-            Ui::DrawList(m_tpData, TeleportToLocation, RemoveTeleportEntry);
+            Widget::DataList(m_tpData, TeleportToLocation, RemoveTeleportEntry);
             ImGui::EndTabItem();
         }
         ImGui::EndTabBar();

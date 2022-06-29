@@ -17,46 +17,16 @@ public:
         int value;
     };
 
-    struct JsonPopUpData
-    {
-        std::function<void(std::string&, std::string&, std::string&)> function;
-        std::string key;
-        std::string root;
-        std::string value;
-    };
-
-    struct ImgPopUpData
-    {
-        std::function<void(std::string&)> function;
-        std::string value;
-    };
-    static inline int m_HeaderId;
-    static inline JsonPopUpData jsonPopup;
-    static inline ImgPopUpData imgPopup;
-
-
     Ui() = delete;
     Ui(Ui&) = delete;
 
-    static void CenterdText(const std::string& text);
     static bool ColorButton(int color_id, std::vector<float>& color, ImVec2 size);
     static bool CheckboxAddress(const char* label, int addr = NULL, const char* hint = nullptr);
     static bool CheckboxAddressEx(const char* label, int addr = NULL, int enabled_val = 1, int disabled_val = 0,
                                   const char* hint = nullptr);
-    static bool CheckboxAddressVar(const char* label, bool val, int addr, const char* hint = nullptr);
-    template <typename T>
-    static bool CheckboxAddressVarEx(const char* label, int addr, T enabled_val, T disabled_val, const char* hint = nullptr);
     static bool CheckboxBitFlag(const char* label, uint flag, const char* hint = nullptr);
     static bool CheckboxWithHint(const char* label, bool* state, const char* hint = nullptr, bool is_disabled = false);
 
-    static void DrawList(ResourceStore& data,
-                         std::function<void(std::string&, std::string&, std::string&)> func_left_click,
-                         std::function<void(std::string&, std::string&, std::string&)> func_right_click);
-    static void DrawImages(ResourceStore &store, std::function<void(std::string&)> on_left_click,
-                           std::function<void(std::string&)> on_right_click,
-                           std::function<std::string(std::string&)> get_name_func,
-                           std::function<bool(std::string&)> verify_func = nullptr,
-                           const char** custom_names = nullptr, size_t length = 0);
     static bool DrawTitleBar();
     template <typename T>
     static void EditAddress(const char* label, int address, int min = 0, int def = 0, int max = 100);
@@ -71,42 +41,17 @@ public:
     static void EditStat(const char* label, int stat_id, int min = 0, int def = 0, int max = 1000);
 #endif
 
-    static void FilterWithHint(const char* label, ImGuiTextFilter& filter, const char* hint);
 
     static ImVec2 GetSize(short count = 1, bool spacing = true);
 
     static bool ListBox(const char* label, const std::vector<std::string>& all_items, int& selected);
     static bool ListBoxStr(const char* label, const std::vector<std::string>& all_items, std::string& selected);
-    static bool ListBoxCustomNames(const char* label, std::string& selected, const char* custom_names[] = nullptr, size_t length = 0);
 
     static void RadioButtonAddress(const char* label, std::vector<NamedMemory>& named_mem);
     static void RadioButtonAddressEx(const char* label, int addr, std::vector<NamedValue>& named_val);
-    static bool RoundedImageButton(ImTextureID user_texture_id, ImVec2& size, const char* hover_text);
     static void ColorPickerAddress(const char* label, int base_addr, ImVec4&& default_color);
-    static void ShowTooltip(const char* text);
 };
 
-template <typename T>
-bool Ui::CheckboxAddressVarEx(const char* label, int addr, T enabled_val, T disabled_val, const char* hint)
-{
-    bool rtn = false;
-    bool state = (patch::Get<T>(addr) == enabled_val);
-    if (CheckboxWithHint(label, &state, hint))
-    {
-        if (state)
-        {
-            patch::Set<T>(addr, enabled_val, false);
-        }
-        else
-        {
-            patch::Set<T>(addr, disabled_val, false);
-        }
-
-        rtn = true;
-    }
-
-    return rtn;
-}
 template <typename T>
 void Ui::EditAddress(const char* label, const int address, const int min, const int def, const int max)
 {

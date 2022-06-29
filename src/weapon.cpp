@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "weapon.h"
 #include "ui.h"
+#include "widget.h"
 #include "util.h"
 #include "CWeaponInfo.h"
 
@@ -224,7 +225,7 @@ void Weapon::ShowPage()
     uint hplayer = CPools::GetPedRef(pPlayer);
 
     ImGui::Spacing();
-    if (ImGui::Button(TEXT("Weapon.DropWeapon"), Ui::GetSize(3)))
+    if (ImGui::Button(TEXT("Weapon.DropWeapon"), Widget::CalcSize(3)))
     {
         float x, y, z;
         Command<Commands::GET_OFFSET_FROM_CHAR_IN_WORLD_COORDS>(hplayer, 0.0, 3.0, 0.0, &x, &y, &z);
@@ -248,13 +249,13 @@ void Weapon::ShowPage()
         }
     }
     ImGui::SameLine();
-    if (ImGui::Button(TEXT("Weapon.DropAll"), Ui::GetSize(3)))
+    if (ImGui::Button(TEXT("Weapon.DropAll"), Widget::CalcSize(3)))
     {
         pPlayer->ClearWeapons();
     }
 
     ImGui::SameLine();
-    if (ImGui::Button(TEXT("Weapon.DropCurrent"), Ui::GetSize(3)))
+    if (ImGui::Button(TEXT("Weapon.DropCurrent"), Widget::CalcSize(3)))
     {
 #ifdef GTASA
         Command<Commands::REMOVE_WEAPON_FROM_CHAR>(hplayer, pPlayer->m_aWeapons[pPlayer->m_nActiveWeaponSlot].m_eWeaponType);
@@ -273,7 +274,7 @@ void Weapon::ShowPage()
             ImGui::Spacing();
             ImGui::SameLine();
             ImGui::Text(TEXT("Window.Info"));
-            Ui::ShowTooltip(TEXT("Weapon.WeaponTweaksText"));
+            Widget::Tooltip(TEXT("Weapon.WeaponTweaksText"));
             ImGui::Columns(2, 0, false);
 #ifdef GTASA
             Ui::CheckboxWithHint(TEXT("Weapon.FastAim"), &m_bAutoAim, TEXT("Weapon.FastAimText"));
@@ -347,18 +348,17 @@ void Weapon::ShowPage()
                 m_nAmmoCount = (m_nAmmoCount > 99999) ? 99999 : m_nAmmoCount;
             }
 #ifdef GTASA
-            Ui::DrawImages(m_WeaponData, GiveWeaponToPlayer, nullptr,
-                           [](std::string str)
+            Widget::ImageList(m_WeaponData, GiveWeaponToPlayer, nullptr,
+            [](std::string& str)
             {
                 return m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
             },
-            [](std::string str)
+            [](std::string& str)
             {
                 return str != "0"; /*Unarmed*/
-            }
-                          );
+            });
 #else
-            Ui::DrawList(m_WeaponData, GiveWeaponToPlayer, nullptr);
+            Widget::DataList(m_WeaponData, GiveWeaponToPlayer, nullptr);
 #endif
             ImGui::EndTabItem();
         }
@@ -380,16 +380,15 @@ void Weapon::ShowPage()
             std::string key = std::to_string(m_nGangWeaponList[m_nSelectedGang][m_nSelectedWeapon]);
             ImGui::Text(TEXT("Weapon.CurrentWeapon"), m_WeaponData.m_pData->Get(key.c_str(), "Unknown").c_str());
             ImGui::Spacing();
-            Ui::DrawImages(m_WeaponData, SetGangWeapon, nullptr,
-                           [](std::string str)
+            Widget::ImageList(m_WeaponData, SetGangWeapon, nullptr,
+            [](std::string& str)
             {
-                    return m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
+                return m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
             },
-            [](std::string str)
+            [](std::string& str)
             {
                 return str != "-1"; /*Jetpack*/
-            }
-                          );
+            });
             ImGui::EndTabItem();
         }
 #endif

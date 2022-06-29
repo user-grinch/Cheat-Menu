@@ -1,8 +1,37 @@
 #include "pch.h"
 #include "util.h"
 #include "ui.h"
+#include "widget.h"
 #include "../depend/imgui/imgui_internal.h"
 #include "menu.h"
+
+ImVec2 Ui::GetSize(short count, bool spacing)
+{
+    if (count == 1)
+    {
+        spacing = false;
+    }
+
+    // manually tested values
+    float factor = ImGui::GetStyle().ItemSpacing.x / 2.0f;
+    float x;
+
+    if (count == 3)
+    {
+        factor = ImGui::GetStyle().ItemSpacing.x / 1.403f;
+    }
+
+    if (spacing)
+    {
+        x = ImGui::GetWindowContentRegionWidth() / count - factor;
+    }
+    else
+    {
+        x = ImGui::GetWindowContentRegionWidth() / count;
+    }
+
+    return ImVec2(x, ImGui::GetFrameHeight() * 1.3f);
+}
 
 // Really messy code, cleanup someday
 bool Ui::DrawTitleBar()
@@ -12,7 +41,7 @@ bool Ui::DrawTitleBar()
     ImGuiID id = window->GetID("#CLOSE");
 
     ImGui::PushFont(FontMgr::Get("title"));
-    CenterdText(MENU_TITLE);
+    Widget::TextCentered(MENU_TITLE);
 
     if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_RootWindow | ImGuiHoveredFlags_ChildWindows
                                 | ImGuiHoveredFlags_AllowWhenBlockedByPopup | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
@@ -47,56 +76,6 @@ bool Ui::DrawTitleBar()
     ImGui::PopFont();
 
     return pressed;
-}
-
-bool Ui::RoundedImageButton(ImTextureID user_texture_id, ImVec2& size, const char* hover_text)
-{
-    ImGuiContext& g = *GImGui;
-    ImGuiWindow* window = g.CurrentWindow;
-    if (window->SkipItems)
-        return false;
-
-    // Default to using texture ID as ID. User can still push string/integer prefixes.
-    ImGui::PushID((void*)(intptr_t)user_texture_id);
-    const ImGuiID id = window->GetID("#image");
-    ImGui::PopID();
-
-    ImRect bb(window->DC.CursorPos, window->DC.CursorPos + size);
-    ImGui::ItemSize(bb);
-    if (!ImGui::ItemAdd(bb, id))
-        return false;
-
-    window->DrawList->AddImageRounded(user_texture_id, bb.Min, bb.Max, ImVec2(0, 0), ImVec2(1, 1), ImGui::GetColorU32(ImVec4(1, 1, 1, 1)), 5.0f);
-
-    if (ImGui::IsItemHovered())
-    {
-        window->DrawList->AddRectFilled(bb.Min, bb.Max, ImGui::GetColorU32(ImGuiCol_ModalWindowDimBg), 5.6f);
-
-        // Calculating and drawing text over the image
-        ImVec2 textSize = ImGui::CalcTextSize(hover_text);
-        if (textSize.x < size.x)
-        {
-            float offsetX = (ImGui::GetItemRectSize().x - textSize.x) / 2;
-            window->DrawList->AddText(ImVec2(bb.Min.x + offsetX, bb.Min.y + 10), ImGui::GetColorU32(ImGuiCol_Text), hover_text);
-        }
-        else
-        {
-            std::string buf = "";
-            std::stringstream ss(hover_text);
-            short count = 1;
-
-            while (ss >> buf)
-            {
-                textSize = ImGui::CalcTextSize(buf.c_str());
-                float offsetX = (ImGui::GetItemRectSize().x - textSize.x) / 2;
-                window->DrawList->AddText(ImVec2(bb.Min.x + offsetX, bb.Min.y + 10 * count),
-                                  ImGui::GetColorU32(ImGuiCol_Text), buf.c_str());
-                ++count;
-            }
-        }
-    }
-
-    return ImGui::IsItemClicked(0);
 }
 
 bool Ui::ListBox(const char* label, const std::vector<std::string>& all_items, int& selected)
@@ -137,84 +116,6 @@ bool Ui::ListBoxStr(const char* label, const std::vector<std::string>& all_items
     }
 
     return rtn;
-}
-
-bool Ui::ListBoxCustomNames(const char* label, std::string& selected, const char* customNames[], size_t length)
-{
-    bool rtn = false;
-    std::string display_selected = (selected == "All") ? selected : customNames[std::stoi(selected)];
-
-    if (ImGui::BeginCombo(label, display_selected.c_str()))
-    {
-        if (ImGui::MenuItem("All"))
-        {
-            selected = "All";
-            rtn = true;
-        }
-
-        for (size_t i = 0; i < length; ++i)
-        {
-            if (ImGui::MenuItem(customNames[i]))
-            {
-                selected = std::to_string(i);
-                rtn = true;
-                break;
-            }
-        }
-        ImGui::EndCombo();
-    }
-    return rtn;
-}
-
-ImVec2 Ui::GetSize(short count, bool spacing)
-{
-    if (count == 1)
-    {
-        spacing = false;
-    }
-
-    float factor = ImGui::GetStyle().ItemSpacing.x / 2.0f;
-    float x;
-
-    if (count == 3)
-    {
-        factor = ImGui::GetStyle().ItemSpacing.x / 1.403f;
-    }
-
-    if (spacing)
-    {
-        x = ImGui::GetWindowContentRegionWidth() / count - factor;
-    }
-    else
-    {
-        x = ImGui::GetWindowContentRegionWidth() / count;
-    }
-
-    return ImVec2(x, ImGui::GetFrameHeight() * 1.3f);
-}
-
-void Ui::CenterdText(const std::string& text)
-{
-    ImVec2 size = ImGui::CalcTextSize(text.c_str());
-    ImGui::NewLine();
-    ImGui::SameLine(
-        ((ImGui::GetWindowContentRegionWidth() - size.x) / 2)
-    );
-
-    ImGui::Text(text.c_str());
-}
-
-void Ui::ShowTooltip(const char* text)
-{
-    ImGui::SameLine();
-    ImGui::TextDisabled("?");
-
-    if (ImGui::IsItemHovered())
-    {
-        ImGui::BeginTooltip();
-        ImGui::Text(text);
-        ImGui::EndTooltip();
-    }
 }
 
 bool Ui::CheckboxWithHint(const char* label, bool* v, const char* hint, bool is_disabled)
@@ -344,19 +245,6 @@ bool Ui::CheckboxAddressEx(const char* label, const int addr, int enabled_val, i
     return rtn;
 }
 
-bool Ui::CheckboxAddressVar(const char* label, bool val, int addr, const char* hint)
-{
-    bool rtn = false;
-    bool state = val;
-    if (CheckboxWithHint(label, &state, hint))
-    {
-        patch::Set<bool>(addr, state, false);
-        rtn = true;
-    }
-
-    return rtn;
-}
-
 bool Ui::CheckboxBitFlag(const char* label, uint flag, const char* hint)
 {
     bool rtn = false;
@@ -368,84 +256,6 @@ bool Ui::CheckboxBitFlag(const char* label, uint flag, const char* hint)
     }
 
     return rtn;
-}
-
-void Ui::DrawList(ResourceStore& data,
-                  std::function<void(std::string&, std::string&, std::string&)> func_left_click,
-                  std::function<void(std::string&, std::string&, std::string&)> func_right_click)
-{
-    ImGui::PushItemWidth((ImGui::GetWindowContentRegionWidth() - ImGui::GetStyle().ItemSpacing.x)/2);
-    ListBoxStr("##Categories", data.m_Categories, data.m_Selected);
-    ImGui::SameLine();
-
-    data.m_Filter.Draw("##Filter");
-    if (strlen(data.m_Filter.InputBuf) == 0)
-    {
-        ImDrawList* drawlist = ImGui::GetWindowDrawList();
-
-        ImVec2 min = ImGui::GetItemRectMin();
-        min.x += ImGui::GetStyle().FramePadding.x;
-        min.y += ImGui::GetStyle().FramePadding.y;
-
-        drawlist->AddText(min, ImGui::GetColorU32(ImGuiCol_TextDisabled), "Search");
-    }
-
-    ImGui::PopItemWidth();
-
-    ImGui::Spacing();
-
-    if (ImGui::IsMouseClicked(1))
-    {
-        jsonPopup.function = nullptr;
-    }
-
-
-    ImGui::BeginChild(1);
-    for (auto [k, v] : data.m_pData->Items())
-    {
-        if (k.str() == data.m_Selected || data.m_Selected == "All")
-        {
-            for (auto [k2, v2] : v.as_table()->ref<DataStore::Table>())
-            {
-                std::string dataKey = std::string(k2.str());
-                if (data.m_Filter.PassFilter(dataKey.c_str()))
-                {
-                    std::string rootKey = std::string(k.str());
-                    std::string dataVal = v2.value_or<std::string>("Unkonwn");
-                    if (ImGui::MenuItem(dataKey.c_str()) && func_left_click != nullptr)
-                    {
-                        func_left_click(rootKey, dataKey, dataVal);
-                    }
-
-                    if (ImGui::IsItemClicked(1) && func_right_click != nullptr)
-                    {
-                        jsonPopup.function = func_right_click;
-                        jsonPopup.root = rootKey;
-                        jsonPopup.key = dataKey;
-                        jsonPopup.value = dataVal;
-                    }
-                }
-            }
-        }
-    }
-
-    if (jsonPopup.function != nullptr)
-    {
-        if (ImGui::BeginPopupContextWindow())
-        {
-            ImGui::Text(jsonPopup.key.c_str());
-            ImGui::Separator();
-            if (ImGui::MenuItem("Remove"))
-                jsonPopup.function(jsonPopup.root, jsonPopup.key, jsonPopup.value);
-
-
-            if (ImGui::MenuItem("Close"))
-                jsonPopup.function = nullptr;
-
-            ImGui::EndPopup();
-        }
-    }
-    ImGui::EndChild();
 }
 
 #ifdef GTASA
@@ -488,154 +298,6 @@ void Ui::EditStat(const char* label, const int stat_id, const int min, const int
     }
 }
 #endif
-
-void Ui::FilterWithHint(const char* label, ImGuiTextFilter& filter, const char* hint)
-{
-    filter.Draw(label);
-
-    if (strlen(filter.InputBuf) == 0)
-    {
-        ImDrawList* drawlist = ImGui::GetWindowDrawList();
-
-        ImVec2 min = ImGui::GetItemRectMin();
-        min.x += ImGui::GetStyle().FramePadding.x;
-        min.y += ImGui::GetStyle().FramePadding.y;
-
-        drawlist->AddText(min, ImGui::GetColorU32(ImGuiCol_TextDisabled), hint);
-    }
-}
-
-void Ui::DrawImages(ResourceStore &store, std::function<void(std::string&)> onLeftClick, std::function<void(std::string&)> onRightClick,
-                    std::function<std::string(std::string&)> getName, std::function<bool(std::string&)> verifyFunc,
-                    const char** customNames, size_t length)
-{
-    ImGuiStyle& style =  ImGui::GetStyle();
-    /*
-    	Trying to scale images based on resolutions
-    	Native 1366x768
-    */
-    ImVec2 m_ImageSize = store.m_ImageSize;
-    m_ImageSize.x *= screen::GetScreenWidth() / 1366.0f;
-    m_ImageSize.y *= screen::GetScreenHeight() / 768.0f;
-
-    int imageCount = 1;
-    int imagesInRow = static_cast<int>(ImGui::GetWindowContentRegionWidth() / m_ImageSize.x);
-    m_ImageSize.x = ImGui::GetWindowContentRegionWidth() - style.ItemSpacing.x * (imagesInRow-1);
-    m_ImageSize.x /= imagesInRow;
-
-    bool showImages = !Menu::m_bTextOnlyMode;
-    if (gRenderer == Render_DirectX11)
-    {
-        showImages = false;
-    }
-
-    ImGui::Spacing();
-
-    // Hide the popup if right clicked again
-    if (ImGui::IsMouseClicked(1))
-    {
-        imgPopup.function = nullptr;
-    }
-
-    ImGui::PushItemWidth((ImGui::GetWindowContentRegionWidth() - style.ItemSpacing.x)/2);
-    if (customNames)
-    {
-        ListBoxCustomNames("##Categories", store.m_Selected, customNames, length);
-    }
-    else
-    {
-        ListBoxStr("##Categories", store.m_Categories, store.m_Selected);
-    }
-
-    ImGui::SameLine();
-    FilterWithHint("##Filter", store.m_Filter, "Search");
-
-    ImGui::Spacing();
-
-    ImGui::BeginChild("DrawImages");
-    if (showImages)
-    {
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(3, 3));
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(3, 3));
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemInnerSpacing, ImVec2(3, 3));
-        ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, 10.0f);
-    }
-
-    for (uint i = 0; i < store.m_ImagesList.size(); ++i)
-    {
-        std::string text = store.m_ImagesList[i]->m_FileName;
-        std::string modelName = getName(text);
-
-        if (store.m_Filter.PassFilter(modelName.c_str())
-                && (store.m_ImagesList[i]->m_CategoryName == store.m_Selected || store.m_Selected == "All")
-                && (verifyFunc == nullptr || verifyFunc(text))
-           )
-        {
-            /*
-            	Couldn't figure out how to laod images for Dx11
-            	Using texts for now
-            */
-            if (showImages)
-            {
-                if (Ui::RoundedImageButton(store.m_ImagesList[i]->m_pTexture, m_ImageSize, modelName.c_str()))
-                {
-                    onLeftClick(text);
-                }
-                
-            }
-            else
-            {
-                if (ImGui::MenuItem(modelName.c_str()))
-                {
-                    onLeftClick(text);
-                }
-            }
-
-            // Right click popup
-            if (ImGui::IsItemClicked(1) && onRightClick != nullptr)
-            {
-                imgPopup.function = onRightClick;
-                imgPopup.value = modelName;
-            }
-
-            if (showImages)
-            {
-                if (imageCount % imagesInRow != 0)
-                {
-                    ImGui::SameLine(0.0, style.ItemInnerSpacing.x);
-                }
-            }
-            imageCount++;
-        }
-    }
-
-    if (showImages)
-    {
-        ImGui::PopStyleVar(4);
-    }
-
-    // Draw popup code
-    if (imgPopup.function != nullptr)
-    {
-        if (ImGui::BeginPopupContextWindow())
-        {
-            ImGui::Text(imgPopup.value.c_str());
-            ImGui::Separator();
-            if (ImGui::MenuItem("Remove"))
-            {
-                imgPopup.function(imgPopup.value);
-            }
-
-            if (ImGui::MenuItem("Close"))
-            {
-                imgPopup.function = nullptr;
-            }
-
-            ImGui::EndPopup();
-        }
-    }
-    ImGui::EndChild();
-}
 
 void Ui::RadioButtonAddress(const char* label, std::vector<NamedMemory>& named_mem)
 {

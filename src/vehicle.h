@@ -97,9 +97,9 @@ public:
     Vehicle(const Vehicle&) = delete;
 
 #ifdef GTASA
-    static void SpawnVehicle(const std::string& name);
+    static void SpawnVehicle(std::string& name);
 #else
-    static void SpawnVehicle(const std::string& rootkey, const std::string& vehName, const std::string& model);
+    static void SpawnVehicle(std::string& rootkey, std::string& vehName, std::string& model);
 #endif
 
     static void Init();

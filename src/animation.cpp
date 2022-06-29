@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "animation.h"
 #include "ui.h"
+#include "widget.h"
 #include "util.h"
 
 #ifdef GTA3
@@ -295,7 +296,7 @@ void Animation::ShowPage()
         if (ImGui::BeginTabItem(TEXT("Animation.AnimationTab")))
         {
             ImGui::Spacing();
-            if (ImGui::Button(TEXT("Animation.StopAnimation"), Ui::GetSize()))
+            if (ImGui::Button(TEXT("Animation.StopAnimation"), Widget::CalcSize()))
             {
                 if (hPlayer)
                 {
@@ -332,7 +333,7 @@ void Animation::ShowPage()
                     ImGui::InputTextWithHint(TEXT("Animation.IFPName"), "ped", ifpBuf, INPUT_BUFFER_SIZE);
                     ImGui::InputTextWithHint(TEXT("Animation.AnimName"), "cower", animBuf, INPUT_BUFFER_SIZE);
                     ImGui::Spacing();
-                    if (ImGui::Button(TEXT("Animation.AddAnimation"), Ui::GetSize()))
+                    if (ImGui::Button(TEXT("Animation.AddAnimation"), Widget::CalcSize()))
                     {
                         std::string key = std::string("Custom.") + animBuf;
                         m_AnimData.m_pData->Set(key.c_str(), std::string(ifpBuf));
@@ -344,7 +345,7 @@ void Animation::ShowPage()
                 if (ImGui::BeginChild("Anims Child"))
                 {
                     ImGui::Spacing();
-                    Ui::DrawList(m_AnimData, Play, Remove);
+                    Widget::DataList(m_AnimData, Play, Remove);
                     ImGui::EndChild();
                 }
             }
@@ -354,7 +355,7 @@ void Animation::ShowPage()
         if (ImGui::BeginTabItem(TEXT("Animation.CutsceneTab")))
         {
             ImGui::Spacing();
-            if (ImGui::Button(TEXT("Animation.StopCutscene"), Ui::GetSize()))
+            if (ImGui::Button(TEXT("Animation.StopCutscene"), Widget::CalcSize()))
             {
                 if (Cutscene::m_bRunning)
                 {
@@ -373,7 +374,7 @@ void Animation::ShowPage()
             if (ImGui::BeginChild("Cutscene Child"))
             {
                 ImGui::Spacing();
-                Ui::DrawList(Cutscene::m_Data, Cutscene::Play, nullptr);
+                Widget::DataList(Cutscene::m_Data, Cutscene::Play, nullptr);
                 ImGui::EndChild();
             }
             ImGui::EndTabItem();
@@ -381,7 +382,7 @@ void Animation::ShowPage()
         if (ImGui::BeginTabItem(TEXT("Animation.ParticleTab")))
         {
             ImGui::Spacing();
-            if (ImGui::Button(TEXT("Animation.RemoveAll"), Ui::GetSize(2)))
+            if (ImGui::Button(TEXT("Animation.RemoveAll"), Widget::CalcSize(2)))
             {
                 for (int& p : Particle::m_nParticleList)
                 {
@@ -390,7 +391,7 @@ void Animation::ShowPage()
                 Particle::m_nParticleList.clear();
             }
             ImGui::SameLine();
-            if (ImGui::Button(TEXT("Animation.RemoveLatest"), Ui::GetSize(2)))
+            if (ImGui::Button(TEXT("Animation.RemoveLatest"), Widget::CalcSize(2)))
             {
                 Command<Commands::KILL_FX_SYSTEM>(Particle::m_nParticleList.back()); // stop if anything is running
                 Particle::m_nParticleList.pop_back();
@@ -406,7 +407,7 @@ void Animation::ShowPage()
                 static char buf[INPUT_BUFFER_SIZE];
                 ImGui::InputTextWithHint(TEXT("Animation.ParticleName"), "kkjj_on_fire", buf, INPUT_BUFFER_SIZE);
                 ImGui::Spacing();
-                if (ImGui::Button(TEXT("Animation.AddParticle"), Ui::GetSize()))
+                if (ImGui::Button(TEXT("Animation.AddParticle"), Widget::CalcSize()))
                 {
                     std::string key = std::string("Custom.") + buf;
                     m_AnimData.m_pData->Set(key.c_str(), std::string("Dummy"));
@@ -417,7 +418,7 @@ void Animation::ShowPage()
             if (ImGui::BeginChild("Anims Child"))
             {
                 ImGui::Spacing();
-                Ui::DrawList(Particle::m_Data, Particle::Play, Particle::Remove);
+                Widget::DataList(Particle::m_Data, Particle::Play, Particle::Remove);
                 ImGui::EndChild();
             }
             ImGui::EndTabItem();

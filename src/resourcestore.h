@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <rw/rwcore.h>
 #include "datastore.h"
@@ -40,7 +41,8 @@ enum eResourceType
 {
     TYPE_IMAGE,
     TYPE_TEXT,
-    TYPE_BOTH,
+    TYPE_IMAGE_TEXT, // priotizes images
+    TYPE_TEXT_IMAGE, // priotizes texts
 };
 
 /*
@@ -60,6 +62,7 @@ public:
     std::unique_ptr<DataStore> m_pData;
     std::vector<std::unique_ptr<TextureResource>> m_ImagesList;
     ImVec2 m_ImageSize;
+    eResourceType m_Type;
     bool m_bTexturesLoaded = false;
 
     ResourceStore(const char* text, eResourceType type = TYPE_IMAGE, ImVec2 imageSize = ImVec2(64, 64));

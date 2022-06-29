@@ -1,5 +1,6 @@
 #include "pch.h"
 #include "ui.h"
+#include "widget.h"
 #include "updater.h"
 #include "d3dhook.h"
 #include "../depend/imgui/imgui_internal.h"
@@ -74,7 +75,7 @@ void CheatMenu::DrawWindow()
 void CheatMenu::ProcessPages()
 {
     static void* pCallback;
-    ImVec2 size = Ui::GetSize(3, false);
+    ImVec2 size = Widget::CalcSize(3, false);
     ImGuiStyle &style = ImGui::GetStyle();
 
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
@@ -263,7 +264,7 @@ void CheatMenu::Init()
 
 void CheatMenu::ShowAnniversaryPage()
 {
-    Ui::CenterdText("Happy Anniversary!");
+    Widget::TextCentered("Happy Anniversary!");
     ImGui::NewLine();
 
     ImGui::TextWrapped("On this day, in 2019, the first public version of menu was released in MixMods Forum." 
@@ -274,12 +275,12 @@ void CheatMenu::ShowAnniversaryPage()
     ImGui::TextWrapped("Feel free to star the GitHub repo or join the discord server and provide feedback, ideas, or suggestions.");
     ImGui::NewLine();
 
-    if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Ui::GetSize(3))))
+    if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Widget::CalcSize(3))))
     {
         ShellExecute(nullptr, "open", DISCORD_INVITE, nullptr, nullptr, SW_SHOWNORMAL);
     }
     ImGui::SameLine();
-    if (ImGui::Button(TEXT("Menu.GitHubRepo"), ImVec2(Ui::GetSize(3))))
+    if (ImGui::Button(TEXT("Menu.GitHubRepo"), ImVec2(Widget::CalcSize(3))))
     {
         ShellExecute(nullptr, "open", GITHUB_LINK, nullptr, nullptr, SW_SHOWNORMAL);
     }
@@ -289,48 +290,48 @@ void CheatMenu::ShowWelcomePage()
 {
     ImGui::NewLine();
 
-    Ui::CenterdText(TEXT("Menu.WelcomeMSG"));
-    Ui::CenterdText(std::format("{}: Grinch_",TEXT("Menu.Author")));
+    Widget::TextCentered(TEXT("Menu.WelcomeMSG"));
+    Widget::TextCentered(std::format("{}: Grinch_",TEXT("Menu.Author")));
 
     ImGui::NewLine();
     ImGui::TextWrapped(TEXT("Menu.EnsureLatest"));
     ImGui::NewLine();
-    if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Ui::GetSize(2))))
+    if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Widget::CalcSize(2))))
     {
         ShellExecute(nullptr, "open", DISCORD_INVITE, nullptr, nullptr, SW_SHOWNORMAL);
     }
     ImGui::SameLine();
-    if (ImGui::Button(TEXT("Menu.GitHubRepo"), ImVec2(Ui::GetSize(2))))
+    if (ImGui::Button(TEXT("Menu.GitHubRepo"), ImVec2(Widget::CalcSize(2))))
     {
         ShellExecute(nullptr, "open", GITHUB_LINK, nullptr, nullptr, SW_SHOWNORMAL);
     }
     ImGui::NewLine();
     ImGui::TextWrapped(TEXT("Menu.BugDisclaimer"));
     ImGui::Dummy(ImVec2(0, 30));
-    Ui::CenterdText(TEXT("Menu.CopyrightDisclaimer"));
+    Widget::TextCentered(TEXT("Menu.CopyrightDisclaimer"));
 }
 
 void CheatMenu::ShowUpdatePage()
 {
     std::string ver = Updater::GetUpdateVersion();
     ImGui::Dummy(ImVec2(0, 20));
-    Ui::CenterdText(TEXT("Menu.NewVersion"));
-    Ui::CenterdText(std::format("{}: {}", TEXT("Menu.CurrentVersion"), MENU_VERSION));
-    Ui::CenterdText(TEXT("Menu.LatestVersion") + ver);
+    Widget::TextCentered(TEXT("Menu.NewVersion"));
+    Widget::TextCentered(std::format("{}: {}", TEXT("Menu.CurrentVersion"), MENU_VERSION));
+    Widget::TextCentered(TEXT("Menu.LatestVersion") + ver);
     ImGui::Dummy(ImVec2(0, 10));
     ImGui::TextWrapped(TEXT("Menu.UpdaterInfo1"));
     ImGui::Dummy(ImVec2(0, 10));
     ImGui::TextWrapped(TEXT("Menu.UpdaterInfo2"));
 
     ImGui::Dummy(ImVec2(0, 5));
-    if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Ui::GetSize(2))))
+    if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Widget::CalcSize(2))))
     {
         ShellExecute(nullptr, "open", DISCORD_INVITE, nullptr, nullptr, SW_SHOWNORMAL);
     }
 
     ImGui::SameLine();
 
-    if (ImGui::Button(TEXT("Menu.DownloadPage"), Ui::GetSize(2)))
+    if (ImGui::Button(TEXT("Menu.DownloadPage"), Widget::CalcSize(2)))
     {
         ShellExecute(NULL, "open", std::string("https://github.com/user-grinch/Cheat-Menu/releases/tag/" +
                                                ver).c_str(), NULL, NULL, SW_SHOWNORMAL);

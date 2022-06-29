@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "visual.h"
 #include "ui.h"
+#include "widget.h"
 #include "util.h"
 #include "game.h"
 #include "timecycle.h"
@@ -588,7 +589,7 @@ void Visual::ShowPage()
                 ImGui::Spacing();
                 ImGui::SameLine();
                 ImGui::TextWrapped(TEXT("Visual.IncompatibleMods"));
-                Ui::ShowTooltip(TEXT("Visual.IncompatibleModsText"));
+                Widget::Tooltip(TEXT("Visual.IncompatibleModsText"));
                 ImGui::Spacing();
                 Ui::ColorPickerAddress(TEXT("Visual.ArmourbarColor"), *(int*)0x5890FC, ImVec4(225, 225, 225, 255));
                 Ui::EditAddress<float>(TEXT("Visual.ArmourbarPosX"), 0x866B78, -999, 94, 999);
@@ -652,13 +653,13 @@ void Visual::ShowPage()
 #endif
         {
             ImGui::Spacing();
-            if (ImGui::Button(TEXT("Visual.GenerateFile"), Ui::GetSize(2)))
+            if (ImGui::Button(TEXT("Visual.GenerateFile"), Widget::CalcSize(2)))
             {
                 GenerateTimecycFile();
                 SetHelpMessage(TEXT("Visual.FileGenerated"));
             }
             ImGui::SameLine();
-            if (ImGui::Button(TEXT("Visual.ResetTimecyc"), Ui::GetSize(2)))
+            if (ImGui::Button(TEXT("Visual.ResetTimecyc"), Widget::CalcSize(2)))
             {
                 CTimeCycle::Initialise();
                 SetHelpMessage(TEXT("Visual.TimecycReset"));
@@ -703,7 +704,7 @@ void Visual::ShowPage()
             if (Game::m_bSyncTime)
             {
                 ImGui::EndDisabled();
-                Ui::ShowTooltip(TEXT("Visual.SyncTimeEnabled"));
+                Widget::Tooltip(TEXT("Visual.SyncTimeEnabled"));
             }
 
             if (ImGui::Checkbox(TEXT("Visual.FreezeGameTime"), &Game::m_bFreezeTime))

@@ -18,7 +18,7 @@ private:
     static inline bool m_bAimSkinChanger;
     static inline bool m_bDrunkEffect;
     static inline bool m_bFastSprint;
-    static inline ResourceStore m_ClothData { "clothes", eResourceType::TYPE_IMAGE, ImVec2(70, 100)};
+    static inline ResourceStore m_ClothData { "clothes", eResourceType::TYPE_TEXT_IMAGE, ImVec2(70, 100)};
     struct CustomSkins
     {
         static inline ImGuiTextFilter m_Filter;

@@ -77,6 +77,11 @@ enum eRenderer
 extern eRenderer gRenderer;
 extern DataStore gConfig;
 
+typedef void(*ArgCallback3)(std::string&, std::string&, std::string&);
+typedef void(*ArgCallback)(std::string&);
+typedef std::string(*ArgCallbackRtn)(std::string&);
+typedef bool(*ArgCallbackRtnBool)(std::string&);
+
 // Fix function clashes
 static void SetHelpMessage(const char *message, bool b1 = false, bool b2 = false, bool b3 = false)
 {

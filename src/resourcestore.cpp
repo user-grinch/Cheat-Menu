@@ -2,13 +2,13 @@
 #include "pch.h"
 
 ResourceStore::ResourceStore(const char* text, eResourceType type, ImVec2 imageSize)
-    : m_ImageSize(imageSize)
+    : m_ImageSize(imageSize), m_Type(type)
 {
-    if (type == eResourceType::TYPE_TEXT || type == eResourceType::TYPE_BOTH)
+    if (m_Type != eResourceType::TYPE_IMAGE)
     {
         m_pData = std::make_unique<DataStore>(text);
 
-        if (type == eResourceType::TYPE_TEXT)
+        if (m_Type != eResourceType::TYPE_IMAGE_TEXT)
         {
             // Generate categories
             for (auto [k, v] : m_pData->Items())
@@ -18,7 +18,7 @@ ResourceStore::ResourceStore(const char* text, eResourceType type, ImVec2 imageS
         }
     }
 
-    if (type == eResourceType::TYPE_IMAGE || type == eResourceType::TYPE_BOTH)
+    if (m_Type != eResourceType::TYPE_TEXT)
     {
         /*
             Textures need to be loaded from main thread
@@ -66,6 +66,7 @@ void ResourceStore::LoadTextureResource(std::string&& name)
     {
         RwLinkList *pRLL = (RwLinkList*)pRwTexDictionary->texturesInDict.link.next;
         RwTexDictionary *pEndDic;
+        bool addCategories = m_Categories.empty();
         do
         {
             pEndDic = (RwTexDictionary*)pRLL->link.next;
@@ -82,7 +83,24 @@ void ResourceStore::LoadTextureResource(std::string&& name)
             std::string str;
 
             getline(ss, str, '$');
-            m_ImagesList.back().get()->m_CategoryName = str;
+
+            if (m_Type == TYPE_TEXT_IMAGE)
+            {
+                // generate categories from text data
+                for (auto [k, v] : m_pData->Items())
+                {
+                    std::string val = v.value_or<std::string>("Unknown");
+                    if (val == str)
+                    {
+                        m_ImagesList.back().get()->m_CategoryName = k.str();
+                        break;
+                    }
+                }
+            }
+            else 
+            {
+                m_ImagesList.back().get()->m_CategoryName = str;
+            }
 
             if (name == "clothes")
             {
@@ -96,10 +114,12 @@ void ResourceStore::LoadTextureResource(std::string&& name)
             }
 
             // Genereate categories
-            if (!std::count(m_Categories.begin(), m_Categories.end(), m_ImagesList.back().get()->m_CategoryName))
+            if (m_Type == TYPE_IMAGE_TEXT && 
+            !std::count(m_Categories.begin(), m_Categories.end(), m_ImagesList.back().get()->m_CategoryName))
             {
                 m_Categories.push_back(m_ImagesList.back().get()->m_CategoryName);
             }
+            
             pRLL = (RwLinkList*)pEndDic;
         }
         while ( pEndDic != (RwTexDictionary*)&pRwTexDictionary->texturesInDict );

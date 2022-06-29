@@ -40,6 +40,25 @@ public:
         }
         return defaultVal;
     }
+
+    Table* GetTable(const char* key) noexcept
+    {
+        if (pTable)
+        {
+            Table *tbl = (*pTable).at_path(key).as_table();
+            if (tbl)
+            {
+                return tbl;
+            }
+            else
+            {
+                pTable->insert(key, Table());
+                return (*pTable).at_path(key).as_table();
+
+            }
+        }
+        return nullptr;
+    }
     
 
     // Adds data to the structure

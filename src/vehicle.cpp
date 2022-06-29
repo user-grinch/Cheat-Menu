@@ -2,6 +2,7 @@
 #include "vehicle.h"
 #include "menu.h"
 #include "ui.h"
+#include "widget.h"
 #include "util.h"
 #include "filehandler.h"
 #include <CPopulation.h>
@@ -311,9 +312,9 @@ void WarpPlayerIntoVehicle(CVehicle *pVeh, int seatId)
 #endif
 
 #ifdef GTASA
-void Vehicle::SpawnVehicle(const std::string& smodel)
+void Vehicle::SpawnVehicle(std::string& smodel)
 #else
-void Vehicle::SpawnVehicle(const std::string& rootkey, const std::string& vehName, const std::string& smodel)
+void Vehicle::SpawnVehicle(std::string& rootkey, std::string& vehName, std::string& smodel)
 #endif
 {
     CPlayerPed* player = FindPlayerPed();
@@ -506,7 +507,7 @@ void Vehicle::ShowPage()
     int hplayer = CPools::GetPedRef(pPlayer);
     CVehicle *pVeh = pPlayer->m_pVehicle;
 
-    if (ImGui::Button(TEXT("Vehicle.BlowCar"), ImVec2(Ui::GetSize(3))))
+    if (ImGui::Button(TEXT("Vehicle.BlowCar"), ImVec2(Widget::CalcSize(3))))
     {
         for (CVehicle *pVeh : CPools::ms_pVehiclePool)
         {
@@ -516,14 +517,14 @@ void Vehicle::ShowPage()
 
     ImGui::SameLine();
 
-    if (ImGui::Button(TEXT("Vehicle.FixCar"), ImVec2(Ui::GetSize(3))) && Util::IsInVehicle())
+    if (ImGui::Button(TEXT("Vehicle.FixCar"), ImVec2(Widget::CalcSize(3))) && Util::IsInVehicle())
     {
         Util::FixVehicle(pVeh);
     }
 
     ImGui::SameLine();
 
-    if (ImGui::Button(TEXT("Vehicle.FlipCar"), ImVec2(Ui::GetSize(3))) && Util::IsInVehicle())
+    if (ImGui::Button(TEXT("Vehicle.FlipCar"), ImVec2(Widget::CalcSize(3))) && Util::IsInVehicle())
     {
         Util::FlipVehicle(pVeh);
     }
@@ -833,7 +834,7 @@ void Vehicle::ShowPage()
                     ImGui::Columns(1);
 
                     ImGui::Spacing();
-                    if (ImGui::Button(TEXT("Vehicle.Driver"), ImVec2(Ui::GetSize(2))))
+                    if (ImGui::Button(TEXT("Vehicle.Driver"), ImVec2(Widget::CalcSize(2))))
                     {
                         Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, pClosestVeh);
                     }
@@ -847,7 +848,7 @@ void Vehicle::ShowPage()
                         }
 
                         if (ImGui::Button((std::string(TEXT("Vehicle.Passenger")) + std::to_string(i + 1)).c_str(),
-                                          ImVec2(Ui::GetSize(2))))
+                                          ImVec2(Widget::CalcSize(2))))
                         {
 #ifdef GTASA
                             Command<Commands::WARP_CHAR_INTO_CAR_AS_PASSENGER>(hplayer, pClosestVeh, i);
@@ -870,7 +871,7 @@ void Vehicle::ShowPage()
             {
                 ImGui::InputInt(TEXT("Vehicle.Radius"), &m_nVehRemoveRadius);
                 ImGui::Spacing();
-                if (ImGui::Button(TEXT("Vehicle.RemoveVeh"), Ui::GetSize(1)))
+                if (ImGui::Button(TEXT("Vehicle.RemoveVeh"), Widget::CalcSize(1)))
                 {
                     CPlayerPed* player = FindPlayerPed();
                     for (CVehicle* pVeh : CPools::ms_pVehiclePool)
@@ -931,7 +932,7 @@ void Vehicle::ShowPage()
                     int doors = seats == 4 ? 6 : 4;
                     int hveh = CPools::GetVehicleRef(pVeh);
 
-                    if (ImGui::Button(TEXT("Vehicle.All"), ImVec2(Ui::GetSize())))
+                    if (ImGui::Button(TEXT("Vehicle.All"), ImVec2(Widget::CalcSize())))
                     {
                         for (int i = 0; i < doors; ++i)
                         {
@@ -957,7 +958,7 @@ void Vehicle::ShowPage()
 
                     for (int i = 0; i != doors; ++i)
                     {
-                        if (ImGui::Button(m_DoorNames[i].c_str(), ImVec2(Ui::GetSize(2))))
+                        if (ImGui::Button(m_DoorNames[i].c_str(), ImVec2(Widget::CalcSize(2))))
                         {
                             switch (m_nDoorMenuButton)
                             {
@@ -998,14 +999,14 @@ void Vehicle::ShowPage()
                     m_fLockSpeed = m_fLockSpeed > 100 ? 100 : m_fLockSpeed;
                     m_fLockSpeed = m_fLockSpeed < 0 ? 0 : m_fLockSpeed;
 
-                    if (ImGui::Button(TEXT("Vehicle.Set"), ImVec2(Ui::GetSize(2))))
+                    if (ImGui::Button(TEXT("Vehicle.Set"), ImVec2(Widget::CalcSize(2))))
                     {
                         Util::SetCarForwardSpeed(pVeh, m_fLockSpeed);
                     }
 
                     ImGui::SameLine();
 
-                    if (ImGui::Button(TEXT("Vehicle.InstantStop"), ImVec2(Ui::GetSize(2))))
+                    if (ImGui::Button(TEXT("Vehicle.InstantStop"), ImVec2(Widget::CalcSize(2))))
                     {
                         Util::SetCarForwardSpeed(pVeh, 0.0f);
                     }
@@ -1067,13 +1068,13 @@ void Vehicle::ShowPage()
             ImGui::SetNextItemWidth(width);
             ImGui::InputTextWithHint("##LicenseText", TEXT("Vehicle.PlateText"), Spawner::m_nLicenseText, 9);
 
-            Ui::DrawImages(Spawner::m_VehData, SpawnVehicle, nullptr,
-                           [](std::string str)
+            Widget::ImageList(Spawner::m_VehData, SpawnVehicle, nullptr,
+                           [](std::string& str)
             {
                 return GetNameFromModel(std::stoi(str));
             });
 #else
-            Ui::DrawList(Spawner::m_VehData, SpawnVehicle, nullptr);
+            Widget::DataList(Spawner::m_VehData, SpawnVehicle, nullptr);
 #endif
             ImGui::EndTabItem();
         }
@@ -1088,7 +1089,7 @@ void Vehicle::ShowPage()
                 Paint::GenerateNodeList(veh, PaintData::m_vecNames, PaintData::m_Selected);
 
                 ImGui::Spacing();
-                if (ImGui::Button(TEXT("Vehicle.ResetColor"), ImVec2(Ui::GetSize())))
+                if (ImGui::Button(TEXT("Vehicle.ResetColor"), ImVec2(Widget::CalcSize())))
                 {
                     Paint::ResetNodeColor(veh, PaintData::m_Selected);
                     SetHelpMessage(TEXT("Vehicle.ResetColorMSG"));
@@ -1129,7 +1130,7 @@ void Vehicle::ShowPage()
 
                 int count = (int)m_CarcolsColorData.size();
 
-                ImVec2 size = Ui::GetSize();
+                ImVec2 size = Widget::CalcSize();
                 int btnsInRow = ImGui::GetWindowContentRegionWidth() / (size.y * 2);
                 int btnSize = (ImGui::GetWindowContentRegionWidth() - int(ImGuiStyleVar_ItemSpacing) * (btnsInRow -
                                0.6 * btnsInRow)) / btnsInRow;
@@ -1159,7 +1160,7 @@ void Vehicle::ShowPage()
                 {
                     int model = veh->m_nModelIndex;
                     ImGui::Spacing();
-                    if (ImGui::Button(TEXT("Vehicle.RemoveNeon"), ImVec2(Ui::GetSize())))
+                    if (ImGui::Button(TEXT("Vehicle.RemoveNeon"), ImVec2(Widget::CalcSize())))
                     {
                         Neon::Remove(veh);
                         SetHelpMessage(TEXT("Vehicle.RemoveNeonMSG"));
@@ -1195,7 +1196,7 @@ void Vehicle::ShowPage()
                     ImGui::Text(TEXT("Vehicle.SelectPreset"));
 
                     int count = (int)m_CarcolsColorData.size();
-                    ImVec2 size = Ui::GetSize();
+                    ImVec2 size = Widget::CalcSize();
                     int btnsInRow = ImGui::GetWindowContentRegionWidth() / (size.y * 2);
                     int btnSize = (ImGui::GetWindowContentRegionWidth() - int(ImGuiStyleVar_ItemSpacing) * (btnsInRow -
                                    0.6 * btnsInRow)) / btnsInRow;
@@ -1228,7 +1229,7 @@ void Vehicle::ShowPage()
                     Paint::GenerateNodeList(veh, PaintData::m_vecNames, PaintData::m_Selected);
 
                     ImGui::Spacing();
-                    if (ImGui::Button(TEXT("Vehicle.ResetTexture"), ImVec2(Ui::GetSize())))
+                    if (ImGui::Button(TEXT("Vehicle.ResetTexture"), ImVec2(Widget::CalcSize())))
                     {
                         Paint::ResetNodeTexture(veh, PaintData::m_Selected);
                         SetHelpMessage(TEXT("Vehicle.ResetTextureMSG"));
@@ -1274,7 +1275,7 @@ void Vehicle::ShowPage()
                     }
                     ImGui::Columns(1);
                     ImGui::Spacing();
-                    Ui::DrawImages(Paint::m_TextureData,
+                    Widget::ImageList(Paint::m_TextureData,
                                    [](std::string& str)
                     {
                         Paint::SetNodeTexture(FindPlayerPed()->m_pVehicle, PaintData::m_Selected, str,
@@ -1292,7 +1293,7 @@ void Vehicle::ShowPage()
             if (ImGui::BeginTabItem(TEXT("Vehicle.TuneTab")))
             {
                 ImGui::Spacing();
-                Ui::DrawImages(m_TuneData,
+                Widget::ImageList(m_TuneData,
                                [](std::string& str)
                 {
                     AddComponent(str);
@@ -1305,11 +1306,10 @@ void Vehicle::ShowPage()
                 {
                     return str;
                 },
-                [pPlayer](std::string& str)
+                [](std::string& str)
                 {
-                    return ((bool(*)(int, CVehicle*))0x49B010)(std::stoi(str), pPlayer->m_pVehicle);
-                }
-                              );
+                    return ((bool(*)(int, CVehicle*))0x49B010)(std::stoi(str), FindPlayerPed()->m_pVehicle);
+                });
 
                 ImGui::EndTabItem();
             }
@@ -1322,7 +1322,7 @@ void Vehicle::ShowPage()
                 int handlingID = patch::Get<WORD>((int)pInfo + 74, false); //  CBaseModelInfo + 74 = handlingID
                 tHandlingData *pHandlingData = reinterpret_cast<tHandlingData*>(0xC2B9DC + (handlingID * 224)); // sizeof(tHandlingData) = 224
 
-                if (ImGui::Button(TEXT("Vehicle.ResetHandling"), ImVec2(Ui::GetSize(3))))
+                if (ImGui::Button(TEXT("Vehicle.ResetHandling"), ImVec2(Widget::CalcSize(3))))
                 {
                     gHandlingDataMgr.LoadHandlingData();
                     SetHelpMessage(TEXT("Vehicle.ResetHandlingMSG"));
@@ -1330,7 +1330,7 @@ void Vehicle::ShowPage()
 
                 ImGui::SameLine();
 
-                if (ImGui::Button(TEXT("Vehicle.SaveFile"), ImVec2(Ui::GetSize(3))))
+                if (ImGui::Button(TEXT("Vehicle.SaveFile"), ImVec2(Widget::CalcSize(3))))
                 {
                     FileHandler::GenerateHandlingFile(pHandlingData, m_VehicleIDE);
                     SetHelpMessage(TEXT("Vehicle.SaveFileMSG"));
@@ -1338,7 +1338,7 @@ void Vehicle::ShowPage()
 
                 ImGui::SameLine();
 
-                if (ImGui::Button(TEXT("Vehicle.ReadMore"), ImVec2(Ui::GetSize(3))))
+                if (ImGui::Button(TEXT("Vehicle.ReadMore"), ImVec2(Widget::CalcSize(3))))
                 {
                     ShellExecute(NULL, "open", "https://projectcerbera.com/gta/sa/tutorials/handling", NULL, NULL,
                                                     SW_SHOWNORMAL);

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "menu.h"
 #include "ui.h"
+#include "widget.h"
 #include "util.h"
 #include "updater.h"
 #include "cheatmenu.h"
@@ -324,7 +325,7 @@ void Menu::ShowPage()
         if (ImGui::BeginTabItem(TEXT("Menu.Config")))
         {
             ImGui::Spacing();
-            if (ImGui::Button(TEXT("Menu.ResetSize"), ImVec2(Ui::GetSize(1))))
+            if (ImGui::Button(TEXT("Menu.ResetSize"), ImVec2(Widget::CalcSize(1))))
             {
                 CheatMenu::ResetMenuSize();
             }
@@ -448,7 +449,7 @@ void Menu::ShowPage()
         {
             ImGui::Spacing();
             ImGui::Text(TEXT("Menu.Usage"));
-            Ui::ShowTooltip(TEXT("Menu.UsageText"));
+            Widget::Tooltip(TEXT("Menu.UsageText"));
             ImGui::Spacing();
             ImGui::BeginChild("Hotkeys");
             menuOpen.DrawUI(TEXT("Menu.OpenMenuKey"));
@@ -530,21 +531,21 @@ void Menu::ShowPage()
         {
             ImGui::Spacing();
 
-            if (ImGui::Button(TEXT("Menu.CheckUpdate"), ImVec2(Ui::GetSize(3))))
+            if (ImGui::Button(TEXT("Menu.CheckUpdate"), ImVec2(Widget::CalcSize(3))))
             {
                 Updater::CheckUpdate();
             }
 
             ImGui::SameLine();
 
-            if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Ui::GetSize(3))))
+            if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Widget::CalcSize(3))))
             {
                 ShellExecute(nullptr, "open", DISCORD_INVITE, nullptr, nullptr, SW_SHOWNORMAL);
             }
 
             ImGui::SameLine();
 
-            if (ImGui::Button(TEXT("Menu.GitHubRepo"), ImVec2(Ui::GetSize(3))))
+            if (ImGui::Button(TEXT("Menu.GitHubRepo"), ImVec2(Widget::CalcSize(3))))
             {
                 ShellExecute(nullptr, "open", GITHUB_LINK, nullptr, nullptr, SW_SHOWNORMAL);
             }
@@ -566,7 +567,7 @@ void Menu::ShowPage()
                 ImGui::Dummy(ImVec2(0, 10));
                 ImGui::TextWrapped(TEXT("Menu.BugDisclaimer"));
                 ImGui::Dummy(ImVec2(0, 10));
-                Ui::CenterdText(TEXT("Menu.CopyrightDisclaimer"));
+                Widget::TextCentered(TEXT("Menu.CopyrightDisclaimer"));
 
                 ImGui::Dummy(ImVec2(0, 30));
                 if (ImGui::BeginTable("Hall of Fame", 2, ImGuiTableFlags_ScrollY))
