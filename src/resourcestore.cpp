@@ -56,7 +56,7 @@ void ResourceStore::LoadTextureResource(std::string&& name)
 
     if (!std::filesystem::exists(fullPath))
     {
-        //Log::PrintWarn("Failed to load {}", fullPath);
+        Log::Print<eLogLevel::Warn>("Failed to load {}", fullPath);
         return;
     }
 
@@ -66,7 +66,7 @@ void ResourceStore::LoadTextureResource(std::string&& name)
     {
         RwLinkList *pRLL = (RwLinkList*)pRwTexDictionary->texturesInDict.link.next;
         RwTexDictionary *pEndDic;
-        bool addCategories = m_Categories.empty();
+        bool addCategories = (m_Categories.size() < 2); // "All"
         do
         {
             pEndDic = (RwTexDictionary*)pRLL->link.next;
@@ -114,7 +114,7 @@ void ResourceStore::LoadTextureResource(std::string&& name)
             }
 
             // Genereate categories
-            if (m_Type == TYPE_IMAGE_TEXT && 
+            if (m_Type != TYPE_TEXT_IMAGE && 
             !std::count(m_Categories.begin(), m_Categories.end(), m_ImagesList.back().get()->m_CategoryName))
             {
                 m_Categories.push_back(m_ImagesList.back().get()->m_CategoryName);

@@ -91,21 +91,8 @@ void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 
             // Category box
             ImGui::PushItemWidth((ImGui::GetWindowContentRegionWidth() - ImGui::GetStyle().ItemSpacing.x)/2);
             Ui::ListBoxStr("##Categories", data.m_Categories, data.m_Selected);
-
             ImGui::SameLine();
-
-            // Search box
-            data.m_Filter.Draw("##Filter");
-            if (strlen(data.m_Filter.InputBuf) == 0)
-            {
-                ImDrawList* drawlist = ImGui::GetWindowDrawList();
-
-                ImVec2 min = ImGui::GetItemRectMin();
-                min.x += ImGui::GetStyle().FramePadding.x;
-                min.y += ImGui::GetStyle().FramePadding.y;
-
-                drawlist->AddText(min, ImGui::GetColorU32(ImGuiCol_TextDisabled), "Search");
-            }
+            FilterWithHint("##Filter", data.m_Filter, TEXT("Window.Search"));
             ImGui::PopItemWidth();
 
             ImGui::Spacing();
@@ -164,7 +151,12 @@ void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 
         if (ImGui::BeginTabItem(TEXT("Window.FavouritesTab")))
         {
             ImGui::Spacing();
+            ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth());
+            FilterWithHint("##Filter", data.m_Filter, TEXT("Window.Search"));
+            ImGui::PopItemWidth();
+            ImGui::Spacing();
             ImGui::BeginChild(1);
+            size_t count = 0;
             for (auto [k, v] : *data.m_pData->GetTable("Favourites"))
             {
                 std::string key = std::string(k.str());
@@ -179,9 +171,14 @@ void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 
 
                     if (ImGui::IsItemClicked(1))
                     {
-                        contextMenu = {std::string("Favourites"), key, val};
+                        contextMenu = {std::string("Favourites"), key, val, removeFunc};
                     }
                 }
+                ++count;
+            }
+            if (count == 0)
+            {
+                Widget::TextCentered(TEXT("Menu.FavouritesNone"));
             }
             if (contextMenu.func != nullptr)
             {
