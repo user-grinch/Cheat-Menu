@@ -16,6 +16,13 @@ private:
     static inline bool m_bNoTextures;
 #endif
 
+    template<typename T>
+    static bool TimeCycColorEdit3(const char* label, T* r, T* g, T* b, ImGuiColorEditFlags flags = 0);
+    template <typename T>
+    static bool TimeCycColorEdit4(const char* label, T* r, T* g, T* b, T* a, ImGuiColorEditFlags flags = 0);
+    template <typename T>
+    static void TimecycSlider(const char* label, T* data, int min, int max);
+    
 public:
     Visual() = delete;
     Visual(const Visual&) = delete;

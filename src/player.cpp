@@ -484,7 +484,7 @@ void Player::ShowPage()
             }
             Widget::CheckboxAddr(TEXT("Player.InfSprint"), 0xB7CEE4);
 #else
-            Widget::CheckboxAddr(TEXT("Player.InfSprint"),Ui::CheckboxBits (int)&pInfo->m_bInfiniteSprint);
+            Widget::CheckboxAddr(TEXT("Player.InfSprint"), (int)&pInfo->m_bInfiniteSprint);
 #endif
 
             ImGui::NextColumn();

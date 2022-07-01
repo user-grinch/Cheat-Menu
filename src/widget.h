@@ -46,8 +46,6 @@ public:
     // Draws a dropdown editor for memory address
     template <typename T>
     static void EditAddr(const char* label, uint address, int min = 0, int def = 0, int max = 100);
-
-    // Draws a dropdown editor for memory address float
     static void EditAddr(const char* label, uint address, float min = 0.0f, float def = 0.0f, 
                             float max = 100.0f, float mul = 1, float change = 1.0f);
 

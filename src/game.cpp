@@ -347,7 +347,6 @@ void Game::Init()
         }
 
         RandomCheats::Process();
-#endif
 
         if (freeCam.Pressed())
         {
@@ -366,6 +365,7 @@ void Game::Init()
         {
             Freecam::Process();
         }
+#endif
 
         // improve this later
         static uint syncTimer;

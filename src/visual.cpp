@@ -286,35 +286,6 @@ int CalcArrayIndex()
     return TOTAL_WEATHERS * hour + CWeather::OldWeatherType;
 }
 
-
-bool TimeCycColorEdit3(const char* label, uchar* r, uchar* g, uchar* b)
-{
-    bool rtn = false;
-    int val = CalcArrayIndex();
-
-#ifdef GTASA
-    auto red = static_cast<uchar*>(patch::GetPointer(int(r)));
-    auto green = static_cast<uchar*>(patch::GetPointer(int(g)));
-    auto blue = static_cast<uchar*>(patch::GetPointer(int(b)));
-#else
-    auto red = static_cast<uchar*>(r);
-    auto green = static_cast<uchar*>(g);
-    auto blue = static_cast<uchar*>(b);
-#endif
-
-    float col[3] { red[val] / 255.0f, green[val] / 255.0f, blue[val] / 255.0f };
-
-    if (ImGui::ColorEdit3(label, col))
-    {
-        red[val] = col[0] * 255;
-        green[val] = col[1] * 255;
-        blue[val] = col[2] * 255;
-        rtn = true;
-    }
-
-    return rtn;
-}
-
 template <typename T>
 void TimecycSlider(const char* label, T* ptr, int min, int max)
 {
@@ -331,26 +302,72 @@ void TimecycSlider(const char* label, T* ptr, int min, int max)
         arr[val] = static_cast<T>(a);
 }
 
-bool TimeCycColorEdit4(const char* label, uchar* r, uchar* g, uchar* b, uchar* a)
+template<typename T>
+bool Visual::TimeCycColorEdit3(const char* label, T* r, T* g, T* b, ImGuiColorEditFlags flags)
 {
     bool rtn = false;
     int val = CalcArrayIndex();
 
 #ifdef GTASA
-    auto red = static_cast<uchar*>(patch::GetPointer(int(r)));
-    auto green = static_cast<uchar*>(patch::GetPointer(int(g)));
-    auto blue = static_cast<uchar*>(patch::GetPointer(int(b)));
-    auto alpha = static_cast<uchar*>(patch::GetPointer(int(a)));
+    auto red = static_cast<T*>(patch::GetPointer(int(r)));
+    auto green = static_cast<T*>(patch::GetPointer(int(g)));
+    auto blue = static_cast<T*>(patch::GetPointer(int(b)));
 #else
-    auto red = static_cast<uchar*>(r);
-    auto green = static_cast<uchar*>(g);
-    auto blue = static_cast<uchar*>(b);
-    auto alpha = static_cast<uchar*>(a);
+    auto red = static_cast<T*>(r);
+    auto green = static_cast<T*>(g);
+    auto blue = static_cast<T*>(b);
+#endif
+
+    float col[3] { red[val] / 255.0f, green[val] / 255.0f, blue[val] / 255.0f };
+
+    if (ImGui::ColorEdit3(label, col, flags))
+    {
+        red[val] = col[0] * 255;
+        green[val] = col[1] * 255;
+        blue[val] = col[2] * 255;
+        rtn = true;
+    }
+
+    return rtn;
+}
+
+template <typename T>
+void Visual::TimecycSlider(const char* label, T* ptr, int min, int max)
+{
+    int val = CalcArrayIndex();
+#ifdef GTASA
+    // Compatable with 24h TimeCyc
+    T* arr = static_cast<T*>(patch::GetPointer(int(ptr)));
+#else
+    T* arr = static_cast<T*>(ptr);
+#endif
+    int a = arr[val];
+
+    if (ImGui::SliderInt(label, &a, min, max))
+        arr[val] = static_cast<T>(a);
+}
+
+template <typename T>
+bool Visual::TimeCycColorEdit4(const char* label, T* r, T* g, T* b, T* a, ImGuiColorEditFlags flags)
+{
+    bool rtn = false;
+    int val = CalcArrayIndex();
+
+#ifdef GTASA
+    auto red = static_cast<T*>(patch::GetPointer(int(r)));
+    auto green = static_cast<T*>(patch::GetPointer(int(g)));
+    auto blue = static_cast<T*>(patch::GetPointer(int(b)));
+    auto alpha = static_cast<T*>(patch::GetPointer(int(a)));
+#else
+    auto red = static_cast<T*>(r);
+    auto green = static_cast<T*>(g);
+    auto blue = static_cast<T*>(b);
+    auto alpha = static_cast<T*>(a);
 #endif
 
     float col[4] { red[val] / 255.0f, green[val] / 255.0f, blue[val] / 255.0f, alpha[val] / 255.0f };
 
-    if (ImGui::ColorEdit4(label, col))
+    if (ImGui::ColorEdit4(label, col, flags))
     {
         red[val] = col[0] * 255;
         green[val] = col[1] * 255;
@@ -361,6 +378,7 @@ bool TimeCycColorEdit4(const char* label, uchar* r, uchar* g, uchar* b, uchar* a
 
     return rtn;
 }
+
 
 static void ColorPickerAddr(const char* label, int addr, ImVec4&& default_color)
 {

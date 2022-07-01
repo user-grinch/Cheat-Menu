@@ -18,8 +18,8 @@ static const char* pedTypeList = "Civ Male\0Civ Female\0Cop (crash)\0Cubans\0Hai
 "\0Criminal\0Unused\0Prostitute\0Special\0";
 
 #else
-static const char* pedTypeList = L"Civ Male\0Civ Female\0Cop\0Leones\0Triads\0Diablos\0Yakuza\0Yardies\0Colombians\0"
-L"Hoods\0unused\0unused\0Emergency\0Fireman\0Criminal\0unused\0Prostitute\0Special\0";
+static const char* pedTypeList = "Civ Male\0Civ Female\0Cop\0Leones\0Triads\0Diablos\0Yakuza\0Yardies\0Colombians\0"
+"Hoods\0unused\0unused\0Emergency\0Fireman\0Criminal\0unused\0Prostitute\0Special\0";
 
 #endif
 
@@ -144,7 +144,7 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
             Command<Commands::LOAD_SPECIAL_CHARACTER>(currentSlot, model.c_str());
             Command<Commands::LOAD_ALL_MODELS_NOW>();
 
-            Command<Commands::CREATE_CHAR>(SpawnPed::m_nSelectedPedType + 4, 108+currentSlot, pos.x, pos.y, pos.z + 1, &hplayer);
+            Command<Commands::CREATE_CHAR>(Spawner::m_nSelectedPedType + 4, 108+currentSlot, pos.x, pos.y, pos.z + 1, &hplayer);
             Command<Commands::UNLOAD_SPECIAL_CHARACTER>(currentSlot);
 
             ++currentSlot;
@@ -369,7 +369,7 @@ void Ped::ShowPage()
                     Widget::DataList(Weapon::m_WeaponData,
                     [](std::string& root, std::string& key, std::string& id)
                     {
-                        SpawnPed::m_nWeaponId = std::stoi(id);
+                        Spawner::m_nWeaponId = std::stoi(id);
                         weaponName = key;
                     },
                     nullptr);

@@ -887,27 +887,20 @@ void Vehicle::ShowPage()
             }
 
 #ifndef GTA3
-            if (ImGui::CollapsingHeader(TEXT("Vehicle.TrafficOpt")))
+            std::vector<Widget::BindInfo> color
             {
-
-                std::vector<Widget::BindInfo> color
-                {
-                    {TEXT("Vehicle.Black"), BY_GAME(0x969151, 0xA10B82, NULL)},
-                    {TEXT("Vehicle.Pink"), BY_GAME(0x969150, 0xA10B26, NULL)}
-                };
-                Widget::EditRadioBtnAddr(TEXT("Vehicle.Color"), color);
-                ImGui::Spacing();
-#ifdef GTASA
-                std::vector<Widget::BindInfo> type
-                {
-                    {TEXT("Vehicle.Cheap"), 0x96915E}, {TEXT("Vehicle.Country"), 0x96917B}, 
-                    {TEXT("Vehicle.Fast"), 0x96915F}
-                };
-                Widget::EditRadioBtnAddr(TEXT("Vehicle.Type"), type);
+                {TEXT("Vehicle.Black"), BY_GAME(0x969151, 0xA10B82, NULL)},
+                {TEXT("Vehicle.Pink"), BY_GAME(0x969150, 0xA10B26, NULL)}
+            };
+            Widget::EditRadioBtnAddr(TEXT("Vehicle.TrafficColor"), color);
 #endif
-                ImGui::Spacing();
-                ImGui::Separator();
-            }
+#ifdef GTASA
+            std::vector<Widget::BindInfo> type
+            {
+                {TEXT("Vehicle.Cheap"), 0x96915E}, {TEXT("Vehicle.Country"), 0x96917B}, 
+                {TEXT("Vehicle.Fast"), 0x96915F}
+            };
+            Widget::EditRadioBtnAddr(TEXT("Vehicle.TrafficType"), type);
 #endif
             if (pPlayer && pPlayer->m_pVehicle)
             {
@@ -1049,7 +1042,8 @@ void Vehicle::ShowPage()
 #ifdef GTASA
                         SpawnVehicle(str);
 #else
-                        SpawnVehicle("", "", str);
+                        std::string temp = "";
+                        SpawnVehicle(temp, temp, str);
 #endif
                     }
                     else
