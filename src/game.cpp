@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "menu.h"
 #include "game.h"
-#include "ui.h"
 #include "widget.h"
 #include "util.h"
 #ifdef GTASA
@@ -468,20 +467,20 @@ void Game::ShowPage()
                 }
             }
 
-            Ui::CheckboxAddress(TEXT("Game.FasterClock"), BY_GAME(0x96913B, 0xA10B87, 0x95CDBB));
+            Widget::CheckboxAddr(TEXT("Game.FasterClock"), BY_GAME(0x96913B, 0xA10B87, 0x95CDBB));
 #ifdef GTASA
-            if (Ui::CheckboxWithHint(TEXT("Game.ForbiddenWantedLevel"), &m_bForbiddenArea, TEXT("Game.ForbiddenWantedLevelText")))
+            if (Widget::Checkbox(TEXT("Game.ForbiddenWantedLevel"), &m_bForbiddenArea, TEXT("Game.ForbiddenWantedLevelText")))
             {
                 patch::Set<BYTE>(0x441770, m_bForbiddenArea ? 0x83 : 0xC3, false);
             }
-            Ui::CheckboxAddress(TEXT("Game.FreePNS"), 0x96C009);
+            Widget::CheckboxAddr(TEXT("Game.FreePNS"), 0x96C009);
 #endif
 
 #ifdef GTAVC
             ImGui::NextColumn();
 #endif
 #ifdef GTASA
-            Ui::CheckboxAddress(TEXT("Game.FreezeGame"), 0xA10B48);
+            Widget::CheckboxAddr(TEXT("Game.FreezeGame"), 0xA10B48);
 #endif
             if (ImGui::Checkbox(TEXT("Game.FreezeGameTime"), &m_bFreezeTime))
             {
@@ -502,7 +501,7 @@ void Game::ShowPage()
             {
                 Command<Commands::FREEZE_ONSCREEN_TIMER>(m_bMissionTimer);
             }
-            if (Ui::CheckboxWithHint(TEXT("Game.HardMode"), &HardMode::m_bEnabled, TEXT("Game.HardModeText")))
+            if (Widget::Checkbox(TEXT("Game.HardMode"), &HardMode::m_bEnabled, TEXT("Game.HardModeText")))
             {
                 CPlayerPed* player = FindPlayerPed();
 
@@ -531,7 +530,7 @@ void Game::ShowPage()
                 }
             }
 #ifdef GTASA
-            if (Ui::CheckboxWithHint(TEXT("Game.NoWaterPhysics"), &m_bNoWaterPhysics))
+            if (Widget::Checkbox(TEXT("Game.NoWaterPhysics"), &m_bNoWaterPhysics))
             {
                 if (m_bNoWaterPhysics)
                 {
@@ -542,15 +541,15 @@ void Game::ShowPage()
                     patch::Set<uint8_t>(0x6C2759, 0, true);
                 }
             }
-            if (Ui::CheckboxWithHint(TEXT("Game.KeepStuff"), &m_bKeepStuff, TEXT("Game.KeepStuffText")))
+            if (Widget::Checkbox(TEXT("Game.KeepStuff"), &m_bKeepStuff, TEXT("Game.KeepStuffText")))
             {
                 Command<Commands::SWITCH_ARREST_PENALTIES>(m_bKeepStuff);
                 Command<Commands::SWITCH_DEATH_PENALTIES>(m_bKeepStuff);
             }
-            Ui::CheckboxWithHint(TEXT("Game.Screenshot"), &m_bScreenShot, 
+            Widget::Checkbox(TEXT("Game.Screenshot"), &m_bScreenShot, 
                                 std::format("{} {}", TEXT("Game.ScreenshotTip"), 
                                 quickSceenShot.GetNameString()).c_str());
-            Ui::CheckboxWithHint(TEXT("Game.SolidWater"), &m_bSolidWater, TEXT("Game.SolidWaterText"));
+            Widget::Checkbox(TEXT("Game.SolidWater"), &m_bSolidWater, TEXT("Game.SolidWaterText"));
 #endif
             if (ImGui::Checkbox(TEXT("Game.SyncSystemTime"), &m_bSyncTime))
             {
@@ -580,14 +579,14 @@ void Game::ShowPage()
 
                 ImGui::Spacing();
                 ImGui::Separator();
-            }
+            }//0xC17040
 #endif
-            Ui::EditAddress<int>(TEXT("Game.DaysPassed"), BY_GAME(0xB79038, 0x97F1F4, 0x8F2BB8), 0, 9999);
-            Ui::EditReference(TEXT("Game.FPSLimit"), RsGlobal.maxFPS, 1, 30, 60);
+            Widget::EditAddr<int>(TEXT("Game.DaysPassed"), BY_GAME(0xB79038, 0x97F1F4, 0x8F2BB8), 0, 9999);
+            Widget::EditAddr<int>(TEXT("Game.FPSLimit"), (uint)&(RsGlobal.maxFPS), 1, 30, 999);
 #ifdef GTASA
             if (ImGui::CollapsingHeader(TEXT("Game.Freecam")))
             {
-                if (Ui::CheckboxWithHint(TEXT("Game.Enable"), &Freecam::m_bEnabled, TEXT("Game.EnableText")))
+                if (Widget::Checkbox(TEXT("Game.Enable"), &Freecam::m_bEnabled, TEXT("Game.EnableText")))
                 {
                     if (!Freecam::m_bEnabled)
                     {
@@ -604,14 +603,15 @@ void Game::ShowPage()
                 ImGui::Separator();
             }
 #endif
-            Ui::EditReference(TEXT("Game.GameSpeed"), CTimer::ms_fTimeScale, 1, 1, 10);
-            Ui::EditFloat(TEXT("Game.Gravity"), BY_GAME(0x863984, 0x68F5F0, 0x5F68D4), -1.0f, 0.008f, 1.0f, 1.0f, 0.01f);
+            Widget::EditAddr<float>(TEXT("Game.GameSpeed"), reinterpret_cast<uint>(&CTimer::ms_fTimeScale), 1, 1, 10);
+            Widget::EditAddr(TEXT("Game.Gravity"), BY_GAME(0x863984, 0x68F5F0, 0x5F68D4), -1.0f, 0.008f, 1.0f, 1.0f, 0.01f);
 
             if (ImGui::CollapsingHeader(TEXT("Game.SetTime")))
             {
                 int hour = CClock::ms_nGameClockHours;
                 int minute = CClock::ms_nGameClockMinutes;
 
+                ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth()/2);
                 if (ImGui::InputInt(TEXT("Game.Hour"), &hour))
                 {
                     if (hour < 0) hour = 23;
@@ -625,30 +625,25 @@ void Game::ShowPage()
                     if (minute > 59) minute = 0;
                     CClock::ms_nGameClockMinutes = minute;
                 }
-
-                ImGui::Spacing();
-                ImGui::Separator();
-            }
 #ifdef GTASA
-            static std::vector<Ui::NamedMemory> themes
-            {
-                {TEXT("Game.Beach"), 0x969159}, {TEXT("Game.Country"), 0x96917D}, {TEXT("Game.FunHouse"), 0x969176}, {TEXT("Game.Ninja"), 0x96915C}
-            };
-            Ui::EditRadioButtonAddress(TEXT("Game.Themes"), themes);
-
-            if (ImGui::CollapsingHeader(TEXT("Game.TotalMinutesDay")))
-            {
                 static int min = 24;
-                if (ImGui::InputInt(TEXT("Game.Minute"), &min))
+                if (ImGui::InputInt(TEXT("Game.TotalMinutesDay"), &min))
                 {
                     int val = min * 41.666666667f;
                     patch::Set<uint32_t>(0x5BA35F, val, true);
                     patch::Set<uint32_t>(0x53BDEC, val, true);
                 }
-                
+#endif
+                ImGui::PopItemWidth();
                 ImGui::Spacing();
                 ImGui::Separator();
             }
+#ifdef GTASA
+            static std::vector<Widget::BindInfo> themes
+            {
+                {TEXT("Game.Beach"), 0x969159}, {TEXT("Game.Country"), 0x96917D}, {TEXT("Game.FunHouse"), 0x969176}, {TEXT("Game.Ninja"), 0x96915C}
+            };
+            Widget::EditRadioBtnAddr(TEXT("Game.Themes"), themes);
 #endif
             if (ImGui::CollapsingHeader(TEXT("Game.Weather")))
             {
@@ -805,9 +800,9 @@ void Game::ShowPage()
 
             ImGui::Spacing();
             ImGui::PushItemWidth((ImGui::GetWindowContentRegionWidth() - ImGui::GetStyle().ItemSpacing.x)/2);
-            Ui::ListBoxStr("##Categories", m_StatData.m_Categories, m_StatData.m_Selected);
+            Widget::ListBox("##Categories", m_StatData.m_Categories, m_StatData.m_Selected);
             ImGui::SameLine();
-            Widget::FilterWithHint("##Filter", m_StatData.m_Filter, TEXT("Window.Search"));
+            Widget::Filter("##Filter", m_StatData.m_Filter, TEXT("Window.Search"));
             ImGui::PopItemWidth();
 
             ImGui::Spacing();
@@ -821,7 +816,7 @@ void Game::ShowPage()
                         std::string name = v2.value_or<std::string>("Unknown");
                         if (m_StatData.m_Filter.PassFilter(name.c_str()))
                         {
-                            Ui::EditStat(name.c_str(), std::stoi(std::string(k2.str())));
+                            Widget::EditStat(name.c_str(), std::stoi(std::string(k2.str())));
                         }
                     }
                 }

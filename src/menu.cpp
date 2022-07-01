@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "menu.h"
-#include "ui.h"
 #include "widget.h"
 #include "util.h"
 #include "updater.h"
@@ -337,7 +336,7 @@ void Menu::ShowPage()
 
             if (vec.size() > 0)
             {
-                if (Ui::ListBox(TEXT("Menu.Language"), vec, selected))
+                if (Widget::ListBox(TEXT("Menu.Language"), vec, selected))
                 {
                     if (Locale::SetLocale(selected) == Locale::eReturnCodes::SUCCESS)
                     {
@@ -368,7 +367,7 @@ void Menu::ShowPage()
             ImGui::NextColumn();
 
             if (gRenderer == Render_DirectX9
-            && Ui::CheckboxWithHint(TEXT("Menu.TextOnlyMode"), &m_bTextOnlyMode, TEXT("Menu.TextOnlyModeHint")))
+            && Widget::Checkbox(TEXT("Menu.TextOnlyMode"), &m_bTextOnlyMode, TEXT("Menu.TextOnlyModeHint")))
             {
                 gConfig.Set("Menu.TextOnlyMode", m_bTextOnlyMode);
             }
@@ -381,7 +380,7 @@ void Menu::ShowPage()
             ImGui::Spacing();
             ImGui::Spacing();
             ImGui::SameLine();
-            if (Ui::ListBox(TEXT("Menu.Position"), Overlay::posNames, (int&)Overlay::mSelectedPos))
+            if (Widget::ListBox(TEXT("Menu.Position"), Overlay::posNames, (int&)Overlay::mSelectedPos))
             {
                 gConfig.Set<int>("Overlay.SelectedPosition", static_cast<int>(Overlay::mSelectedPos));
             }

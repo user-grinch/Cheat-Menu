@@ -1,5 +1,4 @@
 #include "pch.h"
-#include "ui.h"
 #include "widget.h"
 #include "updater.h"
 #include "d3dhook.h"
@@ -16,6 +15,49 @@
 #include "vehicle.h"
 #include "visual.h"
 #include "weapon.h"
+
+static bool DrawTitleBar()
+{
+    bool hovered, held;
+    ImGuiWindow *window = ImGui::GetCurrentWindow();
+    ImGuiStyle& Style = ImGui::GetStyle();
+    ImGuiID id = window->GetID("#CLOSE");
+
+    ImGui::PushFont(FontMgr::Get("title"));
+    Widget::TextCentered(MENU_TITLE);
+
+    // Return now, skip drawing close btn
+    if (!ImGui::IsWindowHovered(ImGuiHoveredFlags_RootWindow | ImGuiHoveredFlags_ChildWindows
+                                | ImGuiHoveredFlags_AllowWhenBlockedByPopup | ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
+    {
+        ImGui::PopFont();
+        return false;
+    }
+
+    // init draw stuff
+    ImVec2 rectMin = ImGui::GetItemRectMin();
+    float fontSize = ImGui::GetFontSize();
+    ImRect titleRect = window->TitleBarRect();
+    float framePadding = Style.FramePadding.x;
+    ImVec2 pos = ImVec2(titleRect.Max.x - framePadding*2 - fontSize, titleRect.Min.y);
+    const ImRect bb(pos, pos + ImVec2(fontSize, fontSize) + Style.FramePadding * 2.0f);
+    ImRect bbInteract = bb;
+    const float areaVisibleRatio = window->OuterRectClipped.GetArea() / bb.GetArea();
+    if (areaVisibleRatio < 1.5f)
+    {
+        bbInteract.Expand(ImFloor(bbInteract.GetSize() * -0.25f));
+    }
+    bool pressed = ImGui::ButtonBehavior(bbInteract, id, &hovered, &held);
+
+    // drawing close button here
+    float cross_extent = (fontSize * 0.3f) - 1.0f;
+    ImVec2 closePos = ImVec2(bb.GetCenter().x - cross_extent, rectMin.y);
+    ImU32 closeCol = ImGui::GetColorU32(held || hovered ? ImVec4(0.80f, 0.0f, 0.0f, 1.0f) : ImVec4(0.80f, 0.80f, 0.80f, 1.00f));
+    window->DrawList->AddText(closePos, closeCol, "X");
+    ImGui::PopFont();
+
+    return pressed;
+}
 
 void CheatMenu::DrawWindow()
 {
@@ -42,7 +84,7 @@ void CheatMenu::DrawWindow()
 
                 if (ImGui::Begin(MENU_TITLE, NULL, ImGuiWindowFlags_NoCollapse || ImGuiWindowFlags_NoTitleBar))
                 {
-                    m_bShowMenu = !Ui::DrawTitleBar();
+                    m_bShowMenu = !DrawTitleBar();
                     ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(250, 350));
                     ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
                                         ImVec2(ImGui::GetWindowWidth() / 85, ImGui::GetWindowHeight() / 200));

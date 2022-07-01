@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "player.h"
 #include "menu.h"
-#include "ui.h"
 #include "widget.h"
 #include "util.h"
 
@@ -411,25 +410,25 @@ void Player::ShowPage()
             ImGui::Columns(2, 0, false);
 
 #ifdef GTASA
-            Ui::CheckboxAddress(TEXT("Player.BountyYourself"), 0x96913F);
+            Widget::CheckboxAddr(TEXT("Player.BountyYourself"), 0x96913F);
 
             ImGui::BeginDisabled(TopDownCamera::m_bEnabled);
-            if (Ui::CheckboxWithHint(TEXT("Player.DrunkEffect"), &m_bDrunkEffect))
+            if (Widget::Checkbox(TEXT("Player.DrunkEffect"), &m_bDrunkEffect))
             {
                 if (!m_bDrunkEffect)
                 {
                     Command<eScriptCommands::COMMAND_SET_PLAYER_DRUNKENNESS> (0, 0);
                 }
             }
-            if (Ui::CheckboxWithHint(TEXT("Player.FastSprint"), &m_bFastSprint, TEXT("Player.FastSprintTip")))
+            if (Widget::Checkbox(TEXT("Player.FastSprint"), &m_bFastSprint, TEXT("Player.FastSprintTip")))
             {
                 patch::Set<float>(0x8D2458, m_bFastSprint ? 0.1f : 5.0f);
             }
             ImGui::EndDisabled();
 #endif
-            Ui::CheckboxAddress(TEXT("Player.FreeHealthcare"), (int)&pInfo->m_bGetOutOfHospitalFree);
+            Widget::CheckboxAddr(TEXT("Player.FreeHealthcare"), (int)&pInfo->m_bGetOutOfHospitalFree);
 
-            if (Ui::CheckboxWithHint(TEXT("Player.FreezeWL"), &m_bFreezeWantedLevel))
+            if (Widget::Checkbox(TEXT("Player.FreezeWL"), &m_bFreezeWantedLevel))
             {
                 static unsigned int chaosLvl;
                 if (m_bFreezeWantedLevel)
@@ -452,7 +451,7 @@ void Player::ShowPage()
                 }
             }
 
-            if (Ui::CheckboxWithHint(TEXT("Player.GodMode"), &m_bGodMode))
+            if (Widget::Checkbox(TEXT("Player.GodMode"), &m_bGodMode))
             {
 #ifdef GTASA
                 patch::Set<bool>(0x96916D, m_bGodMode, false);
@@ -475,39 +474,39 @@ void Player::ShowPage()
                 pPlayer->m_nFlags.bMeleeProof = m_bGodMode;
 #endif
             }
-            Ui::CheckboxWithHint(TEXT("Player.HealthRegen"), &m_bHealthRegen, TEXT("Player.HealthRegenTip"));
+            Widget::Checkbox(TEXT("Player.HealthRegen"), &m_bHealthRegen, TEXT("Player.HealthRegenTip"));
 #ifdef GTASA
-            Ui::CheckboxAddress(TEXT("Player.CycleJump"), 0x969161);
-            Ui::CheckboxAddress(TEXT("Player.InfO2"), 0x96916E);
-            if (Ui::CheckboxBitFlag(TEXT("Player.InvisPlayer"), pPlayer->m_nPedFlags.bDontRender))
+            Widget::CheckboxAddr(TEXT("Player.CycleJump"), 0x969161);
+            Widget::CheckboxAddr(TEXT("Player.InfO2"), 0x96916E);
+            if (Widget::CheckboxBits(TEXT("Player.InvisPlayer"), pPlayer->m_nPedFlags.bDontRender))
             {
                 pPlayer->m_nPedFlags.bDontRender = !pPlayer->m_nPedFlags.bDontRender;
             }
-            Ui::CheckboxAddress(TEXT("Player.InfSprint"), 0xB7CEE4);
+            Widget::CheckboxAddr(TEXT("Player.InfSprint"), 0xB7CEE4);
 #else
-            Ui::CheckboxAddress(TEXT("Player.InfSprint"), (int)&pInfo->m_bInfiniteSprint);
+            Widget::CheckboxAddr(TEXT("Player.InfSprint"),Ui::CheckboxBits (int)&pInfo->m_bInfiniteSprint);
 #endif
 
             ImGui::NextColumn();
 
 #ifdef GTASA
-            if (Ui::CheckboxBitFlag(TEXT("Player.LockControl"), pad->bPlayerSafe))
+            if (Widget::CheckboxBits(TEXT("Player.LockControl"), pad->bPlayerSafe))
             {
                 pad->bPlayerSafe = !pad->bPlayerSafe;
             }
-            Ui::CheckboxAddressEx(TEXT("Player.MaxAppeal"), 0x969180, 1, 0);
-            Ui::CheckboxAddress(TEXT("Player.MegaJump"), 0x96916C);
-            Ui::CheckboxAddress(TEXT("Player.MegaPunch"), 0x969173);
-            Ui::CheckboxAddress(TEXT("Player.NeverGetHungry"), 0x969174);
+            Widget::CheckboxAddrRaw(TEXT("Player.MaxAppeal"), 0x969180, 1, "\x01", "\x00");
+            Widget::CheckboxAddr(TEXT("Player.MegaJump"), 0x96916C);
+            Widget::CheckboxAddr(TEXT("Player.MegaPunch"), 0x969173);
+            Widget::CheckboxAddr(TEXT("Player.NeverGetHungry"), 0x969174);
 
             bool never_wanted = patch::Get<bool>(0x969171, false);
-            if (Ui::CheckboxWithHint(TEXT("Player.NeverWanted"), &never_wanted))
+            if (Widget::Checkbox(TEXT("Player.NeverWanted"), &never_wanted))
             {
                 CCheat::NotWantedCheat();
             }
 #else
             static bool neverWanted = false;
-            if (Ui::CheckboxWithHint(TEXT("Player.NeverWanted"), &neverWanted))
+            if (Widget::Checkbox(TEXT("Player.NeverWanted"), &neverWanted))
             {
                 if (neverWanted)
                 {
@@ -535,12 +534,12 @@ void Player::ShowPage()
                 }
             }
 #endif
-            Ui::CheckboxAddress(TEXT("Player.NoFee"), (int)&pInfo->m_bGetOutOfJailFree);
-            Ui::CheckboxWithHint(TEXT("Player.RespawnDieLoc"), &KeepPosition::m_bEnabled, TEXT("Player.RespawnDieLocTip"));
+            Widget::CheckboxAddr(TEXT("Player.NoFee"), (int)&pInfo->m_bGetOutOfJailFree);
+            Widget::Checkbox(TEXT("Player.RespawnDieLoc"), &KeepPosition::m_bEnabled, TEXT("Player.RespawnDieLocTip"));
             
 #ifdef GTASA
             static bool sprintInt = false;
-            if (Ui::CheckboxWithHint(TEXT("Player.SprintEverywhere"), &sprintInt, TEXT("Player.SprintEverywhereTip")))
+            if (Widget::Checkbox(TEXT("Player.SprintEverywhere"), &sprintInt, TEXT("Player.SprintEverywhereTip")))
             {
                 if (sprintInt)
                 {
@@ -561,7 +560,7 @@ void Player::ShowPage()
 
             bool state = BY_GAME(pPlayer->m_nPhysicalFlags.bBulletProof, pPlayer->m_nFlags.bBulletProof,
                                  pPlayer->m_nFlags.bBulletProof);
-            if (Ui::CheckboxWithHint(TEXT("Player.BulletProof"), &state, nullptr, m_bGodMode))
+            if (Widget::Checkbox(TEXT("Player.BulletProof"), &state, nullptr, m_bGodMode))
             {
                 BY_GAME(pPlayer->m_nPhysicalFlags.bBulletProof, pPlayer->m_nFlags.bBulletProof,
                         pPlayer->m_nFlags.bBulletProof) = state;
@@ -569,7 +568,7 @@ void Player::ShowPage()
 
             state = BY_GAME(pPlayer->m_nPhysicalFlags.bCollisionProof, pPlayer->m_nFlags.bCollisionProof,
                             pPlayer->m_nFlags.bCollisionProof);
-            if (Ui::CheckboxWithHint(TEXT("Player.CollisionProof"), &state, nullptr, m_bGodMode))
+            if (Widget::Checkbox(TEXT("Player.CollisionProof"), &state, nullptr, m_bGodMode))
             {
                 BY_GAME(pPlayer->m_nPhysicalFlags.bCollisionProof, pPlayer->m_nFlags.bCollisionProof,
                         pPlayer->m_nFlags.bCollisionProof) = state;
@@ -577,7 +576,7 @@ void Player::ShowPage()
 
             state = BY_GAME(pPlayer->m_nPhysicalFlags.bExplosionProof, pPlayer->m_nFlags.bExplosionProof,
                             pPlayer->m_nFlags.bExplosionProof);
-            if (Ui::CheckboxWithHint(TEXT("Player.ExplosionProof"), &state, nullptr, m_bGodMode))
+            if (Widget::Checkbox(TEXT("Player.ExplosionProof"), &state, nullptr, m_bGodMode))
             {
                 BY_GAME(pPlayer->m_nPhysicalFlags.bExplosionProof, pPlayer->m_nFlags.bExplosionProof,
                         pPlayer->m_nFlags.bExplosionProof) = state;
@@ -587,7 +586,7 @@ void Player::ShowPage()
 
             state = BY_GAME(pPlayer->m_nPhysicalFlags.bFireProof, pPlayer->m_nFlags.bFireProof,
                             pPlayer->m_nFlags.bFireProof);
-            if (Ui::CheckboxWithHint(TEXT("Player.FireProof"), &state, nullptr, m_bGodMode))
+            if (Widget::Checkbox(TEXT("Player.FireProof"), &state, nullptr, m_bGodMode))
             {
                 BY_GAME(pPlayer->m_nPhysicalFlags.bFireProof, pPlayer->m_nFlags.bFireProof,
                         pPlayer->m_nFlags.bFireProof) = state;
@@ -595,7 +594,7 @@ void Player::ShowPage()
 
             state = BY_GAME(pPlayer->m_nPhysicalFlags.bMeleeProof, pPlayer->m_nFlags.bMeleeProof,
                             pPlayer->m_nFlags.bMeleeProof);
-            if (Ui::CheckboxWithHint(TEXT("Player.MeeleProof"), &state, nullptr, m_bGodMode))
+            if (Widget::Checkbox(TEXT("Player.MeeleProof"), &state, nullptr, m_bGodMode))
             {
                 BY_GAME(pPlayer->m_nPhysicalFlags.bMeleeProof, pPlayer->m_nFlags.bMeleeProof,
                         pPlayer->m_nFlags.bMeleeProof) = state;
@@ -609,7 +608,7 @@ void Player::ShowPage()
         {
             ImGui::BeginChild("PlayerMenus");
 
-            Ui::EditReference(TEXT("Player.Armour"), pPlayer->m_fArmour, 0, 100, BY_GAME(pInfo->m_nMaxArmour, pInfo->m_nMaxArmour, 100));
+            Widget::EditAddr<float>(TEXT("Player.Armour"), reinterpret_cast<uint>(&pPlayer->m_fArmour), 0, 100, BY_GAME(pInfo->m_nMaxArmour, pInfo->m_nMaxArmour, 100));
 #ifdef GTASA
             if (ImGui::CollapsingHeader(TEXT("Player.Body")))
             {
@@ -653,28 +652,28 @@ void Player::ShowPage()
                 ImGui::Separator();
             }
 
-            Ui::EditStat(TEXT("Player.Energy"), STAT_ENERGY);
-            Ui::EditStat(TEXT("Player.Fat"), STAT_FAT);
+            Widget::EditStat(TEXT("Player.Energy"), STAT_ENERGY);
+            Widget::EditStat(TEXT("Player.Fat"), STAT_FAT);
 #endif
-            Ui::EditReference(TEXT("Player.Health"), pPlayer->m_fHealth, 0, 100, BY_GAME(static_cast<int>(pPlayer->m_fMaxHealth), 100, 100));
+            Widget::EditAddr<float>(TEXT("Player.Health"), reinterpret_cast<uint>(&pPlayer->m_fHealth), 0, 100, BY_GAME(static_cast<int>(pPlayer->m_fMaxHealth), 100, 100));
 #ifdef GTASA
-            Ui::EditStat(TEXT("Player.LungCapacity"), STAT_LUNG_CAPACITY);
+            Widget::EditStat(TEXT("Player.LungCapacity"), STAT_LUNG_CAPACITY);
 
-            Ui::EditReference(TEXT("Player.MaxArmour"), pInfo->m_nMaxArmour, 0, 100, 255);
-            Ui::EditStat(TEXT("Player.MaxHealth"), STAT_MAX_HEALTH, 0, 569, 1450);
-            Ui::EditAddress<int>(TEXT("Player.Money"), 0xB7CE50, -99999999, 0, 99999999);
+            Widget::EditAddr<uchar>(TEXT("Player.MaxArmour"), reinterpret_cast<uint>(&pInfo->m_nMaxArmour), 0, 100, 255);
+            Widget::EditStat(TEXT("Player.MaxHealth"), STAT_MAX_HEALTH, 0, 569, 1450);
+            Widget::EditAddr<int>(TEXT("Player.Money"), 0xB7CE50, -99999999, 0, 99999999);
 #else
             int money = pInfo->m_nMoney;
-            Ui::EditAddress<int>(TEXT("Player.Money"), (int)&money, -9999999, 0, 99999999);
+            Widget::EditAddr<int>(TEXT("Player.Money"), (int)&money, -9999999, 0, 99999999);
             pInfo->m_nMoney = money;
             pInfo->m_nDisplayMoney = money;
 #endif
 
 
 #ifdef GTASA
-            Ui::EditStat(TEXT("Player.Muscle"), STAT_MUSCLE);
-            Ui::EditStat(TEXT("Player.Respect"), STAT_RESPECT);
-            Ui::EditStat(TEXT("Player.Stamina"), STAT_STAMINA);
+            Widget::EditStat(TEXT("Player.Muscle"), STAT_MUSCLE);
+            Widget::EditStat(TEXT("Player.Respect"), STAT_RESPECT);
+            Widget::EditStat(TEXT("Player.Stamina"), STAT_STAMINA);
             if (ImGui::CollapsingHeader(TEXT("Player.TopDownCamera")))
             {
                 if (ImGui::Checkbox(TEXT("Window.Enabled"), &TopDownCamera::m_bEnabled))
@@ -769,7 +768,7 @@ void Player::ShowPage()
         {
             ImGui::Spacing();
 
-            if (Ui::CheckboxWithHint(TEXT("Player.AimSkinChanger"), &m_bAimSkinChanger, TEXT("Player.AimSkinChangerTip") + aimSkinChanger.Pressed()))
+            if (Widget::Checkbox(TEXT("Player.AimSkinChanger"), &m_bAimSkinChanger, TEXT("Player.AimSkinChangerTip") + aimSkinChanger.Pressed()))
             {
                 gConfig.Set("Features.AimSkinChanger", m_bAimSkinChanger);
             }
@@ -855,7 +854,7 @@ void Player::ShowPage()
 
                     if (m_bModloaderInstalled)
                     {
-                        Widget::FilterWithHint(TEXT("Window.Search"), m_ClothData.m_Filter,
+                        Widget::Filter(TEXT("Window.Search"), m_ClothData.m_Filter,
                                            std::string(TEXT("Player.TotalSkins") + std::to_string(CustomSkins::m_List.size()))
                                            .c_str());
                         Widget::Tooltip(TEXT("Player.CustomSkinsDirTip"));

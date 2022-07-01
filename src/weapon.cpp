@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "weapon.h"
-#include "ui.h"
 #include "widget.h"
 #include "util.h"
 #include "CWeaponInfo.h"
@@ -277,8 +276,8 @@ void Weapon::ShowPage()
             Widget::Tooltip(TEXT("Weapon.WeaponTweaksText"));
             ImGui::Columns(2, 0, false);
 #ifdef GTASA
-            Ui::CheckboxWithHint(TEXT("Weapon.FastAim"), &m_bAutoAim, TEXT("Weapon.FastAimText"));
-            if (Ui::CheckboxWithHint(TEXT("Weapon.DualWeild"), &m_bDualWeild,TEXT("Weapon.DualWeildText")))
+            Widget::Checkbox(TEXT("Weapon.FastAim"), &m_bAutoAim, TEXT("Weapon.FastAimText"));
+            if (Widget::Checkbox(TEXT("Weapon.DualWeild"), &m_bDualWeild,TEXT("Weapon.DualWeildText")))
             {
                 if (!m_bDualWeild)
                 {
@@ -286,26 +285,26 @@ void Weapon::ShowPage()
                 }
             }
 #endif
-            if (Ui::CheckboxWithHint(TEXT("Weapon.HugeDamage"), &m_bHugeDamage, TEXT("Weapon.HugeDamageText")))
+            if (Widget::Checkbox(TEXT("Weapon.HugeDamage"), &m_bHugeDamage, TEXT("Weapon.HugeDamageText")))
             {
                 if (!m_bHugeDamage)
                 {
                     CWeaponInfo::LoadWeaponData();
                 }
             }
-            if (Ui::CheckboxWithHint(TEXT("Weapon.FastReload"), &m_bFastReload))
+            if (Widget::Checkbox(TEXT("Weapon.FastReload"), &m_bFastReload))
             {
                 Command<Commands::SET_PLAYER_FAST_RELOAD>(hplayer, m_bFastReload);
             }
 
 #ifdef GTASA
-            Ui::CheckboxAddress(TEXT("Weapon.InfiniteAmmo"), 0x969178);
+            Widget::CheckboxAddr(TEXT("Weapon.InfiniteAmmo"), 0x969178);
             ImGui::NextColumn();
 #else
             ImGui::NextColumn();
-            Ui::CheckboxWithHint(TEXT("Weapon.InfiniteAmmo"), &m_bInfiniteAmmo);
+            Widget::Checkbox(TEXT("Weapon.InfiniteAmmo"), &m_bInfiniteAmmo);
 #endif
-            if (Ui::CheckboxWithHint(TEXT("Weapon.LongRange"), &m_bLongRange))
+            if (Widget::Checkbox(TEXT("Weapon.LongRange"), &m_bLongRange))
             {
                 if (!m_bLongRange)
                 {
@@ -313,21 +312,21 @@ void Weapon::ShowPage()
                 }
             }
 #ifdef GTASA
-            if (Ui::CheckboxWithHint(TEXT("Weapon.MoveWhenAiming"), &m_bMoveAim))
+            if (Widget::Checkbox(TEXT("Weapon.MoveWhenAiming"), &m_bMoveAim))
             {
                 if (!m_bMoveAim)
                 {
                     CWeaponInfo::LoadWeaponData();
                 }
             }
-            if (Ui::CheckboxWithHint(TEXT("Weapon.MoveWhenFiring"), &m_bMoveFire))
+            if (Widget::Checkbox(TEXT("Weapon.MoveWhenFiring"), &m_bMoveFire))
             {
                 if (!m_bMoveFire)
                 {
                     CWeaponInfo::LoadWeaponData();
                 }
             }
-            if (Ui::CheckboxWithHint(TEXT("Weapon.RapidFire"), &m_bRapidFire))
+            if (Widget::Checkbox(TEXT("Weapon.RapidFire"), &m_bRapidFire))
             {
                 if (!m_bRapidFire)
                 {

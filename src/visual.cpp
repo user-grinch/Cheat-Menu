@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "visual.h"
-#include "ui.h"
 #include "widget.h"
 #include "util.h"
 #include "game.h"
@@ -17,6 +16,24 @@
 #else
 #define TOTAL_WEATHERS 4
 #endif
+
+ // Timecyc stuff
+static int m_nTimecycHour = 8;
+static std::vector<std::string> m_WeatherNames
+{
+#ifdef GTASA
+    "EXTRASUNNY LA", "SUNNY LA", "EXTRASUNNY SMOG LA", "SUNNY SMOG LA", "CLOUDY LA", "SUNNY SF", "EXTRASUNNY SF",
+    "CLOUDY SF", "RAINY SF", "FOGGY SF",
+    "SUNNY VEGAS", "EXTRASUNNY VEGAS", "CLOUDY VEGAS", "EXTRASUNNY COUNTRYSIDE", "SUNNY COUNTRYSIDE",
+    "CLOUDY COUNTRYSIDE", "RAINY COUNTRYSIDE",
+    "EXTRASUNNY DESERT", "SUNNY DESERT", "SANDSTORM DESERT", "UNDERWATER", "EXTRACOLOURS 1", "EXTRACOLOURS 2"
+#else
+    "SUNNY", "CLOUDY", "RAINY", "FOGGY"
+#ifdef GTAVC
+    ,"EXTRA_SUNNY", "HURRICANE", "EXTRACOLORS"
+#endif
+#endif
+};
 
 void Visual::Init()
 {
@@ -54,7 +71,7 @@ int GetTCVal(T* addr, int index)
     return static_cast<int>(arr[index]);
 }
 
-void Visual::GenerateTimecycFile()
+static void GenerateTimecycFile()
 {
 #ifdef GTASA
     std::ofstream file;
@@ -237,7 +254,7 @@ void Visual::GenerateTimecycFile()
 #endif
 }
 
-int Visual::CalcArrayIndex()
+int CalcArrayIndex()
 {
     int hour = CClock::ms_nGameClockHours;
 
@@ -270,25 +287,24 @@ int Visual::CalcArrayIndex()
 }
 
 
-template<typename T>
-bool Visual::TimeCycColorEdit3(const char* label, T* r, T* g, T* b, ImGuiColorEditFlags flags)
+bool TimeCycColorEdit3(const char* label, uchar* r, uchar* g, uchar* b)
 {
     bool rtn = false;
     int val = CalcArrayIndex();
 
 #ifdef GTASA
-    auto red = static_cast<T*>(patch::GetPointer(int(r)));
-    auto green = static_cast<T*>(patch::GetPointer(int(g)));
-    auto blue = static_cast<T*>(patch::GetPointer(int(b)));
+    auto red = static_cast<uchar*>(patch::GetPointer(int(r)));
+    auto green = static_cast<uchar*>(patch::GetPointer(int(g)));
+    auto blue = static_cast<uchar*>(patch::GetPointer(int(b)));
 #else
-    auto red = static_cast<T*>(r);
-    auto green = static_cast<T*>(g);
-    auto blue = static_cast<T*>(b);
+    auto red = static_cast<uchar*>(r);
+    auto green = static_cast<uchar*>(g);
+    auto blue = static_cast<uchar*>(b);
 #endif
 
     float col[3] { red[val] / 255.0f, green[val] / 255.0f, blue[val] / 255.0f };
 
-    if (ImGui::ColorEdit3(label, col, flags))
+    if (ImGui::ColorEdit3(label, col))
     {
         red[val] = col[0] * 255;
         green[val] = col[1] * 255;
@@ -300,7 +316,7 @@ bool Visual::TimeCycColorEdit3(const char* label, T* r, T* g, T* b, ImGuiColorEd
 }
 
 template <typename T>
-void Visual::TimecycSlider(const char* label, T* ptr, int min, int max)
+void TimecycSlider(const char* label, T* ptr, int min, int max)
 {
     int val = CalcArrayIndex();
 #ifdef GTASA
@@ -315,27 +331,26 @@ void Visual::TimecycSlider(const char* label, T* ptr, int min, int max)
         arr[val] = static_cast<T>(a);
 }
 
-template <typename T>
-bool Visual::TimeCycColorEdit4(const char* label, T* r, T* g, T* b, T* a, ImGuiColorEditFlags flags)
+bool TimeCycColorEdit4(const char* label, uchar* r, uchar* g, uchar* b, uchar* a)
 {
     bool rtn = false;
     int val = CalcArrayIndex();
 
 #ifdef GTASA
-    auto red = static_cast<T*>(patch::GetPointer(int(r)));
-    auto green = static_cast<T*>(patch::GetPointer(int(g)));
-    auto blue = static_cast<T*>(patch::GetPointer(int(b)));
-    auto alpha = static_cast<T*>(patch::GetPointer(int(a)));
+    auto red = static_cast<uchar*>(patch::GetPointer(int(r)));
+    auto green = static_cast<uchar*>(patch::GetPointer(int(g)));
+    auto blue = static_cast<uchar*>(patch::GetPointer(int(b)));
+    auto alpha = static_cast<uchar*>(patch::GetPointer(int(a)));
 #else
-    auto red = static_cast<T*>(r);
-    auto green = static_cast<T*>(g);
-    auto blue = static_cast<T*>(b);
-    auto alpha = static_cast<T*>(a);
+    auto red = static_cast<uchar*>(r);
+    auto green = static_cast<uchar*>(g);
+    auto blue = static_cast<uchar*>(b);
+    auto alpha = static_cast<uchar*>(a);
 #endif
 
     float col[4] { red[val] / 255.0f, green[val] / 255.0f, blue[val] / 255.0f, alpha[val] / 255.0f };
 
-    if (ImGui::ColorEdit4(label, col, flags))
+    if (ImGui::ColorEdit4(label, col))
     {
         red[val] = col[0] * 255;
         green[val] = col[1] * 255;
@@ -345,6 +360,50 @@ bool Visual::TimeCycColorEdit4(const char* label, T* r, T* g, T* b, T* a, ImGuiC
     }
 
     return rtn;
+}
+
+static void ColorPickerAddr(const char* label, int addr, ImVec4&& default_color)
+{
+    if (ImGui::CollapsingHeader(label))
+    {
+        float cur_color[4];
+        cur_color[0] = patch::Get<BYTE>(addr, false);
+        cur_color[1] = patch::Get<BYTE>(addr + 1, false);
+        cur_color[2] = patch::Get<BYTE>(addr + 2, false);
+        cur_color[3] = patch::Get<BYTE>(addr + 3, false);
+
+        // 0-255 -> 0-1
+        cur_color[0] /= 255;
+        cur_color[1] /= 255;
+        cur_color[2] /= 255;
+        cur_color[3] /= 255;
+
+        if (ImGui::ColorPicker4(std::string("Pick color##" + std::string(label)).c_str(), cur_color))
+        {
+            // 0-1 -> 0-255
+            cur_color[0] *= 255;
+            cur_color[1] *= 255;
+            cur_color[2] *= 255;
+            cur_color[3] *= 255;
+
+            patch::Set<BYTE>(addr, cur_color[0], false);
+            patch::Set<BYTE>(addr + 1, cur_color[1], false);
+            patch::Set<BYTE>(addr + 2, cur_color[2], false);
+            patch::Set<BYTE>(addr + 3, cur_color[3], false);
+        }
+        ImGui::Spacing();
+
+        if (ImGui::Button("Reset to default", Widget::CalcSize()))
+        {
+            patch::Set<BYTE>(addr, default_color.x, false);
+            patch::Set<BYTE>(addr + 1, default_color.y, false);
+            patch::Set<BYTE>(addr + 2, default_color.z, false);
+            patch::Set<BYTE>(addr + 3, default_color.w, false);
+        }
+
+        ImGui::Spacing();
+        ImGui::Separator();
+    }
 }
 
 void Visual::ShowPage()
@@ -357,13 +416,13 @@ void Visual::ShowPage()
             ImGui::Columns(2, nullptr, false);
 
 #ifdef GTASA
-            Ui::CheckboxAddress(TEXT("Visual.ArmourBorder"), 0x589123);
-            Ui::CheckboxAddress(TEXT("Visual.ArmourPercentage"), 0x589125);
-            Ui::CheckboxAddress(TEXT("Visual.BreathBorder"), 0x589207);
-            Ui::CheckboxAddress(TEXT("Visual.BreathPercentage"), 0x589209);
-            Ui::CheckboxAddress(TEXT("Visual.CCTVEffect"), 0xC402C5);
-            Ui::CheckboxAddress(TEXT("Visual.DarknessFilter"), 0xC402C4);
-            if (Ui::CheckboxWithHint(TEXT("Visual.DisableHydrant"), &m_bDisableHydrant))
+            Widget::CheckboxAddr(TEXT("Visual.ArmourBorder"), 0x589123);
+            Widget::CheckboxAddr(TEXT("Visual.ArmourPercentage"), 0x589125);
+            Widget::CheckboxAddr(TEXT("Visual.BreathBorder"), 0x589207);
+            Widget::CheckboxAddr(TEXT("Visual.BreathPercentage"), 0x589209);
+            Widget::CheckboxAddr(TEXT("Visual.CCTVEffect"), 0xC402C5);
+            Widget::CheckboxAddr(TEXT("Visual.DarknessFilter"), 0xC402C4);
+            if (Widget::Checkbox(TEXT("Visual.DisableHydrant"), &m_bDisableHydrant))
             {
                 if (m_bDisableHydrant)
                 {
@@ -375,29 +434,29 @@ void Visual::ShowPage()
                     plugin::patch::SetRaw(0x4A0D70, (char*)"\xE9\x94\x3F\xF6\xFF", 5);
                 }
             }
-            Ui::CheckboxAddress(TEXT("Visual.FogEffect"), 0xC402C6);
-            Ui::CheckboxAddress(TEXT("Visual.GrainEffect"), 0xC402B4);
-            Ui::CheckboxAddress(TEXT("Visual.GrayRadar"), 0xA444A4);
-            Ui::CheckboxAddress(TEXT("Visual.HealthBorder"), 0x589353);
-            Ui::CheckboxAddress(TEXT("Visual.HealthPercentage"), 0x589355);
+            Widget::CheckboxAddr(TEXT("Visual.FogEffect"), 0xC402C6);
+            Widget::CheckboxAddr(TEXT("Visual.GrainEffect"), 0xC402B4);
+            Widget::CheckboxAddr(TEXT("Visual.GrayRadar"), 0xA444A4);
+            Widget::CheckboxAddr(TEXT("Visual.HealthBorder"), 0x589353);
+            Widget::CheckboxAddr(TEXT("Visual.HealthPercentage"), 0x589355);
 
-            Ui::CheckboxAddress(TEXT("Visual.HeatHazeEffect"), 0xC402BA);
+            Widget::CheckboxAddr(TEXT("Visual.HeatHazeEffect"), 0xC402BA);
 
-            if (Ui::CheckboxWithHint(TEXT("Visual.HideAreaNames"), &CHud::bScriptDontDisplayAreaName))
+            if (Widget::Checkbox(TEXT("Visual.HideAreaNames"), &CHud::bScriptDontDisplayAreaName))
             {
                 Command<Commands::DISPLAY_ZONE_NAMES>(!CHud::bScriptDontDisplayAreaName);
             }
 
             ImGui::NextColumn();
 
-            if (Ui::CheckboxWithHint(TEXT("Visual.HideVehNames"), &CHud::bScriptDontDisplayVehicleName))
+            if (Widget::Checkbox(TEXT("Visual.HideVehNames"), &CHud::bScriptDontDisplayVehicleName))
             {
                 Command<Commands::DISPLAY_CAR_NAMES>(!CHud::bScriptDontDisplayVehicleName);
             }
 
-            Ui::CheckboxAddressEx(TEXT("Visual.HideWantedLevel"), 0x58DD1B, 0x90, 1);
-            Ui::CheckboxAddress(TEXT("Visual.InfraredVision"), 0xC402B9);
-            if (Ui::CheckboxWithHint(TEXT("Visual.InvisibleWater"), &m_bInvisibleWater))
+            Widget::CheckboxAddrRaw(TEXT("Visual.HideWantedLevel"), 0x58DD1B, 1, "\x90", "\x01");
+            Widget::CheckboxAddr(TEXT("Visual.InfraredVision"), 0xC402B9);
+            if (Widget::Checkbox(TEXT("Visual.InvisibleWater"), &m_bInvisibleWater))
             {
                 if (!m_bNoWater)
                 {
@@ -415,9 +474,9 @@ void Visual::ShowPage()
                     }
                 }
             }
-            Ui::CheckboxWithHint(TEXT("Visual.LockWeather"), &m_bLockWeather);
-            Ui::CheckboxAddress(TEXT("Visual.NightVision"), 0xC402B8);
-            if (Ui::CheckboxWithHint(TEXT("Visual.NoMoneyZeros"), &m_bNoMoneyZeros))
+            Widget::Checkbox(TEXT("Visual.LockWeather"), &m_bLockWeather);
+            Widget::CheckboxAddr(TEXT("Visual.NightVision"), 0xC402B8);
+            if (Widget::Checkbox(TEXT("Visual.NoMoneyZeros"), &m_bNoMoneyZeros))
             {
                 static const char *pos = "$%d", *neg = "-$%d";
                 if(m_bNoMoneyZeros)
@@ -431,7 +490,7 @@ void Visual::ShowPage()
                     patch::SetRaw(0x58F50A, (void*)"\x8C\x6C\x86\x00", 4);
                 }
             }
-            if (Ui::CheckboxWithHint(TEXT("Visual.NoParticles"), &m_bNoPartciles))
+            if (Widget::Checkbox(TEXT("Visual.NoParticles"), &m_bNoPartciles))
             {
                 if(m_bNoPartciles)
                 {
@@ -442,9 +501,9 @@ void Visual::ShowPage()
                     patch::Set<uint32_t>(0x4AA440, 0x5608EC83, true);
                 }
             }
-            Ui::CheckboxAddress(TEXT("Visual.NoPostFX"), 0xC402CF);
+            Widget::CheckboxAddr(TEXT("Visual.NoPostFX"), 0xC402CF);
            
-            if (Ui::CheckboxWithHint(TEXT("Visual.NoWater"), &m_bNoWater))
+            if (Widget::Checkbox(TEXT("Visual.NoWater"), &m_bNoWater))
             {
                 if (m_bNoWater)
                 {
@@ -467,26 +526,26 @@ void Visual::ShowPage()
             }
 
             bool radar_state = (patch::Get<BYTE>(0xBA676C) != 2);
-            if (Ui::CheckboxWithHint(TEXT("Visual.ShowRadar"), &radar_state))
+            if (Widget::Checkbox(TEXT("Visual.ShowRadar"), &radar_state))
             {
                 patch::Set<BYTE>(0xBA676C, radar_state == true ? 0 : 2);
             }
 
-            Ui::CheckboxAddress(TEXT("Visual.ShowHud"), 0xBA6769);
-            Ui::CheckboxAddress(TEXT("Visual.UnderwaterEffect"), 0xC402D3);
-            Ui::CheckboxAddressEx(TEXT("Visual.UnfogMap"), 0xBA372C, 0x50, 0x0, TEXT("Visual.UnfogMapText"));
+            Widget::CheckboxAddr(TEXT("Visual.ShowHud"), 0xBA6769);
+            Widget::CheckboxAddr(TEXT("Visual.UnderwaterEffect"), 0xC402D3);
+            Widget::CheckboxAddrRaw(TEXT("Visual.UnfogMap"), 0xBA372C, 1, "\x50", "\x00", TEXT("Visual.UnfogMapText"));
 #elif GTAVC
-            Ui::CheckboxAddress(TEXT("Visual.HideRadar"), 0xA10AB6);
-            Ui::CheckboxWithHint(TEXT("Visual.Lockweather"), &m_bLockWeather);
-            Ui::CheckboxAddress(TEXT("Visual.ShowHud"), 0x86963A);
+            Widget::CheckboxAddr(TEXT("Visual.HideRadar"), 0xA10AB6);
+            Widget::Checkbox(TEXT("Visual.Lockweather"), &m_bLockWeather);
+            Widget::CheckboxAddr(TEXT("Visual.ShowHud"), 0x86963A);
 
             ImGui::NextColumn();
 
-            Ui::CheckboxAddress(TEXT("Visual.GreenScanlines"), 0xA10B69);
-            Ui::CheckboxAddress(TEXT("Visual.WhiteScanlines"), 0xA10B68);
+            Widget::CheckboxAddr(TEXT("Visual.GreenScanlines"), 0xA10B69);
+            Widget::CheckboxAddr(TEXT("Visual.WhiteScanlines"), 0xA10B68);
 #else
             static bool hideHud, hideRadar;
-            if (Ui::CheckboxWithHint(TEXT("Visual.HideHud"), &hideHud))
+            if (Widget::Checkbox(TEXT("Visual.HideHud"), &hideHud))
             {
                 if (hideHud)
                 {
@@ -497,7 +556,7 @@ void Visual::ShowPage()
                     patch::SetRaw(0x48E420, (char*)"\xE8\x7B\x6E\x07\x00", 5);
                 }
             }
-            if (Ui::CheckboxWithHint(TEXT("Visual.HideRadar"), &hideRadar))
+            if (Widget::Checkbox(TEXT("Visual.HideRadar"), &hideRadar))
             {
                 if (hideHud)
                 {
@@ -508,7 +567,7 @@ void Visual::ShowPage()
                     patch::SetRaw(0x50838D, (char*)"\xE8\x6E\xBE\xF9\xFF", 5);
                 }
             }
-            Ui::CheckboxWithHint(TEXT("Visual.LockWeather"), &m_bLockWeather);
+            Widget::Checkbox(TEXT("Visual.LockWeather"), &m_bLockWeather);
 #endif
             ImGui::Columns(1);
             ImGui::EndTabItem();
@@ -591,53 +650,53 @@ void Visual::ShowPage()
                 ImGui::TextWrapped(TEXT("Visual.IncompatibleMods"));
                 Widget::Tooltip(TEXT("Visual.IncompatibleModsText"));
                 ImGui::Spacing();
-                Ui::ColorPickerAddress(TEXT("Visual.ArmourbarColor"), *(int*)0x5890FC, ImVec4(225, 225, 225, 255));
-                Ui::EditAddress<float>(TEXT("Visual.ArmourbarPosX"), 0x866B78, -999, 94, 999);
-                Ui::EditAddress<float>(TEXT("Visual.ArmourbarPosY"), 0x862D38, -999, 48, 999);
-                Ui::ColorPickerAddress(TEXT("Visual.BreathbarColor"), *(int*)0x5891EB, ImVec4(172, 203, 241, 255));
-                Ui::EditAddress<float>(TEXT("Visual.BreathbarPosX"), *(int*)0x58F11F, -999, 94, 999);
-                Ui::EditAddress<float>(TEXT("Visual.BreathbarPosY"), *(int*)0x58F100, -999, 62, 999);
-                Ui::ColorPickerAddress(TEXT("Visual.ClockColor"), *(int*)0x58EBD1, ImVec4(255, 255, 255, 255));
-                Ui::EditAddress<float>(TEXT("Visual.ClockPosX"), *(int*)0x58EC16, -999, 32, 999);
-                Ui::EditAddress<float>(TEXT("Visual.ClockPosY"), *(int*)0x58EC04, -999, 22, 999);
-                Ui::ColorPickerAddress(TEXT("Visual.HealthbarColor"), *(int*)0x589331, ImVec4(180, 25, 29, 255));
-                Ui::EditAddress<float>(TEXT("Visual.HealthbarPosX"), 0x86535C, -999, 141, 999);
-                Ui::EditAddress<float>(TEXT("Visual.HealthbarPosY"), 0x866CA8, -999, 77, 999);
-                Ui::ColorPickerAddress(TEXT("Visual.DrawMenuTitle"), 0xBAB240, ImVec4(0, 0, 0, 255));
-                Ui::ColorPickerAddress(TEXT("Visual.MoneyColor"), 0xBAB230, ImVec4(54, 104, 44, 255));
-                Ui::EditAddress<float>(TEXT("Visual.MoneyPosX"), *(int*)0x58F5FC, -999, 32, 999);
-                Ui::EditAddress<float>(TEXT("Visual.MoneyPosY"), 0x866C88, -999, 89, 999);
-                static std::vector<Ui::NamedValue> font_outline
+                ColorPickerAddr(TEXT("Visual.ArmourbarColor"), *(int*)0x5890FC, ImVec4(225, 225, 225, 255));
+                Widget::EditAddr<float>(TEXT("Visual.ArmourbarPosX"), 0x866B78, -999, 94, 999);
+                Widget::EditAddr<float>(TEXT("Visual.ArmourbarPosY"), 0x862D38, -999, 48, 999);
+                ColorPickerAddr(TEXT("Visual.BreathbarColor"), *(int*)0x5891EB, ImVec4(172, 203, 241, 255));
+                Widget::EditAddr<float>(TEXT("Visual.BreathbarPosX"), *(int*)0x58F11F, -999, 94, 999);
+                Widget::EditAddr<float>(TEXT("Visual.BreathbarPosY"), *(int*)0x58F100, -999, 62, 999);
+                ColorPickerAddr(TEXT("Visual.ClockColor"), *(int*)0x58EBD1, ImVec4(255, 255, 255, 255));
+                Widget::EditAddr<float>(TEXT("Visual.ClockPosX"), *(int*)0x58EC16, -999, 32, 999);
+                Widget::EditAddr<float>(TEXT("Visual.ClockPosY"), *(int*)0x58EC04, -999, 22, 999);
+                ColorPickerAddr(TEXT("Visual.HealthbarColor"), *(int*)0x589331, ImVec4(180, 25, 29, 255));
+                Widget::EditAddr<float>(TEXT("Visual.HealthbarPosX"), 0x86535C, -999, 141, 999);
+                Widget::EditAddr<float>(TEXT("Visual.HealthbarPosY"), 0x866CA8, -999, 77, 999);
+                ColorPickerAddr(TEXT("Visual.DrawMenuTitle"), 0xBAB240, ImVec4(0, 0, 0, 255));
+                ColorPickerAddr(TEXT("Visual.MoneyColor"), 0xBAB230, ImVec4(54, 104, 44, 255));
+                Widget::EditAddr<float>(TEXT("Visual.MoneyPosX"), *(int*)0x58F5FC, -999, 32, 999);
+                Widget::EditAddr<float>(TEXT("Visual.MoneyPosY"), 0x866C88, -999, 89, 999);
+                static std::vector<Widget::BindInfo> font_outline
                 {
                     {TEXT("Visual.NoOutline"), 0}, {TEXT("Visual.ThinOutline"), 1}, {TEXT("Visual.DefaultOutline"), 2}
                 };
-                Ui::EditRadioButtonAddressEx(TEXT("Visual.MoneyFontOutline"), 0x58F58D, font_outline);
-                static std::vector<Ui::NamedValue> style
+                Widget::EditRadioBtnAddr(TEXT("Visual.MoneyFontOutline"), 0x58F58D, font_outline);
+                static std::vector<Widget::BindInfo> style
                 { 
                     {TEXT("Visual.Style1"), 1}, {TEXT("Visual.Style2"), 2}, {TEXT("Visual.DefaultStyle"), 3} 
                 };
-                Ui::EditRadioButtonAddressEx(TEXT("Visual.MoneyFontStyle"), 0x58F57F, style);
-                Ui::EditAddress<float>(TEXT("Visual.RadarHeight"), *(int*)0x5834F6, 0, 76, 999);
-                Ui::EditAddress<float>(TEXT("Visual.RadarWidth"), *(int*)0x5834C2, 0, 94, 999);
-                Ui::EditAddress<float>(TEXT("Visual.RadarPosX"), *(int*)0x5834D4, -999, 40, 999);
-                Ui::EditAddress<float>(TEXT("Visual.RadarPosY"), *(int*)0x583500, -999, 104, 999);
-                Ui::EditAddress<int>(TEXT("Visual.RadarZoom"), 0xA444A3, 0, 0, 170);
-                Ui::ColorPickerAddress(TEXT("Visual.RadioStationColor"), 0xBAB24C, ImVec4(150, 150, 150, 255));
-                static std::vector<Ui::NamedValue> star_border
+                Widget::EditRadioBtnAddr(TEXT("Visual.MoneyFontStyle"), 0x58F57F, style);
+                Widget::EditAddr<float>(TEXT("Visual.RadarHeight"), *(int*)0x5834F6, 0, 76, 999);
+                Widget::EditAddr<float>(TEXT("Visual.RadarWidth"), *(int*)0x5834C2, 0, 94, 999);
+                Widget::EditAddr<float>(TEXT("Visual.RadarPosX"), *(int*)0x5834D4, -999, 40, 999);
+                Widget::EditAddr<float>(TEXT("Visual.RadarPosY"), *(int*)0x583500, -999, 104, 999);
+                Widget::EditAddr<int>(TEXT("Visual.RadarZoom"), 0xA444A3, 0, 0, 170);
+                ColorPickerAddr(TEXT("Visual.RadioStationColor"), 0xBAB24C, ImVec4(150, 150, 150, 255));
+                static std::vector<Widget::BindInfo> star_border
                 { 
                     {TEXT("Visual.NoBorder"), 0}, {TEXT("Visual.DefaultBorder"), 1}, {TEXT("Visual.BoldBorder"), 2} 
                 };
-                Ui::EditRadioButtonAddressEx(TEXT("Visual.WantedStarBorder"), 0x58DD41, star_border);
-                Ui::EditAddress<float>(TEXT("Visual.WantedPosX"), *(int*)0x58DD0F, -999, 29, 999);
-                Ui::EditAddress<float>(TEXT("Visual.WantedPosY"), *(int*)0x58DDFC, -999, 114, 999);
-                Ui::EditAddress<float>(TEXT("Visual.WeaponAmmoPosX"), *(int*)0x58FA02, -999, 32, 999);
-                Ui::EditAddress<float>(TEXT("Visual.WeaponAmmoPosY"), *(int*)0x58F9E6, -999, 43, 999);
-                Ui::EditAddress<float>(TEXT("Visual.WeaponIconPosX"), *(int*)0x58F927, -999, 32, 999);
-                Ui::EditAddress<float>(TEXT("Visual.WeaponIconPosY"), *(int*)0x58F913, -999, 20, 999);
+                Widget::EditRadioBtnAddr(TEXT("Visual.WantedStarBorder"), 0x58DD41, star_border);
+                Widget::EditAddr<float>(TEXT("Visual.WantedPosX"), *(int*)0x58DD0F, -999, 29, 999);
+                Widget::EditAddr<float>(TEXT("Visual.WantedPosY"), *(int*)0x58DDFC, -999, 114, 999);
+                Widget::EditAddr<float>(TEXT("Visual.WeaponAmmoPosX"), *(int*)0x58FA02, -999, 32, 999);
+                Widget::EditAddr<float>(TEXT("Visual.WeaponAmmoPosY"), *(int*)0x58F9E6, -999, 43, 999);
+                Widget::EditAddr<float>(TEXT("Visual.WeaponIconPosX"), *(int*)0x58F927, -999, 32, 999);
+                Widget::EditAddr<float>(TEXT("Visual.WeaponIconPosY"), *(int*)0x58F913, -999, 20, 999);
 #elif GTAVC
-                Ui::EditAddress<float>(TEXT("Visual.RadarPosX"), 0x68FD2C, -999, 40, 999);
-                Ui::EditAddress<float>(TEXT("Visual.RadarPosY"), 0x68FD34, -999, 104, 999);
-                Ui::EditAddress<BYTE>(TEXT("Visual.RadarWidth"), 0x68FD28, -999, 20, 999);
+                Widget::EditAddr<float>(TEXT("Visual.RadarPosX"), 0x68FD2C, -999, 40, 999);
+                Widget::EditAddr<float>(TEXT("Visual.RadarPosY"), 0x68FD34, -999, 104, 999);
+                Widget::EditAddr<BYTE>(TEXT("Visual.RadarWidth"), 0x68FD28, -999, 20, 999);
 #endif
 
                 ImGui::EndChild();
@@ -667,13 +726,13 @@ void Visual::ShowPage()
             ImGui::Spacing();
 
             int weather = CWeather::OldWeatherType;
-            if (Ui::ListBox(TEXT("Visual.CurrentWeather"), m_WeatherNames, weather))
+            if (Widget::ListBox(TEXT("Visual.CurrentWeather"), m_WeatherNames, weather))
             {
                 CWeather::OldWeatherType = weather;
             }
 
             weather = CWeather::NewWeatherType;
-            if (Ui::ListBox(TEXT("Visual.NextWeather"), m_WeatherNames, weather))
+            if (Widget::ListBox(TEXT("Visual.NextWeather"), m_WeatherNames, weather))
             {
                 CWeather::NewWeatherType = weather;
             }

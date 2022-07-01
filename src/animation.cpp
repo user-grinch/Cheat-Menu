@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "animation.h"
-#include "ui.h"
 #include "widget.h"
 #include "util.h"
 
@@ -310,11 +309,11 @@ void Animation::ShowPage()
             ImGui::Spacing();
 
             ImGui::Columns(2, nullptr, false);
-            Ui::CheckboxWithHint(TEXT("Animation.LoopCheckbox"), &m_Loop, TEXT("Animation.LoopCheckboxText"));
-            Ui::CheckboxWithHint(TEXT("Animation.SecondaryCheckbox"), &m_bSecondary, TEXT("Animation.SecondaryCheckboxText"));
+            Widget::Checkbox(TEXT("Animation.LoopCheckbox"), &m_Loop, TEXT("Animation.LoopCheckboxText"));
+            Widget::Checkbox(TEXT("Animation.SecondaryCheckbox"), &m_bSecondary, TEXT("Animation.SecondaryCheckboxText"));
             ImGui::NextColumn();
 #ifdef GTASA
-            Ui::CheckboxWithHint(TEXT("Animation.PedAnim"), &m_PedAnim, TEXT("Animation.PedAnimText"));
+            Widget::Checkbox(TEXT("Animation.PedAnim"), &m_PedAnim, TEXT("Animation.PedAnimText"));
 #endif
             ImGui::Columns(1);
             ImGui::Spacing();
@@ -397,7 +396,7 @@ void Animation::ShowPage()
                 Particle::m_nParticleList.pop_back();
             }
             ImGui::Spacing();
-            if (Ui::CheckboxBitFlag(TEXT("Animation.InvisiblePlayer"), pPlayer->m_nPedFlags.bDontRender))
+            if (Widget::CheckboxBits(TEXT("Animation.InvisiblePlayer"), pPlayer->m_nPedFlags.bDontRender))
             {
                 pPlayer->m_nPedFlags.bDontRender = (pPlayer->m_nPedFlags.bDontRender == 1) ? 0 : 1;
             }
@@ -442,7 +441,7 @@ void Animation::ShowPage()
                 Command<Commands::GIVE_MELEE_ATTACK_TO_CHAR>(hPlayer, fightStyle + 4, 6);
                 SetHelpMessage(TEXT("Animation.FightingStyleSet"));
             }
-            if (Ui::ListBoxStr(TEXT("Animation.WalkingStyle"), walkStyles, walkStyle))
+            if (Widget::ListBox(TEXT("Animation.WalkingStyle"), walkStyles, walkStyle))
             {
                 if (walkStyle == "default")
                 {

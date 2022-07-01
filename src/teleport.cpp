@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "teleport.h"
 #include "menu.h"
-#include "ui.h"
 #include "widget.h"
 #include "util.h"
 
@@ -217,7 +216,7 @@ void Teleport::ShowPage()
                 ImGui::Checkbox(TEXT("Teleport.InsertCoord"), &m_bInsertCoord);
                 ImGui::NextColumn();
 #ifdef GTASA
-                if (Ui::CheckboxWithHint(TEXT("Teleport.QuickTeleport"), &m_bQuickTeleport,
+                if (Widget::Checkbox(TEXT("Teleport.QuickTeleport"), &m_bQuickTeleport,
                                         std::string(TEXT_S("Teleport.QuickTeleportHint") 
                                                     + quickTeleport.GetNameString()).c_str()))
                 {

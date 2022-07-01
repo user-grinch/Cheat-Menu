@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "vehicle.h"
 #include "menu.h"
-#include "ui.h"
 #include "widget.h"
 #include "util.h"
 #include "filehandler.h"
@@ -544,19 +543,19 @@ void Vehicle::ShowPage()
             ImGui::BeginChild("CheckboxesChild");
             ImGui::Columns(2, 0, false);
 #ifdef GTASA
-            Ui::CheckboxAddress(TEXT("Vehicle.AimDrive"), 0x969179);
-            Ui::CheckboxAddress(TEXT("Vehicle.AllNitro"), 0x969165);
+            Widget::CheckboxAddr(TEXT("Vehicle.AimDrive"), 0x969179);
+            Widget::CheckboxAddr(TEXT("Vehicle.AllNitro"), 0x969165);
 #endif
 
 #ifndef GTA3
-            Ui::CheckboxAddress(TEXT("Vehicle.AggroDriver"), BY_GAME(0x96914F,0xA10B47, NULL));
-            Ui::CheckboxAddress(TEXT("Vehicle.AllTaxiNitro"), BY_GAME(0x96918B,0xA10B3A, NULL));
-            Ui::CheckboxWithHint(TEXT("Vehicle.BikeFly"), &m_bBikeFly);
-            Ui::CheckboxAddress(TEXT("Vehicle.BoatFly"), BY_GAME(0x969153, 0xA10B11, NULL));
+            Widget::CheckboxAddr(TEXT("Vehicle.AggroDriver"), BY_GAME(0x96914F,0xA10B47, NULL));
+            Widget::CheckboxAddr(TEXT("Vehicle.AllTaxiNitro"), BY_GAME(0x96918B,0xA10B3A, NULL));
+            Widget::Checkbox(TEXT("Vehicle.BikeFly"), &m_bBikeFly);
+            Widget::CheckboxAddr(TEXT("Vehicle.BoatFly"), BY_GAME(0x969153, 0xA10B11, NULL));
 #endif
-            Ui::CheckboxAddress(TEXT("Vehicle.CarFly"), BY_GAME(0x969160, 0xA10B28, 0x95CD75));
-            Ui::CheckboxWithHint(TEXT("Vehicle.CarHeavy"), &m_bVehHeavy);
-            if (Ui::CheckboxWithHint(TEXT("Vehicle.DmgProof"), &m_bNoDamage, TEXT("Vehicle.DmgProofTip")))
+            Widget::CheckboxAddr(TEXT("Vehicle.CarFly"), BY_GAME(0x969160, 0xA10B28, 0x95CD75));
+            Widget::Checkbox(TEXT("Vehicle.CarHeavy"), &m_bVehHeavy);
+            if (Widget::Checkbox(TEXT("Vehicle.DmgProof"), &m_bNoDamage, TEXT("Vehicle.DmgProofTip")))
             {
                 if (pVeh && !m_bNoDamage)
                 {
@@ -584,9 +583,9 @@ void Vehicle::ShowPage()
                 }
             }
 #ifdef GTASA
-            Ui::CheckboxAddressEx(TEXT("Vehicle.LockTrainCam"), 0x52A52F, 171, 6);
-            Ui::CheckboxAddress(TEXT("Vehicle.LessTraffic"), 0x96917A);
-            if (Ui::CheckboxWithHint(TEXT("Vehicle.NoDerail"), &m_bNoDerail))
+            Widget::CheckboxAddrRaw(TEXT("Vehicle.LockTrainCam"), 0x52A52F, 1, "\xAB", "\x06");
+            Widget::CheckboxAddr(TEXT("Vehicle.LessTraffic"), 0x96917A);
+            if (Widget::Checkbox(TEXT("Vehicle.NoDerail"), &m_bNoDerail))
             {
                 if (m_bNoDerail)
                 {
@@ -599,7 +598,7 @@ void Vehicle::ShowPage()
                     patch::SetRaw(0x6F8C2A, (void*)"\x8A\x46\x36\xA8\xF8\xD8\x8E", 7);
                 }
             }
-            // if (Ui::CheckboxWithHint(TEXT("Vehicle.NoColl"), &m_bDisableColDetection))
+            // if (Widget::Checkbox(TEXT("Vehicle.NoColl"), &m_bDisableColDetection))
             // {
             // 	if (m_bDisableColDetection)
             // 	{
@@ -625,7 +624,7 @@ void Vehicle::ShowPage()
 #endif
             ImGui::NextColumn();
 #ifndef GTA3
-            if (Ui::CheckboxWithHint(TEXT("Vehicle.StayOnBike"), &m_bDontFallBike))
+            if (Widget::Checkbox(TEXT("Vehicle.StayOnBike"), &m_bDontFallBike))
             {
                 if (m_bDontFallBike)
                 {
@@ -648,20 +647,20 @@ void Vehicle::ShowPage()
 #endif
                 }
             }
-            Ui::CheckboxAddress(TEXT("Vehicle.DriveWater"), BY_GAME(0x969152, 0xA10B81, NULL));
+            Widget::CheckboxAddr(TEXT("Vehicle.DriveWater"), BY_GAME(0x969152, 0xA10B81, NULL));
 #endif
 #ifdef GTASA
-            Ui::CheckboxAddress(TEXT("Vehicle.FloatOnHit"), 0x969166);
+            Widget::CheckboxAddr(TEXT("Vehicle.FloatOnHit"), 0x969166);
 #endif
 #ifndef GTA3
-            Ui::CheckboxAddress(TEXT("Vehicle.GreenLights"), BY_GAME(0x96914E, 0xA10ADC, NULL));
+            Widget::CheckboxAddr(TEXT("Vehicle.GreenLights"), BY_GAME(0x96914E, 0xA10ADC, NULL));
 #endif
 #ifdef GTASA
-            Ui::CheckboxAddress(TEXT("Vehicle.PerfectHandling"), 0x96914C);
-            Ui::CheckboxAddress(TEXT("Vehicle.TankMode"), 0x969164);
+            Widget::CheckboxAddr(TEXT("Vehicle.PerfectHandling"), 0x96914C);
+            Widget::CheckboxAddr(TEXT("Vehicle.TankMode"), 0x969164);
 
-            Ui::CheckboxWithHint(TEXT("Vehicle.InfNitro"), &UnlimitedNitro::m_bEnabled, TEXT("Vehicle.InfNitroTip"));
-            if (Ui::CheckboxWithHint(TEXT("Vehicle.FlipNoBurn"), &m_bVehFlipNoBurn, TEXT("Vehicle.FlipNoBurnTip")))
+            Widget::Checkbox(TEXT("Vehicle.InfNitro"), &UnlimitedNitro::m_bEnabled, TEXT("Vehicle.InfNitroTip"));
+            if (Widget::Checkbox(TEXT("Vehicle.FlipNoBurn"), &m_bVehFlipNoBurn, TEXT("Vehicle.FlipNoBurnTip")))
             {
                 // MixSets (Link2012)
                 if (m_bVehFlipNoBurn)
@@ -681,10 +680,10 @@ void Vehicle::ShowPage()
             }
 
 #elif GTA3
-            Ui::CheckboxAddress(TEXT("Vehicle.PerfectHandling"), 0x95CD66);
+            Widget::CheckboxAddr(TEXT("Vehicle.PerfectHandling"), 0x95CD66);
 #endif
-            Ui::CheckboxWithHint(TEXT("Vehicle.Watertight"), &m_bVehWatertight, TEXT("Vehicle.WatertightTip"));
-            Ui::CheckboxAddress(TEXT("Vehicle.OnlyWheels"), BY_GAME(0x96914B, 0xA10B70, 0x95CD78));
+            Widget::Checkbox(TEXT("Vehicle.Watertight"), &m_bVehWatertight, TEXT("Vehicle.WatertightTip"));
+            Widget::CheckboxAddr(TEXT("Vehicle.OnlyWheels"), BY_GAME(0x96914B, 0xA10B70, 0x95CD78));
             ImGui::Columns(1);
 
             if (is_driver)
@@ -697,38 +696,38 @@ void Vehicle::ShowPage()
                 bool state = false;
 #ifdef GTASA
                 state = pVeh->m_nVehicleFlags.bAlwaysSkidMarks;
-                if (Ui::CheckboxWithHint(TEXT("Vehicle.SkidMarks"), &state, nullptr))
+                if (Widget::Checkbox(TEXT("Vehicle.SkidMarks"), &state, nullptr))
                     pVeh->m_nVehicleFlags.bAlwaysSkidMarks = state;
 #endif
 
                 state = BY_GAME(pVeh->m_nPhysicalFlags.bBulletProof, pVeh->m_nFlags.bBulletProof, pVeh->m_nFlags.bBulletProof);
-                if (Ui::CheckboxWithHint(TEXT("Vehicle.BulletProof"), &state, nullptr, m_bNoDamage))
+                if (Widget::Checkbox(TEXT("Vehicle.BulletProof"), &state, nullptr, m_bNoDamage))
                 {
                     BY_GAME(pVeh->m_nPhysicalFlags.bBulletProof, pVeh->m_nFlags.bBulletProof, pVeh->m_nFlags.bBulletProof) = state;
                 }
 
                 state = BY_GAME(pVeh->m_nPhysicalFlags.bCollisionProof, pVeh->m_nFlags.bCollisionProof, pVeh->m_nFlags.bCollisionProof);
-                if (Ui::CheckboxWithHint(TEXT("Vehicle.ColProof"), &state, nullptr, m_bNoDamage))
+                if (Widget::Checkbox(TEXT("Vehicle.ColProof"), &state, nullptr, m_bNoDamage))
                 {
                     BY_GAME(pVeh->m_nPhysicalFlags.bCollisionProof, pVeh->m_nFlags.bCollisionProof, pVeh->m_nFlags.bCollisionProof) = state;
                 }
 
 #ifdef GTASA
                 state = pVeh->m_nVehicleFlags.bDisableParticles;
-                if (Ui::CheckboxWithHint(TEXT("Vehicle.NoParticles"), &state, nullptr))
+                if (Widget::Checkbox(TEXT("Vehicle.NoParticles"), &state, nullptr))
                 {
                     pVeh->m_nVehicleFlags.bDisableParticles = state;
                 }
 
                 state = pVeh->m_nVehicleFlags.bVehicleCanBeTargetted;
-                if (Ui::CheckboxWithHint(TEXT("Vehicle.DriverTarget"), &state))
+                if (Widget::Checkbox(TEXT("Vehicle.DriverTarget"), &state))
                 {
                     pVeh->m_nVehicleFlags.bVehicleCanBeTargetted = state;
                 }
 #endif
 
                 state = BY_GAME(!pVeh->m_nVehicleFlags.bEngineBroken, true, true) || pVeh->m_nVehicleFlags.bEngineOn;
-                if (Ui::CheckboxWithHint(TEXT("Vehicle.EngineOn"), &state, nullptr, !is_driver))
+                if (Widget::Checkbox(TEXT("Vehicle.EngineOn"), &state, nullptr, !is_driver))
                 {
 #ifdef GTASA
                     pVeh->m_nVehicleFlags.bEngineBroken = !state;
@@ -737,13 +736,13 @@ void Vehicle::ShowPage()
                 }
 
                 state = BY_GAME(pVeh->m_nPhysicalFlags.bExplosionProof, pVeh->m_nFlags.bExplosionProof, pVeh->m_nFlags.bExplosionProof);
-                if (Ui::CheckboxWithHint(TEXT("Vehicle.ExplosionProof"), &state, nullptr, m_bNoDamage))
+                if (Widget::Checkbox(TEXT("Vehicle.ExplosionProof"), &state, nullptr, m_bNoDamage))
                 {
                     BY_GAME(pVeh->m_nPhysicalFlags.bExplosionProof, pVeh->m_nFlags.bExplosionProof, pVeh->m_nFlags.bExplosionProof) = state;
                 }
 
                 state = BY_GAME(pVeh->m_nPhysicalFlags.bFireProof, pVeh->m_nFlags.bFireProof, pVeh->m_nFlags.bFireProof);
-                if (Ui::CheckboxWithHint(TEXT("Vehicle.FireProof"), &state, nullptr, m_bNoDamage))
+                if (Widget::Checkbox(TEXT("Vehicle.FireProof"), &state, nullptr, m_bNoDamage))
                 {
                     BY_GAME(pVeh->m_nPhysicalFlags.bFireProof, pVeh->m_nFlags.bFireProof, pVeh->m_nFlags.bFireProof) = state;
                 }
@@ -752,51 +751,51 @@ void Vehicle::ShowPage()
 
 #ifdef GTASA
                 state = pVeh->m_nVehicleFlags.bVehicleCanBeTargettedByHS;
-                if (Ui::CheckboxWithHint(TEXT("Vehicle.HSTarget"), &state, TEXT("Vehicle.HSTargetTip")))
+                if (Widget::Checkbox(TEXT("Vehicle.HSTarget"), &state, TEXT("Vehicle.HSTargetTip")))
                 {
                     pVeh->m_nVehicleFlags.bVehicleCanBeTargettedByHS = state;
                 }
 #endif
 
                 state = !BY_GAME(pVeh->m_bIsVisible, pVeh->m_nFlags.bIsVisible, pVeh->m_nFlags.bIsVisible);
-                if (Ui::CheckboxWithHint(TEXT("Vehicle.InvisCar"), &state, nullptr, !is_driver))
+                if (Widget::Checkbox(TEXT("Vehicle.InvisCar"), &state, nullptr, !is_driver))
                 {
                     BY_GAME(pVeh->m_bIsVisible, pVeh->m_nFlags.bIsVisible, pVeh->m_nFlags.bIsVisible) = !state;
                 }
 
                 state = BY_GAME(!pVeh->ms_forceVehicleLightsOff, pVeh->m_nVehicleFlags.bLightsOn, pVeh->m_nVehicleFlags.bLightsOn);
-                if (Ui::CheckboxWithHint(TEXT("Vehicle.LightsOn"), &state, nullptr, !is_driver))
+                if (Widget::Checkbox(TEXT("Vehicle.LightsOn"), &state, nullptr, !is_driver))
                 {
                     BY_GAME(pVeh->ms_forceVehicleLightsOff, pVeh->m_nVehicleFlags.bLightsOn, pVeh->m_nVehicleFlags.bLightsOn) = state;
                 }
 
                 state = pVeh->m_eDoorLock == DOORLOCK_LOCKED_PLAYER_INSIDE;
-                if (Ui::CheckboxWithHint(TEXT("Vehicle.LockDoor"), &state, nullptr, !is_driver))
+                if (Widget::Checkbox(TEXT("Vehicle.LockDoor"), &state, nullptr, !is_driver))
                 {
                     pVeh->m_eDoorLock = state ? DOORLOCK_LOCKED_PLAYER_INSIDE : DOORLOCK_UNLOCKED;
                 }
 
                 state = BY_GAME(pVeh->m_nPhysicalFlags.bMeleeProof, pVeh->m_nFlags.bMeleeProof, pVeh->m_nFlags.bMeleeProof);
-                if (Ui::CheckboxWithHint(TEXT("Vehicle.MeleeProof"), &state, nullptr, m_bNoDamage))
+                if (Widget::Checkbox(TEXT("Vehicle.MeleeProof"), &state, nullptr, m_bNoDamage))
                 {
                     BY_GAME(pVeh->m_nPhysicalFlags.bMeleeProof, pVeh->m_nFlags.bMeleeProof, pVeh->m_nFlags.bMeleeProof) = state;
                 }
 
 #ifdef GTASA
                 state = pVeh->m_nVehicleFlags.bPetrolTankIsWeakPoint;
-                if (Ui::CheckboxWithHint(TEXT("Vehicle.PentrolTank"), &state, TEXT("Vehicle.PetrolTankTip")))
+                if (Widget::Checkbox(TEXT("Vehicle.PentrolTank"), &state, TEXT("Vehicle.PetrolTankTip")))
                 {
                     pVeh->m_nVehicleFlags.bPetrolTankIsWeakPoint = state;
                 }
 
                 state = pVeh->m_nVehicleFlags.bSirenOrAlarm;
-                if (Ui::CheckboxWithHint(TEXT("Vehicle.Siren"), &state))
+                if (Widget::Checkbox(TEXT("Vehicle.Siren"), &state))
                 {
                     pVeh->m_nVehicleFlags.bSirenOrAlarm = state;
                 }
 
                 state = pVeh->m_nVehicleFlags.bTakeLessDamage;
-                if (Ui::CheckboxWithHint(TEXT("Vehicle.LessDmg"), &state, nullptr))
+                if (Widget::Checkbox(TEXT("Vehicle.LessDmg"), &state, nullptr))
                 {
                     pVeh->m_nVehicleFlags.bTakeLessDamage = state;
                 }
@@ -814,7 +813,7 @@ void Vehicle::ShowPage()
             ImGui::BeginChild("MenusChild");
 
 #ifdef GTASA
-            Ui::EditAddress<float>(TEXT("Vehicle.DensityMul"), 0x8A5B20, 0, 1, 10);
+            Widget::EditAddr<float>(TEXT("Vehicle.DensityMul"), 0x8A5B20, 0, 1, 10);
 #endif
             if (ImGui::CollapsingHeader(TEXT("Vehicle.EnterNearVeh")))
             {
@@ -891,20 +890,20 @@ void Vehicle::ShowPage()
             if (ImGui::CollapsingHeader(TEXT("Vehicle.TrafficOpt")))
             {
 
-                std::vector<Ui::NamedMemory> color
+                std::vector<Widget::BindInfo> color
                 {
                     {TEXT("Vehicle.Black"), BY_GAME(0x969151, 0xA10B82, NULL)},
                     {TEXT("Vehicle.Pink"), BY_GAME(0x969150, 0xA10B26, NULL)}
                 };
-                Ui::RadioButtonAddress(TEXT("Vehicle.Color"), color);
+                Widget::EditRadioBtnAddr(TEXT("Vehicle.Color"), color);
                 ImGui::Spacing();
 #ifdef GTASA
-                std::vector<Ui::NamedMemory> type
+                std::vector<Widget::BindInfo> type
                 {
                     {TEXT("Vehicle.Cheap"), 0x96915E}, {TEXT("Vehicle.Country"), 0x96917B}, 
                     {TEXT("Vehicle.Fast"), 0x96915F}
                 };
-                Ui::RadioButtonAddress(TEXT("Vehicle.Type"), type);
+                Widget::EditRadioBtnAddr(TEXT("Vehicle.Type"), type);
 #endif
                 ImGui::Spacing();
                 ImGui::Separator();
@@ -916,7 +915,7 @@ void Vehicle::ShowPage()
                 int hVeh = CPools::GetVehicleRef(pVeh);
 
 #ifdef GTASA
-                Ui::EditFloat(TEXT("Vehicle.DirtLvl"), (int)pVeh + 0x4B0, 0, 7.5, 15);
+                Widget::EditAddr(TEXT("Vehicle.DirtLvl"), (int)pVeh + 0x4B0, 0, 7.5, 15);
                 if (pVeh->m_nVehicleClass == VEHICLE_AUTOMOBILE && ImGui::CollapsingHeader(TEXT("Vehicle.Doors")))
                 {
                     ImGui::Columns(2, 0, false);
@@ -991,7 +990,7 @@ void Vehicle::ShowPage()
 #endif
                 if (ImGui::CollapsingHeader(TEXT("Vehicle.SetSpeed")))
                 {
-                    Ui::CheckboxWithHint(TEXT("Vehicle.LockSpeed"), &m_bLockSpeed);
+                    Widget::Checkbox(TEXT("Vehicle.LockSpeed"), &m_bLockSpeed);
                     ImGui::Spacing();
                     ImGui::InputFloat(TEXT("Vehicle.Set"), &m_fLockSpeed);
                     ImGui::Spacing();
@@ -1019,12 +1018,12 @@ void Vehicle::ShowPage()
         {
             ImGui::Spacing();
             ImGui::Columns(2, 0, false);
-            if (Ui::CheckboxWithHint(TEXT("Vehicle.SpawnInside"), &Spawner::m_bSpawnInside))
+            if (Widget::Checkbox(TEXT("Vehicle.SpawnInside"), &Spawner::m_bSpawnInside))
             {
                 gConfig.Set("Features.SpawnInsideVehicle", Spawner::m_bSpawnInside);
             }
             ImGui::NextColumn();
-            if( Ui::CheckboxWithHint(TEXT("Vehicle.SpawnInAir"), &Spawner::m_bSpawnInAir))
+            if( Widget::Checkbox(TEXT("Vehicle.SpawnInAir"), &Spawner::m_bSpawnInAir))
             {
                 gConfig.Set("Features.SpawnAircraftInAir", Spawner::m_bSpawnInAir);
             }
@@ -1096,7 +1095,7 @@ void Vehicle::ShowPage()
                 }
                 ImGui::Spacing();
 
-                Ui::ListBoxStr(TEXT("Vehicle.Component"), PaintData::m_vecNames, PaintData::m_Selected);
+                Widget::ListBox(TEXT("Vehicle.Component"), PaintData::m_vecNames, PaintData::m_Selected);
 
                 if (ImGui::ColorEdit3(TEXT("Vehicle.ColorPicker"), PaintData::m_fColorPicker))
                 {
@@ -1139,7 +1138,7 @@ void Vehicle::ShowPage()
 
                 for (int colorId = 0; colorId < count; ++colorId)
                 {
-                    if (Ui::ColorButton(colorId, m_CarcolsColorData[colorId], ImVec2(btnSize, btnSize)))
+                    if (Widget::ColorBtn(colorId, m_CarcolsColorData[colorId], ImVec2(btnSize, btnSize)))
                     {
                         *(uint8_replacement*)(int(veh) + BY_GAME(0x433, 0x19F, 0x19B) + PaintData::m_nRadioButton) = colorId;
                     }
@@ -1170,14 +1169,14 @@ void Vehicle::ShowPage()
                     ImGui::Columns(2, NULL, false);
 
                     bool pulsing = Neon::IsPulsingEnabled(veh);
-                    if (Ui::CheckboxWithHint(TEXT("Vehicle.PulsingNeon"), &pulsing))
+                    if (Widget::Checkbox(TEXT("Vehicle.PulsingNeon"), &pulsing))
                     {
                         Neon::SetPulsing(veh, pulsing);
                     }
 
-                    Ui::CheckboxWithHint(TEXT("Vehicle.RainbowNeon"), &NeonData::m_bRainbowEffect, TEXT("Vehicle.RainbowNeonMSG"));
+                    Widget::Checkbox(TEXT("Vehicle.RainbowNeon"), &NeonData::m_bRainbowEffect, TEXT("Vehicle.RainbowNeonMSG"));
                     ImGui::NextColumn();
-                    Ui::CheckboxWithHint(TEXT("Vehicle.TrafficNeon"), &NeonData::m_bApplyOnTraffic, TEXT("Vehicle.TrafficNeonMSG"));
+                    Widget::Checkbox(TEXT("Vehicle.TrafficNeon"), &NeonData::m_bApplyOnTraffic, TEXT("Vehicle.TrafficNeonMSG"));
                     ImGui::Columns(1);
 
                     ImGui::Spacing();
@@ -1206,7 +1205,7 @@ void Vehicle::ShowPage()
                     for (int color_id = 0; color_id < count; ++color_id)
                     {
                         auto& color = m_CarcolsColorData[color_id];
-                        if (Ui::ColorButton(color_id, color, ImVec2(btnSize, btnSize)))
+                        if (Widget::ColorBtn(color_id, color, ImVec2(btnSize, btnSize)))
                         {
                             int r = static_cast<int>(color[0] * 255);
                             int g = static_cast<int>(color[1] * 255);
@@ -1236,7 +1235,7 @@ void Vehicle::ShowPage()
                     }
                     ImGui::Spacing();
 
-                    Ui::ListBoxStr(TEXT("Vehicle.Component"), PaintData::m_vecNames, PaintData::m_Selected);
+                    Widget::ListBox(TEXT("Vehicle.Component"), PaintData::m_vecNames, PaintData::m_Selected);
                     ImGui::Spacing();
 
                     ImGui::Columns(2, NULL, false);
@@ -1348,89 +1347,89 @@ void Vehicle::ShowPage()
 
                 ImGui::BeginChild("HandlingChild");
 
-                std::vector<Ui::NamedValue> abs{ {TEXT("Vehicle.On"), 1}, {TEXT("Vehicle.Off"), 0} };
-                Ui::EditRadioButtonAddressEx(TEXT("Vehicle.Abs"), (int)&pHandlingData->m_bABS, abs);
+                std::vector<Widget::BindInfo> abs{ {TEXT("Vehicle.On"), 1}, {TEXT("Vehicle.Off"), 0} };
+                Widget::EditRadioBtnAddr(TEXT("Vehicle.Abs"), (int)&pHandlingData->m_bABS, abs);
 
-                Ui::EditFloat(TEXT("Vehicle.ADM"), (int)&pHandlingData->m_fSuspensionAntiDiveMultiplier, 0.0f, 0.0f, 1.0f);
-                Ui::EditAddress<BYTE>(TEXT("Vehicle.AnimGroup"), (int)&pHandlingData->m_nAnimGroup, 0, 0, 20);
-                Ui::EditFloat(TEXT("Vehicle.BrakeBias"), (int)&pHandlingData->m_fBrakeBias, 0.0f, 0.0f, 1.0f);
+                Widget::EditAddr(TEXT("Vehicle.ADM"), (int)&pHandlingData->m_fSuspensionAntiDiveMultiplier, 0.0f, 0.0f, 1.0f);
+                Widget::EditAddr<BYTE>(TEXT("Vehicle.AnimGroup"), (int)&pHandlingData->m_nAnimGroup, 0, 0, 20);
+                Widget::EditAddr(TEXT("Vehicle.BrakeBias"), (int)&pHandlingData->m_fBrakeBias, 0.0f, 0.0f, 1.0f);
 
                 // Brake deceleration calculation
                 float BrakeDeceleration = pHandlingData->m_fBrakeDeceleration * 2500;
-                Ui::EditFloat(TEXT("Vehicle.BrakeDecel"), (int)&pHandlingData->m_fBrakeDeceleration, 0.0f, 0.0f, 20.0f, 2500.0f);
+                Widget::EditAddr(TEXT("Vehicle.BrakeDecel"), (int)&pHandlingData->m_fBrakeDeceleration, 0.0f, 0.0f, 20.0f, 2500.0f);
                 pHandlingData->m_fBrakeDeceleration = BrakeDeceleration / 2500;
 
-                Ui::EditFloat(TEXT("Vehicle.CemterMassX"), (int)&pHandlingData->m_vecCentreOfMass.x, -10.0f, -10.0f, 10.0f);
-                Ui::EditFloat(TEXT("Vehicle.CemterMassY"), (int)&pHandlingData->m_vecCentreOfMass.y, -10.0f, -10.0f, 10.0f);
-                Ui::EditFloat(TEXT("Vehicle.CemterMassZ"), (int)&pHandlingData->m_vecCentreOfMass.z, -10.0f, -10.0f, 10.0f);
+                Widget::EditAddr(TEXT("Vehicle.CemterMassX"), (int)&pHandlingData->m_vecCentreOfMass.x, -10.0f, -10.0f, 10.0f);
+                Widget::EditAddr(TEXT("Vehicle.CemterMassY"), (int)&pHandlingData->m_vecCentreOfMass.y, -10.0f, -10.0f, 10.0f);
+                Widget::EditAddr(TEXT("Vehicle.CemterMassZ"), (int)&pHandlingData->m_vecCentreOfMass.z, -10.0f, -10.0f, 10.0f);
 
                 // CDM calculations
                 float factor = (1.0 / pHandlingData->m_fMass);
                 float fCDM = pHandlingData->m_fCollisionDamageMultiplier / (2000.0f * factor);
-                Ui::EditFloat(TEXT("Vehicle.CDM"), (int)&fCDM, 0.0f, 0.0f, 1.0f, 0.3381f);
+                Widget::EditAddr(TEXT("Vehicle.CDM"), (int)&fCDM, 0.0f, 0.0f, 1.0f, 0.3381f);
                 pHandlingData->m_fCollisionDamageMultiplier = factor * fCDM * 2000.0f;
 
-                Ui::EditFloat(TEXT("Vehicle.DampingLvl"), (int)&pHandlingData->m_fSuspensionDampingLevel, -10.0f, -10.0f, 10.0f); // test later
-                Ui::EditFloat(TEXT("Vehicle.DragMult"), (int)&pHandlingData->m_fDragMult, 0.0f, 0.0f, 30.0f);
+                Widget::EditAddr(TEXT("Vehicle.DampingLvl"), (int)&pHandlingData->m_fSuspensionDampingLevel, -10.0f, -10.0f, 10.0f); // test later
+                Widget::EditAddr(TEXT("Vehicle.DragMult"), (int)&pHandlingData->m_fDragMult, 0.0f, 0.0f, 30.0f);
 
-                std::vector<Ui::NamedValue> drive_type
+                std::vector<Widget::BindInfo> drive_type
                 {
                     {TEXT("Vehicle.FrontWheelDrive"), 70}, 
                     {TEXT("Vehicle.RearWheelDrive"), 82}, 
                     {TEXT("Vehicle.FourWheelDrive"), 52}
                 };
-                Ui::EditRadioButtonAddressEx(TEXT("Vehicle.DriveType"), (int)&pHandlingData->m_transmissionData.m_nDriveType, drive_type);
+                Widget::EditRadioBtnAddr(TEXT("Vehicle.DriveType"), (int)&pHandlingData->m_transmissionData.m_nDriveType, drive_type);
 
                 // Engine acceleration calculation
                 float fEngineAcceleration = pHandlingData->m_transmissionData.m_fEngineAcceleration * 12500;
-                Ui::EditFloat(TEXT("Vehicle.EngineAccel"), (int)&fEngineAcceleration, 0.0f, 0.0f, 49.0f, 12500.0f);
+                Widget::EditAddr(TEXT("Vehicle.EngineAccel"), (int)&fEngineAcceleration, 0.0f, 0.0f, 49.0f, 12500.0f);
                 pHandlingData->m_transmissionData.m_fEngineAcceleration = fEngineAcceleration / 12500;
 
 
-                Ui::EditFloat(TEXT("Vehicle.EngineInertia"), (int)&pHandlingData->m_transmissionData.m_fEngineInertia, 0.1f, 0.1f, 400.0f);
+                Widget::EditAddr(TEXT("Vehicle.EngineInertia"), (int)&pHandlingData->m_transmissionData.m_fEngineInertia, 0.1f, 0.1f, 400.0f);
 
-                std::vector<Ui::NamedValue> engine_type
+                std::vector<Widget::BindInfo> engine_type
                 { 
                     {TEXT("Vehicle.Petrol"), 80}, {TEXT("Vehicle.Diseal"), 68}, {TEXT("Vehicle.Electric"), 69} 
                 };
-                Ui::EditRadioButtonAddressEx(TEXT("Vehicle.EngineType"), (int)&pHandlingData->m_transmissionData.m_nEngineType, engine_type);
+                Widget::EditRadioBtnAddr(TEXT("Vehicle.EngineType"), (int)&pHandlingData->m_transmissionData.m_nEngineType, engine_type);
 
-                std::vector<Ui::NamedValue> lights
+                std::vector<Widget::BindInfo> lights
                 { 
                     {TEXT("Vehicle.Long"), 0}, {TEXT("Vehicle.Small"), 1}, 
                     {TEXT("Vehicle.Big"), 2}, {TEXT("Vehicle.Tall"), 3} 
                 };
-                Ui::EditRadioButtonAddressEx(TEXT("Vehicle.FrontLights"), (int)&pHandlingData->m_nFrontLights, lights);
+                Widget::EditRadioBtnAddr(TEXT("Vehicle.FrontLights"), (int)&pHandlingData->m_nFrontLights, lights);
 
-                Ui::EditFloat(TEXT("Vehicle.ForceLevel"), (int)&pHandlingData->m_fSuspensionForceLevel, -10.0f, -10.0f, 10.0f); // test later
+                Widget::EditAddr(TEXT("Vehicle.ForceLevel"), (int)&pHandlingData->m_fSuspensionForceLevel, -10.0f, -10.0f, 10.0f); // test later
 
-                Ui::EditBits(TEXT("Vehicle.HandlingFlags"), (int)&pHandlingData->m_nHandlingFlags, m_HandlingFlagNames);
+                Widget::EditBits(TEXT("Vehicle.HandlingFlags"), (int)&pHandlingData->m_nHandlingFlags, m_HandlingFlagNames);
 
-                Ui::EditFloat(TEXT("Vehicle.HighSpeedDamping"), (int)&pHandlingData->m_fSuspensionDampingLevel, -10.0f, -10.0f, 10.0f); // test later
-                Ui::EditFloat(TEXT("Vehicle.LowerKimit"), (int)&pHandlingData->m_fSuspensionLowerLimit, -10.0f, -10.0f, 10.0f); // test later
-                Ui::EditFloat(TEXT("Vehicle.Mass"), (int)&pHandlingData->m_fMass, 1.0f, 1.0f, 50000.0f);
+                Widget::EditAddr(TEXT("Vehicle.HighSpeedDamping"), (int)&pHandlingData->m_fSuspensionDampingLevel, -10.0f, -10.0f, 10.0f); // test later
+                Widget::EditAddr(TEXT("Vehicle.LowerKimit"), (int)&pHandlingData->m_fSuspensionLowerLimit, -10.0f, -10.0f, 10.0f); // test later
+                Widget::EditAddr(TEXT("Vehicle.Mass"), (int)&pHandlingData->m_fMass, 1.0f, 1.0f, 50000.0f);
 
                 // Max Velocity calculation
                 int MaxVelocity = pHandlingData->m_transmissionData.m_fMaxGearVelocity / *(float*)0xC2B9BC;
-                Ui::EditFloat(TEXT("Vehicle.MaxVelocity"), (int)&MaxVelocity, 1.0f, 1.0f, 1000.0f);
+                Widget::EditAddr(TEXT("Vehicle.MaxVelocity"), (int)&MaxVelocity, 1.0f, 1.0f, 1000.0f);
                 pHandlingData->m_transmissionData.m_fMaxGearVelocity = MaxVelocity * (*(float*)0xC2B9BC);
 
-                Ui::EditBits(TEXT("Vehicle.ModelFlags"), (int)&pHandlingData->m_nModelFlags, m_ModelFlagNames);
+                Widget::EditBits(TEXT("Vehicle.ModelFlags"), (int)&pHandlingData->m_nModelFlags, m_ModelFlagNames);
 
-                Ui::EditAddress<int>(TEXT("Vehicle.MonValue"), (int)&pHandlingData->m_nMonetaryValue, 1, 1, 100000);
-                Ui::EditAddress<BYTE>(TEXT("Vehicle.NumGears"), (int)&pHandlingData->m_transmissionData.m_nNumberOfGears, 1, 1, 10);
-                Ui::EditAddress<BYTE>(TEXT("Vehicle.PercentSubmerged"), (int)&pHandlingData->m_nPercentSubmerged, 10, 10, 120);
+                Widget::EditAddr<int>(TEXT("Vehicle.MonValue"), (int)&pHandlingData->m_nMonetaryValue, 1, 1, 100000);
+                Widget::EditAddr<BYTE>(TEXT("Vehicle.NumGears"), (int)&pHandlingData->m_transmissionData.m_nNumberOfGears, 1, 1, 10);
+                Widget::EditAddr<BYTE>(TEXT("Vehicle.PercentSubmerged"), (int)&pHandlingData->m_nPercentSubmerged, 10, 10, 120);
 
-                Ui::EditRadioButtonAddressEx(TEXT("Vehicle.RearLights"), (int)&pHandlingData->m_nRearLights, lights);
+                Widget::EditRadioBtnAddr(TEXT("Vehicle.RearLights"), (int)&pHandlingData->m_nRearLights, lights);
 
-                Ui::EditFloat(TEXT("Vehicle.SeatOffset"), (int)&pHandlingData->m_fSeatOffsetDistance, 0.0f, 0.0f, 1.0f);
-                Ui::EditFloat(TEXT("Vehicle.SteeringLock"), (int)&pHandlingData->m_fSteeringLock, 10.0f, 10.0f, 50.0f);
-                Ui::EditFloat(TEXT("Vehicle.SuspensionBias"), (int)&pHandlingData->m_fSuspensionBiasBetweenFrontAndRear, 0.0f, 0.0f, 1.0f);
-                Ui::EditFloat(TEXT("Vehicle.TractionBias"), (int)&pHandlingData->m_fTractionBias, 0.0f, 0.0f, 1.0f);
-                Ui::EditFloat(TEXT("Vehicle.TractionLoss"), (int)&pHandlingData->m_fTractionLoss, 0.0f, 0.0f, 1.0f);
-                Ui::EditFloat(TEXT("Vehicle.TractionMul"), (int)&pHandlingData->m_fTractionMultiplier, 0.5f, 0.5f, 2.0f);
-                Ui::EditFloat(TEXT("Vehicle.TurnMass"), (int)&pHandlingData->m_fTurnMass, 20.0f, 20.0f, 1000.0f); // test later
-                Ui::EditFloat(TEXT("Vehicle.UpperLimit"), (int)&pHandlingData->m_fSuspensionUpperLimit, -1.0f, -1.0f, 1.0f);
+                Widget::EditAddr(TEXT("Vehicle.SeatOffset"), (int)&pHandlingData->m_fSeatOffsetDistance, 0.0f, 0.0f, 1.0f);
+                Widget::EditAddr(TEXT("Vehicle.SteeringLock"), (int)&pHandlingData->m_fSteeringLock, 10.0f, 10.0f, 50.0f);
+                Widget::EditAddr(TEXT("Vehicle.SuspensionBias"), (int)&pHandlingData->m_fSuspensionBiasBetweenFrontAndRear, 0.0f, 0.0f, 1.0f);
+                Widget::EditAddr(TEXT("Vehicle.TractionBias"), (int)&pHandlingData->m_fTractionBias, 0.0f, 0.0f, 1.0f);
+                Widget::EditAddr(TEXT("Vehicle.TractionLoss"), (int)&pHandlingData->m_fTractionLoss, 0.0f, 0.0f, 1.0f);
+                Widget::EditAddr(TEXT("Vehicle.TractionMul"), (int)&pHandlingData->m_fTractionMultiplier, 0.5f, 0.5f, 2.0f);
+                Widget::EditAddr(TEXT("Vehicle.TurnMass"), (int)&pHandlingData->m_fTurnMass, 20.0f, 20.0f, 1000.0f); // test later
+                Widget::EditAddr(TEXT("Vehicle.UpperLimit"), (int)&pHandlingData->m_fSuspensionUpperLimit, -1.0f, -1.0f, 1.0f);
 
                 ImGui::EndChild();
 

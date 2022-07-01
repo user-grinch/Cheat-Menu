@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "ped.h"
-#include "ui.h"
 #include "widget.h"
 #include "util.h"
 #include "weapon.h"
@@ -202,42 +201,42 @@ void Ped::ShowPage()
             ImGui::BeginChild("CheckboxesChild");
             ImGui::Columns(2, 0, false);
 #ifndef GTAVC
-            Ui::CheckboxWithHint(TEXT("Ped.BigHead"), &m_bBigHead);
+            Widget::Checkbox(TEXT("Ped.BigHead"), &m_bBigHead);
 #endif
 #ifdef GTASA
-            Ui::CheckboxAddress(TEXT("Ped.ElvisEverywhere"), 0x969157);
-            Ui::CheckboxAddress(TEXT("Ped.EveryoneArmed"), 0x969140);
-            Ui::CheckboxAddress(TEXT("Ped.GangsControl"), 0x96915B);
-            Ui::CheckboxAddress(TEXT("Ped.GangsEverywhere"), 0x96915A);
-            Ui::CheckboxWithHint(TEXT("Ped.GangWars"), &CGangWars::bGangWarsActive);
+            Widget::CheckboxAddr(TEXT("Ped.ElvisEverywhere"), 0x969157);
+            Widget::CheckboxAddr(TEXT("Ped.EveryoneArmed"), 0x969140);
+            Widget::CheckboxAddr(TEXT("Ped.GangsControl"), 0x96915B);
+            Widget::CheckboxAddr(TEXT("Ped.GangsEverywhere"), 0x96915A);
+            Widget::Checkbox(TEXT("Ped.GangWars"), &CGangWars::bGangWarsActive);
 
             ImGui::NextColumn();
 
-            Ui::CheckboxAddress(TEXT("Ped.PedsMayhem"), 0x96913E);
-            Ui::CheckboxAddress(TEXT("Ped.PedsAtkRocket"), 0x969158);
-            Ui::CheckboxAddress(TEXT("Ped.PedsRiot"), 0x969175);
-            Ui::CheckboxAddress(TEXT("Ped.SlutMagnet"), 0x96915D);
-            Ui::CheckboxWithHint(TEXT("Ped.ThinBody"), &m_bThinBody);
+            Widget::CheckboxAddr(TEXT("Ped.PedsMayhem"), 0x96913E);
+            Widget::CheckboxAddr(TEXT("Ped.PedsAtkRocket"), 0x969158);
+            Widget::CheckboxAddr(TEXT("Ped.PedsRiot"), 0x969175);
+            Widget::CheckboxAddr(TEXT("Ped.SlutMagnet"), 0x96915D);
+            Widget::Checkbox(TEXT("Ped.ThinBody"), &m_bThinBody);
 #elif GTAVC
-            Ui::CheckboxAddress(TEXT("Ped.NoProstitutes"), 0xA10B99);
-            Ui::CheckboxAddress(TEXT("Ped.SlutMagnet"), 0xA10B5F);
+            Widget::CheckboxAddr(TEXT("Ped.NoProstitutes"), 0xA10B99);
+            Widget::CheckboxAddr(TEXT("Ped.SlutMagnet"), 0xA10B5F);
             ImGui::NextColumn();
-            Ui::CheckboxAddress(TEXT("Ped.WeaponAll"), 0xA10AB3);
+            Widget::CheckboxAddr(TEXT("Ped.WeaponAll"), 0xA10AB3);
 #else
             // Bad idea lol
             static bool pedsMayhem;
-            if (Ui::CheckboxWithHint(TEXT("Ped.PedsMayhem"), &pedsMayhem))
+            if (Widget::Checkbox(TEXT("Ped.PedsMayhem"), &pedsMayhem))
             {
                 Call<0x4911C0>();
             }
             static bool everyoneAttacksPlayer;
-            if (Ui::CheckboxWithHint(TEXT("Ped.EveryoneAtk"), &everyoneAttacksPlayer))
+            if (Widget::Checkbox(TEXT("Ped.EveryoneAtk"), &everyoneAttacksPlayer))
             {
                 Call<0x491270>();
             }
             ImGui::NextColumn();
-            Ui::CheckboxAddress(TEXT("Ped.NastyLimbs"), 0x95CD44);
-            Ui::CheckboxAddress(TEXT("Ped.WeaponAll"), 0x95CCF6);
+            Widget::CheckboxAddr(TEXT("Ped.NastyLimbs"), 0x95CD44);
+            Widget::CheckboxAddr(TEXT("Ped.WeaponAll"), 0x95CCF6);
 #endif
             ImGui::Columns(1);
             ImGui::EndChild();
@@ -248,15 +247,15 @@ void Ped::ShowPage()
         {
             ImGui::Spacing();
             ImGui::BeginChild("MenusChild");
-            Ui::EditReference<float>(TEXT("Ped.PedDensityMul"), CPopulation::PedDensityMultiplier, 0, 1, 10);
+            Widget::EditAddr<float>(TEXT("Ped.PedDensityMul"), reinterpret_cast<uint>(&CPopulation::PedDensityMultiplier), 0, 1, 10);
 #ifdef GTASA
             if (ImGui::CollapsingHeader(TEXT("Ped.RecruitAnyone")))
             {
-                static std::vector<Ui::NamedMemory> selectWeapon
+                static std::vector<Widget::BindInfo> selectWeapon
                 {
                     {"9mm", 0x96917C}, {"AK47", 0x96917D}, {"Rockets", 0x96917E}
                 };
-                Ui::RadioButtonAddress(TEXT("Ped.SelectWeapon"), selectWeapon);
+                Widget::EditRadioBtnAddr(TEXT("Ped.SelectWeapon"), selectWeapon);
                 ImGui::Spacing();
                 ImGui::Separator();
             }
@@ -321,9 +320,9 @@ void Ped::ShowPage()
                     ImGui::Spacing();
                     ImGui::BeginChild("PedCOnfig");
                     ImGui::Columns(2, 0, false);
-                    Ui::CheckboxWithHint(TEXT("Ped.NoMove"), &Spawner::m_bPedMove);
+                    Widget::Checkbox(TEXT("Ped.NoMove"), &Spawner::m_bPedMove);
                     ImGui::NextColumn();
-                    Ui::CheckboxWithHint(TEXT("Ped.PedBleed"), &Spawner::m_bPedBleed);
+                    Widget::Checkbox(TEXT("Ped.PedBleed"), &Spawner::m_bPedBleed);
                     ImGui::Columns(1);
 
                     ImGui::Spacing();

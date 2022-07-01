@@ -1,6 +1,5 @@
 #include "pch.h"
 #include "widget.h"
-#include "ui.h"
 #include "menu.h"
 
 static struct
@@ -59,7 +58,7 @@ void Widget::Tooltip(const char* text)
     }
 }
 
-void Widget::FilterWithHint(const char* label, ImGuiTextFilter& filter, const char* hint)
+void Widget::Filter(const char* label, ImGuiTextFilter& filter, const char* hint)
 {
     filter.Draw(label);
 
@@ -90,9 +89,9 @@ void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 
             ImGui::Spacing();
             // Category box
             ImGui::PushItemWidth((ImGui::GetWindowContentRegionWidth() - ImGui::GetStyle().ItemSpacing.x)/2);
-            Ui::ListBoxStr("##Categories", data.m_Categories, data.m_Selected);
+            Widget::ListBox("##Categories", data.m_Categories, data.m_Selected);
             ImGui::SameLine();
-            FilterWithHint("##Filter", data.m_Filter, TEXT("Window.Search"));
+            Filter("##Filter", data.m_Filter, TEXT("Window.Search"));
             ImGui::PopItemWidth();
 
             ImGui::Spacing();
@@ -152,7 +151,7 @@ void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 
         {
             ImGui::Spacing();
             ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth());
-            FilterWithHint("##Filter", data.m_Filter, TEXT("Window.Search"));
+            Filter("##Filter", data.m_Filter, TEXT("Window.Search"));
             ImGui::PopItemWidth();
             ImGui::Spacing();
             ImGui::BeginChild(1);
@@ -282,9 +281,9 @@ void Widget::ImageList(ResourceStore &store, ArgCallback leftClickFunc, ArgCallb
     }
 
     ImGui::PushItemWidth((ImGui::GetWindowContentRegionWidth() - style.ItemSpacing.x)/2);
-    Ui::ListBoxStr("##Categories", store.m_Categories, store.m_Selected);
+    Widget::ListBox("##Categories", store.m_Categories, store.m_Selected);
     ImGui::SameLine();
-    FilterWithHint("##Filter", store.m_Filter, "Search");
+    Filter("##Filter", store.m_Filter, "Search");
 
     ImGui::Spacing();
 
@@ -372,4 +371,443 @@ void Widget::ImageList(ResourceStore &store, ArgCallback leftClickFunc, ArgCallb
         }
     }
     ImGui::EndChild();
+}
+
+bool Widget::ColorBtn(int colorId, std::vector<float>& color, ImVec2 size)
+{
+    bool rtn = false;
+    std::string label = "Color " + std::to_string(colorId);
+
+    if (ImGui::ColorButton(label.c_str(), ImVec4(color[0], color[1], color[2], 1), 0, size))
+    {
+        rtn = true;
+    }
+
+    if (ImGui::IsItemHovered())
+    {
+        ImDrawList* drawlist = ImGui::GetWindowDrawList();
+        drawlist->AddRectFilled(ImGui::GetItemRectMin(), ImGui::GetItemRectMax(),
+                                ImGui::GetColorU32(ImGuiCol_ModalWindowDimBg));
+    }
+
+    return rtn;
+}
+
+
+bool Widget::Checkbox(const char* label, bool* v, const char* hint, bool is_disabled)
+{
+    // set things up
+    bool pressed = false;
+    const ImGuiStyle& style = ImGui::GetStyle();
+    const ImVec2 textSize = ImGui::CalcTextSize(label, nullptr, true);
+    float square_sz = ImGui::GetFrameHeight();
+    ImDrawList* drawlist = ImGui::GetWindowDrawList();
+    ImU32 color = ImGui::GetColorU32(ImGuiCol_FrameBg);
+    std::string slabel = "##InvCheckboxBtn" + std::string(label);
+
+    ImGui::BeginDisabled(is_disabled);
+
+    // process the button states
+    if (ImGui::InvisibleButton(slabel.c_str(), ImVec2(square_sz, square_sz)) && !is_disabled)
+    {
+        pressed = true;
+        *v = !*v;
+    }
+
+    if (ImGui::IsItemHovered() && !is_disabled)
+    {
+        color = ImGui::GetColorU32(ImGuiCol_FrameBgHovered);
+    }
+
+    // draw the button
+    ImVec2 min = ImGui::GetItemRectMin();
+    ImVec2 max = ImGui::GetItemRectMax();
+    drawlist->AddRectFilled(min, max, color, ImGui::GetStyle().FrameRounding);
+
+    int pad = static_cast<int>(square_sz / 6.0);
+    pad = (pad < 1) ? 1 : pad;
+
+    if (*v)
+    {
+        // draw the checkmark
+        float sz = (square_sz - pad * 2.0);
+        float thickness = sz / 5.0;
+        thickness = (thickness < 1.0) ? 1.0 : thickness;
+        sz = sz - thickness * 0.5;
+
+        auto pos = ImVec2(min.x + pad, min.y + pad);
+        pos.x = pos.x + thickness * 0.25;
+        pos.y = pos.y + thickness * 0.25;
+
+        float third = sz / 3.0;
+        float bx = pos.x + third;
+        float by = pos.y + sz - third * 0.5;
+
+        drawlist->PathLineTo(ImVec2(bx - third, by - third));
+        drawlist->PathLineTo(ImVec2(bx, by));
+        drawlist->PathLineTo(ImVec2(bx + third * 2.0, by - third * 2.0));
+        drawlist->PathStroke(ImGui::GetColorU32(ImGuiCol_CheckMark), false, thickness);
+    }
+
+    // draw label
+    ImGui::SameLine(0, style.ItemInnerSpacing.x);
+    if (ImGui::InvisibleButton(label, ImVec2(ImGui::CalcTextSize(label, nullptr, true).x, square_sz)) && !is_disabled)
+    {
+        pressed = true;
+        *v = !*v;
+    }
+    min = ImGui::GetItemRectMin();
+    drawlist->AddText(ImVec2(min.x, min.y + style.ItemInnerSpacing.y / 2), ImGui::GetColorU32(ImGuiCol_Text), label);
+
+    // draw hint
+    if (hint != nullptr)
+    {
+        ImGui::SameLine(0, style.ItemInnerSpacing.x);
+        ImGui::InvisibleButton("?", ImGui::CalcTextSize("?", nullptr, true));
+        min = ImGui::GetItemRectMin();
+        drawlist->AddText(ImVec2(min.x, min.y + style.ItemInnerSpacing.y / 2), ImGui::GetColorU32(ImGuiCol_TextDisabled),
+                          "?");
+
+        if (ImGui::IsItemHovered() && !is_disabled)
+        {
+            ImGui::BeginTooltip();
+            ImGui::Text(hint);
+            ImGui::Spacing();
+            ImGui::EndTooltip();
+        }
+    }
+
+    ImGui::EndDisabled();
+
+    return pressed;
+}
+
+bool Widget::CheckboxAddr(const char* label, uint addr, const char* hint)
+{
+    bool rtn = false;
+    bool state = patch::Get<bool>(addr, false);
+
+    if (Checkbox(label, &state, hint) && addr != NULL)
+    {
+        patch::Set<bool>(addr, state, false);
+        rtn = true;
+    }
+
+    return rtn;
+}
+
+bool Widget::CheckboxAddrRaw(const char* label, uint addr, size_t size, const char* enabled, const char* disabled, const char* hint)
+{
+    bool rtn = false;
+    char* buf = new char[size+1];
+    patch::GetRaw(addr, buf, size);
+    buf[size] = '\0';
+    bool state = !strcmp(buf, enabled);
+
+    if (Checkbox(label, &state, hint))
+    {
+        if (state)
+        {
+            patch::SetRaw(addr, const_cast<char*>(enabled), size);
+        }
+        else
+        {
+            patch::SetRaw(addr, const_cast<char*>(disabled), size);
+        }
+        rtn = true;
+    }
+    delete buf;
+
+    return rtn;
+}
+
+bool Widget::CheckboxBits(const char* label, uint flag, const char* hint)
+{
+    bool rtn = false;
+    bool state = (flag == 1) ? true : false;
+    if (Checkbox(label, &state, hint))
+    {
+        flag = state ? 1 : 0;
+        rtn = true;
+    }
+
+    return rtn;
+}
+
+void Widget::EditAddr(const char* label, uint address, float min, float def, float max, float mul, float change)
+{
+    if (ImGui::CollapsingHeader(label))
+    {
+        float val = patch::Get<float>(address, false) * mul;
+
+        int items = 3;
+
+        if (min == def)
+        {
+            items = 2;
+        }
+
+        ImGui::Columns(items, nullptr, false);
+
+        ImGui::Text("Min: %f", min);
+
+        if (items == 3)
+        {
+            ImGui::NextColumn();
+            ImGui::Text("Def: %f", def);
+        }
+
+        ImGui::NextColumn();
+        ImGui::Text("Max: %f", max);
+        ImGui::Columns(1);
+
+        ImGui::Spacing();
+
+        int size = ImGui::GetFrameHeight();
+
+        if (ImGui::InputFloat(("##" + std::string(label)).c_str(), &val))
+        {
+            patch::SetFloat(address, val / mul, false);
+        }
+
+        ImGui::SameLine(0.0, 4.0);
+        if (ImGui::Button("-", ImVec2(size, size)) && (val - change) > min)
+        {
+            val -= change;
+            patch::SetFloat(address, val / mul, false);
+        }
+        ImGui::SameLine(0.0, 4.0);
+        if (ImGui::Button("+", ImVec2(size, size)) && (val + change) < max)
+        {
+            val += change;
+            patch::SetFloat(address, val / mul, false);
+        }
+        ImGui::SameLine(0.0, 4.0);
+        ImGui::Text("Set");
+
+
+        ImGui::Spacing();
+
+        if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), CalcSize(items)))
+        {
+            patch::Set<float>(address, min / mul, false);
+        }
+
+        if (items == 3)
+        {
+            ImGui::SameLine();
+
+            if (ImGui::Button(("Default##" + std::string(label)).c_str(), CalcSize(items)))
+            {
+                patch::Set<float>(address, def / mul, false);
+            }
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), CalcSize(items)))
+        {
+            patch::Set<float>(address, max / mul, false);
+        }
+
+        ImGui::Spacing();
+        ImGui::Separator();
+    }
+}
+
+
+void Widget::EditBits(const char* label, const int address, VecStr& names)
+{
+    auto mem_val = (int*)address;
+
+    if (ImGui::CollapsingHeader(label))
+    {
+        ImGui::Columns(2, nullptr, false);
+
+        for (int i = 0; i < 32; ++i)
+        {
+            int mask = 1 << i;
+            bool state = *mem_val & mask;
+
+            if (ImGui::Checkbox(names[i].c_str(), &state))
+            {
+                *mem_val ^= mask;
+            }
+
+            if (i + 1 == 32 / 2)
+            {
+                ImGui::NextColumn();
+            }
+        }
+        ImGui::Columns(1);
+
+        ImGui::Spacing();
+        ImGui::Separator();
+    }
+}
+
+#ifdef GTASA
+void Widget::EditStat(const char* label, const int stat_id, const int min, const int def, const int max)
+{
+    if (ImGui::CollapsingHeader(label))
+    {
+        int val = static_cast<int>(CStats::GetStatValue(stat_id));
+
+        ImGui::Columns(3, nullptr, false);
+        ImGui::Text("Min: %d", min);
+        ImGui::NextColumn();
+        ImGui::Text("Def: %d", def);
+        ImGui::NextColumn();
+        ImGui::Text("Max: %d", max);
+        ImGui::Columns(1);
+
+        ImGui::Spacing();
+
+        if (ImGui::InputInt(("Set value##" + std::string(label)).c_str(), &val))
+        {
+            CStats::SetStatValue(stat_id, static_cast<float>(val));
+        }
+
+        ImGui::Spacing();
+
+        if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), CalcSize(3)))
+        {
+            CStats::SetStatValue(stat_id, static_cast<float>(min));
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button(("Default##" + std::string(label)).c_str(), CalcSize(3)))
+        {
+            CStats::SetStatValue(stat_id, static_cast<float>(def));
+        }
+
+        ImGui::SameLine();
+
+        if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), CalcSize(3)))
+        {
+            CStats::SetStatValue(stat_id, static_cast<float>(max));
+        }
+
+        ImGui::Spacing();
+        ImGui::Separator();
+    }
+}
+#endif
+
+bool Widget::ListBox(const char* label, VecStr& allItems, std::string& selected)
+{
+    bool rtn = false;
+    if (ImGui::BeginCombo(label, selected.c_str()))
+    {
+        for (std::string curItem : allItems)
+        {
+            if (ImGui::MenuItem(curItem.c_str()))
+            {
+                selected = curItem;
+                rtn = true;
+            }
+        }
+        ImGui::EndCombo();
+    }
+
+    return rtn;
+}
+
+bool Widget::ListBox(const char* label, VecStr& allItems, int& selected)
+{
+    bool rtn = false;
+    if (ImGui::BeginCombo(label, std::to_string(selected).c_str()))
+    {
+        for (size_t index = 0; index < allItems.size(); ++index)
+        {
+            if (ImGui::MenuItem(allItems[index].c_str()))
+            {
+                selected = index;
+                rtn = true;
+            }
+        }
+        ImGui::EndCombo();
+    }
+
+    return rtn;
+}
+
+void Widget::EditRadioBtnAddr(const char* label, std::vector<BindInfo>& addrInfo)
+{
+    if (ImGui::CollapsingHeader(label))
+    {
+        size_t btnsInColumn = addrInfo.size() / 2 - 1;
+
+        ImGui::Columns(2, nullptr, false);
+
+        bool state = true;
+
+        for (size_t i = 0; i < addrInfo.size(); i++)
+        {
+            if (patch::Get<bool>(addrInfo[i].val, false))
+            {
+                state = false;
+            }
+        }
+
+        if (ImGui::RadioButton((std::string("None##") + label).c_str(), state))
+        {
+            for (size_t i = 0; i < addrInfo.size(); i++)
+            {
+                patch::Set<bool>(addrInfo[i].val, false);
+            }
+        }
+
+        for (size_t i = 0; i < addrInfo.size(); i++)
+        {
+            state = patch::Get<bool>(addrInfo[i].val, false);
+
+            if (ImGui::RadioButton(addrInfo[i].name.c_str(), state))
+            {
+                for (size_t i = 0; i < addrInfo.size(); i++)
+                {
+                    patch::Set<bool>(addrInfo[i].val, false);
+                }
+
+                patch::Set<bool>(addrInfo[i].val, true);
+            }
+
+            if (i == btnsInColumn)
+            {
+                ImGui::NextColumn();
+            }
+        }
+        ImGui::Columns(1);
+        ImGui::Spacing();
+        ImGui::Separator();
+    }
+}
+
+void Widget::EditRadioBtnAddr(const char* label, uint addr, std::vector<BindInfo>& valInfo)
+{
+    if (ImGui::CollapsingHeader(label))
+    {
+        size_t btnsInColumn = valInfo.size() / 2;
+        ImGui::Columns(2, nullptr, false);
+
+        int mem_val = 0;
+        patch::GetRaw(addr, &mem_val, 1, false);
+
+        for (size_t i = 0; i < valInfo.size(); i++)
+        {
+            if (ImGui::RadioButton(valInfo[i].name.c_str(), &mem_val, valInfo[i].val))
+            {
+                patch::SetRaw(addr, &valInfo[i].val, 1, false);
+            }
+
+            if (i == btnsInColumn)
+            {
+                ImGui::NextColumn();
+            }
+        }
+        ImGui::Columns(1);
+        ImGui::Spacing();
+        ImGui::Separator();
+    }
 }
