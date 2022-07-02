@@ -1061,8 +1061,8 @@ void Vehicle::ShowPage()
             ImGui::SetNextItemWidth(width);
             ImGui::InputTextWithHint("##LicenseText", TEXT("Vehicle.PlateText"), Spawner::m_nLicenseText, 9);
 
-            Widget::ImageList(Spawner::m_VehData, SpawnVehicle, nullptr,
-                           [](std::string& str)
+            Widget::ImageList(Spawner::m_VehData, SpawnVehicle,
+            [](std::string& str)
             {
                 return GetNameFromModel(std::stoi(str));
             });
@@ -1274,7 +1274,6 @@ void Vehicle::ShowPage()
                         Paint::SetNodeTexture(FindPlayerPed()->m_pVehicle, PaintData::m_Selected, str,
                                               PaintData::m_bMatFilter);
                     },
-                    nullptr,
                     [](std::string& str)
                     {
                         return str;
@@ -1291,10 +1290,10 @@ void Vehicle::ShowPage()
                 {
                     AddComponent(str);
                 },
-                [](std::string& str)
-                {
-                    RemoveComponent(str);
-                },
+                // [](std::string& str)
+                // {
+                //     RemoveComponent(str);
+                // },
                 [](std::string& str)
                 {
                     return str;

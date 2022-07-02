@@ -65,8 +65,8 @@ public:
     static void Filter(const char* label, ImGuiTextFilter& filter, const char* hint);
 
     // Draws ResourceStore images in the interface
-    static void ImageList(ResourceStore &store, ArgCallback leftClickFunc, ArgCallback rightClickFunc,
-                           ArgCallbackRtn getNameFunc, ArgCallbackRtnBool verifyFunc = nullptr);
+    static void ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackRtn getNameFunc, 
+                            ArgCallbackRtnBool verifyFunc = nullptr);
 
     // Draws a dropdown listbox
     static bool ListBox(const char* label, VecStr& allItems, int& selected);

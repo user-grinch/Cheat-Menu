@@ -471,7 +471,7 @@ void Game::ShowPage()
 #ifdef GTASA
             if (Widget::Checkbox(TEXT("Game.ForbiddenWantedLevel"), &m_bForbiddenArea, TEXT("Game.ForbiddenWantedLevelText")))
             {
-                patch::Set<BYTE>(0x441770, m_bForbiddenArea ? 0x83 : 0xC3, false);
+                patch::Set<BYTE>(0x441770, m_bForbiddenArea ? 0x83 : 0xC3);
             }
             Widget::CheckboxAddr(TEXT("Game.FreePNS"), 0x96C009);
 #endif

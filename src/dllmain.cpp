@@ -70,18 +70,28 @@ void MenuThread(void* param)
     }
 #endif
 
-    Log::Print<eLogLevel::None>("Stating " MENU_TITLE "\nAuthor: Grinch_\nDiscord: " DISCORD_INVITE "\nMore Info: " GITHUB_LINK "\n");
+    Log::Print<eLogLevel::None>("Starting " MENU_TITLE " (" BUILD_NUMBER ")\nAuthor: Grinch_\nDiscord: "
+                                DISCORD_INVITE "\nMore Info: " GITHUB_LINK);
 
+    // date time
+    SYSTEMTIME st;
+    GetSystemTime(&st);
+    Log::Print<eLogLevel::None>("Date: {}-{}-{} Time: {}:{}\n", st.wYear, st.wMonth, st.wDay,
+                                st.wHour, st.wMinute);
     CheatMenu::Init();
 
     // Checking for updates once a day
-    SYSTEMTIME st;
-    GetSystemTime(&st);
     if (gConfig.Get("Menu.LastUpdateChecked", 0) != st.wDay)
     {
         Updater::CheckUpdate();
         Updater::IncrementDailyUsageCounter();
         gConfig.Set("Menu.LastUpdateChecked", st.wDay);
+    }
+    
+    if (Updater::IsUpdateAvailable())
+    {
+        Updater::GetUpdateVersion();
+        Log::Print<eLogLevel::Info>("New update available: %s", Updater::GetUpdateVersion().c_str());
     }
 
     while (true)

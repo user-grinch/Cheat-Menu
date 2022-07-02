@@ -305,7 +305,7 @@ void Ped::ShowPage()
                 {
                     ImGui::Spacing();
 #ifdef GTASA
-                    Widget::ImageList(m_PedData, SpawnPed, nullptr,
+                    Widget::ImageList(m_PedData, SpawnPed,
                     [](std::string& str)
                     {
                             return m_PedData.m_pData->Get(str.c_str(), "Unknown");
@@ -356,7 +356,6 @@ void Ped::ShowPage()
                         Spawner::m_nWeaponId = std::stoi(str);
                         weaponName = Weapon::m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
                     },
-                    nullptr,
                     [](std::string& str)
                     {
                         return Weapon::m_WeaponData.m_pData->Get(str.c_str(), "Unknown");

@@ -778,7 +778,7 @@ void Player::ShowPage()
                 {
                     if (pPlayer->m_nModelIndex == 0)
                     {
-                        Widget::ImageList(m_ClothData, ChangePlayerCloth, nullptr, [](std::string& str)
+                        Widget::ImageList(m_ClothData, ChangePlayerCloth, [](std::string& str)
                         {
                             std::stringstream ss(str);
                             std::string temp;
@@ -787,7 +787,7 @@ void Player::ShowPage()
                             getline(ss, temp, '$');
 
                             return temp;
-                        });// nullptr, clothNameList, sizeof(clothNameList) / sizeof(const char*));
+                        });
                     }
                     else
                     {
@@ -841,7 +841,7 @@ void Player::ShowPage()
                 }
                 if (ImGui::BeginTabItem(TEXT("Player.PedSkinsTab")))
                 {
-                    Widget::ImageList(Ped::m_PedData, ChangePlayerModel, nullptr,
+                    Widget::ImageList(Ped::m_PedData, ChangePlayerModel,
                     [](std::string& str)
                     {
                         return Ped::m_PedData.m_pData->Get(str.c_str(), "Unknown");

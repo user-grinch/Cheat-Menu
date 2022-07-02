@@ -249,8 +249,7 @@ static bool RoundedImageButton(ImTextureID user_texture_id, ImVec2& size, const 
     return ImGui::IsItemClicked(0);
 }
 
-void Widget::ImageList(ResourceStore &store, ArgCallback leftClickFunc, ArgCallback rightClickFunc,
-                    ArgCallbackRtn getNameFunc, ArgCallbackRtnBool verifyFunc)
+void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackRtn getNameFunc, ArgCallbackRtnBool verifyFunc)
 {
     ImGuiStyle& style =  ImGui::GetStyle();
     /*
@@ -280,14 +279,6 @@ void Widget::ImageList(ResourceStore &store, ArgCallback leftClickFunc, ArgCallb
         contextMenu.func = nullptr;
     }
 
-    ImGui::PushItemWidth((ImGui::GetWindowContentRegionWidth() - style.ItemSpacing.x)/2);
-    Widget::ListBox("##Categories", store.m_Categories, store.m_Selected);
-    ImGui::SameLine();
-    Filter("##Filter", store.m_Filter, "Search");
-
-    ImGui::Spacing();
-
-    ImGui::BeginChild("DrawImages");
     if (showImages)
     {
         ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(3, 3));
@@ -297,80 +288,152 @@ void Widget::ImageList(ResourceStore &store, ArgCallback leftClickFunc, ArgCallb
     }
 
     // Draw images here
-    for (uint i = 0; i < store.m_ImagesList.size(); ++i)
+    if (ImGui::BeginTabBar("MYTABS"))
     {
-        std::string text = store.m_ImagesList[i]->m_FileName;
-        std::string modelName = getNameFunc(text);
-
-        if (store.m_Filter.PassFilter(modelName.c_str())
-            && (store.m_ImagesList[i]->m_CategoryName == store.m_Selected || store.m_Selected == "All")
-            && (verifyFunc == nullptr || verifyFunc(text))
-           )
+        if (ImGui::BeginTabItem(TEXT("Window.Search")))
         {
-            /*
-            	Couldn't figure out how to laod images for Dx11
-            	Using texts for now
-            */
-            if (showImages)
-            {
-                if (RoundedImageButton(store.m_ImagesList[i]->m_pTexture, m_ImageSize, modelName.c_str()))
-                {
-                    leftClickFunc(text);
-                }
-                
-            }
-            else
-            {
-                if (ImGui::MenuItem(modelName.c_str()))
-                {
-                    leftClickFunc(text);
-                }
-            }
+            ImGui::Spacing();
+            ImGui::PushItemWidth((ImGui::GetWindowContentRegionWidth() - style.ItemSpacing.x)/2);
+            Widget::ListBox("##Categories", store.m_Categories, store.m_Selected);
+            ImGui::SameLine();
+            Filter("##Filter", store.m_Filter, "Search");
+            ImGui::PopItemWidth();
+            ImGui::Spacing();
+            ImGui::BeginChild("DrawImages");
 
-            // Right click popup
-            if (ImGui::IsItemClicked(1) && rightClickFunc != nullptr)
+            for (uint i = 0; i < store.m_ImagesList.size(); ++i)
             {
-                contextMenu.func = rightClickFunc;
-                contextMenu.val = modelName;
-            }
+                std::string text = store.m_ImagesList[i]->m_FileName;
+                std::string modelName = getNameFunc(text);
 
-            if (showImages)
-            {
-                if (imageCount % imagesInRow != 0)
+                if (store.m_Filter.PassFilter(modelName.c_str())
+                    && (store.m_ImagesList[i]->m_CategoryName == store.m_Selected || store.m_Selected == "All")
+                    && (verifyFunc == nullptr || verifyFunc(text))
+                )
                 {
-                    ImGui::SameLine(0.0, style.ItemInnerSpacing.x);
+                    /*
+                        Couldn't figure out how to laod images for Dx11
+                        Using texts for now
+                    */
+                    if (showImages)
+                    {
+                        if (RoundedImageButton(store.m_ImagesList[i]->m_pTexture, m_ImageSize, modelName.c_str()))
+                        {
+                            clickFunc(text);
+                        }
+                        
+                    }
+                    else
+                    {
+                        if (ImGui::MenuItem(modelName.c_str()))
+                        {
+                            clickFunc(text);
+                        }
+                    }
+
+                    // Right click popup
+                    if (ImGui::IsItemClicked(1))
+                    {
+                        contextMenu.func = (void*)1;
+                        contextMenu.val = text;
+                        contextMenu.key = std::format("{} ({})", modelName, text);
+                    }
+
+                    if (showImages)
+                    {
+                        if (imageCount % imagesInRow != 0)
+                        {
+                            ImGui::SameLine(0.0, style.ItemInnerSpacing.x);
+                        }
+                    }
+                    imageCount++;
                 }
             }
-            imageCount++;
+            if (contextMenu.func != nullptr)
+            {
+                if (ImGui::BeginPopupContextWindow())
+                {
+                    ImGui::Text(contextMenu.key.c_str());
+                    ImGui::Separator();
+                    if (ImGui::MenuItem(TEXT("Menu.Favourites")))
+                    {
+                        store.m_pData->Set(std::format("Favourites.{}", contextMenu.key).c_str(), contextMenu.val);
+                        store.m_pData->Save();
+                        SetHelpMessage(TEXT("Menu.FavouritesText"));
+                    }
+                    if (ImGui::MenuItem(TEXT("Menu.Close")))
+                    {
+                        contextMenu.func = nullptr;
+                    }
+
+                    ImGui::EndPopup();
+                }
+            }
+            ImGui::EndChild();
+            ImGui::EndTabItem();
         }
+        if (ImGui::BeginTabItem(TEXT("Window.FavouritesTab")))
+        {
+            ImGui::Spacing();
+            ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth());
+            Filter("##Filter", store.m_Filter, TEXT("Window.Search"));
+            ImGui::PopItemWidth();
+            ImGui::Spacing();
+            ImGui::BeginChild("DrawFavourites");
+            size_t count = 0;
+            for (auto [k, v] : *store.m_pData->GetTable("Favourites"))
+            {
+                std::string key = std::string(k.str());
+                if (store.m_Filter.PassFilter(key.c_str()))
+                {
+                    std::string val = v.value_or<std::string>("Unkonwn");
+                    if (ImGui::MenuItem(key.c_str()) && clickFunc != nullptr)
+                    {
+                        clickFunc(val);
+                    }
+
+                    if (ImGui::IsItemClicked(1))
+                    {
+                        contextMenu = {std::string("Favourites"), key, val, (void*)1};
+                    }
+                }
+                ++count;
+            }
+            if (count == 0)
+            {
+                Widget::TextCentered(TEXT("Menu.FavouritesNone"));
+            }
+            if (contextMenu.func != nullptr)
+            {
+                if (ImGui::BeginPopupContextWindow())
+                {
+                    ImGui::Text(contextMenu.key.c_str());
+                    ImGui::Separator();
+                    if (ImGui::MenuItem(TEXT("Menu.FavouritesRemove")))
+                    {
+                        store.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
+                        store.m_pData->Save();
+                        SetHelpMessage(TEXT("Menu.FavouritesRemoveText"));
+                    }
+                    if (ImGui::MenuItem(TEXT("Menu.Close")))
+                    {
+                        contextMenu.func = nullptr;
+                    }
+
+                    ImGui::EndPopup();
+                }
+            }
+            ImGui::EndChild();
+            ImGui::EndTabItem();
+        }
+        ImGui::EndTabBar();
     }
+    
 
     if (showImages)
     {
         ImGui::PopStyleVar(4);
     }
-
-    // Draw popup code
-    if (contextMenu.func != nullptr)
-    {
-        if (ImGui::BeginPopupContextWindow())
-        {
-            ImGui::Text(contextMenu.val.c_str());
-            ImGui::Separator();
-            if (ImGui::MenuItem("Remove"))
-            {
-                static_cast<ArgCallback>(contextMenu.func)(contextMenu.val);
-            }
-
-            if (ImGui::MenuItem("Close"))
-            {
-                contextMenu.func = nullptr;
-            }
-
-            ImGui::EndPopup();
-        }
-    }
-    ImGui::EndChild();
 }
 
 bool Widget::ColorBtn(int colorId, std::vector<float>& color, ImVec2 size)
@@ -717,7 +780,7 @@ bool Widget::ListBox(const char* label, VecStr& allItems, std::string& selected)
 bool Widget::ListBox(const char* label, VecStr& allItems, int& selected)
 {
     bool rtn = false;
-    if (ImGui::BeginCombo(label, std::to_string(selected).c_str()))
+    if (ImGui::BeginCombo(label, allItems[selected].c_str()))
     {
         for (size_t index = 0; index < allItems.size(); ++index)
         {

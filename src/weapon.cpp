@@ -347,7 +347,7 @@ void Weapon::ShowPage()
                 m_nAmmoCount = (m_nAmmoCount > 99999) ? 99999 : m_nAmmoCount;
             }
 #ifdef GTASA
-            Widget::ImageList(m_WeaponData, GiveWeaponToPlayer, nullptr,
+            Widget::ImageList(m_WeaponData, GiveWeaponToPlayer,
             [](std::string& str)
             {
                 return m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
@@ -370,16 +370,14 @@ void Weapon::ShowPage()
                 "Ballas\0Grove street families\0Los santos vagos\0San fierro rifa\0Da nang boys\0"
                 "Mafia\0Mountain cloud triad\0Varrio los aztecas\0Gang9\0Gang10\0"
             };
-            std::string str = std::format("{}\0{}\0{}\0", TEXT("Weapon.Weapon1"), TEXT("Weapon.Weapon2"),
-                                        TEXT("Weapon.Weapon3"));
             ImGui::Combo(TEXT("Weapon.SelectGang"), &m_nSelectedGang, gangList);
-            ImGui::Combo(TEXT("Ped.SelectWeapon"), &m_nSelectedWeapon, str.c_str());
+            ImGui::Combo(TEXT("Ped.SelectWeapon"), &m_nSelectedWeapon, "Weapon 1\0Weapon 2\0Weapon 3\0");
             ImGui::Spacing();
 
             std::string key = std::to_string(m_nGangWeaponList[m_nSelectedGang][m_nSelectedWeapon]);
             ImGui::Text(TEXT("Weapon.CurrentWeapon"), m_WeaponData.m_pData->Get(key.c_str(), "Unknown").c_str());
             ImGui::Spacing();
-            Widget::ImageList(m_WeaponData, SetGangWeapon, nullptr,
+            Widget::ImageList(m_WeaponData, SetGangWeapon,
             [](std::string& str)
             {
                 return m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
