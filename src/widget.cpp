@@ -6,6 +6,7 @@ static struct
 {
     std::string root, key, val;
     void* func = nullptr;
+    bool show = false;
 } contextMenu;
 
 ImVec2 Widget::CalcSize(short count, bool spacing)
@@ -78,7 +79,7 @@ void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 
 {
     if (ImGui::IsMouseClicked(1))
     {
-        contextMenu.func = nullptr;
+        contextMenu.show = false;
     }
 
     // Drawing the list here
@@ -98,6 +99,12 @@ void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 
             ImGui::BeginChild(1);
             for (auto [k, v] : data.m_pData->Items())
             {
+                // Don't show favourites in "All"
+                if (data.m_Selected == "All" && k == "Favourites")
+                {
+                    continue;
+                }
+
                 if (k.str() == data.m_Selected || data.m_Selected == "All")
                 {
                     for (auto [k2, v2] : v.as_table()->ref<DataStore::Table>())
@@ -114,13 +121,13 @@ void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 
 
                             if (ImGui::IsItemClicked(1))
                             {
-                                contextMenu = {root, key, val, removeFunc};
+                                contextMenu = {root, key, val, removeFunc, true};
                             }
                         }
                     }
                 }
             }
-            if (contextMenu.func != nullptr)
+            if (contextMenu.show)
             {
                 if (ImGui::BeginPopupContextWindow())
                 {
@@ -132,13 +139,13 @@ void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 
                         data.m_pData->Save();
                         SetHelpMessage(TEXT("Menu.FavouritesText"));
                     }
-                    if (ImGui::MenuItem(TEXT("Menu.Remove")))
+                    if (contextMenu.func && ImGui::MenuItem(TEXT("Menu.Remove")))
                     {
                         static_cast<ArgCallback3>(contextMenu.func)(contextMenu.root, contextMenu.key, contextMenu.val);
                     }
                     if (ImGui::MenuItem(TEXT("Menu.Close")))
                     {
-                        contextMenu.func = nullptr;
+                        contextMenu.show = false;
                     }
 
                     ImGui::EndPopup();
@@ -170,7 +177,7 @@ void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 
 
                     if (ImGui::IsItemClicked(1))
                     {
-                        contextMenu = {std::string("Favourites"), key, val, removeFunc};
+                        contextMenu = {std::string("Favourites"), key, val, removeFunc, true};
                     }
                 }
                 ++count;
@@ -179,7 +186,7 @@ void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 
             {
                 Widget::TextCentered(TEXT("Menu.FavouritesNone"));
             }
-            if (contextMenu.func != nullptr)
+            if (contextMenu.show)
             {
                 if (ImGui::BeginPopupContextWindow())
                 {
@@ -193,7 +200,7 @@ void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 
                     }
                     if (ImGui::MenuItem(TEXT("Menu.Close")))
                     {
-                        contextMenu.func = nullptr;
+                        contextMenu.show = false;
                     }
 
                     ImGui::EndPopup();
@@ -276,7 +283,7 @@ void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackR
     // Hide the popup if right clicked again
     if (ImGui::IsMouseClicked(1))
     {
-        contextMenu.func = nullptr;
+        contextMenu.show = false;
     }
 
     if (showImages)
@@ -334,7 +341,7 @@ void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackR
                     // Right click popup
                     if (ImGui::IsItemClicked(1))
                     {
-                        contextMenu.func = (void*)1;
+                        contextMenu.show = true;
                         contextMenu.val = text;
                         contextMenu.key = std::format("{} ({})", modelName, text);
                     }
@@ -349,7 +356,7 @@ void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackR
                     imageCount++;
                 }
             }
-            if (contextMenu.func != nullptr)
+            if (contextMenu.show)
             {
                 if (ImGui::BeginPopupContextWindow())
                 {
@@ -363,7 +370,7 @@ void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackR
                     }
                     if (ImGui::MenuItem(TEXT("Menu.Close")))
                     {
-                        contextMenu.func = nullptr;
+                        contextMenu.show = false;
                     }
 
                     ImGui::EndPopup();
@@ -394,7 +401,7 @@ void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackR
 
                     if (ImGui::IsItemClicked(1))
                     {
-                        contextMenu = {std::string("Favourites"), key, val, (void*)1};
+                        contextMenu = {std::string("Favourites"), key, val, nullptr, true};
                     }
                 }
                 ++count;
@@ -403,7 +410,7 @@ void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackR
             {
                 Widget::TextCentered(TEXT("Menu.FavouritesNone"));
             }
-            if (contextMenu.func != nullptr)
+            if (contextMenu.show)
             {
                 if (ImGui::BeginPopupContextWindow())
                 {
@@ -417,7 +424,7 @@ void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackR
                     }
                     if (ImGui::MenuItem(TEXT("Menu.Close")))
                     {
-                        contextMenu.func = nullptr;
+                        contextMenu.show = false;
                     }
 
                     ImGui::EndPopup();
