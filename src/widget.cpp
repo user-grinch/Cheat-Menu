@@ -555,11 +555,11 @@ bool Widget::Checkbox(const char* label, bool* v, const char* hint, bool is_disa
 bool Widget::CheckboxAddr(const char* label, uint addr, const char* hint)
 {
     bool rtn = false;
-    bool state = patch::Get<bool>(addr, false);
+    bool state = patch::Get<bool>(addr);
 
     if (Checkbox(label, &state, hint) && addr != NULL)
     {
-        patch::Set<bool>(addr, state, false);
+        patch::Set<bool>(addr, state);
         rtn = true;
     }
 
