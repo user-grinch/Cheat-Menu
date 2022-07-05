@@ -11,6 +11,142 @@
 
 #ifdef GTASA
 #define TOTAL_WEATHERS 23
+
+// taken from vHud (_AG)
+static bool IsTouchingRect(CVector2D& point, CRect rect1, CRect rect2) 
+{
+    float vroot;
+    float v12;
+    float v13;
+    float v14;
+    float v15;
+    float w1;
+    float h1;
+    float w2;
+    float v19;
+    float h2;
+    float w;
+    float h;
+
+    if (rect1.right == rect1.left && rect1.bottom == rect1.top || rect2.right == rect2.left && rect2.bottom == rect2.top)
+    {
+        return false;
+    }
+
+    if (rect2.left == rect1.left && rect2.top == rect1.top || rect2.left == rect1.right && rect2.top == rect1.bottom || rect2.right == rect1.left && rect2.bottom == rect1.top || rect2.right == rect1.right && rect2.bottom == rect1.bottom)
+    {
+        return false;
+    }
+    
+    w1 = rect1.right - rect1.left;
+    h1 = rect1.bottom - rect1.top;
+    w2 = rect2.left - rect1.left;
+    h2 = rect2.top - rect1.top;
+    w = rect2.right - rect1.left;
+    h = rect2.bottom - rect1.top;
+
+    vroot = sqrtf(w1 * w1 + h1 * h1);
+    v12 = h2 * (w1 / vroot) - w2 * (h1 / vroot);
+    v19 = h1 / vroot * h2 + w1 / vroot * w2;
+    v14 = h * (w1 / vroot) - w * (h1 / vroot);
+
+    if (v12 < 0.0f && v14 < 0.0f || v12 >= 0.0f && v14 >= 0.0f)
+    {
+        return false;
+    }
+
+    v13 = h1 / vroot * h + w1 / vroot * w;
+    v15 = v13 + (v19 - v13) * v14 / (v14 - v12);
+
+    if (v15 < 0.0f)
+    {
+        return false;
+    }
+
+    if (v15 > vroot)
+    {
+        return false;
+    }
+
+    point.x = w1 / vroot * v15 + rect1.left;
+    point.y = v15 * (h1 / vroot) + rect1.top;
+    return true;
+}
+
+static float LimitRadarPoint(CVector2D& point) 
+{
+    if (FrontEndMenuManager.m_bDrawRadarOrMap) 
+    {
+        return point.Magnitude();
+    }
+
+    if (point.x >=  -1.0f && point.x <= 1.0f && point.y >= -1.0f && point.y <= 1.0f)
+    {
+        return 0.99f;
+    }
+
+    CVector2D temp;
+    CRect rect[4] = 
+    {
+        {-1.0f, 1.0f, 1.0f, 1.0f},
+        {-1.0f, 1.0f, -1.0f, -1.0f},
+        {-1.0f, -1.0f, 1.0f, -1.0f},
+        {1.0f, 1.0f, 1.0f, -1.0f}
+    };
+
+    for (int i = 0; i <= 4; i++) 
+    {
+        if (IsTouchingRect(temp, rect[i], CRect(0.0f, 0.0f, point.x, point.y)))
+        {
+            point.x = temp.x;
+            point.y = temp.y;
+            break;
+        }
+    }
+    
+    return 1.1f;
+}
+
+static double __cdecl LimitRadarPoint2(CVector2D *pos)
+{
+    float vroot = pos->Magnitude();
+    if (FrontEndMenuManager.m_bDrawRadarOrMap)
+    {
+        return vroot;
+    }
+
+    if (vroot > 1.0)
+    {
+        if (pos->x > -1.0 && pos->x < 1.0 && pos->y > -1.0 && pos->y < 1.0)
+        {
+            return 0.99;
+        }
+
+        float posYd = pos->y * 57.295779513;
+        if (posYd > 45.0 || posYd <= -45.0)
+        {
+            pos->x = cos(posYd / 57.295779513) * sqrt(2);
+            if (posYd > 45.0 && posYd <= 135.0)
+            {
+                pos->y = 1.0;
+                return vroot;
+            }
+            if (posYd <= 135.0 && posYd > -135.0)
+            {
+                pos->y = -1.0;
+                return vroot;
+            }
+            pos->x = -1.0;
+        }
+        else
+        {
+            pos->x = 1.0;
+        }
+        pos->y = sin(posYd / 57.295779513) * sqrt(2);
+    }
+
+    return vroot;
+}
 #elif GTAVC
 #define TOTAL_WEATHERS 7
 #else
@@ -453,6 +589,43 @@ void Visual::ShowPage()
                 }
             }
             Widget::CheckboxAddr(TEXT("Visual.FogEffect"), 0xC402C6);
+            if (Widget::Checkbox(TEXT("Visual.FullscreenMap"), &m_bFullScreenMap, TEXT("Visual.FullscreenMapTip")))
+            {
+                if (m_bFullScreenMap)
+                {
+                    // NOP CSprite2d::DrawRect calls
+                    patch::Nop(0x575BF6, 5);
+                    patch::Nop(0x575C40, 5);
+                    patch::Nop(0x575C84, 5);
+                    patch::Nop(0x575CCE, 5);
+                    patch::Nop(0x575D1F, 5);
+                    patch::Nop(0x575D6F, 5);
+                    patch::Nop(0x575DC2, 5);
+                    patch::Nop(0x575E12, 5);
+
+                    // Remove screen width height scaling
+                    patch::Nop(0x5754EC, 6);
+                    patch::Nop(0x575537, 6);
+                    patch::Nop(0x575311, 6);
+                    patch::Nop(0x575361, 6);
+                }
+                else
+                {
+                    // restore
+                    plugin::patch::SetRaw(0x575BF6, (char*)"\xE8\x65\x1F\x1B\x00", 5);
+                    plugin::patch::SetRaw(0x575C40, (char*)"\xE8\x1B\x1F\x1B\x00", 5);
+                    plugin::patch::SetRaw(0x575C84, (char*)"\xE8\xD7\x1E\x1B\x00", 5);
+                    plugin::patch::SetRaw(0x575CCE, (char*)"\xE8\x8D\x1E\x1B\x00", 5);
+                    plugin::patch::SetRaw(0x575D1F, (char*)"\xE8\x3C\x1E\x1B\x00", 5);
+                    plugin::patch::SetRaw(0x575D6F, (char*)"\xE8\xEC\x1D\x1B\x00", 5);
+                    plugin::patch::SetRaw(0x575DC2, (char*)"\xE8\x99\x1D\x1B\x00", 5);
+                    plugin::patch::SetRaw(0x575E12, (char*)"\xE8\x49\x1D\x1B\x00", 5);
+                    plugin::patch::SetRaw(0x5754EC, (char*)"\xD8\x0D\x20\x95\x85\x00", 6);
+                    plugin::patch::SetRaw(0x575537, (char*)"\xD8\x0D\x24\x95\x85\x00", 6);
+                    plugin::patch::SetRaw(0x575311, (char*)"\xD8\x0D\x70\x53\x86\x00", 6);
+                    plugin::patch::SetRaw(0x575361, (char*)"\xD8\x0D\x6C\x53\x86\x00", 6);
+                }
+            }
             Widget::CheckboxAddr(TEXT("Visual.GrainEffect"), 0xC402B4);
             Widget::CheckboxAddr(TEXT("Visual.GrayRadar"), 0xA444A4);
             Widget::CheckboxAddr(TEXT("Visual.HealthBorder"), 0x589353);
@@ -550,6 +723,35 @@ void Visual::ShowPage()
             }
 
             Widget::CheckboxAddr(TEXT("Visual.ShowHud"), 0xBA6769);
+            if (Widget::Checkbox(TEXT("Visual.SquareRadar"), &m_bSquareRadar))
+            {
+                if (m_bSquareRadar)
+                {
+                    static float var = 0.000001f;
+                    static CSprite2d sprite;
+                    sprite.m_pTexture = m_MiscData.m_ImagesList[0]->m_pRwTexture;
+
+                    // rediect to our texture
+                    patch::Set(0x58A8C9, &sprite);
+                    patch::Set(0x58A973, &sprite);
+                    patch::Set(0x58AA21, &sprite);
+                    patch::Set(0x58A81F, &sprite);
+
+                    patch::Set(0x58585C, &var);
+                    patch::ReplaceFunction(0x401EC5, &LimitRadarPoint);
+                }
+                else
+                {
+                    patch::Set(0x58A8C9, 0xBAB208);
+                    patch::Set(0x58A973, 0xBAB208);
+                    patch::Set(0x58AA21, 0xBAB208);
+                    patch::Set(0x58A81F, 0xBAB208);
+                    // Only has 1 image atm
+                    patch::SetRaw(0x58585C, (void*)"\x1C\x8F\x85\x00", 4);
+                    patch::SetRaw(0x401EC5, (void*)"\xA0\xA1\x67\xBA\x00", 5);
+                }
+            }
+
             Widget::CheckboxAddr(TEXT("Visual.UnderwaterEffect"), 0xC402D3);
             Widget::CheckboxAddrRaw(TEXT("Visual.UnfogMap"), 0xBA372C, 1, "\x50", "\x00", TEXT("Visual.UnfogMapText"));
 #elif GTAVC

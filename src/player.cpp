@@ -460,6 +460,25 @@ void Player::ShowPage()
                 pPlayer->m_nPhysicalFlags.bExplosionProof = m_bGodMode;
                 pPlayer->m_nPhysicalFlags.bFireProof = m_bGodMode;
                 pPlayer->m_nPhysicalFlags.bMeleeProof = m_bGodMode;
+
+                // if (m_bGodMode)
+                // {
+                //     // patch::PutRetn(0x639900);
+                //     // patch::PutRetn(0x6398F0);
+                //     patch::PutRetn(0x630600);
+                //     patch::Nop(0x637590, 0xA);
+                //     patch::Nop(0x63070C, 0xA);
+                //     //patch::SetRaw(0x639900, (void*)"\xC2\x04\x00", 3);
+                // }
+                // else
+                // {
+                //     patch::SetRaw(0x637590, (void*)"\xC7\x87\x40\x05\x00\x00\x00\x00\x00\x00", 0xA);
+                //     patch::SetRaw(0x63070C, (void*)"\xC7\x86\x40\x05\x00\x00\x00\x00\x00\x00", 0xA);
+                //     patch::SetUChar(0x630600, 0x6A);
+                //     // patch::SetUChar(0x6398F0, 0xE9);
+                //     // patch::SetUChar(0x6397E0, 0x64);
+                //     // patch::SetRaw(0x639900, (void*)"\xC2\x04\x00", 3);
+                // }
 #elif GTAVC
                 pPlayer->m_nFlags.bBulletProof = m_bGodMode;
                 pPlayer->m_nFlags.bCollisionProof = m_bGodMode;
