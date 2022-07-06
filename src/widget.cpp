@@ -608,7 +608,7 @@ void Widget::EditAddr(const char* label, uint address, float min, float def, flo
 {
     if (ImGui::CollapsingHeader(label))
     {
-        float val = patch::Get<float>(address, false) * mul;
+        float val = patch::Get<float>(address) * mul;
 
         int items = 3;
 
@@ -637,20 +637,30 @@ void Widget::EditAddr(const char* label, uint address, float min, float def, flo
 
         if (ImGui::InputFloat(("##" + std::string(label)).c_str(), &val))
         {
-            patch::SetFloat(address, val / mul, false);
+            if (val < min)
+            {
+                val = min;
+            }
+
+            if (val > max)
+            {
+                val = max;
+            }
+            patch::SetFloat(address, val / mul);
         }
 
         ImGui::SameLine(0.0, 4.0);
         if (ImGui::Button("-", ImVec2(size, size)) && (val - change) > min)
         {
             val -= change;
-            patch::SetFloat(address, val / mul, false);
+            if (val < min)
+            patch::SetFloat(address, val / mul);
         }
         ImGui::SameLine(0.0, 4.0);
         if (ImGui::Button("+", ImVec2(size, size)) && (val + change) < max)
         {
             val += change;
-            patch::SetFloat(address, val / mul, false);
+            patch::SetFloat(address, val / mul);
         }
         ImGui::SameLine(0.0, 4.0);
         ImGui::Text("Set");
@@ -660,7 +670,7 @@ void Widget::EditAddr(const char* label, uint address, float min, float def, flo
 
         if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), CalcSize(items)))
         {
-            patch::Set<float>(address, min / mul, false);
+            patch::Set<float>(address, min / mul);
         }
 
         if (items == 3)
@@ -669,7 +679,7 @@ void Widget::EditAddr(const char* label, uint address, float min, float def, flo
 
             if (ImGui::Button(("Default##" + std::string(label)).c_str(), CalcSize(items)))
             {
-                patch::Set<float>(address, def / mul, false);
+                patch::Set<float>(address, def / mul);
             }
         }
 
@@ -677,7 +687,7 @@ void Widget::EditAddr(const char* label, uint address, float min, float def, flo
 
         if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), CalcSize(items)))
         {
-            patch::Set<float>(address, max / mul, false);
+            patch::Set<float>(address, max / mul);
         }
 
         ImGui::Spacing();

@@ -110,20 +110,19 @@ void Widget::EditAddr(const char* label, uint address, int min, int def, int max
 
         if (ImGui::InputInt(("Set value##" + std::string(label)).c_str(), &val))
         {
+            if (val < min)
+            {
+                val = min;
+            }
+
+            if (val > max)
+            {
+                val = max;
+            }
             patch::Set<T>(address, val, false);
         }
 
         ImGui::Spacing();
-
-        if (val < min)
-        {
-            val = min;
-        }
-
-        if (val > max)
-        {
-            val = max;
-        }
 
         if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), CalcSize(items)))
         {
