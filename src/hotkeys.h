@@ -63,6 +63,6 @@ public:
     // Returns true if the hotkeys are pressed
     bool Pressed();
 
-    // Returns true if the hotkeys are pressed, with no checks
-    bool PressedBasic();
+    // Returns true if the hotkeys are pressed in realtime
+    bool PressedRealtime();
 };

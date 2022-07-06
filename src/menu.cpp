@@ -464,7 +464,8 @@ void Menu::ShowPage()
             freeCamLeft.DrawUI(TEXT("Menu.FreecamLeftKey"));
             freeCamRight.DrawUI(TEXT("Menu.FreecamRightKey"));
             quickTeleport.DrawUI(TEXT("Menu.QuickTPKey"));
-
+            teleportMarker.DrawUI(TEXT("Menu.TPMarkerKey"));
+            
             ImGui::Dummy(ImVec2(0, 10));
 
             fixVeh.DrawUI(TEXT("Menu.FixVehKey"));

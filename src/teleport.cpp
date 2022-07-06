@@ -36,49 +36,90 @@ void Teleport::FetchRadarSpriteData()
 
 void Teleport::Init()
 {
+    m_bTeleportMarker = gConfig.Get("Features.TeleportMarker", false);
     m_bQuickTeleport = gConfig.Get("Features.QuickTeleport", false);
 
     Events::processScriptsEvent += []
     {
-        if ((QuickTP::m_bEnabled == true) && ((CTimer::m_snTimeInMilliseconds - QuickTP::m_nTimer) > 500))
+        if ((TPMarker::m_bEnabled == true) && ((CTimer::m_snTimeInMilliseconds - TPMarker::m_nTimer) > 500))
         {
             CPlayerPed* player = FindPlayerPed();
 
 #ifdef GTASA
             CEntity* player_entity = FindPlayerEntity(-1);
-            QuickTP::m_fPos.z = CWorld::FindGroundZFor3DCoord(QuickTP::m_fPos.x, QuickTP::m_fPos.y,
-                    QuickTP::m_fPos.z + 100.0f, nullptr, &player_entity) + 1.0f;
+            TPMarker::m_fPos.z = CWorld::FindGroundZFor3DCoord(TPMarker::m_fPos.x, TPMarker::m_fPos.y,
+                    TPMarker::m_fPos.z + 100.0f, nullptr, &player_entity) + 1.0f;
 #else
-            QuickTP::m_fPos.z = CWorld::FindGroundZFor3DCoord(QuickTP::m_fPos.x, QuickTP::m_fPos.y,
-                    QuickTP::m_fPos.z + 100.0f, nullptr) + 1.0f;
+            TPMarker::m_fPos.z = CWorld::FindGroundZFor3DCoord(TPMarker::m_fPos.x, TPMarker::m_fPos.y,
+                    TPMarker::m_fPos.z + 100.0f, nullptr) + 1.0f;
 #endif
             CVehicle* pVeh = player->m_pVehicle;
 
             if (pVeh && BY_GAME(player->m_nPedFlags.bInVehicle, player->m_pVehicle, player->m_pVehicle))
             {
-                BY_GAME(pVeh->Teleport(QuickTP::m_fPos, false), pVeh->Teleport(QuickTP::m_fPos), player->Teleport(QuickTP::m_fPos));
+                BY_GAME(pVeh->Teleport(TPMarker::m_fPos, false), pVeh->Teleport(TPMarker::m_fPos), player->Teleport(TPMarker::m_fPos));
             }
             else
             {
-                BY_GAME(player->Teleport(QuickTP::m_fPos, false), player->Teleport(QuickTP::m_fPos), player->Teleport(QuickTP::m_fPos));
+                BY_GAME(player->Teleport(TPMarker::m_fPos, false), player->Teleport(TPMarker::m_fPos), player->Teleport(TPMarker::m_fPos));
             }
 
-            QuickTP::m_bEnabled = false;
+            TPMarker::m_bEnabled = false;
             Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(player), false);
             Command<Commands::RESTORE_CAMERA_JUMPCUT>();
             TheCamera.Fade(0, 1);
         }
 
-        if (m_bQuickTeleport)
+        if (m_bTeleportMarker && teleportMarker.Pressed())
         {
-            if (quickTeleport.Pressed()
-                    && ((CTimer::m_snTimeInMilliseconds - m_nQuickTeleportTimer) > 500))
+            TeleportPlayer(true);
+        }
+    };
+
+#ifdef GTASA
+    Events::drawingEvent += []
+    {
+        if (m_bQuickTeleport && quickTeleport.PressedRealtime())
+        {
+            static CSprite2d map; 
+            if (!map.m_pTexture)
             {
-                m_nQuickTeleportTimer = CTimer::m_snTimeInMilliseconds;
+                map.m_pTexture = gTextureList.FindTextureByName("map");
+            }
+            float height = screen::GetScreenHeight();
+            float width = screen::GetScreenWidth();
+            float size = width * height / width; // keep aspect ratio
+            float left = (width-size) / 2;
+            float right = left+size;
+            map.Draw(CRect(left, 0.0f, right, height), CRGBA(255, 255, 255, 200));
+            
+            if (ImGui::IsMouseClicked(0))
+            {
+                // Convert screen space to image space
+                ImVec2 pos = ImGui::GetMousePos();
+                pos.x = (pos.x < left) ? left : pos.x;
+                pos.x = (pos.x > right) ? right : pos.x;
+                pos.x -= left;
+                pos.x -= size/2;
+                pos.y -= size/2;
+                
+                // Convert image space to map space
+                pos.x = pos.x / size * 6000;
+                pos.y = pos.y / size * 6000;
+                pos.y *= -1;
+                
+                tRadarTrace &target = CRadar::ms_RadarTrace[FrontEndMenuManager.m_nTargetBlipIndex];
+                CVector temp = target.m_vecPos;
+                unsigned char sprite = target.m_nRadarSprite;
+                target.m_nRadarSprite = RADAR_SPRITE_WAYPOINT;
+                target.m_vecPos = {pos.x, pos.y, 0.0f};
                 TeleportPlayer(true);
+                target.m_vecPos = temp;
+                target.m_nRadarSprite = sprite;
             }
         }
     };
+#endif
 }
 
 void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
@@ -100,9 +141,9 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
         pos = targetBlip.m_vecPos;
         pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, nullptr, &pPlayerEntity) + 500.f;
 
-        QuickTP::m_fPos = pos;
-        QuickTP::m_nTimer = CTimer::m_snTimeInMilliseconds;
-        QuickTP::m_bEnabled = true;
+        TPMarker::m_fPos = pos;
+        TPMarker::m_nTimer = CTimer::m_snTimeInMilliseconds;
+        TPMarker::m_bEnabled = true;
         TheCamera.Fade(0, 0);
         Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(pPlayer), true);
     }
@@ -214,13 +255,21 @@ void Teleport::ShowPage()
             {
                 ImGui::Columns(2, nullptr, false);
                 ImGui::Checkbox(TEXT("Teleport.InsertCoord"), &m_bInsertCoord);
-                ImGui::NextColumn();
 #ifdef GTASA
                 if (Widget::Checkbox(TEXT("Teleport.QuickTeleport"), &m_bQuickTeleport,
                                         std::string(TEXT_S("Teleport.QuickTeleportHint") 
                                                     + quickTeleport.GetNameString()).c_str()))
                 {
                     gConfig.Set("Features.QuickTeleport", m_bQuickTeleport);
+                }
+#endif
+                ImGui::NextColumn();
+#ifdef GTASA
+                if (Widget::Checkbox(TEXT("Teleport.TeleportMarker"), &m_bTeleportMarker,
+                                        std::string(TEXT_S("Teleport.TeleportMarkerHint") 
+                                                    + teleportMarker.GetNameString()).c_str()))
+                {
+                    gConfig.Set("Features.TeleportMarker", m_bTeleportMarker);
                 }
 #endif
                 ImGui::Columns(1);

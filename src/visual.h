@@ -16,7 +16,6 @@ private:
     static inline bool m_bNoTextures;
     static inline bool m_bFullScreenMap;
     static inline bool m_bSquareRadar;
-    static inline ResourceStore m_MiscData { "misc", eResourceType::TYPE_IMAGE, ImVec2(100, 80) };
 #endif
 
     template<typename T>

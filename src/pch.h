@@ -112,6 +112,8 @@ extern Hotkey godMode;
 extern Hotkey menuOpen;
 extern Hotkey quickSceenShot;
 extern Hotkey quickTeleport;
+extern Hotkey teleportMarker;
 extern Hotkey vehEngine;
 extern Hotkey vehInstantStart;
 extern Hotkey vehInstantStop;
+extern ResourceStore gTextureList;

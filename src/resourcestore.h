@@ -66,4 +66,6 @@ public:
     bool m_bTexturesLoaded = false;
 
     ResourceStore(const char* text, eResourceType type = TYPE_IMAGE, ImVec2 imageSize = ImVec2(64, 64));
+
+    RwTexture* FindTextureByName(std::string&& name);
 };

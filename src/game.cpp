@@ -91,9 +91,9 @@ void Freecam::Process()
         speed *= 2;
     }
 
-    if (freeCamForward.PressedBasic() || freeCamBackward.PressedBasic())
+    if (freeCamForward.PressedRealtime() || freeCamBackward.PressedRealtime())
     {
-        if (freeCamBackward.PressedBasic())
+        if (freeCamBackward.PressedRealtime())
         {
             speed *= -1;
         }
@@ -105,9 +105,9 @@ void Freecam::Process()
         pos.z += speed * 2 * sin(m_fTotalMouse.y / 3 * 3.14159f / 180.0f);
     }
 
-    if (freeCamLeft.PressedBasic() || freeCamRight.PressedBasic())
+    if (freeCamLeft.PressedRealtime() || freeCamRight.PressedRealtime())
     {
-        if (freeCamLeft.PressedBasic())
+        if (freeCamLeft.PressedRealtime())
         {
             speed *= -1;
         }

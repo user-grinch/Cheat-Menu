@@ -50,6 +50,18 @@ RwTexDictionary* LoadTexDictionary(char const* filename) {
     return plugin::CallAndReturnDynGlobal<RwTexDictionary*, char const*>(0x5B3860, filename);
 }
 
+RwTexture* ResourceStore::FindTextureByName(std::string&& name)
+{
+    for (auto& item: m_ImagesList)
+    {
+        if (item->m_FileName == name)
+        {
+            return item->m_pRwTexture;
+        }
+    }
+    return nullptr;
+}
+
 void ResourceStore::LoadTextureResource(std::string&& name)
 {
     std::string fullPath = PLUGIN_PATH((char*)FILE_NAME "\\") + name + ".txd";

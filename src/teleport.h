@@ -6,12 +6,12 @@ class Teleport
 private:
     static inline bool m_bInsertCoord;
     static inline bool m_bQuickTeleport;
+    static inline bool m_bTeleportMarker;
     static inline char m_nInputBuffer[INPUT_BUFFER_SIZE];
     static inline ResourceStore m_tpData{ "locations", eResourceType::TYPE_TEXT };
     static inline char m_nLocationBuffer[INPUT_BUFFER_SIZE];
-    static inline uint m_nQuickTeleportTimer;
 
-    struct QuickTP
+    struct TPMarker
     {
         static inline bool m_bEnabled;
         static inline CVector m_fPos = { -1, -1, -1 };

@@ -112,10 +112,12 @@ void RPC::Process()
             detailsText = std::format("{}: ${}", TEXT("Player.Money"), pInfo->m_nMoney);
         }
 
+#ifndef GTA3
         if (pPed->m_nAreaCode != 0) // world
         {
             stateText = TEXT("RPC.InsideInterior");
         }
+#endif
         
         if (BY_GAME(pPed->m_nPedFlags.bInVehicle, pPed->m_bInVehicle, pPed->m_bInVehicle))
         {

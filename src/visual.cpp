@@ -689,7 +689,7 @@ void Visual::ShowPage()
                 {
                     static float var = 0.000001f;
                     static CSprite2d sprite;
-                    sprite.m_pTexture = m_MiscData.m_ImagesList[0]->m_pRwTexture;
+                    sprite.m_pTexture =  gTextureList.FindTextureByName("radardisc");
 
                     // rediect to our texture
                     patch::Set(0x58A8C9, &sprite);

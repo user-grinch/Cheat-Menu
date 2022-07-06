@@ -282,7 +282,7 @@ bool Hotkey::Pressed()
     return false;
 }
 
-bool Hotkey::PressedBasic()
+bool Hotkey::PressedRealtime()
 {
     return (m_CurrentHotkey == "") ? KeyPressed(m_key1) && KeyPressed(m_key2) : false;
 }
