@@ -41,7 +41,7 @@ void Teleport::Init()
 
     Events::processScriptsEvent += []
     {
-        if ((TPMarker::m_bEnabled == true) && ((CTimer::m_snTimeInMilliseconds - TPMarker::m_nTimer) > 500))
+        if ((TPMarker::m_bEnabled == true) && ((CTimer::m_snTimeInMilliseconds - TPMarker::m_nTimer) > 50))
         {
             CPlayerPed* player = FindPlayerPed();
 
@@ -63,6 +63,12 @@ void Teleport::Init()
             {
                 BY_GAME(player->Teleport(TPMarker::m_fPos, false), player->Teleport(TPMarker::m_fPos), player->Teleport(TPMarker::m_fPos));
             }
+#ifdef GTASA
+            if (TPMarker::m_bJetpack)
+            {
+                Command<Commands::TASK_JETPACK>(CPools::GetPedRef(player));
+            }
+#endif
 
             TPMarker::m_bEnabled = false;
             Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(player), false);
@@ -126,8 +132,10 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
 {
     CPlayerPed* pPlayer = FindPlayerPed();
     CVehicle* pVeh = pPlayer->m_pVehicle;
+    int hplayer = CPools::GetPedRef(pPlayer);
 
 #ifdef GTASA
+    TPMarker::m_bJetpack = Command<Commands::IS_PLAYER_USING_JETPACK>(0);
     if (get_marker)
     {
         tRadarTrace targetBlip = CRadar::ms_RadarTrace[LOWORD(FrontEndMenuManager.m_nTargetBlipIndex)];
@@ -147,6 +155,8 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
         TheCamera.Fade(0, 0);
         Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(pPlayer), true);
     }
+
+    
 #endif
 
 #ifdef GTA3
@@ -193,6 +203,11 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
     else
     {
         pPlayer->Teleport(pos, false);
+    }
+
+    if (TPMarker::m_bJetpack)
+    {
+        Command<Commands::TASK_JETPACK>(hplayer);
     }
 #else
     if (pVeh && pPlayer->m_pVehicle)

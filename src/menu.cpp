@@ -22,7 +22,7 @@ void Menu::Init()
     Overlay::bLocName = gConfig.Get("Overlay.ShowLocationName", false);
     Overlay::bTransparent = gConfig.Get("Overlay.Transparent", false);
     Overlay::bMemUsage = gConfig.Get("Overlay.ShowMemoryUsage", false);
-    Overlay::bVehHealth = gConfig.Get("Overlay.ShowVehicleName", false);
+    Overlay::bVehHealth = gConfig.Get("Overlay.ShowVehicleHealth", false);
     Overlay::bVehSpeed = gConfig.Get("Overlay.ShowVehicleSpeed", false);
     Overlay::mSelectedPos = (DisplayPos)gConfig.Get("Overlay.SelectedPosition", (int)DisplayPos::BOTTOM_RIGHT);
     Overlay::fPosX = gConfig.Get("Overlay.PosX", 0);

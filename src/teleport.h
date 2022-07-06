@@ -16,6 +16,7 @@ private:
         static inline bool m_bEnabled;
         static inline CVector m_fPos = { -1, -1, -1 };
         static inline uint m_nTimer;
+        static inline bool m_bJetpack;
     };
 
 #ifdef GTASA
