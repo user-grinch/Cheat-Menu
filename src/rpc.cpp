@@ -89,6 +89,11 @@ void RPC::Process()
 #else
         size_t wantedLevel = pPed->m_pWanted->m_nWantedLevel;
 #endif
+        if (BY_GAME(Util::IsOnMission(), false, false))
+        {
+            stateText = TEXT("RPC.DoingMission");
+        }
+
         if (wantedLevel > 0)
         {
             detailsText = std::format("{}: ", TEXT("Player.WantedLevel"));
@@ -96,10 +101,20 @@ void RPC::Process()
             {
                 detailsText += "☆";
             }
+
+            if (wantedLevel > 3)
+            {
+                stateText = TEXT("RPC.OnRampage");
+            }   
         }
         else
         {
             detailsText = std::format("{}: ${}", TEXT("Player.Money"), pInfo->m_nMoney);
+        }
+
+        if (pPed->m_nAreaCode != 0) // world
+        {
+            stateText = TEXT("RPC.InsideInterior");
         }
         
         if (BY_GAME(pPed->m_nPedFlags.bInVehicle, pPed->m_bInVehicle, pPed->m_bInVehicle))
@@ -115,16 +130,12 @@ void RPC::Process()
             smallImgText = std::format("{} {} {}", TEXT("RPC.Walking"), TEXT("RPC.In"), Util::GetLocationName(&pPed->GetPosition()));
         }
 
-        if (BY_GAME(Util::IsOnMission(), false, false))
-        {
-            stateText = TEXT("RPC.DoingMission");
-        }
 
         if (CheatMenu::IsMenuShown())
         {
             stateText = TEXT("RPC.BrowsingCheatMenu");
         }
-        
+
         if (Command<Commands::IS_CHAR_DEAD>(CPools::GetPedRef(pPed)))
         {
             stateText = TEXT("RPC.Wasted");

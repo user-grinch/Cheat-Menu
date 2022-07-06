@@ -107,46 +107,6 @@ static float LimitRadarPoint(CVector2D& point)
     return 1.1f;
 }
 
-static double __cdecl LimitRadarPoint2(CVector2D *pos)
-{
-    float vroot = pos->Magnitude();
-    if (FrontEndMenuManager.m_bDrawRadarOrMap)
-    {
-        return vroot;
-    }
-
-    if (vroot > 1.0)
-    {
-        if (pos->x > -1.0 && pos->x < 1.0 && pos->y > -1.0 && pos->y < 1.0)
-        {
-            return 0.99;
-        }
-
-        float posYd = pos->y * 57.295779513;
-        if (posYd > 45.0 || posYd <= -45.0)
-        {
-            pos->x = cos(posYd / 57.295779513) * sqrt(2);
-            if (posYd > 45.0 && posYd <= 135.0)
-            {
-                pos->y = 1.0;
-                return vroot;
-            }
-            if (posYd <= 135.0 && posYd > -135.0)
-            {
-                pos->y = -1.0;
-                return vroot;
-            }
-            pos->x = -1.0;
-        }
-        else
-        {
-            pos->x = 1.0;
-        }
-        pos->y = sin(posYd / 57.295779513) * sqrt(2);
-    }
-
-    return vroot;
-}
 #elif GTAVC
 #define TOTAL_WEATHERS 7
 #else
