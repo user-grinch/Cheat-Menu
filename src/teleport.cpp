@@ -103,25 +103,26 @@ void Teleport::Init()
             {
                 // Convert screen space to image space
                 ImVec2 pos = ImGui::GetMousePos();
-                pos.x = (pos.x < left) ? left : pos.x;
-                pos.x = (pos.x > right) ? right : pos.x;
-                pos.x -= left;
-                pos.x -= size/2;
-                pos.y -= size/2;
-                
-                // Convert image space to map space
-                pos.x = pos.x / size * 6000;
-                pos.y = pos.y / size * 6000;
-                pos.y *= -1;
-                
-                tRadarTrace &target = CRadar::ms_RadarTrace[FrontEndMenuManager.m_nTargetBlipIndex];
-                CVector temp = target.m_vecPos;
-                unsigned char sprite = target.m_nRadarSprite;
-                target.m_nRadarSprite = RADAR_SPRITE_WAYPOINT;
-                target.m_vecPos = {pos.x, pos.y, 0.0f};
-                TeleportPlayer(true);
-                target.m_vecPos = temp;
-                target.m_nRadarSprite = sprite;
+                if (pos.x > left && pos.x < right)
+                {
+                    pos.x -= left;
+                    pos.x -= size/2;
+                    pos.y -= size/2;
+                    
+                    // Convert image space to map space
+                    pos.x = pos.x / size * 6000;
+                    pos.y = pos.y / size * 6000;
+                    pos.y *= -1;
+                    
+                    tRadarTrace &target = CRadar::ms_RadarTrace[FrontEndMenuManager.m_nTargetBlipIndex];
+                    CVector temp = target.m_vecPos;
+                    unsigned char sprite = target.m_nRadarSprite;
+                    target.m_nRadarSprite = RADAR_SPRITE_WAYPOINT;
+                    target.m_vecPos = {pos.x, pos.y, 0.0f};
+                    TeleportPlayer(true);
+                    target.m_vecPos = temp;
+                    target.m_nRadarSprite = sprite;
+                }
             }
         }
     };

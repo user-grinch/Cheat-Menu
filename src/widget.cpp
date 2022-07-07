@@ -162,7 +162,6 @@ void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 
             ImGui::PopItemWidth();
             ImGui::Spacing();
             ImGui::BeginChild(1);
-            size_t count = 0;
             for (auto [k, v] : *data.m_pData->GetTable("Favourites"))
             {
                 std::string key = std::string(k.str());
@@ -180,9 +179,8 @@ void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 
                         contextMenu = {std::string("Favourites"), key, val, removeFunc, true};
                     }
                 }
-                ++count;
             }
-            if (count == 0)
+            if (data.m_pData->GetTable("Favourites")->size() == 0)
             {
                 Widget::TextCentered(TEXT("Menu.FavouritesNone"));
             }
@@ -343,7 +341,7 @@ void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackR
                     {
                         contextMenu.show = true;
                         contextMenu.val = text;
-                        contextMenu.key = std::format("{} ({})", modelName, text);
+                        contextMenu.key = modelName;
                     }
 
                     if (showImages)
@@ -364,7 +362,7 @@ void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackR
                     ImGui::Separator();
                     if (ImGui::MenuItem(TEXT("Menu.Favourites")))
                     {
-                        store.m_pData->Set(std::format("Favourites.{}", contextMenu.key).c_str(), contextMenu.val);
+                        store.m_pData->Set(std::format("Favourites.{}", contextMenu.val).c_str(), contextMenu.key);
                         store.m_pData->Save();
                         SetHelpMessage(TEXT("Menu.FavouritesText"));
                     }
@@ -387,26 +385,58 @@ void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackR
             ImGui::PopItemWidth();
             ImGui::Spacing();
             ImGui::BeginChild("DrawFavourites");
-            size_t count = 0;
+
             for (auto [k, v] : *store.m_pData->GetTable("Favourites"))
             {
-                std::string key = std::string(k.str());
-                if (store.m_Filter.PassFilter(key.c_str()))
-                {
-                    std::string val = v.value_or<std::string>("Unkonwn");
-                    if (ImGui::MenuItem(key.c_str()) && clickFunc != nullptr)
-                    {
-                        clickFunc(val);
-                    }
+                std::string val = std::string(k.str());
 
-                    if (ImGui::IsItemClicked(1))
+                for (uint i = 0; i < store.m_ImagesList.size(); ++i)
+                {
+                    std::string text = store.m_ImagesList[i]->m_FileName;
+                    std::string modelName = getNameFunc(text);
+
+                    if (text == val && store.m_Filter.PassFilter(modelName.c_str()) && (verifyFunc == nullptr || verifyFunc(text)))
                     {
-                        contextMenu = {std::string("Favourites"), key, val, nullptr, true};
+                        /*
+                            Couldn't figure out how to laod images for Dx11
+                            Using texts for now
+                        */
+                        if (showImages)
+                        {
+                            if (RoundedImageButton(store.m_ImagesList[i]->m_pTexture, m_ImageSize, modelName.c_str()))
+                            {
+                                clickFunc(text);
+                            }
+                            
+                        }
+                        else
+                        {
+                            if (ImGui::MenuItem(modelName.c_str()))
+                            {
+                                clickFunc(text);
+                            }
+                        }
+
+                        // Right click popup
+                        if (ImGui::IsItemClicked(1))
+                        {
+                            contextMenu.show = true;
+                            contextMenu.val = text;
+                            contextMenu.key = modelName;
+                        }
+
+                        if (showImages)
+                        {
+                            if (imageCount % imagesInRow != 0)
+                            {
+                                ImGui::SameLine(0.0, style.ItemInnerSpacing.x);
+                            }
+                        }
+                        imageCount++;
                     }
                 }
-                ++count;
             }
-            if (count == 0)
+            if (store.m_pData->GetTable("Favourites")->size() == 0)
             {
                 Widget::TextCentered(TEXT("Menu.FavouritesNone"));
             }
@@ -418,7 +448,7 @@ void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackR
                     ImGui::Separator();
                     if (ImGui::MenuItem(TEXT("Menu.FavouritesRemove")))
                     {
-                        store.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
+                        store.m_pData->RemoveKey("Favourites", contextMenu.val.c_str());
                         store.m_pData->Save();
                         SetHelpMessage(TEXT("Menu.FavouritesRemoveText"));
                     }
