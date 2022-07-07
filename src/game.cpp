@@ -122,24 +122,40 @@ void Freecam::Process()
 
     if (CPad::NewMouseControllerState.wheelUp)
     {
-        if (m_fFOV > 10.0f)
+        if (KeyPressed(VK_LCONTROL) && m_nMul != 10)
         {
-            m_fFOV -= 2.0f * speed;
+            ++m_nMul;
+            SetHelpMessage(std::to_string(m_nMul).c_str());
         }
+        else
+        {
+            if (m_fFOV > 10.0f)
+            {
+                m_fFOV -= 2.0f * speed;
+            }
 
-        TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_fFOV, 250, true);
-        Command<Commands::CAMERA_PERSIST_FOV>(true);
+            TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_fFOV, 250, true);
+            Command<Commands::CAMERA_PERSIST_FOV>(true);
+        }
     }
 
     if (CPad::NewMouseControllerState.wheelDown)
     {
-        if (m_fFOV < 115.0f)
+        if (KeyPressed(VK_LCONTROL) && m_nMul != 1)
         {
-            m_fFOV += 2.0f * speed;
+            --m_nMul;
+            SetHelpMessage(std::to_string(m_nMul).c_str());
         }
+        else
+        {
+            if (m_fFOV < 115.0f)
+            {
+                m_fFOV += 2.0f * speed;
+            }
 
-        TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_fFOV, 250, true);
-        Command<Commands::CAMERA_PERSIST_FOV>(true);
+            TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_fFOV, 250, true);
+            Command<Commands::CAMERA_PERSIST_FOV>(true);
+        }
     }
 
     m_pPed->SetHeading(m_fTotalMouse.x);
@@ -166,26 +182,26 @@ void Freecam::Clear()
 
 void RandomCheats::Process()
 {
+    static bool genCheats = false;
+    if (!genCheats)
+    {
+            // Generate enabled cheats vector
+        for (auto [k, v] : m_pData.Items())
+        {
+            /*
+            [
+                cheat_id = [ cheat_name, state (true/false) ]
+            ]
+            */
+            std::string key { k.str() };
+            m_EnabledCheats[std::stoi(key)][0] = v.value_or<std::string>("Unknown");
+            m_EnabledCheats[std::stoi(key)][1] = "true";
+        }
+        genCheats = true;
+    }
+    
     if (m_bEnabled)
     {
-        static bool genCheats = false;
-        if (!genCheats)
-        {
-                // Generate enabled cheats vector
-            for (auto [k, v] : m_pData.Items())
-            {
-                /*
-                [
-                    cheat_id = [ cheat_name, state (true/false) ]
-                ]
-                */
-                std::string key { k.str() };
-                m_EnabledCheats[std::stoi(key)][0] = v.value_or<std::string>("Unknown");
-                m_EnabledCheats[std::stoi(key)][1] = "true";
-            }
-            genCheats = true;
-        }
-
         uint timer = CTimer::m_snTimeInMilliseconds;
         if ((timer - m_nTimer) > (static_cast<uint>(m_nInterval) * 1000))
         {
@@ -596,7 +612,7 @@ void Game::ShowPage()
                 ImGui::Spacing();
 
                 ImGui::SliderFloat(TEXT("Game.FieldOfView"), &Freecam::m_fFOV, 5.0f, 120.0f);
-                ImGui::SliderInt(TEXT("Game.Movement Speed"), &Freecam::m_nMul, 1, 10);
+                ImGui::SliderInt(TEXT("Game.MovementSpeed"), &Freecam::m_nMul, 1, 10);
                 ImGui::Spacing();
                 ImGui::TextWrapped(TEXT("Game.FreecamTip"));
                 ImGui::Spacing();

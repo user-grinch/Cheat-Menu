@@ -321,7 +321,7 @@ void Teleport::ShowPage()
                 }
                 ImGui::SameLine();
 #ifdef GTASA
-                if (ImGui::Button(TEXT("Teleport.TeleportMarker"), Widget::CalcSize(2)))
+                if (ImGui::Button((TEXT_S("Teleport.TeleportMarker") + "##Btn").c_str(), Widget::CalcSize(2)))
                 {
                     TeleportPlayer(true);
                 }
