@@ -81,16 +81,16 @@ void Freecam::Process()
         SetHelpMessage(TEXT("Game.PlayerTeleported"));
     }
 
-    if (KeyPressed(VK_RCONTROL))
+    if (KeyPressed(VK_MENU))
     {
         speed /= 2;
     }
 
-    if (KeyPressed(VK_RSHIFT))
+    if (KeyPressed(VK_SHIFT))
     {
         speed *= 2;
     }
-
+        
     if (freeCamForward.PressedRealtime() || freeCamBackward.PressedRealtime())
     {
         if (freeCamBackward.PressedRealtime())
@@ -102,7 +102,11 @@ void Freecam::Process()
         Command<Commands::GET_CHAR_HEADING>(m_nPed, &angle);
         pos.x += speed * cos(angle * 3.14159f / 180.0f);
         pos.y += speed * sin(angle * 3.14159f / 180.0f);
-        pos.z += speed * 2 * sin(m_fTotalMouse.y / 3 * 3.14159f / 180.0f);
+        
+        if (!KeyPressed(VK_SPACE))
+        {
+            pos.z += speed * 2 * sin(m_fTotalMouse.y / 3 * 3.14159f / 180.0f);
+        }
     }
 
     if (freeCamLeft.PressedRealtime() || freeCamRight.PressedRealtime())
@@ -122,12 +126,7 @@ void Freecam::Process()
 
     if (CPad::NewMouseControllerState.wheelUp)
     {
-        if (KeyPressed(VK_LCONTROL) && m_nMul != 10)
-        {
-            ++m_nMul;
-            SetHelpMessage(std::to_string(m_nMul).c_str());
-        }
-        else
+        if (KeyPressed(VK_CONTROL) && m_nMul != 10)
         {
             if (m_fFOV > 10.0f)
             {
@@ -137,16 +136,19 @@ void Freecam::Process()
             TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_fFOV, 250, true);
             Command<Commands::CAMERA_PERSIST_FOV>(true);
         }
+        else
+        {
+            if (m_nMul < 10)
+            {
+                ++m_nMul;
+                SetHelpMessage(std::format("Speed: {}", m_nMul).c_str());
+            }
+        }
     }
 
     if (CPad::NewMouseControllerState.wheelDown)
     {
-        if (KeyPressed(VK_LCONTROL) && m_nMul != 1)
-        {
-            --m_nMul;
-            SetHelpMessage(std::to_string(m_nMul).c_str());
-        }
-        else
+        if (KeyPressed(VK_CONTROL) && m_nMul != 1)
         {
             if (m_fFOV < 115.0f)
             {
@@ -155,6 +157,15 @@ void Freecam::Process()
 
             TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_fFOV, 250, true);
             Command<Commands::CAMERA_PERSIST_FOV>(true);
+        }
+        else
+        {
+            if (m_nMul > 1)
+            {
+                --m_nMul;
+                SetHelpMessage(std::to_string(m_nMul).c_str());
+                SetHelpMessage(std::format("Speed: {}", m_nMul).c_str());
+            }
         }
     }
 
@@ -438,6 +449,7 @@ void Game::ShowPage()
     {
         if (ImGui::BeginTabItem(TEXT("Window.CheckboxTab")))
         {
+            ImGui::BeginChild("##Checkbox");
             ImGui::Spacing();
             ImGui::Columns(2, nullptr, false);
             if (ImGui::Checkbox(TEXT("Game.DisableCheats"), &m_bDisableCheats))
@@ -580,10 +592,12 @@ void Game::ShowPage()
             }
 
             ImGui::Columns(1);
+            ImGui::EndChild();
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem(TEXT("Window.MenusTab")))
         {
+            ImGui::BeginChild("##Menus");
 #ifdef GTASA
             if (ImGui::CollapsingHeader(TEXT("Game.CurrentDay")))
             {
@@ -599,26 +613,6 @@ void Game::ShowPage()
 #endif
             Widget::EditAddr<int>(TEXT("Game.DaysPassed"), BY_GAME(0xB79038, 0x97F1F4, 0x8F2BB8), 0, 9999);
             Widget::EditAddr<int>(TEXT("Game.FPSLimit"), (uint)&(RsGlobal.maxFPS), 1, 30, 999);
-#ifdef GTASA
-            if (ImGui::CollapsingHeader(TEXT("Game.Freecam")))
-            {
-                if (Widget::Checkbox(TEXT("Game.Enable"), &Freecam::m_bEnabled, TEXT("Game.EnableText")))
-                {
-                    if (!Freecam::m_bEnabled)
-                    {
-                        Freecam::Clear();
-                    }
-                }
-                ImGui::Spacing();
-
-                ImGui::SliderFloat(TEXT("Game.FieldOfView"), &Freecam::m_fFOV, 5.0f, 120.0f);
-                ImGui::SliderInt(TEXT("Game.MovementSpeed"), &Freecam::m_nMul, 1, 10);
-                ImGui::Spacing();
-                ImGui::TextWrapped(TEXT("Game.FreecamTip"));
-                ImGui::Spacing();
-                ImGui::Separator();
-            }
-#endif
             Widget::EditAddr<float>(TEXT("Game.GameSpeed"), reinterpret_cast<uint>(&CTimer::ms_fTimeScale), 1, 1, 10);
             Widget::EditAddr(TEXT("Game.Gravity"), BY_GAME(0x863984, 0x68F5F0, 0x5F68D4), -1.0f, 0.008f, 1.0f, 1.0f, 0.01f);
 
@@ -756,8 +750,111 @@ void Game::ShowPage()
                 ImGui::Spacing();
                 ImGui::Separator();
             }
+            ImGui::EndChild();
             ImGui::EndTabItem();
         }
+#ifdef GTASA
+        if (ImGui::BeginTabItem(TEXT("Game.Freecam")))
+        {
+            ImGui::Spacing();
+            if (Widget::Checkbox(TEXT("Game.Enable"), &Freecam::m_bEnabled, TEXT("Game.EnableText")))
+            {
+                if (!Freecam::m_bEnabled)
+                {
+                    Freecam::Clear();
+                }
+            }
+            ImGui::Spacing();
+
+            ImGui::SliderFloat(TEXT("Game.FieldOfView"), &Freecam::m_fFOV, 5.0f, 120.0f);
+            ImGui::SliderInt(TEXT("Game.MovementSpeed"), &Freecam::m_nMul, 1, 10);
+            ImGui::Dummy(ImVec2(0.0f, 20.0f));
+
+            ImGui::BeginChild("Conrtls");
+            if (ImGui::BeginTable("FreecamCOntorls", 2, ImGuiTableFlags_ScrollY))
+            {
+                ImGui::TableSetupColumn(TEXT("Game.KeyAction"));
+                ImGui::TableSetupColumn(TEXT("Game.KeyCombo"));
+                ImGui::TableHeadersRow();
+                
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("Forward");
+                ImGui::TableNextColumn();
+                ImGui::Text(freeCamForward.GetNameString().c_str());
+
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("Backward");
+                ImGui::TableNextColumn();
+                ImGui::Text(freeCamBackward.GetNameString().c_str());
+
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("");
+                ImGui::TableNextColumn();
+                ImGui::Text("");
+
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("Forward slide");
+                ImGui::TableNextColumn();
+                ImGui::Text((freeCamForward.GetNameString() + " + Space").c_str());
+
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("Backward slide");
+                ImGui::TableNextColumn();
+                ImGui::Text((freeCamForward.GetNameString() + " + Space").c_str());
+                
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("Left slide");
+                ImGui::TableNextColumn();
+                ImGui::Text(freeCamLeft.GetNameString().c_str());
+
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("Right slide");
+                ImGui::TableNextColumn();
+                ImGui::Text(freeCamRight.GetNameString().c_str());
+
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("");
+                ImGui::TableNextColumn();
+                ImGui::Text("");
+
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("2x faster");
+                ImGui::TableNextColumn();
+                ImGui::Text("Shift");
+
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("2x slower");
+                ImGui::TableNextColumn();
+                ImGui::Text("Alt");
+
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("Change movespeed");
+                ImGui::TableNextColumn();
+                ImGui::Text("Mouse wheel");
+
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("Change zoom");
+                ImGui::TableNextColumn();
+                ImGui::Text("Ctrl + Mouse wheel");
+
+                ImGui::EndTable();
+            }
+            ImGui::EndChild();
+            ImGui::EndTabItem();
+        }
+#endif
         if (ImGui::BeginTabItem(TEXT("Game.Missions")))
         {
             ImGui::Spacing();
