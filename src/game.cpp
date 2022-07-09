@@ -81,7 +81,7 @@ void Freecam::Process()
         SetHelpMessage(TEXT("Game.PlayerTeleported"));
     }
 
-    if (KeyPressed(VK_MENU))
+    if (KeyPressed(VK_MENU) && m_nMul > 1)
     {
         speed /= 2;
     }
@@ -100,12 +100,20 @@ void Freecam::Process()
 
         float angle;
         Command<Commands::GET_CHAR_HEADING>(m_nPed, &angle);
-        pos.x += speed * cos(angle * 3.14159f / 180.0f);
-        pos.y += speed * sin(angle * 3.14159f / 180.0f);
-        
-        if (!KeyPressed(VK_SPACE))
+
+        if (KeyPressed(VK_CONTROL))
         {
-            pos.z += speed * 2 * sin(m_fTotalMouse.y / 3 * 3.14159f / 180.0f);
+            pos.z += speed * sin(90.0f / 3 * 3.14159f / 180.0f);
+        }
+        else
+        {
+            pos.x += speed * cos(angle * 3.14159f / 180.0f);
+            pos.y += speed * sin(angle * 3.14159f / 180.0f);
+
+            if (!KeyPressed(VK_SPACE))
+            {
+                pos.z += speed * 2 * sin(m_fTotalMouse.y / 3 * 3.14159f / 180.0f);
+            }
         }
     }
 
@@ -126,7 +134,7 @@ void Freecam::Process()
 
     if (CPad::NewMouseControllerState.wheelUp)
     {
-        if (KeyPressed(VK_CONTROL) && m_nMul != 10)
+        if (KeyPressed(VK_CONTROL))
         {
             if (m_fFOV > 10.0f)
             {
@@ -148,7 +156,7 @@ void Freecam::Process()
 
     if (CPad::NewMouseControllerState.wheelDown)
     {
-        if (KeyPressed(VK_CONTROL) && m_nMul != 1)
+        if (KeyPressed(VK_CONTROL))
         {
             if (m_fFOV < 115.0f)
             {
@@ -757,7 +765,7 @@ void Game::ShowPage()
         if (ImGui::BeginTabItem(TEXT("Game.Freecam")))
         {
             ImGui::Spacing();
-            if (Widget::Checkbox(TEXT("Game.Enable"), &Freecam::m_bEnabled, TEXT("Game.EnableText")))
+            if (Widget::Checkbox(TEXT("Game.Enable"), &Freecam::m_bEnabled))
             {
                 if (!Freecam::m_bEnabled)
                 {
@@ -818,6 +826,24 @@ void Game::ShowPage()
                 ImGui::Text("Right slide");
                 ImGui::TableNextColumn();
                 ImGui::Text(freeCamRight.GetNameString().c_str());
+
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("");
+                ImGui::TableNextColumn();
+                ImGui::Text("");
+                
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("Up");
+                ImGui::TableNextColumn();
+                ImGui::Text((freeCamForward.GetNameString() + " + Ctrl").c_str());
+
+                ImGui::TableNextRow();
+                ImGui::TableNextColumn();
+                ImGui::Text("Down");
+                ImGui::TableNextColumn();
+                ImGui::Text((freeCamBackward.GetNameString() + " + Ctrl").c_str());
 
                 ImGui::TableNextRow();
                 ImGui::TableNextColumn();

@@ -49,14 +49,6 @@ DaysPassed = "Days passed"
 DisableCheats = "Disable cheats"
 DisableReplay = "Disable F1 & F3 replay"
 Enable = "Enable"
-EnableText = """
-Forward: I\tBackward: K
-
-Left: J\t\t  Right: L
-
-Slower: RCtrl\tFaster: RShift
-
-Zoom: Mouse wheel"""
 ExtraColors = "Extra colors"
 ExtraSunny = "Extra sunny"
 FailMission = "Fail current mission"
