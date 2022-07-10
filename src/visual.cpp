@@ -4,6 +4,10 @@
 #include "util.h"
 #include "game.h"
 #include "timecycle.h"
+#include "CSprite.h"
+#include "CFont.h"
+#include "CWorld.h"
+#include "vehicle.h"
 
 #ifdef GTASA
 #include "CHudColours.h"
@@ -154,6 +158,7 @@ void Visual::Init()
             m_nBacWeatherType = CWeather::OldWeatherType;
         }
     };
+    ShowModelInfo::Init();
 }
 
 template <typename T>
@@ -520,6 +525,103 @@ static void ColorPickerAddr(const char* label, int addr, ImVec4&& default_color)
     }
 }
 
+void ShowModelInfo::Init()
+{
+    ThiscallEvent<AddressList<BY_GAME(0x5343B2, 0x48882E, 0x474BC0), H_CALL>, PRIORITY_BEFORE, ArgPickN<CEntity*, 0>, void(CEntity*)> preRenderEntityEvent;
+
+#ifndef GTASA
+    patch::Nop(BY_GAME(NULL, 0x488828, 0x474BBA), 4);
+#endif
+
+    // Directly drawing here seems to crash renderer?
+    preRenderEntityEvent += [](CEntity *pEnt)
+    {   
+        CPlayerPed *player = FindPlayerPed();
+        if (m_bEnable)
+        {
+            CVector coord = pEnt->GetPosition();
+            CVector plaPos = player->GetPosition();
+
+            CColPoint outColPoint;
+            if (BY_GAME(pEnt->m_bIsVisible, pEnt->IsVisible(), pEnt->IsVisible()))
+            {
+                ShowModelInfo::m_EntityList.push_back(pEnt);
+            }
+        }
+
+#ifdef GTAVC
+    if (CModelInfo::GetModelInfo(pEnt->m_nModelIndex)->m_nNum2dEffects > 0)
+    {
+        pEnt->ProcessLightsForEntity();
+    }
+#elif GTA3
+    // if (CModelInfo::ms_modelInfoPtrs[pEnt->m_nModelIndex]->m_nNum2dEffects > 0)
+    // {
+    //     pEnt->ProcessLightsForEntity();
+    // }
+#endif
+    };
+}
+
+void ShowModelInfo::Draw()
+{
+    if (m_bEnable)
+    {
+        ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove 
+                                | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoNavFocus
+                                | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing;
+        ImGui::SetNextWindowPos(ImVec2(0, 0));
+        ImGui::SetNextWindowSize(ImVec2(screen::GetScreenWidth(), screen::GetScreenHeight()));
+        ImGui::SetNextWindowBgAlpha(0.0f);
+        if (ImGui::Begin("##Overlay", NULL, flags))
+        {
+            ImDrawList *pDrawList = ImGui::GetWindowDrawList();
+            for (CEntity *pEnt : m_EntityList)
+            {
+                CVector coord = BY_GAME(,,*)pEnt->GetBoundCentre();
+                float distance = DistanceBetweenPoints(coord, FindPlayerPed()->GetPosition());
+                RwV3d screen;
+                CVector2D size;
+                if (distance < m_nDistance &&
+#ifdef GTASA                
+                CSprite::CalcScreenCoors(coord.ToRwV3d(), &screen, &size.x, &size.y, true, true)
+#else 
+                CSprite::CalcScreenCoors(coord.ToRwV3d(), &screen, &size.x, &size.y, true)
+#endif
+)
+                {
+                    bool skip = false;
+                    uint model = pEnt->m_nModelIndex;
+                    std::string text = std::to_string(model);
+                    ImU32 col = ImGui::ColorConvertFloat4ToU32(distance < m_nDistance/2 ? ImVec4(1.0f, 1.0f, 1.0f, 1.00f) : ImVec4(0.35f, 0.33f, 0.3f, 1.00f));
+#ifdef GTASA
+                    if (pEnt->m_nType == ENTITY_TYPE_VEHICLE)
+                    {
+                        text = std::format("{}\n{}", model, Vehicle::GetNameFromModel(model));
+                    }
+                    else if (pEnt->m_nType == ENTITY_TYPE_PED)
+                    {
+                        CPed *ped = static_cast<CPed*>(pEnt);
+                        if (BY_GAME(ped->m_nPedFlags.bInVehicle, ped->m_bInVehicle, ped->m_bInVehicle))
+                        {
+                            skip = true;
+                        }
+                    }
+#endif
+
+                    if (!skip)
+                    {
+                        pDrawList->AddText(ImVec2(screen.x, screen.y), col, text.c_str());
+                    }
+                }
+            }
+            m_EntityList.clear();
+            ImGui::End();
+        }
+        
+    }
+}
+
 void Visual::ShowPage()
 {
     if (ImGui::BeginTabBar("Visual", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
@@ -716,7 +818,7 @@ void Visual::ShowPage()
             Widget::CheckboxAddrRaw(TEXT("Visual.UnfogMap"), 0xBA372C, 1, "\x50", "\x00", TEXT("Visual.UnfogMapText"));
 #elif GTAVC
             Widget::CheckboxAddr(TEXT("Visual.HideRadar"), 0xA10AB6);
-            Widget::Checkbox(TEXT("Visual.Lockweather"), &m_bLockWeather);
+            Widget::Checkbox(TEXT("Visual.LockWeather"), &m_bLockWeather);
             Widget::CheckboxAddr(TEXT("Visual.ShowHud"), 0x86963A);
 
             ImGui::NextColumn();
@@ -824,6 +926,22 @@ void Visual::ShowPage()
 #endif
             if (ImGui::BeginChild("VisualsChild"))
             {
+                if(ImGui::CollapsingHeader(TEXT("Visual.ShowModelInfo")))
+                {
+                    Widget::Checkbox(TEXT("Window.Enabled"), &ShowModelInfo::m_bEnable);
+
+                    ImGui::Spacing();
+
+                    if (ImGui::InputInt(TEXT("Visual.Distance"), &ShowModelInfo::m_nDistance))
+                    {
+                        if (ShowModelInfo::m_nDistance < 0.0f)
+                        {
+                            ShowModelInfo::m_nDistance = 0.0f;
+                        }
+                    }
+                    ImGui::Spacing();
+                    ImGui::Separator();
+                }
 #ifdef GTASA
                 ImGui::Spacing();
                 ImGui::SameLine();
@@ -862,6 +980,7 @@ void Visual::ShowPage()
                 Widget::EditAddr<float>(TEXT("Visual.RadarPosY"), *(int*)0x583500, -999, 104, 999);
                 Widget::EditAddr<int>(TEXT("Visual.RadarZoom"), 0xA444A3, 0, 0, 170);
                 ColorPickerAddr(TEXT("Visual.RadioStationColor"), 0xBAB24C, ImVec4(150, 150, 150, 255));
+
                 static std::vector<Widget::BindInfo> star_border
                 { 
                     {TEXT("Visual.NoBorder"), 0}, {TEXT("Visual.DefaultBorder"), 1}, {TEXT("Visual.BoldBorder"), 2} 

@@ -112,6 +112,7 @@ void CheatMenu::DrawWindow()
         }
     }
     Menu::DrawOverlay();
+    ShowModelInfo::Draw();
 }
 
 void CheatMenu::ProcessPages()
