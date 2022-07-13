@@ -980,7 +980,9 @@ void Vehicle::ShowPage()
                     ImGui::Spacing();
                     ImGui::Separator();
                 }
-#endif
+#endif          
+
+                Widget::EditAddr<float>(TEXT("Menu.VehHealth"), (int)&pVeh->m_fHealth, 0, 0, 1000);
                 if (ImGui::CollapsingHeader(TEXT("Vehicle.SetSpeed")))
                 {
                     Widget::Checkbox(TEXT("Vehicle.LockSpeed"), &m_bLockSpeed);

@@ -74,7 +74,7 @@ private:
     static void NodeWrapperRecursive(RwFrame* frame, CVehicle* pVeh, std::function<void(RwFrame*)> func);
 
 public:
-    static inline ResourceStore m_TextureData { "textures", eResourceType::TYPE_IMAGE, ImVec2(100, 80) };
+    static inline ResourceStore m_TextureData { "textures", eResourceType::TYPE_IMAGE_TEXT, ImVec2(100, 80) };
 
     static void InjectHooks();
     static void GenerateNodeList(CVehicle* pVeh, std::vector<std::string>& names_vec, std::string& selected);

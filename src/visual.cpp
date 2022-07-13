@@ -923,6 +923,12 @@ void Visual::ShowPage()
 
                 init_patches = true;
             }
+            
+            ImGui::Spacing();
+            ImGui::SameLine();
+            ImGui::TextWrapped(TEXT("Visual.IncompatibleMods"));
+            Widget::Tooltip(TEXT("Visual.IncompatibleModsText"));
+            ImGui::Spacing();
 #endif
             if (ImGui::BeginChild("VisualsChild"))
             {
@@ -943,11 +949,6 @@ void Visual::ShowPage()
                     ImGui::Separator();
                 }
 #ifdef GTASA
-                ImGui::Spacing();
-                ImGui::SameLine();
-                ImGui::TextWrapped(TEXT("Visual.IncompatibleMods"));
-                Widget::Tooltip(TEXT("Visual.IncompatibleModsText"));
-                ImGui::Spacing();
                 ColorPickerAddr(TEXT("Visual.ArmourbarColor"), *(int*)0x5890FC, ImVec4(225, 225, 225, 255));
                 Widget::EditAddr<float>(TEXT("Visual.ArmourbarPosX"), 0x866B78, -999, 94, 999);
                 Widget::EditAddr<float>(TEXT("Visual.ArmourbarPosY"), 0x862D38, -999, 48, 999);

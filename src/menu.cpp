@@ -153,7 +153,7 @@ void Menu::DrawOverlay()
             {
                 if (Overlay::bVehHealth)
                 {
-                    ImGui::Text(TEXT("Menu.VehHealth"), pPlayer->m_pVehicle->m_fHealth);
+                    ImGui::Text((TEXT_S("Menu.VehHealth") + ": %.f").c_str(), pPlayer->m_pVehicle->m_fHealth);
                 }
 
                 if (Overlay::bVehSpeed)
