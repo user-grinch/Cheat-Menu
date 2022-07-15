@@ -44,6 +44,7 @@ public:
         static inline bool m_bShowMenu;
         static inline char m_nInputBuffer[INPUT_BUFFER_SIZE] = "";
     };
+    static inline bool m_bAutoCheckUpdate;
     static inline bool m_bDiscordRPC;
     static inline bool m_bTextOnlyMode; 
     

@@ -32,6 +32,7 @@ void Menu::Init()
     Overlay::textColor[2] = gConfig.Get("Overlay.TextColor.Blue", 1.0f);
     Overlay::textColor[3] = gConfig.Get("Overlay.TextColor.Alpha", 1.0f);
     m_bDiscordRPC = gConfig.Get("Menu.DiscordRPC", false);
+    m_bAutoCheckUpdate = gConfig.Get("Menu.AutoCheckUpdate", true);
     m_bTextOnlyMode = gConfig.Get("Menu.TextOnlyMode", false);
 
     Util::GetCPUUsageInit();
@@ -352,6 +353,10 @@ void Menu::ShowPage()
             ImGui::Spacing();
 
             ImGui::Columns(2, NULL, false);
+            if (ImGui::Checkbox(TEXT("Menu.AutoCheckUpdate"), &m_bAutoCheckUpdate))
+            {
+                gConfig.Set("Menu.AutoCheckUpdate", m_bAutoCheckUpdate);
+            }
             if (ImGui::Checkbox(TEXT("Menu.DiscordRPC"), &m_bDiscordRPC))
             {
                 if (m_bDiscordRPC)

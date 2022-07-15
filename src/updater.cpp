@@ -24,11 +24,6 @@ void Updater::CheckUpdate()
     }
 }
 
-void Updater::IncrementDailyUsageCounter()
-{
-    URLDownloadToFile(NULL, "https://github.com/user-grinch/Cheat-Menu/releases/download/3.2/counter.info", "", 0, NULL);
-}
-
 void Updater::Process()
 {
     if (Updater::curState != States::CHECKING)

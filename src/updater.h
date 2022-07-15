@@ -31,15 +31,6 @@ public:
     // Is updated version available from GitHub
     static bool IsUpdateAvailable();
 
-    /*
-        Just downloading counter.info file from GitHub repository
-        Initial plan was to add google analytics but people will freak 
-        out about that (though every site has it in some form)
-        
-        Pretty barebones but this shouldn't raise any concerns (i hope)
-    */
-    static void IncrementDailyUsageCounter();
-
     // Needs to run in it's own thread to prevent the game from freezing
     static void Process();
 
