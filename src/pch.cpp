@@ -12,7 +12,7 @@ Hotkey freeCamRight {VK_KEY_D, VK_KEY_D, "Freecam.Right"};
 Hotkey freeCamTeleport {VK_RETURN, VK_RETURN, "Freecam.Teleport"};
 Hotkey commandWindow {VK_LCONTROL, VK_KEY_C, "CommandWindowToggle"};;
 Hotkey fixVeh {VK_NONE, VK_NONE, "Vehicle.Fix"};
-Hotkey flipVeh {VK_NONE, VK_NONE, "Vehicle.Flip"};
+Hotkey unflipVeh {VK_NONE, VK_NONE, "Vehicle.Flip"};
 Hotkey godMode {VK_NONE, VK_NONE, "GodMode"};
 Hotkey menuOpen {VK_LCONTROL, VK_KEY_M, "MenuToggle"};
 Hotkey quickSceenShot {VK_F5, VK_F5, "QuickScreenshot"};

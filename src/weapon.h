@@ -16,6 +16,7 @@ private:
     static inline bool m_bDualWeild;
     static inline bool m_bMoveAim;
     static inline bool m_bMoveFire;
+    static inline bool m_bNoSpread;
     static inline int m_nSelectedGang;
     static inline int m_nGangWeaponList[10][3] =
     {

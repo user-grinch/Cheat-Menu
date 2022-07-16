@@ -78,6 +78,11 @@ void Weapon::Init()
                 pWeaponInfo->m_nFlags.bMoveAim = true;
             }
 
+            if (m_bNoSpread)
+            {
+                pWeaponInfo->m_fAccuracy = 100.0f;
+            }
+
             if (m_bMoveFire)
             {
                 pWeaponInfo->m_nFlags.bMoveFire = true;
@@ -322,6 +327,13 @@ void Weapon::ShowPage()
             if (Widget::Checkbox(TEXT("Weapon.MoveWhenFiring"), &m_bMoveFire))
             {
                 if (!m_bMoveFire)
+                {
+                    CWeaponInfo::LoadWeaponData();
+                }
+            }
+            if (Widget::Checkbox(TEXT("Weapon.NoSpread"), &m_bNoSpread))
+            {
+                if (!m_bNoSpread)
                 {
                     CWeaponInfo::LoadWeaponData();
                 }

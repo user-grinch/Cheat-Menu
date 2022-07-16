@@ -68,6 +68,11 @@ public:
     static inline bool m_bFreezeTime;
     static inline bool m_bSyncTime;
 
+#ifdef GTASA
+    static inline int m_nCameraZoom = 70.0f;
+    static inline bool m_bLockCameraZoom;
+#endif 
+
     Game() = delete;
     Game(const Game&) = delete;
 

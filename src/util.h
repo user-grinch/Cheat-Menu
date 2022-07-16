@@ -24,7 +24,7 @@ public:
     static bool IsOnMission();
 #endif
 
-    static void FlipVehicle(CVehicle *pVeh);
+    static void UnFlipVehicle(CVehicle *pVeh);
     static void FixVehicle(CVehicle *pVeh);
     static CPed* GetClosestPed();
     static CVehicle* GetClosestVehicle();

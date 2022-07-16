@@ -195,7 +195,15 @@ void Freecam::Clear()
     Command<Commands::DELETE_CHAR>(m_nPed);
     m_pPed = nullptr;
 
-    Command<Commands::CAMERA_PERSIST_FOV>(false);
+    // restore lock camera zoom here
+    if (Game::m_bLockCameraZoom)
+    {
+        TheCamera.LerpFOV(TheCamera.FindCamFOV(), Game::m_nCameraZoom, 250, true);
+    }
+    else
+    {
+        Command<Commands::CAMERA_PERSIST_FOV>(false);
+    }
     Command<Commands::RESTORE_CAMERA_JUMPCUT>();
 }
 
@@ -304,6 +312,7 @@ static void RealTimeClock()
 void Game::Init()
 {
 #ifdef GTASA
+
     Events::drawMenuBackgroundEvent += []()
     {
         if (bSaveGameFlag)
@@ -605,8 +614,55 @@ void Game::ShowPage()
         }
         if (ImGui::BeginTabItem(TEXT("Window.MenusTab")))
         {
+            ImGui::Spacing();
             ImGui::BeginChild("##Menus");
 #ifdef GTASA
+            if (ImGui::CollapsingHeader(TEXT("Game.CameraZoom")))
+            {
+                ImGui::Spacing();
+                if (Freecam::m_bEnabled)
+                {
+                    ImGui::TextWrapped(TEXT("Game.CameraZoomLockFreecam"));
+                }
+                else
+                {
+                    if (Widget::Checkbox(TEXT("Game.CameraZoomLock"), &m_bLockCameraZoom))
+                    {
+                        if (!m_bLockCameraZoom)
+                        {
+                            Command<Commands::CAMERA_PERSIST_FOV>(false);
+                        }
+                    }
+                    ImGui::Spacing();
+                    if (!m_bLockCameraZoom)
+                    {
+                        ImGui::BeginDisabled();
+                    }
+                    if (ImGui::SliderInt(TEXT("Game.CameraZoom"), &m_nCameraZoom, 5, 120))
+                    {
+                        TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_nCameraZoom, 250, true);
+                        Command<Commands::CAMERA_PERSIST_FOV>(true);
+                    }
+                    ImGui::Spacing();
+                    if (ImGui::Button(TEXT("Game.ResetDefault"), Widget::CalcSize()))
+                    {
+                        m_nCameraZoom = 70.0f;
+                        TheCamera.LerpFOV(TheCamera.FindCamFOV(), 70.0f, 250, true);
+                        Command<Commands::CAMERA_PERSIST_FOV>(true);
+                    }
+
+                    if (m_bLockCameraZoom)
+                    {
+                        ImGui::TextWrapped(TEXT("Game.CameraZoomLockInfo"));
+                    }
+                    else
+                    {
+                        ImGui::EndDisabled();
+                    }
+                }
+                ImGui::Spacing();
+                ImGui::Separator();
+            }
             if (ImGui::CollapsingHeader(TEXT("Game.CurrentDay")))
             {
                 int day = CClock::CurrentDay - 1;
@@ -617,7 +673,7 @@ void Game::ShowPage()
 
                 ImGui::Spacing();
                 ImGui::Separator();
-            }//0xC17040
+            }
 #endif
             Widget::EditAddr<int>(TEXT("Game.DaysPassed"), BY_GAME(0xB79038, 0x97F1F4, 0x8F2BB8), 0, 9999);
             Widget::EditAddr<int>(TEXT("Game.FPSLimit"), (uint)&(RsGlobal.maxFPS), 1, 30, 999);
@@ -774,7 +830,10 @@ void Game::ShowPage()
             }
             ImGui::Spacing();
 
-            ImGui::SliderFloat(TEXT("Game.FieldOfView"), &Freecam::m_fFOV, 5.0f, 120.0f);
+            if (ImGui::SliderFloat(TEXT("Game.FieldOfView"), &Freecam::m_fFOV, 5.0f, 120.0f) && Freecam::m_bEnabled)
+            {
+                TheCamera.LerpFOV(TheCamera.FindCamFOV(), Freecam::m_fFOV, 250, true);
+            }
             ImGui::SliderInt(TEXT("Game.MovementSpeed"), &Freecam::m_nMul, 1, 10);
             ImGui::Dummy(ImVec2(0.0f, 20.0f));
 

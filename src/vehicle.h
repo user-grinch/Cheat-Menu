@@ -4,6 +4,7 @@
 class Vehicle
 {
 private:
+    static inline bool m_bAutoUnflip;
     static inline bool m_bBikeFly;
     static inline bool m_bDontFallBike;
     static inline bool m_bVehHeavy;

@@ -42,7 +42,7 @@ void Util::FixVehicle(CVehicle *pVeh)
     pVeh->m_fHealth = 1000.0f;
 }
 
-void Util::FlipVehicle(CVehicle *pVeh)
+void Util::UnFlipVehicle(CVehicle *pVeh)
 {
 #ifdef GTASA
     int hveh = CPools::GetVehicleRef(pVeh);

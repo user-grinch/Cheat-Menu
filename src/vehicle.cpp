@@ -37,10 +37,15 @@ void Vehicle::Init()
         if (pPlayer && Util::IsInVehicle())
         {
             int hveh = CPools::GetVehicleRef(pVeh);
-
-            if (flipVeh.Pressed())
+            float speed = pVeh->m_vecMoveSpeed.Magnitude() * 50.0f;
+            if (m_bAutoUnflip && pVeh->IsUpsideDown() && speed < 2.0f)
             {
-                Util::FlipVehicle(pVeh);
+                Util::UnFlipVehicle(pVeh);
+            }
+
+            if (unflipVeh.Pressed())
+            {
+                Util::UnFlipVehicle(pVeh);
             }
 
             if (fixVeh.Pressed())
@@ -525,13 +530,13 @@ void Vehicle::ShowPage()
 
     if (ImGui::Button(TEXT("Vehicle.FlipCar"), ImVec2(Widget::CalcSize(3))) && Util::IsInVehicle())
     {
-        Util::FlipVehicle(pVeh);
+        Util::UnFlipVehicle(pVeh);
     }
 
     ImGui::Spacing();
-
+   
     if (ImGui::BeginTabBar("Vehicle", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
-    {
+    { 
         CVehicle* pVeh = pPlayer->m_pVehicle;
         bool is_driver = pVeh && (pPlayer->m_pVehicle->m_pDriver == pPlayer);
 
@@ -546,6 +551,8 @@ void Vehicle::ShowPage()
             Widget::CheckboxAddr(TEXT("Vehicle.AimDrive"), 0x969179);
             Widget::CheckboxAddr(TEXT("Vehicle.AllNitro"), 0x969165);
 #endif
+
+            Widget::Checkbox(TEXT("Vehicle.AutoUnflip"), &m_bAutoUnflip);
 
 #ifndef GTA3
             Widget::CheckboxAddr(TEXT("Vehicle.AggroDriver"), BY_GAME(0x96914F,0xA10B47, NULL));

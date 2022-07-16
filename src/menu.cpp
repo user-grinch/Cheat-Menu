@@ -474,7 +474,7 @@ void Menu::ShowPage()
             ImGui::Dummy(ImVec2(0, 10));
 
             fixVeh.DrawUI(TEXT("Menu.FixVehKey"));
-            flipVeh.DrawUI(TEXT("Menu.FlipVehKey"));
+            unflipVeh.DrawUI(TEXT("Menu.FlipVehKey"));
             godMode.DrawUI(TEXT("Menu.GodModeKey"));
             vehEngine.DrawUI(TEXT("Menu.VehEngineKey"));
             vehInstantStart.DrawUI(TEXT("Menu.VehStartKey"));
