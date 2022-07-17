@@ -510,7 +510,7 @@ static void StartAutoDrive(CVehicle *pVeh, const char *buf = nullptr)
 
     if (buf ==  nullptr)
     {
-#ifdef GTA SA
+#ifdef GTASA
         tRadarTrace targetBlip = CRadar::ms_RadarTrace[LOWORD(FrontEndMenuManager.m_nTargetBlipIndex)];
         pos = targetBlip.m_vecPos;
         if (targetBlip.m_nRadarSprite != RADAR_SPRITE_WAYPOINT)
