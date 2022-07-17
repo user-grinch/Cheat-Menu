@@ -3,10 +3,10 @@
 #include "menu.h"
 #include "widget.h"
 #include "util.h"
+#include "teleport.h"
 #include "filehandler.h"
 #include <CPopulation.h>
 #include <CDamageManager.h>
-
 
 #ifdef GTASA
 #include "tHandlingData.h"
@@ -323,7 +323,6 @@ void Vehicle::SpawnVehicle(std::string& rootkey, std::string& vehName, std::stri
 {
     CPlayerPed* player = FindPlayerPed();
     int hplayer = CPools::GetPedRef(player);
-
     int imodel = std::stoi(smodel);
     CVehicle* veh = nullptr;
     int interior = BY_GAME(player->m_nAreaCode, player->m_nAreaCode, NULL);
@@ -504,11 +503,83 @@ int Vehicle::GetModelFromName(const char* name)
     }
 }
 
+static void StartAutoDrive(CVehicle *pVeh, const char *buf = nullptr)
+{
+    int hVeh = CPools::GetVehicleRef(pVeh);
+    CVector pos;
+
+    if (buf ==  nullptr)
+    {
+#ifdef GTA SA
+        tRadarTrace targetBlip = CRadar::ms_RadarTrace[LOWORD(FrontEndMenuManager.m_nTargetBlipIndex)];
+        pos = targetBlip.m_vecPos;
+        if (targetBlip.m_nRadarSprite != RADAR_SPRITE_WAYPOINT)
+        {
+            SetHelpMessage(TEXT("Teleport.TargetBlipText"));
+            return;
+        }
+#else
+        return;
+#endif
+    }
+    else
+    {
+         if (sscanf(buf, "%f,%f,%f", &pos.x, &pos.y, &pos.z) != 3)
+        {
+            int dim;
+            sscanf(buf, "%d,%f,%f,%f", &dim, &pos.x, &pos.y, &pos.z);
+        }
+    }
+
+    int model = pVeh->m_nModelIndex;
+    if (CModelInfo::IsBoatModel(model))
+    {
+        Command<Commands::BOAT_GOTO_COORDS>(hVeh, pos.x, pos.y, pos.z);
+    }
+    else if (CModelInfo::IsPlaneModel(model))
+    {
+        CVector p = pVeh->GetPosition();
+        p.z = 300.0f;
+#ifdef GTASA
+        pVeh->SetPosn(p);
+#elif GTAVC
+        pVeh->SetPosition(p);
+#else   
+        pVeh->SetPos(p);
+#endif
+        Command<Commands::PLANE_GOTO_COORDS>(hVeh, pos.x, pos.y, 300.0f, 30, 200);
+    }
+    else if (CModelInfo::IsHeliModel(model))
+    {
+        CVector p = pVeh->GetPosition();
+        p.z = 300.0f;
+#ifdef GTASA
+        pVeh->SetPosn(p);
+#elif GTAVC
+        pVeh->SetPosition(p);
+#else   
+        pVeh->SetPos(p);
+#endif
+        Command<Commands::HELI_GOTO_COORDS>(hVeh, pos.x, pos.y, 300.0f, 30, 200);
+    }
+#ifdef GTASA
+    else if (CModelInfo::IsTrainModel(model))
+    {
+        return;
+    }
+#endif
+    else
+    {
+        Command<Commands::CAR_GOTO_COORDINATES>(hVeh, pos.x, pos.y, pos.z);
+    }
+}
+
 void Vehicle::ShowPage()
 {
     ImGui::Spacing();
     CPlayerPed* pPlayer = FindPlayerPed();
     int hplayer = CPools::GetPedRef(pPlayer);
+    bool bPlayerInCar = Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer);
     CVehicle *pVeh = pPlayer->m_pVehicle;
 
     if (ImGui::Button(TEXT("Vehicle.BlowCar"), ImVec2(Widget::CalcSize(3))))
@@ -822,19 +893,18 @@ void Vehicle::ShowPage()
 #ifdef GTASA
             Widget::EditAddr<float>(TEXT("Vehicle.DensityMul"), 0x8A5B20, 0, 1, 10);
 #endif
-            if (ImGui::CollapsingHeader(TEXT("Vehicle.EnterNearVeh")))
+            if (ImGui::CollapsingHeader(TEXT(bPlayerInCar ? "Vehicle.SwitchSeats" : "Vehicle.EnterNearVeh")))
             {
-                int hplayer = CPools::GetPedRef(pPlayer);
-                CVehicle* pClosestVeh = Util::GetClosestVehicle();
+                CVehicle* pTargetVeh = bPlayerInCar ? pVeh : Util::GetClosestVehicle();
 
-                if (pClosestVeh)
+                if (pTargetVeh)
                 {
-                    int seats = pClosestVeh->m_nMaxPassengers;
+                    int seats = pTargetVeh->m_nMaxPassengers;
 
                     ImGui::Spacing();
                     ImGui::Columns(2, 0, false);
 
-                    ImGui::Text(GetNameFromModel(pClosestVeh->m_nModelIndex).c_str());
+                    ImGui::Text(GetNameFromModel(pTargetVeh->m_nModelIndex).c_str());
                     ImGui::NextColumn();
                     ImGui::Text(TEXT("Vehicle.TotalSeats"), (seats + 1));
                     ImGui::Columns(1);
@@ -842,7 +912,7 @@ void Vehicle::ShowPage()
                     ImGui::Spacing();
                     if (ImGui::Button(TEXT("Vehicle.Driver"), ImVec2(Widget::CalcSize(2))))
                     {
-                        Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, pClosestVeh);
+                        Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, pTargetVeh);
                     }
 
 #ifndef GTA3
@@ -852,14 +922,14 @@ void Vehicle::ShowPage()
                         {
                             ImGui::SameLine();
                         }
-
-                        if (ImGui::Button((std::string(TEXT("Vehicle.Passenger")) + std::to_string(i + 1)).c_str(),
+                        
+                        if (ImGui::Button(std::format("{} {}", TEXT("Vehicle.Passenger"), i+1).c_str(),
                                           ImVec2(Widget::CalcSize(2))))
                         {
 #ifdef GTASA
-                            Command<Commands::WARP_CHAR_INTO_CAR_AS_PASSENGER>(hplayer, pClosestVeh, i);
+                            Command<Commands::WARP_CHAR_INTO_CAR_AS_PASSENGER>(hplayer, pTargetVeh, i);
 #elif GTAVC
-                            WarpPlayerIntoVehicle(pClosestVeh, i);
+                            WarpPlayerIntoVehicle(pTargetVeh, i);
 #endif
                         }
                     }
@@ -867,7 +937,8 @@ void Vehicle::ShowPage()
                 }
                 else
                 {
-                    ImGui::Text(TEXT("Vehicle.NoNearVeh"));
+                    ImGui::Spacing();
+                    Widget::TextCentered(TEXT("Vehicle.NoNearVeh"));
                 }
 
                 ImGui::Spacing();
@@ -1080,11 +1151,56 @@ void Vehicle::ShowPage()
 #endif
             ImGui::EndTabItem();
         }
-
-        if (pPlayer->m_pVehicle && Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer))
+        if (pPlayer->m_pVehicle && bPlayerInCar)
         {
             CVehicle* veh = FindPlayerPed()->m_pVehicle;
             int hveh = CPools::GetVehicleRef(veh);
+            if (ImGui::BeginTabItem(TEXT("Vehicle.AutoDrive")))
+            {
+                ImGui::Spacing();
+                if (ImGui::Button(TEXT("Vehicle.AutoDriveStop"), Widget::CalcSize(1)))
+                {
+                    
+                }
+                ImGui::Spacing();
+                if (ImGui::BeginTabBar("PassTabaBar"))
+                {
+                    if (ImGui::BeginTabItem(TEXT("Teleport.Coordinates")))
+                    {
+                        static char buf[INPUT_BUFFER_SIZE];
+                        ImGui::Spacing();
+                        ImGui::TextWrapped(TEXT("Vehicle.AutoDriveInfo"));
+                        ImGui::Spacing();
+                        ImGui::InputTextWithHint(TEXT("Teleport.Coordinates"), "x, y, z", buf, IM_ARRAYSIZE(buf));
+                        ImGui::Spacing();
+                        if (ImGui::Button(TEXT("Vehicle.AutoDriveCoord"), Widget::CalcSize(BY_GAME(2,1,1))))
+                        {
+                            StartAutoDrive(pVeh, buf);
+                        }
+#ifdef GTASA
+                        ImGui::SameLine();
+                        if (ImGui::Button(TEXT("Vehicle.AutoDriveMarker"), Widget::CalcSize(2)))
+                        {
+                            StartAutoDrive(pVeh);
+                        }
+#endif
+                        ImGui::EndTabItem();
+                    }
+                    if (ImGui::BeginTabItem(TEXT("Teleport.Location")))
+                    {
+                        ImGui::Spacing();
+                        Widget::DataList(Teleport::m_locData, 
+                        [](std::string& rootkey, std::string& bLocName, std::string& loc)
+                        {
+                            CVehicle* pVeh = BY_GAME(FindPlayerVehicle(-1, false), FindPlayerVehicle(), FindPlayerVehicle());
+                            StartAutoDrive(pVeh, loc.c_str());       
+                        }, nullptr);
+                        ImGui::EndTabItem();
+                    }
+                    ImGui::EndTabBar();
+                }
+                ImGui::EndTabItem();
+            }
             if (ImGui::BeginTabItem(TEXT("Vehicle.Color")))
             {
 #ifdef GTASA

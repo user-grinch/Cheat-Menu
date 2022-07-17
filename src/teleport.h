@@ -5,10 +5,8 @@ class Teleport
 {
 private:
     static inline bool m_bInsertCoord;
-    static inline bool m_bQuickTeleport;
     static inline bool m_bTeleportMarker;
     static inline char m_nInputBuffer[INPUT_BUFFER_SIZE];
-    static inline ResourceStore m_tpData{ "locations", eResourceType::TYPE_TEXT };
     static inline char m_nLocationBuffer[INPUT_BUFFER_SIZE];
 
     struct TPMarker
@@ -35,6 +33,8 @@ private:
 public:
     Teleport() = delete;
     Teleport(const Teleport&) = delete;
+    static inline ResourceStore m_locData{ "locations", eResourceType::TYPE_TEXT };
+    static inline bool m_bQuickTeleport;
 
     static void Init();
     static void TeleportPlayer(bool get_marker = false, CVector pos = CVector(0, 0, 0), int interior_id = 0);

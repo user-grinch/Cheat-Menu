@@ -20,7 +20,7 @@ void Teleport::FetchRadarSpriteData()
         return;
     }
 
-    m_tpData.m_pData->RemoveTable("Radar");
+    m_locData.m_pData->RemoveTable("Radar");
     for (int i = 0; i != maxSprites; ++i)
     {
         CVector pos = CRadar::ms_RadarTrace[i].m_vecPos;
@@ -28,7 +28,7 @@ void Teleport::FetchRadarSpriteData()
         std::string keyName = m_SpriteData.Get<std::string>(sprite.c_str(), "Unknown");
         keyName += ", " + Util::GetLocationName(&pos);
         std::string key = "Radar." + keyName;
-        m_tpData.m_pData->Set(key.c_str(), std::format("0, {}, {}, {}", pos.x, pos.y, pos.z));
+        m_locData.m_pData->Set(key.c_str(), std::format("0, {}, {}, {}", pos.x, pos.y, pos.z));
     }
     lastUpdated = timer;
 }
@@ -249,9 +249,9 @@ void Teleport::RemoveTeleportEntry(std::string& category, std::string& key, std:
 {
     if (category == "Custom")
     {
-        m_tpData.m_pData->RemoveKey("Custom", key.c_str());
+        m_locData.m_pData->RemoveKey("Custom", key.c_str());
         SetHelpMessage(TEXT("Teleport.LocationRemoved"));
-        m_tpData.m_pData->Save();
+        m_locData.m_pData->Save();
     }
     else
     {
@@ -351,19 +351,19 @@ void Teleport::ShowPage()
                 if (ImGui::Button(TEXT("Teleport.AddLocation"), Widget::CalcSize()))
                 {
                     std::string key = std::string("Custom.") + m_nLocationBuffer;
-                    m_tpData.m_pData->Set(key.c_str(), ("0, " + std::string(m_nInputBuffer)));
+                    m_locData.m_pData->Set(key.c_str(), ("0, " + std::string(m_nInputBuffer)));
 
     #ifdef GTASA
                     // Clear the Radar coordinates
-                    m_tpData.m_pData->RemoveTable("Radar");
+                    m_locData.m_pData->RemoveTable("Radar");
     #endif
 
-                    m_tpData.m_pData->Save();
+                    m_locData.m_pData->Save();
                 }
             }
 
             ImGui::Spacing();
-            Widget::DataList(m_tpData, TeleportToLocation, RemoveTeleportEntry);
+            Widget::DataList(m_locData, TeleportToLocation, RemoveTeleportEntry);
             ImGui::EndTabItem();
         }
         ImGui::EndTabBar();
