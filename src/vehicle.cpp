@@ -1160,7 +1160,7 @@ void Vehicle::ShowPage()
                 ImGui::Spacing();
                 if (ImGui::Button(TEXT("Vehicle.AutoDriveStop"), Widget::CalcSize(1)))
                 {
-                    
+                    Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
                 }
                 ImGui::Spacing();
                 if (ImGui::BeginTabBar("PassTabaBar"))
