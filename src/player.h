@@ -4,7 +4,7 @@
 class Player
 {
 private:
-    static inline bool m_bHealthRegen;
+    static inline bool m_bPlayerRegen;
     static inline bool m_bGodMode;
     static inline bool m_bModloaderInstalled;
     struct KeepPosition

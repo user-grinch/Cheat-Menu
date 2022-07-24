@@ -216,6 +216,20 @@ void Menu::ProcessCommands()
     std::string command;
     ss >> command;
 
+    if (command == "armour")
+    {
+        try
+        {
+            std::string temp;
+            ss >> temp;
+            FindPlayerPed()->m_fArmour = std::stof(temp);
+        }
+        catch (...)
+        {
+            SetHelpMessage(TEXT("Menu.InvalidValue"));
+        }
+    }
+
     if (command == "hp")
     {
         try
@@ -491,6 +505,13 @@ void Menu::ShowPage()
             {
                 ImGui::TextWrapped(TEXT("Menu.OpenCMDUsing"), commandWindow.GetNameString().c_str());
                 ImGui::Spacing();
+                if (ImGui::CollapsingHeader(TEXT("Menu.SeArmourCMD")))
+                {
+                    ImGui::Spacing();
+                    ImGui::TextWrapped(TEXT("Menu.SetArmourCMDText"));
+                    ImGui::Spacing();
+                    ImGui::Separator();
+                }
                 if (ImGui::CollapsingHeader(TEXT("Menu.SetHealthCMD")))
                 {
                     ImGui::Spacing();

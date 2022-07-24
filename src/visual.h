@@ -30,6 +30,7 @@ private:
     static inline bool m_bNoTextures;
     static inline bool m_bFullScreenMap;
     static inline bool m_bSquareRadar;
+    static inline bool m_bNoRadarRot;
 #endif
 
     template<typename T>

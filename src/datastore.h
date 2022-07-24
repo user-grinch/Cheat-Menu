@@ -15,7 +15,7 @@ private:
     static inline const char* fileExt = ".toml";
     std::unique_ptr<toml::table> pTable;
     std::string path;
-
+    
 public:
     typedef toml::table Table;
 

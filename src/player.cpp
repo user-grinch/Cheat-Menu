@@ -137,29 +137,41 @@ void Player::Init()
     {
         uint timer = CTimer::m_snTimeInMilliseconds;
         CPlayerPed* player = FindPlayerPed();
+        CPlayerInfo *pInfo = &CWorld::Players[CWorld::PlayerInFocus];
         int hplayer = CPools::GetPedRef(player);
 
-        if (m_bHealthRegen)
+        if (m_bPlayerRegen)
         {
-            static uint lastDmgTimer = 0;
-            static uint lastHealTimer = 0;
-            static float health = 0;
+            static uint lastDmg = 0;
+            static uint lastTimer = 0;
             float maxHealth = BY_GAME(player->m_fMaxHealth, 100, 100);
+            float maxArmour = BY_GAME(pInfo->m_nMaxArmour, pInfo->m_nMaxArmour, 100);
 
-            if (player->m_fHealth != health)
+            static float prevVal = 0;
+            float curVal = (player->m_fHealth == player->m_fMaxHealth) ? player->m_fHealth : player->m_fArmour;
+            if (curVal != prevVal)
             {
-                health = player->m_fHealth;
-                lastDmgTimer = timer;
+                lastDmg = timer;
+                curVal = prevVal;
             }
 
-            if (player->m_fHealth != maxHealth
-                    && timer - lastDmgTimer > 5000
-                    && timer - lastHealTimer > 1000
-               )
+            if (timer - lastDmg > 5000 && timer - lastTimer > 1000)
             {
-                player->m_fHealth += 0.2f;
-                lastHealTimer = timer;
-                health = player->m_fHealth;
+                if (player->m_fHealth != maxHealth || player->m_fArmour != maxArmour)
+                {
+                    if (player->m_fHealth != maxHealth)
+                    {
+                        player->m_fHealth += 0.2f;
+                        prevVal = player->m_fHealth;
+                    }
+                    else
+                    {
+                        player->m_fArmour += 0.2f;
+                        prevVal = player->m_fArmour;
+                    }
+                  
+                    lastTimer = timer;
+                }
             }
         }
 
@@ -493,7 +505,6 @@ void Player::ShowPage()
                 pPlayer->m_nFlags.bMeleeProof = m_bGodMode;
 #endif
             }
-            Widget::Checkbox(TEXT("Player.HealthRegen"), &m_bHealthRegen, TEXT("Player.HealthRegenTip"));
 #ifdef GTASA
             Widget::CheckboxAddr(TEXT("Player.CycleJump"), 0x969161);
             Widget::CheckboxAddr(TEXT("Player.InfO2"), 0x96916E);
@@ -555,7 +566,7 @@ void Player::ShowPage()
 #endif
             Widget::CheckboxAddr(TEXT("Player.NoFee"), (int)&pInfo->m_bGetOutOfJailFree);
             Widget::Checkbox(TEXT("Player.RespawnDieLoc"), &KeepPosition::m_bEnabled, TEXT("Player.RespawnDieLocTip"));
-            
+            Widget::Checkbox(TEXT("Player.PlayerRegen"), &m_bPlayerRegen, TEXT("Player.PlayerRegenTip"));
 #ifdef GTASA
             static bool sprintInt = false;
             if (Widget::Checkbox(TEXT("Player.SprintEverywhere"), &sprintInt, TEXT("Player.SprintEverywhereTip")))

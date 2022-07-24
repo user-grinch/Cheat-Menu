@@ -755,7 +755,33 @@ void Visual::ShowPage()
                 }
             }
             Widget::CheckboxAddr(TEXT("Visual.NoPostFX"), 0xC402CF);
-           
+            if (Widget::Checkbox(TEXT("Visual.NoRadarRot"), &m_bNoRadarRot))
+            {
+                // Credits: jeremii (bjeremii.blogspot.com)
+                if (m_bNoRadarRot)
+                { 
+                    patch::Set<float>(0xBA8310, 0.0);
+                    patch::Set<float>(0xBA830C, 0.0);
+                    patch::Set<float>(0xBA8308, 1.0);
+                    
+                    // stop map rotaiton
+                    patch::Nop(0x5837FB, 6);
+                    patch::Nop(0x583805, 6);
+                    patch::Nop(0x58380D, 6);
+                    patch::Nop(0x5837D6, 6);
+                    patch::Nop(0x5837D0, 6);
+                    patch::Nop(0x5837C6, 8);
+                }
+                else
+                {
+                    patch::SetRaw(0x5837FB, (void*)"\xD9\x15\x10\x83\xBA\x00", 6);
+                    patch::SetRaw(0x583805, (void*)"\xD9\x1D\x0C\x83\xBA\x00", 6);
+                    patch::SetRaw(0x58380D, (void*)"\xD9\x1D\x08\x83\xBA\x00", 6);
+                    patch::SetRaw(0x5837D6, (void*)"\xD9\x1D\x10\x83\xBA\x00", 6);
+                    patch::SetRaw(0x5837D0, (void*)"\xD9\x1D\x08\x83\xBA\x00", 6);
+                    patch::SetRaw(0x5837C6, (void*)"\xD9\x1D\x0C\x83\xBA\x00\xD9\xC0", 8);
+                }
+            }
             if (Widget::Checkbox(TEXT("Visual.NoWater"), &m_bNoWater))
             {
                 if (m_bNoWater)
