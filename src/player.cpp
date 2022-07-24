@@ -148,26 +148,36 @@ void Player::Init()
             float maxArmour = BY_GAME(pInfo->m_nMaxArmour, pInfo->m_nMaxArmour, 100);
 
             static float prevVal = 0;
-            float curVal = (player->m_fHealth == player->m_fMaxHealth) ? player->m_fHealth : player->m_fArmour;
+            float curVal = player->m_fHealth;
+
+            if (player->m_fHealth >= player->m_fMaxHealth)
+            {
+                curVal = player->m_fArmour;
+            }
+
             if (curVal != prevVal)
             {
                 lastDmg = timer;
-                curVal = prevVal;
+                prevVal = curVal;
             }
 
             if (timer - lastDmg > 5000 && timer - lastTimer > 1000)
             {
-                if (player->m_fHealth != maxHealth || player->m_fArmour != maxArmour)
+                if (player->m_fHealth < maxHealth || player->m_fArmour < maxArmour)
                 {
-                    if (player->m_fHealth != maxHealth)
+                    if (player->m_fHealth < maxHealth)
                     {
                         player->m_fHealth += 0.2f;
                         prevVal = player->m_fHealth;
                     }
                     else
-                    {
-                        player->m_fArmour += 0.2f;
-                        prevVal = player->m_fArmour;
+                    {   
+                        // Only give armour if player has some already
+                        if (player->m_fArmour >= 1)
+                        {
+                            player->m_fArmour += 0.2f;
+                            prevVal = player->m_fArmour;
+                        }
                     }
                   
                     lastTimer = timer;
