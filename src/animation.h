@@ -9,6 +9,8 @@ public:
     static inline std::string m_SceneName;
     static inline int m_nInterior; // player interior backup
     static inline bool m_bRunning;
+    static inline CVehicle *m_pLastVeh;
+    static inline int m_nVehSeat;
 
     static void Play(std::string& rootKey, std::string& cutsceneId, std::string& interior);
 };

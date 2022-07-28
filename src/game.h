@@ -45,6 +45,7 @@ private:
     static inline bool m_bDisableCheats;
     static inline bool m_bDisableReplay;
     static inline bool m_bMissionTimer;
+    static inline bool m_bMobileRadio;
 
     struct HardMode
     {

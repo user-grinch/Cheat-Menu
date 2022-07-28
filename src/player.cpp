@@ -808,7 +808,7 @@ void Player::ShowPage()
         {
             ImGui::Spacing();
 
-            if (Widget::Checkbox(TEXT("Player.AimSkinChanger"), &m_bAimSkinChanger, TEXT("Player.AimSkinChangerTip") + aimSkinChanger.Pressed()))
+            if (Widget::Checkbox(TEXT("Player.AimSkinChanger"), &m_bAimSkinChanger, (TEXT_S("Player.AimSkinChangerTip") + aimSkinChanger.GetNameString()).c_str()))
             {
                 gConfig.Set("Features.AimSkinChanger", m_bAimSkinChanger);
             }

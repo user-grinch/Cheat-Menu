@@ -505,7 +505,7 @@ void Menu::ShowPage()
             {
                 ImGui::TextWrapped(TEXT("Menu.OpenCMDUsing"), commandWindow.GetNameString().c_str());
                 ImGui::Spacing();
-                if (ImGui::CollapsingHeader(TEXT("Menu.SeArmourCMD")))
+                if (ImGui::CollapsingHeader(TEXT("Menu.SetArmourCMD")))
                 {
                     ImGui::Spacing();
                     ImGui::TextWrapped(TEXT("Menu.SetArmourCMDText"));

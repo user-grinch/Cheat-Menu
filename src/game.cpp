@@ -7,6 +7,7 @@
 #include <CIplStore.h>
 #include <CMessages.h>
 #include <CSprite2d.h>
+#include <CAERadioTrackManager.h>
 #endif
 
 #ifdef GTASA
@@ -575,6 +576,45 @@ void Game::ShowPage()
                 }
             }
 #ifdef GTASA
+            if (Widget::Checkbox(TEXT("Game.MobileRadio"), &m_bMobileRadio))
+            {
+                // AERadioTrackManager.StartRadio(5, 0, 0, 0);
+                CallMethodAndReturn<int, 0x4EB3C0, int, int, int, int, int>((int)&AERadioTrackManager, 5, 0, 0, 0);
+                patch::Nop(0x576C4E, 30);
+                // CVehicle *pVeh = FindPlayerVehicle(-1, false);
+                // static tVehicleAudioSettings settings;
+                // if (m_bMobileRadio)
+                // {
+                //     patch::PutRetn(0x4F5BA0);
+                //     patch::PutRetn(0x4FCF40);
+                //     patch::PutRetn(0x4F5B60);
+                //     patch::PutRetn(0x4F5700);
+
+                //     patch::PutRetn(0x4E9820);
+                        
+                //     if (!pVeh)
+                //     {
+                //         settings.m_nRadioType = RADIO_CIVILIAN;
+                //         settings.m_nRadioID = RADIO_K_DST;
+                //         settings.m_fBassEq = 1.0;
+                //         settings.m_nBassSetting = 1;
+                //         CAEVehicleAudioEntity::s_pVehicleAudioSettingsForRadio = &settings;
+                //         // CAEVehicleAudioEntity::s_pPlayerDriver = FindPlayerPed();
+                //         CallMethod<0x4EB550, int, int>(0x8CB6F8, (int)&settings);
+                //     }
+                // }
+                // else
+                // {
+                //     patch::Set<uint8_t>(0x4F5BA0, 0x90);
+                //     patch::Set<uint8_t>(0x4FCF40, 0x51);
+                //     patch::Set<uint8_t>(0x4F5B60, 0x0F);
+                //     patch::Set<uint8_t>(0x4F5700, 0x51);
+                //     CAEVehicleAudioEntity::s_pVehicleAudioSettingsForRadio = nullptr;
+                //     // CAEVehicleAudioEntity::s_pPlayerDriver = nullptr;
+                //     // AERadioTrackManager.StopRadio(&settings, 0);
+                //     Call<0x4E9820, int, int, int>((int)&AERadioTrackManager, 0, 0);
+                // }
+            }
             if (Widget::Checkbox(TEXT("Game.NoWaterPhysics"), &m_bNoWaterPhysics))
             {
                 if (m_bNoWaterPhysics)
@@ -659,6 +699,45 @@ void Game::ShowPage()
                     {
                         ImGui::EndDisabled();
                     }
+                }
+                ImGui::Spacing();
+                ImGui::Separator();
+            }
+            if (ImGui::CollapsingHeader(TEXT("Game.ChangeRadioStaion")))
+            {
+                static std::string channels[] = {
+                    "Playback FM", "KRose", "KDST", "Bounce FM", "SFUR", "Radio Los Santos", "Radio X",
+                    "CSR ", "KJah West", "Master Sounds", "WCTR", "User Tracks", "None"
+                };
+                
+                int channelIndex = 0;
+                Command<Commands::GET_RADIO_CHANNEL>(&channelIndex);
+                if (ImGui::ArrowButton("Left", ImGuiDir_Left))
+                {
+                    if (channelIndex == 0)
+                    {
+                        channelIndex = 12;
+                    }
+                    else
+                    {
+                        --channelIndex;
+                    }
+                    Command<Commands::SET_RADIO_CHANNEL>(channelIndex);
+                }
+                ImGui::SameLine();
+                ImGui::Text("%s: %s",TEXT("Game.CurrentStation"), channels[channelIndex].c_str());
+                ImGui::SameLine();
+                if (ImGui::ArrowButton("Right", ImGuiDir_Right))
+                {
+                    if (channelIndex == 12)
+                    {
+                        channelIndex = 0;
+                    }
+                    else
+                    {
+                        ++channelIndex;
+                    }
+                    Command<Commands::SET_RADIO_CHANNEL>(channelIndex);
                 }
                 ImGui::Spacing();
                 ImGui::Separator();

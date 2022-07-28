@@ -32,6 +32,20 @@ void Cutscene::Play(std::string& rootKey, std::string& cutsceneId, std::string& 
     if (pPlayer)
     {
         m_SceneName = cutsceneId;
+        m_pLastVeh =  pPlayer->m_nPedFlags.bInVehicle ? pPlayer->m_pVehicle : nullptr;
+        m_nVehSeat = -1;
+
+        if (m_pLastVeh->m_pDriver != pPlayer)
+        {
+            for (size_t i = 0; i != 8; ++i)
+            {
+                if (m_pLastVeh->m_apPassengers[i] == pPlayer)
+                {
+                    m_nVehSeat = i;
+                    break;
+                }
+            }
+        }
         Command<Commands::LOAD_CUTSCENE>(cutsceneId.c_str());
         m_nInterior = pPlayer->m_nAreaCode;
         pPlayer->m_nAreaCode = std::stoi(interior);
@@ -358,12 +372,23 @@ void Animation::ShowPage()
             {
                 if (Cutscene::m_bRunning)
                 {
+                    CPlayerPed* player = FindPlayerPed();
+                    int hPlayer = CPools::GetPedRef(player);
+                    int hVeh = CPools::GetVehicleRef(Cutscene::m_pLastVeh);
                     Command<Commands::CLEAR_CUTSCENE>();
                     Cutscene::m_bRunning = false;
                     Cutscene::m_SceneName = "";
-                    CPlayerPed* player = FindPlayerPed();
                     player->m_nAreaCode = Cutscene::m_nInterior;
                     Command<Commands::SET_AREA_VISIBLE>(player->m_nAreaCode);
+
+                    if (Cutscene::m_nVehSeat == -1)
+                    {
+                        Command<Commands::WARP_CHAR_INTO_CAR>(hPlayer, hVeh);
+                    }
+                    else
+                    {
+                        Command<Commands::WARP_CHAR_INTO_CAR_AS_PASSENGER>(hPlayer, hVeh, Cutscene::m_nVehSeat);
+                    }
                     Cutscene::m_nInterior = 0;
                     TheCamera.Fade(0, 1);
                 }
