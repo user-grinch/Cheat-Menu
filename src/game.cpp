@@ -705,39 +705,14 @@ void Game::ShowPage()
             }
             if (ImGui::CollapsingHeader(TEXT("Game.ChangeRadioStaion")))
             {
-                static std::string channels[] = {
-                    "Playback FM", "KRose", "KDST", "Bounce FM", "SFUR", "Radio Los Santos", "Radio X",
-                    "CSR ", "KJah West", "Master Sounds", "WCTR", "User Tracks", "None"
-                };
+                static const char* channels = 
+                    "Playback FM\0KRose\0KDST\0Bounce FM\0SFUR\0Radio Los Santos\0Radio X\0CSR\0KJah West\0"
+                    "Master Sounds\0WCTR\0User Tracks\0None\0";
                 
-                int channelIndex = 0;
-                Command<Commands::GET_RADIO_CHANNEL>(&channelIndex);
-                if (ImGui::ArrowButton("Left", ImGuiDir_Left))
+                int curStation = Command<Commands::GET_RADIO_CHANNEL>();
+                if (ImGui::Combo(TEXT("Game.CurrentStation"), &curStation, channels))
                 {
-                    if (channelIndex == 0)
-                    {
-                        channelIndex = 12;
-                    }
-                    else
-                    {
-                        --channelIndex;
-                    }
-                    Command<Commands::SET_RADIO_CHANNEL>(channelIndex);
-                }
-                ImGui::SameLine();
-                ImGui::Text("%s: %s",TEXT("Game.CurrentStation"), channels[channelIndex].c_str());
-                ImGui::SameLine();
-                if (ImGui::ArrowButton("Right", ImGuiDir_Right))
-                {
-                    if (channelIndex == 12)
-                    {
-                        channelIndex = 0;
-                    }
-                    else
-                    {
-                        ++channelIndex;
-                    }
-                    Command<Commands::SET_RADIO_CHANNEL>(channelIndex);
+                    Command<Commands::SET_RADIO_CHANNEL>(curStation);
                 }
                 ImGui::Spacing();
                 ImGui::Separator();

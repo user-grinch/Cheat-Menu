@@ -278,7 +278,7 @@ void Menu::ProcessCommands()
             ss >> temp;
             pos.z = std::stof(temp);
 
-            Teleport::TeleportPlayer(false, pos, 0);
+            Teleport::WarpPlayer(pos);
         }
         catch (...)
         {

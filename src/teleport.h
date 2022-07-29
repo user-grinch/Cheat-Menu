@@ -1,6 +1,13 @@
 #pragma once
 #include "pch.h"
 
+enum class eTeleportType
+{
+    Marker,
+    MapPosition,
+    Coordinate,
+};
+
 class Teleport
 {
 private:
@@ -37,6 +44,7 @@ public:
     static inline bool m_bQuickTeleport;
 
     static void Init();
-    static void TeleportPlayer(bool get_marker = false, CVector pos = CVector(0, 0, 0), int interior_id = 0);
+    template<eTeleportType Type = eTeleportType::Coordinate>
+    static void WarpPlayer(CVector pos = CVector(0, 0, 0), int interiorID = 0);
     static void ShowPage();
 };

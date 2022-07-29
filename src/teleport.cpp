@@ -78,7 +78,7 @@ void Teleport::Init()
 
         if (m_bTeleportMarker && teleportMarker.Pressed())
         {
-            TeleportPlayer(true);
+            WarpPlayer<eTeleportType::Marker>();
         }
     };
 
@@ -114,14 +114,7 @@ void Teleport::Init()
                     pos.y = pos.y / size * 6000;
                     pos.y *= -1;
                     
-                    tRadarTrace &target = CRadar::ms_RadarTrace[FrontEndMenuManager.m_nTargetBlipIndex];
-                    CVector temp = target.m_vecPos;
-                    unsigned char sprite = target.m_nRadarSprite;
-                    target.m_nRadarSprite = RADAR_SPRITE_WAYPOINT;
-                    target.m_vecPos = {pos.x, pos.y, 0.0f};
-                    TeleportPlayer(true);
-                    target.m_vecPos = temp;
-                    target.m_nRadarSprite = sprite;
+                    WarpPlayer<eTeleportType::MapPosition>(CVector(pos.x, pos.y, 0.0f));
                 }
             }
         }
@@ -129,7 +122,8 @@ void Teleport::Init()
 #endif
 }
 
-void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
+template<eTeleportType Type>
+void Teleport::WarpPlayer(CVector pos, int interiorID)
 {
     CPlayerPed* pPlayer = FindPlayerPed();
     CVehicle* pVeh = pPlayer->m_pVehicle;
@@ -137,17 +131,20 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
 
 #ifdef GTASA
     TPMarker::m_bJetpack = Command<Commands::IS_PLAYER_USING_JETPACK>(0);
-    if (get_marker)
-    {
-        tRadarTrace targetBlip = CRadar::ms_RadarTrace[LOWORD(FrontEndMenuManager.m_nTargetBlipIndex)];
-
-        if (targetBlip.m_nRadarSprite != RADAR_SPRITE_WAYPOINT)
+    if (Type == eTeleportType::Marker || Type == eTeleportType::MapPosition)
+    {   
+        if (Type == eTeleportType::Marker)
         {
-            SetHelpMessage(TEXT("Teleport.TargetBlipText"));
-            return;
-        }
+            tRadarTrace targetBlip = CRadar::ms_RadarTrace[LOWORD(FrontEndMenuManager.m_nTargetBlipIndex)];
+            if (targetBlip.m_nRadarSprite != RADAR_SPRITE_WAYPOINT)
+            {
+                SetHelpMessage(TEXT("Teleport.TargetBlipText"));
+                return;
+            }
+            pos = targetBlip.m_vecPos;
+        } 
+        
         CEntity* pPlayerEntity = FindPlayerEntity(-1);
-        pos = targetBlip.m_vecPos;
         pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, nullptr, &pPlayerEntity) + 500.f;
 
         TPMarker::m_fPos = pos;
@@ -156,8 +153,6 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
         TheCamera.Fade(0, 0);
         Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(pPlayer), true);
     }
-
-    
 #endif
 
 #ifdef GTA3
@@ -198,7 +193,7 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
                 reinterpret_cast<CAutomobile*>(pVeh)->PlaceOnRoadProperly();
             }
 
-            pVeh->m_nAreaCode = interior_id;
+            pVeh->m_nAreaCode = interiorID;
         }
     }
     else
@@ -225,8 +220,8 @@ void Teleport::TeleportPlayer(bool get_marker, CVector pos, int interior_id)
 #endif
 
 #if defined GTASA || defined GTAVC
-    pPlayer->m_nAreaCode = interior_id;
-    Command<Commands::SET_AREA_VISIBLE>(interior_id);
+    pPlayer->m_nAreaCode = interiorID;
+    Command<Commands::SET_AREA_VISIBLE>(interiorID);
 #endif
 }
 
@@ -237,7 +232,7 @@ void Teleport::TeleportToLocation(std::string& rootkey, std::string& bLocName, s
         int dimension = 0;
         CVector pos;
         sscanf(loc.c_str(), "%d,%f,%f,%f", &dimension, &pos.x, &pos.y, &pos.z);
-        TeleportPlayer(false, pos, dimension);
+        WarpPlayer<eTeleportType::Coordinate>(pos, dimension);
     }
     catch (...)
     {
@@ -312,7 +307,7 @@ void Teleport::ShowPage()
                     {
                         sscanf(m_nInputBuffer,"%f,%f,%f", &pos.x, &pos.y, &pos.z);
                         pos.z += 1.0f;
-                        TeleportPlayer(false, pos);
+                        WarpPlayer(pos);
                     }
                     catch (...)
                     {
@@ -323,12 +318,12 @@ void Teleport::ShowPage()
 #ifdef GTASA
                 if (ImGui::Button((TEXT_S("Teleport.TeleportMarker") + "##Btn").c_str(), Widget::CalcSize(2)))
                 {
-                    TeleportPlayer(true);
+                    WarpPlayer<eTeleportType::Marker>();
                 }
 #else
                 if (ImGui::Button(TEXT("Teleport.TeleportCenter"), Widget::CalcSize(2)))
                 {
-                    TeleportPlayer(false, CVector(0, 0, 23));
+                    TeleportPlayer(CVector(0, 0, 23), eTeleportType::Coordinate);
                 }
 #endif
                 ImGui::EndChild();
