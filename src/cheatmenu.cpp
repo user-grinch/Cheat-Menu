@@ -15,6 +15,7 @@
 #include "vehicle.h"
 #include "visual.h"
 #include "weapon.h"
+#include "overlay.h"
 
 static bool DrawTitleBar()
 {
@@ -76,43 +77,33 @@ void CheatMenu::DrawWindow()
     else
     {
         bRunning = true;
-        if (m_bShowMenu || BY_GAME(Menu::Commands::m_bShowMenu, true, true))
+        if (m_bShowMenu)
         {
-            if (m_bShowMenu)
+            ImGui::SetNextWindowSize(m_fMenuSize);
+
+            if (ImGui::Begin(MENU_TITLE, NULL, ImGuiWindowFlags_NoCollapse || ImGuiWindowFlags_NoTitleBar))
             {
-                ImGui::SetNextWindowSize(m_fMenuSize);
+                m_bShowMenu = !DrawTitleBar();
+                ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(250, 350));
+                ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
+                                    ImVec2(ImGui::GetWindowWidth() / 85, ImGui::GetWindowHeight() / 200));
 
-                if (ImGui::Begin(MENU_TITLE, NULL, ImGuiWindowFlags_NoCollapse || ImGuiWindowFlags_NoTitleBar))
-                {
-                    m_bShowMenu = !DrawTitleBar();
-                    ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(250, 350));
-                    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
-                                        ImVec2(ImGui::GetWindowWidth() / 85, ImGui::GetWindowHeight() / 200));
+                ProcessPages();
 
-                    ProcessPages();
+                if (m_bSizeChangedExternal)
+                    m_bSizeChangedExternal = false;
+                else
+                    m_fMenuSize = ImGui::GetWindowSize();
 
-                    if (m_bSizeChangedExternal)
-                        m_bSizeChangedExternal = false;
-                    else
-                        m_fMenuSize = ImGui::GetWindowSize();
+                gConfig.Set("Window.SizeX", m_fMenuSize.x);
+                gConfig.Set("Window.SizeY", m_fMenuSize.y);
 
-                    gConfig.Set("Window.SizeX", m_fMenuSize.x);
-                    gConfig.Set("Window.SizeY", m_fMenuSize.y);
-
-                    ImGui::PopStyleVar(2);
-                    ImGui::End();
-                }
+                ImGui::PopStyleVar(2);
+                ImGui::End();
             }
-#ifdef GTASA
-            else
-            {
-                Menu::DrawCommandWindow();
-            }
-#endif
         }
     }
-    Menu::DrawOverlay();
-    ShowModelInfo::Draw();
+    Overlay::Draw();
 }
 
 void CheatMenu::ProcessPages()
@@ -271,6 +262,7 @@ void CheatMenu::Init()
     Vehicle::Init();
     Visual::Init();
     Weapon::Init();
+    Overlay::Init();
 
     Events::processScriptsEvent += []()
     {
@@ -283,12 +275,7 @@ void CheatMenu::Init()
 
             if (commandWindow.Pressed())
             {
-                if (Menu::Commands::m_bShowMenu)
-                {
-                    Menu::ProcessCommands();
-                    strcpy(Menu::Commands::m_nInputBuffer, "");
-                }
-                Menu::Commands::m_bShowMenu = !Menu::Commands::m_bShowMenu;
+                Overlay::m_bCmdBar = !Overlay::m_bCmdBar;
             }
 
             bool mouseState = D3dHook::GetMouseState();

@@ -37,7 +37,7 @@ void Updater::Process()
 
     if (res == E_OUTOFMEMORY || res == INET_E_DOWNLOAD_FAILURE)
     {
-        SetHelpMessage(TEXT("Updater.Failed"));
+        Util::SetMessage(TEXT("Updater.Failed"));
         return;
     }
 
@@ -64,12 +64,12 @@ void Updater::Process()
 
     if (latestVer > MENU_VERSION_NUMBER)
     {
-        SetHelpMessage(TEXT("Updater.Found"));
+        Util::SetMessage(TEXT("Updater.Found"));
         curState = States::FOUND;
     }
     else
     {
-        SetHelpMessage(TEXT("Updater.NotFound"));
+        Util::SetMessage(TEXT("Updater.NotFound"));
         Updater::curState = States::IDLE;
     }
 }

@@ -3,6 +3,21 @@
 #include "psapi.h"
 #include <math.h>
 
+void Util::SetMessage(const char *message, bool b1, bool b2, bool b3)
+{
+#if GTASA
+    CHud::SetHelpMessage(message, b1, b2, b3);
+#elif GTAVC
+    CHud::SetHelpMessage(message, b1, b2);
+#else
+    const size_t size = strlen(message)+1;
+    wchar_t* wc = new wchar_t[size];
+    mbstowcs(wc, message, size);
+    CHud::SetHelpMessage(wc, b1);
+    delete wc;
+#endif
+}
+
 float Util::RoundFloat(float val)
 {
     return roundf(val * 100) / 100;

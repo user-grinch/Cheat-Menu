@@ -20,11 +20,13 @@
 #endif
 
 #ifdef GTASA
+#include "overlay.h"
+
 void Cutscene::Play(std::string& rootKey, std::string& cutsceneId, std::string& interior)
 {
     if (Util::IsOnCutscene())
     {
-        SetHelpMessage(TEXT("Animation.CutsceneRunning"));
+        Util::SetMessage(TEXT("Animation.CutsceneRunning"));
         return;
     }
 
@@ -73,11 +75,11 @@ void Particle::Remove(std::string& ifp, std::string& particle, std::string& dumm
     {
         Particle::m_Data.m_pData->RemoveKey("Custom", particle.c_str());
         Particle::m_Data.m_pData->Save();
-        SetHelpMessage(TEXT("Animation.ParticleRemoved"));
+        Util::SetMessage(TEXT("Animation.ParticleRemoved"));
     }
     else
     {
-        SetHelpMessage(TEXT("Animation.CustomParticlesOnly"));
+        Util::SetMessage(TEXT("Animation.CustomParticlesOnly"));
     }
 }
 
@@ -234,11 +236,11 @@ void Animation::Remove(std::string& ifp, std::string& anim, std::string& ifpRepe
     {
         m_AnimData.m_pData->RemoveKey("Custom", anim.c_str());
         m_AnimData.m_pData->Save();
-        SetHelpMessage(TEXT("Animation.AnimationRemoved"));
+        Util::SetMessage(TEXT("Animation.AnimationRemoved"));
     }
     else
     {
-        SetHelpMessage(TEXT("Animation.CustomAnimsOnly"));
+        Util::SetMessage(TEXT("Animation.CustomAnimsOnly"));
     }
 }
 
@@ -365,6 +367,52 @@ void Animation::ShowPage()
             ImGui::EndTabItem();
         }
 #ifdef GTASA
+        if (ImGui::BeginTabItem(TEXT("Animation.Tasks")))
+        {
+            ImGui::Spacing();
+            Widget::Checkbox(TEXT("Menu.ShowPedTasks"), &Overlay::m_bPedTasks);
+            ImGui::Spacing();
+            CPlayerPed* player = FindPlayerPed();
+            if (player)
+            {   
+                ImGui::BeginChild("TasksList");
+                ImGui::Text(TEXT("Animation.PrimaryTasks"));
+                ImGui::Separator();
+                for (size_t i = 0; i != TASK_PRIMARY_MAX; ++i)
+                {
+                    CTask *pTask = player->m_pIntelligence->m_TaskMgr.m_aPrimaryTasks[i];
+                    if (pTask)
+                    {
+                        const char *name = taskNames[pTask->GetId()];
+                        if (ImGui::MenuItem(name))
+                        {
+                            ImGui::SetClipboardText(name);
+                            Util::SetMessage(TEXT("Window.CopiedToClipboard"));
+                        }
+                    }
+                }
+
+                ImGui::Dummy(ImVec2(0, 25));
+
+                ImGui::Text(TEXT("Animation.SecondaryTasks"));
+                ImGui::Separator();
+                for (size_t i = 0; i != TASK_SECONDARY_MAX; ++i)
+                {
+                    CTask *pTask = player->m_pIntelligence->m_TaskMgr.m_aSecondaryTasks[i];
+                    if (pTask)
+                    {
+                        const char *name = taskNames[pTask->GetId()];
+                        if (ImGui::MenuItem(name))
+                        {
+                            ImGui::SetClipboardText(name);
+                            Util::SetMessage(TEXT("Window.CopiedToClipboard"));
+                        }
+                    }
+                }
+                ImGui::EndChild();
+            }
+            ImGui::EndTabItem();
+        }
         if (ImGui::BeginTabItem(TEXT("Animation.CutsceneTab")))
         {
             ImGui::Spacing();
@@ -464,7 +512,7 @@ void Animation::ShowPage()
             if (ImGui::Combo(TEXT("Animation.FightingStyle"), &fightStyle, fightStyles))
             {
                 Command<Commands::GIVE_MELEE_ATTACK_TO_CHAR>(hPlayer, fightStyle + 4, 6);
-                SetHelpMessage(TEXT("Animation.FightingStyleSet"));
+                Util::SetMessage(TEXT("Animation.FightingStyleSet"));
             }
             if (Widget::ListBox(TEXT("Animation.WalkingStyle"), walkStyles, walkStyle))
             {
@@ -481,7 +529,7 @@ void Animation::ShowPage()
                     Command<Commands::SET_ANIM_GROUP_FOR_CHAR>(hPlayer, walkStyle.c_str());
                     Command<Commands::REMOVE_ANIMATION>(walkStyle.c_str());
                 }
-                SetHelpMessage(TEXT("Animation.WalkingStyleSet"));
+                Util::SetMessage(TEXT("Animation.WalkingStyleSet"));
             }
             ImGui::EndTabItem();
         }

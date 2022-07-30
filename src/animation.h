@@ -38,6 +38,10 @@ private:
     static void Play(std::string& rootKey, std::string& anim, std::string& ifp);
     static void Remove(std::string& rootKey, std::string& anim, std::string& ifp);
 
+#ifdef GTASA
+    static void DrawPedTasks();
+#endif
+
 public:
     Animation() = delete;
     Animation(const Animation&) = delete;

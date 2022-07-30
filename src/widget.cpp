@@ -137,7 +137,7 @@ void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 
                     {
                         data.m_pData->Set(std::format("Favourites.{}", contextMenu.key).c_str(), contextMenu.val);
                         data.m_pData->Save();
-                        SetHelpMessage(TEXT("Menu.FavouritesText"));
+                        Util::SetMessage(TEXT("Menu.FavouritesText"));
                     }
                     if (contextMenu.func && ImGui::MenuItem(TEXT("Menu.Remove")))
                     {
@@ -194,7 +194,7 @@ void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 
                     {
                         data.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
                         data.m_pData->Save();
-                        SetHelpMessage(TEXT("Menu.FavouritesRemoveText"));
+                        Util::SetMessage(TEXT("Menu.FavouritesRemoveText"));
                     }
                     if (ImGui::MenuItem(TEXT("Menu.Close")))
                     {
@@ -364,7 +364,7 @@ void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackR
                     {
                         store.m_pData->Set(std::format("Favourites.{}", contextMenu.val).c_str(), contextMenu.key);
                         store.m_pData->Save();
-                        SetHelpMessage(TEXT("Menu.FavouritesText"));
+                        Util::SetMessage(TEXT("Menu.FavouritesText"));
                     }
                     if (ImGui::MenuItem(TEXT("Menu.Close")))
                     {
@@ -450,7 +450,7 @@ void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackR
                     {
                         store.m_pData->RemoveKey("Favourites", contextMenu.val.c_str());
                         store.m_pData->Save();
-                        SetHelpMessage(TEXT("Menu.FavouritesRemoveText"));
+                        Util::SetMessage(TEXT("Menu.FavouritesRemoveText"));
                     }
                     if (ImGui::MenuItem(TEXT("Menu.Close")))
                     {

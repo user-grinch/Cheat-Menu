@@ -94,7 +94,7 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
 {
     if (Spawner::m_List.size() == SPAWN_PED_LIMIT)
     {
-        SetHelpMessage(TEXT("Ped.MaxLimit"));
+        Util::SetMessage(TEXT("Ped.MaxLimit"));
         return;
     }
 
@@ -138,7 +138,7 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
         if (cat == "Special") // Special model
         {
 #ifdef GTA3
-            SetHelpMessage(TEXT("Player.SpecialNotImplement"));
+            Util::SetMessage(TEXT("Player.SpecialNotImplement"));
             return;
 #else
             Command<Commands::LOAD_SPECIAL_CHARACTER>(currentSlot, model.c_str());

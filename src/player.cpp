@@ -255,7 +255,7 @@ void Player::Init()
         {
             if (m_bGodMode)
             {
-                SetHelpMessage(TEXT("Player.GodDisabled"));
+                Util::SetMessage(TEXT("Player.GodDisabled"));
 #ifdef GTASA
                 patch::Set<bool>(0x96916D, m_bGodMode, false);
                 player->m_nPhysicalFlags.bBulletProof = 0;
@@ -280,7 +280,7 @@ void Player::Init()
             }
             else
             {
-                SetHelpMessage(TEXT("Player.GodEnabled"));
+                Util::SetMessage(TEXT("Player.GodEnabled"));
                 m_bGodMode = true;
             }
         }
@@ -381,7 +381,7 @@ void Player::ChangePlayerModel(std::string& cat, std::string& key, std::string& 
         // CStreaming::LoadAllRequestedModels(true);
         // player->SetModelIndex(109);
         // CStreaming::SetMissionDoesntRequireSpecialChar(109);
-        SetHelpMessage(TEXT("Player.SpecialNotImplement"));
+        Util::SetMessage(TEXT("Player.SpecialNotImplement"));
     }
     else
     {
@@ -411,7 +411,7 @@ void Player::ShowPage()
         std::string text = std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z);
 
         ImGui::SetClipboardText(text.c_str());
-        SetHelpMessage(TEXT("Player.CoordCopied"));
+        Util::SetMessage(TEXT("Player.CoordCopied"));
     }
     ImGui::SameLine();
     if (ImGui::Button(TEXT("Player.Suicide"), ImVec2(Widget::CalcSize(2))))

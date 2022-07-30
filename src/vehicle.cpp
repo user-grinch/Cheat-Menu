@@ -51,7 +51,7 @@ void Vehicle::Init()
             if (fixVeh.Pressed())
             {
                 Util::FixVehicle(pVeh);
-                SetHelpMessage("Vehicle fixed");
+                Util::SetMessage("Vehicle fixed");
             }
 
             if (vehEngine.Pressed())
@@ -60,11 +60,11 @@ void Vehicle::Init()
 
                 if (state)
                 {
-                    SetHelpMessage("Vehicle engine off");
+                    Util::SetMessage("Vehicle engine off");
                 }
                 else
                 {
-                    SetHelpMessage("Vehicle engine on");
+                    Util::SetMessage("Vehicle engine on");
                 }
 #ifdef GTASA
                 pVeh->m_nVehicleFlags.bEngineBroken = state;
@@ -215,7 +215,7 @@ void Vehicle::AddComponent(const std::string& component, const bool display_mess
 
         if (display_message)
         {
-            SetHelpMessage("Component added");
+            Util::SetMessage("Component added");
         }
     }
     catch (...)
@@ -237,7 +237,7 @@ void Vehicle::RemoveComponent(const std::string& component, const bool display_m
 
         if (display_message)
         {
-            SetHelpMessage("Component removed");
+            Util::SetMessage("Component removed");
         }
     }
     catch (...)
@@ -272,7 +272,7 @@ int Vehicle::GetRandomTrainIdForModel(int model)
         _end = 10;
         break;
     default:
-        SetHelpMessage("Invalid train model");
+        Util::SetMessage("Invalid train model");
         return -1;
     }
     int id = Random(_start, _end);
@@ -515,7 +515,7 @@ static void StartAutoDrive(CVehicle *pVeh, const char *buf = nullptr)
         pos = targetBlip.m_vecPos;
         if (targetBlip.m_nRadarSprite != RADAR_SPRITE_WAYPOINT)
         {
-            SetHelpMessage(TEXT("Teleport.TargetBlipText"));
+            Util::SetMessage(TEXT("Teleport.TargetBlipText"));
             return;
         }
 #else
@@ -1128,12 +1128,12 @@ void Vehicle::ShowPage()
                     }
                     else
                     {
-                        SetHelpMessage(TEXT("Vehicle.InvalidID"));
+                        Util::SetMessage(TEXT("Vehicle.InvalidID"));
                     }
                 }
                 catch(...)
                 {
-                    SetHelpMessage(TEXT("Vehicle.InvalidID"));
+                    Util::SetMessage(TEXT("Vehicle.InvalidID"));
                 }
             }
 #ifdef GTASA
@@ -1210,7 +1210,7 @@ void Vehicle::ShowPage()
                 if (ImGui::Button(TEXT("Vehicle.ResetColor"), ImVec2(Widget::CalcSize())))
                 {
                     Paint::ResetNodeColor(veh, PaintData::m_Selected);
-                    SetHelpMessage(TEXT("Vehicle.ResetColorMSG"));
+                    Util::SetMessage(TEXT("Vehicle.ResetColorMSG"));
                 }
                 ImGui::Spacing();
 
@@ -1281,7 +1281,7 @@ void Vehicle::ShowPage()
                     if (ImGui::Button(TEXT("Vehicle.RemoveNeon"), ImVec2(Widget::CalcSize())))
                     {
                         Neon::Remove(veh);
-                        SetHelpMessage(TEXT("Vehicle.RemoveNeonMSG"));
+                        Util::SetMessage(TEXT("Vehicle.RemoveNeonMSG"));
                     }
 
                     ImGui::Spacing();
@@ -1350,7 +1350,7 @@ void Vehicle::ShowPage()
                     if (ImGui::Button(TEXT("Vehicle.ResetTexture"), ImVec2(Widget::CalcSize())))
                     {
                         Paint::ResetNodeTexture(veh, PaintData::m_Selected);
-                        SetHelpMessage(TEXT("Vehicle.ResetTextureMSG"));
+                        Util::SetMessage(TEXT("Vehicle.ResetTextureMSG"));
                     }
                     ImGui::Spacing();
 
@@ -1442,7 +1442,7 @@ void Vehicle::ShowPage()
                 if (ImGui::Button(TEXT("Vehicle.ResetHandling"), ImVec2(Widget::CalcSize(3))))
                 {
                     gHandlingDataMgr.LoadHandlingData();
-                    SetHelpMessage(TEXT("Vehicle.ResetHandlingMSG"));
+                    Util::SetMessage(TEXT("Vehicle.ResetHandlingMSG"));
                 }
 
                 ImGui::SameLine();
@@ -1450,7 +1450,7 @@ void Vehicle::ShowPage()
                 if (ImGui::Button(TEXT("Vehicle.SaveFile"), ImVec2(Widget::CalcSize(3))))
                 {
                     FileHandler::GenerateHandlingFile(pHandlingData, m_VehicleIDE);
-                    SetHelpMessage(TEXT("Vehicle.SaveFileMSG"));
+                    Util::SetMessage(TEXT("Vehicle.SaveFileMSG"));
                 }
 
                 ImGui::SameLine();

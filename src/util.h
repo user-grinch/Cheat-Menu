@@ -23,7 +23,6 @@ public:
     static void ClearCharTasksVehCheck(CPed* ped);
     static bool IsOnMission();
 #endif
-
     static void UnFlipVehicle(CVehicle *pVeh);
     static void FixVehicle(CVehicle *pVeh);
     static CPed* GetClosestPed();
@@ -35,5 +34,6 @@ public:
     static bool IsInVehicle(CPed *pPed = FindPlayerPed());
     static void RainbowValues(int& r, int& g, int& b, float speed);
     static void SetCarForwardSpeed(CVehicle *pVeh, float speed);
+    static void SetMessage(const char *message, bool b1 = false, bool b2 = false, bool b3 = false);
     static float RoundFloat(float val);
 };

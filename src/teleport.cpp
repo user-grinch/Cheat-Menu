@@ -138,7 +138,7 @@ void Teleport::WarpPlayer(CVector pos, int interiorID)
             tRadarTrace targetBlip = CRadar::ms_RadarTrace[LOWORD(FrontEndMenuManager.m_nTargetBlipIndex)];
             if (targetBlip.m_nRadarSprite != RADAR_SPRITE_WAYPOINT)
             {
-                SetHelpMessage(TEXT("Teleport.TargetBlipText"));
+                Util::SetMessage(TEXT("Teleport.TargetBlipText"));
                 return;
             }
             pos = targetBlip.m_vecPos;
@@ -209,7 +209,7 @@ void Teleport::WarpPlayer(CVector pos, int interiorID)
     if (pVeh && pPlayer->m_pVehicle)
     {
 #ifdef GTAVC
-        pPlayer->m_nAreaCode = interior_id;
+        pPlayer->m_nAreaCode = interiorID;
 #endif
         pVeh->Teleport(pos);
     }
@@ -236,7 +236,7 @@ void Teleport::TeleportToLocation(std::string& rootkey, std::string& bLocName, s
     }
     catch (...)
     {
-        SetHelpMessage(TEXT("Teleport.InvalidLocation"));
+        Util::SetMessage(TEXT("Teleport.InvalidLocation"));
     }
 }
 
@@ -245,12 +245,12 @@ void Teleport::RemoveTeleportEntry(std::string& category, std::string& key, std:
     if (category == "Custom")
     {
         m_locData.m_pData->RemoveKey("Custom", key.c_str());
-        SetHelpMessage(TEXT("Teleport.LocationRemoved"));
+        Util::SetMessage(TEXT("Teleport.LocationRemoved"));
         m_locData.m_pData->Save();
     }
     else
     {
-        SetHelpMessage(TEXT("Teleport.CustomLocationRemoveOnly"));
+        Util::SetMessage(TEXT("Teleport.CustomLocationRemoveOnly"));
     }
 }
 
@@ -311,7 +311,7 @@ void Teleport::ShowPage()
                     }
                     catch (...)
                     {
-                        SetHelpMessage(TEXT("Teleport.InvalidCoord"));
+                        Util::SetMessage(TEXT("Teleport.InvalidCoord"));
                     }
                 }
                 ImGui::SameLine();
@@ -323,7 +323,7 @@ void Teleport::ShowPage()
 #else
                 if (ImGui::Button(TEXT("Teleport.TeleportCenter"), Widget::CalcSize(2)))
                 {
-                    TeleportPlayer(CVector(0, 0, 23), eTeleportType::Coordinate);
+                    WarpPlayer<eTeleportType::Coordinate>(CVector(0, 0, 23));
                 }
 #endif
                 ImGui::EndChild();

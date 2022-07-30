@@ -61,6 +61,7 @@
 #include "resourcestore.h"
 #include "fontmgr.h"
 #include "locale.h"
+#include "util.h"
 
 #define TEXT(x) Locale::GetText(x).c_str()
 #define TEXT_S(x) Locale::GetText(x)
@@ -82,22 +83,9 @@ typedef void(*ArgCallback)(std::string&);
 typedef std::string(*ArgCallbackRtn)(std::string&);
 typedef bool(*ArgCallbackRtnBool)(std::string&);
 
-// Fix function clashes
-static void SetHelpMessage(const char *message, bool b1 = false, bool b2 = false, bool b3 = false)
-{
-#if GTASA
-    CHud::SetHelpMessage(message, b1, b2, b3);
-#elif GTAVC
-    CHud::SetHelpMessage(message, b1, b2);
-#else
-    const size_t size = strlen(message)+1;
-    wchar_t* wc = new wchar_t[size];
-    mbstowcs(wc, message, size);
-    CHud::SetHelpMessage(wc, b1);
-    delete wc;
+#ifdef GTASA
+extern const char* taskNames[1802];
 #endif
-}
-
 extern Hotkey aimSkinChanger;
 extern Hotkey freeCam;
 extern Hotkey freeCamForward;

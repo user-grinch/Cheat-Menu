@@ -5,331 +5,18 @@
 #include "updater.h"
 #include "cheatmenu.h"
 #include "rpc.h"
-
-#ifdef GTASA
-#include "teleport.h"
-#include "weapon.h"
-#include "vehicle.h"
-#endif
+#include "overlay.h"
 
 void Menu::Init()
 {
-    // TODO: use structs
-    // Load config data
-    Overlay::bCoord = gConfig.Get("Overlay.ShowCoordinates", false);
-    Overlay::bCpuUsage = gConfig.Get("Overlay.ShowCPUUsage", false);
-    Overlay::bFPS = gConfig.Get("Overlay.ShowFPS", false);
-    Overlay::bLocName = gConfig.Get("Overlay.ShowLocationName", false);
-    Overlay::bTransparent = gConfig.Get("Overlay.Transparent", false);
-    Overlay::bMemUsage = gConfig.Get("Overlay.ShowMemoryUsage", false);
-    Overlay::bVehHealth = gConfig.Get("Overlay.ShowVehicleHealth", false);
-    Overlay::bVehSpeed = gConfig.Get("Overlay.ShowVehicleSpeed", false);
-    Overlay::mSelectedPos = (DisplayPos)gConfig.Get("Overlay.SelectedPosition", (int)DisplayPos::BOTTOM_RIGHT);
-    Overlay::fPosX = gConfig.Get("Overlay.PosX", 0);
-    Overlay::fPosY = gConfig.Get("Overlay.PosY", 0);
-    Overlay::textColor[0] = gConfig.Get("Overlay.TextColor.Red", 1.0f);
-    Overlay::textColor[1] = gConfig.Get("Overlay.TextColor.Green", 1.0f);
-    Overlay::textColor[2] = gConfig.Get("Overlay.TextColor.Blue", 1.0f);
-    Overlay::textColor[3] = gConfig.Get("Overlay.TextColor.Alpha", 1.0f);
     m_bDiscordRPC = gConfig.Get("Menu.DiscordRPC", false);
     m_bAutoCheckUpdate = gConfig.Get("Menu.AutoCheckUpdate", true);
     m_bTextOnlyMode = gConfig.Get("Menu.TextOnlyMode", false);
-
-    Util::GetCPUUsageInit();
-    MEMORYSTATUSEX memInfo;
-    memInfo.dwLength = sizeof(MEMORYSTATUSEX);
-    GlobalMemoryStatusEx(&memInfo);
-
-    Overlay::mTotalRam = static_cast<int>(memInfo.ullTotalPhys * 1e-6); // Bytes -> MegaBytes
 
     if (m_bDiscordRPC)
     {
         RPC::Init();
     }
-}
-
-void Menu::DrawOverlay()
-{
-    CPlayerPed* pPlayer = FindPlayerPed();
-    if (pPlayer)
-    {
-        bool m_bShowMenu = Overlay::bCoord || Overlay::bFPS || Overlay::bLocName || Overlay::bCpuUsage || Overlay::bMemUsage ||
-                           ((Overlay::bVehHealth || Overlay::bVehSpeed) && pPlayer && pPlayer->m_pVehicle && pPlayer->m_pVehicle->m_pDriver == pPlayer);
-
-        const float offset = 10.0f;
-        ImGuiIO& io = ImGui::GetIO();
-        ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize |
-                                        ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
-
-        if (Overlay::mSelectedPos == DisplayPos::CUSTOM)
-        {
-            if (Overlay::fPosX != NULL && Overlay::fPosY != NULL)
-            {
-                gConfig.Set("Overlay.PosX", Overlay::fPosX);
-                gConfig.Set("Overlay.PosY", Overlay::fPosY);
-                ImGui::SetNextWindowPos(ImVec2(Overlay::fPosX, Overlay::fPosY), ImGuiCond_Once);
-            }
-        }
-        else
-        {
-            window_flags |= ImGuiWindowFlags_NoMove;
-            ImVec2 pos, pivot;
-
-            if (Overlay::mSelectedPos == DisplayPos::TOP_LEFT)
-            {
-                pos = ImVec2(offset, offset);
-                pivot = ImVec2(0.0f, 0.0f);
-            }
-
-            if (Overlay::mSelectedPos == DisplayPos::TOP_RIGHT)
-            {
-                pos = ImVec2(io.DisplaySize.x - offset, offset);
-                pivot = ImVec2(1.0f, 0.0f);
-            }
-
-            if (Overlay::mSelectedPos == DisplayPos::BOTTOM_LEFT)
-            {
-                pos = ImVec2(offset, io.DisplaySize.y - offset);
-                pivot = ImVec2(0.0f, 1.0f);
-            }
-
-            if (Overlay::mSelectedPos == DisplayPos::BOTTOM_RIGHT)
-            {
-                pos = ImVec2(io.DisplaySize.x - offset, io.DisplaySize.y - offset);
-                pivot = ImVec2(1.0f, 1.0f);
-            }
-
-            ImGui::SetNextWindowPos(pos, ImGuiCond_Always, pivot);
-        }
-
-        ImGui::SetNextWindowBgAlpha(Overlay::bTransparent ? 0.0f : 0.5f);
-        ImGui::PushStyleColor(ImGuiCol_Text, *(ImVec4*)&Overlay::textColor);
-        if (m_bShowMenu && ImGui::Begin("Overlay", nullptr, window_flags))
-        {
-            CVector pos{0,0,0};
-            pos = pPlayer->GetPosition();
-
-            size_t game_ms = CTimer::m_snTimeInMilliseconds;
-            static size_t interval = 0;
-            if (game_ms - interval > 1000)
-            {
-                Overlay::fCpuUsage = static_cast<float>(Util::GetCurrentCPUUsage());
-
-                MEMORYSTATUSEX memInfo;
-                memInfo.dwLength = sizeof(MEMORYSTATUSEX);
-                GlobalMemoryStatusEx(&memInfo);
-                int mUsedRam = static_cast<int>((memInfo.ullTotalPhys - memInfo.ullAvailPhys) * 1e-6);
-                Overlay::fMemUsage = 100.0f * (static_cast<float>(mUsedRam) / static_cast<float>(Overlay::mTotalRam));
-
-                Overlay::mFPS = static_cast<size_t>(BY_GAME(CTimer::game_FPS, io.Framerate, io.Framerate));
-                interval = game_ms;
-            }
-
-            if (Overlay::bCoord)
-            {
-                ImGui::Text(TEXT("Menu.Coords"), pos.x, pos.y, pos.z);
-            }
-
-            if (Overlay::bCpuUsage)
-            {
-                ImGui::Text(TEXT("Menu.CPUUsage"), Overlay::fCpuUsage);
-            }
-
-            if (Overlay::bFPS)
-            {
-                ImGui::Text(TEXT("Menu.Frames"), Overlay::mFPS);
-            }
-
-            if (Overlay::bLocName)
-            {
-                ImGui::Text(TEXT("Menu.Location"), Util::GetLocationName(&pos).c_str());
-            }
-
-            if (Overlay::bMemUsage)
-            {
-                ImGui::Text(TEXT("Menu.RAMUsage"), Overlay::fMemUsage);
-            }
-
-            if (pPlayer->m_pVehicle && pPlayer->m_pVehicle->m_pDriver == pPlayer)
-            {
-                if (Overlay::bVehHealth)
-                {
-                    ImGui::Text((TEXT_S("Menu.VehHealth") + ": %.f").c_str(), pPlayer->m_pVehicle->m_fHealth);
-                }
-
-                if (Overlay::bVehSpeed)
-                {
-                    int speed = pPlayer->m_pVehicle->m_vecMoveSpeed.Magnitude() * 50.0f; // 02E3 - GET_CAR_SPEED
-                    ImGui::Text(TEXT("Menu.VehSpeed"), speed);
-                }
-            }
-
-            ImVec2 windowPos = ImGui::GetWindowPos();
-            Overlay::fPosX = windowPos.x;
-            Overlay::fPosY = windowPos.y;
-
-            ImGui::End();
-        }
-        ImGui::PopStyleColor();
-    }
-}
-
-void Menu::DrawCommandWindow()
-{
-    int resX = static_cast<int>(screen::GetScreenWidth());
-    int resY = static_cast<int>(screen::GetScreenHeight());
-
-    ImGui::SetNextWindowPos(ImVec2(0, resY - 40), ImGuiCond_Always);
-    ImGui::SetNextWindowSize(ImVec2(resX, 40));
-
-    ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration + ImGuiWindowFlags_AlwaysAutoResize +
-                             ImGuiWindowFlags_NoSavedSettings
-                             + ImGuiWindowFlags_NoMove;
-
-    if (ImGui::Begin("Shortcuts window", nullptr, flags))
-    {
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetStyle().FramePadding.x, resY / 130));
-        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(3, 3));
-
-        ImGui::SetNextItemWidth(ImGui::GetContentRegionMax().x);
-
-        if (ImGui::InputTextWithHint("##TEXTFIELD", "Enter command", Commands::m_nInputBuffer, INPUT_BUFFER_SIZE,
-                                     ImGuiInputTextFlags_EnterReturnsTrue))
-        {
-            ProcessCommands();
-            Commands::m_bShowMenu = false;
-            strcpy(Commands::m_nInputBuffer, "");
-        }
-        if (!ImGui::IsAnyItemActive())
-        {
-            ImGui::SetKeyboardFocusHere(-1);
-        }
-        ImGui::PopStyleVar(2);
-        ImGui::End();
-    }
-}
-
-void Menu::ProcessCommands()
-{
-    std::stringstream ss(Commands::m_nInputBuffer);
-
-    std::string command;
-    ss >> command;
-
-    if (command == "armour")
-    {
-        try
-        {
-            std::string temp;
-            ss >> temp;
-            FindPlayerPed()->m_fArmour = std::stof(temp);
-        }
-        catch (...)
-        {
-            SetHelpMessage(TEXT("Menu.InvalidValue"));
-        }
-    }
-
-    if (command == "hp")
-    {
-        try
-        {
-            std::string temp;
-            ss >> temp;
-            FindPlayerPed()->m_fHealth = std::stof(temp);
-        }
-        catch (...)
-        {
-            SetHelpMessage(TEXT("Menu.InvalidValue"));
-        }
-    }
-
-    if (command == "time")
-    {
-        try
-        {
-            std::string temp;
-            ss >> temp;
-            CClock::ms_nGameClockHours = std::stoi(temp);
-
-            ss >> temp;
-            CClock::ms_nGameClockMinutes = std::stoi(temp);
-        }
-        catch (...)
-        {
-            SetHelpMessage(TEXT("Menu.InvalidValue"));
-        }
-    }
-
-#ifdef GTASA
-    if (command == "tp")
-    {
-        try
-        {
-            CVector pos;
-            std::string temp;
-
-            ss >> temp;
-            pos.x = std::stof(temp);
-
-            ss >> temp;
-            pos.y = std::stof(temp);
-
-            ss >> temp;
-            pos.z = std::stof(temp);
-
-            Teleport::WarpPlayer(pos);
-        }
-        catch (...)
-        {
-            SetHelpMessage(TEXT("Menu.InvalidLocation"));
-        }
-    }
-
-    if (command == "wep")
-    {
-        std::string wep_name;
-        ss >> wep_name;
-
-        if (wep_name == "jetpack")
-        {
-            std::string weapon = "-1";
-            Weapon::GiveWeaponToPlayer(weapon);
-            SetHelpMessage(TEXT("Menu.WeaponSpawned"));
-        }
-        else
-        {
-            eWeaponType weapon = CWeaponInfo::FindWeaponType((char*)wep_name.c_str());
-            std::string weapon_name = std::to_string(weapon);
-            CWeaponInfo* pweaponinfo = CWeaponInfo::GetWeaponInfo(weapon, 1);
-
-            if (wep_name != "" && pweaponinfo->m_nModelId1 != -1)
-            {
-                Weapon::GiveWeaponToPlayer(weapon_name);
-                SetHelpMessage(TEXT("Menu.WeaponSpawned"));
-            }
-            else
-                SetHelpMessage(TEXT("Menu.InvalidComamnd"));
-        }
-
-        return;
-    }
-    if (command == "veh")
-    {
-        std::string veh_name;
-        ss >> veh_name;
-
-        int model = Vehicle::GetModelFromName(veh_name.c_str());
-        if (model != 0)
-        {
-            std::string smodel = std::to_string(model);
-            Vehicle::SpawnVehicle(smodel);
-            SetHelpMessage(TEXT("Menu.VehicleSpawned"));
-        }
-        else
-            SetHelpMessage(TEXT("Menu.InvalidComamnd"));
-    }
-#endif
 }
 
 void Menu::ShowPage()
@@ -359,7 +46,7 @@ void Menu::ShowPage()
                     }
                     else
                     {
-                        SetHelpMessage(TEXT("Menu.LanguageChangeFailed"));
+                        Util::SetMessage(TEXT("Menu.LanguageChangeFailed"));
                     }
                 }
             }
@@ -399,64 +86,74 @@ void Menu::ShowPage()
             ImGui::Spacing();
             ImGui::Spacing();
             ImGui::SameLine();
-            if (Widget::ListBox(TEXT("Menu.Position"), Overlay::posNames, (int&)Overlay::mSelectedPos))
+            if (ImGui::Combo(TEXT("Menu.Position"), (int*)&Overlay::m_nSelectedPos, "Custom\0Top left\0Top right\0Bottom left\0Bottom right\0"))
             {
-                gConfig.Set<int>("Overlay.SelectedPosition", static_cast<int>(Overlay::mSelectedPos));
+                gConfig.Set<int>("Overlay.SelectedPosition", static_cast<int>(Overlay::m_nSelectedPos));
             }
 
             ImGui::Spacing();
             ImGui::SameLine();
-            if (ImGui::ColorEdit4(TEXT("Menu.TextColor"), Overlay::textColor))
+            if (ImGui::ColorEdit4(TEXT("Menu.TextColor"), Overlay::m_fTextCol))
             {
-                gConfig.Set("Overlay.TextColor.Red", Overlay::textColor[0]);
-                gConfig.Set("Overlay.TextColor.Green", Overlay::textColor[1]);
-                gConfig.Set("Overlay.TextColor.Blue", Overlay::textColor[2]);
-                gConfig.Set("Overlay.TextColor.Alpha", Overlay::textColor[3]);
+                gConfig.Set("Overlay.TextColor.Red", Overlay::m_fTextCol[0]);
+                gConfig.Set("Overlay.TextColor.Green", Overlay::m_fTextCol[1]);
+                gConfig.Set("Overlay.TextColor.Blue", Overlay::m_fTextCol[2]);
+                gConfig.Set("Overlay.TextColor.Alpha", Overlay::m_fTextCol[3]);
             }
 
             ImGui::Spacing();
 
             ImGui::Columns(2, nullptr, false);
-            if (ImGui::Checkbox(TEXT("Menu.NoBG"), &Overlay::bTransparent))
+            if (ImGui::Checkbox(TEXT("Menu.NoBG"), &Overlay::m_bTransparent))
             {
-                gConfig.Set("Overlay.Transparent", Overlay::bTransparent);
+                gConfig.Set("Overlay.Transparent", Overlay::m_bTransparent);
             }
 
-            if (ImGui::Checkbox(TEXT("Menu.ShowCoords"), &Overlay::bCoord))
+            if (ImGui::Checkbox(TEXT("Menu.ShowCoords"), &Overlay::m_bCoord))
             {
-                gConfig.Set("Overlay.ShowCoordinates", Overlay::bCoord);
+                gConfig.Set("Overlay.ShowCoordinates", Overlay::m_bCoord);
             }
 
-            if (ImGui::Checkbox(TEXT("Menu.ShowCPU"), &Overlay::bCpuUsage))
+            if (ImGui::Checkbox(TEXT("Menu.ShowCPU"), &Overlay::m_bCpuUsage))
             {
-                gConfig.Set("Overlay.ShowCPUUsage", Overlay::bCpuUsage);
+                gConfig.Set("Overlay.ShowCPUUsage", Overlay::m_bCpuUsage);
             }
 
-            if (ImGui::Checkbox(TEXT("Menu.ShowFPS"), &Overlay::bFPS))
+            if (ImGui::Checkbox(TEXT("Menu.ShowFPS"), &Overlay::m_bFPS))
             {
-                gConfig.Set("Overlay.ShowFPS", Overlay::bFPS);
+                gConfig.Set("Overlay.ShowFPS", Overlay::m_bFPS);
+            }
+
+            if (ImGui::Checkbox(TEXT("Menu.ShowLocation"), &Overlay::m_bLocName))
+            {
+                gConfig.Set("Overlay.ShowLocationName", Overlay::m_bLocName);
+            }
+
+            if (ImGui::Checkbox(TEXT("Menu.ShowModelInfo"), &Overlay::m_bModelInfo))
+            {
+                gConfig.Set("Overlay.ShowModelInfo", Overlay::m_bModelInfo);
             }
 
             ImGui::NextColumn();
 
-            if (ImGui::Checkbox(TEXT("Menu.ShowLocation"), &Overlay::bLocName))
+            if (ImGui::Checkbox(TEXT("Menu.ShowPedTasks"), &Overlay::m_bPedTasks))
             {
-                gConfig.Set("Overlay.ShowLocationName", Overlay::bLocName);
+                gConfig.Set("Overlay.ShowPedTasks", Overlay::m_bPedTasks);
             }
 
-            if (ImGui::Checkbox(TEXT("Menu.ShowRAM"), &Overlay::bMemUsage))
+            if (ImGui::Checkbox(TEXT("Menu.ShowRAM"), &Overlay::m_bMemUsage))
             {
-                gConfig.Set("Overlay.ShowMemoryUsage", Overlay::bMemUsage);
+                gConfig.Set("Overlay.ShowMemoryUsage", Overlay::m_bMemUsage);
             }
 
-            if (ImGui::Checkbox(TEXT("Menu.ShowVehHealth"), &Overlay::bVehHealth))
+            if (ImGui::Checkbox(TEXT("Menu.ShowVehHealth"), &Overlay::m_bVehHealth))
             {
-                gConfig.Set("Overlay.ShowVehicleHealth", Overlay::bVehHealth);
+                gConfig.Set("Overlay.ShowVehicleHealth", Overlay::m_bVehHealth);
             }
 
-            if (ImGui::Checkbox(TEXT("Menu.ShowVehSpeed"), &Overlay::bVehSpeed))
+            if (ImGui::Checkbox(TEXT("Menu.ShowVehSpeed"), &Overlay::m_bVehSpeed))
             {
-                gConfig.Set("Overlay.ShowVehicleSpeed", Overlay::bVehSpeed);
+                gConfig.Set("Overlay.ShowVehicleSpeed", Overlay::m_bVehSpeed);
             }
 
             ImGui::Columns(1);

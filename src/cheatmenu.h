@@ -30,7 +30,7 @@ private:
     static void ApplyStyle();
 
     // Draws the window ui each frame
-    // Also handles drawing overlay & command window
+    // Also handles drawing info, overlay, command window
     static void DrawWindow();
 
     static void ShowAnniversaryPage();

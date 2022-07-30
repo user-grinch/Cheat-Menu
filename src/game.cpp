@@ -79,7 +79,7 @@ void Freecam::Process()
         // disble them again cause they get enabled
         CHud::bScriptDontDisplayRadar = true;
         CHud::m_Wants_To_Draw_Hud = false;
-        SetHelpMessage(TEXT("Game.PlayerTeleported"));
+        Util::SetMessage(TEXT("Game.PlayerTeleported"));
     }
 
     if (KeyPressed(VK_MENU) && m_nMul > 1)
@@ -150,7 +150,7 @@ void Freecam::Process()
             if (m_nMul < 10)
             {
                 ++m_nMul;
-                SetHelpMessage(std::format("Speed: {}", m_nMul).c_str());
+                Util::SetMessage(std::format("Speed: {}", m_nMul).c_str());
             }
         }
     }
@@ -172,8 +172,8 @@ void Freecam::Process()
             if (m_nMul > 1)
             {
                 --m_nMul;
-                SetHelpMessage(std::to_string(m_nMul).c_str());
-                SetHelpMessage(std::format("Speed: {}", m_nMul).c_str());
+                Util::SetMessage(std::to_string(m_nMul).c_str());
+                Util::SetMessage(std::format("Speed: {}", m_nMul).c_str());
             }
         }
     }
@@ -353,7 +353,7 @@ void Game::Init()
             if (quickSceenShot.Pressed())
             {
                 Command<Commands::TAKE_PHOTO>();
-                SetHelpMessage(TEXT("Game.ScreenshotTaken"));
+                Util::SetMessage(TEXT("Game.ScreenshotTaken"));
             }
         }
 
@@ -444,7 +444,7 @@ void SetPlayerMission(std::string& rootkey, std::string& name, std::string& id)
     }
     else
     {
-        SetHelpMessage(TEXT("Game.MissionStartFailed"));
+        Util::SetMessage(TEXT("Game.MissionStartFailed"));
     }
 }
 
@@ -1037,7 +1037,7 @@ void Game::ShowPage()
                     CStats::SetStatValue((unsigned short)i, 1000);
                 }
                 CHud::GetRidOfAllHudMessages(true);
-                SetHelpMessage(TEXT("Game.MaxWepSkillsText"));
+                Util::SetMessage(TEXT("Game.MaxWepSkillsText"));
             }
             ImGui::SameLine();
             if (ImGui::Button(TEXT("Game.MaxVehSkills"), Widget::CalcSize(2)))
@@ -1047,7 +1047,7 @@ void Game::ShowPage()
                 CStats::SetStatValue(229, 1000);
                 CStats::SetStatValue(230, 1000);
                 CHud::GetRidOfAllHudMessages(true);
-                SetHelpMessage(TEXT("Game.MaxVehSkillsText"));
+                Util::SetMessage(TEXT("Game.MaxVehSkillsText"));
             }
 
             ImGui::Spacing();
