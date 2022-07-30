@@ -111,7 +111,10 @@ project "CheatMenuIII"
         "../src/locale.h",
         "../src/locale.cpp",
         "../src/rpc.h",
-        "../src/rpc.cpp"
+        "../src/rpc.cpp",
+        "../src/overlay.h",
+        "../src/overlay.cpp",
+        "../src/tasknames.cpp"
     }
     includedirs {
         PSDK_DIR .. "/plugin_III/",
@@ -202,7 +205,10 @@ project "CheatMenuVC"
         "../src/locale.h",
         "../src/locale.cpp",
         "../src/rpc.h",
-        "../src/rpc.cpp"
+        "../src/rpc.cpp",
+        "../src/overlay.h",
+        "../src/overlay.cpp",
+        "../src/tasknames.cpp"
     }
     includedirs {
         PSDK_DIR .. "/plugin_vc/",

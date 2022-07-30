@@ -27,8 +27,10 @@ private:
     // Draws model & it's name on screen (peds, objects, vehicles)
     static void ProcessModelInfo();
 
+#ifdef GTASA
     // Processes current ped tasks & draws them ons creen
     static void ProcessPedTasks();
+#endif
 
     // Processes commad bar & commands
     static void ProcessCmdBar();

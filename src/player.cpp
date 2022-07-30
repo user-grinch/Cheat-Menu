@@ -150,7 +150,7 @@ void Player::Init()
             static float prevVal = 0;
             float curVal = player->m_fHealth;
 
-            if (player->m_fHealth >= player->m_fMaxHealth)
+            if (player->m_fHealth >= BY_GAME(player->m_fMaxHealth, 100, 100))
             {
                 curVal = player->m_fArmour;
             }

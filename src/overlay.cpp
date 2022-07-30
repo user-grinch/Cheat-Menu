@@ -126,6 +126,7 @@ void Overlay::ProcessModelInfo()
     }
 }
 
+#ifdef GTASA
 void Overlay::ProcessPedTasks()
 {
     if (m_bPedTasks)
@@ -174,6 +175,7 @@ void Overlay::ProcessPedTasks()
         }
     }
 }
+#endif
 
 void Overlay::Draw()
 {
@@ -191,7 +193,9 @@ void Overlay::Draw()
     if (ImGui::Begin("##Overlay", NULL, flags))
     {
         ProcessModelInfo();
+#ifdef GTASA
         ProcessPedTasks();
+#endif
         ImGui::End();
     }
 
