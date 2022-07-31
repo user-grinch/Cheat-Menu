@@ -38,6 +38,8 @@ void Teleport::Init()
 {
     m_bTeleportMarker = gConfig.Get("Features.TeleportMarker", false);
     m_bQuickTeleport = gConfig.Get("Features.QuickTeleport", false);
+    m_fMapSize.x = gConfig.Get("Game.MapSizeX", 6000.0f);
+    m_fMapSize.y = gConfig.Get("Game.MapSizeY", 6000.0f);
 
     Events::processScriptsEvent += []
     {
@@ -110,8 +112,8 @@ void Teleport::Init()
                     pos.y -= size/2;
                     
                     // Convert image space to map space
-                    pos.x = pos.x / size * 6000;
-                    pos.y = pos.y / size * 6000;
+                    pos.x = pos.x / size * m_fMapSize.x;
+                    pos.y = pos.y / size * m_fMapSize.y;
                     pos.y *= -1;
                     
                     WarpPlayer<eTeleportType::MapPosition>(CVector(pos.x, pos.y, 0.0f));
@@ -325,7 +327,34 @@ void Teleport::ShowPage()
                 {
                     WarpPlayer<eTeleportType::Coordinate>(CVector(0, 0, 23));
                 }
-#endif
+#endif          
+                ImGui::Dummy(ImVec2(0, 20));
+
+                if (m_bQuickTeleport)
+                {
+                    if (ImGui::CollapsingHeader(TEXT("Teleport.CustomMapSize")))
+                    {
+                        ImGui::TextWrapped(TEXT("Teleport.CustomMapSizeHint"));
+                        ImGui::Spacing();
+                        if (Widget::InputFloat(TEXT("Teleport.Width"), &m_fMapSize.x, 1.0f, 0.0f, 9999999))
+                        {
+                            gConfig.Set("Game.MapSizeX", m_fMapSize.x);
+                        }
+                        if (Widget::InputFloat(TEXT("Teleport.Height"), &m_fMapSize.y, 1.0f, 0.0f, 9999999))
+                        {
+                            gConfig.Set("Game.MapSizeY", m_fMapSize.y);
+                        }
+                        ImGui::Spacing();
+                        if (ImGui::Button(TEXT("Game.ResetDefault"), Widget::CalcSize()))
+                        {
+                            m_fMapSize = {6000.0f, 6000.0f};
+                            gConfig.Set("Game.MapSizeX", m_fMapSize.x);
+                            gConfig.Set("Game.MapSizeY", m_fMapSize.y);
+                        }
+                        ImGui::Spacing();
+                        ImGui::Separator();
+                    }
+                }
                 ImGui::EndChild();
             }
             ImGui::EndTabItem();

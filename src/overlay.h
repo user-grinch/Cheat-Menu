@@ -11,13 +11,13 @@
 class Overlay
 {
 private:
-    enum DisplayPos
+    enum class eDisplayPos
     {
-        CUSTOM,
-        TOP_LEFT,
-        TOP_RIGHT,
-        BOTTOM_LEFT,
-        BOTTOM_RIGHT
+        Custom,
+        TopLeft,
+        TopRight,
+        BottomLeft,
+        BottomRight
     };
     static inline std::vector<CEntity*> m_EntityList;
     static inline const float m_fMaxDistance = 50.0f;
@@ -53,7 +53,7 @@ public:
     static inline bool m_bVehHealth;
     static inline bool m_bVehSpeed;
     static inline float m_fTextCol[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-    static inline DisplayPos m_nSelectedPos = DisplayPos::BOTTOM_RIGHT;
+    static inline eDisplayPos m_nSelectedPos = eDisplayPos::BottomRight;
 
     Overlay() = delete;
     Overlay(Overlay&) = delete;

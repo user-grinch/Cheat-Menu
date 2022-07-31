@@ -22,21 +22,41 @@ public:
     DataStore(const char* fileName, bool isPathPredefined = false) noexcept;
 
     // Returns data from store structure
-    std::string Get(const char* key, const char* defaultVal) noexcept
+    std::string Get(const char* key, const char* defaultVal, bool writeOnNone = false) noexcept
     {
         if (pTable)
         {
-            return (*pTable).at_path(key).value_or(defaultVal);
+            std::optional<std::string> option = pTable->at_path(key).value<std::string>();
+
+            if (option.has_value())
+            {
+                return option.value();
+            }
+        }
+        
+        if (writeOnNone)
+        {
+            Set(key, std::string(defaultVal));
         }
         return defaultVal;
     }
 
     template<typename T>
-    T Get(const char* key, const T& defaultVal) noexcept
+    T Get(const char* key, const T& defaultVal, bool writeOnNone = false) noexcept
     {
         if (pTable)
         {
-            return (*pTable).at_path(key).value_or(defaultVal);
+            std::optional<T> option = pTable->at_path(key).value<T>();
+
+            if (option.has_value())
+            {
+                return option.value();
+            }
+        }
+        
+        if (writeOnNone)
+        {
+            Set(key, defaultVal);
         }
         return defaultVal;
     }

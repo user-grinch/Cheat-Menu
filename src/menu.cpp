@@ -86,7 +86,8 @@ void Menu::ShowPage()
             ImGui::Spacing();
             ImGui::Spacing();
             ImGui::SameLine();
-            if (ImGui::Combo(TEXT("Menu.Position"), (int*)&Overlay::m_nSelectedPos, "Custom\0Top left\0Top right\0Bottom left\0Bottom right\0"))
+            if (ImGui::Combo(TEXT("Menu.Position"), reinterpret_cast<int*>(&Overlay::m_nSelectedPos), 
+                "Custom\0Top left\0Top right\0Bottom left\0Bottom right\0"))
             {
                 gConfig.Set<int>("Overlay.SelectedPosition", static_cast<int>(Overlay::m_nSelectedPos));
             }
@@ -129,12 +130,12 @@ void Menu::ShowPage()
                 gConfig.Set("Overlay.ShowLocationName", Overlay::m_bLocName);
             }
 
+            ImGui::NextColumn();
+
             if (ImGui::Checkbox(TEXT("Menu.ShowModelInfo"), &Overlay::m_bModelInfo))
             {
                 gConfig.Set("Overlay.ShowModelInfo", Overlay::m_bModelInfo);
             }
-
-            ImGui::NextColumn();
 
             if (ImGui::Checkbox(TEXT("Menu.ShowPedTasks"), &Overlay::m_bPedTasks))
             {

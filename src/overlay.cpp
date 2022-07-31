@@ -23,7 +23,7 @@ void Overlay::Init()
     m_bMemUsage = gConfig.Get("Overlay.ShowMemoryUsage", false);
     m_bVehHealth = gConfig.Get("Overlay.ShowVehicleHealth", false);
     m_bVehSpeed = gConfig.Get("Overlay.ShowVehicleSpeed", false);
-    m_nSelectedPos = (DisplayPos)gConfig.Get("Overlay.SelectedPosition", (int)DisplayPos::BOTTOM_RIGHT);
+    m_nSelectedPos = (eDisplayPos)gConfig.Get("Overlay.SelectedPosition", (int)eDisplayPos::BottomRight);
     m_fPos.x = gConfig.Get("Overlay.PosX", 0);
     m_fPos.y = gConfig.Get("Overlay.PosY", 0);
     m_fTextCol[0] = gConfig.Get("Overlay.TextColor.Red", 1.0f);
@@ -154,6 +154,7 @@ void Overlay::ProcessPedTasks()
                 for (size_t i = 0; i != TASK_SECONDARY_MAX; ++i)
                 {
                     CTask *pTask = pPed->m_pIntelligence->m_TaskMgr.m_aSecondaryTasks[i];
+
                     if (pTask)
                     {
                         const char *name = taskNames[pTask->GetId()];
@@ -379,7 +380,7 @@ void Overlay::ProcessInfoBox()
         ImGuiWindowFlags window_flags = ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize |
                                         ImGuiWindowFlags_NoSavedSettings | ImGuiWindowFlags_NoFocusOnAppearing | ImGuiWindowFlags_NoNav;
 
-        if (m_nSelectedPos == DisplayPos::CUSTOM)
+        if (m_nSelectedPos == eDisplayPos::Custom)
         {
             if (m_fPos.x != NULL && m_fPos.y != NULL)
             {
@@ -393,25 +394,25 @@ void Overlay::ProcessInfoBox()
             window_flags |= ImGuiWindowFlags_NoMove;
             ImVec2 pos, pivot;
 
-            if (m_nSelectedPos == DisplayPos::TOP_LEFT)
+            if (m_nSelectedPos == eDisplayPos::TopLeft)
             {
                 pos = ImVec2(offset, offset);
                 pivot = ImVec2(0.0f, 0.0f);
             }
 
-            if (m_nSelectedPos == DisplayPos::TOP_RIGHT)
+            if (m_nSelectedPos == eDisplayPos::TopRight)
             {
                 pos = ImVec2(io.DisplaySize.x - offset, offset);
                 pivot = ImVec2(1.0f, 0.0f);
             }
 
-            if (m_nSelectedPos == DisplayPos::BOTTOM_LEFT)
+            if (m_nSelectedPos == eDisplayPos::BottomLeft)
             {
                 pos = ImVec2(offset, io.DisplaySize.y - offset);
                 pivot = ImVec2(0.0f, 1.0f);
             }
 
-            if (m_nSelectedPos == DisplayPos::BOTTOM_RIGHT)
+            if (m_nSelectedPos == eDisplayPos::BottomRight)
             {
                 pos = ImVec2(io.DisplaySize.x - offset, io.DisplaySize.y - offset);
                 pivot = ImVec2(1.0f, 1.0f);

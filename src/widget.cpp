@@ -634,6 +634,43 @@ bool Widget::CheckboxBits(const char* label, uint flag, const char* hint)
     return rtn;
 }
 
+bool Widget::InputFloat(const char* label, float *val, float change, float min, float max)
+{
+    bool state = false;
+    ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() / 2.0f);
+    if (ImGui::InputFloat(std::format("##{}", label).c_str(), val))
+    {
+        if (min != max)
+        {
+            *val = (*val < min) ? min : *val;
+            *val = (*val > max) ? max : *val;
+        }
+        state = true;
+    }
+    ImGui::SameLine(0.0, 4.0);
+    int size = ImGui::GetFrameHeight();
+    if (ImGui::Button(std::format("-##{}", label).c_str(), ImVec2(size, size)))
+    {
+        if (min != max && (*val - change) > min)
+        {
+            *val -= change;
+        }
+        state = true;
+    }
+    ImGui::SameLine(0.0, 4.0);
+    if (ImGui::Button(std::format("+##{}", label).c_str(), ImVec2(size, size)))
+    {
+        if (min != max && (*val + change) < max)
+        {
+            *val += change;
+        }
+        state = true;
+    }
+    ImGui::SameLine(0.0, 4.0);
+    ImGui::LabelText(label, "%s", label);
+    return state;
+}
+
 void Widget::EditAddr(const char* label, uint address, float min, float def, float max, float mul, float change)
 {
     if (ImGui::CollapsingHeader(label))
@@ -665,37 +702,10 @@ void Widget::EditAddr(const char* label, uint address, float min, float def, flo
 
         int size = ImGui::GetFrameHeight();
 
-        if (ImGui::InputFloat(("##" + std::string(label)).c_str(), &val))
+        if (InputFloat(std::format("Set##{}", label).c_str(), &val, change, min, max))
         {
-            if (val < min)
-            {
-                val = min;
-            }
-
-            if (val > max)
-            {
-                val = max;
-            }
             patch::SetFloat(address, val / mul);
         }
-
-        ImGui::SameLine(0.0, 4.0);
-        if (ImGui::Button("-", ImVec2(size, size)) && (val - change) > min)
-        {
-            val -= change;
-            if (val < min)
-            patch::SetFloat(address, val / mul);
-        }
-        ImGui::SameLine(0.0, 4.0);
-        if (ImGui::Button("+", ImVec2(size, size)) && (val + change) < max)
-        {
-            val += change;
-            patch::SetFloat(address, val / mul);
-        }
-        ImGui::SameLine(0.0, 4.0);
-        ImGui::Text("Set");
-
-
         ImGui::Spacing();
 
         if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), CalcSize(items)))

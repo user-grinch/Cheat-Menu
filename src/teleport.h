@@ -15,6 +15,7 @@ private:
     static inline bool m_bTeleportMarker;
     static inline char m_nInputBuffer[INPUT_BUFFER_SIZE];
     static inline char m_nLocationBuffer[INPUT_BUFFER_SIZE];
+    static inline ImVec2 m_fMapSize;
 
     struct TPMarker
     {
