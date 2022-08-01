@@ -87,7 +87,8 @@ void MenuThread(void* param)
     bool modloader = GetModuleHandle("modloader.asi");
     const char *path = PLUGIN_PATH((char*)"");
     Log::Print<eLogLevel::None>("Install location: {}", modloader && strstr(path, "modloader") ? "Modloader" : "Game directory");
-    Log::Print<eLogLevel::None>("CLEO installed: {}", GetModuleHandle("cleo.asi") || GetModuleHandle("cleo_redux.asi") ? "True" : "False");
+    Log::Print<eLogLevel::None>("Font support package: {}", FontMgr::IsSupportPackageInstalled() ? "True" : "False");
+    Log::Print<eLogLevel::None>("\nCLEO installed: {}", GetModuleHandle("cleo.asi") || GetModuleHandle("cleo_redux.asi") ? "True" : "False");
     Log::Print<eLogLevel::None>("FLA installed: {}", GetModuleHandle("$fastman92limitAdjuster.asi") ? "True" : "False");
     Log::Print<eLogLevel::None>("Mixsets installed: {}", GetModuleHandle("MixSets.asi") ? "True" : "False");
     Log::Print<eLogLevel::None>("Modloader installed: {}", modloader ? "True" : "False");

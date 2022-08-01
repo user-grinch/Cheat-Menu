@@ -51,7 +51,9 @@ ImFont* FontMgr::Load(const char* fontID, const char* path, float fontMul)
 
 void FontMgr::UnloadAll()
 {
-    ImGui::GetIO().Fonts->Clear();
+    ImGuiIO& io = ImGui::GetIO();
+    io.Fonts->Clear();
+    io.Fonts->ClearFonts();
 }
 
 void FontMgr::ReloadAll()
@@ -66,11 +68,12 @@ void FontMgr::ReloadAll()
     }
     io.FontDefault = Get("text");
     io.Fonts->Build();
+    m_bFontReloadRequired = false;
 }
 
 void FontMgr::Process()
 {
-    if (curState != eStates::Idle)
+    if (curState == eStates::Idle)
     {
         return;
     }
@@ -83,8 +86,19 @@ void FontMgr::Process()
         Util::SetMessage(TEXT("Updater.Failed"));
         return;
     }
-    
+
+    m_bFontReloadRequired = true;
     curState = eStates::Idle;
+}
+
+bool FontMgr::IsSupportPackageInstalled()
+{
+    return std::filesystem::file_size(MENU_DATA_PATH("fonts/text.ttf")) > 1000000; // 1 MB
+}
+
+bool FontMgr::IsFontReloadRequired()
+{
+    return m_bFontReloadRequired;
 }
 
 void FontMgr::StartOptionalFontDownload()

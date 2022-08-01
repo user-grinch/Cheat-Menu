@@ -27,10 +27,9 @@ void Menu::ShowPage()
         {
             static int selected = Locale::GetCurrentLocaleIndex();
             static std::vector<std::string>& vec = Locale::GetLocaleList();
-            static size_t fontSz = std::filesystem::file_size(MENU_DATA_PATH("fonts/text.ttf"));
 
             if (Locale::GetLocaleList()[Locale::GetCurrentLocaleIndex()] == "Chinese" 
-            && fontSz < 1000000) // Normal font size is < 1 MB
+            && !FontMgr::IsSupportPackageInstalled())
             {
                 ImGui::Spacing();
                 ImGui::TextWrapped("Font support package is required to display this language! This may take a while depending on your connection.");

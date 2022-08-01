@@ -23,6 +23,7 @@ private:
     };
     static inline std::vector<FontInfo> m_vecFonts;
     static inline eStates curState = eStates::Idle;
+    static inline bool m_bFontReloadRequired = false;
 
 public:
     FontMgr() = delete;
@@ -49,6 +50,12 @@ public:
 
     // Downloads optional font package
     static void StartOptionalFontDownload();
+
+    // Returns true if font support package is already installed
+    static bool IsSupportPackageInstalled();
+
+    // Returns true if font needs to be reloaded
+    static bool IsFontReloadRequired();
 };
 
 

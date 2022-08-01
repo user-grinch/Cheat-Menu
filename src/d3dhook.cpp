@@ -112,6 +112,19 @@ void D3dHook::ProcessFrame(void* ptr)
         {
             ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
         }
+
+        if (FontMgr::IsFontReloadRequired())
+        {
+            FontMgr::ReloadAll();
+            if (gRenderer == Render_DirectX9)
+            {
+                ImGui_ImplDX9_InvalidateDeviceObjects();
+            }
+            else
+            {
+                ImGui_ImplDX11_InvalidateDeviceObjects();
+            }
+        }
     }
     else
     {
