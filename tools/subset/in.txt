@@ -11,11 +11,11 @@
 0980-09FF,
 
 # Chinease
-#3000-30FF,
-#31F0-31FF,
-#FF00-FFEF,
-#FFFD-FFFD,
-#4E00-9FAF,
+3000-30FF,
+31F0-31FF,
+FF00-FFEF,
+FFFD-FFFD,
+4E00-9FAF,
 
 # Russian
 0400-052F, # Cyrillic + Cyrillic Supplement

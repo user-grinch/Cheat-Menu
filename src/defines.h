@@ -21,6 +21,8 @@
 #endif
 
 #define FILE_NAME BY_GAME("CheatMenuSA" , "CheatMenuVC", "CheatMenuIII")
+#define MENU_DATA_PATH(x) (PLUGIN_PATH((char*)FILE_NAME##"/"##x))
+#define MENU_DATA_EXISTS(x) (std::filesystem::exists(MENU_DATA_PATH(x)))
 
 
 

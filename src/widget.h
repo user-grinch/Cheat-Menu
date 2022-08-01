@@ -64,8 +64,9 @@ public:
     // ImGui::TextFilter with hint support
     static void Filter(const char* label, ImGuiTextFilter& filter, const char* hint);
 
-    // Input Float widget with increment & decrement buttons
+    // Input widgets with increment & decrement buttons
     static bool InputFloat(const char* label, float *val, float change = 1.0f, float min = -1.0f, float max = -1.0f);
+    static bool InputInt(const char* label, int *val, int change = 1, int min = -1, int max = -1);
 
     // Draws ResourceStore images in the interface
     static void ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackRtn getNameFunc, 

@@ -101,6 +101,18 @@ size_t Locale::GetCurrentLocaleIndex()
     return localeIndex;
 }
 
+void Locale::SetDefaultLocale()
+{
+    for (size_t i = 0; i < m_locales.size(); ++i)
+    {
+        if (m_locales[i] == "English")
+        {
+            SetLocale(i);
+            return;
+        }
+    }
+}
+
 Locale::eReturnCodes Locale::SetLocale(size_t index)
 {
     if(m_pData)

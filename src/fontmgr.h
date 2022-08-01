@@ -7,6 +7,12 @@
 class FontMgr
 {
 private:
+    enum class eStates
+    {
+        Idle,
+        Downloading,
+    };
+
     struct FontInfo
     {
         ImFont *m_pFont;
@@ -16,6 +22,7 @@ private:
         std::string m_path;
     };
     static inline std::vector<FontInfo> m_vecFonts;
+    static inline eStates curState = eStates::Idle;
 
 public:
     FontMgr() = delete;
@@ -34,8 +41,14 @@ public:
     // ImGui::GetIO().Default font must be loaded after unloading all fonts
     static void UnloadAll();
 
+    // Handles font downloading
+    static void Process();
+
     // Reloads all the fonts 
     static void ReloadAll();
+
+    // Downloads optional font package
+    static void StartOptionalFontDownload();
 };
 
 

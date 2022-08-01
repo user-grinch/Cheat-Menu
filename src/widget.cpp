@@ -671,6 +671,21 @@ bool Widget::InputFloat(const char* label, float *val, float change, float min, 
     return state;
 }
 
+bool Widget::InputInt(const char* label, int *val, int change, int min, int max)
+{
+    bool state = false;
+    if (ImGui::InputInt(label, val, change))
+    {
+        if (min != max)
+        {
+            *val = (*val < min) ? min : *val;
+            *val = (*val > max) ? max : *val;
+        }
+        state = true;
+    }
+    return state;
+}
+
 void Widget::EditAddr(const char* label, uint address, float min, float def, float max, float mul, float change)
 {
     if (ImGui::CollapsingHeader(label))

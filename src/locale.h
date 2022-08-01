@@ -58,4 +58,9 @@ public:
         index is the index of the language in the GetLocaleList() list
     */
     static eReturnCodes SetLocale(size_t index);
+
+    /*
+        Sets the language back to default (aka English)
+    */
+    static void SetDefaultLocale();
 };

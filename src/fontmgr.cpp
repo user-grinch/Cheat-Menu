@@ -23,11 +23,11 @@ const ImWchar* FontMgr::GetGlyphRanges()
         0x2000, 0x206F, // General Punctuation
 
         // Chinease
-        // 0x3000, 0x30FF, // CJK Symbols and Punctuations, Hiragana, Katakana
-        // 0x31F0, 0x31FF, // Katakana Phonetic Extensions
-        // 0xFF00, 0xFFEF, // Half-width characters
-        // 0xFFFD, 0xFFFD, // Invalid
-        // 0x4E00, 0x9FAF, // CJK Ideograms
+        0x3000, 0x30FF, // CJK Symbols and Punctuations, Hiragana, Katakana
+        0x31F0, 0x31FF, // Katakana Phonetic Extensions
+        0xFF00, 0xFFEF, // Half-width characters
+        0xFFFD, 0xFFFD, // Invalid
+        0x4E00, 0x9FAF, // CJK Ideograms
 
         // Russian
         0x0400, 0x052F, // Cyrillic + Cyrillic Supplement
@@ -66,4 +66,31 @@ void FontMgr::ReloadAll()
     }
     io.FontDefault = Get("text");
     io.Fonts->Build();
+}
+
+void FontMgr::Process()
+{
+    if (curState != eStates::Idle)
+    {
+        return;
+    }
+
+    const char* link = "https://github.com/user-grinch/Cheat-Menu/raw/master/resource/addon/text.ttf";
+    HRESULT res = URLDownloadToFile(NULL, link, MENU_DATA_PATH("fonts/text.ttf"), 0, NULL);
+
+    if (res == E_OUTOFMEMORY || res == INET_E_DOWNLOAD_FAILURE)
+    {
+        Util::SetMessage(TEXT("Updater.Failed"));
+        return;
+    }
+    
+    curState = eStates::Idle;
+}
+
+void FontMgr::StartOptionalFontDownload()
+{
+    if (curState == eStates::Idle)
+    {
+        curState = eStates::Downloading;
+    }
 }

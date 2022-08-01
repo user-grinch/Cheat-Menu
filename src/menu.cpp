@@ -25,6 +25,28 @@ void Menu::ShowPage()
     {
         if (ImGui::BeginTabItem(TEXT("Menu.Config")))
         {
+            static int selected = Locale::GetCurrentLocaleIndex();
+            static std::vector<std::string>& vec = Locale::GetLocaleList();
+            static size_t fontSz = std::filesystem::file_size(MENU_DATA_PATH("fonts/text.ttf"));
+
+            if (Locale::GetLocaleList()[Locale::GetCurrentLocaleIndex()] == "Chinese" 
+            && fontSz < 1000000) // Normal font size is < 1 MB
+            {
+                ImGui::Spacing();
+                ImGui::TextWrapped("Font support package is required to display this language! This may take a while depending on your connection.");
+                ImGui::Spacing();
+                if (ImGui::Button("Install package", ImVec2(Widget::CalcSize(2))))
+                {
+                    FontMgr::StartOptionalFontDownload();
+                }
+                ImGui::SameLine();
+                if (ImGui::Button("Switch to English", ImVec2(Widget::CalcSize(2))))
+                {
+                    Locale::SetDefaultLocale();
+                    selected = Locale::GetCurrentLocaleIndex();
+                }
+            }
+
             ImGui::Spacing();
             if (ImGui::Button(TEXT("Menu.ResetSize"), ImVec2(Widget::CalcSize(1))))
             {
@@ -32,9 +54,6 @@ void Menu::ShowPage()
             }
 
             ImGui::Spacing();
-
-            static int selected = Locale::GetCurrentLocaleIndex();
-            static std::vector<std::string>& vec = Locale::GetLocaleList();
 
             if (vec.size() > 0)
             {

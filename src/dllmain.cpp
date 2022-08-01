@@ -113,8 +113,9 @@ void MenuThread(void* param)
 
     while (true)
     {
-        Updater::Process();
+        FontMgr::Process();
         RPC::Process();
+        Updater::Process();
         Sleep(1000);
     }
 }
