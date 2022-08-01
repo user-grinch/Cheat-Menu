@@ -289,7 +289,7 @@ void CheatMenu::Init()
                 D3dHook::SetMouseState(m_bShowMenu);
             }
 
-            if (Teleport::m_bQuickTeleport && quickTeleport.PressedRealtime())
+            if (Teleport::IsQuickTeleportActive() && quickTeleport.PressedRealtime())
             {
                 D3dHook::SetMouseState(true);
             }

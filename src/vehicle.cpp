@@ -1065,11 +1065,8 @@ void Vehicle::ShowPage()
                 {
                     Widget::Checkbox(TEXT("Vehicle.LockSpeed"), &m_bLockSpeed);
                     ImGui::Spacing();
-                    ImGui::InputFloat(TEXT("Vehicle.Set"), &m_fLockSpeed);
+                    Widget::InputFloat(TEXT("Vehicle.Set"), &m_fLockSpeed, 1.0f, 0.0f, 100.0f);
                     ImGui::Spacing();
-
-                    m_fLockSpeed = m_fLockSpeed > 100 ? 100 : m_fLockSpeed;
-                    m_fLockSpeed = m_fLockSpeed < 0 ? 0 : m_fLockSpeed;
 
                     if (ImGui::Button(TEXT("Vehicle.Set"), ImVec2(Widget::CalcSize(2))))
                     {

@@ -34,6 +34,11 @@ void Teleport::FetchRadarSpriteData()
 }
 #endif
 
+bool Teleport::IsQuickTeleportActive()
+{
+    return m_bQuickTeleport;
+}
+
 void Teleport::Init()
 {
     m_bTeleportMarker = gConfig.Get("Features.TeleportMarker", false);
@@ -41,52 +46,14 @@ void Teleport::Init()
     m_fMapSize.x = gConfig.Get("Game.MapSizeX", 6000.0f);
     m_fMapSize.y = gConfig.Get("Game.MapSizeY", 6000.0f);
 
-    Events::processScriptsEvent += []
+    Events::drawingEvent += []
     {
-        if ((TPMarker::m_bEnabled == true) && ((CTimer::m_snTimeInMilliseconds - TPMarker::m_nTimer) > 50))
-        {
-            CPlayerPed* player = FindPlayerPed();
-
-#ifdef GTASA
-            CEntity* player_entity = FindPlayerEntity(-1);
-            TPMarker::m_fPos.z = CWorld::FindGroundZFor3DCoord(TPMarker::m_fPos.x, TPMarker::m_fPos.y,
-                    TPMarker::m_fPos.z + 100.0f, nullptr, &player_entity) + 1.0f;
-#else
-            TPMarker::m_fPos.z = CWorld::FindGroundZFor3DCoord(TPMarker::m_fPos.x, TPMarker::m_fPos.y,
-                    TPMarker::m_fPos.z + 100.0f, nullptr) + 1.0f;
-#endif
-            CVehicle* pVeh = player->m_pVehicle;
-
-            if (pVeh && BY_GAME(player->m_nPedFlags.bInVehicle, player->m_pVehicle, player->m_pVehicle))
-            {
-                BY_GAME(pVeh->Teleport(TPMarker::m_fPos, false), pVeh->Teleport(TPMarker::m_fPos), player->Teleport(TPMarker::m_fPos));
-            }
-            else
-            {
-                BY_GAME(player->Teleport(TPMarker::m_fPos, false), player->Teleport(TPMarker::m_fPos), player->Teleport(TPMarker::m_fPos));
-            }
-#ifdef GTASA
-            if (TPMarker::m_bJetpack)
-            {
-                Command<Commands::TASK_JETPACK>(CPools::GetPedRef(player));
-            }
-#endif
-
-            TPMarker::m_bEnabled = false;
-            Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(player), false);
-            Command<Commands::RESTORE_CAMERA_JUMPCUT>();
-            TheCamera.Fade(0, 1);
-        }
-
         if (m_bTeleportMarker && teleportMarker.Pressed())
         {
             WarpPlayer<eTeleportType::Marker>();
         }
-    };
 
 #ifdef GTASA
-    Events::drawingEvent += []
-    {
         if (m_bQuickTeleport && quickTeleport.PressedRealtime())
         {
             static CSprite2d map; 
@@ -120,56 +87,42 @@ void Teleport::Init()
                 }
             }
         }
-    };
 #endif
+    };
 }
 
+#ifdef GTASA
 template<eTeleportType Type>
 void Teleport::WarpPlayer(CVector pos, int interiorID)
 {
     CPlayerPed* pPlayer = FindPlayerPed();
     CVehicle* pVeh = pPlayer->m_pVehicle;
     int hplayer = CPools::GetPedRef(pPlayer);
+    bool jetpack = Command<Commands::IS_PLAYER_USING_JETPACK>(0);
 
-#ifdef GTASA
-    TPMarker::m_bJetpack = Command<Commands::IS_PLAYER_USING_JETPACK>(0);
-    if (Type == eTeleportType::Marker || Type == eTeleportType::MapPosition)
-    {   
-        if (Type == eTeleportType::Marker)
+    if (Type == eTeleportType::Marker)
+    {
+        tRadarTrace targetBlip = CRadar::ms_RadarTrace[LOWORD(FrontEndMenuManager.m_nTargetBlipIndex)];
+        if (targetBlip.m_nRadarSprite != RADAR_SPRITE_WAYPOINT)
         {
-            tRadarTrace targetBlip = CRadar::ms_RadarTrace[LOWORD(FrontEndMenuManager.m_nTargetBlipIndex)];
-            if (targetBlip.m_nRadarSprite != RADAR_SPRITE_WAYPOINT)
-            {
-                Util::SetMessage(TEXT("Teleport.TargetBlipText"));
-                return;
-            }
-            pos = targetBlip.m_vecPos;
-        } 
-        
-        CEntity* pPlayerEntity = FindPlayerEntity(-1);
-        pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, nullptr, &pPlayerEntity) + 500.f;
+            Util::SetMessage(TEXT("Teleport.TargetBlipText"));
+            return;
+        }
+        pos = targetBlip.m_vecPos;
+    } 
 
-        TPMarker::m_fPos = pos;
-        TPMarker::m_nTimer = CTimer::m_snTimeInMilliseconds;
-        TPMarker::m_bEnabled = true;
-        TheCamera.Fade(0, 0);
-        Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(CPools::GetPedRef(pPlayer), true);
-    }
-#endif
-
-#ifdef GTA3
-    CStreaming::LoadScene(pos);
-#else
     CStreaming::LoadScene(&pos);
     CStreaming::LoadSceneCollision(&pos);
-#endif
     CStreaming::LoadAllRequestedModels(false);
 
-#ifdef GTASA
+    if (Type == eTeleportType::Marker || Type == eTeleportType::MapPosition)
+    {   
+        CEntity* pPlayerEntity = FindPlayerEntity(-1);
+        pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, nullptr, &pPlayerEntity) + 1.0f;
+    }
 
     if (pVeh && pPlayer->m_nPedFlags.bInVehicle)
     {
-
         if (CModelInfo::IsTrainModel(pVeh->m_nModelIndex))
         {
             CVector vehPos = pVeh->GetPosition();
@@ -203,15 +156,33 @@ void Teleport::WarpPlayer(CVector pos, int interiorID)
         pPlayer->Teleport(pos, false);
     }
 
-    if (TPMarker::m_bJetpack)
+    if (jetpack)
     {
         Command<Commands::TASK_JETPACK>(hplayer);
     }
+
+    pPlayer->m_nAreaCode = interiorID;
+    Command<Commands::SET_AREA_VISIBLE>(interiorID);
+}
 #else
+template<eTeleportType Type>
+void Teleport::WarpPlayer(CVector pos, int interiorID)
+{
+    CPlayerPed* pPlayer = FindPlayerPed();
+    CVehicle* pVeh = pPlayer->m_pVehicle;
+
+#ifdef GTAVC
+    CStreaming::LoadScene(&pos);
+    CStreaming::LoadSceneCollision(&pos);
+#else
+    CStreaming::LoadScene(pos);
+#endif
+    CStreaming::LoadAllRequestedModels(false);
+
     if (pVeh && pPlayer->m_pVehicle)
     {
 #ifdef GTAVC
-        pPlayer->m_nAreaCode = interiorID;
+        pVeh->m_nAreaCode = interiorID;
 #endif
         pVeh->Teleport(pos);
     }
@@ -219,45 +190,17 @@ void Teleport::WarpPlayer(CVector pos, int interiorID)
     {
         pPlayer->Teleport(pos);
     }
-#endif
 
-#if defined GTASA || defined GTAVC
+#ifdef GTAVC
     pPlayer->m_nAreaCode = interiorID;
     Command<Commands::SET_AREA_VISIBLE>(interiorID);
 #endif
 }
-
-void Teleport::TeleportToLocation(std::string& rootkey, std::string& bLocName, std::string& loc)
-{
-    try
-    {
-        int dimension = 0;
-        CVector pos;
-        sscanf(loc.c_str(), "%d,%f,%f,%f", &dimension, &pos.x, &pos.y, &pos.z);
-        WarpPlayer<eTeleportType::Coordinate>(pos, dimension);
-    }
-    catch (...)
-    {
-        Util::SetMessage(TEXT("Teleport.InvalidLocation"));
-    }
-}
-
-void Teleport::RemoveTeleportEntry(std::string& category, std::string& key, std::string& val)
-{
-    if (category == "Custom")
-    {
-        m_locData.m_pData->RemoveKey("Custom", key.c_str());
-        Util::SetMessage(TEXT("Teleport.LocationRemoved"));
-        m_locData.m_pData->Save();
-    }
-    else
-    {
-        Util::SetMessage(TEXT("Teleport.CustomLocationRemoveOnly"));
-    }
-}
+#endif
 
 void Teleport::ShowPage()
 {
+    static char locBuf[INPUT_BUFFER_SIZE], inBuf[INPUT_BUFFER_SIZE];
     if (ImGui::BeginTabBar("Teleport", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {
         ImGui::Spacing();
@@ -266,52 +209,53 @@ void Teleport::ShowPage()
             ImGui::Spacing();
             if (ImGui::BeginChild("Teleport Child"))
             {
+#ifdef GTASA
                 ImGui::Columns(2, nullptr, false);
                 ImGui::Checkbox(TEXT("Teleport.InsertCoord"), &m_bInsertCoord);
-#ifdef GTASA
+
                 if (Widget::Checkbox(TEXT("Teleport.QuickTeleport"), &m_bQuickTeleport,
                                         std::string(TEXT_S("Teleport.QuickTeleportHint") 
                                                     + quickTeleport.GetNameString()).c_str()))
                 {
                     gConfig.Set("Features.QuickTeleport", m_bQuickTeleport);
                 }
-#endif
                 ImGui::NextColumn();
-#ifdef GTASA
                 if (Widget::Checkbox(TEXT("Teleport.TeleportMarker"), &m_bTeleportMarker,
                                         std::string(TEXT_S("Teleport.TeleportMarkerHint") 
                                                     + teleportMarker.GetNameString()).c_str()))
                 {
                     gConfig.Set("Features.TeleportMarker", m_bTeleportMarker);
                 }
-#endif
                 ImGui::Columns(1);
+#else
+                ImGui::Spacing();
+                ImGui::Sameline();
+                ImGui::Checkbox(TEXT("Teleport.InsertCoord"), &m_bInsertCoord);
+#endif
                 ImGui::Spacing();
 
                 if (m_bInsertCoord)
                 {
                     CVector pos = FindPlayerPed()->GetPosition();
 
-                    strcpy(m_nInputBuffer,
+                    strcpy(inBuf,
                            (std::to_string(static_cast<int>(pos.x)) + ", " + std::to_string(static_cast<int>(pos.y)) +
                             ", " + std::to_string(static_cast<int>(pos.z))).c_str());
                 }
 
-                ImGui::InputTextWithHint(TEXT("Teleport.Coordinates"), "x, y, z", m_nInputBuffer, IM_ARRAYSIZE(m_nInputBuffer));
+                ImGui::InputTextWithHint(TEXT("Teleport.Coordinates"), "x, y, z", inBuf, INPUT_BUFFER_SIZE);
 
                 ImGui::Spacing();
 
                 if (ImGui::Button(TEXT("Teleport.TeleportToCoord"), Widget::CalcSize(2)))
                 {
                     CVector pos{0, 0, 10};
-
-                    try
+                    if (sscanf(inBuf,"%f,%f,%f", &pos.x, &pos.y, &pos.z) == 3)
                     {
-                        sscanf(m_nInputBuffer,"%f,%f,%f", &pos.x, &pos.y, &pos.z);
                         pos.z += 1.0f;
                         WarpPlayer(pos);
                     }
-                    catch (...)
+                    else
                     {
                         Util::SetMessage(TEXT("Teleport.InvalidCoord"));
                     }
@@ -369,13 +313,13 @@ void Teleport::ShowPage()
             if (ImGui::CollapsingHeader(TEXT("Window.AddNew")))
             {
                 ImGui::Spacing();
-                ImGui::InputTextWithHint(TEXT("Teleport.Location"), TEXT("Teleport.LocationHint"), m_nLocationBuffer, IM_ARRAYSIZE(m_nInputBuffer));
-                ImGui::InputTextWithHint(TEXT("Teleport.Coordinates"), "x, y, z", m_nInputBuffer, IM_ARRAYSIZE(m_nInputBuffer));
+                ImGui::InputTextWithHint(TEXT("Teleport.Location"), TEXT("Teleport.LocationHint"), locBuf, INPUT_BUFFER_SIZE);
+                ImGui::InputTextWithHint(TEXT("Teleport.Coordinates"), "x, y, z", inBuf, INPUT_BUFFER_SIZE);
                 ImGui::Spacing();
                 if (ImGui::Button(TEXT("Teleport.AddLocation"), Widget::CalcSize()))
                 {
-                    std::string key = std::string("Custom.") + m_nLocationBuffer;
-                    m_locData.m_pData->Set(key.c_str(), ("0, " + std::string(m_nInputBuffer)));
+                    std::string key = std::string("Custom.") + locBuf;
+                    m_locData.m_pData->Set(key.c_str(), ("0, " + std::string(inBuf)));
 
     #ifdef GTASA
                     // Clear the Radar coordinates
@@ -387,7 +331,31 @@ void Teleport::ShowPage()
             }
 
             ImGui::Spacing();
-            Widget::DataList(m_locData, TeleportToLocation, RemoveTeleportEntry);
+            Widget::DataList(m_locData, 
+            [](std::string& unk1, std::string& unk2, std::string& loc){
+                int dim = 0;
+                CVector pos;
+                if (sscanf(loc.c_str(), "%d,%f,%f,%f", &dim, &pos.x, &pos.y, &pos.z) == 4)
+                {
+                    WarpPlayer<eTeleportType::Coordinate>(pos, dim);
+                }
+                else
+                {
+                    Util::SetMessage(TEXT("Teleport.InvalidLocation"));
+                }
+            },
+            [](std::string& category, std::string& key, std::string& _){
+                if (category == "Custom")
+                {
+                    m_locData.m_pData->RemoveKey("Custom", key.c_str());
+                    Util::SetMessage(TEXT("Teleport.LocationRemoved"));
+                    m_locData.m_pData->Save();
+                }
+                else
+                {
+                    Util::SetMessage(TEXT("Teleport.CustomLocationRemoveOnly"));
+                }
+            });
             ImGui::EndTabItem();
         }
         ImGui::EndTabBar();
