@@ -1,631 +1,791 @@
-{
-  "动画": {
-    "AddAnimation": "添加动画",
-    "AddParticle": "添加粒子",
-    "AnimationRemoved": "动画已删除",
-    "AnimationTab": "动画##TABBAR",
-    "AnimName": "动画名称",
-    "CustomAnimsOnly": "您只能删除自定义动画",
-    "CustomParticlesOnly": "您只能删除自定义粒子",
-    "CutsceneRunning": "另一个过场动画正在运行",
-    "CutsceneTab": "过场动画##TABBAR",
-    "FightingStyle": "格斗风格",
-    "FightingStyleSet": "格斗风格集",
-    "IFPName": "IFP name",
-    "InvisiblePlayer": "隐形玩家",
-    "LoopCheckbox": "循环",
-    "LoopCheckboxText": "继续重复播放动画",
-    "NoTarget": "未找到玩家目标。用武器瞄准一个踏板，为动画播放器选择它。",
-    "ParticleName": "粒子名称",
-    "ParticleRemoved": "粒子已删除",
-    "ParticleTab": "Particle##TABBAR",
-    "PedAnim": "Ped anim",
-    "PedAnimText": "在其他踏板上播放动画。选择武器目标。",
-    "RemoveAll": "全部删除",
-    "RemoveLatest": "删除最新",
-    "SecondaryCheckbox": "次要",
-    "SecondaryCheckboxText": "播放器可以在播放动画时移动",
-    "StopAnimation": "停止动画",
-    "StopCutscene": "Stop cutscene",
-    "Styles": "样式",
-    "WalkingStyle": "步行风格",
-    "WalkingStyleSet": "步行风格集"
-  },
-  "游戏": {
-    "ActivateTimer": "激活作弊计时器",
-    "ActivateTimerText": "下次激活作弊的时间",
-    "Beach": "海滩",
-    "Cloudy": "多云",
-    "Country": "国家",
-    "CurrentDay": "当前日期",
-    "DaysPassed": "已过去天数",
-    "DisableCheats": "禁用作弊",
-    "DisableReplay": "禁用 F1 和 F3 重播",
-    "Enable": "启用",
-    "EnableText": "Forward: I\tBackward: K\n\nLeft: J\t\t  Right: L\n\nSlower: RCtrl\tFaster: RShift\n\nZoom: Mouse wheel",
-    "ExtraColors": "额外颜色",
-    "ExtraSunny": "额外阳光",
-    "FailMission": "失败当前任务",
-    "FasterClock": "更快的时钟",
-    "FieldOfView": "视野",
-    "Foggy": "雾",
-    "ForbiddenWantedLevel": "Forbidden area wl",
-    "ForbiddenWantedLevelText": "Wanted levels that appears outside of LS without completing missions",
-    "FPSLimit": "FPS limit",
-    "Freecam": "Freecam",
-    "FreecamTip": "Press Enter to teleport player to camera location",
-    "FreePNS": "Free pay n spray",
-    "FreezeGame": "冻结游戏",
-    "FreezeGameTime": "冻结游戏时间",
-    "FunHouse": "Fun house",
-    "GameSpeed": "游戏速度",
-    "Gravity": "重力",
-    "HardMode": "困难模式",
-    "HardModeText": "使游戏更具挑战性.\降低盔甲,生命值,耐力等.",
-    "Hour": "小时",
-    "Hurricane": "飓风",
-    "KeepStuff": "Keep stuff",
-    "KeepStuffText": "在逮捕/死亡后保留东西",
-    "MaxVehSkills": "最大车辆技能",
-    "MaxVehSkillsText": "将所有车辆技能发挥到极致",
-    "MaxWepSkills": "最大武器技能",
-    "MaxWepSkillsText": "将所有武器技能发挥到极致",
-    "Minute": "Minute",
-    "MissionLoaderTip": "任务加载器可能导致,\n\n1. 游戏崩溃\n2.中断保存游戏\n3. 打破游戏进度
-\n4.随机错误和故障\n\n建议在使用任务加载器后不要保存.使用风险自负!",
-    "Missions": "任务",
-    "MissionStartFailed": "任务开始失败",
-    "MovementSpeed": "移动速度",
-    "Ninja": "忍者",
-    "Overcast": "阴天",
-    "PlayerTeleported": "玩家远程传送",
-    "ProgressBar": "进度条",
-    "Rainy": "下雨",
-    "RandomCheats": "随机作弊",
-    "Sandstorm": "沙尘暴",
-    "SaveGame": "Save Game （可能会导致游戏错误）",
-    "Screenshot": "截图",
-    "ScreenshotTaken": "正在使用截图",
-    "SelectCheats": "选择作弊",
-    "SelectDay": "选择日期",
-    "SetTime": "设置时间",
-    "ShowLoader": "显示任务加载器",
-    "SolidWater": "固体水",
-    "SolidWaterText": "玩家可以在水上行走\n如果你想游泳,请关闭此选项.",
-    "Stats": "统计",
-    "Sunny": "阳光明媚",
-    "SyncSystemTime": "同步系统时间",
-    "Themes": "主题",
-    "Thunderstorm": "雷暴",
-    "VerySunny": "非常阳光明媚",
-    "Weather": "天气",
-    "WeatherID": "天气 ID",
-    "WeatherIDText": "按 ID 设置天气 （0-255）.除非你知道自己在做什么,否则不要触摸!"
-  },
-  "主要": {
-    "TranslationLanguage": "简体中文",
-    "TranslationLanguageDisclaimer": "异楠军翻译",
-    "Translator": "翻译",
-    "TranslatorName": "异楠军"
-  },
-  "菜单": {
-    "About": "关于",
-    "Author": "作者",
-    "BugDisclaimer": "If you find bugs or have suggestions, let me know on discord.",
-    "Build": "建筑",
-    "CheckUpdate": "CheckUpdate",
-    "Commands": "Commands",
-    "Config": "Config",
-    "CopyrightDisclaimer": "Copyright Grinch_ 2019-2022. All rights reserved.",
-    "Credits": "Credits",
-    "DiscordRPC": "Discord rich presence",
-    "DiscordServer": "Discord server",
-    "FixVehKey": "Fix current vehicle",
-    "FlipVehKey": "Flip current vehicle",
-    "FreecamKey": "Toggle freecam",
-    "GitHubRepo": "GitHub repo",
-    "GodModeKey": "切换上帝模式",
-    "Hotkeys": "热键",
-    "InvalidValue": "InvalidValue",
-    "Language": "语言",
-    "LanguageChangeFailed": "无法更改语言!",
-    "Name": "名称",
-    "NoBG": "无背景",
-    "OpenCMDKey": "打开/关闭命令窗口",
-    "OpenCMDUsing": "使用 %s 打开或关闭命令窗口",
-    "OpenMenuKey": "打开/关闭作弊菜单",
-    "Overlay": "Overlay",
-    "Position": "位置",
-    "QuickSSKey": "快速截图",
-    "QuickTPKey": "切换快速传送",
-    "QuickVehSpawnerCMD": "生成车辆",
-    "QuickVehSpawnerCMDText": "通过输入模型名称来生成车辆。
-示例：veh （veh_name）",
-    "QuickWepSpawnerCMD": "Quick weapon spawner",
-    "QuickWepSpawnerCMDText": "通过键入模型名称来生成武器。示例：wep （wep_name）",
-    "ResetConfig": "Reset config",
-    "ResetConfigMSG": "Config has been reset. Restart the game for it to take effect.",
-    "ResetSize": "Reset size",
-    "SetHealthCMD": "Set health",
-    "SetHealthCMDText": "Set player health.\nExample: hp (health).",
-    "SetTimeCMD": "Set time",
-    "SetTimeCMDText": "Set current game time.\nExample: time (hour) (minute).\n",
-    "SetTimeCMDText2": "Writing something like 'time 12' would be interpreted as 'time 12 12'",
-    "ShowCoords": "Show coordinates",
-    "ShowCPU": "Show CPU usage",
-    "ShowFPS": "Show FPS",
-    "ShowLocation": "Show location",
-    "ShowRAM": "Show RAM usage",
-    "ShowVehHealth": "Show veh health",
-    "ShowVehSpeed": "Show veh speed",
-    "SkinChangerKey": "Activate aim skin changer",
-    "TeleportCMD": "Teleport",
-    "TeleportCMDText": "Teleports player to specified coordinates.\nExample: tp x y z",
-    "TextColor": "Text color",
-    "Usage": "Usage",
-    "UsageText": "Left-click selects hotkey.\nLeft clicking outside deselects.\nRight click disables hotkey.",
-    "VehEngineKey": "Toggle vehicle engine",
-    "VehStartKey": "Vehicle instant start",
-    "VehStopKey": "Vehicle instant stop",
-    "Version": "Version"
-  },
-  "Ped": {
-    "Accuracy": "Accuracy",
-    "BigHead": "Big head effect",
-    "ConfigTab": "Config",
-    "DownloadExGangWars": "Download ExGangWars",
-    "ElvisEverywhere": "Elvis everywhere",
-    "EndWar": "End gang war",
-    "EveryoneArmed": "Everyone is armed",
-    "EveryoneAtk": "Everyone attacks players",
-    "ExGangWarsTip": "You'll need ExGangWars plugin to display some turf colors",
-    "GangsControl": "Gangs control streets",
-    "GangsEverywhere": "Gangs everywhere",
-    "GangWars": "Gang wars",
-    "Health": "Health",
-    "MaxLimit": "Max limit reached",
-    "NastyLimbs": "Nasty limbs",
-    "NoMove": "Don't move",
-    "NoProstitutes": "No prostitutes",
-    "PedBleed": "Ped bleed",
-    "PedDensityMul": "Ped density multiplier",
-    "PedsAtkRocket": "Peds attack with rockets",
-    "PedsMayhem": "Peds mayhem",
-    "PedsRiot": "Peds riot",
-    "PedType": "Ped type",
-    "Radius": "Radius",
-    "RecruitAnyone": "Recruit anyone",
-    "RemoveFrozen": "Remove frozen peds",
-    "RemovePeds": "Remove peds",
-    "RemovePedsRadius": "Remove peds in radius",
-    "SelectedWeapon": "Selected weapon: %s",
-    "SelectWeapon": "Select weapon",
-    "SlutMagnet": "Slut magnet",
-    "SpawnerTab": "Spawner",
-    "StartWar": "Start gang war",
-    "ThinBody": "Thin body effect",
-    "WeaponAll": "Weapons for all",
-    "ZoneDensity": "Gang zone density:"
-  },
-  "Player": {
-    "AimSkinChanger": "Aim skin changer",
-    "AimSkinChangerTip": "Changes to the ped, player is targeting with a weapon.\nTo use aim a ped with a weapon and press ",
-    "AppearanceTab": "Appearance",
-    "Armour": "Armour",
-    "Body": "Body",
-    "BountyYourself": "Bounty on yourself",
-    "BulletProof": "Bullet proof",
-    "CameraZoom": "Camera zoom",
-    "ChangeToCJ": "Change to CJ skin",
-    "ClothesTab": "Clothes",
-    "ClothesTip": "If CJ is wearing a full suit, click 'Extras' or 'Remove all' to remove it.",
-    "CollisionProof": "Collision proof",
-    "CoordCopied": "Coordinates copied",
-    "CopyCoordinates": "Copy coordinates",
-    "CustomSkinsDirTip": "Place your dff & txd files inside 'modloader/CustomSkins'",
-    "CustomSkinsTab": "Custom skins",
-    "CustomSkinsTip": "Note: Your txd & dff names can't exceed 8 characters. Don't change names while the game is running.",
-    "CustomSkinTutorial": "Custom skin allows to change player skins without replacing any existing game ped skins.\n\nSteps to enable 'Custom Skins',\n\n\n1. Download & install modloader\n\n2. Create a folder inside 'modloader' folder with the name 'CustomSkins'\n\n3. Download ped skins online ( .dff & .txd files) and put them inside.\n\n4. Restart your game.\n\n\n\nLimitations:\n\n1. Your .dff & .txd file names must not exceed 8 characters.\n\n2. Do not rename them while the game is running\n\n\nDoing so will crash your game.",
-    "CycleJump": "Higher cycle jumps",
-    "DownloadModloader": "Download modloader",
-    "DrunkEffect": "Drunk effect",
-    "Energy": "Energy",
-    "ExplosionProof": "Explosion proof",
-    "FastSprint": "Fast sprint",
-    "FastSprintTip": "Best to enable God Mode & Infinite sprint too",
-    "Fat": "Fat",
-    "FireProof": "Fire proof",
-    "FreeHealthcare": "Free healthcare",
-    "FreezeWL" : "Freeze wanted level",
-    "GodDisabled": "God mode disabled",
-    "GodEnabled": "God mode enabled",
-    "GodMode": "God mode",
-    "Health": "Health",
-    "HealthRegen": "Health regeneration",
-    "HealthRegenTip": "Player heals if not taken damage for 5 seconds",
-    "InfO2": "Infinite oxygen",
-    "InfSprint": "Infinite sprint",
-    "InvisPlayer": "Invisible player",
-    "LockControl": "Lock control",
-    "LungCapacity": "Lung capacity",
-    "MaxAppeal": "Max sex appeal",
-    "MaxArmour": "Max armour",
-    "MaxHealth": "Max health",
-    "MeeleProof": "Meele proof",
-    "MegaJump": "Mega jump",
-    "MegaPunch": "Mega punch",
-    "Money": "Money",
-    "Muscle": "Muscle",
-    "NeedCJSkin": "You need to be in CJ skin",
-    "NeverGetHungry": "Never get hungry",
-    "NeverWanted": "Never wanted",
-    "NoFee": "无逮捕费",
-    "PedSkinsTab": "Ped skins",
-    "PlayerFlags": "Player flags,",
-    "RemoveAll": "全部删除",
-    "RemoveClothesTab": "Remove clothes",
-    "RespawnDieLoc": "Respawn die location",
-    "RespawnDieLocTip": "Respawn to the location you died from",
-    "Respect": "Respect",
-    "SkinChangeFrozen": "玩家必须被冻结才能改变皮肤",
-    "Skinny": "瘦",
-    "SkinsTab": "Skins",
-    "SpecialNotImplement": "Spawning special peds isn't implemented yet",
-    "SprintEverywhere": "Sprint everywhere",
-    "SprintEverywhereTip": "Enables sprinting on every\nground surface (interior etc.)",
-    "Stamina": "耐力",
-    "Suicide": "自杀",
-    "TopDownCamera": "Top down camera",
-    "TotalSkins": "总皮肤数： ",
-    "WantedLevel": "通缉等级",
-    "WorkSkinOnly": "仅包含有效的皮肤"
-  },
-  "RPC": {
-    "BrowsingCheatMenu": "Browsing CheatMenu",
-    "Busted": "Busted!",
-    "DoingMission": "Doing mission",
-    "Driving": "驾驶",
-    "In": "in",
-    "InsideMenus": "Inside Menus",
-    "PlayingFor": "Playing for {}:{}:{}",
-    "Walking": "Walking",
-    "Wasted": "Wasted!"
-  },
-  "传送": {
-    "AddLocation": "添加位置",
-    "Coordinates": "坐标",
-    "CustomLocationRemoveOnly": "您只能删除自定义位置",
-    "InsertCoord": "插入坐标",
-    "InvalidCoord": "无效坐标",
-    "InvalidLocation": "无效位置",
-    "Location": "位置",
-    "LocationHint": "Groove Street",
-    "LocationRemoved": "位置已删除",
-    "QuickTeleport": "Quick teleport",
-    "QuickTeleportHint": "传送到雷达的位置\n使用 ",
-    "TargetBlipText": "未找到目标光点。你需要先把它放在地图上",
-    "TeleportCenter": "传送到中心",
-    "TeleportMarker": "传送到标记点",
-    "TeleportToCoord": "Teleport to coordinates"
-  },
-  "车辆": {
-    "Abs": "Abs",
-    "ADM": "Anti dive multiplier",
-    "AggroDriver": "Aggressive driver",
-    "AimDrive": "在驾驶时瞄准",
-    "All": "全部",
-    "AllNitro": "所有汽车都有氮气",
-    "AllTaxiNitro": "All taxis have nitro",
-    "AnimGroup": "Anim group",
-    "Big": "Big",
-    "BikeFly": "Bikes fly",
-    "Black": "黑色",
-    "BlowCar": "炸毁汽车",
-    "BoatFly": "船飞",
-    "BrakeBias": "制动偏差",
-    "BrakeDecel": "制动减速",
-    "BulletProof": "防弹",
-    "CarFly": "Cars fly",
-    "CarHeavy": "Cars heavy",
-    "CDM": "Collision damage multiplier",
-    "CemterMassX": "Centre of mass X",
-    "CemterMassY": "Centre of mass Y",
-    "CemterMassZ": "Centre of mass Z",
-    "Cheap": "劣质",
-    "Color": "颜色",
-    "ColorPicker": "Color picker",
-    "ColProof": "防碰撞",
-    "Component": "Component",
-    "Country": "Country",
-    "Damage": "Damage",
-    "DampingLvl": "Damping level",
-    "DensityMul": "Density multiplier",
-    "DirtLvl": "Dirt level",
-    "Diseal": "Diseal",
-    "DmgProof": "防损坏",
-    "DmgProofTip": "Every vehicle entered will be damage proof\nBullet, Collision, Explosion, Fire, Meele etc",
-    "Doors": "Doors",
-    "DragMult": "Drag multiplier",
-    "Driver": "Driver",
-    "DriverTarget": "Driver targetable",
-    "DriveType": "Drive type",
-    "DriveWater": "Drive on water",
-    "Electric": "Electric",
-    "EngineAccel": "Engine acceleration",
-    "EngineInertia": "Engine inertia",
-    "EngineOn": "Engine on",
-    "EngineType": "Engine type",
-    "EnterNearVeh": "Enter nearest vehicle as",
-    "ExplosionProof": "Explosion proof",
-    "Fast": "Fast",
-    "FireProof": "Fire proof",
-    "Fix": "Fix",
-    "FixCar": "Fix vehicle",
-    "FlipCar": "Flip vehicle",
-    "FloatOnHit": "Float away when hit",
-    "ForceLevel": "Force level",
-    "ForCurVeh": "For current vehicle,",
-    "FourWheelDrive": "Four wheel drive",
-    "FrontLights": "Front lights",
-    "FrontWheelDrive": "Front wheel drive",
-    "GreenLights": "Green traffic lights",
-    "HandlingFlags": "Handling flags",
-    "HandlingTab": "Handling",
-    "HighSpeedDamping": "High speed damping",
-    "HSTarget": "HS targetable",
-    "HSTargetTip": "Heat Seaker missile can target this",
-    "InfNitro": "Unlimited nitro",
-    "InfNitroTip": "Nitro will activate when left clicked\n\n\nEnabling this would disable\nAll cars have nitro\nAll taxis have nitro",
-    "InstantStop": "Instant stop",
-    "InvisCar": "Invisible car",
-    "LessDmg": "Take less damage",
-    "LessTraffic": "Decreased traffic",
-    "LightsOn": "Lights on",
-    "LockDoor": "Lock doors",
-    "LockSpeed": "Lock speed",
-    "LockTrainCam": "Lock train camera",
-    "Long": "Long",
-    "LowerLimit": "Lower limit",
-    "Mass": "Mass",
-    "MatFilter": "Material filter",
-    "MaxVelocity": "Max velocity",
-    "MeleeProof": "Melee proof",
-    "ModelFlags": "Model flags",
-    "MonValue": "Monetary value",
-    "NeonsTab": "Neons",
-    "NoColl": "Disable collisions",
-    "NoNearVeh": "No nearby vehicles",
-    "NoParticles": "Disable particles",
-    "NumGears": "Number of gears",
-    "Off": "Off",
-    "On": "On",
-    "OnlyWheels": "Wheels only",
-    "Open": "Open",
-    "Paintjob": "Paintjob",
-    "Passenger": "Passenger ",
-    "PentrolTank": "Petrol tank KO",
-    "PercentSubmerged": "Percent submerged",
-    "PerfectHandling": "Perfect handling",
-    "Petrol": "Petrol",
-    "PetrolTankTip": "Vehicle will blow up if petrol tank is shot",
-    "Pink": "Pink",
-    "PlateText": "License plate text",
-    "Pop": "Pop",
-    "Primary": "Primary",
-    "PulsingNeon": "Pulsing neons",
-    "Quaternary": "Quaternary",
-    "Radius": "Radius",
-    "RainbowNeon": "Rainbow neons",
-    "RainbowNeonMSG": "Rainbow effect to neon lights",
-    "ReadMore": "Read more",
-    "RearLights": "Rear lights",
-    "RearWheelDrive": "Rear wheel drive",
-    "RemoveNeon": "Remove neon",
-    "RemoveNeonMSG": "Neon removed sucessfully",
-    "RemoveVeh": "Remove vehicles",
-    "RemoveVehRadius": "Remove vehicles in radius",
-    "ResetColor": "Reset color",
-    "ResetColorMSG": "Color reset sucessfully",
-    "ResetHandling": "Reset handling",
-    "ResetHandlingMSG": "Handling reset sucessfully",
-    "ResetTexture": "Reset texture",
-    "ResetTextureMSG": "Texture reset sucessfully",
-    "SaveFile": "Save to file",
-    "SaveFileMSG": "Handling saved successfully",
-    "SeatOffset": "Seat offset",
-    "Secondary": "Secondary",
-    "SelectPreset": "Select preset:",
-    "Set": "Set",
-    "SetSpeed": "Set speed",
-    "Siren": "Siren",
-    "SkidMarks": "Always skid marks",
-    "Small": "Small",
-    "SpawnInAir": "Spawn aircraft in air",
-    "SpawnInside": "Spawn inside as driver",
-    "StayOnBike": "Don't fall off bike",
-    "SteeringLock": "Steering lock",
-    "SuspensionBias": "Suspension bias",
-    "Tall": "Tall",
-    "TankMode": "Tank mode",
-    "Tertiary": "Tertiary",
-    "TextureTab": "Textures",
-    "TotalSeats": "Total seats: %d",
-    "TractionBias": "Traction bias",
-    "TractionLoss": "Traction loss",
-    "TractionMul": "Traction multiplier",
-    "TrafficNeon": "Traffic neons",
-    "TrafficNeonMSG": "Adds neon lights to traffic vehicles.\n\nOnly some vehicles will have them.",
-    "TrafficOpt": "Traffic options",
-    "TuneTab": "Tune",
-    "TurnMass": "Turn mass",
-    "Type": "Type",
-    "UpperLimit": "Upper limit",
-    "Watertight": "Watertight car",
-    "WatertightTip": "Peds inside won't drown if the vehicle\nis submerged in water"
-  },
-  "Updater":
-  {
-    "Failed" : "Failed to check for updates",
-    "Found" : "Update found",
-    "NotFound" : "No update found"
-  },
-  "视觉": {
-    "Ambient": "环境",
-    "AmbientBl": "Ambient bl",
-    "AmbientObj": "Ambient object",
-    "AmbientObjBl": "Ambient object bl",
-    "ArmourbarColor": "Armour bar color",
-    "ArmourbarPosX": "Armour bar X",
-    "ArmourbarPosY": "Armour bar Y",
-    "ArmourBorder": "Armour border",
-    "ArmourPercentage": "Armour percentage",
-    "Blur": "模糊",
-    "BoldBorder": "Bold border",
-    "BreathbarColor": "Breath bar color",
-    "BreathbarPosX": "Breath bar X",
-    "BreathbarPosY": "Breath bar Y",
-    "BreathBorder": "Breath border",
-    "BreathPercentage": "Breath percentage",
-    "ClockColor": "Clock color",
-    "ClockPosX": "Clock X",
-    "ClockPosY": "Clock Y",
-    "CloudAlpha": "Cloud alpha",
-    "CloudsBottom": "Clouds bottom",
-    "CloudsLow": "Clouds low",
-    "CloudsTop": "Clouds top",
-    "ColorsTab": "Colors",
-    "CurrentWeather": "Current weather",
-    "DefaultBorder": "Default border",
-    "DefaultOutline": "Default outline",
-    "DefaultStyle": "Default Style",
-    "DirectionalLight": "Directional light",
-    "DirectionalMult": "Directional mult",
-    "DisableHydrant": "Disable hydrant splash",
-    "DrawMenuTitle": "Draw menu title border color",
-    "FarClip": "Far clip",
-    "FileGenerated": "File generated",
-    "FluffyClouds": "Fluffy clouds",
-    "FogStart": "Fog start",
-    "FreezeGameTime": "Freeze game time",
-    "GenerateFile": "Generate timecyc file",
-    "GrayRadar": "Gray radar",
-    "GreenScanlines": "Green scanlines",
-    "HealthbarColor": "Health bar color",
-    "HealthbarPosX": "Health bar X",
-    "HealthbarPosY": "Health bar Y",
-    "HealthBorder": "Health border",
-    "HealthPercentage": "Health percentage",
-    "HideAreaNames": "Hide area names",
-    "HideHud": "Hide HUD",
-    "HideRadar": "Hide radar",
-    "HideVehNames": "Hide vehicle names",
-    "HideWantedLevel": "Hide wanted level",
-    "Hour": "Hour",
-    "IncompatibleMods": "Incompatible mods",
-    "IncompatibleModsText": "1. vHud\n2. GTA 5 Hud\n3. MobileHud\n\nAnd others that change HUD drastically",
-    "InvisibleWater": "Invisible water",
-    "LightBrightness": "地面亮度",
-    "LightIntensity": "高光最小强度",
-    "LightShadowStrength": "光影强度",
-    "LockWeather": "锁定天气",
-    "Minute": "分钟",
-    "MoneyColor": "Money color",
-    "MoneyFontOutline": "Money font outline",
-    "MoneyFontStyle": "Money font style",
-    "MoneyPosX": "Money X",
-    "MoneyPosY": "Money Y",
-    "NextWeather": "下一个天气",
-    "NoBorder": "无边框",
-    "NoOutline": "No outline",
-    "NoWater": "No water",
-    "PoleShadowStrength": "Pole shadow strength",
-    "PostFX1": "PostFX 1",
-    "PostFX2": "PostFX 2",
-    "RadarHeight": "Radar height",
-    "RadarPosX": "Radar posX",
-    "RadarPosY": "Radar posY",
-    "RadarWidth": "Radar width",
-    "RadarZoom": "Radar zoom",
-    "RadioStationColor": "Radio station color",
-    "ResetTimecyc": "Reset timecyc",
-    "ShadowStrength": "暗影强度",
-    "ShowHud": "Show HUD",
-    "ShowRadar": "显示雷达",
-    "SkyBottom": "Sky bottom",
-    "SkyTop": "天穹",
-    "SpriteBrightness": "Sprite brightness",
-    "SpriteSize": "Sprite size",
-    "Style1": "样式 1",
-    "Style2": "样式 2",
-    "SunCore": "Sun core",
-    "SunCorona": "Sun corona",
-    "SunSize": "太阳大小",
-    "SyncTimeEnabled": "同步系统时间已启用./n（游戏/同步系统时间）",
-    "ThinOutline": "Thin outline",
-    "Timecyc24hTab": "Timecyc 24h",
-    "TimecycReset": "Timecyc reset",
-    "TimecycTab": "Timecyc",
-    "TreeShadowStrength": "树影强度",
-    "UnfogMap": "Unfog map",
-    "UnfogMapText": "Removes fog from Main Menu Map",
-    "WantedAmmoPosX": "Wanted ammo posX",
-    "WantedAmmoPosY": "Wanted ammo posY",
-    "WantedPosX": "Wanted posX",
-    "WantedPosY": "Wanted posY",
-    "WantedStarBorder": "Wanted star border",
-    "Water": "Water",
-    "WaterFogAlpha": "Water fog alpha",
-    "WeaponAmmoPosX": "Weapon icon posX",
-    "WeaponAmmoPosY": "Weapon icon posY",
-    "WeaponIconPosX": "Weapon icon posX",
-    "WeaponIconPosY": "Weapon icon posY",
-    "WhiteScanlines": "White scanlines"
-  },
-  "Weapon": {
-    "Ammo": "弹药",
-    "CurrentWeapon": "当前武器:    %s",
-    "DropAll": "全部删除",
-    "DropCurrent": "删除电流",
-    "DropWeapon": "掉落武器",
-    "DualWeild": "Dual weild",
-    "DualWeildText": "双持手枪,肖夫,乌兹,tec9/n（其他武器不起作用）",
-    "FastAim": "Fast aim",
-    "FastAimText": "在键盘上启用瞄准辅助Q = 左 E = 右按 Q 和 E 切换目标.移动鼠标删除目标!",
-    "FastReload": "快速重新加载",
-    "GangWeaponEditor": "Gang weapon editor",
-    "HugeDamage": "巨大伤害",
-    "HugeDamageText": "如果武器射程短，也启用'远程'",
-    "InfiniteAmmo": "无限弹药",
-    "LongRange": "长距离",
-    "MoveWhenAiming": "瞄准时移动",
-    "MoveWhenFiring": "开火时移动",
-    "RapidFire": "速射",
-    "SelectGang": "选择帮派",
-    "Weapon1": "武器 1",
-    "Weapon2": "武器 2",
-    "Weapon3": "武器 3",
-    "WeaponTweaksText": "Weapon tweaks apply globally\nto every ped weapon type"
-  },
-  "Window": {
-    "AddNew": "Add new",
-    "AnimationPage": "动画",
-    "CheckboxTab": "Checkboxes",
-    "Default": "Def",
-    "Enabled": "已启用",
-    "GamePage": "游戏",
-    "Info": "信息",
-    "Maximum": "最大值",
-    "MenuPage": "菜单",
-    "MenusTab": "菜单",
-    "Minimum": "最小值",
-    "PedPage": "Ped",
-    "PlayerPage": "玩家",
-    "Search": "搜索",
-    "SetValue": "设置值",
-    "SpawnTab": "生成",
-    "TeleportPage": "传送",
-    "VehiclePage": "车辆",
-    "VisualPage": "视觉",
-    "WeaponPage": "武器"
-  }
-}
+
+[动画]
+AddAnimation = "添加动画"
+AddParticle = "添加粒子"
+AnimationRemoved = "动画已删除"
+AnimationTab = "动画##TABBAR"
+AnimName = "动画名称"
+CustomAnimsOnly = "您只能删除自定义动画"
+CustomParticlesOnly = "您只能删除自定义粒子"
+CutsceneRunning = "另一个过场动画正在运行"
+CutsceneTab = "过场动画##TABBAR"
+FightingStyle = "格斗风格"
+FightingStyleSet = "格斗风格集"
+IFPName = "IFP name"
+InvisiblePlayer = "隐形玩家"
+LoopCheckbox = "循环"
+LoopCheckboxText = "继续重复播放动画"
+NoTarget = "未找到玩家目标。用武器瞄准一个踏板，为动画播放器选择它。"
+ParticleName = "粒子名称"
+ParticleRemoved = "粒子已删除"
+ParticleTab = "Particle##TABBAR"
+PedAnim = "Ped anim"
+PedAnimText = """
+在其他踏板上播放动画。
+选择武器目标。"""
+RemoveAll = "全部删除"
+RemoveLatest = "删除最新"
+SecondaryCheckbox = "次要"
+SecondaryCheckboxText = "播放器可以在播放动画时移动"
+StopAnimation = "停止动画"
+StopCutscene = "Stop cutscene"
+Styles = "样式"
+Tasks = "任务"
+PrimaryTasks = "主要任务"
+SecondaryTasks = "次要任务"
+WalkingStyle = "步行风格"
+WalkingStyleSet = "步行风格集"
+
+[游戏]
+ActivateTimer = "激活作弊计时器"
+ActivateTimerText = "下次激活作弊的时间"
+Beach = "海滩"
+CameraZoom = "相机变焦"
+CameraZoomLock = "锁定相机变焦"
+CameraZoomLockFreecam = "Freecam 已启用。相机变焦无法与自由相机模式一起工作"
+CameraZoomLockInfo = "注意：这将永久锁定相机变焦。狙击手或示波器将无法正常工作！"
+ChangeRadioStaion = "更换电台"
+CurrentStation = "电流状态"
+Cloudy = "多云"
+Country = "国家"
+CurrentDay = "当前日期"
+DaysPassed = "已过去天数"
+DisableCheats = "禁用作弊"
+DisableReplay = "禁用 F1 和 F3 重播"
+Enable = "启用"
+ExtraColors = "额外颜色"
+ExtraSunny = "额外阳光"
+FailMission = "失败当前任务"
+FasterClock = "更快的时钟"
+FieldOfView = "视野"
+Foggy = "雾"
+ForbiddenWantedLevel = "Forbidden area wl"
+ForbiddenWantedLevelText = "出现在LS之外但未完成任务的通缉级别"
+FPSLimit = "FPS limit"
+Freecam = "Freecam"
+FreePNS = "Free pay n spray"
+FreezeGame = "冻结游戏"
+FreezeGameTime = "冻结游戏时间"
+FunHouse = "Fun house"
+GameSpeed = "游戏速度"
+Gravity = "重力"
+HardMode = "困难模式"
+HardModeText = """
+使游戏更具挑战性。
+降低护甲，生命值，耐力等."""
+Hour = "小时"
+Hurricane = "飓风"
+KeepStuff = "保留东西"
+KeepStuffText = "在逮捕/死亡后保留东西"
+KeyAction = "操作"
+KeyCombo = "组合"
+MaxVehSkills = "最大车辆技能"
+MaxVehSkillsText = "用尽所有车辆技能"
+MaxWepSkills = "最大武器技能"
+MaxWepSkillsText = "用尽所有武器技能"
+Minute = "分钟"
+MissionLoaderTip = """
+任务加载器可能导致，
+1. 游戏崩溃
+2.中断保存游戏
+3. 打破游戏进度
+4.随机错误和故障
+建议在使用任务加载器后不要保存。使用风险自负！"""
+Missions = "任务"
+MissionStartFailed = "现在无法开始任务"
+MobileRadio = "移动无线电"
+MovementSpeed = "移动速度"
+Ninja = "忍者"
+NoWaterPhysics = "无水物理"
+Overcast = "阴天"
+PlayerTeleported = "玩家远程传送"
+ProgressBar = "进度条"
+Rainy = "下雨"
+RandomCheats = "随机作弊"
+ResetDefault = "重置为默认值"
+Sandstorm = "沙尘暴"
+SaveGame = "保存游戏 （可能会导致游戏错误）"
+Screenshot = "截图"
+ScreenshotTip = "截图成功"
+ScreenshotTaken = "Screenshot taken"
+SelectCheats = "选择作弊"
+SelectDay = "选择日期"
+SetTime = "设置时间"
+ShowLoader = "显示任务加载器"
+SolidWater = "固体水"
+SolidWaterText = """
+玩家可以在水上行走
+如果您想游泳，请关闭此功能。"""
+Stats = "统计"
+Sunny = "阳光明媚"
+SyncSystemTime = "同步系统时间"
+Themes = "主题"
+Thunderstorm = "雷暴"
+TotalMinutesDay = "每天的总分钟数"
+VerySunny = "非常晴朗"
+Weather = "天气"
+WeatherID = "天气 ID"
+WeatherIDText = "按 ID 设置天气 （0-255）。除非你知道自己在做什么，否则不要触摸！"
+
+[主要]
+TranslationLanguage = "简体中文"
+TranslationLanguageDisclaimer = "由bilibili异楠军丶翻译"
+Translator = "翻译者"
+TranslatorName = "bilibili异楠军丶"
+
+[菜单]
+About = "关于"
+Author = "作者"
+AutoCheckUpdate = "检查更新"
+BugDisclaimer = "如果您发现错误或有建议，请通知我告诉我有哪些问题。"
+Build = "生成"
+CheatMenuNoDir = "未能找到 CheatMenu 目录！"
+CheckUpdate = "检查更新"
+Commands = "命令"
+Config = "配置"
+Coords = "坐标: %.2f, %.2f, %.2f"
+CopyrightDisclaimer = "版权所有Grinch_2019-2022。所有权归属Grinch_."
+CPUUsage = "CPU 使用率: %.2f%%"
+Credits = "学分"
+CurrentVersion = "当前版本"
+DiscordRPC = "Discord rich presence"
+DiscordServer = "不适用服务器"
+DownloadPage = "下载页面"
+EnsureLatest = "请确保您拥有来自 GitHub 的最新版本."
+DiscordRPCInitFailed = "Failed to init discord rpc"
+DiscordRPCNoDll = "Failed to find discord-rpc.dll"
+FixVehKey = "Fix current vehicle"
+FlipVehKey = "Flip current vehicle"
+Frames = "Frames: %d"
+FreecamKey = "Toggle freecam"
+FreecamBackwardKey = "Freecam backward"
+FreecamForwardKey = "Freecam forward"
+FreecamLeftKey = "Freecam left"
+FreecamRightKey = "Freecam right"
+GitHubRepo = "GitHub repo"
+GodModeKey = "切换上帝模式"
+Hotkeys = "热键"
+InvalidComamnd = "无效命令"
+InvalidLocation = "无效位置"
+InvalidValue = "无效值"
+Language = "语言"
+LanguageChangeFailed = "无法更改语言！"
+LatestVersion = "最新版本: "
+Location = "Location: %s"
+Name = "名称"
+NewVersion = "菜单的新版本可用."
+NoBG = "无背景"
+OpenCMDKey = "打开/关闭命令窗口"
+OpenCMDUsing = "使用 %s 打开或关闭命令窗口"
+OpenMenuKey = "打开/关闭作弊菜单"
+Overlay = "叠加"
+Position = "位置"
+Remove = "删除"
+Favourites = "添加到收藏夹"
+FavouritesNone = "你没有任何收藏夹！"
+FavouritesRemove = "从收藏夹中删除"
+FavouritesRemoveText = "从收藏夹中删除"
+FavouritesText = "添加到收藏夹"
+Close = "关闭"
+QuickSSKey = "快速屏幕截图"
+QuickTPKey = "快速传送"
+QuickVehSpawnerCMD = "生成车辆"
+QuickVehSpawnerCMDText = """
+通过输入模型名称来生成车辆。
+Example: veh (veh_name)"""
+QuickWepSpawnerCMD = "生成武器"
+QuickWepSpawnerCMDText = """
+通过键入模型名称来生成武器。
+Example: wep (wep_name)"""
+RAMUsage = "RAM usage: %.2f%%"
+ResetConfig = "重置配置"
+ResetConfigMSG = "配置已重置。重新启动游戏以使其生效。"
+ResetSize = "重置大小"
+SetArmourCMD = "设置护甲值"
+SetArmourCMDText = """
+设置玩家护甲。
+示例: 护甲 (护甲值)."""
+SetHealthCMD = "Set health"
+SetHealthCMDText = """
+设置玩家生命值。
+示例: 生命 (生命值)."""
+SetTimeCMD = "Set time"
+SetTimeCMDText = """
+设置当前游戏时间.
+示例: 时间 (小时) (分钟).
+"""
+SetTimeCMDText2 = "Writing something like 'time 12' would be interpreted as 'time 12 12'"
+ShowCoords = "Show coordinates"
+ShowCPU = "Show CPU usage"
+ShowFPS = "Show FPS"
+ShowLocation = "Show location"
+ShowModelInfo = "Show model info"
+ShowPedTasks = "Show ped tasks"
+ShowRAM = "Show RAM usage"
+ShowVehHealth = "Show veh health"
+ShowVehSpeed = "Show veh speed"
+SkinChangerKey = "开启目标皮肤变化"
+TeleportCMD = "Teleport"
+TeleportCMDText = """
+将玩家传送到指定的坐标.
+Example: tp x y z"""
+TextColor = "Text color"
+TextOnlyMode = "Text only"
+TextOnlyModeHint = "Replace images with their appropriate texts"
+TPMarkerKey = "Teleport to marker"
+Usage = "Usage"
+UpdaterInfo1 = "It's highly recommanded to update to the latest version. Newer version contains new features and bug fixes."
+UpdaterInfo2 = "To know what changes are made or to download, click on the 'Download page' button. Follow the instructions there. If you're still having issues, let me know on discord."
+UsageText = """
+左键单击选择热键。
+向外左单击可取消选择。
+右键单击禁用热键。"""
+VehEngineKey = "切换车辆引擎"
+VehHealth = "车辆健康"
+VehicleSpawned = "生成车辆"
+VehSpeed = "车速: %d"
+VehStartKey = "车辆即时启动"
+VehStopKey = "车辆即时启动"
+Version = "版本"
+WeaponSpawned = "武器生成"
+WelcomeMSG = "欢迎使用作弊菜单"
+
+[人物]
+Accuracy = "精度"
+BigHead = "大头效应"
+ConfigTab = "配置"
+DownloadExGangWars = "Download ExGangWars"
+ElvisEverywhere = "猫王无处不在"
+EndWar = "结束帮派战争"
+EveryoneArmed = "每个人都有武装"
+EveryoneAtk = "每个人都攻击玩家"
+ExGangWarsTip = "You'll need ExGangWars plugin to display some turf colors"
+GangsControl = "帮派控制街道"
+GangsEverywhere = "到处都是帮派"
+Gangs = "帮派"
+GangWars = "帮派战争"
+Health = "健康"
+MaxLimit = "已达到最大限制"
+NastyLimbs = "肮脏的四肢不"
+NoMove = "不要动"
+NoProstitutes = "没有妓女"
+PedBleed = "Ped bleed"
+PedDensityMul = "Ped density multiplier"
+PedsAtkRocket = "Peds attack with rockets"
+PedsMayhem = "Peds mayhem"
+PedsRiot = "Peds riot"
+PedType = "Ped type"
+Radius = "Radius"
+RecruitAnyone = "招募任何人"
+RemoveFrozen = "Remove frozen peds"
+RemovePeds = "Remove peds"
+RemovePedsRadius = "Remove peds in radius"
+SelectedWeapon = "Selected weapon: %s"
+SelectWeapon = "选择武器"
+SlutMagnet = "Slut magnet"
+SpawnerTab = "生成"
+StartWar = "开始帮派战争"
+ThinBody = "瘦子"
+WeaponAll = "所有人都有武器"
+ZoneDensity = "Gang zone density (0-127):"
+
+[玩家]
+AimSkinChanger = "皮肤变换器"
+AimSkinChangerTip = """
+改变踏板，玩家用武器瞄准。
+要使用武器瞄准踏板，请按 """
+AppearanceTab = "外观"
+Armour = "装甲"
+Body = "正文"
+BountyYourself = "奖励自己"
+BulletProof = "防弹"
+CameraZoom = "相机变焦"
+ChangeToCJ = "更改为 CJ 皮肤"
+ClothesTab = "衣服"
+ClothesTip = "如果CJ穿着全套西装，请单击'Extras'或'全部删除'以将其删除。"
+CollisionProof = "防碰撞"
+CoordCopied = "坐标已复制"
+CopyCoordinates = "复制坐标"
+CustomSkinsDirTip = "将你的 dff 和 txd 文件放在 'modloader/CustomSkins' 中'"
+CustomSkinsTab = "自定义皮肤"
+CustomSkinsTip = "注意：您的 txd & dff 名称不能超过 8 个字符。请勿在游戏运行时更改名称。"
+CustomSkinTutorial = """
+自定义皮肤允许更改玩家皮肤，而无需替换任何现有的游戏皮肤。
+启用“自定义皮肤”的步骤，
+1. 下载并安装模组加载器
+2.在“modloader”文件夹中创建一个名为“CustomSkins”的文件夹
+3.在线下载ped皮肤（.dff和.txd文件）并将它们放入其中。
+4. 重启游戏。
+局限性：
+1. 您的 .dff 和 .txd 文件名不得超过 8 个字符。
+2.请勿在游戏运行时重命名它们
+这样做会使游戏崩溃。"""
+CycleJump = "更高的循环跳跃"
+DownloadModloader = "下载模块加载器"
+DrunkEffect = "醉酒效果"
+Energy = "能量"
+ExplosionProof = "防爆"
+FastSprint = "快速冲刺"
+FastSprintTip = "最好启用上帝模式和无限冲刺"
+Fat = "肥胖"
+FireProof = "防火"
+FreeHealthcare = "免费医疗"
+FreezeWL = "冻结通缉级别"
+GodDisabled = "上帝模式已禁用"
+GodEnabled = "上帝模式启用"
+GodMode = "上帝模式"
+Health = "无限血量"
+InfO2 = "无限氧气"
+InfSprint = "无限冲刺"
+InvisPlayer = "隐形玩家"
+LockControl = "锁定控制"
+LungCapacity = "最大肺活量"
+MaxAppeal = "最大吸引力"
+MaxArmour = "最大护甲"
+MaxHealth = "最大血量"
+MeeleProof = "Meele proof"
+MegaJump = "超级跳跃"
+MegaPunch = "百万重拳"
+Money = "钱"
+Muscle = "肌肉"
+NeedCJSkin = "你需要在CJ皮肤中"
+NeverGetHungry = "永远不会饿"
+NeverWanted = "永远不会被通辑"
+NoFee = "无逮捕费"
+PedSkinsTab = "Ped skins"
+PlayerFlags = "Player flags,"
+PlayerRegen = "玩家再生"
+PlayerRegenTip = "如果 5 秒未受到伤害，玩家将进行治疗"
+RemoveAll = "全部删除"
+RemoveClothesTab = "脱下衣服"
+RespawnDieLoc = "重新定位"
+RespawnDieLocTip = "复活到你死亡的地方"
+Respect = "尊重"
+SkinChangeFrozen = "玩家必须被冻结才能改变皮肤"
+Skinny = "瘦"
+SkinsTab = "皮肤"
+SpecialNotImplement = "尚未实现生成特殊 ped"
+SprintEverywhere = "到处冲刺"
+SprintEverywhereTip = """
+支持冲刺
+地表（内部等）"""
+Stamina = "耐力"
+Suicide = "自杀"
+TopDownCamera = "自由视角"
+TotalSkins = "总皮肤数: "
+WantedLevel = "通缉等级"
+WorkSkinOnly = "仅包含有效的皮肤"
+
+[RPC]
+BrowsingCheatMenu = "浏览作弊菜单"
+Busted = "被毁了！"
+DoingMission = "正在执行任务"
+Driving = "驾驶"
+In = "in"
+InsideMenus = "内部菜单"
+InsideInterior = "内部里面"
+OnRampage = "与警察横冲直撞"
+PlayingFor = "Playing for {}:{}:{}"
+Walking = "行走"
+Wasted = "Wasted!"
+
+[传送]
+AddLocation = "添加位置"
+Coordinates = "坐标"
+CustomLocationRemoveOnly = "您只能删除自定义位置"
+CustomMapSize = "自定义地图大小"
+CustomMapSizeHint = "自定义游戏地图大小，用于快速传送。只需要总转换模组（SAxVCxLC）"
+Height = "高度"
+InsertCoord = "插入坐标"
+InvalidCoord = "无效坐标"
+InvalidLocation = "无效位置"
+Location = "位置"
+LocationHint = "Groove Street"
+LocationRemoved = "位置已删除"
+QuickTeleport = "快速传送"
+QuickTeleportHint = "使用快速传送 "
+TeleportMarkerHint = """
+传送到雷达的位置
+目标光点使用 """
+TargetBlipText = "未找到目标光点。你需要先定位"
+TeleportCenter = "传送到中心"
+TeleportMarker = "传送到标记"
+TeleportToCoord = "传送到坐标"
+Width = "宽度"
+
+[Updater]
+Failed = "Failed to check for updates"
+Found = "Update found"
+NotFound = "No update found"
+
+[车辆]
+Abs = "Abs"
+ADM = "Anti dive multiplier"
+AggroDriver = "Aggressive driver"
+AimDrive = "在驾驶时瞄准"
+All = "全部"
+AllNitro = "所有汽车都有氮气"
+AllTaxiNitro = "所有出租车都有氮气"
+AnimGroup = "Anim group"
+AutoDrive = "Auto drive"
+AutoDriveNoVeh = "你需要在车内！"
+AutoDriveCoord = "行驶到坐标"
+AutoDriveMarker = "Drive to marker"
+AutoDriveStop = "停止驾驶"
+AutoDriveInfo = """自动将您带到所选位置。这效果不是很好，车辆可能会卡住！"""
+AutoUnflip = "自动展开"
+Big = "大"
+BikeFly = "自行车会飞"
+Black = "黑色"
+BlowCar = "炸毁汽车"
+BoatFly = "船飞"
+BrakeBias = "刹车偏置"
+BrakeDecel = "制动减速"
+BulletProof = "防弹"
+CarFly = "汽车会飞"
+CarHeavy = "重型汽车"
+CDM = "碰撞伤害乘数"
+CemterMassX = "重心 X"
+CemterMassY = "重心 Y"
+CemterMassZ = "重心 Z"
+Cheap = "便宜"
+Color = "颜色"
+ColorPicker = "拾色器"
+ColProof = "防碰撞"
+Component = "组件"
+Country = "国家"
+Damage = "损害"
+DampingLvl = "阻尼水平"
+DensityMul = "密度乘数"
+DirtLvl = "污垢水平"
+Diseal = "Diseal"
+DmgProof = "防损坏"
+DmgProofTip = """
+每辆进入的车辆都是防损坏的
+子弹、碰撞、爆炸、火灾、Meele等"""
+Doors = "门"
+DragMult = "阻力倍增器"
+Driver = "驱动程序"
+DriverTarget = "驱动程序可定位"
+DriveType = "驱动器类型"
+DriveWater = "水上驾驶"
+Electric = "电动"
+EngineAccel = "发动机加速"
+EngineInertia = "发动机惯性"
+EngineOn = "引擎打开"
+EngineType = "引擎类型"
+EnterNearVeh = "进入最近的车辆"
+ExplosionProof = "防爆型"
+Fast = "快"
+FireProof = "防火"
+Fix = "修复"
+FixCar = "固定车辆"
+FlipCar = "翻转车辆"
+FlipNoBurn = "翻转时不燃烧"
+FlipNoBurnTip = "车辆在飞行时不会燃烧"
+FloatOnHit = "击中就漂浮"
+ForceLevel = "部队级别"
+ForCurVeh = "对于当前车辆,"
+FourWheelDrive = "四轮驱动"
+FrontLights = "前灯"
+FrontWheelDrive = "前轮驱动"
+GreenLights = "绿色交通信号灯"
+HandlingFlags = "处理标志"
+HandlingTab = "处理"
+HighSpeedDamping = "高速阻尼"
+HSTarget = "HS targetable"
+HSTargetTip = "Heat Seaker导弹可以瞄准这个"
+IDSpawnText = "使用ID生成（Enter）"
+InfNitro = "无限氮气"
+InfNitroTip = """
+氮气将在左键点击时激活
+启用此选项将禁用
+所有汽车都有氮气
+所有出租车都有氮气"""
+InstantStop = "即时停止"
+InvalidID = "无效的模型 ID"
+InvisCar = "汽车隐形"
+LessDmg = "减少伤害"
+LessTraffic = "减少流量"
+LightsOn = "灯亮起"
+LockDoor = "锁门"
+LockSpeed = "锁定速度"
+Long = "长"
+LowerLimit = "下限"
+Mass = "质量"
+MatFilter = "Material filter"
+MaxVelocity = "最大速度"
+MeleeProof = "近战防护"
+ModelFlags = "模型标志"
+MonValue = "货币价值"
+LockTrainCam = "Lock train cam"
+NeonsTab = "霓虹灯"
+NoColl = "禁用碰撞"
+NoNearVeh = "附近不生成车辆！"
+NoParticles = "禁用粒子特效"
+NoDerail = "列车不会脱轨"
+NumGears = "挂档位数"
+Off = "关"
+On = "开"
+OnlyWheels = "仅限车轮"
+Open = "打开"
+Paintjob = "喷漆作业"
+Passenger = "乘客"
+PentrolTank = "Petrol tank KO"
+PercentSubmerged = "淹没百分比"
+PerfectHandling = "完美处理"
+Petrol = "汽油"
+PetrolTankTip = "如果油箱被击中，车辆将爆炸"
+Pink = "粉红色"
+PlateText = "车牌文本"
+Pop = "流行"
+Primary = "主要"
+PulsingNeon = "脉冲霓虹灯"
+Quaternary = "第四级"
+Radius = "半径"
+RainbowNeon = "彩虹霓虹灯"
+RainbowNeonMSG = "彩虹效果到霓虹灯"
+ReadMore = "阅读全文"
+RearLights = "尾灯"
+RearWheelDrive = "后轮驱动"
+RemoveNeon = "删除霓虹灯"
+RemoveNeonMSG = "霓虹灯成功移除"
+RemoveVeh = "拆卸车辆"
+RemoveVehRadius = "移除半径内的车辆"
+ResetColor = "重置颜色"
+ResetColorMSG = "颜色重置成功"
+ResetHandling = "重置处理"
+ResetHandlingMSG = "重置处理成功"
+ResetTexture = "重置纹理"
+ResetTextureMSG = "纹理重置成功"
+SaveFile = "保存到文件"
+SaveFileMSG = "处理已成功保存"
+SeatOffset = "座椅偏移量"
+Secondary = "次要"
+SelectPreset = "选择预设:"
+Set = "设置"
+SetSpeed = "设定速度"
+Siren = "警笛"
+SkidMarks = "始终有打滑痕迹"
+Small = "小"
+SpawnInAir = "空中生成飞机"
+SpawnInside = "生成为驱动程序"
+StayOnBike = "不会从摩托/自行车上摔下来"
+SteeringLock = "转向锁"
+SuspensionBias = "悬架偏置"
+SwitchSeats = "开关座位"
+Tall = "高"
+TankMode = "坦克模式"
+Tertiary = "第三级"
+TextureTab = "纹理"
+TotalSeats = "座位数: %d"
+TractionBias = "牵引偏置"
+TractionLoss = "牵引力损失"
+TractionMul = "牵引力倍增器"
+TrafficColor = "交通颜色"
+TrafficNeon = "交通霓虹灯"
+TrafficNeonMSG = """
+为交通车辆添加霓虹灯.
+只有一些车辆会有霓虹灯."""
+TrafficType = "流量类型"
+TuneTab = "Tune"
+TurnMass = "转向质量"
+Type = "类型"
+UpperLimit = "上限"
+Watertight = "防水汽车"
+WatertightTip = """
+车内的PED不会溺水
+被淹没在水中"""
+
+[视觉]
+Ambient = "环境"
+AmbientBl = "Ambient bl"
+AmbientObj = "Ambient object"
+AmbientObjBl = "Ambient object bl"
+ArmourbarColor = "Armour bar color"
+ArmourbarPosX = "Armour bar posX"
+ArmourbarPosY = "Armour bar posY"
+ArmourBorder = "Armour border"
+ArmourPercentage = "Armour percentage"
+Blur = "模糊"
+BoldBorder = "粗体边框"
+BreathbarColor = "呼吸条颜色"
+BreathbarPosX = "Breath bar posX"
+BreathbarPosY = "Breath bar posY"
+BreathBorder = "Breath border"
+BreathPercentage = "呼吸百分比"
+CCTVEffect = "闭路电视效应"
+ClockColor = "时钟颜色"
+ClockPosX = "Clock posX"
+ClockPosY = "Clock posY"
+CloudAlpha = "Cloud alpha"
+CloudsBottom = "Clouds bottom"
+CloudsLow = "Clouds low"
+CloudsTop = "Clouds top"
+ColorsTab = "颜色"
+CurrentWeather = "当前天气"
+DarknessFilter = "黑暗过滤器"
+DefaultBorder = "默认边框"
+DefaultOutline = "默认大纲"
+DefaultStyle = "默认样式"
+DirectionalLight = "定向光"
+DirectionalMult = "定向多"
+DisableHydrant = "禁用消火栓飞溅"
+Distance = "距离"
+DrawMenuTitle = "绘制菜单标题边框颜色"
+UnderwaterEffect = "水下效应"
+FarClip = "远距剪切"
+FileGenerated = "文件生成"
+FluffyClouds = "蓬松的云"
+FogEffect = "雾效应"
+FogStart = "雾开始"
+FreezeGameTime = "冻结游戏时间"
+FullscreenMap = "全屏地图"
+FullscreenMapTip = "删除菜单地图中的黑色边框"
+GenerateFile = "生成时间周期文件"
+GrainEffect = "颗粒效应"
+GrayRadar = "灰色雷达"
+GreenScanlines = "绿色扫描线"
+HealthbarColor = "健康条颜色"
+HealthbarPosX = "Health bar posX"
+HealthbarPosY = "Health bar posY"
+HealthBorder = "运行状况边界"
+HealthPercentage = "健康百分比"
+HeatHazeEffect = "热雾效应"
+HideAreaNames = "隐藏区域名称"
+HideHud = "隐藏HUD"
+HideRadar = "隐藏雷达"
+HideVehNames = "隐藏车辆名称"
+HideWantedLevel = "隐藏通缉级别"
+Hour = "小时"
+IncompatibleMods = "不兼容的MOD"
+IncompatibleModsText = """
+1. vHud
+2. GTA 5 Hud
+3. MobileHud
+以及其他彻底改变HUD的mod"""
+InfraredVision = "红外视觉"
+InvisibleWater = "看不见的水"
+LightBrightness = "地面亮度"
+LightIntensity = "高光最小强度"
+LightShadowStrength = "光影强度"
+LockWeather = "锁定天气"
+Minute = "分钟"
+MoneyColor = "金钱颜色"
+MoneyFontOutline = "Money font outline"
+MoneyFontStyle = "Money font style"
+MoneyPosX = "Money posX"
+MoneyPosY = "Money posY"
+NextWeather = "下一个天气"
+NightVision = "夜视"
+NoBorder = "无边框"
+NoMoneyZeros = "No money zeros"
+NoOutline = "无轮廓"
+NoParticles = "无粒子效应"
+NoPostFX = "No postfx"
+NoRadarRot = "No radar rotation"
+NoWater = "无水"
+PoleShadowStrength = "极影强度"
+PostFX1 = "PostFX 1"
+PostFX2 = "PostFX 2"
+RadarHeight = "雷达高度"
+RadarPosX = "Radar posX"
+RadarPosY = "Radar posY"
+RadarWidth = "雷达宽度"
+RadarZoom = "雷达变焦"
+RadioStationColor = "Radio station color"
+ResetTimecyc = "Reset timecyc"
+ShadowStrength = "阴影强度"
+ShowHud = "显示HUD"
+ShowRadar = "显示雷达"
+SkyBottom = "天空下部分"
+SkyTop = "天空上部分"
+SpriteBrightness = "精灵亮度"
+SpriteSize = "精灵大小"
+SquareRadar = "直线折旧"
+Style1 = "样式 1"
+Style2 = "样式 2"
+SunCore = "Sun core"
+SunCorona = "Sun corona"
+SunSize = "太阳大小"
+SyncTimeEnabled = """
+同步系统时间已启用。
+（游戏/同步系统时间）"""
+ThinOutline = "细轮廓"
+Timecyc24hTab = "Timecyc 24h"
+TimecycReset = "Timecyc reset"
+TimecycTab = "Timecyc"
+TreeShadowStrength = "树影强度"
+UnfogMap = "Unfog map"
+UnfogMapText = "从主菜单地图中删除雾"
+WantedAmmoPosX = "Wanted ammo posX"
+WantedAmmoPosY = "Wanted ammo posY"
+WantedPosX = "Wanted posX"
+WantedPosY = "Wanted posY"
+WantedStarBorder = "Wanted star border"
+Water = "水"
+WaterFogAlpha = "Water fog alpha"
+WeaponAmmoPosX = "Weapon ammo posX"
+WeaponAmmoPosY = "Weapon ammo posY"
+WeaponIconPosX = "Weapon icon posX"
+WeaponIconPosY = "Weapon icon posY"
+WhiteScanlines = "White scanlines"
+
+[武器]
+Ammo = "弹药"
+CurrentWeapon = "当前武器: %s"
+DropAll = "全部删除"
+DropCurrent = "删除电流"
+DropWeapon = "扔下武器"
+DualWeild = "双持武器"
+DualWeildText = """
+双持手枪，肖夫，乌兹，tec9
+（其他武器不起作用）"""
+FastAim = "快速瞄准"
+FastAimText = """
+在键盘上启用瞄准辅助
+Q = 左 E = 右
+按 Q 和 E 切换目标。
+移动鼠标删除目标！"""
+FastReload = "快速重新加载"
+GangWeaponEditor = "帮派武器编辑器"
+HugeDamage = "巨大伤害"
+HugeDamageText = "如果武器射程短，也启用'远程'"
+InfiniteAmmo = "无限弹药"
+LongRange = "长距离"
+MoveWhenAiming = "瞄准时移动"
+MoveWhenFiring = "射击时移动"
+NoSpread = "无扩散"
+RapidFire = "速射"
+SelectGang = "选择帮派"
+Weapon1 = "武器 1"
+Weapon2 = "武器 2"
+Weapon3 = "武器 3"
+WeaponTweaksText = """
+武器调整适用于全部
+适用于每种ped武器类型"""
+
+[窗]
+AddNew = "Add new"
+AnimationPage = "动画"
+CheckboxTab = "复选框"
+CopiedToClipboard = "复制到剪贴板"
+Default = "Def"
+Enabled = "已启用"
+GamePage = "游戏"
+Info = "信息"
+Maximum = "最大值"
+MenuPage = "菜单"
+MenusTab = "菜单"
+Minimum = "最小值"
+PedPage = "Ped"
+PlayerPage = "玩家"
+Search = "搜索"
+LocationsTab = "位置"
+FavouritesTab = "收藏夹"
+SetValue = "设定值"
+SpawnTab = "生成"
+TeleportPage = "传送"
+VehiclePage = "车辆"
+VisualPage = "视觉"
+WeaponPage = "武器"
