@@ -108,3 +108,8 @@ void FontMgr::StartOptionalFontDownload()
         curState = eStates::Downloading;
     }
 }
+
+void FontMgr::SetFontReloadRequired(bool state)
+{
+    m_bFontReloadRequired = state;
+}

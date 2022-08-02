@@ -32,15 +32,17 @@ public:
     // Returns font pointer from name
     static ImFont* Get(const char* fontID);
 
-    // Loads a font into memory
-    static ImFont* Load(const char* fontID, const char* path = 0, float fontMul = 1.0f);
-
     // Get the glyph ranges for our needed fonts
     static const ImWchar* GetGlyphRanges();
-    
-    // Unloads all the loaded fonts from fontmgr
-    // ImGui::GetIO().Default font must be loaded after unloading all fonts
-    static void UnloadAll();
+
+    // Returns true if font needs to be reloaded
+    static bool IsFontReloadRequired();
+
+    // Returns true if font support package is already installed
+    static bool IsSupportPackageInstalled();
+
+    // Loads a font into memory
+    static ImFont* Load(const char* fontID, const char* path = 0, float fontMul = 1.0f);
 
     // Handles font downloading
     static void Process();
@@ -48,14 +50,15 @@ public:
     // Reloads all the fonts 
     static void ReloadAll();
 
-    // Downloads optional font package
+    // Sets if the font reloading is requried
+    static void SetFontReloadRequired(bool state);
+
+    // Downloads optional font package from GitHub reository
     static void StartOptionalFontDownload();
 
-    // Returns true if font support package is already installed
-    static bool IsSupportPackageInstalled();
-
-    // Returns true if font needs to be reloaded
-    static bool IsFontReloadRequired();
+    // Unloads all the loaded fonts from fontmgr
+    // ImGui::GetIO().Default font must be loaded after unloading all fonts
+    static void UnloadAll();
 };
 
 

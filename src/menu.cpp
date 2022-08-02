@@ -43,13 +43,19 @@ void Menu::ShowPage()
                 {
                     Locale::SetDefaultLocale();
                     selected = Locale::GetCurrentLocaleIndex();
+                    CheatMenu::GenHeaderList();
                 }
             }
 
             ImGui::Spacing();
-            if (ImGui::Button(TEXT("Menu.ResetSize"), ImVec2(Widget::CalcSize(1))))
+            if (ImGui::Button(TEXT("Menu.ResetSize"), ImVec2(Widget::CalcSize(2))))
             {
                 CheatMenu::ResetMenuSize();
+            }
+            ImGui::SameLine();
+            if (ImGui::Button(TEXT("Menu.ReloadFonts"), ImVec2(Widget::CalcSize(2))))
+            {
+                FontMgr::SetFontReloadRequired(true);
             }
 
             ImGui::Spacing();
