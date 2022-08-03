@@ -2,7 +2,7 @@
 #include "pch.h"
 
 ResourceStore::ResourceStore(const char* text, eResourceType type, ImVec2 imageSize)
-    : m_ImageSize(imageSize), m_Type(type)
+    : m_ImageSize(imageSize), m_Type(type), m_FileName(text)
 {
     if (m_Type != eResourceType::TYPE_IMAGE)
     {
@@ -50,7 +50,7 @@ RwTexDictionary* LoadTexDictionary(char const* filename) {
     return plugin::CallAndReturnDynGlobal<RwTexDictionary*, char const*>(0x5B3860, filename);
 }
 
-RwTexture* ResourceStore::FindTextureByName(std::string&& name)
+RwTexture* ResourceStore::FindRwTextureByName(const std::string& name)
 {
     for (auto& item: m_ImagesList)
     {
@@ -58,6 +58,16 @@ RwTexture* ResourceStore::FindTextureByName(std::string&& name)
         {
             return item->m_pRwTexture;
         }
+    }
+    return nullptr;
+}
+
+IDirect3DTexture9** ResourceStore::FindTextureByName(const std::string& name)
+{
+    RwTexture *pTex = FindRwTextureByName(name);
+    if (pTex)
+    {
+        return GetTextureFromRaster(pTex);
     }
     return nullptr;
 }
@@ -78,7 +88,7 @@ void ResourceStore::LoadTextureResource(std::string&& name)
     {
         RwLinkList *pRLL = (RwLinkList*)pRwTexDictionary->texturesInDict.link.next;
         RwTexDictionary *pEndDic;
-        bool addCategories = (m_Categories.size() < 2); // "All"
+        bool addCategories = (m_Categories.size() < 3); // "All", "Custom"
         do
         {
             pEndDic = (RwTexDictionary*)pRLL->link.next;

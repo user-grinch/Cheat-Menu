@@ -5,9 +5,6 @@
 ######################################################################
 
 [Animation]
-AddAnimation = "Add animation"
-AddParticle = "Add particle"
-AnimationRemoved = "Animation removed"
 AnimationTab = "Animation##TABBAR"
 AnimName = "Anim name"
 CustomAnimsOnly = "You can only remove custom animations"
@@ -22,6 +19,8 @@ LoopCheckbox = "Loop"
 LoopCheckboxText = "Keep playing the animation on repeat"
 NoTarget = "No player target found. Aim a ped with a weapon to select it for animation player."
 ParticleName = "Particle name"
+ParticleID = "Particle id"
+ParticleAdded = "Particle added"
 ParticleRemoved = "Particle removed"
 ParticleTab = "Particle##TABBAR"
 PedAnim = "Ped anim"
@@ -260,6 +259,8 @@ WelcomeMSG = "Welcome to Cheat Menu"
 
 [Ped]
 Accuracy = "Accuracy"
+AddPed = "Add ped"
+AddPedMSG = "Ped added"
 BigHead = "Big head effect"
 ConfigTab = "Config"
 DownloadExGangWars = "Download ExGangWars"
@@ -272,8 +273,10 @@ GangsControl = "Gangs control streets"
 GangsEverywhere = "Gangs everywhere"
 Gangs = "Gangs"
 GangWars = "Gang wars"
+GetPlayerModel = "Insert player model"
 Health = "Health"
 MaxLimit = "Max limit reached"
+Model = "Model"
 NastyLimbs = "Nasty limbs"
 NoMove = "Don't move"
 NoProstitutes = "No prostitutes"
@@ -403,9 +406,7 @@ Walking = "Walking"
 Wasted = "Wasted!"
 
 [Teleport]
-AddLocation = "Add location"
 Coordinates = "Coordinates"
-CustomLocationRemoveOnly = "You can only remove custom location"
 CustomMapSize = "Custom map size"
 CustomMapSizeHint = "Custom game map size for quick teleport. Only needed for Total Conversion mods (SAxVCxLC)"
 Height = "Height"
@@ -434,6 +435,7 @@ NotFound = "No update found"
 [Vehicle]
 Abs = "Abs"
 ADM = "Anti dive multiplier"
+AddVehicle = "Add vehicle"
 AggroDriver = "Aggressive driver"
 AimDrive = "Aim while driving"
 All = "All"
@@ -502,6 +504,7 @@ ForCurVeh = "For current vehicle,"
 FourWheelDrive = "Four wheel drive"
 FrontLights = "Front lights"
 FrontWheelDrive = "Front wheel drive"
+GetCurrentVehInfo = "Current vehicle info"
 GreenLights = "Green traffic lights"
 HandlingFlags = "Handling flags"
 HandlingTab = "Handling"
@@ -511,12 +514,11 @@ HSTargetTip = "Heat Seaker missile can target this"
 IDSpawnText = "Spawn with ID (Enter)"
 InfNitro = "Unlimited nitro"
 InfNitroTip = """
-Nitro will activate when left clicked
-
-
-Enabling this would disable
+Enabling this would disable,
 All cars have nitro
-All taxis have nitro"""
+All taxis have nitro
+
+(Activate nitro with left click)"""
 InstantStop = "Instant stop"
 InvalidID = "Invalid model ID"
 InvisCar = "Invisible car"
@@ -531,14 +533,16 @@ Mass = "Mass"
 MatFilter = "Material filter"
 MaxVelocity = "Max velocity"
 MeleeProof = "Melee proof"
+Model = "Model"
 ModelFlags = "Model flags"
 MonValue = "Monetary value"
 LockTrainCam = "Lock train cam"
 NeonsTab = "Neons"
 NoColl = "Disable collisions"
+NoDerail = "No train derail"
+NotInVehicle = "Not inside vehicle!"
 NoNearVeh = "No nearby vehicles!"
 NoParticles = "Disable particles"
-NoDerail = "No train derail"
 NumGears = "Number of gears"
 Off = "Off"
 On = "On"
@@ -783,13 +787,27 @@ Weapon3 = "Weapon 3"
 WeaponTweaksText = """
 Weapon tweaks apply globally
 to every ped weapon type"""
+WeaponType = "Weapon type"
 
 [Window]
+AddEntry = "Add entry"
+AddEntryMSG = "Entry added"
 AddNew = "Add new"
+AddNewCustomImg = "How to add custom images for entries?"
+AddNewTip = "Providing wrong values might crash your game"
+AddNewTip2 = """
+Custom entry images can be added inside texture file.
+
+1. Open up the 'CheatMenuSA/{}.txd' file using Magic.TXD program.
+2. Add your images to that file (Follow aspect ratio & naming format)
+3. Save & try in game
+"""
 AnimationPage = "Animation"
 CheckboxTab = "Checkboxes"
 CopiedToClipboard = "Copied to clipboard"
+CustomRemoveOnly = "You can only remove added entries"
 Default = "Def"
+DownloadMagicTxd = "Download Magic.TXD"
 Enabled = "Enabled"
 GamePage = "Game"
 Info = "Info"

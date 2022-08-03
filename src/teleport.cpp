@@ -59,7 +59,7 @@ void Teleport::Init()
             static CSprite2d map; 
             if (!map.m_pTexture)
             {
-                map.m_pTexture = gTextureList.FindTextureByName("map");
+                map.m_pTexture = gTextureList.FindRwTextureByName("map");
             }
             float height = screen::GetScreenHeight();
             float width = screen::GetScreenWidth();
@@ -310,27 +310,6 @@ void Teleport::ShowPage()
             FetchRadarSpriteData();
 #endif  
             ImGui::Spacing();
-            if (ImGui::CollapsingHeader(TEXT("Window.AddNew")))
-            {
-                ImGui::Spacing();
-                ImGui::InputTextWithHint(TEXT("Teleport.Location"), TEXT("Teleport.LocationHint"), locBuf, INPUT_BUFFER_SIZE);
-                ImGui::InputTextWithHint(TEXT("Teleport.Coordinates"), "x, y, z", inBuf, INPUT_BUFFER_SIZE);
-                ImGui::Spacing();
-                if (ImGui::Button(TEXT("Teleport.AddLocation"), Widget::CalcSize()))
-                {
-                    std::string key = std::string("Custom.") + locBuf;
-                    m_locData.m_pData->Set(key.c_str(), ("0, " + std::string(inBuf)));
-
-    #ifdef GTASA
-                    // Clear the Radar coordinates
-                    m_locData.m_pData->RemoveTable("Radar");
-    #endif
-
-                    m_locData.m_pData->Save();
-                }
-            }
-
-            ImGui::Spacing();
             Widget::DataList(m_locData, 
             [](std::string& unk1, std::string& unk2, std::string& loc){
                 int dim = 0;
@@ -353,7 +332,24 @@ void Teleport::ShowPage()
                 }
                 else
                 {
-                    Util::SetMessage(TEXT("Teleport.CustomLocationRemoveOnly"));
+                    Util::SetMessage(TEXT("Window.CustomRemoveOnly"));
+                }
+            },
+            [](){
+                ImGui::InputTextWithHint(TEXT("Teleport.Location"), TEXT("Teleport.LocationHint"), locBuf, INPUT_BUFFER_SIZE);
+                ImGui::InputTextWithHint(TEXT("Teleport.Coordinates"), "x, y, z", inBuf, INPUT_BUFFER_SIZE);
+                ImGui::Spacing();
+                if (ImGui::Button(TEXT("Window.AddEntry"), Widget::CalcSize()))
+                {
+                    std::string key = std::string("Custom.") + locBuf;
+                    m_locData.m_pData->Set(key.c_str(), ("0, " + std::string(inBuf)));
+#ifdef GTASA
+                    // Clear the Radar coordinates
+                    m_locData.m_pData->RemoveTable("Radar");
+#endif
+
+                    m_locData.m_pData->Save();
+                    Util::SetMessage(TEXT("Window.AddEntryMSG"));
                 }
             });
             ImGui::EndTabItem();

@@ -312,12 +312,12 @@ void CheatMenu::ShowAnniversaryPage()
 
     if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Widget::CalcSize(3))))
     {
-        ShellExecute(nullptr, "open", DISCORD_INVITE, nullptr, nullptr, SW_SHOWNORMAL);
+        OPEN_LINK(DISCORD_INVITE);
     }
     ImGui::SameLine();
     if (ImGui::Button(TEXT("Menu.GitHubRepo"), ImVec2(Widget::CalcSize(3))))
     {
-        ShellExecute(nullptr, "open", GITHUB_LINK, nullptr, nullptr, SW_SHOWNORMAL);
+        OPEN_LINK(GITHUB_LINK);
     }
 }   
 
@@ -333,12 +333,12 @@ void CheatMenu::ShowWelcomePage()
     ImGui::NewLine();
     if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Widget::CalcSize(2))))
     {
-        ShellExecute(nullptr, "open", DISCORD_INVITE, nullptr, nullptr, SW_SHOWNORMAL);
+        OPEN_LINK(DISCORD_INVITE);
     }
     ImGui::SameLine();
     if (ImGui::Button(TEXT("Menu.GitHubRepo"), ImVec2(Widget::CalcSize(2))))
     {
-        ShellExecute(nullptr, "open", GITHUB_LINK, nullptr, nullptr, SW_SHOWNORMAL);
+        OPEN_LINK(GITHUB_LINK);
     }
     ImGui::NewLine();
     ImGui::TextWrapped(TEXT("Menu.BugDisclaimer"));
@@ -361,7 +361,7 @@ void CheatMenu::ShowUpdatePage()
     ImGui::Dummy(ImVec2(0, 5));
     if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Widget::CalcSize(2))))
     {
-        ShellExecute(nullptr, "open", DISCORD_INVITE, nullptr, nullptr, SW_SHOWNORMAL);
+        OPEN_LINK(DISCORD_INVITE);
     }
 
     ImGui::SameLine();

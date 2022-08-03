@@ -57,8 +57,9 @@ private:
 
 public:
     ImGuiTextFilter m_Filter = "";
-    std::vector<std::string> m_Categories = {"All"};
+    std::vector<std::string> m_Categories = {"All", "Custom"};
     std::string m_Selected = "All";
+    std::string m_FileName;
     std::unique_ptr<DataStore> m_pData;
     std::vector<std::unique_ptr<TextureResource>> m_ImagesList;
     ImVec2 m_ImageSize;
@@ -67,5 +68,6 @@ public:
 
     ResourceStore(const char* text, eResourceType type = TYPE_IMAGE, ImVec2 imageSize = ImVec2(64, 64));
 
-    RwTexture* FindTextureByName(std::string&& name);
+    RwTexture* FindRwTextureByName(const std::string& name);
+    IDirect3DTexture9** FindTextureByName(const std::string& name);
 };

@@ -367,6 +367,21 @@ void Weapon::ShowPage()
             [](std::string& str)
             {
                 return str != "0"; /*Unarmed*/
+            },
+            [](){
+                static char name[INPUT_BUFFER_SIZE];
+                static int model = 0;
+                ImGui::InputTextWithHint(TEXT("Menu.Name"), "Minigun", name, INPUT_BUFFER_SIZE);
+                Widget::InputInt(TEXT("Weapon.WeaponType"), &model, 1, 0, 999999);
+                ImGui::Spacing();
+                ImVec2 sz = Widget::CalcSize(1);
+                if (ImGui::Button(TEXT("Window.AddEntry"), sz))
+                {
+                    std::string key = std::format("Custom.{} (Added)", name);
+                    m_WeaponData.m_pData->Set(key.c_str(), std::to_string(model));
+                    m_WeaponData.m_pData->Save();
+                    Util::SetMessage(TEXT("Window.AddEntryMSG"));
+                }
             });
 #else
             Widget::DataList(m_WeaponData, GiveWeaponToPlayer, nullptr);
@@ -390,12 +405,10 @@ void Weapon::ShowPage()
             ImGui::Text(TEXT("Weapon.CurrentWeapon"), m_WeaponData.m_pData->Get(key.c_str(), "Unknown").c_str());
             ImGui::Spacing();
             Widget::ImageList(m_WeaponData, SetGangWeapon,
-            [](std::string& str)
-            {
+            [](std::string& str){
                 return m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
             },
-            [](std::string& str)
-            {
+            [](std::string& str){
                 return str != "-1"; /*Jetpack*/
             });
             ImGui::EndTabItem();

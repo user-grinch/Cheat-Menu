@@ -55,7 +55,7 @@ void Cutscene::Play(std::string& rootKey, std::string& cutsceneId, std::string& 
     }
 }
 
-void Particle::Play(std::string& rootKey, std::string& particle, std::string& dummy)
+void Particle::Play(std::string& cat, std::string& name, std::string& particle)
 {
     CPlayerPed* pPlayer = FindPlayerPed();
     if (pPlayer)
@@ -69,9 +69,9 @@ void Particle::Play(std::string& rootKey, std::string& particle, std::string& du
 }
 
 
-void Particle::Remove(std::string& ifp, std::string& particle, std::string& dummy)
+void Particle::Remove(std::string& cat, std::string& name, std::string& particle)
 {
-    if (ifp == "Custom")
+    if (cat == "Custom")
     {
         Particle::m_Data.m_pData->RemoveKey("Custom", particle.c_str());
         Particle::m_Data.m_pData->Save();
@@ -340,27 +340,27 @@ void Animation::ShowPage()
             }
             else
             {
-                if (ImGui::CollapsingHeader(TEXT("Window.AddNew")))
-                {
-                    static char animBuf[INPUT_BUFFER_SIZE];
-                    static char ifpBuf[INPUT_BUFFER_SIZE];
-                    
-                    ImGui::InputTextWithHint(TEXT("Animation.IFPName"), "ped", ifpBuf, INPUT_BUFFER_SIZE);
-                    ImGui::InputTextWithHint(TEXT("Animation.AnimName"), "cower", animBuf, INPUT_BUFFER_SIZE);
-                    ImGui::Spacing();
-                    if (ImGui::Button(TEXT("Animation.AddAnimation"), Widget::CalcSize()))
-                    {
-                        std::string key = std::string("Custom.") + animBuf;
-                        m_AnimData.m_pData->Set(key.c_str(), std::string(ifpBuf));
-                        m_AnimData.m_pData->Save();
-                    }
-                }
                 ImGui::Spacing();
 
                 if (ImGui::BeginChild("Anims Child"))
                 {
                     ImGui::Spacing();
-                    Widget::DataList(m_AnimData, Play, Remove);
+                    Widget::DataList(m_AnimData, Play, Remove, 
+                    [](){
+                        static char animBuf[INPUT_BUFFER_SIZE];
+                        static char ifpBuf[INPUT_BUFFER_SIZE];
+                        
+                        ImGui::InputTextWithHint(TEXT("Animation.IFPName"), "ped", ifpBuf, INPUT_BUFFER_SIZE);
+                        ImGui::InputTextWithHint(TEXT("Animation.AnimName"), "cower", animBuf, INPUT_BUFFER_SIZE);
+                        ImGui::Spacing();
+                        if (ImGui::Button(TEXT("Window.AddEntry"), Widget::CalcSize()))
+                        {
+                            std::string key = std::string("Custom.") + animBuf;
+                            m_AnimData.m_pData->Set(key.c_str(), std::string(ifpBuf));
+                            m_AnimData.m_pData->Save();
+                            Util::SetMessage("Window.AddEntryMSG");
+                        }
+                    });
                     ImGui::EndChild();
                 }
             }
@@ -474,23 +474,24 @@ void Animation::ShowPage()
                 pPlayer->m_nPedFlags.bDontRender = (pPlayer->m_nPedFlags.bDontRender == 1) ? 0 : 1;
             }
             ImGui::Spacing();
-            if (ImGui::CollapsingHeader(TEXT("Window.AddNew")))
-            {
-                static char buf[INPUT_BUFFER_SIZE];
-                ImGui::InputTextWithHint(TEXT("Animation.ParticleName"), "kkjj_on_fire", buf, INPUT_BUFFER_SIZE);
-                ImGui::Spacing();
-                if (ImGui::Button(TEXT("Animation.AddParticle"), Widget::CalcSize()))
-                {
-                    std::string key = std::string("Custom.") + buf;
-                    m_AnimData.m_pData->Set(key.c_str(), std::string("Dummy"));
-                    Particle::m_Data.m_pData->Save();
-                }
-            }
             ImGui::Spacing();
             if (ImGui::BeginChild("Anims Child"))
             {
                 ImGui::Spacing();
-                Widget::DataList(Particle::m_Data, Particle::Play, Particle::Remove);
+                Widget::DataList(Particle::m_Data, Particle::Play, Particle::Remove,
+                [](){
+                    static char name[INPUT_BUFFER_SIZE], particle[INPUT_BUFFER_SIZE];
+                    ImGui::InputTextWithHint(TEXT("Animation.ParticleName"), "KKJJ fire particle", name, INPUT_BUFFER_SIZE);
+                    ImGui::InputTextWithHint(TEXT("Animation.ParticleID"), "kkjj_on_fire", particle, INPUT_BUFFER_SIZE);
+                    ImGui::Spacing();
+                    if (ImGui::Button(TEXT("Window.AddEntry"), Widget::CalcSize()))
+                    {
+                        std::string key = std::string("Custom.") + name;
+                        Particle::m_Data.m_pData->Set(key.c_str(), std::string(particle));
+                        Particle::m_Data.m_pData->Save();
+                        Util::SetMessage(TEXT("Window.AddEntryMSG"));
+                    }
+                });
                 ImGui::EndChild();
             }
             ImGui::EndTabItem();

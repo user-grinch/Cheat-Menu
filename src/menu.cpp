@@ -32,7 +32,8 @@ void Menu::ShowPage()
             && !FontMgr::IsSupportPackageInstalled())
             {
                 ImGui::Spacing();
-                ImGui::TextWrapped("Font support package is required to display this language! This may take a while depending on your connection.");
+                ImGui::TextWrapped("Font support package is required to display this language!"
+" This may take a while depending on your internet connection.\n\nIt's recommended NOT to install unless you want to use this language! (Affects game loading time)");
                 ImGui::Spacing();
                 if (ImGui::Button("Install package", ImVec2(Widget::CalcSize(2))))
                 {
@@ -288,14 +289,14 @@ void Menu::ShowPage()
 
             if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Widget::CalcSize(3))))
             {
-                ShellExecute(nullptr, "open", DISCORD_INVITE, nullptr, nullptr, SW_SHOWNORMAL);
+                OPEN_LINK(DISCORD_INVITE);
             }
 
             ImGui::SameLine();
 
             if (ImGui::Button(TEXT("Menu.GitHubRepo"), ImVec2(Widget::CalcSize(3))))
             {
-                ShellExecute(nullptr, "open", GITHUB_LINK, nullptr, nullptr, SW_SHOWNORMAL);
+                OPEN_LINK(GITHUB_LINK);
             }
             ImGui::Spacing();
 

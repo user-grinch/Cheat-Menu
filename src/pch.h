@@ -80,6 +80,7 @@ extern DataStore gConfig;
 
 typedef void(*ArgCallback3)(std::string&, std::string&, std::string&);
 typedef void(*ArgCallback)(std::string&);
+typedef void(*ArgCallbackNone)();
 typedef std::string(*ArgCallbackRtn)(std::string&);
 typedef bool(*ArgCallbackRtnBool)(std::string&);
 

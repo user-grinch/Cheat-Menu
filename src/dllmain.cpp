@@ -45,7 +45,7 @@ void MenuThread(void* param)
 
         if (msgID == IDOK)
         {
-            ShellExecute(nullptr, "open", "https://gtaforums.com/topic/669045-silentpatch/", nullptr, nullptr, SW_SHOWNORMAL);
+            OPEN_LINK("https://gtaforums.com/topic/669045-silentpatch/");
         };
         return;
     }

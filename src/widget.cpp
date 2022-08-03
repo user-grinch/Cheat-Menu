@@ -7,6 +7,7 @@ static struct
     std::string root, key, val;
     void* func = nullptr;
     bool show = false;
+    bool added = false;
 } contextMenu;
 
 ImVec2 Widget::CalcSize(short count, bool spacing)
@@ -75,7 +76,7 @@ void Widget::Filter(const char* label, ImGuiTextFilter& filter, const char* hint
     }
 }
 
-void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 removeFunc)
+void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 removeFunc, ArgCallbackNone addFunc)
 {
     if (ImGui::IsMouseClicked(1))
     {
@@ -207,37 +208,54 @@ void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
+        if (addFunc)
+        {
+            if (ImGui::BeginTabItem(TEXT("Window.AddNew")))
+            {
+                ImGui::Spacing();
+                ImGui::BeginChild("AddNew2");
+                ImGui::TextWrapped(TEXT("Window.AddNewTip"));
+                ImGui::Dummy(ImVec2(0, 5));
+                addFunc();
+                ImGui::EndChild();
+                ImGui::EndTabItem();
+            } 
+        }
         ImGui::EndTabBar();
     }
 }
 
-static bool RoundedImageButton(ImTextureID user_texture_id, ImVec2& size, const char* hover_text)
+static bool RoundedImageButton(ImTextureID textureID, ImVec2& size, const char* hoverText, bool alwaysHovered = false)
 {
     // Default to using texture ID as ID. User can still push string/integer prefixes.
 
     // Creating a invisible button as placeholder
-    ImGui::InvisibleButton(hover_text, size);
+    ImGui::InvisibleButton(hoverText, size);
     ImVec2 min = ImGui::GetItemRectMin();
     ImVec2 max = ImGui::GetItemRectMax();
     ImDrawList *drawList = ImGui::GetWindowDrawList();
-    drawList->AddImageRounded(user_texture_id, min, max, ImVec2(0, 0), ImVec2(1, 1), ImGui::GetColorU32(ImVec4(1, 1, 1, 1)), 5.0f);
+    drawList->AddImageRounded(textureID, min, max, ImVec2(0, 0), ImVec2(1, 1), ImGui::GetColorU32(ImVec4(1, 1, 1, 1)), 5.0f);
     
     // Add selection overlay and stuff on hover
-    if (ImGui::IsItemHovered())
+    bool isHovered = ImGui::IsItemHovered();
+    if (isHovered || alwaysHovered)
     {
-        drawList->AddRectFilled(min, max, ImGui::GetColorU32(ImGuiCol_ModalWindowDimBg), 5.6f);
+        if (isHovered)
+        {
+            drawList->AddRectFilled(min, max, ImGui::GetColorU32(ImGuiCol_ModalWindowDimBg), 5.6f);
+        }
 
         // Calculating and drawing text over the image
-        ImVec2 textSize = ImGui::CalcTextSize(hover_text);
+        ImVec2 textSize = ImGui::CalcTextSize(hoverText);
         if (textSize.x < size.x)
         {
             float offsetX = (ImGui::GetItemRectSize().x - textSize.x) / 2;
-            drawList->AddText(ImVec2(min.x + offsetX, min.y + 10), ImGui::GetColorU32(ImGuiCol_Text), hover_text);
+            drawList->AddText(ImVec2(min.x + offsetX, min.y + 10), ImGui::GetColorU32(ImGuiCol_Text), hoverText);
         }
         else
         {
             std::string buf = "";
-            std::stringstream ss(hover_text);
+            std::stringstream ss(hoverText);
             short count = 1;
 
             while (ss >> buf)
@@ -254,8 +272,14 @@ static bool RoundedImageButton(ImTextureID user_texture_id, ImVec2& size, const 
     return ImGui::IsItemClicked(0);
 }
 
-void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackRtn getNameFunc, ArgCallbackRtnBool verifyFunc)
+/*
+    Here we go again...
+    This direly needs a refactor oof
+*/
+void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackRtn getNameFunc, 
+                        ArgCallbackRtnBool verifyFunc, ArgCallbackNone addFunc)
 {
+    static IDirect3DTexture9 **pDefaultTex = nullptr;
     ImGuiStyle& style =  ImGui::GetStyle();
     /*
     	Trying to scale images based on resolutions
@@ -316,30 +340,55 @@ void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackR
                     && (verifyFunc == nullptr || verifyFunc(text))
                 )
                 {
-                    /*
-                        Couldn't figure out how to laod images for Dx11
-                        Using texts for now
-                    */
-                    if (showImages)
+                    if (showImages ? RoundedImageButton(store.m_ImagesList[i]->m_pTexture, m_ImageSize, modelName.c_str())
+                        : ImGui::MenuItem(modelName.c_str())
+                    )
                     {
-                        if (RoundedImageButton(store.m_ImagesList[i]->m_pTexture, m_ImageSize, modelName.c_str()))
-                        {
-                            clickFunc(text);
-                        }
-                        
-                    }
-                    else
-                    {
-                        if (ImGui::MenuItem(modelName.c_str()))
-                        {
-                            clickFunc(text);
-                        }
+                        clickFunc(text);
                     }
 
                     // Right click popup
                     if (ImGui::IsItemClicked(1))
                     {
                         contextMenu.show = true;
+                        contextMenu.added = false;
+                        contextMenu.val = text;
+                        contextMenu.key = modelName;
+                    }
+
+                    if (showImages)
+                    {
+                        if (imageCount % imagesInRow != 0)
+                        {
+                            ImGui::SameLine(0.0, style.ItemInnerSpacing.x);
+                        }
+                    }
+                    imageCount++;
+                }
+            }
+            for (auto [k, v] : *store.m_pData->GetTable("Custom"))
+            {
+                if (!pDefaultTex)
+                {
+                    pDefaultTex = gTextureList.FindTextureByName("placeholder");
+                }
+                std::string modelName = std::string(k.str());
+                std::string text = v.as_string()->value_or("0");
+                if (store.m_Filter.PassFilter(modelName.c_str())
+                    && (store.m_Selected == "Custom" || store.m_Selected == "All"))
+                {
+                    if (showImages ? RoundedImageButton(pDefaultTex, m_ImageSize, modelName.c_str(), true)
+                        : ImGui::MenuItem(modelName.c_str())
+                    )
+                    {
+                        clickFunc(text);
+                    }
+
+                    // Right click popup
+                    if (ImGui::IsItemClicked(1))
+                    {
+                        contextMenu.show = true;
+                        contextMenu.added = (addFunc != nullptr);
                         contextMenu.val = text;
                         contextMenu.key = modelName;
                     }
@@ -362,9 +411,15 @@ void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackR
                     ImGui::Separator();
                     if (ImGui::MenuItem(TEXT("Menu.Favourites")))
                     {
-                        store.m_pData->Set(std::format("Favourites.{}", contextMenu.val).c_str(), contextMenu.key);
+                        store.m_pData->Set(std::format("Favourites.{}", contextMenu.key).c_str(), contextMenu.val);
                         store.m_pData->Save();
                         Util::SetMessage(TEXT("Menu.FavouritesText"));
+                    }
+                    if (contextMenu.added && ImGui::MenuItem(TEXT("Menu.Remove")))
+                    {
+                        store.m_pData->RemoveKey("Custom", contextMenu.key.c_str());
+                        store.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
+                        store.m_pData->Save();
                     }
                     if (ImGui::MenuItem(TEXT("Menu.Close")))
                     {
@@ -388,39 +443,26 @@ void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackR
 
             for (auto [k, v] : *store.m_pData->GetTable("Favourites"))
             {
-                std::string val = std::string(k.str());
-
-                for (uint i = 0; i < store.m_ImagesList.size(); ++i)
+                auto str = k.str();
+                bool state = str.find("Added") != std::string::npos;
+                if (state)
                 {
-                    std::string text = store.m_ImagesList[i]->m_FileName;
-                    std::string modelName = getNameFunc(text);
-
-                    if (text == val && store.m_Filter.PassFilter(modelName.c_str()) && (verifyFunc == nullptr || verifyFunc(text)))
+                    std::string modelName = std::string(k.str());
+                    std::string text = v.as_string()->value_or("0");
+                    if (store.m_Filter.PassFilter(modelName.c_str()))
                     {
-                        /*
-                            Couldn't figure out how to laod images for Dx11
-                            Using texts for now
-                        */
-                        if (showImages)
+                        if (showImages ? RoundedImageButton(pDefaultTex, m_ImageSize, modelName.c_str(), true)
+                            : ImGui::MenuItem(modelName.c_str())
+                        )
                         {
-                            if (RoundedImageButton(store.m_ImagesList[i]->m_pTexture, m_ImageSize, modelName.c_str()))
-                            {
-                                clickFunc(text);
-                            }
-                            
-                        }
-                        else
-                        {
-                            if (ImGui::MenuItem(modelName.c_str()))
-                            {
-                                clickFunc(text);
-                            }
+                            clickFunc(text);
                         }
 
                         // Right click popup
                         if (ImGui::IsItemClicked(1))
                         {
                             contextMenu.show = true;
+                            contextMenu.added = false;
                             contextMenu.val = text;
                             contextMenu.key = modelName;
                         }
@@ -433,6 +475,42 @@ void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackR
                             }
                         }
                         imageCount++;
+                    }
+                }
+                else
+                {
+                    for (uint i = 0; i < store.m_ImagesList.size(); ++i)
+                    {
+                        std::string text = store.m_ImagesList[i]->m_FileName;
+                        std::string modelName = getNameFunc(text);
+
+                        if (modelName == k.str() && store.m_Filter.PassFilter(modelName.c_str()) && (verifyFunc == nullptr || verifyFunc(text)))
+                        {
+                            if (showImages ? RoundedImageButton(store.m_ImagesList[i]->m_pTexture, m_ImageSize, modelName.c_str())
+                                : ImGui::MenuItem(modelName.c_str())
+                            )
+                            {
+                                clickFunc(text);
+                            }
+
+                            // Right click popup
+                            if (ImGui::IsItemClicked(1))
+                            {
+                                contextMenu.show = true;
+                                contextMenu.added = false;
+                                contextMenu.val = text;
+                                contextMenu.key = modelName;
+                            }
+
+                            if (showImages)
+                            {
+                                if (imageCount % imagesInRow != 0)
+                                {
+                                    ImGui::SameLine(0.0, style.ItemInnerSpacing.x);
+                                }
+                            }
+                            imageCount++;
+                        }
                     }
                 }
             }
@@ -448,13 +526,14 @@ void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackR
                     ImGui::Separator();
                     if (ImGui::MenuItem(TEXT("Menu.FavouritesRemove")))
                     {
-                        store.m_pData->RemoveKey("Favourites", contextMenu.val.c_str());
+                        store.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
                         store.m_pData->Save();
                         Util::SetMessage(TEXT("Menu.FavouritesRemoveText"));
                     }
                     if (ImGui::MenuItem(TEXT("Menu.Close")))
                     {
                         contextMenu.show = false;
+                        contextMenu.added = false;
                     }
 
                     ImGui::EndPopup();
@@ -463,9 +542,36 @@ void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackR
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
+        if (addFunc)
+        {
+            if (ImGui::BeginTabItem(TEXT("Window.AddNew")))
+            {
+                ImGui::Spacing();
+                ImGui::TextWrapped(TEXT("Window.AddNewTip"));
+                ImGui::Dummy(ImVec2(0, 5));
+
+                ImGui::BeginChild("AddNew2");
+                addFunc();
+
+                ImGui::Dummy(ImVec2(0.0f, 10.0f));
+                if (ImGui::CollapsingHeader(TEXT("Window.AddNewCustomImg")))
+                {
+                    ImGui::Spacing();
+                    ImGui::TextWrapped(std::vformat(TEXT("Window.AddNewTip2"), std::make_format_args(store.m_FileName)).c_str());
+                    ImGui::Spacing();
+                    if (ImGui::Button(TEXT("Window.DownloadMagicTxd"), Widget::CalcSize()))
+                    {
+                        OPEN_LINK("https://gtaforums.com/topic/851436-relopensrc-magictxd/");
+                    }
+                    ImGui::Spacing();
+                    ImGui::Separator();
+                }
+                ImGui::EndChild();
+                ImGui::EndTabItem();
+            } 
+        }
         ImGui::EndTabBar();
     }
-    
 
     if (showImages)
     {
