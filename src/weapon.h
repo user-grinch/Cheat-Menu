@@ -43,6 +43,7 @@ public:
     static void Init();
     static void ShowPage();
     
+    static void AddWeapon();
 #ifdef GTASA
     static inline ResourceStore m_WeaponData { "weapons", eResourceType::TYPE_IMAGE_TEXT, ImVec2(65, 65) };
     

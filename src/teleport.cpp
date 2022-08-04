@@ -229,7 +229,7 @@ void Teleport::ShowPage()
                 ImGui::Columns(1);
 #else
                 ImGui::Spacing();
-                ImGui::Sameline();
+                ImGui::SameLine();
                 ImGui::Checkbox(TEXT("Teleport.InsertCoord"), &m_bInsertCoord);
 #endif
                 ImGui::Spacing();
@@ -321,18 +321,6 @@ void Teleport::ShowPage()
                 else
                 {
                     Util::SetMessage(TEXT("Teleport.InvalidLocation"));
-                }
-            },
-            [](std::string& category, std::string& key, std::string& _){
-                if (category == "Custom")
-                {
-                    m_locData.m_pData->RemoveKey("Custom", key.c_str());
-                    Util::SetMessage(TEXT("Teleport.LocationRemoved"));
-                    m_locData.m_pData->Save();
-                }
-                else
-                {
-                    Util::SetMessage(TEXT("Window.CustomRemoveOnly"));
                 }
             },
             [](){

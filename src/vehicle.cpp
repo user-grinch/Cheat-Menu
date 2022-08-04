@@ -315,6 +315,46 @@ void WarpPlayerIntoVehicle(CVehicle *pVeh, int seatId)
 }
 #endif
 
+void Vehicle::AddNewVehicle()
+{
+    static char name[INPUT_BUFFER_SIZE];
+    static int model = 0;
+    ImGui::InputTextWithHint(TEXT("Menu.Name"), "Cheetah", name, INPUT_BUFFER_SIZE);
+    Widget::InputInt(TEXT("Vehicle.Model"), &model, 0, 999999);
+    ImGui::Spacing();
+    ImVec2 sz = Widget::CalcSize(2);
+    if (ImGui::Button(TEXT("Window.AddEntry"), sz))
+    {
+        if (CModelInfo::IsCarModel(model))
+        {
+            std::string key = std::format("Custom.{} (Added)", name);
+            Spawner::m_VehData.m_pData->Set(key.c_str(), std::to_string(model));
+            Spawner::m_VehData.m_pData->Save();
+            Util::SetMessage(TEXT("Window.AddEntryMSG"));
+        }
+        else
+        {
+            Util::SetMessage(TEXT("Vehicle.InvalidID"));
+        }
+    }
+    ImGui::SameLine();
+    if (ImGui::Button(TEXT("Vehicle.GetCurrentVehInfo"), sz))
+    {
+        CPlayerPed *pPlayer = FindPlayerPed();
+        int hPlayer = CPools::GetPedRef(pPlayer);
+        if (Command<Commands::IS_CHAR_IN_ANY_CAR>(hPlayer))
+        {
+            model = pPlayer->m_pVehicle->m_nModelIndex;
+            std::string str = Vehicle::GetNameFromModel(model);
+            strcpy(name, str.c_str());
+        }
+        else
+        {
+            Util::SetMessage(TEXT("Vehicle.NotInVehicle"));
+        }
+    }
+}
+
 #ifdef GTASA
 void Vehicle::SpawnVehicle(std::string& smodel)
 #else
@@ -1141,47 +1181,9 @@ void Vehicle::ShowPage()
             Widget::ImageList(Spawner::m_VehData, SpawnVehicle,
             [](std::string& str){
                 return GetNameFromModel(std::stoi(str));
-            }, nullptr,
-            [](){
-                static char name[INPUT_BUFFER_SIZE];
-                static int model = 0;
-                ImGui::InputTextWithHint(TEXT("Menu.Name"), "Cheetah", name, INPUT_BUFFER_SIZE);
-                Widget::InputInt(TEXT("Vehicle.Model"), &model, 1, 0, 999999);
-                ImGui::Spacing();
-                ImVec2 sz = Widget::CalcSize(2);
-                if (ImGui::Button(TEXT("Window.AddEntry"), sz))
-                {
-                    if (Command<Commands::IS_THIS_MODEL_A_CAR>(model))
-                    {
-                        std::string key = std::format("Custom.{} (Added)", name);
-                        Spawner::m_VehData.m_pData->Set(key.c_str(), std::to_string(model));
-                        Spawner::m_VehData.m_pData->Save();
-                        Util::SetMessage(TEXT("Window.AddEntryMSG"));
-                    }
-                    else
-                    {
-                        Util::SetMessage(TEXT("Vehicle.InvalidID"));
-                    }
-                }
-                ImGui::SameLine();
-                if (ImGui::Button(TEXT("Vehicle.GetCurrentVehInfo"), sz))
-                {
-                    CPlayerPed *pPlayer = FindPlayerPed();
-                    int hPlayer = CPools::GetPedRef(pPlayer);
-                    if (Command<Commands::IS_CHAR_IN_ANY_CAR>(hPlayer))
-                    {
-                        model = pPlayer->m_pVehicle->m_nModelIndex;
-                        std::string str = Vehicle::GetNameFromModel(model);
-                        strcpy(name, str.c_str());
-                    }
-                    else
-                    {
-                        Util::SetMessage(TEXT("Vehicle.NotInVehicle"));
-                    }
-                }
-            });
+            }, nullptr, AddNewVehicle);
 #else
-            Widget::DataList(Spawner::m_VehData, SpawnVehicle, nullptr);
+            Widget::DataList(Spawner::m_VehData, SpawnVehicle, AddNewVehicle);
 #endif
             ImGui::EndTabItem();
         }
@@ -1228,7 +1230,7 @@ void Vehicle::ShowPage()
                         {
                             CVehicle* pVeh = BY_GAME(FindPlayerVehicle(-1, false), FindPlayerVehicle(), FindPlayerVehicle());
                             StartAutoDrive(pVeh, loc.c_str());       
-                        }, nullptr);
+                        });
                         ImGui::EndTabItem();
                     }
                     ImGui::EndTabBar();

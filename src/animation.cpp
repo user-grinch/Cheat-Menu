@@ -68,21 +68,6 @@ void Particle::Play(std::string& cat, std::string& name, std::string& particle)
     }
 }
 
-
-void Particle::Remove(std::string& cat, std::string& name, std::string& particle)
-{
-    if (cat == "Custom")
-    {
-        Particle::m_Data.m_pData->RemoveKey("Custom", particle.c_str());
-        Particle::m_Data.m_pData->Save();
-        Util::SetMessage(TEXT("Animation.ParticleRemoved"));
-    }
-    else
-    {
-        Util::SetMessage(TEXT("Animation.CustomParticlesOnly"));
-    }
-}
-
 #elif GTAVC
 
 // Thanks to codenulls(https://github.com/codenulls/)
@@ -191,7 +176,7 @@ void _PlayAnim(RpClump* pClump, int animGroup, int animID, float blend, bool loo
 }
 #endif
 
-void Animation::Play(std::string& ifp, std::string& anim, std::string& _)
+void Animation::Play(std::string& cat, std::string& anim, std::string& ifp)
 {
     CPed *pPed = m_PedAnim ? m_pTarget : FindPlayerPed();
     if (!pPed)
@@ -228,20 +213,6 @@ void Animation::Play(std::string& ifp, std::string& anim, std::string& _)
     sscanf(ifp.c_str(), "%d$%d,", &groupID, &animID);
     _PlayAnim(pPed->m_pRwClump, groupID, animID, 4.0f, m_Loop, m_bSecondary);
 #endif
-}
-
-void Animation::Remove(std::string& ifp, std::string& anim, std::string& ifpRepeat)
-{
-    if (ifp == "Custom")
-    {
-        m_AnimData.m_pData->RemoveKey("Custom", anim.c_str());
-        m_AnimData.m_pData->Save();
-        Util::SetMessage(TEXT("Animation.AnimationRemoved"));
-    }
-    else
-    {
-        Util::SetMessage(TEXT("Animation.CustomAnimsOnly"));
-    }
 }
 
 void Animation::Init()
@@ -345,7 +316,7 @@ void Animation::ShowPage()
                 if (ImGui::BeginChild("Anims Child"))
                 {
                     ImGui::Spacing();
-                    Widget::DataList(m_AnimData, Play, Remove, 
+                    Widget::DataList(m_AnimData, Play, 
                     [](){
                         static char animBuf[INPUT_BUFFER_SIZE];
                         static char ifpBuf[INPUT_BUFFER_SIZE];
@@ -446,7 +417,7 @@ void Animation::ShowPage()
             if (ImGui::BeginChild("Cutscene Child"))
             {
                 ImGui::Spacing();
-                Widget::DataList(Cutscene::m_Data, Cutscene::Play, nullptr);
+                Widget::DataList(Cutscene::m_Data, Cutscene::Play);
                 ImGui::EndChild();
             }
             ImGui::EndTabItem();
@@ -478,7 +449,7 @@ void Animation::ShowPage()
             if (ImGui::BeginChild("Anims Child"))
             {
                 ImGui::Spacing();
-                Widget::DataList(Particle::m_Data, Particle::Play, Particle::Remove,
+                Widget::DataList(Particle::m_Data, Particle::Play,
                 [](){
                     static char name[INPUT_BUFFER_SIZE], particle[INPUT_BUFFER_SIZE];
                     ImGui::InputTextWithHint(TEXT("Animation.ParticleName"), "KKJJ fire particle", name, INPUT_BUFFER_SIZE);

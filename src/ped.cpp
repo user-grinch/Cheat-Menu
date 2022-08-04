@@ -86,6 +86,37 @@ void Ped::Init()
 #endif
 }
 
+void Ped::AddNewPed()
+{
+    static char name[8];
+    static int model = 0;
+    ImGui::InputTextWithHint(TEXT("Menu.Name"), "PEDNAME", name, 7);
+    Widget::InputInt(TEXT("Ped.Model"), &model, 0, 999999);
+    ImGui::Spacing();
+    ImVec2 sz = Widget::CalcSize(2);
+    if (ImGui::Button(TEXT("Ped.AddPed"), sz))
+    {
+        Command<Commands::REQUEST_MODEL>(model);
+        Command<Commands::LOAD_ALL_MODELS_NOW>();
+        if (Command<Commands::IS_MODEL_AVAILABLE>(model))
+        {
+            std::string key = std::format("Custom.{} (Added)", name);
+            m_PedData.m_pData->Set(key.c_str(), std::to_string(model));
+            m_PedData.m_pData->Save();
+            Util::SetMessage(TEXT("Ped.AddPedMSG"));
+            Command<Commands::MARK_MODEL_AS_NO_LONGER_NEEDED>(model);
+        }
+        else
+        {
+            Util::SetMessage(TEXT("Vehicle.InvalidID"));
+        }
+    }
+    ImGui::SameLine();
+    if (ImGui::Button(TEXT("Ped.GetPlayerModel"), sz))
+    {
+        model = FindPlayerPed()->m_nModelIndex;
+    }
+}
 #ifdef GTASA
 void Ped::SpawnPed(std::string& model)
 #else
@@ -308,39 +339,9 @@ void Ped::ShowPage()
                     Widget::ImageList(m_PedData, SpawnPed,
                     [](std::string& str){
                             return m_PedData.m_pData->Get(str.c_str(), "Unknown");
-                    }, nullptr,
-                    [](){
-                        static char name[8];
-                        static int model = 0;
-                        ImGui::InputTextWithHint(TEXT("Menu.Name"), "PEDNAME", name, 7);
-                        Widget::InputInt(TEXT("Ped.Model"), &model, 1, 0, 999999);
-                        ImGui::Spacing();
-                        ImVec2 sz = Widget::CalcSize(2);
-                        if (ImGui::Button(TEXT("Ped.AddPed"), sz))
-                        {
-                            Command<Commands::REQUEST_MODEL>(model);
-                            Command<Commands::LOAD_ALL_MODELS_NOW>();
-                            if (Command<Commands::IS_MODEL_AVAILABLE>(model))
-                            {
-                                std::string key = std::format("Custom.{} (Added)", name);
-                                m_PedData.m_pData->Set(key.c_str(), std::to_string(model));
-                                m_PedData.m_pData->Save();
-                                Util::SetMessage(TEXT("Ped.AddPedMSG"));
-                                Command<Commands::MARK_MODEL_AS_NO_LONGER_NEEDED>(model);
-                            }
-                            else
-                            {
-                                Util::SetMessage(TEXT("Vehicle.InvalidID"));
-                            }
-                        }
-                        ImGui::SameLine();
-                        if (ImGui::Button(TEXT("Ped.GetPlayerModel"), sz))
-                        {
-                            model = FindPlayerPed()->m_nModelIndex;
-                        }
-                    });
+                    }, nullptr, AddNewPed);
 #else
-                    Widget::DataList(m_PedData, SpawnPed, nullptr);
+                    Widget::DataList(m_PedData, SpawnPed, AddNewPed);
 #endif
                     ImGui::EndTabItem();
                 }
@@ -399,8 +400,7 @@ void Ped::ShowPage()
                     {
                         Spawner::m_nWeaponId = std::stoi(id);
                         weaponName = key;
-                    },
-                    nullptr);
+                    });
 #endif
                     ImGui::EndTabItem();
                 }

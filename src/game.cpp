@@ -1020,14 +1020,13 @@ void Game::ShowPage()
 
                 ImGui::Spacing();
 
-                Widget::DataList(m_MissionData, SetPlayerMission, nullptr);
+                Widget::DataList(m_MissionData, SetPlayerMission);
             }
             ImGui::EndTabItem();
         }
 #ifdef GTASA
         if (ImGui::BeginTabItem(TEXT("Game.Stats")))
         {
-            // similar to Widget::DataList()
             ImGui::Spacing();
 
             if (ImGui::Button(TEXT("Game.MaxWepSkills"), Widget::CalcSize(2)))
@@ -1051,29 +1050,7 @@ void Game::ShowPage()
             }
 
             ImGui::Spacing();
-            ImGui::PushItemWidth((ImGui::GetWindowContentRegionWidth() - ImGui::GetStyle().ItemSpacing.x)/2);
-            Widget::ListBox("##Categories", m_StatData.m_Categories, m_StatData.m_Selected);
-            ImGui::SameLine();
-            Widget::Filter("##Filter", m_StatData.m_Filter, TEXT("Window.Search"));
-            ImGui::PopItemWidth();
-
-            ImGui::Spacing();
-            ImGui::BeginChild("STATCHILD");
-            for (auto [k, v] : m_StatData.m_pData->Items())
-            {
-                if (k.str() == m_StatData.m_Selected || m_StatData.m_Selected == "All")
-                {
-                    for (auto [k2, v2] : v.as_table()->ref<DataStore::Table>())
-                    {
-                        std::string name = v2.value_or<std::string>("Unknown");
-                        if (m_StatData.m_Filter.PassFilter(name.c_str()))
-                        {
-                            Widget::EditStat(name.c_str(), std::stoi(std::string(k2.str())));
-                        }
-                    }
-                }
-            }
-            ImGui::EndChild();
+            Widget::DataList(m_StatData, nullptr, nullptr, true);
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem(TEXT("Game.RandomCheats")))

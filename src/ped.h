@@ -18,6 +18,7 @@ private:
         static inline int m_nWeaponId;
     };
 
+    static void AddNewPed();
 #ifdef GTASA
     static void SpawnPed(std::string& model);
 #else

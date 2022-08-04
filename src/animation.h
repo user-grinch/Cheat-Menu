@@ -22,7 +22,6 @@ public:
     static inline std::vector<int> m_nParticleList;
 
     static void Play(std::string& rootKey, std::string& particle, std::string& dummy);
-    static void Remove(std::string& ifp, std::string& anim, std::string& ifpRepeat);
 };
 #endif
 
@@ -36,7 +35,6 @@ private:
     static inline CPed *m_pTarget = nullptr;
 
     static void Play(std::string& rootKey, std::string& anim, std::string& ifp);
-    static void Remove(std::string& rootKey, std::string& anim, std::string& ifp);
 
 #ifdef GTASA
     static void DrawPedTasks();

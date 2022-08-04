@@ -41,8 +41,7 @@ public:
     static bool ColorBtn(int colorId, std::vector<float>& color, ImVec2 size);
 
     // Draws DataStore data in the interface
-    static void DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 removeFunc, 
-                            ArgCallbackNone addFunc = nullptr);
+    static void DataList(ResourceStore& data, ArgCallback3 clickFunc = nullptr, ArgCallbackNone addFunc = nullptr, bool isEditItem = false);
     
     // Draws a dropdown editor for memory address
     template <typename T>
@@ -67,7 +66,7 @@ public:
 
     // Input widgets with increment & decrement buttons
     static bool InputFloat(const char* label, float *val, float change = 1.0f, float min = -1.0f, float max = -1.0f);
-    static bool InputInt(const char* label, int *val, int change = 1, int min = -1, int max = -1);
+    static bool InputInt(const char* label, int *val, int min = -1, int max = -1);
 
     // Draws ResourceStore images in the interface
     static void ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackRtn getNameFunc, 

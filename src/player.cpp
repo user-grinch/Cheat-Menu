@@ -936,7 +936,7 @@ void Player::ShowPage()
 #else
             ImGui::TextWrapped(TEXT("Player.WorkSkinOnly"));
 #endif
-            Widget::DataList(skinData, ChangePlayerModel, nullptr);
+            Widget::DataList(skinData, ChangePlayerModel);
             ImGui::EndTabItem();
         }
 #endif

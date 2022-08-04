@@ -5,7 +5,6 @@
 static struct
 {
     std::string root, key, val;
-    void* func = nullptr;
     bool show = false;
     bool added = false;
 } contextMenu;
@@ -76,7 +75,7 @@ void Widget::Filter(const char* label, ImGuiTextFilter& filter, const char* hint
     }
 }
 
-void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 removeFunc, ArgCallbackNone addFunc)
+void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallbackNone addFunc, bool isEditItem)
 {
     if (ImGui::IsMouseClicked(1))
     {
@@ -115,14 +114,24 @@ void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 
                         {
                             std::string root = std::string(k.str());
                             std::string val = v2.value_or<std::string>("Unkonwn");
-                            if (ImGui::MenuItem(key.c_str()) && clickFunc != nullptr)
+
+                            if (isEditItem)
                             {
-                                clickFunc(root, key, val);
+#ifdef GTASA
+                                Widget::EditStat(key.c_str(), std::stoi(val));
+#endif
+                            }
+                            else
+                            {
+                                if (ImGui::MenuItem(key.c_str()) && clickFunc != nullptr)
+                                {
+                                    clickFunc(root, key, val);
+                                }
                             }
 
                             if (ImGui::IsItemClicked(1))
                             {
-                                contextMenu = {root, key, val, removeFunc, true};
+                                contextMenu = {root, key, val, true};
                             }
                         }
                     }
@@ -140,9 +149,19 @@ void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 
                         data.m_pData->Save();
                         Util::SetMessage(TEXT("Menu.FavouritesText"));
                     }
-                    if (contextMenu.func && ImGui::MenuItem(TEXT("Menu.Remove")))
+                    if (ImGui::MenuItem(TEXT("Menu.Remove")))
                     {
-                        static_cast<ArgCallback3>(contextMenu.func)(contextMenu.root, contextMenu.key, contextMenu.val);
+                        if (contextMenu.root == "Custom")
+                        {
+                            data.m_pData->RemoveKey("Custom", contextMenu.key.c_str());
+                            data.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
+                            data.m_pData->Save();
+                            Util::SetMessage(TEXT("Window.RemoveEntry"));
+                        }
+                        else
+                        {
+                            Util::SetMessage(TEXT("Window.CustomRemoveOnly"));
+                        }
                     }
                     if (ImGui::MenuItem(TEXT("Menu.Close")))
                     {
@@ -169,15 +188,25 @@ void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallback3 
                 if (data.m_Filter.PassFilter(key.c_str()))
                 {
                     std::string val = v.value_or<std::string>("Unkonwn");
-                    if (ImGui::MenuItem(key.c_str()) && clickFunc != nullptr)
+                    
+                    if (isEditItem)
                     {
-                        std::string str = "Favourites";
-                        clickFunc(str, key, val);
+#ifdef GTASA
+                        Widget::EditStat(key.c_str(), std::stoi(val));
+#endif
+                    }
+                    else
+                    {
+                        if (ImGui::MenuItem(key.c_str()) && clickFunc != nullptr)
+                        {
+                            std::string str = "Favourites";
+                            clickFunc(str, key, val);
+                        }
                     }
 
                     if (ImGui::IsItemClicked(1))
                     {
-                        contextMenu = {std::string("Favourites"), key, val, removeFunc, true};
+                        contextMenu = {std::string("Favourites"), key, val, true};
                     }
                 }
             }
@@ -777,10 +806,10 @@ bool Widget::InputFloat(const char* label, float *val, float change, float min, 
     return state;
 }
 
-bool Widget::InputInt(const char* label, int *val, int change, int min, int max)
+bool Widget::InputInt(const char* label, int *val, int min, int max)
 {
     bool state = false;
-    if (ImGui::InputInt(label, val, change))
+    if (ImGui::InputInt(label, val))
     {
         if (min != max)
         {
