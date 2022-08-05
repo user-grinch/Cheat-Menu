@@ -11,8 +11,6 @@
 
 void Overlay::Init()
 {
-    // TODO: use structs
-    // Load config data
     m_bCoord = gConfig.Get("Overlay.ShowCoordinates", false);
     m_bCpuUsage = gConfig.Get("Overlay.ShowCPUUsage", false);
     m_bFPS = gConfig.Get("Overlay.ShowFPS", false);

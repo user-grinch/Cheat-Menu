@@ -9,9 +9,7 @@
 #include <CAnimManager.h>
 #include "eAnimations.h"
 #include <CAnimBlendAssociation.h>
-
 #elif GTAVC
-
 #include "../depend/kiero/minhook/MinHook.h"
 #include <CAnimationStyleDescriptor.h>
 #include <CAnimManager.h>
@@ -22,9 +20,18 @@
 #ifdef GTASA
 #include "overlay.h"
 
+void Cutscene::Init()
+{
+    static CdeclEvent <AddressList<0x5B195F, H_JUMP>, PRIORITY_AFTER,  ArgPickNone, void()> skipCutsceneEvent;
+    skipCutsceneEvent += []()
+    {
+        Stop();
+    };
+}
+
 void Cutscene::Play(std::string& rootKey, std::string& cutsceneId, std::string& interior)
 {
-    if (Util::IsOnCutscene())
+    if (CCutsceneMgr::ms_running)
     {
         Util::SetMessage(TEXT("Animation.CutsceneRunning"));
         return;
@@ -33,11 +40,10 @@ void Cutscene::Play(std::string& rootKey, std::string& cutsceneId, std::string& 
     CPlayerPed* pPlayer = FindPlayerPed();
     if (pPlayer)
     {
-        m_SceneName = cutsceneId;
         m_pLastVeh =  pPlayer->m_nPedFlags.bInVehicle ? pPlayer->m_pVehicle : nullptr;
         m_nVehSeat = -1;
 
-        if (m_pLastVeh->m_pDriver != pPlayer)
+        if (m_pLastVeh && m_pLastVeh->m_pDriver != pPlayer)
         {
             for (size_t i = 0; i != 8; ++i)
             {
@@ -48,10 +54,44 @@ void Cutscene::Play(std::string& rootKey, std::string& cutsceneId, std::string& 
                 }
             }
         }
-        Command<Commands::LOAD_CUTSCENE>(cutsceneId.c_str());
+        CCutsceneMgr::LoadCutsceneData(cutsceneId.c_str());
+        CCutsceneMgr::Update();
+
         m_nInterior = pPlayer->m_nAreaCode;
         pPlayer->m_nAreaCode = std::stoi(interior);
         Command<Commands::SET_AREA_VISIBLE>(pPlayer->m_nAreaCode);
+        Cutscene::m_bRunning = true;
+        CCutsceneMgr::StartCutscene();
+    }
+}
+
+void Cutscene::Stop()
+{
+    if (Cutscene::m_bRunning)
+    {
+        CPlayerPed *pPlayer = FindPlayerPed();
+        int hPlayer = CPools::GetPedRef(pPlayer);
+
+        CCutsceneMgr::DeleteCutsceneData();
+        Cutscene::m_bRunning = false;
+        pPlayer->m_nAreaCode = Cutscene::m_nInterior;
+        Cutscene::m_nInterior = 0;
+        Command<Commands::SET_AREA_VISIBLE>(pPlayer->m_nAreaCode);
+
+        // handle vehicle
+        if (Cutscene::m_pLastVeh)
+        {
+            int hVeh = CPools::GetVehicleRef(Cutscene::m_pLastVeh);
+            if (Cutscene::m_nVehSeat == -1)
+            {
+                Command<Commands::WARP_CHAR_INTO_CAR>(hPlayer, hVeh);
+            }
+            else
+            {
+                Command<Commands::WARP_CHAR_INTO_CAR_AS_PASSENGER>(hPlayer, hVeh, Cutscene::m_nVehSeat);
+            }
+        }
+        TheCamera.Fade(0, 1);
     }
 }
 
@@ -64,8 +104,23 @@ void Particle::Play(std::string& cat, std::string& name, std::string& particle)
         int handle;
         Command<Commands::CREATE_FX_SYSTEM>(particle.c_str(), pos.x, pos.y, pos.z, 1, &handle);
         Command<Commands::PLAY_FX_SYSTEM>(handle);
-        m_nParticleList.push_back(handle);
+        m_nList.push_back(handle);
     }
+}
+
+void Particle::RemoveAll()
+{
+    for (int& p : Particle::m_nList)
+    {
+        Command<Commands::KILL_FX_SYSTEM>(p);
+    }
+    Particle::m_nList.clear();
+}
+
+void Particle::RemoveLatest()
+{
+    Command<Commands::KILL_FX_SYSTEM>(Particle::m_nList.back()); // stop if anything is running
+    Particle::m_nList.pop_back();
 }
 
 #elif GTAVC
@@ -178,14 +233,14 @@ void _PlayAnim(RpClump* pClump, int animGroup, int animID, float blend, bool loo
 
 void Animation::Play(std::string& cat, std::string& anim, std::string& ifp)
 {
-    CPed *pPed = m_PedAnim ? m_pTarget : FindPlayerPed();
+    CPed *pPed = m_bPedAnim ? m_pTarget : FindPlayerPed();
     if (!pPed)
     {
         return;
     }
 
 #ifdef GTASA
-    int hped = CPools::GetPedRef(pPed);
+    int hPed = CPools::GetPedRef(pPed);
 
     if (ifp != "PED")
     {
@@ -193,14 +248,14 @@ void Animation::Play(std::string& cat, std::string& anim, std::string& ifp)
         Command<Commands::LOAD_ALL_MODELS_NOW>();
     }
 
-    Command<Commands::CLEAR_CHAR_TASKS>(hped);
+    Command<Commands::CLEAR_CHAR_TASKS>(hPed);
     if (m_bSecondary)
     {
-        Command<Commands::TASK_PLAY_ANIM_SECONDARY>(hped, anim.c_str(), ifp.c_str(), 4.0, m_Loop, 0, 0, 0, -1);
+        Command<Commands::TASK_PLAY_ANIM_SECONDARY>(hPed, anim.c_str(), ifp.c_str(), 4.0, m_Loop, 0, 0, 0, -1);
     }
     else
     {
-        Command<Commands::TASK_PLAY_ANIM>(hped, anim.c_str(), ifp.c_str(), 4.0, m_Loop, 0, 0, 0, -1);
+        Command<Commands::TASK_PLAY_ANIM>(hPed, anim.c_str(), ifp.c_str(), 4.0, m_Loop, 0, 0, 0, -1);
     }
 
     if (ifp != "PED")
@@ -218,32 +273,10 @@ void Animation::Play(std::string& cat, std::string& anim, std::string& ifp)
 void Animation::Init()
 {
 #ifdef GTASA
+    Cutscene::Init();
     Events::processScriptsEvent += []
     {
         CPlayerPed* pPlayer = FindPlayerPed();
-        if (Cutscene::m_bRunning)
-        {
-            if (Command<Commands::HAS_CUTSCENE_FINISHED>())
-            {
-                if (!pPlayer)
-                {
-                    return;
-                }
-
-                pPlayer->m_nAreaCode = Cutscene::m_nInterior;
-                Command<Commands::SET_AREA_VISIBLE>(pPlayer->m_nAreaCode);
-                Cutscene::m_nInterior = 0;
-                TheCamera.Fade(0, 1);
-            }
-        }
-        else
-        {
-            if (Cutscene::m_SceneName != "" && Command<Commands::HAS_CUTSCENE_LOADED>())
-            {
-                Command<Commands::START_CUTSCENE>();
-                Cutscene::m_bRunning = true;
-            }
-        }
 
         if (pPlayer && pPlayer->m_pPlayerTargettedPed)
         {
@@ -277,8 +310,6 @@ void Animation::ShowPage()
         CPlayerPed* pPlayer = FindPlayerPed();
         int hPlayer = CPools::GetPedRef(pPlayer);
 
-        ImGui::Spacing();
-
         if (ImGui::BeginTabItem(TEXT("Animation.AnimationTab")))
         {
             ImGui::Spacing();
@@ -300,12 +331,12 @@ void Animation::ShowPage()
             Widget::Checkbox(TEXT("Animation.SecondaryCheckbox"), &m_bSecondary, TEXT("Animation.SecondaryCheckboxText"));
             ImGui::NextColumn();
 #ifdef GTASA
-            Widget::Checkbox(TEXT("Animation.PedAnim"), &m_PedAnim, TEXT("Animation.PedAnimText"));
+            Widget::Checkbox(TEXT("Animation.PedAnim"), &m_bPedAnim, TEXT("Animation.PedAnimText"));
 #endif
             ImGui::Columns(1);
             ImGui::Spacing();
 
-            if (m_PedAnim && !m_pTarget)
+            if (m_bPedAnim && !m_pTarget)
             {
                 ImGui::TextWrapped(TEXT("Animation.NoTarget"));
             }
@@ -343,15 +374,14 @@ void Animation::ShowPage()
             ImGui::Spacing();
             Widget::Checkbox(TEXT("Menu.ShowPedTasks"), &Overlay::m_bPedTasks);
             ImGui::Spacing();
-            CPlayerPed* player = FindPlayerPed();
-            if (player)
+            if (pPlayer)
             {   
                 ImGui::BeginChild("TasksList");
                 ImGui::Text(TEXT("Animation.PrimaryTasks"));
                 ImGui::Separator();
                 for (size_t i = 0; i != TASK_PRIMARY_MAX; ++i)
                 {
-                    CTask *pTask = player->m_pIntelligence->m_TaskMgr.m_aPrimaryTasks[i];
+                    CTask *pTask = pPlayer->m_pIntelligence->m_TaskMgr.m_aPrimaryTasks[i];
                     if (pTask)
                     {
                         const char *name = taskNames[pTask->GetId()];
@@ -369,7 +399,7 @@ void Animation::ShowPage()
                 ImGui::Separator();
                 for (size_t i = 0; i != TASK_SECONDARY_MAX; ++i)
                 {
-                    CTask *pTask = player->m_pIntelligence->m_TaskMgr.m_aSecondaryTasks[i];
+                    CTask *pTask = pPlayer->m_pIntelligence->m_TaskMgr.m_aSecondaryTasks[i];
                     if (pTask)
                     {
                         const char *name = taskNames[pTask->GetId()];
@@ -389,28 +419,7 @@ void Animation::ShowPage()
             ImGui::Spacing();
             if (ImGui::Button(TEXT("Animation.StopCutscene"), Widget::CalcSize()))
             {
-                if (Cutscene::m_bRunning)
-                {
-                    CPlayerPed* player = FindPlayerPed();
-                    int hPlayer = CPools::GetPedRef(player);
-                    int hVeh = CPools::GetVehicleRef(Cutscene::m_pLastVeh);
-                    Command<Commands::CLEAR_CUTSCENE>();
-                    Cutscene::m_bRunning = false;
-                    Cutscene::m_SceneName = "";
-                    player->m_nAreaCode = Cutscene::m_nInterior;
-                    Command<Commands::SET_AREA_VISIBLE>(player->m_nAreaCode);
-
-                    if (Cutscene::m_nVehSeat == -1)
-                    {
-                        Command<Commands::WARP_CHAR_INTO_CAR>(hPlayer, hVeh);
-                    }
-                    else
-                    {
-                        Command<Commands::WARP_CHAR_INTO_CAR_AS_PASSENGER>(hPlayer, hVeh, Cutscene::m_nVehSeat);
-                    }
-                    Cutscene::m_nInterior = 0;
-                    TheCamera.Fade(0, 1);
-                }
+                Cutscene::Stop();
             }
             ImGui::Spacing();
 
@@ -427,17 +436,12 @@ void Animation::ShowPage()
             ImGui::Spacing();
             if (ImGui::Button(TEXT("Animation.RemoveAll"), Widget::CalcSize(2)))
             {
-                for (int& p : Particle::m_nParticleList)
-                {
-                    Command<Commands::KILL_FX_SYSTEM>(p);
-                }
-                Particle::m_nParticleList.clear();
+                Particle::RemoveAll();
             }
             ImGui::SameLine();
             if (ImGui::Button(TEXT("Animation.RemoveLatest"), Widget::CalcSize(2)))
             {
-                Command<Commands::KILL_FX_SYSTEM>(Particle::m_nParticleList.back()); // stop if anything is running
-                Particle::m_nParticleList.pop_back();
+                Particle::RemoveLatest();
             }
             ImGui::Spacing();
             if (Widget::CheckboxBits(TEXT("Animation.InvisiblePlayer"), pPlayer->m_nPedFlags.bDontRender))
