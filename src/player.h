@@ -14,6 +14,10 @@ private:
     };
     static inline bool m_bFreezeWantedLevel;
 
+#ifdef GTAVC
+    static inline bool m_bNoUndress;
+#endif
+
 #ifdef GTASA
     static inline bool m_bAimSkinChanger;
     static inline bool m_bDrunkEffect;

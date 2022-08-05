@@ -18,7 +18,7 @@ void Vehicle::Init()
 {
 #ifdef GTASA
     FileHandler::FetchHandlingID(m_VehicleIDE);
-    Neon::InjectHooks();
+    Neon::Init();
     Paint::InjectHooks();
 #endif
 

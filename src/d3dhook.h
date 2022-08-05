@@ -36,8 +36,15 @@ public:
     D3dHook(D3dHook const&) = delete;
     void operator=(D3dHook const&) = delete;
 
+    // Returns the current mouse visibility state
     static bool GetMouseState();
-    static bool InjectHook(void *pCallback);
-    static void RemoveHook();
+
+    // Injects game hooks & stuff
+    static bool Init(void *pCallback);
+
+    // Sets the current mouse visibility state
     static void SetMouseState(bool state);
+
+    // Cleans up hooks
+    static void Shutdown();
 };

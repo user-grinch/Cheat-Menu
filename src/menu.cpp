@@ -28,6 +28,11 @@ void Menu::ShowPage()
             static int selected = Locale::GetCurrentLocaleIndex();
             static std::vector<std::string>& vec = Locale::GetLocaleList();
 
+
+            /*
+                Chinese fonts is huge & adds overhead
+                Only download & use it if the user asks for it
+            */
             if (Locale::GetLocaleList()[Locale::GetCurrentLocaleIndex()] == "Chinese" 
             && !FontMgr::IsSupportPackageInstalled())
             {

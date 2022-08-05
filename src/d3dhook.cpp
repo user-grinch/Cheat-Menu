@@ -253,7 +253,7 @@ void D3dHook::ProcessMouse()
     }
 }
 
-bool D3dHook::InjectHook(void *pCallback)
+bool D3dHook::Init(void *pCallback)
 {
     static bool hookInjected;
     if (hookInjected)
@@ -291,7 +291,7 @@ bool D3dHook::InjectHook(void *pCallback)
     return hookInjected;
 }
 
-void D3dHook::RemoveHook()
+void D3dHook::Shutdown()
 {
     pCallbackFunc = nullptr;
     SetWindowLongPtr(RsGlobal.ps->window, GWL_WNDPROC, (LRESULT)oWndProc);

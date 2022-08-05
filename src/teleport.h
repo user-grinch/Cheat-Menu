@@ -35,6 +35,7 @@ public:
     Teleport() = delete;
     Teleport(const Teleport&) = delete;
 
+    // Initialized the class, hooks etc.
     static void Init();
 
     // Warp player to position, marker, map etc

@@ -237,7 +237,7 @@ void CheatMenu::Init()
         return;
     }
 
-    if (!D3dHook::InjectHook(DrawWindow))
+    if (!D3dHook::Init(DrawWindow))
     {
         return;
     }
