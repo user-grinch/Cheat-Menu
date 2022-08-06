@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "weapon.h"
-#include "widget.h"
-#include "util.h"
-#include "CWeaponInfo.h"
+#include "utils/widget.h"
+#include "utils/util.h"
+#include <CWeaponInfo.h>
 
 void Weapon::Init()
 {

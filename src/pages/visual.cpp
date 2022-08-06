@@ -1,14 +1,14 @@
 #include "pch.h"
 #include "visual.h"
-#include "widget.h"
-#include "util.h"
 #include "game.h"
-#include "timecycle.h"
-#include "CWorld.h"
 #include "vehicle.h"
+#include "utils/widget.h"
+#include "utils/util.h"
+#include "utils/timecycle.h"
+#include <CWorld.h>
 
 #ifdef GTASA
-#include "CHudColours.h"
+#include <CHudColours.h>
 #endif
 
 #ifdef GTASA

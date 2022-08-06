@@ -1,11 +1,11 @@
 #include "pch.h"
 #include "menu.h"
-#include "widget.h"
-#include "util.h"
-#include "updater.h"
 #include "cheatmenu.h"
-#include "rpc.h"
-#include "overlay.h"
+#include "utils/widget.h"
+#include "utils/util.h"
+#include "utils/updater.h"
+#include "utils/rpc.h"
+#include "utils/overlay.h"
 
 void Menu::Init()
 {

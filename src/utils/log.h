@@ -2,7 +2,6 @@
 #include <stdarg.h>
 #include <fstream>
 #include <memory>
-#include "defines.h"
 
 enum class eLogLevel
 {

@@ -1,8 +1,9 @@
 #include "pch.h"
 #include "menu.h"
 #include "game.h"
-#include "widget.h"
-#include "util.h"
+#include "utils/widget.h"
+#include "utils/util.h"
+
 #ifdef GTASA
 #include <CIplStore.h>
 #include <CMessages.h>

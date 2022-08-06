@@ -1,5 +1,6 @@
-#include "extensions/Paths.h"
 #include "pch.h"
+#include "resourcestore.h"
+#include <extensions/Paths.h>
 
 ResourceStore::ResourceStore(const char* text, eResourceType type, ImVec2 imageSize)
     : m_ImageSize(imageSize), m_Type(type), m_FileName(text)

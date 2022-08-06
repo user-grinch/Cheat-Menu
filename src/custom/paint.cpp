@@ -23,9 +23,10 @@
 // SOFTWARE.
 
 #include "pch.h"
+#ifdef GTASA
 #include "paint.h"
-#include "NodeName.h"
-#include "util.h"
+#include "utils/util.h"
+#include <NodeName.h>
 
 void Paint::InjectHooks()
 {
@@ -319,3 +320,4 @@ void Paint::ResetNodeTexture(CVehicle* pVeh, std::string node_name)
         }
     });
 }
+#endif

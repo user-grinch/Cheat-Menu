@@ -19,6 +19,68 @@ end
 
 ----------------------------
 
+function createProject(projectID)
+    upperID = string.upper(projectID)
+    pathExt = ""
+    if (projectID ~= "sa") then
+        pathExt = "_" .. projectID 
+    end
+
+    project ("CheatMenu" .. upperID)
+        kind "SharedLib"
+        targetextension ".asi"
+        
+        
+        includedirs {
+            PSDK_DIR .. "/plugin_" .. projectID .. "/",
+            PSDK_DIR .. "/plugin_" .. projectID .. "/game_" .. projectID .. "/",
+            PSDK_DIR .. "/shared/",
+            PSDK_DIR .. "/shared/game/"
+        }
+
+        libdirs {
+            PSDK_DIR .. "/output/lib",
+            "lib"
+        }
+        
+        files { 
+            "../src/**.h", 
+            "../src/**.hpp", 
+            "../src/**.c", 
+            "../src/**.cpp" 
+        }
+        
+        if upperID == "III" then 
+            upperID = "3" 
+
+            linkoptions { 
+                "/FORCE:MULTIPLE"
+            }
+        end
+        defines { 
+            "GTA" .. upperID,
+        }
+
+        pchheader "pch.h"
+        pchsource "../src/pch.cpp"
+        filter "files:..src/utils/**.cpp"
+            flags {"NoPCH"}
+
+        filter "configurations:Debug"
+            symbols "On"
+            links { 
+                "depend",
+                "plugin" .. pathExt .. "_d.lib",
+            }
+
+        filter "configurations:Release"
+            optimize "On"
+            links { 
+                "depend",
+                "plugin" .. pathExt.. ".lib",
+            }
+end
+
 workspace "CheatMenu"
     configurations { "Debug", "Release" }
     architecture "x86"
@@ -41,6 +103,20 @@ workspace "CheatMenu"
         "urlmon"
     }
 
+    defines { 
+        "IS_PLATFORM_WIN" ,
+        "_CRT_SECURE_NO_WARNINGS",
+        "_CRT_NON_CONFORMING_SWPRINTFS",
+        "_DX9_SDK_INSTALLED",
+        "PLUGIN_SGV_10US",
+        "_GTA_"
+    }
+
+    includedirs {
+        "../depend/",
+        "../src/",
+    }
+
 project "depend"
     kind "StaticLib"
 
@@ -52,241 +128,14 @@ project "depend"
     }
 
     filter "configurations:Debug"
-        defines { "DEBUG", "IS_PLATFORM_WIN" }
+        defines { "DEBUG" }
         symbols "On"
 
     filter "configurations:Release"
-        defines { "NDEBUG", "IS_PLATFORM_WIN" }
+        defines { "NDEBUG" }
         optimize "On"
 
-project "CheatMenuIII"
-    kind "SharedLib"
-    targetextension ".asi"
+createProject("III")
+createProject("sa")
+createProject("vc")
     
-    files { 
-        "../src/cheatmenu.h", 
-        "../src/cheatmenu.cpp", 
-        "../src/pch.h", 
-        "../src/pch.cpp", 
-        "../src/d3dhook.h", 
-        "../src/d3dhook.cpp", 
-        "../src/updater.h", 
-        "../src/updater.cpp", 
-        "../src/datastore.h", 
-        "../src/datastore.cpp",
-        "../src/widget.h", 
-        "../src/widget.cpp",
-        "../src/log.h", 
-        "../src/log.cpp",
-        "../src/util.h", 
-        "../src/util.cpp",
-        "../src/menu.h", 
-        "../src/menu.cpp",
-        "../src/player.h", 
-        "../src/player.cpp",
-        "../src/animation.h", 
-        "../src/animation.cpp",
-        "../src/teleport.h", 
-        "../src/teleport.cpp",
-        "../src/ped.h", 
-        "../src/ped.cpp",
-        "../src/resourcestore.h", 
-        "../src/resourcestore.cpp",
-        "../src/fontmgr.h", 
-        "../src/fontmgr.cpp",
-        "../src/hotkeys.h", 
-        "../src/hotkeys.cpp",
-        "../src/vehicle.h", 
-        "../src/vehicle.cpp",
-        "../src/weapon.h", 
-        "../src/weapon.cpp",
-        "../src/game.h", 
-        "../src/game.cpp",
-        "../src/timecyc.h", 
-        "../src/visual.h", 
-        "../src/visual.cpp",
-        "../src/filehandler.h", 
-        "../src/filehandler.cpp",
-        "../src/dllmain.cpp",
-        "../src/locale.h",
-        "../src/locale.cpp",
-        "../src/rpc.h",
-        "../src/rpc.cpp",
-        "../src/overlay.h",
-        "../src/overlay.cpp",
-        "../src/tasknames.cpp"
-    }
-    includedirs {
-        PSDK_DIR .. "/plugin_III/",
-        PSDK_DIR .. "/plugin_III/game_III/",
-        PSDK_DIR .. "/shared/",
-        PSDK_DIR .. "/shared/game/"
-    }
-    libdirs (PSDK_DIR .. "/output/lib")
-    
-    defines { 
-        "IS_PLATFORM_WIN" ,
-        "_CRT_SECURE_NO_WARNINGS",
-        "_CRT_NON_CONFORMING_SWPRINTFS",
-        "GTA3",
-        "_DX9_SDK_INSTALLED",
-        "PLUGIN_SGV_10US"
-    }
-
-    linkoptions { 
-        "/FORCE:MULTIPLE"
-    }
-
-    pchheader "pch.h"
-    pchsource "../src/pch.cpp"
-
-    filter "configurations:Debug"
-        symbols "On"
-        links { 
-            "depend",
-            "plugin_III_d.lib" 
-        }
-
-    filter "configurations:Release"
-        optimize "On"
-        links { 
-            "depend",
-            "plugin_III.lib" 
-        }
-
-project "CheatMenuVC"
-    kind "SharedLib"
-    targetextension ".asi"
-    
-    files { 
-        "../src/cheatmenu.h", 
-        "../src/cheatmenu.cpp", 
-        "../src/pch.h", 
-        "../src/pch.cpp", 
-        "../src/d3dhook.h", 
-        "../src/d3dhook.cpp", 
-        "../src/updater.h", 
-        "../src/updater.cpp", 
-        "../src/datastore.h", 
-        "../src/datastore.cpp",
-        "../src/animation.h", 
-        "../src/animation.cpp",
-        "../src/teleport.h", 
-        "../src/teleport.cpp",
-        "../src/player.h", 
-        "../src/player.cpp",
-        "../src/ped.h", 
-        "../src/ped.cpp",
-        "../src/widget.h", 
-        "../src/widget.cpp", 
-        "../src/log.h", 
-        "../src/log.cpp",
-        "../src/vehicle.h", 
-        "../src/vehicle.cpp", 
-        "../src/util.h", 
-        "../src/util.cpp", 
-        "../src/menu.h", 
-        "../src/menu.cpp",
-        "../src/weapon.h", 
-        "../src/weapon.cpp",
-        "../src/game.h", 
-        "../src/game.cpp",
-        "../src/visual.h", 
-        "../src/visual.cpp",
-        "../src/resourcestore.h", 
-        "../src/resourcestore.cpp",
-        "../src/fontmgr.h", 
-        "../src/fontmgr.cpp",
-        "../src/filehandler.h", 
-        "../src/filehandler.cpp",
-        "../src/hotkeys.h", 
-        "../src/hotkeys.cpp",
-        "../src/dllmain.cpp",
-        "../src/locale.h",
-        "../src/locale.cpp",
-        "../src/rpc.h",
-        "../src/rpc.cpp",
-        "../src/overlay.h",
-        "../src/overlay.cpp",
-        "../src/tasknames.cpp"
-    }
-    includedirs {
-        PSDK_DIR .. "/plugin_vc/",
-        PSDK_DIR .. "/plugin_vc/game_vc/",
-        PSDK_DIR .. "/shared/",
-        PSDK_DIR .. "/shared/game/"
-    }
-    libdirs (PSDK_DIR .. "/output/lib")
-    
-    defines { 
-        "IS_PLATFORM_WIN" ,
-        "_CRT_SECURE_NO_WARNINGS",
-        "_CRT_NON_CONFORMING_SWPRINTFS",
-        "GTAVC",
-        "_DX9_SDK_INSTALLED",
-        "PLUGIN_SGV_10US"
-    }
-
-    pchheader "pch.h"
-    pchsource "../src/pch.cpp"
-
-    filter "configurations:Debug"
-        symbols "On"
-        links { 
-            "depend",
-            "plugin_vc_d.lib" 
-        }
-
-    filter "configurations:Release"
-        optimize "On"
-        links { 
-            "depend",
-            "plugin_vc.lib" 
-        }
-
-project "CheatMenuSA"
-    kind "SharedLib"
-    targetextension ".asi"
-    
-    files { 
-        "../src/**.h", 
-        "../src/**.hpp", 
-        "../src/**.cpp" 
-    }
-    includedirs {
-        PSDK_DIR .. "/plugin_sa/",
-        PSDK_DIR .. "/plugin_sa/game_sa/",
-        PSDK_DIR .. "/shared/",
-        PSDK_DIR .. "/shared/game/"
-    }
-    libdirs {
-        PSDK_DIR .. "/output/lib",
-        "../depend/lib"
-    }
-    
-    defines { 
-        "IS_PLATFORM_WIN" ,
-        "_CRT_SECURE_NO_WARNINGS",
-        "_CRT_NON_CONFORMING_SWPRINTFS",
-        "GTASA",
-        "_DX9_SDK_INSTALLED",
-        "PLUGIN_SGV_10US"
-    }
-
-    pchheader "pch.h"
-    pchsource "../src/pch.cpp"
-
-    filter "configurations:Debug"
-        symbols "On"
-        links { 
-            "depend",
-            "plugin_d.lib",
-        }
-
-    filter "configurations:Release"
-        optimize "On"
-        links { 
-            "depend",
-            "plugin.lib",
-        }
-        

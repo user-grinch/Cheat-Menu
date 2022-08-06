@@ -1,10 +1,10 @@
 #include "pch.h"
 #include "d3dhook.h"
-#include "../depend/kiero/kiero.h"
-#include "../depend/kiero/minhook/MinHook.h"
-#include "../depend/imgui/imgui_impl_dx9.h"
-#include "../depend/imgui/imgui_impl_dx11.h"
-#include "../depend/imgui/imgui_impl_win32.h"
+#include "kiero/kiero.h"
+#include "kiero/minhook/MinHook.h"
+#include "imgui/imgui_impl_dx9.h"
+#include "imgui/imgui_impl_dx11.h"
+#include "imgui/imgui_impl_win32.h"
 #include <dinput.h>
 
 #define DIMOUSE ((LPDIRECTINPUTDEVICE8)(RsGlobal.ps->diMouse))

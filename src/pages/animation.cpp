@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "animation.h"
-#include "widget.h"
-#include "util.h"
+#include "utils/widget.h"
+#include "utils/util.h"
 
 #ifdef GTA3
 #include <RpAnimBlend.h>
@@ -10,7 +10,7 @@
 #include "eAnimations.h"
 #include <CAnimBlendAssociation.h>
 #elif GTAVC
-#include "../depend/kiero/minhook/MinHook.h"
+#include "kiero/minhook/MinHook.h"
 #include <CAnimationStyleDescriptor.h>
 #include <CAnimManager.h>
 #include "eAnimations.h"
@@ -18,7 +18,7 @@
 #endif
 
 #ifdef GTASA
-#include "overlay.h"
+#include "utils/overlay.h"
 
 void Cutscene::Init()
 {

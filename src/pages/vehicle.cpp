@@ -1,17 +1,17 @@
 #include "pch.h"
 #include "vehicle.h"
-#include "menu.h"
-#include "widget.h"
-#include "util.h"
-#include "teleport.h"
-#include "filehandler.h"
 #include <CPopulation.h>
 #include <CDamageManager.h>
+#include "menu.h"
+#include "teleport.h"
+#include "utils/widget.h"
+#include "utils/util.h"
+#include "custom/filehandler.h"
 
 #ifdef GTASA
-#include "tHandlingData.h"
-#include "neon.h"
-#include "paint.h"
+#include <tHandlingData.h>
+#include "custom/neon.h"
+#include "custom/paint.h"
 #endif
 
 void Vehicle::Init()
@@ -750,8 +750,7 @@ void Vehicle::ShowPage()
                     pPlayer->m_nPedFlags.CantBeKnockedOffBike = 1;
 #elif GTAVC
                     
-                    patch::SetRaw(0x614C4E, (void*)"\x8B\x8D\x00\x00\x00\x00", 6);
-                    patch::SetRaw(0x614CC5, (void*)"\x8B\x85\x00\x00\x00\x00", 6);
+                    patch::PutRetn(0x613920, 0x10);
 #endif
                 }
                 else
@@ -760,8 +759,7 @@ void Vehicle::ShowPage()
                     pPlayer->m_nPedFlags.CantBeKnockedOffBike = 2;
 #elif GTAVC
                     
-                    patch::SetRaw(0x614C4E, (void*)"\x8B\x8D\xA8\x01\x00\x00", 6);
-                    patch::SetRaw(0x614CC5, (void*)"\x8B\x85\xAC\x01\x00\x00", 6);
+                    patch::SetRaw(0x613920, (void*)"\x53\x56\x57\x55", 4);
 #endif
                 }
             }

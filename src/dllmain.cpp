@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "cheatmenu.h"
-#include "updater.h"
-#include "rpc.h"
-#include "menu.h"
+#include "utils/updater.h"
+#include "utils/rpc.h"
+#include "pages/menu.h"
 
 void MenuThread(void* param)
 {

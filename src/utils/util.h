@@ -1,6 +1,6 @@
 #pragma once
-#include "tchar.h"
-#include "pdh.h"
+#include <tchar.h>
+#include <pdh.h>
 
 /*
 *   Contains utility functions 

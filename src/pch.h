@@ -51,17 +51,17 @@
 #include <CTheZones.h>
 #endif
 
-#include "../depend/fla/IDaccess.h"
-#include "../depend/imgui/imgui.h"
+#include "fla/IDaccess.h"
+#include "imgui/imgui.h"
 
 #include "defines.h"
-#include "log.h"
-#include "datastore.h"
-#include "hotkeys.h"
-#include "resourcestore.h"
-#include "fontmgr.h"
-#include "locale.h"
-#include "util.h"
+#include "utils/log.h"
+#include "utils/datastore.h"
+#include "utils/hotkeys.h"
+#include "utils/resourcestore.h"
+#include "utils/fontmgr.h"
+#include "utils/locale.h"
+#include "utils/util.h"
 
 #define TEXT(x) Locale::GetText(x).c_str()
 #define TEXT_S(x) Locale::GetText(x)

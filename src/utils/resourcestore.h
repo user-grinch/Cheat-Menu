@@ -1,9 +1,9 @@
 #pragma once
 #include <string>
+#include <d3d9.h>
 #include <rw/rwcore.h>
-#include "datastore.h"
-#include "../depend/imgui/imgui.h"
-#include "d3d9.h"
+#include "imgui/imgui.h"
+#include "utils/datastore.h"
 
 struct RwD3D9Raster
 {

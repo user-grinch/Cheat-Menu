@@ -1,12 +1,11 @@
 #include "pch.h"
-#include "vehicle.h"
 #include <CSprite.h>
-#include "overlay.h"
+#include "utils/overlay.h"
 
 #ifdef GTASA
-#include "teleport.h"
-#include "weapon.h"
-#include "vehicle.h"
+#include "pages/teleport.h"
+#include "pages/weapon.h"
+#include "pages/vehicle.h"
 #endif
 
 void Overlay::Init()

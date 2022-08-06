@@ -1,6 +1,6 @@
 #include "pch.h"
 #include "widget.h"
-#include "menu.h"
+#include "pages/menu.h"
 
 static struct
 {

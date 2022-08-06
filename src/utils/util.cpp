@@ -1,7 +1,7 @@
 #include "pch.h"
-#include "util.h"
-#include "psapi.h"
 #include <math.h>
+#include <psapi.h>
+#include "util.h"
 
 void Util::SetMessage(const char *message, bool b1, bool b2, bool b3)
 {

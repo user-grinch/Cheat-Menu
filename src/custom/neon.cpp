@@ -1,4 +1,6 @@
 #include "pch.h"
+
+#ifdef GTASA
 #include "neon.h"
 
 // Neon sprite
@@ -275,5 +277,4 @@ void Neon::Remove(CVehicle* pVeh)
 {
     m_VehNeon.Get(pVeh).m_bNeonInstalled = false;
 }
-
-
+#endif

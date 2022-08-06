@@ -1,5 +1,6 @@
 #pragma once
-#include "extender/VehicleExtender.h"
+#ifdef GTASA
+#include <extender/VehicleExtender.h>
 
 /*
 	Vehicle Neon implementation class for GTA: San Andreas
@@ -56,3 +57,4 @@ public:
     // Removes neon from vehicle
     static void Remove(CVehicle* veh);
 };
+#endif

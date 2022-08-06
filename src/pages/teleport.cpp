@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "teleport.h"
 #include "menu.h"
-#include "widget.h"
-#include "util.h"
+#include "utils/widget.h"
+#include "utils/util.h"
 
 #ifdef GTASA
 // FlA

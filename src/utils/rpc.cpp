@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "rpc.h"
-#include "util.h"
-#include "menu.h"
-#include "vehicle.h"
+#include "utils/util.h"
+#include "pages/menu.h"
+#include "pages/vehicle.h"
 #include "cheatmenu.h"
 
 // discord server ids
