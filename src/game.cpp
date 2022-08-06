@@ -31,8 +31,6 @@ void Freecam::Process()
         m_bRadarState = patch::Get<BYTE>(BY_GAME(0xBA676C, 0xA10AB6, NULL)); // radar
 
         CVector playerPos = player->GetPosition();
-        CPad::GetPad(0)->DisablePlayerControls = true;
-
         Command<Commands::CREATE_RANDOM_CHAR>(playerPos.x, playerPos.y, playerPos.z, &m_nPed);
         m_pPed = CPools::GetPed(m_nPed);
 
@@ -190,8 +188,6 @@ void Freecam::Clear()
     Command<Commands::SET_EVERYONE_IGNORE_PLAYER>(0, false);
     patch::Set<BYTE>(BY_GAME(0xBA6769, 0x86963A, NULL), m_bHudState); // hud
     patch::Set<BYTE>(BY_GAME(0xBA676C, 0xA10AB6, NULL), m_bRadarState); // radar
-
-    CPad::GetPad(0)->DisablePlayerControls = false;
 
     Command<Commands::DELETE_CHAR>(m_nPed);
     m_pPed = nullptr;

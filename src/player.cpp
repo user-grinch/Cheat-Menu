@@ -448,39 +448,6 @@ void Player::ShowPage()
             }
             ImGui::EndDisabled();
 #endif
-#ifdef GTAVC
-            if (Widget::Checkbox(TEXT("Player.NoUndress"), &m_bNoUndress, TEXT("Player.NoUndressTip")))
-            {
-                if (m_bNoUndress)
-                {
-                    // pop ecx
-                    patch::SetUChar(0x42BDC5, 0x59);
-                    patch::SetUChar(0x42C1B0, 0x59);
-                    patch::SetUChar(0x42C3B2, 0x59);
-                    patch::SetUChar(0x42BDC5, 0x59);
-                    patch::SetUChar(0x42C1B0, 0x59);
-                    patch::SetUChar(0x42C3B2, 0x59);
-                    // nop Undress()
-                    patch::RedirectShortJump(0x42BDC6, (void*)0x42BDE1);
-                    patch::RedirectShortJump(0x42C1B1, (void*)0x42C1CC);
-                    patch::RedirectShortJump(0x42C3B3, (void*)0x42C3CE);
-                    // nop Dress()
-                    patch::RedirectShortJump(0x42BDC6, (void*)0x42BE05);
-                    patch::RedirectShortJump(0x42C1B1, (void*)0x42C1F0);
-                    patch::RedirectShortJump(0x42C3B3, (void*)0x42C3F2);
-                }
-                else
-                {
-                    // restore
-                    patch::SetRaw(0x42BDC5, (void*)"\x0F\xB6\x05\xFB\x0A\xA1", 6);
-                    patch::SetRaw(0x42C1B0, (void*)"\x0F\xB6\x05\xFB\x0A\xA1", 6);
-                    patch::SetRaw(0x42C3B2, (void*)"\x0F\xB6\x05\xFB\x0A\xA1", 6);
-                    patch::SetRaw(0x42BDC5, (void*)"\x0F\xB6\x05\xFB\x0A\xA1", 6);
-                    patch::SetRaw(0x42C1B0, (void*)"\x0F\xB6\x05\xFB\x0A\xA1", 6);
-                    patch::SetRaw(0x42C3B2, (void*)"\x0F\xB6\x05\xFB\x0A\xA1", 6);
-                }
-            }
-#endif
             Widget::CheckboxAddr(TEXT("Player.FreeHealthcare"), (int)&pInfo->m_bGetOutOfHospitalFree);
 
             if (Widget::Checkbox(TEXT("Player.FreezeWL"), &m_bFreezeWantedLevel))
@@ -559,7 +526,39 @@ void Player::ShowPage()
 #else
             Widget::CheckboxAddr(TEXT("Player.InfSprint"), (int)&pInfo->m_bInfiniteSprint);
 #endif
-
+            #ifdef GTAVC
+            if (Widget::Checkbox(TEXT("Player.NoUndress"), &m_bNoUndress, TEXT("Player.NoUndressTip")))
+            {
+                if (m_bNoUndress)
+                {
+                    // pop ecx
+                    patch::SetUChar(0x42BDC5, 0x59);
+                    patch::SetUChar(0x42C1B0, 0x59);
+                    patch::SetUChar(0x42C3B2, 0x59);
+                    patch::SetUChar(0x42BDC5, 0x59);
+                    patch::SetUChar(0x42C1B0, 0x59);
+                    patch::SetUChar(0x42C3B2, 0x59);
+                    // nop Undress()
+                    patch::RedirectShortJump(0x42BDC6, (void*)0x42BDE1);
+                    patch::RedirectShortJump(0x42C1B1, (void*)0x42C1CC);
+                    patch::RedirectShortJump(0x42C3B3, (void*)0x42C3CE);
+                    // nop Dress()
+                    patch::RedirectShortJump(0x42BDC6, (void*)0x42BE05);
+                    patch::RedirectShortJump(0x42C1B1, (void*)0x42C1F0);
+                    patch::RedirectShortJump(0x42C3B3, (void*)0x42C3F2);
+                }
+                else
+                {
+                    // restore
+                    patch::SetRaw(0x42BDC5, (void*)"\x0F\xB6\x05\xFB\x0A\xA1", 6);
+                    patch::SetRaw(0x42C1B0, (void*)"\x0F\xB6\x05\xFB\x0A\xA1", 6);
+                    patch::SetRaw(0x42C3B2, (void*)"\x0F\xB6\x05\xFB\x0A\xA1", 6);
+                    patch::SetRaw(0x42BDC5, (void*)"\x0F\xB6\x05\xFB\x0A\xA1", 6);
+                    patch::SetRaw(0x42C1B0, (void*)"\x0F\xB6\x05\xFB\x0A\xA1", 6);
+                    patch::SetRaw(0x42C3B2, (void*)"\x0F\xB6\x05\xFB\x0A\xA1", 6);
+                }
+            }
+#endif
             ImGui::NextColumn();
 
 #ifdef GTASA
