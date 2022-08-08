@@ -63,8 +63,6 @@ function createProject(projectID)
 
         pchheader "pch.h"
         pchsource "../src/pch.cpp"
-        filter "files:..src/utils/**.cpp"
-            flags {"NoPCH"}
 
         filter "configurations:Debug"
             symbols "On"

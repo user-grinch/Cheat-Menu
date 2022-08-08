@@ -18,7 +18,6 @@ void Vehicle::Init()
 {
 #ifdef GTASA
     FileHandler::FetchHandlingID(m_VehicleIDE);
-    Neon::Init();
     Paint::InjectHooks();
 #endif
 
@@ -144,7 +143,7 @@ void Vehicle::Init()
                 int red, green, blue;
 
                 Util::RainbowValues(red, green, blue, 0.25);
-                Neon::Install(pVeh, red, green, blue);
+                Neon.Install(pVeh, red, green, blue);
                 NeonData::m_nRainbowTimer = timer;
             }
 #endif
@@ -173,9 +172,9 @@ void Vehicle::Init()
                     chance = Random(1, 3);
                 }
 
-                if (chance == 1 && !Neon::IsInstalled(veh) && veh->m_pDriver != pPlayer)
+                if (chance == 1 && !Neon.IsInstalled(veh) && veh->m_pDriver != pPlayer)
                 {
-                    Neon::Install(veh, Random(0, 255), Random(0, 255), Random(0, 255));
+                    Neon.Install(veh, Random(0, 255), Random(0, 255), Random(0, 255));
                 }
             }
             NeonData::m_bTrafficTimer = timer;
@@ -1314,17 +1313,17 @@ void Vehicle::ShowPage()
                     ImGui::Spacing();
                     if (ImGui::Button(TEXT("Vehicle.RemoveNeon"), ImVec2(Widget::CalcSize())))
                     {
-                        Neon::Remove(veh);
+                        Neon.Remove(veh);
                         Util::SetMessage(TEXT("Vehicle.RemoveNeonMSG"));
                     }
 
                     ImGui::Spacing();
                     ImGui::Columns(2, NULL, false);
 
-                    bool pulsing = Neon::IsPulsingEnabled(veh);
+                    bool pulsing = Neon.IsPulsingEnabled(veh);
                     if (Widget::Checkbox(TEXT("Vehicle.PulsingNeon"), &pulsing))
                     {
-                        Neon::SetPulsing(veh, pulsing);
+                        Neon.SetPulsing(veh, pulsing);
                     }
 
                     Widget::Checkbox(TEXT("Vehicle.RainbowNeon"), &NeonData::m_bRainbowEffect, TEXT("Vehicle.RainbowNeonMSG"));
@@ -1340,7 +1339,7 @@ void Vehicle::ShowPage()
                         int g = static_cast<int>(NeonData::m_fColorPicker[1] * 255);
                         int b = static_cast<int>(NeonData::m_fColorPicker[2] * 255);
 
-                        Neon::Install(veh, r, g, b);
+                        Neon.Install(veh, r, g, b);
                     }
 
 
@@ -1364,7 +1363,7 @@ void Vehicle::ShowPage()
                             int g = static_cast<int>(color[1] * 255);
                             int b = static_cast<int>(color[2] * 255);
 
-                            Neon::Install(veh, r, g, b);
+                            Neon.Install(veh, r, g, b);
                         }
 
                         if ((color_id + 1) % btnsInRow != 0)

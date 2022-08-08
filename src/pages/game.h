@@ -1,43 +1,6 @@
 #pragma once
 #include "pch.h"
 
-#ifdef GTASA
-class Freecam
-{
-private:
-    static inline bool m_bInitDone;
-    static inline CPed* m_pPed;
-    static inline int m_nPed = -1;
-    static inline BYTE m_bHudState;
-    static inline BYTE m_bRadarState;
-
-public:
-    static inline bool m_bEnabled;
-    static inline int m_nMul = 1;
-    static inline float m_fFOV = 60.0f;
-
-    static void Clear();
-    static void Process();
-};
-
-class RandomCheats
-{
-private:
-    static inline std::string m_EnabledCheats[92][2];
-    static inline DataStore m_pData {"cheats"};
-    static inline uint m_nTimer;
-
-public:
-    static inline bool m_bEnabled;
-    static inline bool m_bProgressBar = true;
-    static inline int m_nInterval = 10;
-
-    static void DrawBar();
-    static void DrawList();
-    static void Process();
-};
-#endif
-
 class Game
 {
 private:

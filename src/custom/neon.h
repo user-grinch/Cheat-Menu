@@ -1,7 +1,7 @@
 #pragma once
 #ifdef GTASA
 #include <extender/VehicleExtender.h>
-
+#include "interface/icheat.hpp"
 /*
 	Vehicle Neon implementation class for GTA: San Andreas
 	Handles neon colors and neon color changing
@@ -9,7 +9,7 @@
 	TODO: Implement for VC & 3 too (maybe)
 	Dunno how it'd work with the d3d8to9 wrapper
 */
-class Neon
+class NeonMgr : public ICheat<NeonMgr>
 {
 private:
     class NeonData
@@ -29,32 +29,31 @@ private:
         }
     };
 
-    static inline RwTexture* m_pNeonTexture = nullptr; // pointer to the neon mask texture
-    static inline VehicleExtendedData<NeonData> m_VehNeon;
+    RwTexture* m_pNeonTexture = nullptr; // pointer to the neon mask texture
+    VehicleExtendedData<NeonData> m_VehNeon;
+
+    friend ICheat;
+    NeonMgr();
+    NeonMgr(NeonMgr&);
+    ~NeonMgr();
 
 public:
-    Neon() = delete;
-    Neon(Neon&) = delete;
-
-    // Injects necessary hooks into the game
-    static void Init();
 
     // Installs neons with color
-    static void Install(CVehicle* veh, int r, int g, int b);
+    void Install(CVehicle* veh, int r, int g, int b);
 
     // Is neon installer for particular vehicle
-    static bool IsInstalled(CVehicle* veh);
+    bool IsInstalled(CVehicle* veh);
 
     // Is neon pulsing enabled for vehicle
-    static bool IsPulsingEnabled(CVehicle* veh);
+    bool IsPulsingEnabled(CVehicle* veh);
 
     // Set neon pulsing state
-    static void SetPulsing(CVehicle* veh, bool state);
-
-    // Removes the neon game hooks
-    static void Shutdown();
+    void SetPulsing(CVehicle* veh, bool state);
 
     // Removes neon from vehicle
-    static void Remove(CVehicle* veh);
+    void Remove(CVehicle* veh);
 };
+
+extern NeonMgr& Neon;
 #endif

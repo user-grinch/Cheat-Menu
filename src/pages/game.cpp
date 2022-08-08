@@ -5,7 +5,8 @@
 #include "utils/util.h"
 
 #ifdef GTASA
-#include <CIplStore.h>
+#include "custom/freecam.h"
+#include "custom/randomcheats.h"
 #include <CMessages.h>
 #include <CSprite2d.h>
 #include <CAERadioTrackManager.h>
@@ -13,275 +14,6 @@
 
 #ifdef GTASA
 static bool bSaveGameFlag = false;
-void Freecam::Process()
-{
-    static CVector m_fTotalMouse;
-
-    int delta = (CTimer::m_snTimeInMilliseconds - CTimer::m_snPreviousTimeInMilliseconds);
-
-    int ratio = 1 / (1 + (delta * m_nMul));
-    int speed = m_nMul + m_nMul * ratio * delta;
-
-    if (!m_bInitDone)
-    {
-        CPlayerPed* player = FindPlayerPed();
-        Command<Commands::SET_EVERYONE_IGNORE_PLAYER>(0, true);
-
-        m_bHudState = patch::Get<BYTE>(BY_GAME(0xBA6769, 0x86963A, NULL)); // hud
-        patch::Set<BYTE>(BY_GAME(0xBA6769, 0x86963A, NULL), 0); // hud
-        m_bRadarState = patch::Get<BYTE>(BY_GAME(0xBA676C, 0xA10AB6, NULL)); // radar
-
-        CVector playerPos = player->GetPosition();
-        Command<Commands::CREATE_RANDOM_CHAR>(playerPos.x, playerPos.y, playerPos.z, &m_nPed);
-        m_pPed = CPools::GetPed(m_nPed);
-
-        m_fTotalMouse.x = player->GetHeading() + 89.6f;
-        m_fTotalMouse.y = 0;
-        playerPos.z -= 20;
-
-        Command<Commands::FREEZE_CHAR_POSITION_AND_DONT_LOAD_COLLISION>(m_nPed, true);
-        Command<Commands::SET_LOAD_COLLISION_FOR_CHAR_FLAG>(m_nPed, false);
-
-        m_pPed->m_bIsVisible = false;
-        Command<Commands::SET_CHAR_COLLISION>(m_nPed, false);
-        m_pPed->SetPosn(playerPos);
-        TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_fFOV, 1000, true);
-        Command<Commands::CAMERA_PERSIST_FOV>(true);
-        patch::Set<BYTE>(0xBA676C, 2); // disable radar
-        m_bInitDone = true;
-    }
-
-    CVector pos = m_pPed->GetPosition();
-
-    m_fTotalMouse.x = m_fTotalMouse.x - CPad::NewMouseControllerState.x / 250;
-    m_fTotalMouse.y = m_fTotalMouse.y + CPad::NewMouseControllerState.y / 3;
-
-    if (m_fTotalMouse.x > 150)
-    {
-        m_fTotalMouse.y = 150;
-    }
-
-    if (m_fTotalMouse.y < -150)
-    {
-        m_fTotalMouse.y = -150;
-    }
-
-    if (freeCamTeleport.Pressed())
-    {
-        CPlayerPed* player = FindPlayerPed();
-        CVector pos = m_pPed->GetPosition();
-
-        CEntity* playerEntity = FindPlayerEntity(-1);
-        pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, nullptr, &playerEntity) + 0.5f;
-        Command<Commands::SET_CHAR_COORDINATES>(CPools::GetPedRef(player), pos.x, pos.y, pos.z);
-
-        // disble them again cause they get enabled
-        CHud::bScriptDontDisplayRadar = true;
-        CHud::m_Wants_To_Draw_Hud = false;
-        Util::SetMessage(TEXT("Game.PlayerTeleported"));
-    }
-
-    if (KeyPressed(VK_MENU) && m_nMul > 1)
-    {
-        speed /= 2;
-    }
-
-    if (KeyPressed(VK_SHIFT))
-    {
-        speed *= 2;
-    }
-        
-    if (freeCamForward.PressedRealtime() || freeCamBackward.PressedRealtime())
-    {
-        if (freeCamBackward.PressedRealtime())
-        {
-            speed *= -1;
-        }
-
-        float angle;
-        Command<Commands::GET_CHAR_HEADING>(m_nPed, &angle);
-
-        if (KeyPressed(VK_CONTROL))
-        {
-            pos.z += speed * sin(90.0f / 3 * 3.14159f / 180.0f);
-        }
-        else
-        {
-            pos.x += speed * cos(angle * 3.14159f / 180.0f);
-            pos.y += speed * sin(angle * 3.14159f / 180.0f);
-
-            if (!KeyPressed(VK_SPACE))
-            {
-                pos.z += speed * 2 * sin(m_fTotalMouse.y / 3 * 3.14159f / 180.0f);
-            }
-        }
-    }
-
-    if (freeCamLeft.PressedRealtime() || freeCamRight.PressedRealtime())
-    {
-        if (freeCamLeft.PressedRealtime())
-        {
-            speed *= -1;
-        }
-
-        float angle;
-        Command<Commands::GET_CHAR_HEADING>(m_nPed, &angle);
-        angle -= 90;
-
-        pos.x += speed * cos(angle * 3.14159f / 180.0f);
-        pos.y += speed * sin(angle * 3.14159f / 180.0f);
-    }
-
-    if (CPad::NewMouseControllerState.wheelUp)
-    {
-        if (KeyPressed(VK_CONTROL))
-        {
-            if (m_fFOV > 10.0f)
-            {
-                m_fFOV -= 2.0f * speed;
-            }
-
-            TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_fFOV, 250, true);
-            Command<Commands::CAMERA_PERSIST_FOV>(true);
-        }
-        else
-        {
-            if (m_nMul < 10)
-            {
-                ++m_nMul;
-                Util::SetMessage(std::format("Speed: {}", m_nMul).c_str());
-            }
-        }
-    }
-
-    if (CPad::NewMouseControllerState.wheelDown)
-    {
-        if (KeyPressed(VK_CONTROL))
-        {
-            if (m_fFOV < 115.0f)
-            {
-                m_fFOV += 2.0f * speed;
-            }
-
-            TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_fFOV, 250, true);
-            Command<Commands::CAMERA_PERSIST_FOV>(true);
-        }
-        else
-        {
-            if (m_nMul > 1)
-            {
-                --m_nMul;
-                Util::SetMessage(std::to_string(m_nMul).c_str());
-                Util::SetMessage(std::format("Speed: {}", m_nMul).c_str());
-            }
-        }
-    }
-
-    m_pPed->SetHeading(m_fTotalMouse.x);
-    Command<Commands::ATTACH_CAMERA_TO_CHAR>(m_nPed, 0.0, 0.0, 20.0, 90.0, 180, m_fTotalMouse.y, 0.0, 2);
-    m_pPed->SetPosn(pos);
-    CIplStore::AddIplsNeededAtPosn(pos);
-}
-
-void Freecam::Clear()
-{
-    m_bInitDone = false;
-    Command<Commands::SET_EVERYONE_IGNORE_PLAYER>(0, false);
-    patch::Set<BYTE>(BY_GAME(0xBA6769, 0x86963A, NULL), m_bHudState); // hud
-    patch::Set<BYTE>(BY_GAME(0xBA676C, 0xA10AB6, NULL), m_bRadarState); // radar
-
-    Command<Commands::DELETE_CHAR>(m_nPed);
-    m_pPed = nullptr;
-
-    // restore lock camera zoom here
-    if (Game::m_bLockCameraZoom)
-    {
-        TheCamera.LerpFOV(TheCamera.FindCamFOV(), Game::m_nCameraZoom, 250, true);
-    }
-    else
-    {
-        Command<Commands::CAMERA_PERSIST_FOV>(false);
-    }
-    Command<Commands::RESTORE_CAMERA_JUMPCUT>();
-}
-
-void RandomCheats::Process()
-{
-    static bool genCheats = false;
-    if (!genCheats)
-    {
-            // Generate enabled cheats vector
-        for (auto [k, v] : m_pData.Items())
-        {
-            /*
-            [
-                cheat_id = [ cheat_name, state (true/false) ]
-            ]
-            */
-            std::string key { k.str() };
-            m_EnabledCheats[std::stoi(key)][0] = v.value_or<std::string>("Unknown");
-            m_EnabledCheats[std::stoi(key)][1] = "true";
-        }
-        genCheats = true;
-    }
-    
-    if (m_bEnabled)
-    {
-        uint timer = CTimer::m_snTimeInMilliseconds;
-        if ((timer - m_nTimer) > (static_cast<uint>(m_nInterval) * 1000))
-        {
-            int id = Random(0, 91);
-
-            for (int i = 0; i < 92; i++)
-            {
-                if (i == id)
-                {
-                    if (m_EnabledCheats[i][1] == "true")
-                    {
-                        Call<0x438370>(id); // cheatEnableLegimate(int CheatID)
-                        CMessages::AddMessage((char*)m_EnabledCheats[i][0].c_str(), 2000, 0, false);
-                        m_nTimer = timer;
-                    }
-                    break;
-                }
-            }
-        }
-    }
-}
-
-void RandomCheats::DrawBar()
-{
-    if (m_bEnabled && m_bProgressBar)
-    {
-        // Next cheat timer bar
-        uint screenWidth = screen::GetScreenWidth();
-        uint screenHeight = screen::GetScreenHeight();
-        uint timer = CTimer::m_snTimeInMilliseconds;
-        uint totalTime = m_nInterval;
-        float progress = (totalTime - (timer - m_nTimer) / 1000.0f) / totalTime;
-
-        CRect sizeBox = CRect(0,0, screenWidth, screenHeight/50);
-        CRect sizeProgress = CRect(0,0, screenWidth*progress, screenHeight/50);
-        CRGBA colorBG = CRGBA(24, 99, 44, 255);
-        CRGBA colorProgress = CRGBA(33, 145, 63, 255);
-
-        CSprite2d::DrawRect(sizeBox, colorBG);
-        CSprite2d::DrawRect(sizeProgress, colorProgress);
-    }
-}
-
-void RandomCheats::DrawList()
-{
-    for (std::string* element : m_EnabledCheats)
-    {
-        bool selected = (element[1] == "true") ? true : false;
-
-        if (ImGui::MenuItem(element[0].c_str(), nullptr, selected))
-        {
-            element[1] = selected ? "false" : "true";
-        }
-    }
-}
 #endif
 
 static void RealTimeClock()
@@ -319,8 +51,6 @@ void Game::Init()
             bSaveGameFlag = false;
         }
     };
-
-    Events::drawingEvent.Add(RandomCheats::DrawBar);
 #endif
 
     Events::processScriptsEvent += []
@@ -388,24 +118,20 @@ void Game::Init()
             }
         }
 
-        RandomCheats::Process();
-
         if (freeCam.Pressed())
         {
-            if (Freecam::m_bEnabled)
+            if (Freecam.Toggle())
             {
-                Freecam::m_bEnabled = false;
-                Freecam::Clear();
+                // restore lock camera zoom here
+                if (Game::m_bLockCameraZoom)
+                {
+                    TheCamera.LerpFOV(TheCamera.FindCamFOV(), Game::m_nCameraZoom, 250, true);
+                }
+                else
+                {
+                    Command<Commands::CAMERA_PERSIST_FOV>(false);
+                }
             }
-            else
-            {
-                Freecam::m_bEnabled = true;
-            }
-        }
-
-        if (Freecam::m_bEnabled)
-        {
-            Freecam::Process();
         }
 #endif
 
@@ -657,7 +383,7 @@ void Game::ShowPage()
             if (ImGui::CollapsingHeader(TEXT("Game.CameraZoom")))
             {
                 ImGui::Spacing();
-                if (Freecam::m_bEnabled)
+                if (Freecam.GetState())
                 {
                     ImGui::TextWrapped(TEXT("Game.CameraZoomLockFreecam"));
                 }
@@ -872,20 +598,29 @@ void Game::ShowPage()
         if (ImGui::BeginTabItem(TEXT("Game.Freecam")))
         {
             ImGui::Spacing();
-            if (Widget::Checkbox(TEXT("Game.Enable"), &Freecam::m_bEnabled))
+            bool state = Freecam.GetState();
+            if (Widget::Checkbox(TEXT("Game.Enable"), &state))
             {
-                if (!Freecam::m_bEnabled)
+                if (Freecam.Toggle())
                 {
-                    Freecam::Clear();
+                    // restore lock camera zoom here
+                    if (Game::m_bLockCameraZoom)
+                    {
+                        TheCamera.LerpFOV(TheCamera.FindCamFOV(), Game::m_nCameraZoom, 250, true);
+                    }
+                    else
+                    {
+                        Command<Commands::CAMERA_PERSIST_FOV>(false);
+                    }
                 }
             }
             ImGui::Spacing();
 
-            if (ImGui::SliderFloat(TEXT("Game.FieldOfView"), &Freecam::m_fFOV, 5.0f, 120.0f) && Freecam::m_bEnabled)
+            if (ImGui::SliderFloat(TEXT("Game.FieldOfView"), &Freecam.m_fFOV, 5.0f, 120.0f) && Freecam.GetState())
             {
-                TheCamera.LerpFOV(TheCamera.FindCamFOV(), Freecam::m_fFOV, 250, true);
+                TheCamera.LerpFOV(TheCamera.FindCamFOV(), Freecam.m_fFOV, 250, true);
             }
-            ImGui::SliderInt(TEXT("Game.MovementSpeed"), &Freecam::m_nMul, 1, 10);
+            ImGui::SliderInt(TEXT("Game.MovementSpeed"), &Freecam.m_nMul, 1, 10);
             ImGui::Dummy(ImVec2(0.0f, 20.0f));
 
             ImGui::BeginChild("Conrtls");
@@ -1054,15 +789,20 @@ void Game::ShowPage()
         {
             ImGui::Spacing();
             ImGui::Columns(2, NULL, false);
-            ImGui::Checkbox(TEXT("Game.Enable"), &RandomCheats::m_bEnabled);
+
+            bool state = RandomCheats.GetState();
+            if (ImGui::Checkbox(TEXT("Game.Enable"), &state))
+            {
+                RandomCheats.Toggle();
+            }
             ImGui::NextColumn();
-            ImGui::Checkbox(TEXT("Game.ProgressBar"), &RandomCheats::m_bProgressBar);
+            ImGui::Checkbox(TEXT("Game.ProgressBar"), &RandomCheats.m_bProgressBar);
             ImGui::Columns(1);
             ImGui::Spacing();
 
             ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 2);
 
-            ImGui::SliderInt(TEXT("Game.ActivateTimer"), &RandomCheats::m_nInterval, 5, 60);
+            ImGui::SliderInt(TEXT("Game.ActivateTimer"), &RandomCheats.m_nInterval, 5, 60);
             Widget::Tooltip(TEXT("Game.ActivateTimerText"));
 
             ImGui::PopItemWidth();
@@ -1071,7 +811,7 @@ void Game::ShowPage()
             ImGui::Separator();
             if (ImGui::BeginChild("Cheats list"))
             {
-                RandomCheats::DrawList();
+                RandomCheats.DrawList();
                 ImGui::EndChild();
             }
             ImGui::EndTabItem();

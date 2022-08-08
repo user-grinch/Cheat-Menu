@@ -1,6 +1,5 @@
 #include "log.h"
 #include "pch.h"
-#include <stdarg.h>
 
 void Log::AppendLogLevel(std::string& text) noexcept
 {
