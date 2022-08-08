@@ -12,6 +12,7 @@ private:
         static inline bool m_bEnabled = false;
         static inline CVector m_fPos;
     };
+    static inline bool m_bKeepStuff;
     static inline bool m_bFreezeWantedLevel;
 
 #ifdef GTAVC

@@ -5,12 +5,13 @@
 #include "utils/util.h"
 
 #ifdef GTASA
-// FlA
-tRadarTrace* CRadar::ms_RadarTrace = reinterpret_cast<tRadarTrace*>(patch::GetPointer(0x5838B0 + 2));
+// FLA
+tRadarTrace* ms_RadarTrace = reinterpret_cast<tRadarTrace*>(patch::GetPointer(0x5838B0 + 2));
+static int maxSprites = *(uint*)0x5D5870;
 
 void Teleport::FetchRadarSpriteData()
 {
-    static int maxSprites = *(uint*)0x5D5870;
+    
     uint timer = CTimer::m_snTimeInMilliseconds;
     static uint lastUpdated = timer;
 
@@ -23,8 +24,8 @@ void Teleport::FetchRadarSpriteData()
     m_locData.m_pData->RemoveTable("Radar");
     for (int i = 0; i != maxSprites; ++i)
     {
-        CVector pos = CRadar::ms_RadarTrace[i].m_vecPos;
-        std::string sprite = std::to_string(CRadar::ms_RadarTrace[i].m_nRadarSprite);
+        CVector pos = ms_RadarTrace[i].m_vecPos;
+        std::string sprite = std::to_string(ms_RadarTrace[i].m_nRadarSprite);
         std::string keyName = m_SpriteData.Get<std::string>(sprite.c_str(), "Unknown");
         keyName += ", " + Util::GetLocationName(&pos);
         std::string key = "Radar." + keyName;
@@ -38,6 +39,8 @@ bool Teleport::IsQuickTeleportActive()
 {
     return m_bQuickTeleport;
 }
+
+
 
 void Teleport::Init()
 {
@@ -61,29 +64,52 @@ void Teleport::Init()
             {
                 map.m_pTexture = gTextureList.FindRwTextureByName("map");
             }
-            float height = screen::GetScreenHeight();
-            float width = screen::GetScreenWidth();
-            float size = width * height / width; // keep aspect ratio
-            float left = (width-size) / 2;
+            ImVec2 screenSz = ImVec2(screen::GetScreenWidth(), screen::GetScreenHeight());
+            float size = screenSz.x * screenSz.y / screenSz.x; // keep aspect ratio
+            float left = (screenSz.x-size) / 2;
             float right = left+size;
-            map.Draw(CRect(left, 0.0f, right, height), CRGBA(255, 255, 255, 200));
-            
-            if (ImGui::IsMouseClicked(0))
+            map.Draw(CRect(left, 0.0f, right, screenSz.y), CRGBA(255, 255, 255, 200));
+
+            // draw sprites on map
+            static float sz = SCREEN_MULTIPLIER(12.5f);
+            for (int i = 0; i != maxSprites; ++i)
+            {   
+                tRadarTrace &trace = ms_RadarTrace[i];
+                
+                if (trace.m_nRadarSprite != RADAR_SPRITE_NONE)
+                {
+                    CSprite2d &sprite = CRadar::RadarBlipSprites[LOWORD(trace.m_nRadarSprite)];
+                    ImVec2 pos = ImVec2(trace.m_vecPos.x, trace.m_vecPos.y);
+                    pos = Util::ConvertMapToScreen(pos, m_fMapSize, screenSz);
+                    sprite.Draw(CRect(pos.x-sz, pos.y-sz, pos.x+sz, pos.y+sz), CRGBA(255, 255, 255, 200));
+                }
+            }
+            // create player sprite
+            CSprite2d &sprite = CRadar::RadarBlipSprites[RADAR_SPRITE_CENTRE];
+            CPlayerPed *pPlayer = FindPlayerPed();
+            CVector coord = pPlayer->GetPosition();
+            ImVec2 pos = Util::ConvertMapToScreen(ImVec2(coord.x, coord.y), m_fMapSize, screenSz);
+            sprite.Draw(CRect(pos.x-sz, pos.y-sz, pos.x+sz, pos.y+sz), CRGBA(255, 255, 255, 200));
+
+            if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
             {
-                // Convert screen space to image space
                 ImVec2 pos = ImGui::GetMousePos();
                 if (pos.x > left && pos.x < right)
                 {
-                    pos.x -= left;
-                    pos.x -= size/2;
-                    pos.y -= size/2;
-                    
-                    // Convert image space to map space
-                    pos.x = pos.x / size * m_fMapSize.x;
-                    pos.y = pos.y / size * m_fMapSize.y;
-                    pos.y *= -1;
-                    
+                    pos = Util::ConvertScreenToMap(pos, m_fMapSize, screenSz);
                     WarpPlayer<eTeleportType::MapPosition>(CVector(pos.x, pos.y, 0.0f));
+                }
+            }
+
+            if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+            {
+                ImVec2 pos = ImGui::GetMousePos();
+                if (pos.x > left && pos.x < right)
+                {
+                    pos = Util::ConvertScreenToMap(pos, m_fMapSize, screenSz);
+                    tRadarTrace *trace = &ms_RadarTrace[LOWORD(FrontEndMenuManager.m_nTargetBlipIndex)];
+                    trace->m_vecPos = CVector(pos.x, pos.y, 0.0f);
+                    // trace->m_nRadarSprite = RADAR_SPRITE_WAYPOINT;
                 }
             }
         }
@@ -102,7 +128,7 @@ void Teleport::WarpPlayer(CVector pos, int interiorID)
 
     if (Type == eTeleportType::Marker)
     {
-        tRadarTrace targetBlip = CRadar::ms_RadarTrace[LOWORD(FrontEndMenuManager.m_nTargetBlipIndex)];
+        tRadarTrace targetBlip = ms_RadarTrace[LOWORD(FrontEndMenuManager.m_nTargetBlipIndex)];
         if (targetBlip.m_nRadarSprite != RADAR_SPRITE_WAYPOINT)
         {
             Util::SetMessage(TEXT("Teleport.TargetBlipText"));

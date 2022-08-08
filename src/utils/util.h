@@ -23,6 +23,9 @@ public:
     static void ClearCharTasksVehCheck(CPed* ped);
     static bool IsOnMission();
 #endif
+
+    static ImVec2 ConvertScreenToMap(ImVec2 pos, ImVec2 mapSz, ImVec2 screenSz);
+    static ImVec2 ConvertMapToScreen(ImVec2 pos, ImVec2 mapSz, ImVec2 screenSz);
     static void UnFlipVehicle(CVehicle *pVeh);
     static void FixVehicle(CVehicle *pVeh);
     static CPed* GetClosestPed();

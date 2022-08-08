@@ -108,7 +108,6 @@ void MenuThread(void* param)
     
     if (Updater::IsUpdateAvailable())
     {
-        Updater::GetUpdateVersion();
         Log::Print<eLogLevel::Info>("New update available: %s", Updater::GetUpdateVersion().c_str());
     }
 

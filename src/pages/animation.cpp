@@ -297,8 +297,23 @@ void Animation::Init()
     // // nop (3x)
     patch::SetRaw(0x404950, (void*)"\xC3\x90\x90\x90", 4);
 
-    MH_CreateHook((void*)0x40D6E0, NEW_CStreaming_RemoveModel, (void**)&OLD_CStreaming_RemoveModel);
-    MH_EnableHook((void*)0x40D6E0);
+    // Fix crash at 0x4019EA
+    static bool hookInjected = false;
+    Events::initGameEvent.before += []()
+    {
+        if (hookInjected)
+        {
+            MH_DisableHook((void*)0x40D6E0);
+        }
+    };
+
+    Events::initGameEvent.after += []()
+    {
+        MH_CreateHook((void*)0x40D6E0, NEW_CStreaming_RemoveModel, (void**)&OLD_CStreaming_RemoveModel);
+        MH_EnableHook((void*)0x40D6E0);
+        hookInjected = true;
+    };
+
 #endif
 }
 

@@ -24,7 +24,6 @@ private:
     static inline bool m_bSolidWater; // walk on water hack
     static inline bool m_bNoWaterPhysics;
     static inline bool m_bScreenShot;
-    static inline bool m_bKeepStuff;
     static inline ResourceStore m_StatData{ "stats", eResourceType::TYPE_TEXT };
 #endif
 

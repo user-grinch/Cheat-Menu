@@ -221,11 +221,11 @@ void Player::Init()
             player->m_nFlags.bFireProof = 1;
             player->m_nFlags.bMeleeProof = 1;
 #else
-            player->m_nFlags.bBulletProof = m_bGodMode;
-            player->m_nFlags.bCollisionProof = m_bGodMode;
-            player->m_nFlags.bExplosionProof = m_bGodMode;
-            player->m_nFlags.bFireProof = m_bGodMode;
-            player->m_nFlags.bMeleeProof = m_bGodMode;
+            player->m_nFlags.bBulletProof = 1;
+            player->m_nFlags.bCollisionProof = 1;
+            player->m_nFlags.bExplosionProof = 1;
+            player->m_nFlags.bFireProof = 1;
+            player->m_nFlags.bMeleeProof = 1;
 #endif
         }
 
@@ -270,11 +270,11 @@ void Player::Init()
                 player->m_nFlags.bFireProof = 0;
                 player->m_nFlags.bMeleeProof = 0;
 #else
-                player->m_nFlags.bBulletProof = m_bGodMode;
-                player->m_nFlags.bCollisionProof = m_bGodMode;
-                player->m_nFlags.bExplosionProof = m_bGodMode;
-                player->m_nFlags.bFireProof = m_bGodMode;
-                player->m_nFlags.bMeleeProof = m_bGodMode;
+                player->m_nFlags.bBulletProof = 0;
+                player->m_nFlags.bCollisionProof = 0;
+                player->m_nFlags.bExplosionProof = 0;
+                player->m_nFlags.bFireProof = 0;
+                player->m_nFlags.bMeleeProof = 0;
 #endif
                 m_bGodMode = false;
             }
@@ -558,7 +558,40 @@ void Player::ShowPage()
                     patch::SetRaw(0x42C3B2, (void*)"\x0F\xB6\x05\xFB\x0A\xA1", 6);
                 }
             }
+#endif      
+            if (Widget::Checkbox(TEXT("Game.KeepStuff"), &m_bKeepStuff, TEXT("Game.KeepStuffText")))
+            {
+#ifdef GTASA
+                Command<Commands::SWITCH_ARREST_PENALTIES>(m_bKeepStuff);
+                Command<Commands::SWITCH_DEATH_PENALTIES>(m_bKeepStuff);
+#elif GTAVC
+                if (m_bKeepStuff)
+                {
+                    patch::Nop(0x42C184, 5);
+                    patch::Nop(0x42C068, 5);
+                    patch::Nop(0x42BC7B, 5);
+                }
+                else
+                {
+                    patch::SetRaw(0x42C184, (void*)"\xE8\xB7\x35\x0D\x00", 5);
+                    patch::SetRaw(0x42C068, (void*)"\xE8\xD3\x36\x0D\x00", 5);
+                    patch::SetRaw(0x42BC7B, (void*)"\xE8\xC0\x3A\x0D\x00", 5);
+                }
+#elif GTA3
+                if (m_bKeepStuff)
+                {
+                    patch::Nop(0x421507, 7);
+                    patch::Nop(0x421724, 7);
+                    patch::Nop(0x4217F8, 8);
+                }
+                else
+                {
+                    patch::SetRaw(0x421507, (void*)"\x8B\x0B\xE8\x62\xE6\x0A\x00", 7);
+                    patch::SetRaw(0x421724, (void*)"\x8B\x0B\xE8\x45\xE4\x0A\x00", 7);
+                    patch::SetRaw(0x4217F8, (void*)"\x83\xC4\x14\xE8\x73\xE3\x0A\x00", 8);
+                }
 #endif
+            }
             ImGui::NextColumn();
 
 #ifdef GTASA

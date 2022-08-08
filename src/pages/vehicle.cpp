@@ -89,6 +89,7 @@ void Vehicle::Init()
                 pVeh->m_nPhysicalFlags.bFireProof = true;
                 pVeh->m_nPhysicalFlags.bCollisionProof = true;
                 pVeh->m_nPhysicalFlags.bMeleeProof = true;
+                pVeh->m_nVehicleFlags.bTyresDontBurst = true;
                 pVeh->m_nVehicleFlags.bCanBeDamaged = true;
 #elif GTAVC
                 pVeh->m_nFlags.bBulletProof = true;
@@ -97,12 +98,19 @@ void Vehicle::Init()
                 pVeh->m_nFlags.bCollisionProof = true;
                 pVeh->m_nFlags.bMeleeProof = true;
                 pVeh->m_nFlags.bImmuneToNonPlayerDamage = true;
+
+                // no tyre burst
+                patch::SetRaw(0x609F30, (void*)"\xC2\x08\x00", 3);
+                patch::SetRaw(0x5886A0, (void*)"\xC2\x08\x00", 3);
 #else
                 pVeh->m_nFlags.bBulletProof = true;
                 pVeh->m_nFlags.bExplosionProof = true;
                 pVeh->m_nFlags.bFireProof = true;
                 pVeh->m_nFlags.bCollisionProof = true;
                 pVeh->m_nFlags.bMeleeProof = true;
+
+                // no tyre burst
+                patch::SetRaw(0x53C0E0, (void*)"\xC2\x04\x00", 3);
 #endif
             }
 
@@ -682,6 +690,7 @@ void Vehicle::ShowPage()
                     pVeh->m_nPhysicalFlags.bFireProof = false;
                     pVeh->m_nPhysicalFlags.bCollisionProof = false;
                     pVeh->m_nPhysicalFlags.bMeleeProof = false;
+                    pVeh->m_nVehicleFlags.bTyresDontBurst = false;
                     pVeh->m_nVehicleFlags.bCanBeDamaged = false;
 #elif GTAVC
                     pVeh->m_nFlags.bBulletProof = false;
@@ -690,12 +699,19 @@ void Vehicle::ShowPage()
                     pVeh->m_nFlags.bCollisionProof = false;
                     pVeh->m_nFlags.bMeleeProof = false;
                     pVeh->m_nFlags.bImmuneToNonPlayerDamage = false;
+                    
+                    // restore tyre burst
+                    patch::SetRaw(0x609F30, (void*)"\x53\x56\x57", 3);
+                    patch::SetRaw(0x5886A0, (void*)"\x53\x56\x55", 3);
 #else
                     pVeh->m_nFlags.bBulletProof = false;
                     pVeh->m_nFlags.bExplosionProof = false;
                     pVeh->m_nFlags.bFireProof = false;
                     pVeh->m_nFlags.bCollisionProof = false;
                     pVeh->m_nFlags.bMeleeProof = false;
+
+                    // restore tyre burst
+                    patch::SetRaw(0x53C0E0, (void*)"\x53\x56\x55", 3);
 #endif
                 }
             }

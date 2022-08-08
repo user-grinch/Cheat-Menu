@@ -349,11 +349,6 @@ void Game::ShowPage()
                     patch::Set<uint8_t>(0x6C2759, 0, true);
                 }
             }
-            if (Widget::Checkbox(TEXT("Game.KeepStuff"), &m_bKeepStuff, TEXT("Game.KeepStuffText")))
-            {
-                Command<Commands::SWITCH_ARREST_PENALTIES>(m_bKeepStuff);
-                Command<Commands::SWITCH_DEATH_PENALTIES>(m_bKeepStuff);
-            }
             Widget::Checkbox(TEXT("Game.Screenshot"), &m_bScreenShot, 
                                 std::format("{} {}", TEXT("Game.ScreenshotTip"), 
                                 quickSceenShot.GetNameString()).c_str());

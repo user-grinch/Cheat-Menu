@@ -3,6 +3,40 @@
 #include <psapi.h>
 #include "util.h"
 
+ImVec2 Util::ConvertScreenToMap(ImVec2 pos, ImVec2 mapSz, ImVec2 screenSz)
+{
+    float size = screenSz.x * screenSz.y / screenSz.x;
+    float left = (screenSz.x-size) / 2;
+
+    pos.x -= left;
+    pos.x -= size/2;
+    pos.y -= size/2;
+    
+    // Convert image space to map space
+    pos.x = pos.x / size * mapSz.x;
+    pos.y = pos.y / size * mapSz.y;
+    pos.y *= -1;
+
+    return pos;
+}
+
+ImVec2 Util::ConvertMapToScreen(ImVec2 pos, ImVec2 mapSz, ImVec2 screenSz)
+{
+    float size = screenSz.x * screenSz.y / screenSz.x;
+    float left = (screenSz.x-size) / 2;
+
+    // Convert map space to screen space
+    pos.x = pos.x / mapSz.x * size;
+    pos.y = pos.y / mapSz.y * size;
+    pos.y *= -1;
+    
+    pos.x += left;
+    pos.x += size/2;
+    pos.y += size/2;
+
+    return pos;
+}
+
 void Util::SetMessage(const char *message, bool b1, bool b2, bool b3)
 {
 #if GTASA
