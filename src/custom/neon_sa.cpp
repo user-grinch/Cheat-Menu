@@ -1,7 +1,5 @@
 #include "pch.h"
-
-#ifdef GTASA
-#include "neon.h"
+#include "neon_sa.h"
 
 NeonMgr& Neon = *NeonMgr::Get();
 
@@ -271,4 +269,3 @@ void NeonMgr::Remove(CVehicle* pVeh)
 {
     m_VehNeon.Get(pVeh).m_bNeonInstalled = false;
 }
-#endif

@@ -4,8 +4,8 @@
 class Player
 {
 private:
-    static inline bool m_bPlayerRegen;
     static inline bool m_bGodMode;
+    static inline bool m_bPlayerRegen;
     static inline bool m_bModloaderInstalled;
     struct KeepPosition
     {
@@ -47,6 +47,7 @@ private:
 #endif
 
 public:
+
     Player() = delete;
     Player(const Player&) = delete;
 

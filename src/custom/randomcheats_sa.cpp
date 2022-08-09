@@ -1,7 +1,6 @@
 #include "pch.h"
-#include "randomcheats.h"
+#include "randomcheats_sa.h"
 
-#ifdef GTASA
 RandomCheatsMgr& RandomCheats = *RandomCheatsMgr::Get();
 
 void RandomCheatsMgr::Process()
@@ -77,4 +76,3 @@ RandomCheatsMgr::RandomCheatsMgr()
         }
     };
 }
-#endif

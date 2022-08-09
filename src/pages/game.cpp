@@ -5,8 +5,8 @@
 #include "utils/util.h"
 
 #ifdef GTASA
-#include "custom/freecam.h"
-#include "custom/randomcheats.h"
+#include "custom/freecam_sa.h"
+#include "custom/randomcheats_sa.h"
 #include <CMessages.h>
 #include <CSprite2d.h>
 #include <CAERadioTrackManager.h>

@@ -1,6 +1,5 @@
 #include "pch.h"
-#ifdef GTASA
-#include "freecam.h"
+#include "freecam_sa.h"
 
 static CVector gTotalMouse;
 FreecamMgr& Freecam = *FreecamMgr::Get();
@@ -188,4 +187,3 @@ FreecamMgr::FreecamMgr()
         }
     };
 }
-#endif

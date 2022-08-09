@@ -1,5 +1,4 @@
 #pragma once
-#ifdef GTASA
 #include "interface/icheat.hpp"
 #include "pch.h"
 
@@ -29,4 +28,3 @@ public:
 };
 
 extern RandomCheatsMgr& RandomCheats;
-#endif

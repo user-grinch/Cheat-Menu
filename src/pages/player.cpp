@@ -3,6 +3,7 @@
 #include "menu.h"
 #include "utils/widget.h"
 #include "utils/util.h"
+#include "kiero/minhook/MinHook.h"
 
 #ifdef GTASA
 #include "ped.h"
@@ -98,6 +99,7 @@ void Player::Init()
     patch::RedirectCall(0x5A834D, &PlayerModelBrokenFix);
     m_bAimSkinChanger = gConfig.Get("Features.AimSkinChanger", false);
 #endif
+
 
     // Custom skins setup
     std::string path = GAME_PATH((char*)"modloader/");

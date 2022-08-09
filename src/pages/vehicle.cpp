@@ -10,8 +10,8 @@
 
 #ifdef GTASA
 #include <tHandlingData.h>
-#include "custom/neon.h"
-#include "custom/paint.h"
+#include "custom/neon_sa.h"
+#include "custom/paint_sa.h"
 #endif
 
 void Vehicle::Init()

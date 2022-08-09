@@ -23,7 +23,6 @@
 // SOFTWARE.
 
 #pragma once
-#ifdef GTASA
 #include <vector>
 
 class Paint
@@ -84,4 +83,3 @@ public:
     static void ResetNodeColor(CVehicle* veh, std::string node_name);
     static void ResetNodeTexture(CVehicle* pVeh, std::string node_name);
 };
-#endif

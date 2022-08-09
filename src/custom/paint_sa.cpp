@@ -23,8 +23,7 @@
 // SOFTWARE.
 
 #include "pch.h"
-#ifdef GTASA
-#include "paint.h"
+#include "paint_sa.h"
 #include "utils/util.h"
 #include <NodeName.h>
 
@@ -320,4 +319,3 @@ void Paint::ResetNodeTexture(CVehicle* pVeh, std::string node_name)
         }
     });
 }
-#endif

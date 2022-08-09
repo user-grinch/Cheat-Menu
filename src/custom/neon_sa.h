@@ -1,5 +1,4 @@
 #pragma once
-#ifdef GTASA
 #include <extender/VehicleExtender.h>
 #include "interface/icheat.hpp"
 /*
@@ -56,4 +55,3 @@ public:
 };
 
 extern NeonMgr& Neon;
-#endif

@@ -49,6 +49,14 @@ function createProject(projectID)
             "../src/**.c", 
             "../src/**.cpp" 
         }
+
+        if (upperID ~= "SA") then
+            removefiles { 
+                "../src/**_sa.c", 
+                "../src/**_sa.hpp",
+                "../src/**_sa.cpp"
+            }
+        end
         
         if upperID == "III" then 
             upperID = "3" 

@@ -1,5 +1,4 @@
 #pragma once
-#ifdef GTASA
 #include "interface/icheat.hpp"
 
 /*
@@ -31,4 +30,3 @@ public:
 };
 
 extern FreecamMgr& Freecam;
-#endif
