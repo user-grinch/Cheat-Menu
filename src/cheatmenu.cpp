@@ -329,7 +329,6 @@ void CheatMenu::ShowWelcomePage()
 
     ImGui::NewLine();
     ImGui::TextWrapped(TEXT("Menu.EnsureLatest"));
-    ImGui::NewLine();
     if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Widget::CalcSize(2))))
     {
         OPEN_LINK(DISCORD_INVITE);
@@ -341,6 +340,12 @@ void CheatMenu::ShowWelcomePage()
     }
     ImGui::NewLine();
     ImGui::TextWrapped(TEXT("Menu.BugDisclaimer"));
+    ImGui::Dummy(ImVec2(0, 20));
+    Widget::TextCentered(TEXT("Menu.PatreonText"));
+    if (ImGui::Button(TEXT("Menu.Patreon"), ImVec2(Widget::CalcSize(1))))
+    {
+        OPEN_LINK("https://www.patreon.com/grinch_");
+    }
     ImGui::Dummy(ImVec2(0, 30));
     Widget::TextCentered(TEXT("Menu.CopyrightDisclaimer"));
 }

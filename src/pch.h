@@ -6,7 +6,6 @@
 #include <d3d11Shader.h>
 #include <filesystem>
 #include <fstream>
-#include <functional>
 #include <memory>
 #include <iostream>
 #include <sstream>
@@ -78,11 +77,12 @@ enum eRenderer
 extern eRenderer gRenderer;
 extern DataStore gConfig;
 
-typedef void(*ArgCallback3)(std::string&, std::string&, std::string&);
-typedef void(*ArgCallback)(std::string&);
+typedef std::string str;
+typedef void(*ArgCallback3)(str&, str&, str&);
+typedef void(*ArgCallback)(str&);
 typedef void(*ArgCallbackNone)();
-typedef std::string(*ArgCallbackRtn)(std::string&);
-typedef bool(*ArgCallbackRtnBool)(std::string&);
+typedef std::string(*ArgCallbackRtn)(str&);
+typedef bool(*ArgCallbackRtnBool)(str&);
 
 #ifdef GTASA
 extern const char* taskNames[1802];

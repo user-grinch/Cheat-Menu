@@ -24,11 +24,12 @@
                     "shell": {
                         "executable": "cmd.exe",
                         "args": [
-                            "/d", "/c"
+                            "/d",
+                            "/c"
                         ]
                     }
                 }
-            },
+            }
         },
         {
             "label": "Build ReleaseSA",
@@ -51,11 +52,12 @@
                     "shell": {
                         "executable": "cmd.exe",
                         "args": [
-                            "/d", "/c"
+                            "/d",
+                            "/c"
                         ]
                     }
                 }
-            },
+            }
         },
         {
             "label": "Build DebugVC",
@@ -78,11 +80,12 @@
                     "shell": {
                         "executable": "cmd.exe",
                         "args": [
-                            "/d", "/c"
+                            "/d",
+                            "/c"
                         ]
                     }
                 }
-            },
+            }
         },
         {
             "label": "Build ReleaseVC",
@@ -105,11 +108,12 @@
                     "shell": {
                         "executable": "cmd.exe",
                         "args": [
-                            "/d", "/c"
+                            "/d",
+                            "/c"
                         ]
                     }
                 }
-            },
+            }
         },
         {
             "label": "Build DebugIII",
@@ -132,11 +136,12 @@
                     "shell": {
                         "executable": "cmd.exe",
                         "args": [
-                            "/d", "/c"
+                            "/d",
+                            "/c"
                         ]
                     }
                 }
-            },
+            }
         },
         {
             "label": "Build ReleaseIII",
@@ -159,11 +164,12 @@
                     "shell": {
                         "executable": "cmd.exe",
                         "args": [
-                            "/d", "/c"
+                            "/d",
+                            "/c"
                         ]
                     }
                 }
-            },
+            }
         },
         {
             "label": "Build DebugAll",
@@ -186,11 +192,12 @@
                     "shell": {
                         "executable": "cmd.exe",
                         "args": [
-                            "/d", "/c"
+                            "/d",
+                            "/c"
                         ]
                     }
                 }
-            },
+            }
         },
         {
             "label": "Build ReleaseAll",
@@ -213,11 +220,12 @@
                     "shell": {
                         "executable": "cmd.exe",
                         "args": [
-                            "/d", "/c"
+                            "/d",
+                            "/c"
                         ]
                     }
                 }
-            },
+            }
         },
         {
             "label": "Package all",
@@ -240,11 +248,12 @@
                     "shell": {
                         "executable": "cmd.exe",
                         "args": [
-                            "/d", "/c"
+                            "/d",
+                            "/c"
                         ]
                     }
                 }
-            },
+            }
         },
         {
             "label": "Format Code",
@@ -267,11 +276,32 @@
                     "shell": {
                         "executable": "cmd.exe",
                         "args": [
-                            "/d", "/c"
+                            "/d",
+                            "/c"
                         ]
                     }
                 }
-            },
+            }
         },
+        {
+            "type": "cppbuild",
+            "label": "C/C++: cl.exe build active file",
+            "command": "cl.exe",
+            "args": [
+                "/Zi",
+                "/EHsc",
+                "/nologo",
+                "/Fe${fileDirname}\\${fileBasenameNoExtension}.exe",
+                "${file}"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ],
+            "group": "build",
+            "detail": "compiler: cl.exe"
+        }
     ]
 }

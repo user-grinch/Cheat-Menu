@@ -2,35 +2,7 @@
 #include "pch.h"
 
 #ifdef GTASA
-/*
-    Cutscene Player Class for SA
-    Plays mission cutscenes
-*/
-class Cutscene
-{
-private:
-    static inline bool m_bRunning;          // is cutscene currently running
 
-    // backup data
-    static inline int m_nInterior;          // interior player was in 
-    static inline CVehicle *m_pLastVeh;     // vehicle player was in
-    static inline int m_nVehSeat;           // seat id of player vehicle
-
-public:
-    static inline ResourceStore m_Data{ "cutscenes", eResourceType::TYPE_TEXT }; // names
-
-    Cutscene() = delete;
-    Cutscene(const Cutscene&) = delete;
-
-    // Initializes hooks, vars etc.
-    static void Init();
-
-    // Plays a cutscene 
-    static void Play(std::string& cat, std::string& key, std::string& val);
-
-    // Stops a running cutscene
-    static void Stop();
-};
 
 /*
     Particle Player Class for SA
