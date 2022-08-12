@@ -522,6 +522,82 @@ static void ColorPickerAddr(const char* label, int addr, ImVec4&& default_color)
     }
 }
 
+void Visual::PatchRadar()
+{
+#ifdef GTASA
+    static float clockPosX = *(float*)*(int*)0x58EC16;
+    static float clockPosY = *(float*)*(int*)0x58EC04;
+    static float radarPosX = *(float*)*(int*)0x5834D4;
+    static float radarPosY = *(float*)*(int*)0x583500;
+    static float radarWidth = *(float*)*(int*)0x5834C2;
+    static float radarHeight = *(float*)*(int*)0x5834F6;
+    static CHudColour armourBar = HudColour.m_aColours[4];
+    static CHudColour clockBar = HudColour.m_aColours[4];
+    static CHudColour healthBar = HudColour.m_aColours[0];
+    static CHudColour breathBar = HudColour.m_aColours[3];
+    static CHudColour wantedBar = HudColour.m_aColours[6];
+    static float moneyPosX = *(float*)*(int*)0x58F5FC;
+    static float breathPosX = *(float*)*(int*)0x58F11F;
+    static float breathPosY = *(float*)*(int*)0x58F100;
+    static float weaponIconPosX = *(float*)*(int*)0x58F927;
+    static float weaponIconPosY = *(float*)*(int*)0x58F913;
+    static float weaponAmmoPosX = *(float*)*(int*)0x58FA02;
+    static float weaponAmmoPosY = *(float*)*(int*)0x58F9E6;
+    static float wantedPosX = *(float*)*(int*)0x58DD0F;
+
+    patch::SetPointer(0x58EC16, &clockPosX);
+    patch::SetPointer(0x58EC04, &clockPosY);
+    patch::SetPointer(0x5834D4, &radarPosX);
+    patch::SetPointer(0x583500, &radarPosY);
+    patch::SetPointer(0x5834F6, &radarHeight);
+    patch::SetPointer(0x5834C2, &radarWidth);
+
+    patch::SetPointer(0x58A79B, &radarPosX);
+    patch::SetPointer(0x58A7C7, &radarPosY);
+    patch::SetPointer(0x58A801, &radarHeight);
+    patch::SetPointer(0x58A7E9, &radarWidth);
+    patch::SetPointer(0x58A836, &radarPosX);
+    patch::SetPointer(0x58A868, &radarPosY);
+    patch::SetPointer(0x58A8AB, &radarHeight);
+    patch::SetPointer(0x58A840, &radarWidth);
+    patch::SetPointer(0x58A8E9, &radarPosX);
+    patch::SetPointer(0x58A913, &radarPosY);
+    patch::SetPointer(0x58A921, &radarHeight);
+    patch::SetPointer(0x58A943, &radarWidth);
+    patch::SetPointer(0x58A98A, &radarPosX);
+    patch::SetPointer(0x58A9C7, &radarPosY);
+    patch::SetPointer(0x58A9D5, &radarHeight);
+    patch::SetPointer(0x58A99D, &radarWidth);
+
+    patch::SetPointer(0x5890FC, &armourBar);
+    patch::SetChar(0x5890F5, 0);
+    patch::SetPointer(0x589331, &healthBar);
+    patch::SetPointer(0x5891EB, &breathBar);
+    patch::SetChar(0x5891E4, 0);
+    patch::SetPointer(0x58EBD1, &clockBar);
+    patch::SetChar(0x58EBCA, 0);
+
+    patch::SetPointer(0x58F5FC, &moneyPosX);
+    patch::SetPointer(0x58F11F, &breathPosX);
+    patch::SetPointer(0x58F100, &breathPosY);
+    patch::SetPointer(0x58DD0F, &wantedPosX);
+    patch::SetPointer(0x58F927, &weaponIconPosX);
+    patch::SetPointer(0x58F913, &weaponIconPosY);
+    patch::SetPointer(0x58FA02, &weaponAmmoPosX);
+    patch::SetPointer(0x58F9E6, &weaponAmmoPosY);
+#elif GTAVC
+    // posY
+    patch::SetUInt(0x55A972, 0x68FD34);
+    patch::SetUInt(0x55AAB2, 0x68FD34);
+    // scaleY
+    patch::SetUInt(0x55A9C1, 0x68FD30);
+    patch::SetUInt(0x55AAFA, 0x68FD30);
+    // scaleX
+    patch::SetUInt(0x55A9A8, 0x68FD24);
+    patch::SetUInt(0x55AAE1, 0x68FD24);
+#endif
+}
+
 void Visual::ShowPage()
 {
     if (ImGui::BeginTabBar("Visual", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
@@ -781,72 +857,11 @@ void Visual::ShowPage()
         }
         if (ImGui::BeginTabItem(TEXT("Window.MenusTab")))
         {
-#ifdef GTASA
-            static bool init_patches = false;
-            static float clock_posX = *(float*)*(int*)0x58EC16;
-            static float clock_posY = *(float*)*(int*)0x58EC04;
-            static float radar_posX = *(float*)*(int*)0x5834D4;
-            static float radar_posY = *(float*)*(int*)0x583500;
-            static float radar_width = *(float*)*(int*)0x5834C2;
-            static float radar_height = *(float*)*(int*)0x5834F6;
-            static CHudColour armour_bar = HudColour.m_aColours[4];
-            static CHudColour clock_bar = HudColour.m_aColours[4];
-            static CHudColour health_bar = HudColour.m_aColours[0];
-            static CHudColour breath_bar = HudColour.m_aColours[3];
-            static CHudColour wanted_bar = HudColour.m_aColours[6];
-            static float money_posX = *(float*)*(int*)0x58F5FC;
-            static float breath_posX = *(float*)*(int*)0x58F11F;
-            static float breath_posY = *(float*)*(int*)0x58F100;
-            static float weapon_icon_posX = *(float*)*(int*)0x58F927;
-            static float weapon_icon_posY = *(float*)*(int*)0x58F913;
-            static float weapon_ammo_posX = *(float*)*(int*)0x58FA02;
-            static float weapon_ammo_posY = *(float*)*(int*)0x58F9E6;
-            static float wanted_posX = *(float*)*(int*)0x58DD0F;
-
-            if (!init_patches)
+            static bool initPatches = false;
+            if (!initPatches)
             {
-                patch::SetPointer(0x58EC16, &clock_posX);
-                patch::SetPointer(0x58EC04, &clock_posY);
-                patch::SetPointer(0x5834D4, &radar_posX);
-                patch::SetPointer(0x583500, &radar_posY);
-                patch::SetPointer(0x5834F6, &radar_height);
-                patch::SetPointer(0x5834C2, &radar_width);
-
-                patch::SetPointer(0x58A79B, &radar_posX);
-                patch::SetPointer(0x58A7C7, &radar_posY);
-                patch::SetPointer(0x58A801, &radar_height);
-                patch::SetPointer(0x58A7E9, &radar_width);
-                patch::SetPointer(0x58A836, &radar_posX);
-                patch::SetPointer(0x58A868, &radar_posY);
-                patch::SetPointer(0x58A8AB, &radar_height);
-                patch::SetPointer(0x58A840, &radar_width);
-                patch::SetPointer(0x58A8E9, &radar_posX);
-                patch::SetPointer(0x58A913, &radar_posY);
-                patch::SetPointer(0x58A921, &radar_height);
-                patch::SetPointer(0x58A943, &radar_width);
-                patch::SetPointer(0x58A98A, &radar_posX);
-                patch::SetPointer(0x58A9C7, &radar_posY);
-                patch::SetPointer(0x58A9D5, &radar_height);
-                patch::SetPointer(0x58A99D, &radar_width);
-
-                patch::SetPointer(0x5890FC, &armour_bar);
-                patch::SetChar(0x5890F5, 0);
-                patch::SetPointer(0x589331, &health_bar);
-                patch::SetPointer(0x5891EB, &breath_bar);
-                patch::SetChar(0x5891E4, 0);
-                patch::SetPointer(0x58EBD1, &clock_bar);
-                patch::SetChar(0x58EBCA, 0);
-
-                patch::SetPointer(0x58F5FC, &money_posX);
-                patch::SetPointer(0x58F11F, &breath_posX);
-                patch::SetPointer(0x58F100, &breath_posY);
-                patch::SetPointer(0x58DD0F, &wanted_posX);
-                patch::SetPointer(0x58F927, &weapon_icon_posX);
-                patch::SetPointer(0x58F913, &weapon_icon_posY);
-                patch::SetPointer(0x58FA02, &weapon_ammo_posX);
-                patch::SetPointer(0x58F9E6, &weapon_ammo_posY);
-
-                init_patches = true;
+                PatchRadar();
+                initPatches = true;
             }
             
             ImGui::Spacing();
@@ -854,7 +869,7 @@ void Visual::ShowPage()
             ImGui::TextWrapped(TEXT("Visual.IncompatibleMods"));
             Widget::Tooltip(TEXT("Visual.IncompatibleModsText"));
             ImGui::Spacing();
-#endif
+            
             if (ImGui::BeginChild("VisualsChild"))
             {
 #ifdef GTASA
@@ -903,9 +918,22 @@ void Visual::ShowPage()
                 Widget::EditAddr<float>(TEXT("Visual.WeaponIconPosX"), *(int*)0x58F927, -999, 32, 999);
                 Widget::EditAddr<float>(TEXT("Visual.WeaponIconPosY"), *(int*)0x58F913, -999, 20, 999);
 #elif GTAVC
+                static float discLeft = *(float*)0x55A956;
+                static float discRight = *(float*)*(int*)0x55A9AE;
+                patch::SetPointer(0x55A9AE, &discRight);
+                patch::SetPointer(0x55AAE7, &discRight);
+                patch::SetFloat(0x55A956, discLeft);
+                patch::SetFloat(0x55AA94, discLeft);
+
+                float prevVal = *(float*)0x68FD2C;
                 Widget::EditAddr<float>(TEXT("Visual.RadarPosX"), 0x68FD2C, -999, 40, 999);
-                Widget::EditAddr<float>(TEXT("Visual.RadarPosY"), 0x68FD34, -999, 104, 999);
-                Widget::EditAddr<BYTE>(TEXT("Visual.RadarWidth"), 0x68FD28, -999, 20, 999);
+                float diff = *(float*)0x68FD2C - prevVal;
+                discLeft += diff;
+                discRight += diff;
+
+                Widget::EditAddr<float>(TEXT("Visual.RadarPosY"), 0x68FD34, -999, 116, 999);
+                Widget::EditAddr<float>(TEXT("Visual.RadarHeight"), 0x68FD30, -999, 76, 999);
+                Widget::EditAddr<float>(TEXT("Visual.RadarWidth"), 0x68FD24, -999, 94, 999);
 #endif
 
                 ImGui::EndChild();

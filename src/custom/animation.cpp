@@ -18,51 +18,6 @@
 
 AnimationMgr& Animation = *AnimationMgr::Get();
 
-AnimationMgr::AnimationMgr()
-{
-#ifdef GTASA
-    Events::processScriptsEvent += [&]
-    {
-        CPlayerPed* pPlayer = FindPlayerPed();
-
-        if (pPlayer && pPlayer->m_pPlayerTargettedPed)
-        {
-            m_pTarget = pPlayer->m_pPlayerTargettedPed;
-        }
-
-        if (m_pTarget && !m_pTarget->IsAlive())
-        {
-            m_pTarget = nullptr;
-        }
-    };
-#elif GTAVC
-    // mov al, 01
-    // ret
-    // nop (2x)
-    patch::SetRaw(0x40C9C0, (void*)"\xB0\x01\xC3\x90\x90", 5);
-    // // ret
-    // // nop (3x)
-    patch::SetRaw(0x404950, (void*)"\xC3\x90\x90\x90", 4);
-
-    // Fix crash at 0x4019EA
-    static bool hookInjected = false;
-    Events::initGameEvent.before += [&hookInjected]()
-    {
-        if (hookInjected)
-        {
-            MH_DisableHook((void*)0x40D6E0);
-        }
-    };
-
-    Events::initGameEvent.after += [&hookInjected]()
-    {
-        MH_CreateHook((void*)0x40D6E0, NEW_CStreaming_RemoveModel, (void**)&OLD_CStreaming_RemoveModel);
-        MH_EnableHook((void*)0x40D6E0);
-        hookInjected = true;
-    };
-#endif
-}
-
 #ifdef GTAVC
 // Thanks to codenulls(https://github.com/codenulls/)
 static auto OLD_CStreaming_RemoveModel = (bool(__cdecl*)(int))0x40D6E0;
@@ -167,6 +122,51 @@ void _PlayAnim(RpClump* pClump, int animGroup, int animID, float blend, bool loo
     }
 }
 #endif
+
+AnimationMgr::AnimationMgr()
+{
+#ifdef GTASA
+    Events::processScriptsEvent += [&]
+    {
+        CPlayerPed* pPlayer = FindPlayerPed();
+
+        if (pPlayer && pPlayer->m_pPlayerTargettedPed)
+        {
+            m_pTarget = pPlayer->m_pPlayerTargettedPed;
+        }
+
+        if (m_pTarget && !m_pTarget->IsAlive())
+        {
+            m_pTarget = nullptr;
+        }
+    };
+#elif GTAVC
+    // mov al, 01
+    // ret
+    // nop (2x)
+    patch::SetRaw(0x40C9C0, (void*)"\xB0\x01\xC3\x90\x90", 5);
+    // // ret
+    // // nop (3x)
+    patch::SetRaw(0x404950, (void*)"\xC3\x90\x90\x90", 4);
+
+    // Fix crash at 0x4019EA
+    static bool hookInjected = false;
+    Events::initGameEvent.before += []()
+    {
+        if (hookInjected)
+        {
+            MH_DisableHook((void*)0x40D6E0);
+        }
+    };
+
+    Events::initGameEvent.after += []()
+    {
+        MH_CreateHook((void*)0x40D6E0, NEW_CStreaming_RemoveModel, (void**)&OLD_CStreaming_RemoveModel);
+        MH_EnableHook((void*)0x40D6E0);
+        hookInjected = true;
+    };
+#endif
+}
 
 void AnimationMgr::Play(std::string& cat, std::string& anim, std::string& ifp)
 {

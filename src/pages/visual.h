@@ -32,5 +32,7 @@ public:
 
     static void Init();
     static void ShowPage();
-    static void DrawModelInfo();
+
+    // Patches the radar for visual changes
+    static void PatchRadar();
 };
