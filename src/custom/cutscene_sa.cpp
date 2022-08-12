@@ -15,7 +15,7 @@ void CutsceneMgr::Play(std::string& rootKey, std::string& cutsceneId, std::strin
 {
     if (CCutsceneMgr::ms_running)
     {
-        Util::SetMessage(TEXT("Animation.CutsceneRunning"));
+        Util::SetMessage(TEXT("Scene.CutsceneRunning"));
         return;
     }
 

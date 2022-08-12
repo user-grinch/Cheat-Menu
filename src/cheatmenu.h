@@ -10,7 +10,7 @@ class CheatMenu
 private:
     enum class eMenuPages
     {
-        ANIMATION, ANNIVERSARY, GAME, MENU, NONE, PED, PLAYER, TELEPORT, UPDATE, VEHICLE, VISUAL, WEAPON, WELCOME
+        ANNIVERSARY, GAME, MENU, NONE, PED, PLAYER, SCENE, TELEPORT, UPDATE, VEHICLE, VISUAL, WEAPON, WELCOME
     };
     struct HeaderData
     {

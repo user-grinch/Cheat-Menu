@@ -4,7 +4,7 @@
 # Author: Ruben Viera
 ######################################################################
 
-[Animation]
+[Scene]
 AddAnimation = "Añadir animación"
 AddParticle = "Añadir particula"
 AnimationRemoved = "Animación removida"

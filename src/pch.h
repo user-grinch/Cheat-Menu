@@ -78,11 +78,15 @@ extern eRenderer gRenderer;
 extern DataStore gConfig;
 
 typedef std::string str;
-typedef void(*ArgCallback3)(str&, str&, str&);
-typedef void(*ArgCallback)(str&);
-typedef void(*ArgCallbackNone)();
-typedef std::string(*ArgCallbackRtn)(str&);
-typedef bool(*ArgCallbackRtnBool)(str&);
+typedef void(*fArg3_t)(str&, str&, str&);
+typedef void(*fArg1_t)(str&);
+typedef void(*fArgNone_t)();
+typedef std::string(*fRtnArg1_t)(str&);
+typedef bool(*fRtnBoolArg1_t)(str&);
+
+#define fArg3Wrapper(x) [](str& a, str& b, str& c){x(a, b, c);}
+#define fArgWrapper(x) [](str& a){x(a);}
+#define fArgNoneWrapper(x) [](){x();}
 
 #ifdef GTASA
 extern const char* taskNames[1802];

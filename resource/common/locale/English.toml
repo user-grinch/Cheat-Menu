@@ -4,7 +4,7 @@
 # Author: Grinch_
 ######################################################################
 
-[Animation]
+[Scene]
 AnimationTab = "Animation##TABBAR"
 AnimName = "Anim name"
 CustomAnimsOnly = "You can only remove custom animations"
@@ -824,6 +824,7 @@ RemoveEntry = "Entry removed"
 Search = "Search"
 LocationsTab = "Locations"
 FavouritesTab = "Favourites"
+ScenePage = "Scene"
 SetValue = "Set value"
 SpawnTab = "Spawn"
 TeleportPage = "Teleport"

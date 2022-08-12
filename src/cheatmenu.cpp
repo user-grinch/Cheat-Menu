@@ -6,7 +6,7 @@
 #include "utils/d3dhook.h"
 #include "utils/util.h"
 #include "utils/overlay.h"
-#include "pages/animation.h"
+#include "pages/scene.h"
 #include "pages/game.h"
 #include "pages/menu.h"
 #include "pages/ped.h"
@@ -216,7 +216,7 @@ void CheatMenu::GenHeaderList()
         {TEXT_S("Window.TeleportPage"), &Teleport::ShowPage, eMenuPages::TELEPORT}, 
         {TEXT_S("Window.PlayerPage"), &Player::ShowPage, eMenuPages::PLAYER}, 
         {TEXT_S("Window.PedPage"), &Ped::ShowPage, eMenuPages::PED}, 
-        {TEXT_S("Window.AnimationPage"), &Animation::ShowPage, eMenuPages::ANIMATION}, 
+        {TEXT_S("Window.ScenePage"), &ScenePage::Draw, eMenuPages::SCENE}, 
         {TEXT_S("Window.VehiclePage"), &Vehicle::ShowPage, eMenuPages::VEHICLE},
         {TEXT_S("Window.WeaponPage"), &Weapon::ShowPage, eMenuPages::WEAPON},
         {TEXT_S("Window.GamePage"), &Game::ShowPage, eMenuPages::GAME}, 
@@ -252,7 +252,6 @@ void CheatMenu::Init()
     GenHeaderList();
     
     // Init menu parts
-    Animation::Init();
     Game::Init();
     Menu::Init();
     Player::Init();

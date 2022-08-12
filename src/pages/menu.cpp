@@ -325,10 +325,8 @@ void Menu::ShowPage()
 
                 ImGui::Dummy(ImVec2(0, 10));
                 ImGui::TextWrapped(TEXT("Menu.BugDisclaimer"));
-                ImGui::Spacing();
-                Widget::TextCentered(TEXT("Menu.PatreonText"));
-  
                 ImGui::Dummy(ImVec2(0, 10));
+                Widget::TextCentered(TEXT("Menu.PatreonText"));
                 Widget::TextCentered(TEXT("Menu.CopyrightDisclaimer"));
 
                 ImGui::Dummy(ImVec2(0, 30));

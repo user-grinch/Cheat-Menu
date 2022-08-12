@@ -1,5 +1,5 @@
 
-[Animation]
+[Scene]
 AddAnimation = "添加动画"
 AddParticle = "添加粒子"
 AnimationRemoved = "动画已删除"

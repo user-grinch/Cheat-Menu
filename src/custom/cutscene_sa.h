@@ -2,7 +2,6 @@
 #include "utils/resourcestore.h"
 #include "interface/icheat.hpp"
 
-extern class CVehicle;
 
 /*
     Cutscene Player Class for SA

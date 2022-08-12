@@ -75,7 +75,7 @@ void Widget::Filter(const char* label, ImGuiTextFilter& filter, const char* hint
     }
 }
 
-void Widget::DataList(ResourceStore& data, ArgCallback3 clickFunc, ArgCallbackNone addFunc, bool isEditItem)
+void Widget::DataList(ResourceStore& data, fArg3_t clickFunc, fArgNone_t addFunc, bool isEditItem)
 {
     if (ImGui::IsMouseClicked(1))
     {
@@ -305,8 +305,8 @@ static bool RoundedImageButton(ImTextureID textureID, ImVec2& size, const char* 
     Here we go again...
     This direly needs a refactor oof
 */
-void Widget::ImageList(ResourceStore &store, ArgCallback clickFunc, ArgCallbackRtn getNameFunc, 
-                        ArgCallbackRtnBool verifyFunc, ArgCallbackNone addFunc)
+void Widget::ImageList(ResourceStore &store, fArg1_t clickFunc, fRtnArg1_t getNameFunc, 
+                        fRtnBoolArg1_t verifyFunc, fArgNone_t addFunc)
 {
     static IDirect3DTexture9 **pDefaultTex = nullptr;
     ImGuiStyle& style =  ImGui::GetStyle();
