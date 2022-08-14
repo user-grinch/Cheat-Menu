@@ -7,6 +7,7 @@
 
 #ifdef GTASA
 #include "ped.h"
+#include "custom/topdowncam_sa.h"
 
 static inline const char* clothNameList[18] =
 {
@@ -24,71 +25,6 @@ static inline void PlayerModelBrokenFix()
     {
         Call<0x5A81E0>(0, pPlayer->m_pPlayerData->m_pPedClothesDesc, 0xBC1C78, false);
     }
-}
-
-/*
-	Taken from gta chaos mod by Lordmau5
-	https://github.com/gta-chaos-mod/Trilogy-ASI-Script
-*/
-void Player::TopDownCamera::Process()
-{
-    CPlayerPed *player = FindPlayerPed ();
-    CVector     pos    = player->GetPosition ();
-    float       curOffset = m_fOffset;
-
-    // drunk effect causes issues
-    Command<eScriptCommands::COMMAND_SET_PLAYER_DRUNKENNESS> (0, 0);
-
-    CVehicle *vehicle = FindPlayerVehicle(-1, false);
-
-    // TODO: implement smooth transition
-    if (vehicle)
-    {
-        float speed = vehicle->m_vecMoveSpeed.Magnitude();
-        if (speed > 1.2f)
-        {
-            speed = 1.2f;
-        }
-        if (speed * 40.0f > 40.0f)
-        {
-            speed = 40.0f;
-        }
-
-        if (speed < 0.0f)
-        {
-            speed = 0.0f;
-        }
-        curOffset += speed;
-    }
-
-    CVector playerOffset = CVector (pos.x, pos.y, pos.z + 2.0f);
-    CVector cameraPos
-        = CVector (playerOffset.x, playerOffset.y, playerOffset.z + curOffset);
-
-    CColPoint outColPoint;
-    CEntity * outEntity;
-
-    // TODO: Which variable? X, Y or Z for the look direction?
-
-    if (CWorld::ProcessLineOfSight (playerOffset, cameraPos, outColPoint,
-                                    outEntity, true, true, true, true, true,
-                                    true, true, true))
-    {
-        Command<eScriptCommands::COMMAND_SET_FIXED_CAMERA_POSITION> (
-            outColPoint.m_vecPoint.x, outColPoint.m_vecPoint.y,
-            outColPoint.m_vecPoint.z, 0.0f, 0.0f, 0.0f);
-    }
-    else
-    {
-        Command<eScriptCommands::COMMAND_SET_FIXED_CAMERA_POSITION> (
-            cameraPos.x, cameraPos.y, cameraPos.z, 0.0f, 0.0f, 0.0f);
-    }
-
-    Command<eScriptCommands::COMMAND_POINT_CAMERA_AT_POINT> (pos.x, pos.y,
-            pos.z, 2);
-
-    TheCamera.m_fGenerationDistMultiplier = 10.0f;
-    TheCamera.m_fLODDistMultiplier        = 10.0f;
 }
 #endif
 
@@ -232,14 +168,9 @@ void Player::Init()
         }
 
 #ifdef GTASA
-        if (m_bDrunkEffect && !TopDownCamera::m_bEnabled)
+        if (m_bDrunkEffect && !TopDownCam.GetState())
         {
             Command<eScriptCommands::COMMAND_SET_PLAYER_DRUNKENNESS> (0, 100);
-        }
-
-        if (TopDownCamera::m_bEnabled)
-        {
-            TopDownCamera::Process();
         }
 
         if (m_bAimSkinChanger && aimSkinChanger.Pressed())
@@ -436,7 +367,7 @@ void Player::ShowPage()
 #ifdef GTASA
             Widget::CheckboxAddr(TEXT("Player.BountyYourself"), 0x96913F);
 
-            ImGui::BeginDisabled(TopDownCamera::m_bEnabled);
+            ImGui::BeginDisabled(TopDownCam.GetState());
             if (Widget::Checkbox(TEXT("Player.DrunkEffect"), &m_bDrunkEffect))
             {
                 if (!m_bDrunkEffect)
@@ -782,17 +713,6 @@ void Player::ShowPage()
             Widget::EditStat(TEXT("Player.Muscle"), STAT_MUSCLE);
             Widget::EditStat(TEXT("Player.Respect"), STAT_RESPECT);
             Widget::EditStat(TEXT("Player.Stamina"), STAT_STAMINA);
-            if (ImGui::CollapsingHeader(TEXT("Player.TopDownCamera")))
-            {
-                if (ImGui::Checkbox(TEXT("Window.Enabled"), &TopDownCamera::m_bEnabled))
-                {
-                    Command<Commands::RESTORE_CAMERA_JUMPCUT>();
-                }
-                ImGui::Spacing();
-                ImGui::SliderFloat(TEXT("Player.CameraZoom"), &TopDownCamera::m_fOffset, 20.0f, 60.0f);
-                ImGui::Spacing();
-                ImGui::Separator();
-            }
 #endif
             if (ImGui::CollapsingHeader(TEXT("Player.WantedLevel")))
             {

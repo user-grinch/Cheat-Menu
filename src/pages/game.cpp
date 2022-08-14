@@ -5,14 +5,13 @@
 #include "utils/util.h"
 
 #ifdef GTASA
-#include "custom/freecam_sa.h"
-#include "custom/randomcheats_sa.h"
 #include <CMessages.h>
 #include <CSprite2d.h>
 #include <CAERadioTrackManager.h>
-#endif
+#include "custom/freecam_sa.h"
+#include "custom/randomcheats_sa.h"
+#include "custom/topdowncam_sa.h"
 
-#ifdef GTASA
 static bool bSaveGameFlag = false;
 #endif
 
@@ -490,6 +489,19 @@ void Game::ShowPage()
                 {TEXT("Game.Beach"), 0x969159}, {TEXT("Game.Country"), 0x96917D}, {TEXT("Game.FunHouse"), 0x969176}, {TEXT("Game.Ninja"), 0x96915C}
             };
             Widget::EditRadioBtnAddr(TEXT("Game.Themes"), themes);
+            if (ImGui::CollapsingHeader(TEXT("Player.TopDownCamera")))
+            {
+                bool state = TopDownCam.GetState();
+                if (ImGui::Checkbox(TEXT("Window.Enabled"), &state))
+                {
+                    Command<Commands::RESTORE_CAMERA_JUMPCUT>();
+                    TopDownCam.Toggle();
+                }
+                ImGui::Spacing();
+                ImGui::SliderInt(TEXT("Player.CameraZoom"), &TopDownCam.m_nZoom, 20, 60);
+                ImGui::Spacing();
+                ImGui::Separator();
+            }
 #endif
             if (ImGui::CollapsingHeader(TEXT("Game.Weather")))
             {

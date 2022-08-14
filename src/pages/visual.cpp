@@ -920,14 +920,15 @@ void Visual::ShowPage()
 #elif GTAVC
                 static float discLeft = *(float*)0x55A956;
                 static float discRight = *(float*)*(int*)0x55A9AE;
+                static float &posX = *(float*)0x68FD2C;
                 patch::SetPointer(0x55A9AE, &discRight);
                 patch::SetPointer(0x55AAE7, &discRight);
                 patch::SetFloat(0x55A956, discLeft);
                 patch::SetFloat(0x55AA94, discLeft);
 
-                float prevVal = *(float*)0x68FD2C;
-                Widget::EditAddr<float>(TEXT("Visual.RadarPosX"), 0x68FD2C, -999, 40, 999);
-                float diff = *(float*)0x68FD2C - prevVal;
+                float prevVal = posX;
+                Widget::EditAddr<float>(TEXT("Visual.RadarPosX"), (uint)&posX, -999, 40, 999);
+                float diff = posX - prevVal;
                 discLeft += diff;
                 discRight += diff;
 

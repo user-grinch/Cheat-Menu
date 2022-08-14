@@ -30,15 +30,6 @@ private:
         static inline std::vector<std::string> m_List;
     };
 
-    struct TopDownCamera
-    {
-    public:
-        static inline bool m_bEnabled = false;
-        static inline float m_fOffset = 40.0f;
-
-        static void Process();
-    };
-
     static void ChangePlayerModel(std::string& model);
     static void ChangePlayerCloth(std::string& model);
 #else
