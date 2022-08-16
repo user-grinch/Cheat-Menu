@@ -56,7 +56,7 @@ void Menu::ShowPage()
             ImGui::Spacing();
             if (ImGui::Button(TEXT("Menu.ResetSize"), ImVec2(Widget::CalcSize(2))))
             {
-                CheatMenu::ResetMenuSize();
+                CheatMenu::ResetSize();
             }
             ImGui::SameLine();
             if (ImGui::Button(TEXT("Menu.ReloadFonts"), ImVec2(Widget::CalcSize(2))))

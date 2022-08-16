@@ -326,7 +326,7 @@ void Overlay::ProcessCommands(std::string&& str)
         if (wep_name == "jetpack")
         {
             std::string weapon = "-1";
-            Weapon::GiveWeaponToPlayer(weapon);
+            WeaponPage::GiveWeaponToPlayer(weapon);
             Util::SetMessage(TEXT("Menu.WeaponSpawned"));
         }
         else
@@ -337,7 +337,7 @@ void Overlay::ProcessCommands(std::string&& str)
 
             if (wep_name != "" && pweaponinfo->m_nModelId1 != -1)
             {
-                Weapon::GiveWeaponToPlayer(weapon_name);
+                WeaponPage::GiveWeaponToPlayer(weapon_name);
                 Util::SetMessage(TEXT("Menu.WeaponSpawned"));
             }
             else

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "randomcheats_sa.h"
 
-RandomCheatsMgr& RandomCheats = *RandomCheatsMgr::Get();
+RandomCheatsMgr& RandomCheats = RandomCheatsMgr::Get();
 
 void RandomCheatsMgr::Process()
 { 

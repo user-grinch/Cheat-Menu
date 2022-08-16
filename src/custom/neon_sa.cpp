@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "neon_sa.h"
 
-NeonMgr& Neon = *NeonMgr::Get();
+NeonMgr& Neon = NeonMgr::Get();
 
 // Neon sprite
 const unsigned char neon_mask[1689] =

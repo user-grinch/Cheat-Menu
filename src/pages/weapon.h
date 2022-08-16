@@ -1,7 +1,7 @@
 #pragma once
 #include "pch.h"
 
-class Weapon
+class WeaponPage
 {
 private:
     static inline bool m_bFastReload;
@@ -37,13 +37,14 @@ private:
 #endif
 
 public:
-    Weapon() = delete;
-    Weapon(const Weapon&) = delete;
+    WeaponPage() = delete;
+    WeaponPage(const WeaponPage&) = delete;
 
     static void Init();
-    static void ShowPage();
+
+    static void Draw();
     
-    static void AddWeapon();
+    static void AddNew();
 #ifdef GTASA
     static inline ResourceStore m_WeaponData { "weapons", eResourceType::TYPE_IMAGE_TEXT, ImVec2(65, 65) };
     

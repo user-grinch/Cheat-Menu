@@ -2,7 +2,7 @@
 #include "freecam_sa.h"
 
 static CVector gTotalMouse;
-FreecamMgr& Freecam = *FreecamMgr::Get();
+FreecamMgr& Freecam = FreecamMgr::Get();
 
 void FreecamMgr::Enable()
 {

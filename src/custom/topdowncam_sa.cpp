@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "topdowncam_sa.h"
 
-TopDownCamera& TopDownCam = *TopDownCamera::Get();
+TopDownCamera& TopDownCam = TopDownCamera::Get();
 
 TopDownCamera::TopDownCamera()
 {

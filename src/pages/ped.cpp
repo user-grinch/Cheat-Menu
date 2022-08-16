@@ -380,15 +380,15 @@ void Ped::ShowPage()
                     ImGui::Text(TEXT("Ped.SelectedWeapon"), weaponName.c_str());
                     ImGui::Spacing();
 #ifdef GTASA
-                    Widget::ImageList(Weapon::m_WeaponData,
+                    Widget::ImageList(WeaponPage::m_WeaponData,
                     [](std::string& str)
                     {
                         Spawner::m_nWeaponId = std::stoi(str);
-                        weaponName = Weapon::m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
+                        weaponName = WeaponPage::m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
                     },
                     [](std::string& str)
                     {
-                        return Weapon::m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
+                        return WeaponPage::m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
                     },
                     [](std::string& str)
                     {

@@ -16,7 +16,7 @@
 #include <CAnimBlendAssociation.h>
 #endif
 
-AnimationMgr& Animation = *AnimationMgr::Get();
+AnimationMgr& Animation = AnimationMgr::Get();
 
 #ifdef GTAVC
 // Thanks to codenulls(https://github.com/codenulls/)

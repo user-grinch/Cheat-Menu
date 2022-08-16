@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "cutscene_sa.h"
 
-CutsceneMgr& Cutscene = *CutsceneMgr::Get();
+CutsceneMgr& Cutscene = CutsceneMgr::Get();
 CutsceneMgr::CutsceneMgr()
 {
     static CdeclEvent <AddressList<0x5B195F, H_JUMP>, PRIORITY_AFTER,  ArgPickNone, void()> skipCutsceneEvent;

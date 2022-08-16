@@ -4,7 +4,7 @@
 #include "utils/util.h"
 #include <CWeaponInfo.h>
 
-void Weapon::Init()
+void WeaponPage::Init()
 {
     Events::processScriptsEvent += []
     {
@@ -94,7 +94,7 @@ void Weapon::Init()
 }
 
 #ifdef GTASA
-void Weapon::SetGangWeapon(std::string& weapon_type)
+void WeaponPage::SetGangWeapon(std::string& weapon_type)
 {
     m_nGangWeaponList[m_nSelectedGang][m_nSelectedWeapon] = std::stoi(weapon_type);
     CGangs::SetGangWeapons(m_nSelectedGang, m_nGangWeaponList[m_nSelectedGang][0], m_nGangWeaponList[m_nSelectedGang][1],
@@ -162,7 +162,7 @@ static eWeaponType GetWeaponTypeFromModel(int model)
 #endif
 
 #ifdef GTASA
-void Weapon::GiveWeaponToPlayer(std::string& weapon_type)
+void WeaponPage::GiveWeaponToPlayer(std::string& weapon_type)
 {
     CPlayerPed* player = FindPlayerPed();
     int hplayer = CPools::GetPedRef(player);
@@ -223,7 +223,7 @@ void Weapon::GiveWeaponToPlayer(std::string& rootkey, std::string& name, std::st
 }
 #endif
 
-void Weapon::AddWeapon()
+void WeaponPage::AddNew()
 {
     static char name[INPUT_BUFFER_SIZE];
     static int model = 0;
@@ -240,7 +240,7 @@ void Weapon::AddWeapon()
     }
 }
 
-void Weapon::ShowPage()
+void WeaponPage::Draw()
 {
     CPlayerPed* pPlayer = FindPlayerPed();
     uint hplayer = CPools::GetPedRef(pPlayer);
@@ -384,7 +384,7 @@ void Weapon::ShowPage()
             [](std::string& str)
             {
                 return str != "0"; /*Unarmed*/
-            }, AddWeapon);
+            }, AddNew);
 #else
             Widget::DataList(m_WeaponData, GiveWeaponToPlayer, AddWeapon);
 #endif

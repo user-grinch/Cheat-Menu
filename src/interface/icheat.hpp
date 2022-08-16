@@ -20,10 +20,10 @@ public:
         m_bEnabled = true;
     }
 
-    static T *Get()
+    static T &Get()
     {
         static T _instance;
-        return &_instance;
+        return _instance;
     }
     
     // Returns the current stae of the cheat

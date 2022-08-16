@@ -2,7 +2,7 @@
 #include "particle_sa.h"
 #include "utils/widget.h"
 
-ParticleMgr& Particle = *ParticleMgr::Get();
+ParticleMgr& Particle = ParticleMgr::Get();
 void ParticleMgr::Play(std::string& cat, std::string& name, std::string& particle)
 {
     CPlayerPed* pPlayer = FindPlayerPed();

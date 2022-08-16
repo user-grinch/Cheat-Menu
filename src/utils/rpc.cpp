@@ -133,7 +133,7 @@ void RPC::Process()
         }
 
 
-        if (CheatMenu::IsMenuShown())
+        if (CheatMenu::IsBeingDrawn())
         {
             stateText = TEXT("RPC.BrowsingCheatMenu");
         }
