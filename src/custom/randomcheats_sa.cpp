@@ -3,7 +3,7 @@
 
 RandomCheatsMgr& RandomCheats = RandomCheatsMgr::Get();
 
-void RandomCheatsMgr::Process()
+void RandomCheatsMgr::DrawPages()
 { 
     uint timer = CTimer::m_snTimeInMilliseconds;
     static uint m_nTimer = 0;
@@ -72,7 +72,7 @@ RandomCheatsMgr::RandomCheatsMgr()
     {
         if (m_bEnabled)
         {
-            Process();
+            DrawPages();
         }
     };
 }

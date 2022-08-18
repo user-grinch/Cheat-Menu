@@ -1,23 +1,18 @@
 #pragma once
-#include "pch.h"
+#include "interface/ipage.h"
 
-/*
-    Menu Class
-    Handles code for the Menu page
-*/
-class Menu
+class MenuPage : public IPage<MenuPage>
 {
 public:
-    static inline bool m_bAutoCheckUpdate;  // Should updates be checked automatically
-    static inline bool m_bDiscordRPC;       // Is the discord rich presence enabled
-    static inline bool m_bTextOnlyMode;     // Hide all menu images mode
-    
-    Menu() = delete;
-    Menu(const Menu&) = delete;
+    bool m_bAutoCheckUpdate;  // Should updates be checked automatically
+    bool m_bDiscordRPC;       // Is the discord rich presence enabled
+    bool m_bTextOnlyMode;     // Hide all menu images mode
 
-    // Inits the class
-    static void Init();
+    friend IPage;
+    MenuPage();
+    MenuPage(const MenuPage&);
 
-    // Displays the menu page
-    static void ShowPage();
+    void Draw();
 };
+
+extern MenuPage& menuPage;

@@ -979,34 +979,34 @@ void Visual::ShowPage()
             int hour = CClock::ms_nGameClockHours;
             int minute = CClock::ms_nGameClockMinutes;
 
-            if (Game::m_bSyncTime)
+            if (gamePage.m_bSyncTime)
             {
-                ImGui::BeginDisabled(Game::m_bSyncTime);
+                ImGui::BeginDisabled(gamePage.m_bSyncTime);
             }
 
-            if (ImGui::InputInt(TEXT("Visual.Hour"), &hour) & !Game::m_bSyncTime)
+            if (ImGui::InputInt(TEXT("Visual.Hour"), &hour) & !gamePage.m_bSyncTime)
             {
                 if (hour < 0) hour = 23;
                 if (hour > 23) hour = 0;
                 CClock::ms_nGameClockHours = hour;
             }
 
-            if (ImGui::InputInt(TEXT("Visual.Minute"), &minute) & !Game::m_bSyncTime)
+            if (ImGui::InputInt(TEXT("Visual.Minute"), &minute) & !gamePage.m_bSyncTime)
             {
                 if (minute < 0) minute = 59;
                 if (minute > 59) minute = 0;
                 CClock::ms_nGameClockMinutes = minute;
             }
 
-            if (Game::m_bSyncTime)
+            if (gamePage.m_bSyncTime)
             {
                 ImGui::EndDisabled();
                 Widget::Tooltip(TEXT("Visual.SyncTimeEnabled"));
             }
 
-            if (ImGui::Checkbox(TEXT("Visual.FreezeGameTime"), &Game::m_bFreezeTime))
+            if (ImGui::Checkbox(TEXT("Visual.FreezeGameTime"), &gamePage.m_bFreezeTime))
             {
-                if (Game::m_bFreezeTime)
+                if (gamePage.m_bFreezeTime)
                 {
                     patch::SetRaw(BY_GAME(0x52CF10, 0x487010, 0x473460), (char *)"\xEB\xEF", 2);
                 }

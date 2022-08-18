@@ -9,7 +9,7 @@ TopDownCamera::TopDownCamera()
     {
         if (m_bEnabled)
         {
-            Process();
+            DrawPages();
         }
     };
 }
@@ -18,7 +18,7 @@ TopDownCamera::TopDownCamera()
 	Taken from gta chaos mod by Lordmau5
 	https://github.com/gta-chaos-mod/Trilogy-ASI-Script
 */
-void TopDownCamera::Process()
+void TopDownCamera::DrawPages()
 { 
     CPlayerPed *player = FindPlayerPed();
     CVector     pos    = player->GetPosition ();

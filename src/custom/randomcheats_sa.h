@@ -17,7 +17,7 @@ private:
     RandomCheatsMgr(const RandomCheatsMgr&);
     
     // Process the RandomCheat each frame & draw progress bar
-    void Process();
+    void DrawPages();
 
 public:
     bool m_bProgressBar = true;

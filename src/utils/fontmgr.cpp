@@ -71,7 +71,7 @@ void FontMgr::ReloadAll()
     m_bFontReloadRequired = false;
 }
 
-void FontMgr::Process()
+void FontMgr::DrawPages()
 {
     if (curState == eStates::Idle)
     {

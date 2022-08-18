@@ -15,13 +15,14 @@
 #include "pages/vehicle.h"
 #include "pages/visual.h"
 #include "pages/weapon.h"
+#include "interface/ipage.h"
 
 static bool DrawTitleBar()
 {
     bool hovered, held;
     ImGuiWindow *window = ImGui::GetCurrentWindow();
     ImGuiStyle& Style = ImGui::GetStyle();
-    ImGuiID id = window->GetID("#CLOSE");
+    ImGuiID id = window->GetPageID("#CLOSE");
 
     ImGui::PushFont(FontMgr::Get("title"));
     Widget::TextCentered(MENU_TITLE);
@@ -87,7 +88,7 @@ void CheatMenu::DrawWindow()
                 ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
                                     ImVec2(ImGui::GetWindowWidth() / 85, ImGui::GetWindowHeight() / 200));
 
-                ProcessPages();
+                PageHandler::DrawPages();
 
                 if (m_bSizeChangedExternal)
                     m_bSizeChangedExternal = false;
@@ -119,21 +120,18 @@ void CheatMenu::Init()
     }
 
     // Load menu settings
-    m_nMenuPage = (eMenuPages)gConfig.Get("Window.CurrentPage", (size_t)eMenuPages::WELCOME);
+    // m_nMenuPage = (eMenuPages)gConfig.Get("Window.CurrentPage", (size_t)eMenuPages::WELCOME);
     m_fMenuSize.x = gConfig.Get("Window.SizeX", screen::GetScreenWidth() / 4.0f);
     m_fMenuSize.y = gConfig.Get("Window.SizeY", screen::GetScreenHeight() / 1.2f);
     srand(CTimer::m_snTimeInMilliseconds);
 
     ApplyStyle();
     Locale::Init(FILE_NAME "/locale/", "English", "English");
-    GenHeaderList();
+    // GenHeaderList();
     
     // Init menu parts
-    Game::Init();
-    Menu::Init();
     Player::Init();
     Ped::Init();
-    Teleport::Init();
     Vehicle::Init();
     Visual::Init();
     WeaponPage::Init();
@@ -164,7 +162,7 @@ void CheatMenu::Init()
                 D3dHook::SetMouseState(m_bShowMenu);
             }
 
-            if (Teleport::IsQuickTeleportActive() && quickTeleport.PressedRealtime())
+            if (teleportPage.IsQuickTeleportActive() && quickTeleport.PressedRealtime())
             {
                 D3dHook::SetMouseState(true);
             }

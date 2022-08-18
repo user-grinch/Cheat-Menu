@@ -9,7 +9,7 @@
 tRadarTrace* ms_RadarTrace = reinterpret_cast<tRadarTrace*>(patch::GetPointer(0x5838B0 + 2));
 static int maxSprites = *(uint*)0x5D5870;
 
-void Teleport::FetchRadarSpriteData()
+void TeleportPage::FetchRadarSpriteData()
 {
     
     uint timer = CTimer::m_snTimeInMilliseconds;
@@ -35,21 +35,22 @@ void Teleport::FetchRadarSpriteData()
 }
 #endif
 
-bool Teleport::IsQuickTeleportActive()
+bool TeleportPage::IsQuickTeleportActive()
 {
     return m_bQuickTeleport;
 }
 
+TeleportPage& teleportPage = TeleportPage::Get();
 
-
-void Teleport::Init()
+TeleportPage::TeleportPage()
+: IPage<TeleportPage>(ePageID::Teleport, "Window.TeleportPage", true)
 {
     m_bTeleportMarker = gConfig.Get("Features.TeleportMarker", false);
     m_bQuickTeleport = gConfig.Get("Features.QuickTeleport", false);
     m_fMapSize.x = gConfig.Get("Game.MapSizeX", 6000.0f);
     m_fMapSize.y = gConfig.Get("Game.MapSizeY", 6000.0f);
 
-    Events::drawingEvent += []
+    Events::drawingEvent += [this]
     {
         if (m_bTeleportMarker && teleportMarker.Pressed())
         {
@@ -119,7 +120,7 @@ void Teleport::Init()
 
 #ifdef GTASA
 template<eTeleportType Type>
-void Teleport::WarpPlayer(CVector pos, int interiorID)
+void TeleportPage::WarpPlayer(CVector pos, int interiorID)
 {
     CPlayerPed* pPlayer = FindPlayerPed();
     CVehicle* pVeh = pPlayer->m_pVehicle;
@@ -192,7 +193,7 @@ void Teleport::WarpPlayer(CVector pos, int interiorID)
 }
 #else
 template<eTeleportType Type>
-void Teleport::WarpPlayer(CVector pos, int interiorID)
+void TeleportPage::WarpPlayer(CVector pos, int interiorID)
 {
     CPlayerPed* pPlayer = FindPlayerPed();
     CVehicle* pVeh = pPlayer->m_pVehicle;
@@ -224,9 +225,41 @@ void Teleport::WarpPlayer(CVector pos, int interiorID)
 }
 #endif
 
-void Teleport::ShowPage()
+void TeleportPage::LocationAddNew()
 {
-    static char locBuf[INPUT_BUFFER_SIZE], inBuf[INPUT_BUFFER_SIZE];
+    ImGui::InputTextWithHint(TEXT("Teleport.Location"), TEXT("Teleport.LocationHint"), m_LocBuf, INPUT_BUFFER_SIZE);
+    ImGui::InputTextWithHint(TEXT("Teleport.Coordinates"), "x, y, z", m_InBuf, INPUT_BUFFER_SIZE);
+    ImGui::Spacing();
+    if (ImGui::Button(TEXT("Window.AddEntry"), Widget::CalcSize()))
+    {
+        std::string key = std::string("Custom.") + m_LocBuf;
+        m_locData.m_pData->Set(key.c_str(), ("0, " + std::string(m_InBuf)));
+#ifdef GTASA
+        // Clear the Radar coordinates
+        m_locData.m_pData->RemoveTable("Radar");
+#endif
+
+        m_locData.m_pData->Save();
+        Util::SetMessage(TEXT("Window.AddEntryMSG"));
+    }
+}
+
+void TeleportPage::LocationClick(str& unk1, str& unk2, str& loc)
+{
+    int dim = 0;
+    CVector pos;
+    if (sscanf(loc.c_str(), "%d,%f,%f,%f", &dim, &pos.x, &pos.y, &pos.z) == 4)
+    {
+        WarpPlayer<eTeleportType::Coordinate>(pos, dim);
+    }
+    else
+    {
+        Util::SetMessage(TEXT("Teleport.InvalidLocation"));
+    }
+}
+
+void TeleportPage::Draw()
+{
     if (ImGui::BeginTabBar("Teleport", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {
         ImGui::Spacing();
@@ -264,19 +297,19 @@ void Teleport::ShowPage()
                 {
                     CVector pos = FindPlayerPed()->GetPosition();
 
-                    strcpy(inBuf,
+                    strcpy(m_InBuf,
                            (std::to_string(static_cast<int>(pos.x)) + ", " + std::to_string(static_cast<int>(pos.y)) +
                             ", " + std::to_string(static_cast<int>(pos.z))).c_str());
                 }
 
-                ImGui::InputTextWithHint(TEXT("Teleport.Coordinates"), "x, y, z", inBuf, INPUT_BUFFER_SIZE);
+                ImGui::InputTextWithHint(TEXT("Teleport.Coordinates"), "x, y, z", m_InBuf, INPUT_BUFFER_SIZE);
 
                 ImGui::Spacing();
 
                 if (ImGui::Button(TEXT("Teleport.TeleportToCoord"), Widget::CalcSize(2)))
                 {
                     CVector pos{0, 0, 10};
-                    if (sscanf(inBuf,"%f,%f,%f", &pos.x, &pos.y, &pos.z) == 3)
+                    if (sscanf(m_InBuf,"%f,%f,%f", &pos.x, &pos.y, &pos.z) == 3)
                     {
                         pos.z += 1.0f;
                         WarpPlayer(pos);
@@ -336,36 +369,8 @@ void Teleport::ShowPage()
             FetchRadarSpriteData();
 #endif  
             ImGui::Spacing();
-            Widget::DataList(m_locData, 
-            [](std::string& unk1, std::string& unk2, std::string& loc){
-                int dim = 0;
-                CVector pos;
-                if (sscanf(loc.c_str(), "%d,%f,%f,%f", &dim, &pos.x, &pos.y, &pos.z) == 4)
-                {
-                    WarpPlayer<eTeleportType::Coordinate>(pos, dim);
-                }
-                else
-                {
-                    Util::SetMessage(TEXT("Teleport.InvalidLocation"));
-                }
-            },
-            [](){
-                ImGui::InputTextWithHint(TEXT("Teleport.Location"), TEXT("Teleport.LocationHint"), locBuf, INPUT_BUFFER_SIZE);
-                ImGui::InputTextWithHint(TEXT("Teleport.Coordinates"), "x, y, z", inBuf, INPUT_BUFFER_SIZE);
-                ImGui::Spacing();
-                if (ImGui::Button(TEXT("Window.AddEntry"), Widget::CalcSize()))
-                {
-                    std::string key = std::string("Custom.") + locBuf;
-                    m_locData.m_pData->Set(key.c_str(), ("0, " + std::string(inBuf)));
-#ifdef GTASA
-                    // Clear the Radar coordinates
-                    m_locData.m_pData->RemoveTable("Radar");
-#endif
-
-                    m_locData.m_pData->Save();
-                    Util::SetMessage(TEXT("Window.AddEntryMSG"));
-                }
-            });
+            Widget::DataList(m_locData, fArg3Wrapper(teleportPage.LocationClick), 
+                                fArgNoneWrapper(teleportPage.LocationAddNew));
             ImGui::EndTabItem();
         }
         ImGui::EndTabBar();

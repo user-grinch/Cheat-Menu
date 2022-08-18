@@ -231,11 +231,11 @@ NeonMgr::NeonMgr()
 
 NeonMgr::~NeonMgr()
 {
-    if (m_pNeonTexture)
-    {
-        RwTextureDestroy(m_pNeonTexture);
-        m_pNeonTexture = nullptr;
-    }
+    // if (m_pNeonTexture)
+    // {
+    //     RwTextureDestroy(m_pNeonTexture);
+    //     m_pNeonTexture = nullptr;
+    // }
 }
 
 bool NeonMgr::IsInstalled(CVehicle* pVeh)

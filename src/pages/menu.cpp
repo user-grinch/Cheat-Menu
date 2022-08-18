@@ -7,7 +7,9 @@
 #include "utils/rpc.h"
 #include "utils/overlay.h"
 
-void Menu::Init()
+MenuPage& menuPage = MenuPage::Get();
+MenuPage::MenuPage()
+: IPage<MenuPage>(ePageID::Menu, "Window.MenuPage", true)
 {
     m_bDiscordRPC = gConfig.Get("Menu.DiscordRPC", false);
     m_bAutoCheckUpdate = gConfig.Get("Menu.AutoCheckUpdate", true);
@@ -19,7 +21,7 @@ void Menu::Init()
     }
 }
 
-void Menu::ShowPage()
+void MenuPage::Draw()
 {
     if (ImGui::BeginTabBar("Menu", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {
@@ -49,7 +51,7 @@ void Menu::ShowPage()
                 {
                     Locale::SetDefaultLocale();
                     selected = Locale::GetCurrentLocaleIndex();
-                    CheatMenu::GenHeaderList();
+                    // CheatMenu::GenHeaderList();
                 }
             }
 
@@ -72,7 +74,7 @@ void Menu::ShowPage()
                 {
                     if (Locale::SetLocale(selected) == Locale::eReturnCodes::SUCCESS)
                     {
-                        CheatMenu::GenHeaderList();
+                        // CheatMenu::GenHeaderList();
                     }
                     else
                     {
@@ -306,7 +308,7 @@ void Menu::ShowPage()
 
             if (ImGui::Button(TEXT("Menu.Patreon"), ImVec2(Widget::CalcSize(2))))
             {
-                OPEN_LINK("https://www.patreon.com/grinch_");
+                OPEN_LINK(PATREON_LINK);
             }
             ImGui::Spacing();
 

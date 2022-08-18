@@ -1,44 +1,47 @@
 #pragma once
 #include "pch.h"
+#include "interface/ipage.h"
 
-class Game
+class GamePage : public IPage<GamePage>
 {
 private:
-    static inline ResourceStore m_MissionData{ "missions", eResourceType::TYPE_TEXT };
-    static inline bool m_bDisableCheats;
-    static inline bool m_bDisableReplay;
-    static inline bool m_bMissionTimer;
-    static inline bool m_bMobileRadio;
+    ResourceStore m_MissionData{ "missions", eResourceType::TYPE_TEXT };
+    bool m_bDisableCheats;
+    bool m_bDisableReplay;
+    bool m_bMissionTimer;
+    bool m_bMobileRadio;
 
-    struct HardMode
+    struct
     {
-        static inline bool m_bEnabled;
-        static inline float m_fBacHealth = 0.0f;
-        static inline float m_fBacMaxHealth = 0.0f;
-        static inline float m_fBacArmour = 0.0f;
-        static inline float m_fBacStamina = 0.0f;
-    };
+        bool m_bEnabled;
+        float m_fBacHealth;
+        float m_fBacMaxHealth;
+        float m_fBacArmour;
+        float m_fBacStamina;
+    } m_HardMode;
 
 #ifdef GTASA
-    static inline bool m_bForbiddenArea = true; // wanted level when going outside playable aea
-    static inline bool m_bSolidWater; // walk on water hack
-    static inline bool m_bNoWaterPhysics;
-    static inline bool m_bScreenShot;
-    static inline ResourceStore m_StatData{ "stats", eResourceType::TYPE_TEXT };
+    bool m_bForbiddenArea = true;   // Wanted level when going outside playable aea
+    bool m_bSolidWater;             // Walk on water hack
+    bool m_bNoWaterPhysics;
+    bool m_bScreenShot;
+    ResourceStore m_StatData{ "stats", eResourceType::TYPE_TEXT };
 #endif
 
+    friend IPage;
+    GamePage();
+    GamePage(const GamePage&);
+
 public:
-    static inline bool m_bFreezeTime;
-    static inline bool m_bSyncTime;
+    bool m_bFreezeTime;
+    bool m_bSyncTime;               // Sync time with system
 
 #ifdef GTASA
-    static inline int m_nCameraZoom = 70.0f;
-    static inline bool m_bLockCameraZoom;
+    int m_nCameraZoom = 70.0f;
+    bool m_bLockCameraZoom;
 #endif 
 
-    Game() = delete;
-    Game(const Game&) = delete;
-
-    static void Init();
-    static void ShowPage();
+    void Draw();
 };
+
+extern GamePage& gamePage;

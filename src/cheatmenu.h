@@ -3,7 +3,7 @@
 
 /*
 *   Main CheatMenu Class
-*   Handles rendering, resizing, page handling etc.
+*   Handles rendering, resizing, page drawing etc.
 */
 class CheatMenu
 {

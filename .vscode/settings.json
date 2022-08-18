@@ -76,6 +76,7 @@
         "xutility": "cpp",
         "*.rh": "cpp",
         "csignal": "cpp",
-        "coroutine": "cpp"
+        "coroutine": "cpp",
+        "any": "cpp"
     }
 }

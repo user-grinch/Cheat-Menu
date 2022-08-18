@@ -66,9 +66,9 @@ void RPC::Init()
     }
 }
 
-void RPC::Process()
+void RPC::DrawPages()
 {
-    if (!(Menu::m_bDiscordRPC && bInit))
+    if (!(menuPage.m_bDiscordRPC && bInit))
     {
         return;
     }

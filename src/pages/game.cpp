@@ -38,7 +38,10 @@ static void RealTimeClock()
     CClock::ms_nGameClockSeconds = now->tm_sec;
 }
 
-void Game::Init()
+GamePage& gamePage = GamePage::Get();
+
+GamePage::GamePage()
+ : IPage<GamePage>(ePageID::Game, "Window.GamePage", true)
 {
 #ifdef GTASA
 
@@ -52,13 +55,13 @@ void Game::Init()
     };
 #endif
 
-    Events::processScriptsEvent += []
+    Events::processScriptsEvent += [this]
     {
         uint timer = CTimer::m_snTimeInMilliseconds;
         CPlayerPed* pPlayer = FindPlayerPed();
         int hplayer = CPools::GetPedRef(pPlayer);
 
-        if (HardMode::m_bEnabled)
+        if (m_HardMode.m_bEnabled)
         {
             if (pPlayer->m_fHealth > 50.0f)
             {
@@ -122,9 +125,9 @@ void Game::Init()
             if (Freecam.Toggle())
             {
                 // restore lock camera zoom here
-                if (Game::m_bLockCameraZoom)
+                if (m_bLockCameraZoom)
                 {
-                    TheCamera.LerpFOV(TheCamera.FindCamFOV(), Game::m_nCameraZoom, 250, true);
+                    TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_nCameraZoom, 250, true);
                 }
                 else
                 {
@@ -170,7 +173,7 @@ void SetPlayerMission(std::string& rootkey, std::string& name, std::string& id)
     }
 }
 
-void Game::ShowPage()
+void GamePage::Draw()
 {
     ImGui::Spacing();
     CPlayerPed* pPlayer = FindPlayerPed();
@@ -269,32 +272,32 @@ void Game::ShowPage()
             {
                 Command<Commands::FREEZE_ONSCREEN_TIMER>(m_bMissionTimer);
             }
-            if (Widget::Checkbox(TEXT("Game.HardMode"), &HardMode::m_bEnabled, TEXT("Game.HardModeText")))
+            if (Widget::Checkbox(TEXT("Game.HardMode"), &m_HardMode.m_bEnabled, TEXT("Game.HardModeText")))
             {
                 CPlayerPed* player = FindPlayerPed();
 
-                if (HardMode::m_bEnabled)
+                if (m_HardMode.m_bEnabled)
                 {
-                    HardMode::m_fBacArmour = player->m_fArmour;
-                    HardMode::m_fBacHealth = player->m_fHealth;
+                    m_HardMode.m_fBacArmour = player->m_fArmour;
+                    m_HardMode.m_fBacHealth = player->m_fHealth;
 
 #ifdef GTASA
-                    HardMode::m_fBacMaxHealth = CStats::GetStatValue(STAT_MAX_HEALTH);
-                    HardMode::m_fBacStamina = CStats::GetStatValue(STAT_STAMINA);
+                    m_HardMode.m_fBacMaxHealth = CStats::GetStatValue(STAT_MAX_HEALTH);
+                    m_HardMode.m_fBacStamina = CStats::GetStatValue(STAT_STAMINA);
 #else
-                    HardMode::m_fBacMaxHealth = 100.0f;
+                    m_HardMode.m_fBacMaxHealth = 100.0f;
 #endif
                     player->m_fHealth = 50.0f;
                 }
                 else
                 {
-                    player->m_fArmour = HardMode::m_fBacArmour;
+                    player->m_fArmour = m_HardMode.m_fBacArmour;
 
 #ifdef GTASA
-                    CStats::SetStatValue(STAT_STAMINA, HardMode::m_fBacStamina);
-                    CStats::SetStatValue(STAT_MAX_HEALTH, HardMode::m_fBacMaxHealth);
+                    CStats::SetStatValue(STAT_STAMINA, m_HardMode.m_fBacStamina);
+                    CStats::SetStatValue(STAT_MAX_HEALTH, m_HardMode.m_fBacMaxHealth);
 #endif
-                    player->m_fHealth = HardMode::m_fBacHealth;
+                    player->m_fHealth = m_HardMode.m_fBacHealth;
                 }
             }
 #ifdef GTASA
@@ -611,9 +614,9 @@ void Game::ShowPage()
                 if (Freecam.Toggle())
                 {
                     // restore lock camera zoom here
-                    if (Game::m_bLockCameraZoom)
+                    if (m_bLockCameraZoom)
                     {
-                        TheCamera.LerpFOV(TheCamera.FindCamFOV(), Game::m_nCameraZoom, 250, true);
+                        TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_nCameraZoom, 250, true);
                     }
                     else
                     {

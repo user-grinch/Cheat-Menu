@@ -32,7 +32,7 @@ public:
     static bool IsUpdateAvailable();
 
     // Needs to run in it's own thread to prevent the game from freezing
-    static void Process();
+    static void DrawPages();
 
     // Resets updater state to IDLE
     static void ResetUpdaterState();

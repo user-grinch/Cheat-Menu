@@ -1238,7 +1238,7 @@ void Vehicle::ShowPage()
                     if (ImGui::BeginTabItem(TEXT("Teleport.Location")))
                     {
                         ImGui::Spacing();
-                        Widget::DataList(Teleport::m_locData, 
+                        Widget::DataList(teleportPage.m_locData, 
                         [](std::string& rootkey, std::string& bLocName, std::string& loc)
                         {
                             CVehicle* pVeh = BY_GAME(FindPlayerVehicle(-1, false), FindPlayerVehicle(), FindPlayerVehicle());

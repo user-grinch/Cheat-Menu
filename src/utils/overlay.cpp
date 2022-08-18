@@ -310,7 +310,7 @@ void Overlay::ProcessCommands(std::string&& str)
             ss >> temp;
             pos.z = std::stof(temp);
 
-            Teleport::WarpPlayer(pos);
+            teleportPage.WarpPlayer(pos);
         }
         catch (...)
         {

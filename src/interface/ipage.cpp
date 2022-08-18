@@ -2,90 +2,21 @@
 #include "ipage.h"
 #include "utils/updater.h"
 #include "utils/widget.h"
+#include "imgui/imgui_internal.h"
+#include "pages/welcome.h"
 
-static void DrawAnniversaryPage()
+void PageHandler::AddPage(PagePtr page)
 {
-    Widget::TextCentered("Happy Anniversary!");
-    ImGui::NewLine();
-
-    ImGui::TextWrapped("On this day, in 2019, the first public version of menu was released in MixMods Forum." 
-    " It's been a blast working on it and I've learned a lot in the process.\n\nThanks to you and everyone who used or" 
-    " contributed to the modification in any form or shape.");
-
-    ImGui::NewLine();
-    ImGui::TextWrapped("Feel free to star the GitHub repo or join the discord server and provide feedback, ideas, or suggestions.");
-    ImGui::NewLine();
-
-    if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Widget::CalcSize(3))))
-    {
-        OPEN_LINK(DISCORD_INVITE);
-    }
-    ImGui::SameLine();
-    if (ImGui::Button(TEXT("Menu.GitHubRepo"), ImVec2(Widget::CalcSize(3))))
-    {
-        OPEN_LINK(GITHUB_LINK);
-    }
-}   
-
-static void DrawWelcomePage()
-{
-    ImGui::NewLine();
-
-    Widget::TextCentered(TEXT("Menu.WelcomeMSG"));
-    Widget::TextCentered(std::format("{}: Grinch_",TEXT("Menu.Author")));
-
-    ImGui::NewLine();
-    ImGui::TextWrapped(TEXT("Menu.EnsureLatest"));
-    if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Widget::CalcSize(2))))
-    {
-        OPEN_LINK(DISCORD_INVITE);
-    }
-    ImGui::SameLine();
-    if (ImGui::Button(TEXT("Menu.GitHubRepo"), ImVec2(Widget::CalcSize(2))))
-    {
-        OPEN_LINK(GITHUB_LINK);
-    }
-    ImGui::NewLine();
-    ImGui::TextWrapped(TEXT("Menu.BugDisclaimer"));
-    ImGui::Dummy(ImVec2(0, 20));
-    Widget::TextCentered(TEXT("Menu.PatreonText"));
-    if (ImGui::Button(TEXT("Menu.Patreon"), ImVec2(Widget::CalcSize(1))))
-    {
-        OPEN_LINK("https://www.patreon.com/grinch_");
-    }
-    ImGui::Dummy(ImVec2(0, 30));
-    Widget::TextCentered(TEXT("Menu.CopyrightDisclaimer"));
+    m_PageList.push_back(page);
 }
 
-static void DrawUpdatePage()
+void PageHandler::SetCurrentPage(PagePtr page)
 {
-    std::string ver = Updater::GetUpdateVersion();
-    ImGui::Dummy(ImVec2(0, 20));
-    Widget::TextCentered(TEXT("Menu.NewVersion"));
-    Widget::TextCentered(std::format("{}: {}", TEXT("Menu.CurrentVersion"), MENU_VERSION));
-    Widget::TextCentered(TEXT("Menu.LatestVersion") + ver);
-    ImGui::Dummy(ImVec2(0, 10));
-    ImGui::TextWrapped(TEXT("Menu.UpdaterInfo1"));
-    ImGui::Dummy(ImVec2(0, 10));
-    ImGui::TextWrapped(TEXT("Menu.UpdaterInfo2"));
-
-    ImGui::Dummy(ImVec2(0, 5));
-    if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Widget::CalcSize(2))))
-    {
-        OPEN_LINK(DISCORD_INVITE);
-    }
-
-    ImGui::SameLine();
-
-    if (ImGui::Button(TEXT("Menu.DownloadPage"), Widget::CalcSize(2)))
-    {
-        ShellExecute(NULL, "open", std::string("https://github.com/user-grinch/Cheat-Menu/releases/tag/" +
-                                               ver).c_str(), NULL, NULL, SW_SHOWNORMAL);
-    }
+    m_pCurrentPage = page;
 }
 
-template <typename T>
-void IPage<T>::Process()
+using IPageStatic = IPage<WelcomePage>; // dummy class
+void PageHandler::DrawPages()
 {
     ImVec2 size = Widget::CalcSize(3, false);
     ImGuiStyle &style = ImGui::GetStyle();
@@ -93,12 +24,20 @@ void IPage<T>::Process()
     ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
     if (Updater::IsUpdateAvailable())
     {
-        m_nCurrentPage = eMenuPage::Update;
+        for (PagePtr ptr : m_PageList)
+        {   
+            IPageStatic* page = reinterpret_cast<IPageStatic*>(ptr);
+            if (page->GetPageID() == ePageID::Update)
+            {
+                m_pCurrentPage = page;
+                break;
+            }
+        }
     }
     
     // Check once if it's anniversary day
-    static bool aniCheckDone;
-    if (!aniCheckDone)
+    static bool checked;
+    if (!checked)
     {
         SYSTEMTIME st;
         GetSystemTime(&st);
@@ -114,48 +53,40 @@ void IPage<T>::Process()
             if (!flag)
             {
                 gConfig.Set("Window.AnniversaryShown", true);
-                m_nMenuPage = eMenuPages::ANNIVERSARY;
+
+                for (void* ptr : m_PageList)
+                {
+                    IPageStatic* page = reinterpret_cast<IPageStatic*>(ptr);
+                    if (page->GetPageID() == ePageID::Anniversary)
+                    {
+                        m_pCurrentPage = page;
+                        break;
+                    }
+                }
             }
         }
-        aniCheckDone = true;
+        checked = true;
     }
 
+    // Draw header buttons
     ImDrawList *pDrawList = ImGui::GetWindowDrawList();
-    for (size_t i = 0; i < m_headerList.size(); ++i)
-    {
-        /*
-        * For welcome & update pages
-        * They don't need to add item in the header list
-        */
-        if (m_headerList[i].skipHeader)
+    size_t count = 0;
+    for (PagePtr ptr : m_PageList)
+    {   
+        IPageStatic* pg = reinterpret_cast<IPageStatic*>(ptr);
+        if (!pg->HasHeaderButton())
         {
-            if (m_nMenuPage == m_headerList[i].page)
-            {
-                pCallback = m_headerList[i].pFunc;
-            }
-
             continue;
         }
 
-        const char* text = m_headerList[i].name.c_str();
+        std::string text = TEXT_S(pg->GetPageKey());
+        ImVec4 color = (pg == m_pCurrentPage) ? style.Colors[ImGuiCol_ButtonActive] : style.Colors[ImGuiCol_Button];
 
-        ImVec4 color;
-        if (m_headerList[i].page == m_nMenuPage)
+        if (ImGui::InvisibleButton(text.c_str(), size))
         {
-            color = style.Colors[ImGuiCol_ButtonActive];
-            pCallback = m_headerList[i].pFunc;
-        }
-        else
-        {
-            color = style.Colors[ImGuiCol_Button];
-        }
-
-        if (ImGui::InvisibleButton(text, size))
-        {
-            m_nMenuPage = m_headerList[i].page;
-            size_t curPage = static_cast<size_t>(m_headerList[i].page);
-            gConfig.Set("Window.CurrentPage", curPage);
-            pCallback = m_headerList[i].pFunc;
+            m_pCurrentPage = pg;
+            size_t id = static_cast<size_t>(pg->GetPageID());
+            gConfig.Set("Window.CurrentPage", id);
             Updater::ResetUpdaterState();
         }
 
@@ -169,28 +100,30 @@ void IPage<T>::Process()
         * TODO: hardcoded atm
         */
         ImDrawFlags flags = ImDrawFlags_RoundCornersNone;
-        if (i == 0) flags = ImDrawFlags_RoundCornersTopLeft;
-        if (i == 2) flags = ImDrawFlags_RoundCornersTopRight;
-        if (i == 6) flags = ImDrawFlags_RoundCornersBottomLeft;
-        if (i == 8) flags = ImDrawFlags_RoundCornersBottomRight;
+        if (count == 0) flags = ImDrawFlags_RoundCornersTopLeft;
+        if (count == 2) flags = ImDrawFlags_RoundCornersTopRight;
+        if (count == 6) flags = ImDrawFlags_RoundCornersBottomLeft;
+        if (count == 8) flags = ImDrawFlags_RoundCornersBottomRight;
 
         ImVec2 min = ImGui::GetItemRectMin();
         ImVec2 max = ImGui::GetItemRectMax();
-        ImVec2 size = ImGui::CalcTextSize(text);
+        ImVec2 size = ImGui::CalcTextSize(text.c_str());
         pDrawList->AddRectFilled(min, max, ImGui::GetColorU32(color), style.FrameRounding, flags);
-        ImGui::RenderTextClipped(min + style.FramePadding, max - style.FramePadding, text, NULL, &size, style.ButtonTextAlign);
+        ImGui::RenderTextClipped(min + style.FramePadding, max - style.FramePadding, text.c_str(), NULL, &size, style.ButtonTextAlign);
 
-        if (i % 3 != 2)
+        if (count % 3 != 2)
         {
             ImGui::SameLine();
         }
+        ++count;
     }
     ImGui::PopStyleVar();
+    ImGui::Spacing();
     ImGui::Dummy(ImVec2(0, 10));
 
     if (m_pCurrentPage != nullptr && ImGui::BeginChild("HEADERCONTENT"))
     {
-        m_pCurrentPage->Draw();
+        reinterpret_cast<IPageStatic*>(m_pCurrentPage)->Draw();
         ImGui::EndChild();
     }
 }

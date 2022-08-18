@@ -10,6 +10,8 @@
 #include "custom/particle_sa.h"
 #endif
 
+ScenePage& scenePage = ScenePage::Get();
+
 void ScenePage::Draw()
 {
     if (ImGui::BeginTabBar("Animation", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))

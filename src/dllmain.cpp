@@ -100,7 +100,7 @@ void MenuThread(void* param)
     CheatMenu::Init();
 
     // Checking for updates once a day
-    if (Menu::m_bAutoCheckUpdate && gConfig.Get("Menu.LastUpdateChecked", 0) != st.wDay)
+    if (menuPage.m_bAutoCheckUpdate && gConfig.Get("Menu.LastUpdateChecked", 0) != st.wDay)
     {
         Updater::CheckUpdate();
         gConfig.Set("Menu.LastUpdateChecked", st.wDay);
@@ -113,9 +113,9 @@ void MenuThread(void* param)
 
     while (true)
     {
-        FontMgr::Process();
-        RPC::Process();
-        Updater::Process();
+        FontMgr::DrawPages();
+        RPC::DrawPages();
+        Updater::DrawPages();
         Sleep(1000);
     }
 }

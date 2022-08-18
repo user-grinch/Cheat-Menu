@@ -19,7 +19,7 @@ private:
     FreecamMgr(const FreecamMgr&);
 
     // Process freecam mode each frame
-    void Process();
+    void DrawPages();
 
 public:
     int m_nMul = 1;       // speed multiplier

@@ -17,7 +17,7 @@ public:
     int m_nZoom = 40; 
 
     // Process cheat each frame
-    void Process();
+    void DrawPages();
 };
 
 extern TopDownCamera& TopDownCam;

@@ -24,7 +24,7 @@ void Updater::CheckUpdate()
     }
 }
 
-void Updater::Process()
+void Updater::DrawPages()
 {
     if (Updater::curState != States::CHECKING)
     {

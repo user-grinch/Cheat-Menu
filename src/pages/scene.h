@@ -1,14 +1,19 @@
 #pragma once
-#include "pch.h"
+#include "interface/ipage.h"
 
 /*
-    Scene Player class
+    ScenePage Class
+    Contains animations, cutscenes, particles, tasks etc
 */
-class ScenePage
+class ScenePage : public IPage<ScenePage>
 {
-public:
-    ScenePage() = delete;
-    ScenePage(const ScenePage&) = delete;
+private:
+    friend IPage;
+    ScenePage() : IPage<ScenePage>(ePageID::Scene, "Window.ScenePage", true){}
+    ScenePage(const ScenePage&);
 
-    static void Draw();
+public:
+    void Draw();
 };
+
+extern ScenePage& scenePage;

@@ -323,7 +323,7 @@ void Widget::ImageList(ResourceStore &store, fArg1_t clickFunc, fRtnArg1_t getNa
     m_ImageSize.x = ImGui::GetWindowContentRegionWidth() - style.ItemSpacing.x * (imagesInRow-1);
     m_ImageSize.x /= imagesInRow;
 
-    bool showImages = !Menu::m_bTextOnlyMode;
+    bool showImages = !menuPage.m_bTextOnlyMode;
     if (gRenderer == Render_DirectX11)
     {
         showImages = false;

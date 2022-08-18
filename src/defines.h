@@ -4,6 +4,7 @@
 #define SPAWN_PED_LIMIT 20
 #define DISCORD_INVITE "https://discord.gg/ZzW7kmf"
 #define GITHUB_LINK "https://github.com/user-grinch/Cheat-Menu"
+#define PATREON_LINK "https://www.patreon.com/grinch_"
 #define IMGUI_DEFINE_MATH_OPERATORS
 
 #define MENU_NAME "Cheat Menu"

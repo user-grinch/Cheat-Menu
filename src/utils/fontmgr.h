@@ -45,7 +45,7 @@ public:
     static ImFont* Load(const char* fontID, const char* path = 0, float fontMul = 1.0f);
 
     // Handles font downloading
-    static void Process();
+    static void DrawPages();
 
     // Reloads all the fonts 
     static void ReloadAll();

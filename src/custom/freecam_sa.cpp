@@ -35,7 +35,7 @@ void FreecamMgr::Enable()
     Command<Commands::CAMERA_PERSIST_FOV>(true);
 }
 
-void FreecamMgr::Process()
+void FreecamMgr::DrawPages()
 {
     int delta = (CTimer::m_snTimeInMilliseconds - CTimer::m_snPreviousTimeInMilliseconds);
     int ratio = 1 / (1 + (delta * m_nMul));
@@ -183,7 +183,7 @@ FreecamMgr::FreecamMgr()
     {
         if (m_bEnabled)
         {
-            Process();
+            DrawPages();
         }
     };
 }
