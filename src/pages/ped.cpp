@@ -62,7 +62,7 @@ PedPage::PedPage()
 #elif GTA3
     CdeclEvent <AddressList<0x4CFE12, H_CALL>, PRIORITY_AFTER, ArgPickN<CPed*, 0>, void(CPed*)> onPreRender;
     
-    onPreRender += [](CPed* ped) 
+    onPreRender += [this](CPed* ped) 
     {
         if (!m_bBigHead)
         {
