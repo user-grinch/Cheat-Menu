@@ -8,7 +8,15 @@ private:
     friend class IFeature;
     WelcomePage() : IPage<WelcomePage>(ePageID::Welcome, "Welcome", false)
     {
-        PageHandler::SetCurrentPage(this);
+        Events::initGameEvent += [this]()
+        {
+            ePageID pageID = static_cast<ePageID>(gConfig.Get("Window.CurrentPage", static_cast<size_t>(ePageID::Welcome)));
+            PagePtr ptr = PageHandler::FindPagePtr(pageID);
+            if (ptr)
+            {
+                PageHandler::SetCurrentPage(ptr);
+            }
+        };
     }
     WelcomePage(const WelcomePage&);
 

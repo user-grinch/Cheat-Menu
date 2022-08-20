@@ -135,3 +135,16 @@ void PageHandler::DrawPages()
         ImGui::EndChild();
     }
 }
+
+PagePtr PageHandler::FindPagePtr(ePageID id)
+{
+    for (void* ptr : m_PageList)
+    {
+        IPageStatic* page = reinterpret_cast<IPageStatic*>(ptr);
+        if (page->GetPageID() == id)
+        {
+            return reinterpret_cast<PagePtr>(page);
+        }
+    }
+    return nullptr;
+}

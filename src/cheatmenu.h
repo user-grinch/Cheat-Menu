@@ -8,15 +8,15 @@
 class CheatMenu
 {
 private:
-    static inline ImVec2 m_fMenuSize = ImVec2(screen::GetScreenWidth() / 4, screen::GetScreenHeight() / 1.2);
-    static inline bool m_bShowMenu = false;             // should the menu be drawn
-    static inline bool m_bSizeChangedExternal = false;  // Was menu size change requested
+    static inline ImVec2 m_fSize = ImVec2(screen::GetScreenWidth() / 4, screen::GetScreenHeight() / 1.2);
+    static inline bool m_bVisible = false;      // should the menu be drawn
+    static inline bool m_bSizeUpdated = false;  // Was menu size change requested
 
     // Applies imgui theme to the menu
     static void ApplyStyle();
 
     // Draws the window ui each frame
-    static void DrawWindow();
+    static void Draw();
 
 public:
     CheatMenu() = delete;
@@ -26,7 +26,7 @@ public:
     static void Init();
 
     // Returns true if the menu is being shown
-    static bool IsBeingDrawn();
+    static bool IsVisible();
 
     // Resets the menu height & width to default
     static void ResetSize();

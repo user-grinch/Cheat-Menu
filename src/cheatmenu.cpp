@@ -60,7 +60,7 @@ static bool DrawTitleBar()
     return pressed;
 }
 
-void CheatMenu::DrawWindow()
+void CheatMenu::Draw()
 {
     ImGuiIO& io = ImGui::GetIO();
     static bool bRunning = true;
@@ -77,26 +77,30 @@ void CheatMenu::DrawWindow()
     else
     {
         bRunning = true;
-        if (m_bShowMenu)
+        if (m_bVisible)
         {
-            ImGui::SetNextWindowSize(m_fMenuSize);
+            ImGui::SetNextWindowSize(m_fSize);
 
             if (ImGui::Begin(MENU_TITLE, NULL, ImGuiWindowFlags_NoCollapse || ImGuiWindowFlags_NoTitleBar))
             {
-                m_bShowMenu = !DrawTitleBar();
+                m_bVisible = !DrawTitleBar();
                 ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(250, 350));
                 ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
                                     ImVec2(ImGui::GetWindowWidth() / 85, ImGui::GetWindowHeight() / 200));
 
                 PageHandler::DrawPages();
 
-                if (m_bSizeChangedExternal)
-                    m_bSizeChangedExternal = false;
+                if (m_bSizeUpdated)
+                {
+                    m_bSizeUpdated = false;
+                }
                 else
-                    m_fMenuSize = ImGui::GetWindowSize();
+                {
+                    m_fSize = ImGui::GetWindowSize();
+                }
 
-                gConfig.Set("Window.SizeX", m_fMenuSize.x);
-                gConfig.Set("Window.SizeY", m_fMenuSize.y);
+                gConfig.Set("Window.SizeX", m_fSize.x);
+                gConfig.Set("Window.SizeY", m_fSize.y);
 
                 ImGui::PopStyleVar(2);
                 ImGui::End();
@@ -114,15 +118,14 @@ void CheatMenu::Init()
         return;
     }
 
-    if (!D3dHook::Init(DrawWindow))
+    if (!D3dHook::Init(Draw))
     {
         return;
     }
 
     // Load menu settings
-    // m_nMenuPage = (eMenuPages)gConfig.Get("Window.CurrentPage", (size_t)eMenuPages::WELCOME);
-    m_fMenuSize.x = gConfig.Get("Window.SizeX", screen::GetScreenWidth() / 4.0f);
-    m_fMenuSize.y = gConfig.Get("Window.SizeY", screen::GetScreenHeight() / 1.2f);
+    m_fSize.x = gConfig.Get("Window.SizeX", screen::GetScreenWidth() / 4.0f);
+    m_fSize.y = gConfig.Get("Window.SizeY", screen::GetScreenHeight() / 1.2f);
     srand(CTimer::m_snTimeInMilliseconds);
 
     ApplyStyle();
@@ -135,7 +138,7 @@ void CheatMenu::Init()
         {
             if (menuOpen.Pressed())
             {
-                m_bShowMenu = !m_bShowMenu;
+                m_bVisible = !m_bVisible;
             }
 
             if (commandWindow.Pressed())
@@ -144,14 +147,14 @@ void CheatMenu::Init()
             }
 
             bool mouseState = D3dHook::GetMouseState();
-            if (mouseState != m_bShowMenu)
+            if (mouseState != m_bVisible)
             {
                 if (mouseState) // Only write when the menu closes
                 {
                     gConfig.Save();
                 }
 
-                D3dHook::SetMouseState(m_bShowMenu);
+                D3dHook::SetMouseState(m_bVisible);
             }
 
             if (teleportPage.IsQuickTeleportActive() && quickTeleport.PressedRealtime())
@@ -162,9 +165,9 @@ void CheatMenu::Init()
     };
 }
 
-bool CheatMenu::IsBeingDrawn()
+bool CheatMenu::IsVisible()
 {
-    return m_bShowMenu;
+    return m_bVisible;
 }
 
 void CheatMenu::ApplyStyle()
@@ -235,7 +238,7 @@ void CheatMenu::ApplyStyle()
 
 void CheatMenu::ResetSize()
 {
-    m_fMenuSize.x = screen::GetScreenWidth() / 4.0f;
-    m_fMenuSize.y = screen::GetScreenHeight() / 1.2f;
-    m_bSizeChangedExternal = true;
+    m_fSize.x = screen::GetScreenWidth() / 4.0f;
+    m_fSize.y = screen::GetScreenHeight() / 1.2f;
+    m_bSizeUpdated = true;
 }

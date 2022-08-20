@@ -45,10 +45,13 @@ TeleportPage& teleportPage = TeleportPage::Get();
 TeleportPage::TeleportPage()
 : IPage<TeleportPage>(ePageID::Teleport, "Window.TeleportPage", true)
 {
-    m_bTeleportMarker = gConfig.Get("Features.TeleportMarker", false);
-    m_bQuickTeleport = gConfig.Get("Features.QuickTeleport", false);
-    m_fMapSize.x = gConfig.Get("Game.MapSizeX", 6000.0f);
-    m_fMapSize.y = gConfig.Get("Game.MapSizeY", 6000.0f);
+    Events::initGameEvent += [this]()
+    {
+        m_bTeleportMarker = gConfig.Get("Features.TeleportMarker", false);
+        m_bQuickTeleport = gConfig.Get("Features.QuickTeleport", false);
+        m_fMapSize.x = gConfig.Get("Game.MapSizeX", 6000.0f);
+        m_fMapSize.y = gConfig.Get("Game.MapSizeY", 6000.0f);
+    };
 
     Events::drawingEvent += [this]
     {

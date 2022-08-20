@@ -20,8 +20,12 @@ VehiclePage::VehiclePage()
 : IPage<VehiclePage>(ePageID::Vehicle, "Window.VehiclePage", true)
 {
     // Get config data
-    m_Spawner.m_bInAir = gConfig.Get("Features.SpawnAircraftInAir", true);
-    m_Spawner.m_bAsDriver = gConfig.Get("Features.SpawnInsideVehicle", true);
+    Events::initGameEvent += [this]()
+    {
+        m_Spawner.m_bInAir = gConfig.Get("Features.SpawnAircraftInAir", true);
+        m_Spawner.m_bAsDriver = gConfig.Get("Features.SpawnInsideVehicle", true);
+    };
+    
 
     Events::processScriptsEvent += [this]
     {

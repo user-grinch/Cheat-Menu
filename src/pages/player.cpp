@@ -36,7 +36,10 @@ PlayerPage::PlayerPage()
 #ifdef GTASA
 //	Fix player model being broken after rebuild
     patch::RedirectCall(0x5A834D, &PlayerModelBrokenFix);
-    m_bAimSkinChanger = gConfig.Get("Features.AimSkinChanger", false);
+    Events::initGameEvent += [this]()
+    {
+        m_bAimSkinChanger = gConfig.Get("Features.AimSkinChanger", false);
+    };
 #endif
 
     Events::processScriptsEvent += [this]

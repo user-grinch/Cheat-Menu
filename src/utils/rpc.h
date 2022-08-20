@@ -36,6 +36,6 @@ public:
     RPC(RPC&) = delete;
 
     static void Init();
-    static void DrawPages();
+    static void Process();
     static void Shutdown();
 };

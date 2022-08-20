@@ -11,9 +11,12 @@ MenuPage& menuPage = MenuPage::Get();
 MenuPage::MenuPage()
 : IPage<MenuPage>(ePageID::Menu, "Window.MenuPage", true)
 {
-    m_bDiscordRPC = gConfig.Get("Menu.DiscordRPC", false);
-    m_bAutoCheckUpdate = gConfig.Get("Menu.AutoCheckUpdate", true);
-    m_bTextOnlyMode = gConfig.Get("Menu.TextOnlyMode", false);
+    Events::initGameEvent += [this]()
+    {
+        m_bDiscordRPC = gConfig.Get("Menu.DiscordRPC", false);
+        m_bAutoCheckUpdate = gConfig.Get("Menu.AutoCheckUpdate", true);
+        m_bTextOnlyMode = gConfig.Get("Menu.TextOnlyMode", false);
+    };
 
     if (m_bDiscordRPC)
     {

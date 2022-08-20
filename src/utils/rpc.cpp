@@ -3,7 +3,7 @@
 #include "utils/util.h"
 #include "pages/menu.h"
 #include "pages/vehicle.h"
-#include "cheatmenu.h"
+#include "menu.h"
 
 // discord server ids
 const char* id = BY_GAME("951199292981403669", "951448264195059712", "951457540573655080");
@@ -66,7 +66,7 @@ void RPC::Init()
     }
 }
 
-void RPC::DrawPages()
+void RPC::Process()
 {
     if (!(menuPage.m_bDiscordRPC && bInit))
     {
@@ -133,7 +133,7 @@ void RPC::DrawPages()
         }
 
 
-        if (CheatMenu::IsBeingDrawn())
+        if (MenuMgr::IsBeingDrawn())
         {
             stateText = TEXT("RPC.BrowsingCheatMenu");
         }

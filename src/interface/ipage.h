@@ -42,7 +42,9 @@ public:
 
     // Add a new page
     static void AddPage(PagePtr page, size_t index);
+    static PagePtr FindPagePtr(ePageID id);
     static void SetCurrentPage(PagePtr page);
+
 };
 
 /*
@@ -84,4 +86,5 @@ public:
     {
         return m_NameKey;
     }
+
 };
