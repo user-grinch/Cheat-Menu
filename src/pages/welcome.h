@@ -5,7 +5,7 @@
 class WelcomePage : public IPage<WelcomePage>
 {
 private:
-    friend IPage;
+    friend class IFeature;
     WelcomePage() : IPage<WelcomePage>(ePageID::Welcome, "Welcome", false)
     {
         PageHandler::SetCurrentPage(this);

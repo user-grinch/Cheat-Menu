@@ -31,7 +31,7 @@ private:
 public:
     ResourceStore m_locData{"locations", eResourceType::TYPE_TEXT};
 
-    friend IPage;
+    friend class IFeature;
     TeleportPage();
     TeleportPage(const TeleportPage&);
 

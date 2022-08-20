@@ -127,14 +127,6 @@ void CheatMenu::Init()
 
     ApplyStyle();
     Locale::Init(FILE_NAME "/locale/", "English", "English");
-    // GenHeaderList();
-    
-    // Init menu parts
-    Player::Init();
-    Ped::Init();
-    Vehicle::Init();
-    Visual::Init();
-    WeaponPage::Init();
     Overlay::Init();
 
     Events::processScriptsEvent += []()

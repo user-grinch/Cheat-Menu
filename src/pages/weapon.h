@@ -1,59 +1,65 @@
 #pragma once
 #include "pch.h"
+#include "interface/ipage.h"
 
-class WeaponPage
+class WeaponPage : public IPage<WeaponPage>
 {
 private:
-    static inline bool m_bFastReload;
-    static inline bool m_bHugeDamage;
-    static inline bool m_bLongRange;
-    static inline int m_nAmmoCount = 99999;
-    static inline int m_nSelectedWeapon;
+    bool m_bFastReload;
+    bool m_bHugeDamage;
+    bool m_bLongRange;
+    int m_nAmmoCount = 99999;
 
 #ifdef GTASA
-    static inline bool m_bAutoAim;
-    static inline bool m_bRapidFire;
-    static inline bool m_bDualWeild;
-    static inline bool m_bMoveAim;
-    static inline bool m_bMoveFire;
-    static inline bool m_bNoSpread;
-    static inline int m_nSelectedGang;
-    static inline int m_nGangWeaponList[10][3] =
+    bool m_bAutoAim;
+    bool m_bRapidFire;
+    bool m_bDualWeild;
+    bool m_bMoveAim;
+    bool m_bMoveFire;
+    bool m_bNoSpread;
+    struct GangStruct
     {
-        {WEAPON_PISTOL, WEAPON_MICRO_UZI, WEAPON_UNARMED}, // Ballas
-        {WEAPON_PISTOL, WEAPON_UNARMED, WEAPON_UNARMED}, // Grove
-        {WEAPON_PISTOL, WEAPON_UNARMED, WEAPON_UNARMED}, // Vagos
-        {WEAPON_UNARMED, WEAPON_UNARMED, WEAPON_UNARMED}, // SF Rifa
-        {WEAPON_PISTOL, WEAPON_MICRO_UZI, WEAPON_UNARMED}, // Da Nang Boys
-        {WEAPON_DESERT_EAGLE, WEAPON_UNARMED, WEAPON_UNARMED}, // Mafia
-        {WEAPON_PISTOL, WEAPON_AK47, WEAPON_UNARMED}, // Triads
-        {WEAPON_PISTOL, WEAPON_MICRO_UZI, WEAPON_UNARMED}, // VLA
-        {WEAPON_UNARMED, WEAPON_UNARMED, WEAPON_UNARMED}, // Gang 9
-        {WEAPON_UNARMED, WEAPON_UNARMED, WEAPON_UNARMED}, // Gang 10
-    };
+        int m_nSelected;
+        int m_nSelectedWeapon;
+        int m_WeaponList[10][3] =
+        {
+            {WEAPON_PISTOL, WEAPON_MICRO_UZI, WEAPON_UNARMED},      // Ballas
+            {WEAPON_PISTOL, WEAPON_UNARMED, WEAPON_UNARMED},        // Grove
+            {WEAPON_PISTOL, WEAPON_UNARMED, WEAPON_UNARMED},        // Vagos
+            {WEAPON_UNARMED, WEAPON_UNARMED, WEAPON_UNARMED},       // SF Rifa
+            {WEAPON_PISTOL, WEAPON_MICRO_UZI, WEAPON_UNARMED},      // Da Nang Boys
+            {WEAPON_DESERT_EAGLE, WEAPON_UNARMED, WEAPON_UNARMED},  // Mafia
+            {WEAPON_PISTOL, WEAPON_AK47, WEAPON_UNARMED},           // Triads
+            {WEAPON_PISTOL, WEAPON_MICRO_UZI, WEAPON_UNARMED},      // VLA
+            {WEAPON_UNARMED, WEAPON_UNARMED, WEAPON_UNARMED},       // Gang 9
+            {WEAPON_UNARMED, WEAPON_UNARMED, WEAPON_UNARMED},       // Gang 10
+        };
+
+        void SetWeapon(std::string& weaponType);
+    } m_Gang;
 
 #else
-    static inline bool m_bInfiniteAmmo;
+    bool m_bInfiniteAmmo;
 #endif
+
+    friend class IFeature;
+    WeaponPage();
+    WeaponPage(const WeaponPage&);
 
 public:
-    WeaponPage() = delete;
-    WeaponPage(const WeaponPage&) = delete;
+    ResourceStore m_WeaponData { "weapons", BY_GAME(eResourceType::TYPE_IMAGE_TEXT, eResourceType::TYPE_TEXT,
+                                eResourceType::TYPE_TEXT), ImVec2(65, 65) };
 
-    static void Init();
-
-    static void Draw();
+    // Add new weapon entry
+    void AddNew();
+    void Draw();
     
-    static void AddNew();
 #ifdef GTASA
-    static inline ResourceStore m_WeaponData { "weapons", eResourceType::TYPE_IMAGE_TEXT, ImVec2(65, 65) };
-    
-    static void GiveWeaponToPlayer(std::string& weapon_type);
-    static void SetGangWeapon(std::string& weapon_type);
+    void GiveWeaponToPlayer(std::string& weaponType);
 #else
-    static inline ResourceStore m_WeaponData { "weapons", eResourceType::TYPE_TEXT };
-
-    static void GiveWeaponToPlayer(std::string& rootkey, std::string& model, std::string& name);
+    void GiveWeaponToPlayer(std::string& rootkey, std::string& model, std::string& name);
 #endif
 };
+
+extern WeaponPage& weaponPage;
 

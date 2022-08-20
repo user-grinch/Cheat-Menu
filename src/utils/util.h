@@ -19,24 +19,29 @@ public:
     Util(Util&) = delete;
 
 #ifdef GTASA
+    static void ClearCharTasksCarCheck(CPed* ped);
     static int GetLargestGangInZone();
-    static void ClearCharTasksVehCheck(CPed* ped);
     static bool IsOnMission();
 #endif
-
+    
     static ImVec2 ConvertScreenToMap(ImVec2 pos, ImVec2 mapSz, ImVec2 screenSz);
     static ImVec2 ConvertMapToScreen(ImVec2 pos, ImVec2 mapSz, ImVec2 screenSz);
-    static void UnFlipVehicle(CVehicle *pVeh);
-    static void FixVehicle(CVehicle *pVeh);
-    static CPed* GetClosestPed();
-    static CVehicle* GetClosestVehicle();
+
+    static void FixCar(CVehicle *pVeh);
+    static void SetCarForwardSpeed(CVehicle *pVeh, float speed);
+    static CVehicle* GetClosestCar();
+    static int GetCarModel(const char* name);
+    static std::string GetCarName(int model);
+    static bool IsInCar(CPed *pPed = FindPlayerPed());
+    static void UnFlipCar(CVehicle *pVeh);
+
     static void GetCPUUsageInit();
     static double GetCurrentCPUUsage();
+    static float RoundFloat(float val);
+    
+    static CPed* GetClosestPed();
     static std::string GetLocationName(CVector* pos);
     static bool IsOnCutscene();
-    static bool IsInVehicle(CPed *pPed = FindPlayerPed());
     static void RainbowValues(int& r, int& g, int& b, float speed);
-    static void SetCarForwardSpeed(CVehicle *pVeh, float speed);
     static void SetMessage(const char *message, bool b1 = false, bool b2 = false, bool b3 = false);
-    static float RoundFloat(float val);
 };

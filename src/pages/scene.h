@@ -8,7 +8,7 @@
 class ScenePage : public IPage<ScenePage>
 {
 private:
-    friend IPage;
+    friend class IFeature;
     ScenePage() : IPage<ScenePage>(ePageID::Scene, "Window.ScenePage", true){}
     ScenePage(const ScenePage&);
 

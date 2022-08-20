@@ -5,9 +5,17 @@
 #include "imgui/imgui_internal.h"
 #include "pages/welcome.h"
 
-void PageHandler::AddPage(PagePtr page)
+void PageHandler::AddPage(PagePtr page, size_t index)
 {
-    m_PageList.push_back(page);
+    static size_t size = static_cast<size_t>(ePageID::None);
+    if (index <= size)
+    {
+        if (m_PageList.size() < size)
+        {
+            m_PageList.resize(size);
+        }
+        m_PageList[index] = page;
+    }
 }
 
 void PageHandler::SetCurrentPage(PagePtr page)

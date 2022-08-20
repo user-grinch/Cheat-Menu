@@ -14,7 +14,7 @@ private:
     bool m_bHudState;     // backup of the prev game hud state
     bool m_bRadarState;   // backup of the prev game radar state
 
-    friend ICheat;
+    friend class IFeature;
     FreecamMgr();
     FreecamMgr(const FreecamMgr&);
 

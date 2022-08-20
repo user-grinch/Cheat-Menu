@@ -6,6 +6,7 @@
 #include <d3d11Shader.h>
 #include <filesystem>
 #include <fstream>
+#include <functional>
 #include <memory>
 #include <iostream>
 #include <sstream>
@@ -67,25 +68,26 @@
 
 using namespace plugin;
 
-enum eRenderer
+enum class eRenderer
 {
-    Render_DirectX9,
-    Render_DirectX11,
-    Render_Unknown
+    DirectX9,
+    DirectX11,
+    Unknown
 };
 
 extern eRenderer gRenderer;
 extern DataStore gConfig;
 
-typedef std::string str;
-typedef void(*fArg3_t)(str&, str&, str&);
-typedef void(*fArg1_t)(str&);
-typedef void(*fArgNone_t)();
-typedef std::string(*fRtnArg1_t)(str&);
-typedef bool(*fRtnBoolArg1_t)(str&);
+using str = std::string;
+using fArgNone_t = std::function<void()>;
+using fArg1_t = std::function<void(str&)>;
+using fArg3_t = std::function<void(str&, str&, str&)>;
+using fRtnArg1_t = std::function<std::string(str&)>;
+using fRtnBoolArg1_t = std::function<bool(str&)>;
 
 #define fArg3Wrapper(x) [](str& a, str& b, str& c){x(a, b, c);}
 #define fArgWrapper(x) [](str& a){x(a);}
+#define fRtnArgWrapper(x) [](str& a){return x(a);}
 #define fArgNoneWrapper(x) [](){x();}
 
 #ifdef GTASA

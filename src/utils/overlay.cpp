@@ -102,7 +102,7 @@ void Overlay::ProcessModelInfo()
 #ifdef GTASA
                 if (pEnt->m_nType == ENTITY_TYPE_VEHICLE)
                 {
-                    text = std::format("{}\n{}", model, Vehicle::GetNameFromModel(model));
+                    text = std::format("{}\n{}", model, Util::GetCarName(model));
                 }
                 else if (pEnt->m_nType == ENTITY_TYPE_PED)
                 {
@@ -326,7 +326,7 @@ void Overlay::ProcessCommands(std::string&& str)
         if (wep_name == "jetpack")
         {
             std::string weapon = "-1";
-            WeaponPage::GiveWeaponToPlayer(weapon);
+            weaponPage.GiveWeaponToPlayer(weapon);
             Util::SetMessage(TEXT("Menu.WeaponSpawned"));
         }
         else
@@ -337,7 +337,7 @@ void Overlay::ProcessCommands(std::string&& str)
 
             if (wep_name != "" && pweaponinfo->m_nModelId1 != -1)
             {
-                WeaponPage::GiveWeaponToPlayer(weapon_name);
+                weaponPage.GiveWeaponToPlayer(weapon_name);
                 Util::SetMessage(TEXT("Menu.WeaponSpawned"));
             }
             else
@@ -351,11 +351,11 @@ void Overlay::ProcessCommands(std::string&& str)
         std::string veh_name;
         ss >> veh_name;
 
-        int model = Vehicle::GetModelFromName(veh_name.c_str());
+        int model = Util::GetCarModel(veh_name.c_str());
         if (model != 0)
         {
             std::string smodel = std::to_string(model);
-            Vehicle::SpawnVehicle(smodel);
+            vehiclePage.SpawnVehicle(smodel);
             Util::SetMessage(TEXT("Menu.VehicleSpawned"));
         }
         else

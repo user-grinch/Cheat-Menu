@@ -133,7 +133,9 @@ static std::vector<std::string> m_WeatherNames
 #endif
 };
 
-void Visual::Init()
+VisualPage& visualPage = VisualPage::Get();
+VisualPage::VisualPage()
+: IPage<VisualPage>(ePageID::Visual, "Window.VisualPage", true)
 {
 #ifdef GTASA
     if (GetModuleHandle("timecycle24.asi"))
@@ -142,7 +144,7 @@ void Visual::Init()
     }
 #endif
 
-    Events::processScriptsEvent += []
+    Events::processScriptsEvent += [this]
     {
         // TODO: Needs improvement
         static short m_nBacWeatherType;
@@ -401,7 +403,7 @@ void TimecycSlider(const char* label, T* ptr, int min, int max)
 }
 
 template<typename T>
-bool Visual::TimeCycColorEdit3(const char* label, T* r, T* g, T* b, ImGuiColorEditFlags flags)
+bool VisualPage::TimeCycColorEdit3(const char* label, T* r, T* g, T* b, ImGuiColorEditFlags flags)
 {
     bool rtn = false;
     int val = CalcArrayIndex();
@@ -430,7 +432,7 @@ bool Visual::TimeCycColorEdit3(const char* label, T* r, T* g, T* b, ImGuiColorEd
 }
 
 template <typename T>
-void Visual::TimecycSlider(const char* label, T* ptr, int min, int max)
+void VisualPage::TimecycSlider(const char* label, T* ptr, int min, int max)
 {
     int val = CalcArrayIndex();
 #ifdef GTASA
@@ -446,7 +448,7 @@ void Visual::TimecycSlider(const char* label, T* ptr, int min, int max)
 }
 
 template <typename T>
-bool Visual::TimeCycColorEdit4(const char* label, T* r, T* g, T* b, T* a, ImGuiColorEditFlags flags)
+bool VisualPage::TimeCycColorEdit4(const char* label, T* r, T* g, T* b, T* a, ImGuiColorEditFlags flags)
 {
     bool rtn = false;
     int val = CalcArrayIndex();
@@ -522,7 +524,7 @@ static void ColorPickerAddr(const char* label, int addr, ImVec4&& default_color)
     }
 }
 
-void Visual::PatchRadar()
+void VisualPage::PatchRadar()
 {
 #ifdef GTASA
     static float clockPosX = *(float*)*(int*)0x58EC16;
@@ -598,7 +600,7 @@ void Visual::PatchRadar()
 #endif
 }
 
-void Visual::ShowPage()
+void VisualPage::Draw()
 {
     if (ImGui::BeginTabBar("Visual", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {
@@ -619,11 +621,11 @@ void Visual::ShowPage()
                 if (m_bDisableHydrant)
                 {
                     // don't call Fx_c::TriggerWaterHydrant
-                    plugin::patch::Nop(0x4A0D70, 5);
+                    patch::Nop(0x4A0D70, 5);
                 }
                 else
                 {
-                    plugin::patch::SetRaw(0x4A0D70, (char*)"\xE9\x94\x3F\xF6\xFF", 5);
+                    patch::SetRaw(0x4A0D70, (char*)"\xE9\x94\x3F\xF6\xFF", 5);
                 }
             }
             Widget::CheckboxAddr(TEXT("Visual.FogEffect"), 0xC402C6);
@@ -650,18 +652,18 @@ void Visual::ShowPage()
                 else
                 {
                     // restore
-                    plugin::patch::SetRaw(0x575BF6, (char*)"\xE8\x65\x1F\x1B\x00", 5);
-                    plugin::patch::SetRaw(0x575C40, (char*)"\xE8\x1B\x1F\x1B\x00", 5);
-                    plugin::patch::SetRaw(0x575C84, (char*)"\xE8\xD7\x1E\x1B\x00", 5);
-                    plugin::patch::SetRaw(0x575CCE, (char*)"\xE8\x8D\x1E\x1B\x00", 5);
-                    plugin::patch::SetRaw(0x575D1F, (char*)"\xE8\x3C\x1E\x1B\x00", 5);
-                    plugin::patch::SetRaw(0x575D6F, (char*)"\xE8\xEC\x1D\x1B\x00", 5);
-                    plugin::patch::SetRaw(0x575DC2, (char*)"\xE8\x99\x1D\x1B\x00", 5);
-                    plugin::patch::SetRaw(0x575E12, (char*)"\xE8\x49\x1D\x1B\x00", 5);
-                    plugin::patch::SetRaw(0x5754EC, (char*)"\xD8\x0D\x20\x95\x85\x00", 6);
-                    plugin::patch::SetRaw(0x575537, (char*)"\xD8\x0D\x24\x95\x85\x00", 6);
-                    plugin::patch::SetRaw(0x575311, (char*)"\xD8\x0D\x70\x53\x86\x00", 6);
-                    plugin::patch::SetRaw(0x575361, (char*)"\xD8\x0D\x6C\x53\x86\x00", 6);
+                    patch::SetRaw(0x575BF6, (char*)"\xE8\x65\x1F\x1B\x00", 5);
+                    patch::SetRaw(0x575C40, (char*)"\xE8\x1B\x1F\x1B\x00", 5);
+                    patch::SetRaw(0x575C84, (char*)"\xE8\xD7\x1E\x1B\x00", 5);
+                    patch::SetRaw(0x575CCE, (char*)"\xE8\x8D\x1E\x1B\x00", 5);
+                    patch::SetRaw(0x575D1F, (char*)"\xE8\x3C\x1E\x1B\x00", 5);
+                    patch::SetRaw(0x575D6F, (char*)"\xE8\xEC\x1D\x1B\x00", 5);
+                    patch::SetRaw(0x575DC2, (char*)"\xE8\x99\x1D\x1B\x00", 5);
+                    patch::SetRaw(0x575E12, (char*)"\xE8\x49\x1D\x1B\x00", 5);
+                    patch::SetRaw(0x5754EC, (char*)"\xD8\x0D\x20\x95\x85\x00", 6);
+                    patch::SetRaw(0x575537, (char*)"\xD8\x0D\x24\x95\x85\x00", 6);
+                    patch::SetRaw(0x575311, (char*)"\xD8\x0D\x70\x53\x86\x00", 6);
+                    patch::SetRaw(0x575361, (char*)"\xD8\x0D\x6C\x53\x86\x00", 6);
                 }
             }
             Widget::CheckboxAddr(TEXT("Visual.GrainEffect"), 0xC402B4);
@@ -692,14 +694,14 @@ void Visual::ShowPage()
                     if (m_bInvisibleWater)
                     {
                         // don't call CWaterLevel::RenderWater()
-                        plugin::patch::Nop(0x53E004, 5);
-                        plugin::patch::Nop(0x53E142, 5);
+                        patch::Nop(0x53E004, 5);
+                        patch::Nop(0x53E142, 5);
                     }
                     else
                     {
                         // restore call CWaterLevel::RenderWater()
-                        plugin::patch::SetRaw(0x53E004, (char*)"\xE8\x47\x16\x1B\x00", 5);
-                        plugin::patch::SetRaw(0x53E142, (char*)"\xE8\x09\x15\x1B\x00", 5);
+                        patch::SetRaw(0x53E004, (char*)"\xE8\x47\x16\x1B\x00", 5);
+                        patch::SetRaw(0x53E142, (char*)"\xE8\x09\x15\x1B\x00", 5);
                     }
                 }
             }
@@ -740,7 +742,7 @@ void Visual::ShowPage()
                     patch::Set<float>(0xBA830C, 0.0);
                     patch::Set<float>(0xBA8308, 1.0);
                     
-                    // stop map rotaiton
+                    // stop map rotation
                     patch::Nop(0x5837FB, 6);
                     patch::Nop(0x583805, 6);
                     patch::Nop(0x58380D, 6);
@@ -763,20 +765,20 @@ void Visual::ShowPage()
                 if (m_bNoWater)
                 {
                     // don't call CWaterLevel::RenderWater()
-                    plugin::patch::Nop(0x53E004, 5);
-                    plugin::patch::Nop(0x53E142, 5);
+                    patch::Nop(0x53E004, 5);
+                    patch::Nop(0x53E142, 5);
 
                     // rtn CWaterLevel::GetWaterLevelNoWaves
-                    plugin::patch::SetRaw(0x6E8580, (char*)"\x32\xC0\xC3", 3);
+                    patch::SetRaw(0x6E8580, (char*)"\x32\xC0\xC3", 3);
                 }
                 else
                 {
                     // restore call CWaterLevel::RenderWater()
-                    plugin::patch::SetRaw(0x53E004, (char*)"\xE8\x47\x16\x1B\x00", 5);
-                    plugin::patch::SetRaw(0x53E142, (char*)"\xE8\x09\x15\x1B\x00", 5);
+                    patch::SetRaw(0x53E004, (char*)"\xE8\x47\x16\x1B\x00", 5);
+                    patch::SetRaw(0x53E142, (char*)"\xE8\x09\x15\x1B\x00", 5);
 
                     // restore CWaterLevel::GetWaterLevelNoWaves
-                    plugin::patch::SetRaw(0x6E8580, (char*)"\x51\xD9\x44", 3);
+                    patch::SetRaw(0x6E8580, (char*)"\x51\xD9\x44", 3);
                 }
             }
             bool radar_state = (patch::Get<BYTE>(0xBA676C) != 2);

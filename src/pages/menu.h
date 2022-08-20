@@ -8,7 +8,7 @@ public:
     bool m_bDiscordRPC;       // Is the discord rich presence enabled
     bool m_bTextOnlyMode;     // Hide all menu images mode
 
-    friend IPage;
+    friend class IFeature;
     MenuPage();
     MenuPage(const MenuPage&);
 

@@ -1,5 +1,5 @@
 #include "pch.h"
-eRenderer gRenderer = Render_Unknown;
+eRenderer gRenderer = eRenderer::Unknown;
 DataStore gConfig = DataStore(FILE_NAME, true);
 
 ResourceStore gTextureList { "misc", eResourceType::TYPE_IMAGE, ImVec2(100, 80) };

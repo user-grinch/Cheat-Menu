@@ -324,7 +324,7 @@ void Widget::ImageList(ResourceStore &store, fArg1_t clickFunc, fRtnArg1_t getNa
     m_ImageSize.x /= imagesInRow;
 
     bool showImages = !menuPage.m_bTextOnlyMode;
-    if (gRenderer == Render_DirectX11)
+    if (gRenderer == eRenderer::DirectX11)
     {
         showImages = false;
     }

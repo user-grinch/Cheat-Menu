@@ -28,7 +28,7 @@ private:
     ResourceStore m_StatData{ "stats", eResourceType::TYPE_TEXT };
 #endif
 
-    friend IPage;
+    friend class IFeature;
     GamePage();
     GamePage(const GamePage&);
 

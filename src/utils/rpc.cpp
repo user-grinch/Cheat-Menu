@@ -121,7 +121,7 @@ void RPC::DrawPages()
         
         if (BY_GAME(pPed->m_nPedFlags.bInVehicle, pPed->m_bInVehicle, pPed->m_bInVehicle))
         {
-            std::string name = Vehicle::GetNameFromModel(pPed->m_pVehicle->m_nModelIndex);
+            std::string name = Util::GetCarName(pPed->m_pVehicle->m_nModelIndex);
             std::transform(name.begin(), name.end(), name.begin(), asciitolower);
             smallImgText = std::format("{} {} {} {}", TEXT("RPC.Driving"), name, TEXT("RPC.In"), Util::GetLocationName(&pPed->GetPosition()));
             smallImg = "drive";

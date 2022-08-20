@@ -1,47 +1,44 @@
 #pragma once
 #include "pch.h"
+#include "interface/ipage.h"
 
-class Player
+class PlayerPage : public IPage<PlayerPage>
 {
 private:
-    static inline bool m_bGodMode;
-    static inline bool m_bPlayerRegen;
-    static inline bool m_bModloaderInstalled;
-    struct KeepPosition
+    bool m_bGodMode;
+    bool m_bPlayerRegen;
+    struct 
     {
-        static inline bool m_bEnabled = false;
-        static inline CVector m_fPos;
-    };
-    static inline bool m_bKeepStuff;
-    static inline bool m_bFreezeWantedLevel;
+        bool m_bEnabled = false;
+        CVector m_fPos;
+    } m_RespawnDieLoc;
+    bool m_bKeepStuff;
+    bool m_bFreezeWantedLevel;
 
 #ifdef GTAVC
-    static inline bool m_bNoUndress;
+    bool m_bNoUndress;          // Tommy won't lose clothes after busted/ wasted
 #endif
 
 #ifdef GTASA
-    static inline bool m_bAimSkinChanger;
-    static inline bool m_bDrunkEffect;
-    static inline bool m_bFastSprint;
-    static inline ResourceStore m_ClothData { "clothes", eResourceType::TYPE_TEXT_IMAGE, ImVec2(70, 100)};
-    struct CustomSkins
-    {
-        static inline ImGuiTextFilter m_Filter;
-        static inline std::vector<std::string> m_List;
-    };
+    bool m_bAimSkinChanger;
+    bool m_bDrunkEffect;
+    bool m_bFastSprint;
+    ResourceStore m_ClothData { "clothes", eResourceType::TYPE_TEXT_IMAGE, ImVec2(70, 100)};
 
-    static void ChangePlayerModel(std::string& model);
-    static void ChangePlayerCloth(std::string& model);
+    void SetCloth(str& id);
+    void SetModel(str& id);
 #else
-    static inline ResourceStore skinData { BY_GAME(NULL, "skins", "peds"), eResourceType::TYPE_TEXT };
-    static void ChangePlayerModel(std::string& cat, std::string& name, std::string& id);
+    ResourceStore skinData { BY_GAME(NULL, "skins", "peds"), eResourceType::TYPE_TEXT };
+    void ChangePlayerModel(str& cat, str& name, str& id);
 #endif
+
+    friend class IFeature;
+    PlayerPage();
+    PlayerPage(const PlayerPage&);
 
 public:
 
-    Player() = delete;
-    Player(const Player&) = delete;
-
-    static void Init();
-    static void ShowPage();
+    void Draw();
 };
+
+extern PlayerPage &playerPage;

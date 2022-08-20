@@ -11,7 +11,7 @@ class AnimationMgr : public ICheat<AnimationMgr>
 private:
     CPed *m_pTarget = nullptr;    // target ped pointer
 
-    friend class ICheat;
+    friend class IFeature;
     AnimationMgr();
     AnimationMgr(const AnimationMgr&);
 

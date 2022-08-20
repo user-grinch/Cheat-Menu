@@ -8,6 +8,7 @@
 #ifdef GTASA
 #include "ped.h"
 #include "custom/topdowncam_sa.h"
+#include "custom/customskins_sa.h"
 
 static inline const char* clothNameList[18] =
 {
@@ -28,7 +29,9 @@ static inline void PlayerModelBrokenFix()
 }
 #endif
 
-void Player::Init()
+PlayerPage &playerPage = PlayerPage::Get();
+PlayerPage::PlayerPage()
+ : IPage<PlayerPage>(ePageID::Player, "Window.PlayerPage", true)
 {
 #ifdef GTASA
 //	Fix player model being broken after rebuild
@@ -36,42 +39,7 @@ void Player::Init()
     m_bAimSkinChanger = gConfig.Get("Features.AimSkinChanger", false);
 #endif
 
-
-    // Custom skins setup
-    std::string path = GAME_PATH((char*)"modloader/");
-    if (GetModuleHandle("modloader.asi") && std::filesystem::is_directory(path))
-    {
-#ifdef GTASA
-        path += "CustomSkins/";
-        if (std::filesystem::is_directory(path))
-        {
-            for (auto& p : std::filesystem::recursive_directory_iterator(path))
-            {
-                if (p.path().extension() == ".dff")
-                {
-                    std::string file_name = p.path().stem().string();
-
-                    if (file_name.size() < 9)
-                    {
-                        CustomSkins::m_List.push_back(file_name);
-                    }
-                    else
-                    {
-                        Log::Print<eLogLevel::Error>("Custom Skin longer than 8 characters {}", file_name);
-                    }
-                }
-            }
-        }
-        else
-        {
-            std::filesystem::create_directory(path);
-        }
-#endif
-
-        m_bModloaderInstalled = true;
-    }
-
-    Events::processScriptsEvent += []
+    Events::processScriptsEvent += [this]
     {
         uint timer = CTimer::m_snTimeInMilliseconds;
         CPlayerPed* player = FindPlayerPed();
@@ -123,22 +91,22 @@ void Player::Init()
             }
         }
 
-        if (KeepPosition::m_bEnabled)
+        if (m_RespawnDieLoc.m_bEnabled)
         {
             if (Command<Commands::IS_CHAR_DEAD>(hplayer))
             {
-                KeepPosition::m_fPos = player->GetPosition();
+                m_RespawnDieLoc.m_fPos = player->GetPosition();
             }
             else
             {
                 CVector cur_pos = player->GetPosition();
 
-                if (KeepPosition::m_fPos.x != 0 && KeepPosition::m_fPos.x != cur_pos.x
-                        && KeepPosition::m_fPos.y != 0 && KeepPosition::m_fPos.y != cur_pos.y)
+                if (m_RespawnDieLoc.m_fPos.x != 0 && m_RespawnDieLoc.m_fPos.x != cur_pos.x
+                        && m_RespawnDieLoc.m_fPos.y != 0 && m_RespawnDieLoc.m_fPos.y != cur_pos.y)
                 {
-                    BY_GAME(player->Teleport(KeepPosition::m_fPos, false)
-                            , player->Teleport(KeepPosition::m_fPos), player->Teleport(KeepPosition::m_fPos));
-                    KeepPosition::m_fPos = CVector(0, 0, 0);
+                    BY_GAME(player->Teleport(m_RespawnDieLoc.m_fPos, false)
+                            , player->Teleport(m_RespawnDieLoc.m_fPos), player->Teleport(m_RespawnDieLoc.m_fPos));
+                    m_RespawnDieLoc.m_fPos = CVector(0, 0, 0);
                 }
             }
         }
@@ -179,7 +147,7 @@ void Player::Init()
             if (targetPed)
             {
                 player->SetModelIndex(targetPed->m_nModelIndex);
-                Util::ClearCharTasksVehCheck(player);
+                Util::ClearCharTasksCarCheck(player);
             }
         }
 #endif
@@ -221,7 +189,7 @@ void Player::Init()
 }
 
 #ifdef GTASA
-void Player::ChangePlayerCloth(std::string& name)
+void PlayerPage::SetCloth(std::string& name)
 {
     int bodyPart;
     char model[16], tex[16];
@@ -259,47 +227,32 @@ void Player::ChangePlayerCloth(std::string& name)
 #endif
 
 #ifdef GTASA
-void Player::ChangePlayerModel(std::string& model)
+void PlayerPage::SetModel(std::string& model)
 {
-    bool custom_skin = std::find(CustomSkins::m_List.begin(), CustomSkins::m_List.end(), model) !=
-                       CustomSkins::m_List.end();
-
-    if (Ped::m_PedData.m_pData->Contains(model.c_str()) || custom_skin)
+    if (pedPage.m_PedData.m_pData->Contains(model.c_str()))
     {
         CPlayerPed* player = FindPlayerPed();
-        if (Ped::m_SpecialPedData.Contains(model.c_str()) || custom_skin)
+        if (pedPage.m_SpecialPedData.Contains(model.c_str()))
         {
-            std::string name;
-            if (Ped::m_SpecialPedData.Contains(model.c_str()))
-            {
-                name = Ped::m_SpecialPedData.Get(model.c_str(), "Unknown");
-            }
-            else
-            {
-                name = model;
-            }
-
+            std::string name = pedPage.m_SpecialPedData.Get(model.c_str(), "Unknown");
             CStreaming::RequestSpecialChar(1, name.c_str(), PRIORITY_REQUEST);
             CStreaming::LoadAllRequestedModels(true);
-
             player->SetModelIndex(291);
-
             CStreaming::SetSpecialCharIsDeletable(291);
         }
         else
         {
             int imodel = std::stoi(model);
-
             CStreaming::RequestModel(imodel, eStreamingFlags::PRIORITY_REQUEST);
             CStreaming::LoadAllRequestedModels(false);
             player->SetModelIndex(imodel);
             CStreaming::SetModelIsDeletable(imodel);
         }
-        Util::ClearCharTasksVehCheck(player);
+        Util::ClearCharTasksCarCheck(player);
     }
 }
 #else
-void Player::ChangePlayerModel(std::string& cat, std::string& key, std::string& val)
+void PlayerPage::ChangePlayerModel(std::string& cat, std::string& key, std::string& val)
 {
     CPlayerPed* player = FindPlayerPed();
 
@@ -329,7 +282,7 @@ void Player::ChangePlayerModel(std::string& cat, std::string& key, std::string& 
 }
 #endif
 
-void Player::ShowPage()
+void PlayerPage::Draw()
 {
     CPlayerPed* pPlayer = FindPlayerPed();
     int hplayer = CPools::GetPedRef(pPlayer);
@@ -574,7 +527,7 @@ void Player::ShowPage()
 #endif
             Widget::CheckboxAddr(TEXT("Player.NoFee"), (int)&pInfo->m_bGetOutOfJailFree);
 
-            Widget::Checkbox(TEXT("Player.RespawnDieLoc"), &KeepPosition::m_bEnabled, TEXT("Player.RespawnDieLocTip"));
+            Widget::Checkbox(TEXT("Player.RespawnDieLoc"), &m_RespawnDieLoc.m_bEnabled, TEXT("Player.RespawnDieLocTip"));
             Widget::Checkbox(TEXT("Player.PlayerRegen"), &m_bPlayerRegen, TEXT("Player.PlayerRegenTip"));
 #ifdef GTASA
             static bool sprintInt = false;
@@ -684,7 +637,7 @@ void Player::ShowPage()
                     if (ImGui::Button(TEXT("Player.ChangeToCJ"), ImVec2(Widget::CalcSize(1))))
                     {
                         pPlayer->SetModelIndex(0);
-                        Util::ClearCharTasksVehCheck(pPlayer);
+                        Util::ClearCharTasksCarCheck(pPlayer);
                     }
                 }
                 ImGui::Spacing();
@@ -806,7 +759,8 @@ void Player::ShowPage()
                 {
                     if (pPlayer->m_nModelIndex == 0)
                     {
-                        Widget::ImageList(m_ClothData, ChangePlayerCloth, [](std::string& str)
+                        Widget::ImageList(m_ClothData, fArgWrapper(playerPage.SetCloth), 
+                        [](std::string& str)
                         {
                             std::stringstream ss(str);
                             std::string temp;
@@ -825,7 +779,7 @@ void Player::ShowPage()
                         if (ImGui::Button(TEXT("Player.ChangeToCJ"), ImVec2(Widget::CalcSize(1))))
                         {
                             pPlayer->SetModelIndex(0);
-                            Util::ClearCharTasksVehCheck(pPlayer);
+                            Util::ClearCharTasksCarCheck(pPlayer);
                         }
                     }
                     ImGui::EndTabItem();
@@ -837,7 +791,6 @@ void Player::ShowPage()
                     ImGui::Spacing();
 
                     ImGui::BeginChild("ClothesRemove");
-                    size_t count = 0;
                     if (ImGui::Button(TEXT("Player.RemoveAll"), ImVec2(Widget::CalcSize(2))))
                     {
                         CPlayerPed* player = FindPlayerPed();
@@ -848,12 +801,13 @@ void Player::ShowPage()
                         CClothes::RebuildPlayer(player, false);
                     }
                     ImGui::SameLine();
+                    size_t count = 0;
                     for (auto [k, v] : m_ClothData.m_pData->Items())
                     {
                         if (ImGui::Button(std::string(k.str()).c_str(), ImVec2(Widget::CalcSize(2))))
                         {
                             CPlayerPed* player = FindPlayerPed();
-                            player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(0u, 0u, count);
+                            player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(0u, 0u, std::stoi(v.value_or<std::string>("0")));
                             CClothes::RebuildPlayer(player, false);
                         }
 
@@ -869,45 +823,17 @@ void Player::ShowPage()
                 }
                 if (ImGui::BeginTabItem(TEXT("Player.PedSkinsTab")))
                 {
-                    Widget::ImageList(Ped::m_PedData, ChangePlayerModel,
+                    Widget::ImageList(pedPage.m_PedData, fArgWrapper(playerPage.SetModel),
                     [](std::string& str)
                     {
-                        return Ped::m_PedData.m_pData->Get(str.c_str(), "Unknown");
+                        return pedPage.m_PedData.m_pData->Get(str.c_str(), "Unknown");
                     });
                     ImGui::EndTabItem();
                 }
                 if (ImGui::BeginTabItem(TEXT("Player.CustomSkinsTab")))
                 {
                     ImGui::Spacing();
-
-                    if (m_bModloaderInstalled)
-                    {
-                        Widget::Filter(TEXT("Window.Search"), m_ClothData.m_Filter,
-                                           std::string(TEXT("Player.TotalSkins") + std::to_string(CustomSkins::m_List.size()))
-                                           .c_str());
-                        Widget::Tooltip(TEXT("Player.CustomSkinsDirTip"));
-                        ImGui::Spacing();
-                        ImGui::TextWrapped(TEXT("Player.CustomSkinsTip"));
-                        ImGui::Spacing();
-                        for (std::string name : CustomSkins::m_List)
-                        {
-                            if (CustomSkins::m_Filter.PassFilter(name.c_str()))
-                            {
-                                if (ImGui::MenuItem(name.c_str()))
-                                {
-                                    ChangePlayerModel(name);
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        ImGui::TextWrapped(TEXT("Player.CustomSkinTutorial"));
-                        ImGui::Spacing();
-                        if (ImGui::Button(TEXT("Player.DownloadModloader"), ImVec2(Widget::CalcSize(1))))
-                            ShellExecute(NULL, "open", "https://gtaforums.com/topic/669520-mod-loader/", NULL, NULL,
-                                         SW_SHOWNORMAL);
-                    }
+                    CustomSkins.Draw();
                     ImGui::EndTabItem();
                 }
                 ImGui::EndTabBar();
@@ -924,7 +850,7 @@ void Player::ShowPage()
 #else
             ImGui::TextWrapped(TEXT("Player.WorkSkinOnly"));
 #endif
-            Widget::DataList(skinData, ChangePlayerModel);
+            Widget::DataList(skinData, fArg3Wrapper(playerPage.ChangePlayerModel));
             ImGui::EndTabItem();
         }
 #endif

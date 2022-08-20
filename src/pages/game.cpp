@@ -175,7 +175,6 @@ void SetPlayerMission(std::string& rootkey, std::string& name, std::string& id)
 
 void GamePage::Draw()
 {
-    ImGui::Spacing();
     CPlayerPed* pPlayer = FindPlayerPed();
     int hplayer = CPools::GetPedRef(pPlayer);
 

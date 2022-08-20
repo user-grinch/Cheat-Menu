@@ -31,7 +31,7 @@ private:
     RwTexture* m_pNeonTexture = nullptr; // pointer to the neon mask texture
     VehicleExtendedData<NeonData> m_VehNeon;
 
-    friend ICheat;
+    friend class IFeature;
     NeonMgr();
     NeonMgr(NeonMgr&);
     ~NeonMgr();

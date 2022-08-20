@@ -104,7 +104,7 @@ void MenuPage::Draw()
             }
             ImGui::NextColumn();
 
-            if (gRenderer == Render_DirectX9
+            if (gRenderer == eRenderer::DirectX9
             && Widget::Checkbox(TEXT("Menu.TextOnlyMode"), &m_bTextOnlyMode, TEXT("Menu.TextOnlyModeHint")))
             {
                 gConfig.Set("Menu.TextOnlyMode", m_bTextOnlyMode);
@@ -379,6 +379,12 @@ void MenuPage::Draw()
                     ImGui::Text("TsudaKageyu");
                     ImGui::TableNextColumn();
                     ImGui::Text("MinHook");
+
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
+                    ImGui::Text("_AG & jeremii");
+                    ImGui::TableNextColumn();
+                    ImGui::Text("Radar code");
 
                     ImGui::TableNextRow();
                     ImGui::TableNextColumn();

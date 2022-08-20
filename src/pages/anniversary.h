@@ -5,7 +5,7 @@
 class AnniversaryPage : public IPage<AnniversaryPage>
 {
 private:
-    friend IPage;
+    friend class IFeature;
     AnniversaryPage() : IPage<AnniversaryPage>(ePageID::Anniversary, "Anniversary", false){}
     AnniversaryPage(const AnniversaryPage&);
 

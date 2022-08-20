@@ -37,6 +37,30 @@ ImVec2 Util::ConvertMapToScreen(ImVec2 pos, ImVec2 mapSz, ImVec2 screenSz)
     return pos;
 }
 
+std::string Util::GetCarName(int model)
+{
+#ifdef GTA3
+    return std::to_string(model);
+#else
+    return (const char*)CModelInfo::GetModelInfo(model) + 0x32;
+#endif
+}
+
+int Util::GetCarModel(const char* name)
+{
+    int model = 0;
+    CBaseModelInfo* pModelInfo = CModelInfo::GetModelInfo((char*)name, &model);
+
+    if (model > 0 && model < 1000000 && GetCarName(model) != "")
+    {
+        return model;
+    }
+    else
+    {
+        return 0;
+    }
+}
+
 void Util::SetMessage(const char *message, bool b1, bool b2, bool b3)
 {
 #if GTASA
@@ -57,7 +81,7 @@ float Util::RoundFloat(float val)
     return roundf(val * 100) / 100;
 }
 
-bool Util::IsInVehicle(CPed *pPed)
+bool Util::IsInCar(CPed *pPed)
 {
     if (!pPed)
     {
@@ -67,7 +91,7 @@ bool Util::IsInVehicle(CPed *pPed)
     return BY_GAME(pPed->m_nPedFlags.bInVehicle, pPed->m_bInVehicle, pPed->m_bInVehicle);
 }
 
-void Util::FixVehicle(CVehicle *pVeh)
+void Util::FixCar(CVehicle *pVeh)
 {
 #ifdef GTASA
     pVeh->Fix();
@@ -91,7 +115,7 @@ void Util::FixVehicle(CVehicle *pVeh)
     pVeh->m_fHealth = 1000.0f;
 }
 
-void Util::UnFlipVehicle(CVehicle *pVeh)
+void Util::UnFlipCar(CVehicle *pVeh)
 {
 #ifdef GTASA
     int hveh = CPools::GetVehicleRef(pVeh);
@@ -170,14 +194,14 @@ std::string Util::GetLocationName(CVector* pos)
 }
 
 #ifdef GTASA
-void Util::ClearCharTasksVehCheck(CPed* pPed)
+void Util::ClearCharTasksCarCheck(CPed* pPed)
 {
     uint hped = CPools::GetPedRef(pPed);
     uint hveh = NULL;
     bool veh_engine = true;
     float speed;
 
-    if (IsInVehicle(pPed))
+    if (IsInCar(pPed))
     {
         hveh = CPools::GetVehicleRef(pPed->m_pVehicle);
         veh_engine = pPed->m_pVehicle->m_nVehicleFlags.bEngineOn;
@@ -223,7 +247,7 @@ int Util::GetLargestGangInZone()
 
 // implemention of opcode 0AB5 (STORE_CLOSEST_ENTITIES)
 // https://github.com/cleolibrary/CLEO4/blob/916d400f4a731ba1dd0ff16e52bdb056f42b7038/source/CCustomOpcodeSystem.cpp#L1671
-CVehicle* Util::GetClosestVehicle()
+CVehicle* Util::GetClosestCar()
 {
     CPlayerPed* player = FindPlayerPed();
 

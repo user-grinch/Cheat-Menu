@@ -1,21 +1,24 @@
 #pragma once
 #include <vector>
+#include "ifeature.hpp"
 
 enum class ePageID
 {
-    Anniversary, 
-    Game, 
-    Menu, 
-    None, 
-    Ped, 
+    Teleport,
     Player, 
+    Ped, 
     Scene, 
-    Teleport, 
-    Update, 
     Vehicle, 
-    Visual, 
     Weapon, 
-    Welcome
+    Game, 
+    Visual, 
+    Menu, 
+
+    // Pages without headers
+    None, 
+    Anniversary, 
+    Update, 
+    Welcome,
 };
 
 /*
@@ -38,7 +41,7 @@ public:
     static void DrawPages();
 
     // Add a new page
-    static void AddPage(PagePtr page);
+    static void AddPage(PagePtr page, size_t index);
     static void SetCurrentPage(PagePtr page);
 };
 
@@ -47,7 +50,7 @@ public:
     Every page must inherit this 
 */
 template<typename T>
-class IPage
+class IPage : public IFeature<T>
 {
 private:
     ePageID m_eID;          // Menu page ID
@@ -58,17 +61,11 @@ public:
     IPage(ePageID page, const std::string& key, bool header)
     : m_eID(page), m_NameKey(key), m_bHasHeader(header)
     {
-        PageHandler::AddPage(reinterpret_cast<PagePtr>(this));
+        PageHandler::AddPage(reinterpret_cast<PagePtr>(this), static_cast<size_t>(m_eID));
     }
 
     // Page drawing code goes here
     virtual void Draw() = 0;
-
-    static T &Get()
-    {
-        static T _instance;
-        return _instance;
-    }
 
     // Returns the ID of the page
     virtual ePageID GetPageID() final

@@ -12,7 +12,7 @@ private:
     std::string m_EnabledCheats[92][2];
     DataStore m_pData {"cheats"};
 
-    friend ICheat;
+    friend class IFeature;
     RandomCheatsMgr();
     RandomCheatsMgr(const RandomCheatsMgr&);
     

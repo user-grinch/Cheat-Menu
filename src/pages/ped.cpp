@@ -23,14 +23,17 @@ static const char* pedTypeList = "Civ Male\0Civ Female\0Cop\0Leones\0Triads\0Dia
 
 #endif
 
-void Ped::Init()
+PedPage &pedPage = PedPage::Get();
+
+PedPage::PedPage()
+ : IPage<PedPage>(ePageID::Ped, "Window.PedPage", true)
 {
     /*
     	Taken from gta chaos mod by Lordmau5 & _AG
     	TODO: Implement in VC too
     */
 #ifdef GTASA
-    Events::pedRenderEvent += [](CPed *ped)
+    Events::pedRenderEvent += [this](CPed *ped)
     {
 
         if (m_bBigHead)// || m_bThinBody)
@@ -86,7 +89,7 @@ void Ped::Init()
 #endif
 }
 
-void Ped::AddNewPed()
+void PedPage::AddNewPed()
 {
     static char name[8];
     static int model = 0;
@@ -118,12 +121,12 @@ void Ped::AddNewPed()
     }
 }
 #ifdef GTASA
-void Ped::SpawnPed(std::string& model)
+void PedPage::SpawnPed(std::string& model)
 #else
-void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
+void PedPage::SpawnPed(std::string& cat, std::string& name, std::string& model)
 #endif
 {
-    if (Spawner::m_List.size() == SPAWN_PED_LIMIT)
+    if (m_Spawner.m_List.size() == SPAWN_PED_LIMIT)
     {
         Util::SetMessage(TEXT("Ped.MaxLimit"));
         return;
@@ -155,7 +158,7 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
             CStreaming::RequestSpecialChar(currentSlot, name.c_str(), PRIORITY_REQUEST);
             CStreaming::LoadAllRequestedModels(true);
 
-            Command<Commands::CREATE_CHAR>(Spawner::m_nSelectedPedType + 4, 290 + currentSlot, pos.x, pos.y, pos.z + 1, &hplayer);
+            Command<Commands::CREATE_CHAR>(m_Spawner.m_nSelectedPedType + 4, 290 + currentSlot, pos.x, pos.y, pos.z + 1, &hplayer);
             CStreaming::SetSpecialCharIsDeletable(290 + currentSlot);
 
             // SA has 10 slots
@@ -175,7 +178,7 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
             Command<Commands::LOAD_SPECIAL_CHARACTER>(currentSlot, model.c_str());
             Command<Commands::LOAD_ALL_MODELS_NOW>();
 
-            Command<Commands::CREATE_CHAR>(Spawner::m_nSelectedPedType + 4, 108+currentSlot, pos.x, pos.y, pos.z + 1, &hplayer);
+            Command<Commands::CREATE_CHAR>(m_Spawner.m_nSelectedPedType + 4, 108+currentSlot, pos.x, pos.y, pos.z + 1, &hplayer);
             Command<Commands::UNLOAD_SPECIAL_CHARACTER>(currentSlot);
 
             ++currentSlot;
@@ -192,37 +195,37 @@ void Ped::SpawnPed(std::string& cat, std::string& name, std::string& model)
             CStreaming::RequestModel(iModel, eStreamingFlags::PRIORITY_REQUEST);
             CStreaming::LoadAllRequestedModels(false);
 
-            Command<Commands::CREATE_CHAR>(Spawner::m_nSelectedPedType + 4, iModel, pos.x, pos.y, pos.z + 1, &hplayer);
+            Command<Commands::CREATE_CHAR>(m_Spawner.m_nSelectedPedType + 4, iModel, pos.x, pos.y, pos.z + 1, &hplayer);
             CStreaming::SetModelIsDeletable(iModel);
         }
 
         ped = CPools::GetPed(hplayer);
 
-        if (Spawner::m_bPedMove)
+        if (m_Spawner.m_bPedMove)
         {
-            Spawner::m_List.push_back(ped);
+            m_Spawner.m_List.push_back(ped);
         }
         else
         {
             Command<Commands::MARK_CHAR_AS_NO_LONGER_NEEDED>(hplayer);
         }
-        ped->m_nPedFlags.bPedIsBleeding = Spawner::m_bPedBleed;
-        ped->m_nWeaponAccuracy = Spawner::m_nAccuracy;
-        ped->m_fHealth = Spawner::m_nPedHealth;
+        ped->m_nPedFlags.bPedIsBleeding = m_Spawner.m_bPedBleed;
+        ped->m_nWeaponAccuracy = m_Spawner.m_nAccuracy;
+        ped->m_fHealth = m_Spawner.m_nPedHealth;
 #ifdef GTASA
-        if (Spawner::m_nWeaponId != 0)
+        if (m_Spawner.m_nWeaponId != 0)
         {
             int model = 0;
-            Command<Commands::GET_WEAPONTYPE_MODEL>(Spawner::m_nWeaponId, &model);
+            Command<Commands::GET_WEAPONTYPE_MODEL>(m_Spawner.m_nWeaponId, &model);
             CStreaming::RequestModel(model, PRIORITY_REQUEST);
             CStreaming::LoadAllRequestedModels(false);
-            Command<Commands::GIVE_WEAPON_TO_CHAR>(hplayer, Spawner::m_nWeaponId, 999);
+            Command<Commands::GIVE_WEAPON_TO_CHAR>(hplayer, m_Spawner.m_nWeaponId, 999);
         }
 #endif
     }
 }
 
-void Ped::ShowPage()
+void PedPage::Draw()
 {
     if (ImGui::BeginTabBar("Ped", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {
@@ -320,12 +323,12 @@ void Ped::ShowPage()
             ImGui::Spacing();
             if (ImGui::Button(TEXT("Ped.RemoveFrozen"), Widget::CalcSize(1)))
             {
-                for (CPed* ped : Spawner::m_List)
+                for (CPed* ped : m_Spawner.m_List)
                 {
                     CWorld::Remove(ped);
                     ped->Remove();
                 }
-                Spawner::m_List.clear();
+                m_Spawner.m_List.clear();
             }
             ImGui::Spacing();
             if (ImGui::BeginTabBar("SpawnPedBar"))
@@ -336,12 +339,14 @@ void Ped::ShowPage()
                 {
                     ImGui::Spacing();
 #ifdef GTASA
-                    Widget::ImageList(m_PedData, SpawnPed,
-                    [](std::string& str){
-                            return m_PedData.m_pData->Get(str.c_str(), "Unknown");
-                    }, nullptr, AddNewPed);
+                    Widget::ImageList(m_PedData, fArgWrapper(pedPage.SpawnPed), 
+                    [this](str &text)
+                    {
+                        return m_PedData.m_pData->Get(text.c_str(), "Unknown");
+                    },
+                    nullptr, fArgNoneWrapper(pedPage.AddNewPed));
 #else
-                    Widget::DataList(m_PedData, SpawnPed, AddNewPed);
+                    Widget::DataList(m_PedData, fArg3Wrapper(pedPage.SpawnPed), fArgNoneWrapper(pedPage.AddNewPed));
 #endif
                     ImGui::EndTabItem();
                 }
@@ -350,26 +355,26 @@ void Ped::ShowPage()
                     ImGui::Spacing();
                     ImGui::BeginChild("PedCOnfig");
                     ImGui::Columns(2, 0, false);
-                    Widget::Checkbox(TEXT("Ped.NoMove"), &Spawner::m_bPedMove);
+                    Widget::Checkbox(TEXT("Ped.NoMove"), &m_Spawner.m_bPedMove);
                     ImGui::NextColumn();
-                    Widget::Checkbox(TEXT("Ped.PedBleed"), &Spawner::m_bPedBleed);
+                    Widget::Checkbox(TEXT("Ped.PedBleed"), &m_Spawner.m_bPedBleed);
                     ImGui::Columns(1);
 
                     ImGui::Spacing();
-                    ImGui::SliderInt(TEXT("Ped.Accuracy"), &Spawner::m_nAccuracy, 0.0, 100.0);
-                    if (ImGui::InputInt(TEXT("Ped.Health"), &Spawner::m_nPedHealth))
+                    ImGui::SliderInt(TEXT("Ped.Accuracy"), &m_Spawner.m_nAccuracy, 0.0, 100.0);
+                    if (ImGui::InputInt(TEXT("Ped.Health"), &m_Spawner.m_nPedHealth))
                     {
-                        if (Spawner::m_nPedHealth > 1000)
+                        if (m_Spawner.m_nPedHealth > 1000)
                         {
-                            Spawner::m_nPedHealth = 1000;
+                            m_Spawner.m_nPedHealth = 1000;
                         }
 
-                        if (Spawner::m_nPedHealth < 0)
+                        if (m_Spawner.m_nPedHealth < 0)
                         {
-                            Spawner::m_nPedHealth = 0;
+                            m_Spawner.m_nPedHealth = 0;
                         }
                     }
-                    ImGui::Combo(TEXT("Ped.PedType"), &Spawner::m_nSelectedPedType, pedTypeList);
+                    ImGui::Combo(TEXT("Ped.PedType"), &m_Spawner.m_nSelectedPedType, pedTypeList);
                     ImGui::EndChild();
                     ImGui::EndTabItem();
                 }
@@ -380,25 +385,25 @@ void Ped::ShowPage()
                     ImGui::Text(TEXT("Ped.SelectedWeapon"), weaponName.c_str());
                     ImGui::Spacing();
 #ifdef GTASA
-                    Widget::ImageList(WeaponPage::m_WeaponData,
-                    [](std::string& str)
+                    Widget::ImageList(weaponPage.m_WeaponData,
+                    [this](std::string& str)
                     {
-                        Spawner::m_nWeaponId = std::stoi(str);
-                        weaponName = WeaponPage::m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
+                        m_Spawner.m_nWeaponId = std::stoi(str);
+                        weaponName = weaponPage.m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
                     },
                     [](std::string& str)
                     {
-                        return WeaponPage::m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
+                        return weaponPage.m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
                     },
                     [](std::string& str)
                     {
                         return str != "-1"; /*Jetpack*/
                     });
 #else
-                    Widget::DataList(Weapon::m_WeaponData,
-                    [](std::string& root, std::string& key, std::string& id)
+                    Widget::DataList(weaponPage.m_WeaponData,
+                    [this](std::string& root, std::string& key, std::string& id)
                     {
-                        Spawner::m_nWeaponId = std::stoi(id);
+                        m_Spawner.m_nWeaponId = std::stoi(id);
                         weaponName = key;
                     });
 #endif
@@ -462,8 +467,7 @@ void Ped::ShowPage()
                 ImGui::Spacing();
                 if (ImGui::Button(TEXT("Ped.DownloadExGangWars"), Widget::CalcSize(1)))
                 {
-                    ShellExecute(NULL, "open", "https://gtaforums.com/topic/682194-extended-gang-wars/", NULL, NULL,
-                                    SW_SHOWNORMAL);
+                    OPEN_LINK("https://gtaforums.com/topic/682194-extended-gang-wars/");
                 }
             }
 

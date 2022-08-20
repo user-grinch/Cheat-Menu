@@ -17,7 +17,7 @@ private:
     CVehicle *m_pLastVeh;     // vehicle player was in
     int m_nVehSeat;           // seat id of player vehicle
 
-    friend class ICheat;
+    friend class IFeature;
     CutsceneMgr();
     CutsceneMgr(const CutsceneMgr&);
 

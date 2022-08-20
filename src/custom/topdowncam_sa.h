@@ -9,7 +9,7 @@ class TopDownCamera : public ICheat<TopDownCamera>
 {
 private:
 
-    friend ICheat;
+    friend class IFeature;
     TopDownCamera();
     TopDownCamera(const TopDownCamera&);
     

@@ -4,9 +4,11 @@
 #include "utils/util.h"
 #include <CWeaponInfo.h>
 
-void WeaponPage::Init()
+WeaponPage& weaponPage = WeaponPage::Get();
+WeaponPage::WeaponPage()
+: IPage<WeaponPage>(ePageID::Weapon, "Window.WeaponPage", true)
 {
-    Events::processScriptsEvent += []
+    Events::processScriptsEvent += [this]
     {
         CPlayerPed* player = FindPlayerPed();
 
@@ -94,11 +96,11 @@ void WeaponPage::Init()
 }
 
 #ifdef GTASA
-void WeaponPage::SetGangWeapon(std::string& weapon_type)
+void WeaponPage::GangStruct::SetWeapon(std::string& weaponType)
 {
-    m_nGangWeaponList[m_nSelectedGang][m_nSelectedWeapon] = std::stoi(weapon_type);
-    CGangs::SetGangWeapons(m_nSelectedGang, m_nGangWeaponList[m_nSelectedGang][0], m_nGangWeaponList[m_nSelectedGang][1],
-                           m_nGangWeaponList[m_nSelectedGang][2]);
+    m_WeaponList[m_nSelected][m_nSelectedWeapon] = std::stoi(weaponType);
+    CGangs::SetGangWeapons(m_nSelected, m_WeaponList[m_nSelected][0], m_WeaponList[m_nSelected][1],
+                           m_WeaponList[m_nSelected][2]);
 }
 #else
 // Implementation of SA opcode 0x555
@@ -206,7 +208,7 @@ void WeaponPage::GiveWeaponToPlayer(std::string& weapon_type)
     }
 }
 #else
-void Weapon::GiveWeaponToPlayer(std::string& rootkey, std::string& name, std::string& model)
+void WeaponPage::GiveWeaponToPlayer(std::string& rootkey, std::string& name, std::string& model)
 {
     CPlayerPed* player = FindPlayerPed();
     int hplayer = CPools::GetPedRef(player);
@@ -376,17 +378,17 @@ void WeaponPage::Draw()
                 m_nAmmoCount = (m_nAmmoCount > 99999) ? 99999 : m_nAmmoCount;
             }
 #ifdef GTASA
-            Widget::ImageList(m_WeaponData, GiveWeaponToPlayer,
-            [](std::string& str)
+            Widget::ImageList(m_WeaponData, fArgWrapper(weaponPage.GiveWeaponToPlayer),
+            [this](std::string& str)
             {
                 return m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
             },
             [](std::string& str)
             {
                 return str != "0"; /*Unarmed*/
-            }, AddNew);
+            }, fArgNoneWrapper(weaponPage.AddNew));
 #else
-            Widget::DataList(m_WeaponData, GiveWeaponToPlayer, AddWeapon);
+            Widget::DataList(m_WeaponData, fArg3Wrapper(weaponPage.GiveWeaponToPlayer), fArgNoneWrapper(weaponPage.AddNew));
 #endif
             ImGui::EndTabItem();
         }
@@ -399,15 +401,15 @@ void WeaponPage::Draw()
                 "Ballas\0Grove street families\0Los santos vagos\0San fierro rifa\0Da nang boys\0"
                 "Mafia\0Mountain cloud triad\0Varrio los aztecas\0Gang9\0Gang10\0"
             };
-            ImGui::Combo(TEXT("Weapon.SelectGang"), &m_nSelectedGang, gangList);
-            ImGui::Combo(TEXT("Ped.SelectWeapon"), &m_nSelectedWeapon, "Weapon 1\0Weapon 2\0Weapon 3\0");
+            ImGui::Combo(TEXT("Weapon.SelectGang"), &m_Gang.m_nSelected, gangList);
+            ImGui::Combo(TEXT("Ped.SelectWeapon"), &m_Gang.m_nSelectedWeapon, "Weapon 1\0Weapon 2\0Weapon 3\0");
             ImGui::Spacing();
 
-            std::string key = std::to_string(m_nGangWeaponList[m_nSelectedGang][m_nSelectedWeapon]);
+            std::string key = std::to_string(m_Gang.m_WeaponList[m_Gang.m_nSelected][m_Gang.m_nSelectedWeapon]);
             ImGui::Text(TEXT("Weapon.CurrentWeapon"), m_WeaponData.m_pData->Get(key.c_str(), "Unknown").c_str());
             ImGui::Spacing();
-            Widget::ImageList(m_WeaponData, SetGangWeapon,
-            [](std::string& str){
+            Widget::ImageList(m_WeaponData, fArgWrapper(weaponPage.m_Gang.SetWeapon),
+            [this](std::string& str){
                 return m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
             },
             [](std::string& str){

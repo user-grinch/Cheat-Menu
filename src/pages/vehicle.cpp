@@ -7,49 +7,45 @@
 #include "utils/widget.h"
 #include "utils/util.h"
 #include "custom/filehandler.h"
+#include "custom/vehpaint.h"
+#include "custom/autodrive.h"
 
 #ifdef GTASA
 #include <tHandlingData.h>
-#include "custom/neon_sa.h"
-#include "custom/paint_sa.h"
+#include "custom/vehmod_sa.h"
 #endif
 
-void Vehicle::Init()
+VehiclePage& vehiclePage = VehiclePage::Get();
+VehiclePage::VehiclePage()
+: IPage<VehiclePage>(ePageID::Vehicle, "Window.VehiclePage", true)
 {
-#ifdef GTASA
-    FileHandler::FetchHandlingID(m_VehicleIDE);
-    Paint::InjectHooks();
-#endif
-
-    FileHandler::FetchColorData(m_CarcolsColorData);
-
     // Get config data
-    Spawner::m_bSpawnInAir = gConfig.Get("Features.SpawnAircraftInAir", true);
-    Spawner::m_bSpawnInside = gConfig.Get("Features.SpawnInsideVehicle", true);
+    m_Spawner.m_bInAir = gConfig.Get("Features.SpawnAircraftInAir", true);
+    m_Spawner.m_bAsDriver = gConfig.Get("Features.SpawnInsideVehicle", true);
 
-    Events::processScriptsEvent += []
+    Events::processScriptsEvent += [this]
     {
         uint timer = CTimer::m_snTimeInMilliseconds;
         CPlayerPed* pPlayer = FindPlayerPed();
         CVehicle* pVeh = BY_GAME(FindPlayerVehicle(-1, false), FindPlayerVehicle(), FindPlayerVehicle());
 
-        if (pPlayer && Util::IsInVehicle())
+        if (pPlayer && Util::IsInCar())
         {
             int hveh = CPools::GetVehicleRef(pVeh);
             float speed = pVeh->m_vecMoveSpeed.Magnitude() * 50.0f;
             if (m_bAutoUnflip && pVeh->IsUpsideDown() && speed < 2.0f)
             {
-                Util::UnFlipVehicle(pVeh);
+                Util::UnFlipCar(pVeh);
             }
 
             if (unflipVeh.Pressed())
             {
-                Util::UnFlipVehicle(pVeh);
+                Util::UnFlipCar(pVeh);
             }
 
             if (fixVeh.Pressed())
             {
-                Util::FixVehicle(pVeh);
+                Util::FixCar(pVeh);
                 Util::SetMessage("Vehicle fixed");
             }
 
@@ -121,72 +117,9 @@ void Vehicle::Init()
             {
                 Util::SetCarForwardSpeed(pVeh, m_fLockSpeed);
             }
-
-#ifdef GTASA
-            if (UnlimitedNitro::m_bEnabled && pVeh->m_nVehicleSubClass == VEHICLE_AUTOMOBILE)
-            {
-                patch::Set<BYTE>(0x969165, 0, true); // All cars have nitro
-                patch::Set<BYTE>(0x96918B, 0, true); // All taxis have nitro
-
-                if (KeyPressed(VK_LBUTTON))
-                {
-                    if (!UnlimitedNitro::m_bCompAdded)
-                    {
-                        AddComponent("1010", false);
-                        UnlimitedNitro::m_bCompAdded = true;
-                    }
-                }
-                else
-                {
-                    if (UnlimitedNitro::m_bCompAdded)
-                    {
-                        RemoveComponent("1010", false);
-                        UnlimitedNitro::m_bCompAdded = false;
-                    }
-                }
-            }
-
-            if (NeonData::m_bRainbowEffect && timer - NeonData::m_nRainbowTimer > 50)
-            {
-                int red, green, blue;
-
-                Util::RainbowValues(red, green, blue, 0.25);
-                Neon.Install(pVeh, red, green, blue);
-                NeonData::m_nRainbowTimer = timer;
-            }
-#endif
         }
 
 #ifdef GTASA
-        // Traffic neons
-        if (NeonData::m_bApplyOnTraffic && timer - NeonData::m_bTrafficTimer > 1000)
-        {
-            for (CVehicle* veh : CPools::ms_pVehiclePool)
-            {
-                int chance = 0;
-
-                if (veh->m_nVehicleClass == CLASS_NORMAL) // Normal
-                {
-                    chance = Random(1, 20);
-                }
-
-                if (veh->m_nVehicleClass == CLASS_RICHFAMILY) // Rich family
-                {
-                    chance = Random(1, 4);
-                }
-
-                if (veh->m_nVehicleClass == CLASS_EXECUTIVE) // Executive
-                {
-                    chance = Random(1, 3);
-                }
-
-                if (chance == 1 && !Neon.IsInstalled(veh) && veh->m_pDriver != pPlayer)
-                {
-                    Neon.Install(veh, Random(0, 255), Random(0, 255), Random(0, 255));
-                }
-            }
-            NeonData::m_bTrafficTimer = timer;
-        }
 
         if (m_bBikeFly && pVeh && pVeh->IsDriver(pPlayer))
         {
@@ -207,54 +140,8 @@ void Vehicle::Init()
 }
 
 #ifdef GTASA
-void Vehicle::AddComponent(const std::string& component, const bool display_message)
-{
-    try
-    {
-        CPlayerPed* player = FindPlayerPed();
-        int icomp = std::stoi(component);
-        int hveh = CPools::GetVehicleRef(player->m_pVehicle);
-
-        CStreaming::RequestModel(icomp, eStreamingFlags::PRIORITY_REQUEST);
-        CStreaming::LoadAllRequestedModels(true);
-        player->m_pVehicle->AddVehicleUpgrade(icomp);
-        CStreaming::SetModelIsDeletable(icomp);
-
-        if (display_message)
-        {
-            Util::SetMessage("Component added");
-        }
-    }
-    catch (...)
-    {
-        Log::Print<eLogLevel::Warn>("Failed to add component to vehicle {}", component);
-    }
-}
-
-
-void Vehicle::RemoveComponent(const std::string& component, const bool display_message)
-{
-    try
-    {
-        CPlayerPed* player = FindPlayerPed();
-        int icomp = std::stoi(component);
-        int hveh = CPools::GetVehicleRef(player->m_pVehicle);
-
-        player->m_pVehicle->RemoveVehicleUpgrade(icomp);
-
-        if (display_message)
-        {
-            Util::SetMessage("Component removed");
-        }
-    }
-    catch (...)
-    {
-        Log::Print<eLogLevel::Warn>("Failed to remove component from vehicle {}", component);
-    }
-}
-
 // hardcoded for now
-int Vehicle::GetRandomTrainIdForModel(int model)
+int VehiclePage::GetRandomTrainIdForModel(int model)
 {
     static int train_ids[] =
     {
@@ -322,7 +209,7 @@ void WarpPlayerIntoVehicle(CVehicle *pVeh, int seatId)
 }
 #endif
 
-void Vehicle::AddNewVehicle()
+void VehiclePage::AddNew()
 {
     static char name[INPUT_BUFFER_SIZE];
     static int model = 0;
@@ -335,8 +222,8 @@ void Vehicle::AddNewVehicle()
         if (CModelInfo::IsCarModel(model))
         {
             std::string key = std::format("Custom.{} (Added)", name);
-            Spawner::m_VehData.m_pData->Set(key.c_str(), std::to_string(model));
-            Spawner::m_VehData.m_pData->Save();
+            m_Spawner.m_VehData.m_pData->Set(key.c_str(), std::to_string(model));
+            m_Spawner.m_VehData.m_pData->Save();
             Util::SetMessage(TEXT("Window.AddEntryMSG"));
         }
         else
@@ -352,7 +239,7 @@ void Vehicle::AddNewVehicle()
         if (Command<Commands::IS_CHAR_IN_ANY_CAR>(hPlayer))
         {
             model = pPlayer->m_pVehicle->m_nModelIndex;
-            std::string str = Vehicle::GetNameFromModel(model);
+            std::string str = Util::GetCarName(model);
             strcpy(name, str.c_str());
         }
         else
@@ -363,9 +250,9 @@ void Vehicle::AddNewVehicle()
 }
 
 #ifdef GTASA
-void Vehicle::SpawnVehicle(std::string& smodel)
+void VehiclePage::SpawnVehicle(std::string& smodel)
 #else
-void Vehicle::SpawnVehicle(std::string& rootkey, std::string& vehName, std::string& smodel)
+void VehiclePage::SpawnVehicle(std::string& rootkey, std::string& vehName, std::string& smodel)
 #endif
 {
     CPlayerPed* player = FindPlayerPed();
@@ -378,7 +265,7 @@ void Vehicle::SpawnVehicle(std::string& rootkey, std::string& vehName, std::stri
     float speed = 0;
 
     bool bInVehicle = Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer);
-    if (bInVehicle && Spawner::m_bSpawnInside)
+    if (bInVehicle && m_Spawner.m_bAsDriver)
     {
         CVehicle* pveh = player->m_pVehicle;
         int hveh = CPools::GetVehicleRef(pveh);
@@ -404,7 +291,7 @@ void Vehicle::SpawnVehicle(std::string& rootkey, std::string& vehName, std::stri
 
     if (interior == 0)
     {
-        if (Spawner::m_bSpawnInAir && (CModelInfo::IsHeliModel(imodel) || CModelInfo::IsPlaneModel(imodel)))
+        if (m_Spawner.m_bInAir && (CModelInfo::IsHeliModel(imodel) || CModelInfo::IsPlaneModel(imodel)))
         {
             pos.z = 400;
         }
@@ -446,7 +333,7 @@ void Vehicle::SpawnVehicle(std::string& rootkey, std::string& vehName, std::stri
         if (veh->m_pDriver)
             Command<Commands::DELETE_CHAR>(CPools::GetPedRef(veh->m_pDriver));
 
-        if (Spawner::m_bSpawnInside)
+        if (m_Spawner.m_bAsDriver)
         {
             Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
             Util::SetCarForwardSpeed(veh, speed);
@@ -466,13 +353,13 @@ void Vehicle::SpawnVehicle(std::string& rootkey, std::string& vehName, std::stri
         CStreaming::RequestModel(imodel, PRIORITY_REQUEST);
         CStreaming::LoadAllRequestedModels(false);
 #ifdef GTASA
-        if (Spawner::m_nLicenseText[0] != '\0')
+        if (m_Spawner.m_nLicenseText[0] != '\0')
         {
-            Command<Commands::CUSTOM_PLATE_FOR_NEXT_CAR>(imodel, Spawner::m_nLicenseText);
+            Command<Commands::CUSTOM_PLATE_FOR_NEXT_CAR>(imodel, m_Spawner.m_nLicenseText);
         }
 #endif
         int hveh = 0;
-        if (Spawner::m_bSpawnInside)
+        if (m_Spawner.m_bAsDriver)
         {
             Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 4.0f, &hveh);
             veh = CPools::GetVehicle(hveh);
@@ -526,102 +413,7 @@ void Vehicle::SpawnVehicle(std::string& rootkey, std::string& vehName, std::stri
 #endif
 }
 
-std::string Vehicle::GetNameFromModel(int model)
-{
-#ifdef GTA3
-    return std::to_string(model);
-#else
-    return (const char*)CModelInfo::GetModelInfo(model) + 0x32;
-#endif
-}
-
-int Vehicle::GetModelFromName(const char* name)
-{
-    int model = 0;
-    CBaseModelInfo* pModelInfo = CModelInfo::GetModelInfo((char*)name, &model);
-
-    if (model > 0 && model < 1000000 && GetNameFromModel(model) != "")
-    {
-        return model;
-    }
-    else
-    {
-        return 0;
-    }
-}
-
-static void StartAutoDrive(CVehicle *pVeh, const char *buf = nullptr)
-{
-    int hVeh = CPools::GetVehicleRef(pVeh);
-    CVector pos;
-
-    if (buf ==  nullptr)
-    {
-#ifdef GTASA
-        tRadarTrace targetBlip = CRadar::ms_RadarTrace[LOWORD(FrontEndMenuManager.m_nTargetBlipIndex)];
-        pos = targetBlip.m_vecPos;
-        if (targetBlip.m_nRadarSprite != RADAR_SPRITE_WAYPOINT)
-        {
-            Util::SetMessage(TEXT("Teleport.TargetBlipText"));
-            return;
-        }
-#else
-        return;
-#endif
-    }
-    else
-    {
-         if (sscanf(buf, "%f,%f,%f", &pos.x, &pos.y, &pos.z) != 3)
-        {
-            int dim;
-            sscanf(buf, "%d,%f,%f,%f", &dim, &pos.x, &pos.y, &pos.z);
-        }
-    }
-
-    int model = pVeh->m_nModelIndex;
-    if (CModelInfo::IsBoatModel(model))
-    {
-        Command<Commands::BOAT_GOTO_COORDS>(hVeh, pos.x, pos.y, pos.z);
-    }
-    else if (CModelInfo::IsPlaneModel(model))
-    {
-        CVector p = pVeh->GetPosition();
-        p.z = 300.0f;
-#ifdef GTASA
-        pVeh->SetPosn(p);
-#elif GTAVC
-        pVeh->SetPosition(p);
-#else   
-        pVeh->SetPos(p);
-#endif
-        Command<Commands::PLANE_GOTO_COORDS>(hVeh, pos.x, pos.y, 300.0f, 30, 200);
-    }
-    else if (CModelInfo::IsHeliModel(model))
-    {
-        CVector p = pVeh->GetPosition();
-        p.z = 300.0f;
-#ifdef GTASA
-        pVeh->SetPosn(p);
-#elif GTAVC
-        pVeh->SetPosition(p);
-#else   
-        pVeh->SetPos(p);
-#endif
-        Command<Commands::HELI_GOTO_COORDS>(hVeh, pos.x, pos.y, 300.0f, 30, 200);
-    }
-#ifdef GTASA
-    else if (CModelInfo::IsTrainModel(model))
-    {
-        return;
-    }
-#endif
-    else
-    {
-        Command<Commands::CAR_GOTO_COORDINATES>(hVeh, pos.x, pos.y, pos.z);
-    }
-}
-
-void Vehicle::ShowPage()
+void VehiclePage::Draw()
 {
     ImGui::Spacing();
     CPlayerPed* pPlayer = FindPlayerPed();
@@ -639,16 +431,16 @@ void Vehicle::ShowPage()
 
     ImGui::SameLine();
 
-    if (ImGui::Button(TEXT("Vehicle.FixCar"), ImVec2(Widget::CalcSize(3))) && Util::IsInVehicle())
+    if (ImGui::Button(TEXT("Vehicle.FixCar"), ImVec2(Widget::CalcSize(3))) && Util::IsInCar())
     {
-        Util::FixVehicle(pVeh);
+        Util::FixCar(pVeh);
     }
 
     ImGui::SameLine();
 
-    if (ImGui::Button(TEXT("Vehicle.FlipCar"), ImVec2(Widget::CalcSize(3))) && Util::IsInVehicle())
+    if (ImGui::Button(TEXT("Vehicle.FlipCar"), ImVec2(Widget::CalcSize(3))) && Util::IsInCar())
     {
-        Util::UnFlipVehicle(pVeh);
+        Util::UnFlipCar(pVeh);
     }
 
     ImGui::Spacing();
@@ -790,7 +582,7 @@ void Vehicle::ShowPage()
             Widget::CheckboxAddr(TEXT("Vehicle.PerfectHandling"), 0x96914C);
             Widget::CheckboxAddr(TEXT("Vehicle.TankMode"), 0x969164);
 
-            Widget::Checkbox(TEXT("Vehicle.InfNitro"), &UnlimitedNitro::m_bEnabled, TEXT("Vehicle.InfNitroTip"));
+            Widget::Checkbox(TEXT("Vehicle.InfNitro"), &VehMod.m_Nitro.m_bEnabled, TEXT("Vehicle.InfNitroTip"));
             if (Widget::Checkbox(TEXT("Vehicle.FlipNoBurn"), &m_bVehFlipNoBurn, TEXT("Vehicle.FlipNoBurnTip")))
             {
                 // MixSets (Link2012)
@@ -948,7 +740,7 @@ void Vehicle::ShowPage()
 #endif
             if (ImGui::CollapsingHeader(TEXT(bPlayerInCar ? "Vehicle.SwitchSeats" : "Vehicle.EnterNearVeh")))
             {
-                CVehicle* pTargetVeh = bPlayerInCar ? pVeh : Util::GetClosestVehicle();
+                CVehicle* pTargetVeh = bPlayerInCar ? pVeh : Util::GetClosestCar();
 
                 if (pTargetVeh)
                 {
@@ -957,7 +749,7 @@ void Vehicle::ShowPage()
                     ImGui::Spacing();
                     ImGui::Columns(2, 0, false);
 
-                    ImGui::Text(GetNameFromModel(pTargetVeh->m_nModelIndex).c_str());
+                    ImGui::Text(Util::GetCarName(pTargetVeh->m_nModelIndex).c_str());
                     ImGui::NextColumn();
                     ImGui::Text(TEXT("Vehicle.TotalSeats"), (seats + 1));
                     ImGui::Columns(1);
@@ -999,14 +791,15 @@ void Vehicle::ShowPage()
             }
             if (ImGui::CollapsingHeader(TEXT("Vehicle.RemoveVehRadius")))
             {
-                ImGui::InputInt(TEXT("Vehicle.Radius"), &m_nVehRemoveRadius);
+                static int removeRadius;
+                ImGui::InputInt(TEXT("Vehicle.Radius"), &removeRadius);
                 ImGui::Spacing();
                 if (ImGui::Button(TEXT("Vehicle.RemoveVeh"), Widget::CalcSize(1)))
                 {
                     CPlayerPed* player = FindPlayerPed();
                     for (CVehicle* pVeh : CPools::ms_pVehiclePool)
                     {
-                        if (DistanceBetweenPoints(pVeh->GetPosition(), player->GetPosition()) < m_nVehRemoveRadius
+                        if (DistanceBetweenPoints(pVeh->GetPosition(), player->GetPosition()) < removeRadius
                                 && player->m_pVehicle != pVeh)
                         {
                             Command<Commands::DELETE_CAR>(CPools::GetVehicleRef(pVeh));
@@ -1042,6 +835,7 @@ void Vehicle::ShowPage()
                 Widget::EditAddr(TEXT("Vehicle.DirtLvl"), (int)pVeh + 0x4B0, 0, 7.5, 15);
                 if (pVeh->m_nVehicleClass == VEHICLE_AUTOMOBILE && ImGui::CollapsingHeader(TEXT("Vehicle.Doors")))
                 {
+                    static int m_nDoorMenuButton;
                     ImGui::Columns(2, 0, false);
                     ImGui::RadioButton(TEXT("Vehicle.Damage"), &m_nDoorMenuButton, 0);
                     ImGui::RadioButton(TEXT("Vehicle.Fix"), &m_nDoorMenuButton, 1);
@@ -1141,14 +935,14 @@ void Vehicle::ShowPage()
         {
             ImGui::Spacing();
             ImGui::Columns(2, 0, false);
-            if (Widget::Checkbox(TEXT("Vehicle.SpawnInside"), &Spawner::m_bSpawnInside))
+            if (Widget::Checkbox(TEXT("Vehicle.SpawnInside"), &m_Spawner.m_bAsDriver))
             {
-                gConfig.Set("Features.SpawnInsideVehicle", Spawner::m_bSpawnInside);
+                gConfig.Set("Features.SpawnInsideVehicle", m_Spawner.m_bAsDriver);
             }
             ImGui::NextColumn();
-            if( Widget::Checkbox(TEXT("Vehicle.SpawnInAir"), &Spawner::m_bSpawnInAir))
+            if( Widget::Checkbox(TEXT("Vehicle.SpawnInAir"), &m_Spawner.m_bInAir))
             {
-                gConfig.Set("Features.SpawnAircraftInAir", Spawner::m_bSpawnInAir);
+                gConfig.Set("Features.SpawnAircraftInAir", m_Spawner.m_bInAir);
             }
             ImGui::Columns(1);
 
@@ -1189,14 +983,14 @@ void Vehicle::ShowPage()
 #ifdef GTASA
             ImGui::SameLine();
             ImGui::SetNextItemWidth(width);
-            ImGui::InputTextWithHint("##LicenseText", TEXT("Vehicle.PlateText"), Spawner::m_nLicenseText, 9);
+            ImGui::InputTextWithHint("##LicenseText", TEXT("Vehicle.PlateText"), m_Spawner.m_nLicenseText, 9);
 
-            Widget::ImageList(Spawner::m_VehData, SpawnVehicle,
+            Widget::ImageList(m_Spawner.m_VehData, fArgWrapper(vehiclePage.SpawnVehicle),
             [](std::string& str){
-                return GetNameFromModel(std::stoi(str));
-            }, nullptr, AddNewVehicle);
+                return Util::GetCarName(std::stoi(str));
+            }, nullptr, fArgNoneWrapper(vehiclePage.AddNew));
 #else
-            Widget::DataList(Spawner::m_VehData, SpawnVehicle, AddNewVehicle);
+            Widget::DataList(m_Spawner.m_VehData, fArg3Wrapper(vehiclePage.SpawnVehicle), fArgNoneWrapper(vehiclePage.AddNew));
 #endif
             ImGui::EndTabItem();
         }
@@ -1207,401 +1001,13 @@ void Vehicle::ShowPage()
             if (ImGui::BeginTabItem(TEXT("Vehicle.AutoDrive")))
             {
                 ImGui::Spacing();
-                if (ImGui::Button(TEXT("Vehicle.AutoDriveStop"), Widget::CalcSize(1)))
-                {
-                    Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
-                }
-                ImGui::Spacing();
-                if (ImGui::BeginTabBar("PassTabaBar"))
-                {
-                    if (ImGui::BeginTabItem(TEXT("Teleport.Coordinates")))
-                    {
-                        static char buf[INPUT_BUFFER_SIZE];
-                        ImGui::Spacing();
-                        ImGui::TextWrapped(TEXT("Vehicle.AutoDriveInfo"));
-                        ImGui::Spacing();
-                        ImGui::InputTextWithHint(TEXT("Teleport.Coordinates"), "x, y, z", buf, IM_ARRAYSIZE(buf));
-                        ImGui::Spacing();
-                        if (ImGui::Button(TEXT("Vehicle.AutoDriveCoord"), Widget::CalcSize(BY_GAME(2,1,1))))
-                        {
-                            StartAutoDrive(pVeh, buf);
-                        }
-#ifdef GTASA
-                        ImGui::SameLine();
-                        if (ImGui::Button(TEXT("Vehicle.AutoDriveMarker"), Widget::CalcSize(2)))
-                        {
-                            StartAutoDrive(pVeh);
-                        }
-#endif
-                        ImGui::EndTabItem();
-                    }
-                    if (ImGui::BeginTabItem(TEXT("Teleport.Location")))
-                    {
-                        ImGui::Spacing();
-                        Widget::DataList(teleportPage.m_locData, 
-                        [](std::string& rootkey, std::string& bLocName, std::string& loc)
-                        {
-                            CVehicle* pVeh = BY_GAME(FindPlayerVehicle(-1, false), FindPlayerVehicle(), FindPlayerVehicle());
-                            StartAutoDrive(pVeh, loc.c_str());       
-                        });
-                        ImGui::EndTabItem();
-                    }
-                    ImGui::EndTabBar();
-                }
+                AutoDrive.Draw();
                 ImGui::EndTabItem();
             }
-            if (ImGui::BeginTabItem(TEXT("Vehicle.Color")))
-            {
+            
+            VehPaint.Draw();
 #ifdef GTASA
-                Paint::GenerateNodeList(veh, PaintData::m_vecNames, PaintData::m_Selected);
-
-                ImGui::Spacing();
-                if (ImGui::Button(TEXT("Vehicle.ResetColor"), ImVec2(Widget::CalcSize())))
-                {
-                    Paint::ResetNodeColor(veh, PaintData::m_Selected);
-                    Util::SetMessage(TEXT("Vehicle.ResetColorMSG"));
-                }
-                ImGui::Spacing();
-
-                Widget::ListBox(TEXT("Vehicle.Component"), PaintData::m_vecNames, PaintData::m_Selected);
-
-                if (ImGui::ColorEdit3(TEXT("Vehicle.ColorPicker"), PaintData::m_fColorPicker))
-                {
-                    uchar r = PaintData::m_fColorPicker[0] * 255;
-                    uchar g = PaintData::m_fColorPicker[1] * 255;
-                    uchar b = PaintData::m_fColorPicker[2] * 255;
-                    Paint::SetNodeColor(veh, PaintData::m_Selected, { r, g, b, 255 }, PaintData::m_bMatFilter);
-                }
-#endif
-
-                ImGui::Spacing();
-                ImGui::Columns(2, NULL, false);
-
-#ifdef GTASA
-                ImGui::Checkbox(TEXT("Vehicle.MatFilter"), &PaintData::m_bMatFilter);
-                ImGui::RadioButton(TEXT("Vehicle.Primary"), &PaintData::m_nRadioButton, 1);
-                ImGui::RadioButton(TEXT("Vehicle.Secondary"), &PaintData::m_nRadioButton, 2);
-                ImGui::NextColumn();
-                ImGui::NewLine();
-                ImGui::RadioButton(TEXT("Vehicle.Tertiary"), &PaintData::m_nRadioButton, 3);
-                ImGui::RadioButton(TEXT("Vehicle.Quaternary"), &PaintData::m_nRadioButton, 4);
-#else
-                ImGui::RadioButton(TEXT("Vehicle.Primary"), &PaintData::m_nRadioButton, 1);
-                ImGui::NextColumn();
-                ImGui::RadioButton(TEXT("Vehicle.Secondary"), &PaintData::m_nRadioButton, 2);
-#endif
-                ImGui::Spacing();
-                ImGui::Columns(1);
-                ImGui::Text(TEXT("Vehicle.SelectPreset"));
-                ImGui::Spacing();
-
-                int count = (int)m_CarcolsColorData.size();
-
-                ImVec2 size = Widget::CalcSize();
-                int btnsInRow = ImGui::GetWindowContentRegionWidth() / (size.y * 2);
-                int btnSize = (ImGui::GetWindowContentRegionWidth() - int(ImGuiStyleVar_ItemSpacing) * (btnsInRow -
-                               0.6 * btnsInRow)) / btnsInRow;
-
-                ImGui::BeginChild("Colorss");
-
-                for (int colorId = 0; colorId < count; ++colorId)
-                {
-                    if (Widget::ColorBtn(colorId, m_CarcolsColorData[colorId], ImVec2(btnSize, btnSize)))
-                    {
-                        *(uint8_replacement*)(int(veh) + BY_GAME(0x433, 0x19F, 0x19B) + PaintData::m_nRadioButton) = colorId;
-                    }
-
-                    if ((colorId + 1) % btnsInRow != 0)
-                    {
-                        ImGui::SameLine(0.0, 4.0);
-                    }
-                }
-
-                ImGui::EndChild();
-                ImGui::EndTabItem();
-            }
-#ifdef GTASA
-            if (gRenderer != Render_DirectX11)
-            {
-                if (ImGui::BeginTabItem(TEXT("Vehicle.NeonsTab")))
-                {
-                    int model = veh->m_nModelIndex;
-                    ImGui::Spacing();
-                    if (ImGui::Button(TEXT("Vehicle.RemoveNeon"), ImVec2(Widget::CalcSize())))
-                    {
-                        Neon.Remove(veh);
-                        Util::SetMessage(TEXT("Vehicle.RemoveNeonMSG"));
-                    }
-
-                    ImGui::Spacing();
-                    ImGui::Columns(2, NULL, false);
-
-                    bool pulsing = Neon.IsPulsingEnabled(veh);
-                    if (Widget::Checkbox(TEXT("Vehicle.PulsingNeon"), &pulsing))
-                    {
-                        Neon.SetPulsing(veh, pulsing);
-                    }
-
-                    Widget::Checkbox(TEXT("Vehicle.RainbowNeon"), &NeonData::m_bRainbowEffect, TEXT("Vehicle.RainbowNeonMSG"));
-                    ImGui::NextColumn();
-                    Widget::Checkbox(TEXT("Vehicle.TrafficNeon"), &NeonData::m_bApplyOnTraffic, TEXT("Vehicle.TrafficNeonMSG"));
-                    ImGui::Columns(1);
-
-                    ImGui::Spacing();
-
-                    if (ImGui::ColorEdit3(TEXT("Vehicle.ColorPicker"), NeonData::m_fColorPicker))
-                    {
-                        int r = static_cast<int>(NeonData::m_fColorPicker[0] * 255);
-                        int g = static_cast<int>(NeonData::m_fColorPicker[1] * 255);
-                        int b = static_cast<int>(NeonData::m_fColorPicker[2] * 255);
-
-                        Neon.Install(veh, r, g, b);
-                    }
-
-
-                    ImGui::Spacing();
-                    ImGui::Text(TEXT("Vehicle.SelectPreset"));
-
-                    int count = (int)m_CarcolsColorData.size();
-                    ImVec2 size = Widget::CalcSize();
-                    int btnsInRow = ImGui::GetWindowContentRegionWidth() / (size.y * 2);
-                    int btnSize = (ImGui::GetWindowContentRegionWidth() - int(ImGuiStyleVar_ItemSpacing) * (btnsInRow -
-                                   0.6 * btnsInRow)) / btnsInRow;
-
-                    ImGui::BeginChild("Neonss");
-
-                    for (int color_id = 0; color_id < count; ++color_id)
-                    {
-                        auto& color = m_CarcolsColorData[color_id];
-                        if (Widget::ColorBtn(color_id, color, ImVec2(btnSize, btnSize)))
-                        {
-                            int r = static_cast<int>(color[0] * 255);
-                            int g = static_cast<int>(color[1] * 255);
-                            int b = static_cast<int>(color[2] * 255);
-
-                            Neon.Install(veh, r, g, b);
-                        }
-
-                        if ((color_id + 1) % btnsInRow != 0)
-                        {
-                            ImGui::SameLine(0.0, 4.0);
-                        }
-                    }
-
-                    ImGui::EndChild();
-                    ImGui::EndTabItem();
-                }
-                if (ImGui::BeginTabItem(TEXT("Vehicle.TextureTab")))
-                {
-                    Paint::GenerateNodeList(veh, PaintData::m_vecNames, PaintData::m_Selected);
-
-                    ImGui::Spacing();
-                    if (ImGui::Button(TEXT("Vehicle.ResetTexture"), ImVec2(Widget::CalcSize())))
-                    {
-                        Paint::ResetNodeTexture(veh, PaintData::m_Selected);
-                        Util::SetMessage(TEXT("Vehicle.ResetTextureMSG"));
-                    }
-                    ImGui::Spacing();
-
-                    Widget::ListBox(TEXT("Vehicle.Component"), PaintData::m_vecNames, PaintData::m_Selected);
-                    ImGui::Spacing();
-
-                    ImGui::Columns(2, NULL, false);
-                    ImGui::Checkbox(TEXT("Vehicle.MatFilter"), &PaintData::m_bMatFilter);
-                    ImGui::NextColumn();
-                    int maxpjob, curpjob;
-                    Command<Commands::GET_NUM_AVAILABLE_PAINTJOBS>(hveh, &maxpjob);
-
-                    if (maxpjob > 0)
-                    {
-                        Command<Commands::GET_CURRENT_VEHICLE_PAINTJOB>(hveh, &curpjob);
-                        
-                        if (ImGui::ArrowButton("Left", ImGuiDir_Left))
-                        {
-                            curpjob -= 1;
-                            if (curpjob < -1)
-                            {
-                               curpjob = maxpjob - 1; 
-                            }
-                            Command<Commands::GIVE_VEHICLE_PAINTJOB>(hveh, curpjob);
-                        }
-                        ImGui::SameLine();
-                        ImGui::Text("%s: %d",TEXT("Vehicle.Paintjob"), curpjob+2);
-                        ImGui::SameLine();
-                        if (ImGui::ArrowButton("Right", ImGuiDir_Right))
-                        {
-                            curpjob += 1;
-                            if (curpjob > maxpjob)
-                            {
-                               curpjob =  -1; 
-                            }
-                            Command<Commands::GIVE_VEHICLE_PAINTJOB>(hveh, curpjob);
-                        }
-
-                        ImGui::Spacing();
-                    }
-                    ImGui::Columns(1);
-                    ImGui::Spacing();
-                    Widget::ImageList(Paint::m_TextureData,
-                                   [](std::string& str)
-                    {
-                        Paint::SetNodeTexture(FindPlayerPed()->m_pVehicle, PaintData::m_Selected, str,
-                                              PaintData::m_bMatFilter);
-                    },
-                    [](std::string& str)
-                    {
-                        return str;
-                    }, nullptr, [](){});
-
-                    ImGui::EndTabItem();
-                }
-            }
-            if (ImGui::BeginTabItem(TEXT("Vehicle.TuneTab")))
-            {
-                ImGui::Spacing();
-                Widget::ImageList(m_TuneData,
-                               [](std::string& str)
-                {
-                    AddComponent(str);
-                },
-                // [](std::string& str)
-                // {
-                //     RemoveComponent(str);
-                // },
-                [](std::string& str)
-                {
-                    return str;
-                },
-                [](std::string& str)
-                {
-                    return ((bool(*)(int, CVehicle*))0x49B010)(std::stoi(str), FindPlayerPed()->m_pVehicle);
-                });
-
-                ImGui::EndTabItem();
-            }
-            if (ImGui::BeginTabItem(TEXT("Vehicle.HandlingTab")))
-            {
-                ImGui::Spacing();
-
-                // https://github.com/multitheftauto/mtasa-blue/blob/16769b8d1c94e2b9fe6323dcba46d1305f87a190/Client/game_sa/CModelInfoSA.h#L213
-                CBaseModelInfo* pInfo = CModelInfo::GetModelInfo(pPlayer->m_pVehicle->m_nModelIndex);
-                int handlingID = patch::Get<WORD>((int)pInfo + 74, false); //  CBaseModelInfo + 74 = handlingID
-                tHandlingData *pHandlingData = reinterpret_cast<tHandlingData*>(0xC2B9DC + (handlingID * 224)); // sizeof(tHandlingData) = 224
-
-                if (ImGui::Button(TEXT("Vehicle.ResetHandling"), ImVec2(Widget::CalcSize(3))))
-                {
-                    gHandlingDataMgr.LoadHandlingData();
-                    Util::SetMessage(TEXT("Vehicle.ResetHandlingMSG"));
-                }
-
-                ImGui::SameLine();
-
-                if (ImGui::Button(TEXT("Vehicle.SaveFile"), ImVec2(Widget::CalcSize(3))))
-                {
-                    FileHandler::GenerateHandlingFile(pHandlingData, m_VehicleIDE);
-                    Util::SetMessage(TEXT("Vehicle.SaveFileMSG"));
-                }
-
-                ImGui::SameLine();
-
-                if (ImGui::Button(TEXT("Vehicle.ReadMore"), ImVec2(Widget::CalcSize(3))))
-                {
-                    ShellExecute(NULL, "open", "https://projectcerbera.com/gta/sa/tutorials/handling", NULL, NULL,
-                                                    SW_SHOWNORMAL);
-                }
-
-                ImGui::Spacing();
-
-                ImGui::BeginChild("HandlingChild");
-
-                std::vector<Widget::BindInfo> abs{ {TEXT("Vehicle.On"), 1}, {TEXT("Vehicle.Off"), 0} };
-                Widget::EditRadioBtnAddr(TEXT("Vehicle.Abs"), (int)&pHandlingData->m_bABS, abs);
-
-                Widget::EditAddr(TEXT("Vehicle.ADM"), (int)&pHandlingData->m_fSuspensionAntiDiveMultiplier, 0.0f, 0.0f, 1.0f);
-                Widget::EditAddr<BYTE>(TEXT("Vehicle.AnimGroup"), (int)&pHandlingData->m_nAnimGroup, 0, 0, 20);
-                Widget::EditAddr(TEXT("Vehicle.BrakeBias"), (int)&pHandlingData->m_fBrakeBias, 0.0f, 0.0f, 1.0f);
-
-                // Brake deceleration calculation
-                float BrakeDeceleration = pHandlingData->m_fBrakeDeceleration * 2500;
-                Widget::EditAddr(TEXT("Vehicle.BrakeDecel"), (int)&pHandlingData->m_fBrakeDeceleration, 0.0f, 0.0f, 20.0f, 2500.0f);
-                pHandlingData->m_fBrakeDeceleration = BrakeDeceleration / 2500;
-
-                Widget::EditAddr(TEXT("Vehicle.CemterMassX"), (int)&pHandlingData->m_vecCentreOfMass.x, -10.0f, -10.0f, 10.0f);
-                Widget::EditAddr(TEXT("Vehicle.CemterMassY"), (int)&pHandlingData->m_vecCentreOfMass.y, -10.0f, -10.0f, 10.0f);
-                Widget::EditAddr(TEXT("Vehicle.CemterMassZ"), (int)&pHandlingData->m_vecCentreOfMass.z, -10.0f, -10.0f, 10.0f);
-
-                // CDM calculations
-                float factor = (1.0 / pHandlingData->m_fMass);
-                float fCDM = pHandlingData->m_fCollisionDamageMultiplier / (2000.0f * factor);
-                Widget::EditAddr(TEXT("Vehicle.CDM"), (int)&fCDM, 0.0f, 0.0f, 1.0f, 0.3381f);
-                pHandlingData->m_fCollisionDamageMultiplier = factor * fCDM * 2000.0f;
-
-                Widget::EditAddr(TEXT("Vehicle.DampingLvl"), (int)&pHandlingData->m_fSuspensionDampingLevel, -10.0f, -10.0f, 10.0f); // test later
-                Widget::EditAddr(TEXT("Vehicle.DragMult"), (int)&pHandlingData->m_fDragMult, 0.0f, 0.0f, 30.0f);
-
-                std::vector<Widget::BindInfo> drive_type
-                {
-                    {TEXT("Vehicle.FrontWheelDrive"), 70}, 
-                    {TEXT("Vehicle.RearWheelDrive"), 82}, 
-                    {TEXT("Vehicle.FourWheelDrive"), 52}
-                };
-                Widget::EditRadioBtnAddr(TEXT("Vehicle.DriveType"), (int)&pHandlingData->m_transmissionData.m_nDriveType, drive_type);
-
-                // Engine acceleration calculation
-                float fEngineAcceleration = pHandlingData->m_transmissionData.m_fEngineAcceleration * 12500;
-                Widget::EditAddr(TEXT("Vehicle.EngineAccel"), (int)&fEngineAcceleration, 0.0f, 0.0f, 49.0f, 12500.0f);
-                pHandlingData->m_transmissionData.m_fEngineAcceleration = fEngineAcceleration / 12500;
-
-
-                Widget::EditAddr(TEXT("Vehicle.EngineInertia"), (int)&pHandlingData->m_transmissionData.m_fEngineInertia, 0.1f, 0.1f, 400.0f);
-
-                std::vector<Widget::BindInfo> engine_type
-                { 
-                    {TEXT("Vehicle.Petrol"), 80}, {TEXT("Vehicle.Diseal"), 68}, {TEXT("Vehicle.Electric"), 69} 
-                };
-                Widget::EditRadioBtnAddr(TEXT("Vehicle.EngineType"), (int)&pHandlingData->m_transmissionData.m_nEngineType, engine_type);
-
-                std::vector<Widget::BindInfo> lights
-                { 
-                    {TEXT("Vehicle.Long"), 0}, {TEXT("Vehicle.Small"), 1}, 
-                    {TEXT("Vehicle.Big"), 2}, {TEXT("Vehicle.Tall"), 3} 
-                };
-                Widget::EditRadioBtnAddr(TEXT("Vehicle.FrontLights"), (int)&pHandlingData->m_nFrontLights, lights);
-
-                Widget::EditAddr(TEXT("Vehicle.ForceLevel"), (int)&pHandlingData->m_fSuspensionForceLevel, -10.0f, -10.0f, 10.0f); // test later
-
-                Widget::EditBits(TEXT("Vehicle.HandlingFlags"), (int)&pHandlingData->m_nHandlingFlags, m_HandlingFlagNames);
-
-                Widget::EditAddr(TEXT("Vehicle.HighSpeedDamping"), (int)&pHandlingData->m_fSuspensionDampingLevel, -10.0f, -10.0f, 10.0f); // test later
-                Widget::EditAddr(TEXT("Vehicle.LowerKimit"), (int)&pHandlingData->m_fSuspensionLowerLimit, -10.0f, -10.0f, 10.0f); // test later
-                Widget::EditAddr(TEXT("Vehicle.Mass"), (int)&pHandlingData->m_fMass, 1.0f, 1.0f, 50000.0f);
-
-                // Max Velocity calculation
-                int MaxVelocity = pHandlingData->m_transmissionData.m_fMaxGearVelocity / *(float*)0xC2B9BC;
-                Widget::EditAddr(TEXT("Vehicle.MaxVelocity"), (int)&MaxVelocity, 1.0f, 1.0f, 1000.0f);
-                pHandlingData->m_transmissionData.m_fMaxGearVelocity = MaxVelocity * (*(float*)0xC2B9BC);
-
-                Widget::EditBits(TEXT("Vehicle.ModelFlags"), (int)&pHandlingData->m_nModelFlags, m_ModelFlagNames);
-
-                Widget::EditAddr<int>(TEXT("Vehicle.MonValue"), (int)&pHandlingData->m_nMonetaryValue, 1, 1, 100000);
-                Widget::EditAddr<BYTE>(TEXT("Vehicle.NumGears"), (int)&pHandlingData->m_transmissionData.m_nNumberOfGears, 1, 1, 10);
-                Widget::EditAddr<BYTE>(TEXT("Vehicle.PercentSubmerged"), (int)&pHandlingData->m_nPercentSubmerged, 10, 10, 120);
-
-                Widget::EditRadioBtnAddr(TEXT("Vehicle.RearLights"), (int)&pHandlingData->m_nRearLights, lights);
-
-                Widget::EditAddr(TEXT("Vehicle.SeatOffset"), (int)&pHandlingData->m_fSeatOffsetDistance, 0.0f, 0.0f, 1.0f);
-                Widget::EditAddr(TEXT("Vehicle.SteeringLock"), (int)&pHandlingData->m_fSteeringLock, 10.0f, 10.0f, 50.0f);
-                Widget::EditAddr(TEXT("Vehicle.SuspensionBias"), (int)&pHandlingData->m_fSuspensionBiasBetweenFrontAndRear, 0.0f, 0.0f, 1.0f);
-                Widget::EditAddr(TEXT("Vehicle.TractionBias"), (int)&pHandlingData->m_fTractionBias, 0.0f, 0.0f, 1.0f);
-                Widget::EditAddr(TEXT("Vehicle.TractionLoss"), (int)&pHandlingData->m_fTractionLoss, 0.0f, 0.0f, 1.0f);
-                Widget::EditAddr(TEXT("Vehicle.TractionMul"), (int)&pHandlingData->m_fTractionMultiplier, 0.5f, 0.5f, 2.0f);
-                Widget::EditAddr(TEXT("Vehicle.TurnMass"), (int)&pHandlingData->m_fTurnMass, 20.0f, 20.0f, 1000.0f); // test later
-                Widget::EditAddr(TEXT("Vehicle.UpperLimit"), (int)&pHandlingData->m_fSuspensionUpperLimit, -1.0f, -1.0f, 1.0f);
-
-                ImGui::EndChild();
-
-                ImGui::EndTabItem();
-            }
+            VehMod.Draw();
 #endif
         }
         ImGui::EndTabBar();

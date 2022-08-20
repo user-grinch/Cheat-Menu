@@ -1,7 +1,8 @@
 #pragma once
+#include "ifeature.hpp"
 
 template<typename T>
-class ICheat
+class ICheat : public IFeature<T>
 {
 protected:
     bool m_bEnabled = false;     
@@ -20,12 +21,6 @@ public:
         m_bEnabled = true;
     }
 
-    static T &Get()
-    {
-        static T _instance;
-        return _instance;
-    }
-    
     // Returns the current stae of the cheat
     virtual const bool GetState() final
     {

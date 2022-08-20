@@ -1,41 +1,47 @@
 #pragma once
 #include "pch.h"
+#include "interface/ipage.h"
 
-class Ped
+class PedPage : public IPage<PedPage>
 {
 private:
-    static inline bool m_bBigHead;
-    static inline bool m_bThinBody;
-
-    struct Spawner
+    bool m_bBigHead;
+    bool m_bThinBody;
+    struct 
     {
-        static inline std::vector<CPed*> m_List;
-        static inline int m_nAccuracy = 50;
-        static inline int m_nPedHealth = 100;
-        static inline bool m_bPedMove;
-        static inline bool m_bPedBleed;
-        static inline int m_nSelectedPedType;
-        static inline int m_nWeaponId;
-    };
+        std::vector<CPed*> m_List;
+        int m_nAccuracy = 50;
+        int m_nPedHealth = 100;
+        bool m_bPedMove;
+        bool m_bPedBleed;
+        int m_nSelectedPedType;
+        int m_nWeaponId;
+    } m_Spawner;
 
-    static void AddNewPed();
+
+    friend class IFeature;
+    PedPage();
+    PedPage(const PedPage&);
+
+    // Add new ped to data file
+    void AddNewPed();
+
+    // Spawn a ped with specified model
 #ifdef GTASA
-    static void SpawnPed(std::string& model);
+    void SpawnPed(str& model);
 #else
-    static void SpawnPed(std::string& cat, std::string& name, std::string& model);
+    void SpawnPed(str& cat, str& name, str& model);
 #endif
-
+    
 public:
 #ifdef GTASA
-    static inline DataStore m_SpecialPedData {"special_peds"};
-    static inline ResourceStore m_PedData{"peds", eResourceType::TYPE_IMAGE_TEXT, ImVec2(65, 110)};
+    DataStore m_SpecialPedData {"special_peds"};
+    ResourceStore m_PedData{"peds", eResourceType::TYPE_IMAGE_TEXT, ImVec2(65, 110)};
 #else
-    static inline ResourceStore m_PedData {"peds", eResourceType::TYPE_TEXT};
+    ResourceStore m_PedData {"peds", eResourceType::TYPE_TEXT};
 #endif
 
-    Ped() = delete;
-    Ped(const Ped&) = delete;
-
-    static void Init();
-    static void ShowPage();
+    void Draw();
 };
+
+extern PedPage &pedPage;

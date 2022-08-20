@@ -11,7 +11,7 @@ class ParticleMgr : public ICheat<ParticleMgr>
 private:
     std::vector<int> m_nList;
 
-    friend class ICheat;
+    friend class IFeature;
     ParticleMgr(){};
     ParticleMgr(const ParticleMgr&);
 
