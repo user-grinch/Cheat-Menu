@@ -4,18 +4,10 @@
 #include "utils/widget.h"
 #include "utils/updater.h"
 #include "utils/d3dhook.h"
-#include "utils/util.h"
 #include "utils/overlay.h"
-#include "pages/scene.h"
-#include "pages/game.h"
-#include "pages/menu.h"
-#include "pages/ped.h"
-#include "pages/player.h"
-#include "pages/teleport.h"
-#include "pages/vehicle.h"
-#include "pages/visual.h"
-#include "pages/weapon.h"
 #include "interface/ipage.h"
+#include "pages/teleport.h"
+#include "pages/menu.h"
 
 static bool DrawTitleBar()
 {
@@ -60,7 +52,7 @@ static bool DrawTitleBar()
     return pressed;
 }
 
-void CheatMenu::Draw()
+void CheatMenuMgr::Draw()
 {
     ImGuiIO& io = ImGui::GetIO();
     static bool bRunning = true;
@@ -110,29 +102,121 @@ void CheatMenu::Draw()
     Overlay::Draw();
 }
 
-void CheatMenu::Init()
+CheatMenuMgr& CheatMenu = CheatMenuMgr::Get();
+CheatMenuMgr::CheatMenuMgr()
 {
-    if (!std::filesystem::exists(PLUGIN_PATH((char*)FILE_NAME)))
+    Events::initRwEvent += [this]()
     {
-        Log::Print<eLogLevel::Error>("Failed to find CheatMenu directory!");
-        return;
-    }
+        /*
+            Had to put this in place since some people put the folder in root
+            directory and the asi in modloader. Why??
+        */
+        if (!std::filesystem::is_directory(PLUGIN_PATH((char*)FILE_NAME)))
+        {
+            std::string msg = std::format("{} folder not found. You need to put both '{}.asi' & '{}' folder in the same directory", FILE_NAME, FILE_NAME, FILE_NAME);
+            Log::Print<eLogLevel::Error>(msg.c_str());
+            MessageBox(NULL, msg.c_str(), FILE_NAME, MB_ICONERROR);
+            return;
+        }
 
-    if (!D3dHook::Init(Draw))
-    {
-        return;
-    }
+        /*
+            Need SilentPatch since all gta games have issues with mouse input
+            Implementing mouse fix is a headache anyway
+        */
+        if (!GetModuleHandle(BY_GAME("SilentPatchSA.asi","SilentPatchVC.asi","SilentPatchIII.asi")))
+        {
+            Log::Print<eLogLevel::Error>("SilentPatch not found. Please install it from here https://gtaforums.com/topic/669045-silentpatch/");
+            int msgID = MessageBox(NULL, "SilentPatch not found. Do you want to install Silent Patch? (Game restart required)", FILE_NAME, MB_OKCANCEL | MB_DEFBUTTON1);
 
-    // Load menu settings
-    m_fSize.x = gConfig.Get("Window.SizeX", screen::GetScreenWidth() / 4.0f);
-    m_fSize.y = gConfig.Get("Window.SizeY", screen::GetScreenHeight() / 1.2f);
-    srand(CTimer::m_snTimeInMilliseconds);
+            if (msgID == IDOK)
+            {
+                OPEN_LINK("https://gtaforums.com/topic/669045-silentpatch/");
+            };
+            return;
+        }
 
-    ApplyStyle();
-    Locale::Init(FILE_NAME "/locale/", "English", "English");
-    Overlay::Init();
+        Log::Print<eLogLevel::None>("Starting " MENU_TITLE " (" BUILD_NUMBER ")\nAuthor: Grinch_\nDiscord: "
+                                DISCORD_INVITE "\nMore Info: " GITHUB_LINK);
 
-    Events::processScriptsEvent += []()
+        // date time
+        SYSTEMTIME st;
+        GetSystemTime(&st);
+        Log::Print<eLogLevel::None>("Date: {}-{}-{} Time: {}:{}\n", st.wYear, st.wMonth, st.wDay,
+                                    st.wHour, st.wMinute);
+
+        /*
+            TODO: Find a better way
+            Since you could still name it something else
+        */
+#ifdef GTASA
+        if (GetModuleHandle("SAMP.dll") || GetModuleHandle("SAMP.asi"))
+        {
+            Log::Print<eLogLevel::Error>(FILE_NAME " doesn't support SAMP");
+            MessageBox(RsGlobal.ps->window, "SAMP detected. Exiting...", FILE_NAME, MB_ICONERROR);
+            exit(EXIT_FAILURE);
+        }
+        CFastman92limitAdjuster::Init();
+        Log::Print<eLogLevel::None>("Game detected: GTA San Andreas 1.0 US");
+#elif GTAVC
+        if (GetModuleHandle("vcmp-proxy.dll") || GetModuleHandle("vcmp-proxy.asi"))
+        {
+            Log::Print<eLogLevel::Error>(FILE_NAME " doesn't support VCMP");
+            MessageBox(RsGlobal.ps->window, "VCMP detected. Exiting...", FILE_NAME, MB_ICONERROR);
+            exit(EXIT_FAILURE);
+        }
+        Log::Print<eLogLevel::None>("Game detected: GTA Vice City 1.0 EN");
+#else
+        Log::Print<eLogLevel::None>("Game detected: GTA III 1.0 EN");
+#endif
+
+        bool modloader = GetModuleHandle("modloader.asi");
+        const char *path = PLUGIN_PATH((char*)"");
+        Log::Print<eLogLevel::None>("Install location: {}", modloader && strstr(path, "modloader") ? "Modloader" : "Game directory");
+        Log::Print<eLogLevel::None>("Font support package: {}", FontMgr::IsSupportPackageInstalled() ? "True" : "False");
+        Log::Print<eLogLevel::None>("\nCLEO installed: {}", GetModuleHandle("cleo.asi") || GetModuleHandle("cleo_redux.asi") ? "True" : "False");
+        Log::Print<eLogLevel::None>("FLA installed: {}", GetModuleHandle("$fastman92limitAdjuster.asi") ? "True" : "False");
+        Log::Print<eLogLevel::None>("Mixsets installed: {}", GetModuleHandle("MixSets.asi") ? "True" : "False");
+        Log::Print<eLogLevel::None>("Modloader installed: {}", modloader ? "True" : "False");
+        Log::Print<eLogLevel::None>("OLA installed: {}", GetModuleHandle("III.VC.SA.LimitAdjuster.asi") ? "True" : "False");
+        Log::Print<eLogLevel::None>("ProjectProps installed: {}", GetModuleHandle("ProjectProps.asi") ? "True" : "False");
+        Log::Print<eLogLevel::None>("Renderhook installed: {}", GetModuleHandle("_gtaRenderHook.asi") ? "True" : "False");
+        Log::Print<eLogLevel::None>("Widescreen Fix installed: {}\n", GetModuleHandle("GTASA.WidescreenFix.asi") ? "True" : "False");
+
+        // Checking for updates once a day
+        if (menuPage.m_bAutoCheckUpdate && gConfig.Get("Menu.LastUpdateChecked", 0) != st.wDay)
+        {
+            Updater::CheckUpdate();
+            gConfig.Set("Menu.LastUpdateChecked", st.wDay);
+        }
+        
+        if (Updater::IsUpdateAvailable())
+        {
+            Log::Print<eLogLevel::Info>("New update available: %s", Updater::GetUpdateVersion().c_str());
+        }
+
+        m_fSize = ImVec2(screen::GetScreenWidth() / 4, screen::GetScreenHeight() / 1.2);
+        if (!std::filesystem::exists(PLUGIN_PATH((char*)FILE_NAME)))
+        {
+            Log::Print<eLogLevel::Error>("Failed to find CheatMenu directory!");
+            return;
+        }
+
+        if (!D3dHook::Init(fArgNoneWrapper(CheatMenu.Draw)))
+        {
+            return;
+        }
+
+        ApplyStyle();
+        Locale::Init(FILE_NAME "/locale/", "English", "English");
+        Overlay::Init();
+
+        // Load menu settings
+        m_fSize.x = gConfig.Get("Window.SizeX", screen::GetScreenWidth() / 4.0f);
+        m_fSize.y = gConfig.Get("Window.SizeY", screen::GetScreenHeight() / 1.2f);
+        srand(CTimer::m_snTimeInMilliseconds);
+    };
+
+    Events::processScriptsEvent += [this]()
     {
         if (!FrontEndMenuManager.m_bMenuActive)
         {
@@ -165,12 +249,12 @@ void CheatMenu::Init()
     };
 }
 
-bool CheatMenu::IsVisible()
+bool CheatMenuMgr::IsVisible()
 {
     return m_bVisible;
 }
 
-void CheatMenu::ApplyStyle()
+void CheatMenuMgr::ApplyStyle()
 {
     ImGuiStyle* style = &ImGui::GetStyle();
     ImVec4* colors = style->Colors;
@@ -236,7 +320,7 @@ void CheatMenu::ApplyStyle()
     style->Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.20f, 0.20f, 0.20f, 0.6f);
 }
 
-void CheatMenu::ResetSize()
+void CheatMenuMgr::ResetSize()
 {
     m_fSize.x = screen::GetScreenWidth() / 4.0f;
     m_fSize.y = screen::GetScreenHeight() / 1.2f;

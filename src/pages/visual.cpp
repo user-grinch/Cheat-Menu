@@ -138,6 +138,7 @@ VisualPage::VisualPage()
 : IPage<VisualPage>(ePageID::Visual, "Window.VisualPage", true)
 {
 #ifdef GTASA
+
     if (GetModuleHandle("timecycle24.asi"))
     {
         m_nTimecycHour = 24;

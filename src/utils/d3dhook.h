@@ -17,7 +17,7 @@ private:
     static inline f_EndScene oEndScene;
     static inline f_Reset oReset;
     static inline bool mouseShown;
-    static inline void* pCallbackFunc = nullptr;
+    static inline std::function<void()> pCallbackFunc = nullptr;
 
     static void CALLBACK ProcessFrame(void* ptr);
     static LRESULT CALLBACK hkWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -40,7 +40,7 @@ public:
     static bool GetMouseState();
 
     // Injects game hooks & stuff
-    static bool Init(void *pCallback);
+    static bool Init(std::function<void()> pCallback);
 
     // Sets the current mouse visibility state
     static void SetMouseState(bool state);

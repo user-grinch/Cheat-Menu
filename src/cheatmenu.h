@@ -1,33 +1,35 @@
 #pragma once
 #include "pch.h"
+#include "interface/ifeature.hpp"
 
 /*
 *   Main CheatMenu Class
 *   Handles rendering, resizing, page drawing etc.
 */
-class CheatMenu
+class CheatMenuMgr : public IFeature<CheatMenuMgr>
 {
 private:
-    static inline ImVec2 m_fSize = ImVec2(screen::GetScreenWidth() / 4, screen::GetScreenHeight() / 1.2);
-    static inline bool m_bVisible = false;      // should the menu be drawn
-    static inline bool m_bSizeUpdated = false;  // Was menu size change requested
+    ImVec2 m_fSize;
+    bool m_bVisible;      // should the menu be drawn
+    bool m_bSizeUpdated;  // Was menu size change requested
+    bool m_bIsOnline;     // SAMP & VCMP flag
+
+    friend class IFeature;
+    CheatMenuMgr();
+    CheatMenuMgr(const CheatMenuMgr&);
 
     // Applies imgui theme to the menu
-    static void ApplyStyle();
+    void ApplyStyle();
 
     // Draws the window ui each frame
-    static void Draw();
+    void Draw();
 
 public:
-    CheatMenu() = delete;
-    CheatMenu(const CheatMenu&) = delete;
-
-    // Initilizes the menu, page, hooks etc
-    static void Init();
-
     // Returns true if the menu is being shown
-    static bool IsVisible();
+    bool IsVisible();
 
     // Resets the menu height & width to default
-    static void ResetSize();
+    void ResetSize();
 };
+
+extern CheatMenuMgr& CheatMenu;

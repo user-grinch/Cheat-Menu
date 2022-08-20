@@ -98,7 +98,7 @@ void D3dHook::ProcessFrame(void* ptr)
 
         if (pCallbackFunc != nullptr)
         {
-            ((void(*)())pCallbackFunc)();
+            pCallbackFunc();
         }
 
         ImGui::EndFrame();
@@ -253,7 +253,7 @@ void D3dHook::ProcessMouse()
     }
 }
 
-bool D3dHook::Init(void *pCallback)
+bool D3dHook::Init(std::function<void()> pCallback)
 {
     static bool hookInjected;
     if (hookInjected)

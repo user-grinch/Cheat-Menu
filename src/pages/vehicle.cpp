@@ -25,7 +25,6 @@ VehiclePage::VehiclePage()
         m_Spawner.m_bInAir = gConfig.Get("Features.SpawnAircraftInAir", true);
         m_Spawner.m_bAsDriver = gConfig.Get("Features.SpawnInsideVehicle", true);
     };
-    
 
     Events::processScriptsEvent += [this]
     {
@@ -98,6 +97,9 @@ VehiclePage::VehiclePage()
                 pVeh->m_nFlags.bCollisionProof = true;
                 pVeh->m_nFlags.bMeleeProof = true;
                 pVeh->m_nFlags.bImmuneToNonPlayerDamage = true;
+
+                // patch for bikes
+                patch::Nop(0x614E20, 6);
 
                 // no tyre burst
                 patch::SetRaw(0x609F30, (void*)"\xC2\x08\x00", 3);
@@ -495,6 +497,7 @@ void VehiclePage::Draw()
                     pVeh->m_nFlags.bCollisionProof = false;
                     pVeh->m_nFlags.bMeleeProof = false;
                     pVeh->m_nFlags.bImmuneToNonPlayerDamage = false;
+                    patch::SetRaw(0x614E20, (void*)"\xD9\x9D\x04\x02\x00\x00", 6);
                     
                     // restore tyre burst
                     patch::SetRaw(0x609F30, (void*)"\x53\x56\x57", 3);
