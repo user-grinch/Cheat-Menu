@@ -129,6 +129,7 @@ PlayerPage::PlayerPage()
             player->m_nFlags.bExplosionProof = 1;
             player->m_nFlags.bFireProof = 1;
             player->m_nFlags.bMeleeProof = 1;
+            player->m_nFlags.bImmuneToNonPlayerDamage = 1;
 #else
             player->m_nFlags.bBulletProof = 1;
             player->m_nFlags.bCollisionProof = 1;
@@ -396,6 +397,7 @@ void PlayerPage::Draw()
                 pPlayer->m_nFlags.bExplosionProof = m_bGodMode;
                 pPlayer->m_nFlags.bFireProof = m_bGodMode;
                 pPlayer->m_nFlags.bMeleeProof = m_bGodMode;
+                pPlayer->m_nFlags.bImmuneToNonPlayerDamage = m_bGodMode;
 #else
                 pPlayer->m_nFlags.bBulletProof = m_bGodMode;
                 pPlayer->m_nFlags.bCollisionProof = m_bGodMode;
@@ -589,7 +591,7 @@ void PlayerPage::Draw()
 
             state = BY_GAME(pPlayer->m_nPhysicalFlags.bMeleeProof, pPlayer->m_nFlags.bMeleeProof,
                             pPlayer->m_nFlags.bMeleeProof);
-            if (Widget::Checkbox(TEXT("Player.MeeleProof"), &state, nullptr, m_bGodMode))
+            if (Widget::Checkbox(TEXT("Player.MeleeProof"), &state, nullptr, m_bGodMode))
             {
                 BY_GAME(pPlayer->m_nPhysicalFlags.bMeleeProof, pPlayer->m_nFlags.bMeleeProof,
                         pPlayer->m_nFlags.bMeleeProof) = state;

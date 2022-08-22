@@ -35,11 +35,12 @@ public:
     static bool IsInCar(CPed *pPed = FindPlayerPed());
     static void UnFlipCar(CVehicle *pVeh);
 
+    static CPed* GetClosestPed();
+
     static void GetCPUUsageInit();
     static double GetCurrentCPUUsage();
     static float RoundFloat(float val);
     
-    static CPed* GetClosestPed();
     static std::string GetLocationName(CVector* pos);
     static bool IsOnCutscene();
     static void RainbowValues(int& r, int& g, int& b, float speed);

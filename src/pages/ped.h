@@ -18,6 +18,16 @@ private:
         int m_nWeaponId;
     } m_Spawner;
 
+    struct GangStruct
+    {
+        int m_nSelected;
+        int m_nSelectedMember;
+
+        unsigned int GetModel(unsigned int gangId, unsigned int memberId);
+        void SetModel(unsigned int gangId, unsigned int memberId, unsigned int model);
+        void ResetModels();
+    } m_Gang;
+
 
     friend class IFeature;
     PedPage();
@@ -37,6 +47,12 @@ public:
 #ifdef GTASA
     DataStore m_SpecialPedData {"special_peds"};
     ResourceStore m_PedData{"peds", eResourceType::TYPE_IMAGE_TEXT, ImVec2(65, 110)};
+
+    const char* m_GangList =
+    {
+        "Ballas\0Grove street families\0Los santos vagos\0San fierro rifa\0Da nang boys\0"
+        "Mafia\0Mountain cloud triad\0Varrio los aztecas\0Gang9\0Gang10\0"
+    };
 #else
     ResourceStore m_PedData {"peds", eResourceType::TYPE_TEXT};
 #endif

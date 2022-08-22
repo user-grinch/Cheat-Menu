@@ -2,6 +2,7 @@
 #include <math.h>
 #include <psapi.h>
 #include "util.h"
+#include <CPopulation.h>
 
 ImVec2 Util::ConvertScreenToMap(ImVec2 pos, ImVec2 mapSz, ImVec2 screenSz)
 {

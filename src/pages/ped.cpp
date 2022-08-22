@@ -121,6 +121,22 @@ void PedPage::AddNewPed()
     }
 }
 #ifdef GTASA
+
+unsigned int PedPage::GangStruct::GetModel(unsigned int gangId, unsigned int memberId)
+{
+    return CPopulation::m_PedGroups[42 + static_cast<int>(gangId)][memberId];
+}
+
+void PedPage::GangStruct::SetModel(unsigned int gangId, unsigned int memberId, unsigned int model)
+{
+    CPopulation::m_PedGroups[42 + static_cast<int>(gangId)][memberId] = model;
+}
+
+void PedPage::GangStruct::ResetModels()
+{
+    CPopulation::LoadPedGroups();
+}
+
 void PedPage::SpawnPed(std::string& model)
 #else
 void PedPage::SpawnPed(std::string& cat, std::string& name, std::string& model)
@@ -413,64 +429,99 @@ void PedPage::Draw()
             }
             ImGui::EndTabItem();
         }
-    
 #ifdef GTASA
         if (ImGui::BeginTabItem(TEXT("Ped.Gangs")))
         {
             ImGui::Spacing();
-            if (ImGui::Button(TEXT("Ped.StartWar"), ImVec2(Widget::CalcSize(2))))
-            {
-                if (Util::GetLargestGangInZone() == 1)
-                {
-                    CGangWars::StartDefensiveGangWar();
-                }
-                else
-                {
-                    CGangWars::StartOffensiveGangWar();
-                }
-                CGangWars::bGangWarsActive = true;
-            }
-            ImGui::SameLine();
-            if (ImGui::Button(TEXT("Ped.EndWar"), ImVec2(Widget::CalcSize(2))))
-            {
-                CGangWars::EndGangWar(true);
-            }
 
-            ImGui::Dummy(ImVec2(0, 20));
-            ImGui::TextWrapped(TEXT("Ped.ZoneDensity"));
-            ImGui::Spacing();
-
-            static const char* m_GangList[] =
+            if (ImGui::BeginTabBar("GANGGGG"))
             {
-                "Ballas", "Grove street families", "Los santos vagos", "San fierro rifa",
-                "Da nang boys", "Mafia", "Mountain cloud triad", "Varrio los aztecas", "Gang9", "Gang10"
-            };
-            ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 2);
-            for (int i = 0; i != 10; ++i)
-            {
-                CVector pos = FindPlayerPed()->GetPosition();
-                CZoneInfo* info = CTheZones::GetZoneInfo(&pos, nullptr);
-                int density = info->m_nGangDensity[i];
-                if (ImGui::SliderInt(m_GangList[i], &density, 0, 127))
+                if (ImGui::BeginTabItem(TEXT("Ped.GangWars")))
                 {
-                    info->m_nGangDensity[i] = static_cast<int8_t>(density);
-                    Command<Commands::CLEAR_SPECIFIC_ZONES_TO_TRIGGER_GANG_WAR>();
-                    CGangWars::bGangWarsActive = true;
-                }
-            }
-            ImGui::PopItemWidth();
-            static bool pluginRequired = (GetModuleHandle("ExGangWars.asi") == 0); 
-            if (pluginRequired)
-            {
-                ImGui::Spacing();
-                ImGui::TextWrapped(TEXT("Ped.ExGangWarsTip"));
-                ImGui::Spacing();
-                if (ImGui::Button(TEXT("Ped.DownloadExGangWars"), Widget::CalcSize(1)))
-                {
-                    OPEN_LINK("https://gtaforums.com/topic/682194-extended-gang-wars/");
-                }
-            }
+                    ImGui::Spacing();
+                    if (ImGui::Button(TEXT("Ped.StartWar"), ImVec2(Widget::CalcSize(2))))
+                    {
+                        if (Util::GetLargestGangInZone() == 1)
+                        {
+                            CGangWars::StartDefensiveGangWar();
+                        }
+                        else
+                        {
+                            CGangWars::StartOffensiveGangWar();
+                        }
+                        CGangWars::bGangWarsActive = true;
+                    }
+                    ImGui::SameLine();
+                    if (ImGui::Button(TEXT("Ped.EndWar"), ImVec2(Widget::CalcSize(2))))
+                    {
+                        CGangWars::EndGangWar(true);
+                    }
 
+                    ImGui::Dummy(ImVec2(0, 20));
+                    ImGui::TextWrapped(TEXT("Ped.ZoneDensity"));
+                    ImGui::Spacing();
+
+                    static const char* m_GangList[] =
+                    {
+                        "Ballas", "Grove street families", "Los santos vagos", "San fierro rifa",
+                        "Da nang boys", "Mafia", "Mountain cloud triad", "Varrio los aztecas", "Gang9", "Gang10"
+                    };
+                    ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 2);
+                    for (int i = 0; i != 10; ++i)
+                    {
+                        CVector pos = FindPlayerPed()->GetPosition();
+                        CZoneInfo* info = CTheZones::GetZoneInfo(&pos, nullptr);
+                        int density = info->m_nGangDensity[i];
+                        if (ImGui::SliderInt(m_GangList[i], &density, 0, 127))
+                        {
+                            info->m_nGangDensity[i] = static_cast<int8_t>(density);
+                            Command<Commands::CLEAR_SPECIFIC_ZONES_TO_TRIGGER_GANG_WAR>();
+                            CGangWars::bGangWarsActive = true;
+                        }
+                    }
+                    ImGui::PopItemWidth();
+                    static bool pluginRequired = (GetModuleHandle("ExGangWars.asi") == 0); 
+                    if (pluginRequired)
+                    {
+                        ImGui::Spacing();
+                        ImGui::TextWrapped(TEXT("Ped.ExGangWarsTip"));
+                        ImGui::Spacing();
+                        if (ImGui::Button(TEXT("Ped.DownloadExGangWars"), Widget::CalcSize(1)))
+                        {
+                            OPEN_LINK("https://gtaforums.com/topic/682194-extended-gang-wars/");
+                        }
+                    }
+                    ImGui::EndTabItem();
+                }
+                if (ImGui::BeginTabItem(TEXT("Ped.GangModelEditor")))
+                {
+                    ImGui::Spacing();
+                    if (ImGui::Button(TEXT("Ped.ResetModels"), Widget::CalcSize(1)))
+                    {
+                        m_Gang.ResetModels();
+                    }
+                    ImGui::Spacing();
+                    ImGui::Combo(TEXT("Weapon.SelectGang"), &m_Gang.m_nSelected, pedPage.m_GangList);
+                    ImGui::Combo(TEXT("Ped.SelectMember"), &m_Gang.m_nSelectedMember, "Member 1\0Member 2\0Member 3\0");
+                    ImGui::Spacing();
+
+                    int mem1 = m_Gang.GetModel(m_Gang.m_nSelected, 0);
+                    int mem2 = m_Gang.GetModel(m_Gang.m_nSelected, 1);
+                    int mem3 = m_Gang.GetModel(m_Gang.m_nSelected, 2);
+                    ImGui::Text("%s: %d,  %d,  %d", TEXT("Ped.CurrentModels"), mem1, mem2, mem3);
+
+                    ImGui::Spacing();
+
+                    Widget::ImageList(m_PedData, [this](str &id){
+                        m_Gang.SetModel(m_Gang.m_nSelected, m_Gang.m_nSelectedMember, std::stoi(id));
+                    }, 
+                    [this](str &text){
+                        return m_PedData.m_pData->Get(text.c_str(), "Unknown");
+                    });
+                    ImGui::EndTabItem();
+                }
+                ImGui::EndTabBar();
+            }
             ImGui::EndTabItem();
         }
 #endif

@@ -3,6 +3,7 @@
 #include "utils/widget.h"
 #include "utils/util.h"
 #include <CWeaponInfo.h>
+#include "pages/ped.h"
 
 WeaponPage& weaponPage = WeaponPage::Get();
 WeaponPage::WeaponPage()
@@ -396,12 +397,7 @@ void WeaponPage::Draw()
         if (ImGui::BeginTabItem(TEXT("Weapon.GangWeaponEditor")))
         {
             ImGui::Spacing();
-            static const char* gangList =
-            {
-                "Ballas\0Grove street families\0Los santos vagos\0San fierro rifa\0Da nang boys\0"
-                "Mafia\0Mountain cloud triad\0Varrio los aztecas\0Gang9\0Gang10\0"
-            };
-            ImGui::Combo(TEXT("Weapon.SelectGang"), &m_Gang.m_nSelected, gangList);
+            ImGui::Combo(TEXT("Weapon.SelectGang"), &m_Gang.m_nSelected, pedPage.m_GangList);
             ImGui::Combo(TEXT("Ped.SelectWeapon"), &m_Gang.m_nSelectedWeapon, "Weapon 1\0Weapon 2\0Weapon 3\0");
             ImGui::Spacing();
 
