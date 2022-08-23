@@ -7,7 +7,6 @@
 #include "imgui/imgui_impl_win32.h"
 #include <dinput.h>
 
-#define DIMOUSE ((LPDIRECTINPUTDEVICE8)(RsGlobal.ps->diMouse))
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 bool D3dHook::GetMouseState()
@@ -227,6 +226,12 @@ void D3dHook::ProcessMouse()
 
             patch::SetUChar(BY_GAME(0x6194A0, 0x6020A0, 0x580D20), 0xC3); // psSetMousePos
             patch::Nop(BY_GAME(0x541DD7, 0x4AB6CA, 0x49272F), 5); // don't call CPad::UpdateMouse()
+#ifdef GTASA
+            // Fix bug with radio switching
+            patch::SetUChar(0x4EB731, 0xEB); 
+            patch::SetUChar(0x4EB75A, 0xEB); 
+            
+#endif
         }
         else
         {
@@ -234,6 +239,8 @@ void D3dHook::ProcessMouse()
             patch::SetUChar(BY_GAME(0x6194A0, 0x6020A0, 0x580D20), BY_GAME(0xE9, 0x53, 0x53));
 #ifdef GTASA
             patch::SetRaw(0x541DD7, (char*)"\xE8\xE4\xD5\xFF\xFF", 5);
+            patch::SetUChar(0x4EB731, 0x74); 
+            patch::SetUChar(0x4EB75A, 0x74); 
 #elif GTAVC
             patch::SetRaw(0x4AB6CA, (char*)"\xE8\x51\x21\x00\x00", 5);
 #else
@@ -241,14 +248,18 @@ void D3dHook::ProcessMouse()
 #endif
         }
 
+        CPad::UpdatePads();
         CPad::NewMouseControllerState.x = 0;
         CPad::NewMouseControllerState.y = 0;
 #ifdef GTA3
         CPad::GetPad(0)->ClearMouseHistory();
 #else
         CPad::ClearMouseHistory();
+        CPad::GetPad(0)->NewState.DPadUp = 0;
+        CPad::GetPad(0)->OldState.DPadUp = 0;
+        CPad::GetPad(0)->NewState.DPadDown = 0;
+        CPad::GetPad(0)->OldState.DPadDown = 0;
 #endif
-        CPad::UpdatePads();
         mouseState = mouseShown;
     }
 }
