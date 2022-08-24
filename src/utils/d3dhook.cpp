@@ -228,9 +228,8 @@ void D3dHook::ProcessMouse()
             patch::Nop(BY_GAME(0x541DD7, 0x4AB6CA, 0x49272F), 5); // don't call CPad::UpdateMouse()
 #ifdef GTASA
             // Fix bug with radio switching
-            patch::SetUChar(0x4EB731, 0xEB); 
-            patch::SetUChar(0x4EB75A, 0xEB); 
-            
+            patch::SetUInt(0x4EB731, 0xEB); // jz -> jmp, skip mouse checks
+            patch::SetUChar(0x4EB75A, 0xEB); // jz -> jmp, skip mouse checks
 #endif
         }
         else
@@ -239,8 +238,8 @@ void D3dHook::ProcessMouse()
             patch::SetUChar(BY_GAME(0x6194A0, 0x6020A0, 0x580D20), BY_GAME(0xE9, 0x53, 0x53));
 #ifdef GTASA
             patch::SetRaw(0x541DD7, (char*)"\xE8\xE4\xD5\xFF\xFF", 5);
-            patch::SetUChar(0x4EB731, 0x74); 
-            patch::SetUChar(0x4EB75A, 0x74); 
+            patch::SetUChar(0x4EB731, 0x74); // jz
+            patch::SetUChar(0x4EB75A, 0x74); // jz
 #elif GTAVC
             patch::SetRaw(0x4AB6CA, (char*)"\xE8\x51\x21\x00\x00", 5);
 #else
@@ -248,6 +247,7 @@ void D3dHook::ProcessMouse()
 #endif
         }
 
+        // Need to update pads before resting values
         CPad::UpdatePads();
         CPad::NewMouseControllerState.x = 0;
         CPad::NewMouseControllerState.y = 0;

@@ -2,8 +2,18 @@
 #include "utils/updater.h"
 #include "utils/rpc.h"
 
+LONG WINAPI CrashHandler(PEXCEPTION_POINTERS pExceptionInfo)
+{
+    Log::Print<eLogLevel::None>("");
+    Log::Print<eLogLevel::Error>("Game crashed. Unhandled exception at {} (0x{:x})", 
+        pExceptionInfo->ExceptionRecord->ExceptionAddress, pExceptionInfo->ExceptionRecord->ExceptionCode);
+    return EXCEPTION_CONTINUE_SEARCH;
+}
+
 void MenuThread(void* param)
 {
+    // SetUnhandledExceptionFilter can get replaced by other dlls
+    AddVectoredExceptionHandler(0, CrashHandler);
     while (true)
     {
         FontMgr::Process();
