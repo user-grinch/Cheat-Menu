@@ -5,7 +5,6 @@
 #include "imgui/imgui_impl_dx9.h"
 #include "imgui/imgui_impl_dx11.h"
 #include "imgui/imgui_impl_win32.h"
-#include <dinput.h>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -228,7 +227,7 @@ void D3dHook::ProcessMouse()
             patch::Nop(BY_GAME(0x541DD7, 0x4AB6CA, 0x49272F), 5); // don't call CPad::UpdateMouse()
 #ifdef GTASA
             // Fix bug with radio switching
-            patch::SetUInt(0x4EB731, 0xEB); // jz -> jmp, skip mouse checks
+            patch::SetUChar(0x4EB731, 0xEB); // jz -> jmp, skip mouse checks
             patch::SetUChar(0x4EB75A, 0xEB); // jz -> jmp, skip mouse checks
 #endif
         }

@@ -337,7 +337,9 @@ void VehiclePage::SpawnVehicle(std::string& rootkey, std::string& vehName, std::
         veh = (CVehicle*)train;
         hveh = CPools::GetVehicleRef(veh);
         if (veh->m_pDriver)
+        {
             Command<Commands::DELETE_CHAR>(CPools::GetPedRef(veh->m_pDriver));
+        }
 
         if (m_Spawner.m_bAsDriver)
         {
