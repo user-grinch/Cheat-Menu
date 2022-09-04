@@ -324,7 +324,7 @@ void MenuPage::Draw()
 
                 ImGui::NextColumn();
                 ImGui::Text("ImGui: %s", ImGui::GetVersion());
-                ImGui::Text("%s: %s",TEXT("Menu.Build"), BUILD_NUMBER);
+                ImGui::Text("%s: %s",TEXT("Menu.Build"), __DATE__);
 
                 ImGui::Columns(1);
 

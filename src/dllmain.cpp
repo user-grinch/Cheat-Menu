@@ -2,11 +2,11 @@
 #include "utils/updater.h"
 #include "utils/rpc.h"
 
-LONG WINAPI CrashHandler(PEXCEPTION_POINTERS pExceptionInfo)
+LONG WINAPI CrashHandler(PEXCEPTION_POINTERS pInfo)
 {
     Log::Print<eLogLevel::None>("");
     Log::Print<eLogLevel::Error>("Game crashed. Unhandled exception at {} (0x{:x})", 
-        pExceptionInfo->ExceptionRecord->ExceptionAddress, pExceptionInfo->ExceptionRecord->ExceptionCode);
+        pInfo->ExceptionRecord->ExceptionAddress, pInfo->ExceptionRecord->ExceptionCode);
     return EXCEPTION_CONTINUE_SEARCH;
 }
 

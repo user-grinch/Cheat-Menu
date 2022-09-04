@@ -591,7 +591,7 @@ void PlayerPage::Draw()
 
             state = BY_GAME(pPlayer->m_nPhysicalFlags.bMeleeProof, pPlayer->m_nFlags.bMeleeProof,
                             pPlayer->m_nFlags.bMeleeProof);
-            if (Widget::Checkbox(TEXT("Player.MeleeProof"), &state, nullptr, m_bGodMode))
+            if (Widget::Checkbox(TEXT("Vehicle.MeleeProof"), &state, nullptr, m_bGodMode))
             {
                 BY_GAME(pPlayer->m_nPhysicalFlags.bMeleeProof, pPlayer->m_nFlags.bMeleeProof,
                         pPlayer->m_nFlags.bMeleeProof) = state;

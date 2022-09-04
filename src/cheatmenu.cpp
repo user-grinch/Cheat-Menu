@@ -135,7 +135,7 @@ CheatMenuMgr::CheatMenuMgr()
             return;
         }
 
-        Log::Print<eLogLevel::None>("Starting " MENU_TITLE " (" BUILD_NUMBER ")\nAuthor: Grinch_\nDiscord: "
+        Log::Print<eLogLevel::None>("Starting " MENU_TITLE " (" __DATE__ ")\nAuthor: Grinch_\nDiscord: "
                                 DISCORD_INVITE "\nMore Info: " GITHUB_LINK);
 
         // date time

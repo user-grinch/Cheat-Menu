@@ -15,10 +15,10 @@ enum class ePageID
     Menu, 
 
     // Pages without headers
-    None, 
     Anniversary, 
     Update, 
     Welcome,
+    COUNT,
 };
 
 /*
