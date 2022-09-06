@@ -1,7 +1,7 @@
 ######################################################################
-# English Translation File
+# Russian Translation File
 # Make a copy of this file and translate it to your language.
-# Author: Grinch_
+# Author: ekrem-qb
 ######################################################################
 
 [Scene]
@@ -134,10 +134,10 @@ WeatherID = "Weather ID"
 WeatherIDText = "Sets weather by IDs (0-255). Don't touch unless you know what you're doing!"
 
 [Main]
-TranslationLanguage = "English"
-TranslationLanguageDisclaimer = "Translated to English by Grinch_"
-Translator = "Translator"
-TranslatorName = "Grinch_"
+TranslationLanguage = "Russian"
+TranslationLanguageDisclaimer = "Перевёл на русский ekrem-qb"
+Translator = "Перевод"
+TranslatorName = "ekrem-qb"
 
 [Menu]
 About = "About"
