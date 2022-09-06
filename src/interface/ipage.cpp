@@ -7,15 +7,12 @@
 
 void PageHandler::AddPage(PagePtr page, size_t index)
 {
-    static size_t size = static_cast<size_t>(ePageID::None);
-    if (index <= size)
+    static size_t size = static_cast<size_t>(ePageID::COUNT);
+    if (m_PageList.size() < size)
     {
-        if (m_PageList.size() < size)
-        {
-            m_PageList.resize(size);
-        }
-        m_PageList[index] = page;
+        m_PageList.resize(size);
     }
+    m_PageList[index] = page;
 }
 
 void PageHandler::SetCurrentPage(PagePtr page)

@@ -8,7 +8,7 @@ private:
     friend class IFeature;
     WelcomePage() : IPage<WelcomePage>(ePageID::Welcome, "Welcome", false)
     {
-        Events::initGameEvent += [this]()
+        Events::initGameEvent.after += [this]()
         {
             ePageID pageID = static_cast<ePageID>(gConfig.Get("Window.CurrentPage", static_cast<size_t>(ePageID::Welcome)));
             PagePtr ptr = PageHandler::FindPagePtr(pageID);
