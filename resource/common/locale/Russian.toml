@@ -759,41 +759,41 @@ WeaponIconPosY = "Weapon icon posY"
 WhiteScanlines = "White scanlines"
 
 [Weapon]
-Ammo = "Ammo"
-CurrentWeapon = "Current weapon: %s"
-DropAll = "Remove all"
-DropCurrent = "Remove current"
-DropWeapon = "Drop weapon"
-DualWeild = "Dual wield"
+Ammo = "Патроны"
+CurrentWeapon = "Текущее оружие: %s"
+DropAll = "Убрать все"
+DropCurrent = "Убрать текущее"
+DropWeapon = "Выбросить"
+DualWeild = "Двуствольное"
 DualWeildText = """
-Dual wield pistol, shawoff, uzi, tec9
-(Other weapons don't work)"""
-FastAim = "Fast aim"
+Двуствольный пистолет, обрез, Uzi и TEC-9
+(Не работает с другим оружием)"""
+FastAim = "Авто прицеливание"
 FastAimText = """
-Enables aim assist on keyboard
+Включение функции помощи при прицеливании на клавиатуре
 
-Q = left    E = right
+Q = влево    E = вправо
 
-Press Q and E to switch targets.
-Moving mouse removes the target!"""
-FastReload = "Fast reload"
-GangWeaponEditor = "Gang weapon editor"
-HugeDamage = "Huge damage"
-HugeDamageText = "Also enable 'Long range' if weapon range is short"
-InfiniteAmmo = "Infinite ammo"
-LongRange = "Long range"
-MoveWhenAiming = "Move when aiming"
-MoveWhenFiring = "Move when firing"
-NoSpread = "No spread"
-RapidFire = "Rapid fire"
-SelectGang = "Select gang"
-Weapon1 = "Weapon 1"
-Weapon2 = "Weapon 2"
-Weapon3 = "Weapon 3"
+Нажимайте Q и E для переключения целей.
+Перемещение мыши убирает прицеливание!"""
+FastReload = "Быстрая перезарядка"
+GangWeaponEditor = "Редактор оружия банд"
+HugeDamage = "Огромный урон"
+HugeDamageText = "Также включите 'Большая дальность', если дальность оружия мала."
+InfiniteAmmo = "Бесконечные патроны"
+LongRange = "Большая дальность"
+MoveWhenAiming = "Ходьба при прицеливании"
+MoveWhenFiring = "Ходьба при стрельбе"
+NoSpread = "Нет разброса"
+RapidFire = "Быстрый огонь"
+SelectGang = "Выберите банду"
+Weapon1 = "Оружие 1"
+Weapon2 = "Оружие 2"
+Weapon3 = "Оружие 3"
 WeaponTweaksText = """
-Weapon tweaks apply globally
-to every ped weapon type"""
-WeaponType = "Weapon type"
+Настройки оружия применяются глобально
+к каждому типу оружия педов"""
+WeaponType = "Тип оружия"
 
 [Window]
 AddEntry = "Добавить"
