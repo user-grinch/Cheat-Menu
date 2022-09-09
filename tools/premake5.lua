@@ -30,7 +30,6 @@ function createProject(projectID)
         kind "SharedLib"
         targetextension ".asi"
         
-        
         includedirs {
             PSDK_DIR .. "/plugin_" .. projectID .. "/",
             PSDK_DIR .. "/plugin_" .. projectID .. "/game_" .. projectID .. "/",
@@ -40,7 +39,7 @@ function createProject(projectID)
 
         libdirs {
             PSDK_DIR .. "/output/lib",
-            "lib"
+            "../lib/",
         }
         
         files { 
@@ -98,10 +97,6 @@ workspace "CheatMenu"
     location "../build"
     targetdir "../build/bin"
 
-    libdirs {
-        PSDK_DIR .. "/output/lib"
-    }
-
     links { 
         "d3d9",
         "d3d11",
@@ -119,7 +114,7 @@ workspace "CheatMenu"
     }
 
     includedirs {
-        "../depend/",
+        "../include/",
         "../src/",
     }
 
@@ -127,10 +122,10 @@ project "depend"
     kind "StaticLib"
 
     files { 
-        "../depend/**.h", 
-        "../depend/**.hpp", 
-        "../depend/**.c", 
-        "../depend/**.cpp" 
+        "../include/**.h", 
+        "../include/**.hpp", 
+        "../include/**.c", 
+        "../include/**.cpp" 
     }
 
     filter "configurations:Debug"
