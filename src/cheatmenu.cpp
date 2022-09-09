@@ -14,7 +14,8 @@ static bool DrawTitleBar()
     bool hovered, held;
     ImGuiWindow *window = ImGui::GetCurrentWindow();
     ImGuiStyle& Style = ImGui::GetStyle();
-    ImGuiID id = window->GetPageID("#CLOSE");
+    ImGuiID id = window->GetID("#CLOSE");
+    ImGui::KeepAliveID(id);
 
     ImGui::PushFont(FontMgr::Get("title"));
     Widget::TextCentered(MENU_TITLE);
