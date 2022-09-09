@@ -5,6 +5,9 @@
 <p align="center">  
   Press <kbd>Left Ctrl</kbd> + <kbd>M</kbd> to open the menu. Doesn't work in multiplayer
 </p>
+<p align="center">  
+  READ THE INSTRUCTIONS. EVERYTHING YOU NEED TO KNOW IS ALREADY HERE.
+</p>
 
 ## Introduction
 
@@ -22,7 +25,7 @@ Only these versions of the game is supported. I highly recommand installing the 
 
 If you have those mentioned versions installed follow the steps below,
 1. Install [DirectX9](https://www.microsoft.com/en-us/download/details.aspx?id=35), [Visual C++ Redistributable 2022 x86](https://aka.ms/vs/17/release/vc_redist.x86.exe) & [Ultimate asi loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases) (Necessary).
-2. Download [**CheatMenuSA/VC/III.7z**](https://github.com/user-grinch/Cheat-Menu/releases) and extract everything in game root directory. The **CheatMenu** folder & **.asi** file must be placed in the same place.
+2. Download [**CheatMenuSA/VC/III.7z**](https://github.com/user-grinch/Cheat-Menu/releases) and extract everything in game root directory (NOT MODLOADER). The **CheatMenu** folder & **.asi** file must be placed in the same place.
 3. Install [SilentPatch](https://gtaforums.com/topic/669045-silentpatch/) (For GTA III don't install the ddraw.dll component)
 
 ### For III & VC
@@ -30,7 +33,7 @@ If you have those mentioned versions installed follow the steps below,
 
 ## Incompatible Mods
 ### GTA SA
-1. **ENB/ SA_DirectX 2.0**  **FIX:** Disable Effect/ Enable water
+1. **ENB/ SA_DirectX 2.0** 
 2. **MSI Afterburner**  **FIX:**  Enable Stealth mode in rivatuner
 3. **GTA Underground**
 
