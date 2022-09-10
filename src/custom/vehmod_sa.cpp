@@ -191,8 +191,8 @@ void VehModMgr::Draw()
 
         std::vector<Widget::BindInfo> drive_type
         {
-            {TEXT("Vehicle.FrontWheelDrive"), 70}, 
-            {TEXT("Vehicle.RearWheelDrive"), 82}, 
+            {TEXT("Vehicle.FrontWheelDrive"), 70},
+            {TEXT("Vehicle.RearWheelDrive"), 82},
             {TEXT("Vehicle.FourWheelDrive"), 52}
         };
         Widget::EditRadioBtnAddr(TEXT("Vehicle.DriveType"), (int)&pHandlingData->m_transmissionData.m_nDriveType, drive_type);
@@ -206,15 +206,15 @@ void VehModMgr::Draw()
         Widget::EditAddr(TEXT("Vehicle.EngineInertia"), (int)&pHandlingData->m_transmissionData.m_fEngineInertia, 0.1f, 0.1f, 400.0f);
 
         std::vector<Widget::BindInfo> engine_type
-        { 
-            {TEXT("Vehicle.Petrol"), 80}, {TEXT("Vehicle.Diseal"), 68}, {TEXT("Vehicle.Electric"), 69} 
+        {
+            {TEXT("Vehicle.Petrol"), 80}, {TEXT("Vehicle.Diesel"), 68}, {TEXT("Vehicle.Electric"), 69}
         };
         Widget::EditRadioBtnAddr(TEXT("Vehicle.EngineType"), (int)&pHandlingData->m_transmissionData.m_nEngineType, engine_type);
 
         std::vector<Widget::BindInfo> lights
-        { 
-            {TEXT("Vehicle.Long"), 0}, {TEXT("Vehicle.Small"), 1}, 
-            {TEXT("Vehicle.Big"), 2}, {TEXT("Vehicle.Tall"), 3} 
+        {
+            {TEXT("Vehicle.Long"), 0}, {TEXT("Vehicle.Small"), 1},
+            {TEXT("Vehicle.Big"), 2}, {TEXT("Vehicle.Tall"), 3}
         };
         Widget::EditRadioBtnAddr(TEXT("Vehicle.FrontLights"), (int)&pHandlingData->m_nFrontLights, lights);
 
