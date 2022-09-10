@@ -479,7 +479,7 @@ Damage = "Damage"
 DampingLvl = "Damping level"
 DensityMul = "Density multiplier"
 DirtLvl = "Dirt level"
-Diseal = "Diseal"
+Diesel = "Diesel"
 DmgProof = "Damage proof"
 DmgProofTip = """
 Every vehicle entered will be damage proof

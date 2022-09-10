@@ -464,7 +464,7 @@ Damage = "损害"
 DampingLvl = "悬挂水平"
 DensityMul = "密度乘数"
 DirtLvl = "污垢水平"
-Diseal = "Diseal"
+Diesel = "Diesel"
 DmgProof = "防损坏"
 DmgProofTip = """
 每辆进入的车辆都是防损坏的
