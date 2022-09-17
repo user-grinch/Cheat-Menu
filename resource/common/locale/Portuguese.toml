@@ -408,7 +408,7 @@ Damage = "Dano"
 DampingLvl = "Nível de amortecimento"
 DensityMul = "Multiplicador de densidade"
 DirtLvl = "Nível de sujeira"
-Diseal = "Diesel"
+Diesel = "Diesel"
 DmgProof = "A prova de danos"
 DmgProofTip = """
 Cada veículo inserido será à prova de danos

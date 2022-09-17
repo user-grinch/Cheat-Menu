@@ -328,7 +328,7 @@ SkinsTab = "Skins"
 SpecialNotImplement = "Spawneo de peds especiales no se ha implementado aún"
 SprintEverywhere = "Correr en todos lados"
 SprintEverywhereTip = """
-Activa poder correr en todas las 
+Activa poder correr en todas las
 superficies (interiores etc.)"""
 Stamina = "Stamina"
 Suicide = "Suicidio"
@@ -389,7 +389,7 @@ Damage = "Daño"
 DampingLvl = "Nivel de amortiguación"
 DensityMul = "Multiplicador de densidad"
 DirtLvl = "Nivel de suciedad"
-Diseal = "Diesel"
+Diesel = "Diesel"
 DmgProof = "A prueba de daños"
 DmgProofTip = """
 En cada vehiculo que entres será a prueba de daño

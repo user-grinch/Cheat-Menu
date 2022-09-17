@@ -315,7 +315,7 @@ void GamePage::Draw()
                 //     patch::PutRetn(0x4F5700);
 
                 //     patch::PutRetn(0x4E9820);
-                        
+
                 //     if (!pVeh)
                 //     {
                 //         settings.m_nRadioType = RADIO_CIVILIAN;
@@ -350,8 +350,8 @@ void GamePage::Draw()
                     patch::Set<uint8_t>(0x6C2759, 0, true);
                 }
             }
-            Widget::Checkbox(TEXT("Game.Screenshot"), &m_bScreenShot, 
-                                std::format("{} {}", TEXT("Game.ScreenshotTip"), 
+            Widget::Checkbox(TEXT("Game.Screenshot"), &m_bScreenShot,
+                                std::format("{} {}", TEXT("Game.ScreenshotTip"),
                                 quickSceenShot.GetNameString()).c_str());
             Widget::Checkbox(TEXT("Game.SolidWater"), &m_bSolidWater, TEXT("Game.SolidWaterText"));
 #endif
@@ -422,12 +422,12 @@ void GamePage::Draw()
                 ImGui::Spacing();
                 ImGui::Separator();
             }
-            if (ImGui::CollapsingHeader(TEXT("Game.ChangeRadioStaion")))
+            if (ImGui::CollapsingHeader(TEXT("Game.ChangeRadioStation")))
             {
-                static const char* channels = 
+                static const char* channels =
                     "Playback FM\0KRose\0KDST\0Bounce FM\0SFUR\0Radio Los Santos\0Radio X\0CSR\0KJah West\0"
                     "Master Sounds\0WCTR\0User Tracks\0None\0";
-                
+
                 int curStation = Command<Commands::GET_RADIO_CHANNEL>();
                 if (ImGui::Combo(TEXT("Game.CurrentStation"), &curStation, channels))
                 {
@@ -638,7 +638,7 @@ void GamePage::Draw()
                 ImGui::TableSetupColumn(TEXT("Game.KeyAction"));
                 ImGui::TableSetupColumn(TEXT("Game.KeyCombo"));
                 ImGui::TableHeadersRow();
-                
+
                 ImGui::TableNextRow();
                 ImGui::TableNextColumn();
                 ImGui::Text("Forward");
@@ -668,7 +668,7 @@ void GamePage::Draw()
                 ImGui::Text("Backward slide");
                 ImGui::TableNextColumn();
                 ImGui::Text((freeCamForward.GetNameString() + " + Space").c_str());
-                
+
                 ImGui::TableNextRow();
                 ImGui::TableNextColumn();
                 ImGui::Text("Left slide");
@@ -686,7 +686,7 @@ void GamePage::Draw()
                 ImGui::Text("");
                 ImGui::TableNextColumn();
                 ImGui::Text("");
-                
+
                 ImGui::TableNextRow();
                 ImGui::TableNextColumn();
                 ImGui::Text("Up");
