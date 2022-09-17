@@ -16,6 +16,7 @@ ResourceStore::ResourceStore(const char* text, eResourceType type, ImVec2 imageS
             {
                 m_Categories.push_back(std::string(k.str()));
             }
+            UpdateSearchList();
         }
     }
 
@@ -28,13 +29,9 @@ ResourceStore::ResourceStore(const char* text, eResourceType type, ImVec2 imageS
                 Maybe enabling a dx9 flag fixes this?
                 Switch to initScriptsEvent
         */
-        Events::processScriptsEvent += [text, this]()
+        Events::initGameEvent += [text, this]()
         {
-            if (!m_bTexturesLoaded)
-            {
-                LoadTextureResource(text);
-                m_bTexturesLoaded = true;
-            }
+            LoadTextureResource(text);
         };
     }
 }
@@ -147,4 +144,49 @@ void ResourceStore::LoadTextureResource(std::string&& name)
         }
         while ( pEndDic != (RwTexDictionary*)&pRwTexDictionary->texturesInDict );
     }
+}
+
+void ResourceStore::UpdateSearchList(bool favourites)
+{
+    m_nSearchList.clear();
+    if (favourites)
+    {
+        for (auto [key, val] : *m_pData->GetTable("Favourites"))
+        {
+            std::string label = std::string(key.str());
+            if (m_Filter.PassFilter(label.c_str()))
+            {
+                std::string data = val.value_or<std::string>("Unkonwn");
+                m_nSearchList.push_back({std::move(std::string("Favourites")), std::move(label), std::move(data)});
+            }
+        }
+    }
+    else
+    {
+        for (auto [cat, table] : m_pData->Items())
+        {
+            // Don't show favourites in "All"
+            if (m_Selected == "All" && cat == "Favourites")
+            {
+                continue;
+            }
+            if (cat.str() == m_Selected || m_Selected == "All")
+            {
+                if (!table.as_table())
+                {
+                    return;
+                }
+                for (auto [key, val] : *table.as_table()->as_table())
+                {
+                    std::string label = std::string(key.str());
+                    if (m_Filter.PassFilter(label.c_str()))
+                    {
+                        std::string data = val.value_or<std::string>("Unkonwn");
+                        m_nSearchList.push_back({std::move(std::string(cat.str())), std::move(label), std::move(data)});
+                    }
+                }
+            }
+        }
+    }
+    m_nSearchList.shrink_to_fit();
 }

@@ -43,6 +43,9 @@ public:
     // Draws DataStore data in the interface
     static void DataList(ResourceStore& data, fArg3_t clickFunc = nullptr, fArgNone_t addFunc = nullptr, bool isEditItem = false);
     
+    // Draws listed data, used in DataList
+    static void DrawClippedList(ResourceStore& data, fArg3_t clickFunc = nullptr, bool favourites = false, bool isEditItem = false);
+
     // Draws a dropdown editor for memory address
     template <typename T>
     static void EditAddr(const char* label, uint address, int min = 0, int def = 0, int max = 100);
@@ -62,7 +65,7 @@ public:
 #endif
 
     // ImGui::TextFilter with hint support
-    static void Filter(const char* label, ImGuiTextFilter& filter, const char* hint);
+    static bool Filter(const char* label, ImGuiTextFilter& filter, const char* hint);
 
     // Input widgets with increment & decrement buttons
     static bool InputFloat(const char* label, float *val, float change = 1.0f, float min = -1.0f, float max = -1.0f);
