@@ -75,7 +75,7 @@ bool Widget::Filter(const char* label, ImGuiTextFilter& filter, const char* hint
     return state;
 }
 
-void Widget::DrawClippedList(ResourceStore& data, fArg3_t clickFunc, bool favourites, bool isEditItem)
+void DrawClippedList(ResourceStore& data, fArg3_t clickFunc, bool favourites, bool isEditItem)
 {
     // Category box
     ImGui::PushItemWidth(favourites ? ImGui::GetWindowContentRegionWidth() :
@@ -83,30 +83,33 @@ void Widget::DrawClippedList(ResourceStore& data, fArg3_t clickFunc, bool favour
 
     if (!favourites)
     {
-        if (ListBox("##Categories", data.m_Categories, data.m_Selected))
+        if (Widget::ListBox("##Categories", data.m_Categories, data.m_Selected))
         {
             data.UpdateSearchList(favourites);
         }
         ImGui::SameLine();
     }
     
-    if (Filter("##Filter", data.m_Filter, TEXT("Window.Search")))
+    if (Widget::Filter("##Filter", data.m_Filter, TEXT("Window.Search")))
     {
         data.UpdateSearchList(favourites);
     }
     ImGui::PopItemWidth();
 
     ImGui::Spacing();
-    ImGui::BeginChild(1);
-
+    if (favourites && data.m_pData->GetTable("Favourites")->size() == 0)
+    {
+        Widget::TextCentered(TEXT("Menu.FavouritesNone"));
+    }
+    ImGui::BeginChild("CliipingLIst");
     ImGuiListClipper clipper(data.m_nSearchList.size(), ImGui::GetTextLineHeight());
     while (clipper.Step())
     {
         for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i)
         {   
-            std::string &label = data.m_nSearchList[i].key;
-            std::string &cat = data.m_nSearchList[i].cat;
-            std::string &val =  data.m_nSearchList[i].val;
+            std::string &label = std::get<ListLookup>(data.m_nSearchList[i]).key;
+            std::string &cat = std::get<ListLookup>(data.m_nSearchList[i]).cat;
+            std::string &val =  std::get<ListLookup>(data.m_nSearchList[i]).val;
             if (isEditItem)
             {
 #ifdef GTASA
@@ -127,6 +130,52 @@ void Widget::DrawClippedList(ResourceStore& data, fArg3_t clickFunc, bool favour
             }
         }
     }
+
+    if (contextMenu.show)
+    {
+        if (ImGui::BeginPopupContextWindow())
+        {
+            ImGui::Text(contextMenu.key.c_str());
+            ImGui::Separator();
+
+            if (!favourites && ImGui::MenuItem(TEXT("Menu.Favourites")))
+            {
+                data.m_pData->Set(std::format("Favourites.{}", contextMenu.key).c_str(), contextMenu.val);
+                data.m_pData->Save();
+                Util::SetMessage(TEXT("Menu.FavouritesText"));
+            }
+            if (!favourites && ImGui::MenuItem(TEXT("Menu.Remove")))
+            {
+                if (contextMenu.root == "Custom")
+                {
+                    data.m_pData->RemoveKey("Custom", contextMenu.key.c_str());
+                    data.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
+                    data.m_pData->Save();
+                    data.UpdateSearchList();
+                    Util::SetMessage(TEXT("Window.RemoveEntry"));
+                }
+                else
+                {
+                    Util::SetMessage(TEXT("Window.CustomRemoveOnly"));
+                }
+            }
+
+            if (favourites &&ImGui::MenuItem(TEXT("Menu.FavouritesRemove")))
+            {
+                data.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
+                data.m_pData->Save();
+                data.UpdateSearchList(true);
+                Util::SetMessage(TEXT("Menu.FavouritesRemoveText"));
+            }
+
+            if (ImGui::MenuItem(TEXT("Menu.Close")))
+            {
+                contextMenu.show = false;
+            }
+            ImGui::EndPopup();
+        }
+    }
+    ImGui::EndChild();
 }
 
 void Widget::DataList(ResourceStore& data, fArg3_t clickFunc, fArgNone_t addFunc, bool isEditItem)
@@ -143,42 +192,6 @@ void Widget::DataList(ResourceStore& data, fArg3_t clickFunc, fArgNone_t addFunc
         {
             ImGui::Spacing();
             DrawClippedList(data, clickFunc, false, isEditItem);
-            if (contextMenu.show)
-            {
-                if (ImGui::BeginPopupContextWindow())
-                {
-                    ImGui::Text(contextMenu.key.c_str());
-                    ImGui::Separator();
-                    if (ImGui::MenuItem(TEXT("Menu.Favourites")))
-                    {
-                        data.m_pData->Set(std::format("Favourites.{}", contextMenu.key).c_str(), contextMenu.val);
-                        data.m_pData->Save();
-                        Util::SetMessage(TEXT("Menu.FavouritesText"));
-                    }
-                    if (ImGui::MenuItem(TEXT("Menu.Remove")))
-                    {
-                        if (contextMenu.root == "Custom")
-                        {
-                            data.m_pData->RemoveKey("Custom", contextMenu.key.c_str());
-                            data.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
-                            data.m_pData->Save();
-                            data.UpdateSearchList();
-                            Util::SetMessage(TEXT("Window.RemoveEntry"));
-                        }
-                        else
-                        {
-                            Util::SetMessage(TEXT("Window.CustomRemoveOnly"));
-                        }
-                    }
-                    if (ImGui::MenuItem(TEXT("Menu.Close")))
-                    {
-                        contextMenu.show = false;
-                    }
-
-                    ImGui::EndPopup();
-                }
-            }
-            ImGui::EndChild();
             ImGui::EndTabItem();
         }
         if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
@@ -189,32 +202,6 @@ void Widget::DataList(ResourceStore& data, fArg3_t clickFunc, fArgNone_t addFunc
         {
             ImGui::Spacing();
             DrawClippedList(data, clickFunc, true, isEditItem);
-            if (data.m_pData->GetTable("Favourites")->size() == 0)
-            {
-                Widget::TextCentered(TEXT("Menu.FavouritesNone"));
-            }
-            if (contextMenu.show)
-            {
-                if (ImGui::BeginPopupContextWindow())
-                {
-                    ImGui::Text(contextMenu.key.c_str());
-                    ImGui::Separator();
-                    if (ImGui::MenuItem(TEXT("Menu.FavouritesRemove")))
-                    {
-                        data.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
-                        data.m_pData->Save();
-                        data.UpdateSearchList(true);
-                        Util::SetMessage(TEXT("Menu.FavouritesRemoveText"));
-                    }
-                    if (ImGui::MenuItem(TEXT("Menu.Close")))
-                    {
-                        contextMenu.show = false;
-                    }
-
-                    ImGui::EndPopup();
-                }
-            }
-            ImGui::EndChild();
             ImGui::EndTabItem();
         }
         if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
@@ -285,6 +272,109 @@ static bool RoundedImageButton(ImTextureID textureID, ImVec2& size, const char* 
     return ImGui::IsItemClicked(0);
 }
 
+void DrawClippedImages(ResourceStore& data, ImVec2 imgSz, size_t imagesInRow, bool showImages, 
+                        bool favourites, fArg1_t clickFunc, fRtnArg1_t getNameFunc, fRtnBoolArg1_t verifyFunc)
+{
+    static IDirect3DTexture9 **pDefaultTex = gTextureList.FindTextureByName("placeholder");
+    ImGuiStyle &style = ImGui::GetStyle();
+
+    // Category box
+    ImGui::PushItemWidth(favourites ? ImGui::GetWindowContentRegionWidth() :
+        (ImGui::GetWindowContentRegionWidth() - ImGui::GetStyle().ItemSpacing.x)/2);
+    if (!favourites)
+    {
+        if (Widget::ListBox("##Categories", data.m_Categories, data.m_Selected))
+        {
+            data.UpdateSearchList(favourites);
+        }
+        ImGui::SameLine();
+    }
+    if (Widget::Filter("##Filter", data.m_Filter, TEXT("Window.Search")))
+    {
+        data.UpdateSearchList(favourites);
+    }
+    ImGui::PopItemWidth();
+
+    ImGui::Spacing();
+    ImGui::BeginChild("CliipingImag");
+    if (favourites && data.m_pData->GetTable("Favourites")->size() == 0)
+    {
+        Widget::TextCentered(TEXT("Menu.FavouritesNone"));
+    }
+
+    float itemSz = imgSz.y/(imagesInRow+1);
+    int imageCount = 1;
+    ImGuiListClipper clipper(data.m_nSearchList.size(), itemSz);
+    while (clipper.Step())
+    {
+        for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i)
+        {   
+            std::string &text = std::get<ImageLookup>(data.m_nSearchList[i]).m_FileName;
+            std::string &modelName = std::get<ImageLookup>(data.m_nSearchList[i]).m_ModelName;
+            bool custom = std::get<ImageLookup>(data.m_nSearchList[i]).m_bCustom;
+            void *pTexture = custom ? pDefaultTex : std::get<ImageLookup>(data.m_nSearchList[i]).m_pTexture;
+            if (showImages ? RoundedImageButton(pTexture, imgSz, modelName.c_str(), custom)
+                : ImGui::MenuItem(modelName.c_str())
+            )
+            {
+                clickFunc(text);
+            }
+
+            // Right click popup
+            if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+            {
+                contextMenu.show = true;
+                contextMenu.added = custom;
+                contextMenu.val = std::string(text);
+                contextMenu.key = std::string(modelName);
+            }
+
+            if (showImages)
+            {
+                if (imageCount % imagesInRow != 0)
+                {
+                    ImGui::SameLine(0.0, style.ItemInnerSpacing.x);
+                }
+            }
+            imageCount++;
+        }
+    }
+    if (contextMenu.show)
+    {
+        if (ImGui::BeginPopupContextWindow())
+        {
+            ImGui::Text(contextMenu.key.c_str());
+            ImGui::Separator();
+            if (!favourites && ImGui::MenuItem(TEXT("Menu.Favourites")))
+            {
+                data.m_pData->Set(std::format("Favourites.{}", contextMenu.key).c_str(), contextMenu.val);
+                data.m_pData->Save();
+                Util::SetMessage(TEXT("Menu.FavouritesText"));
+            }
+            if (!favourites && contextMenu.added && ImGui::MenuItem(TEXT("Menu.Remove")))
+            {
+                data.m_pData->RemoveKey("Custom", contextMenu.key.c_str());
+                data.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
+                data.m_pData->Save();
+                data.UpdateSearchList(false, getNameFunc, verifyFunc);
+            }
+            if (favourites && ImGui::MenuItem(TEXT("Menu.FavouritesRemove")))
+            {
+                data.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
+                data.m_pData->Save();
+                data.UpdateSearchList(true, getNameFunc, verifyFunc);
+                Util::SetMessage(TEXT("Menu.FavouritesRemoveText"));
+            }
+            if (ImGui::MenuItem(TEXT("Menu.Close")))
+            {
+                contextMenu.show = false;
+            }
+
+            ImGui::EndPopup();
+        }
+    }
+    ImGui::EndChild();
+}
 /*
     Here we go again...
     This direly needs a refactor oof
@@ -292,7 +382,6 @@ static bool RoundedImageButton(ImTextureID textureID, ImVec2& size, const char* 
 void Widget::ImageList(ResourceStore &store, fArg1_t clickFunc, fRtnArg1_t getNameFunc, 
                         fRtnBoolArg1_t verifyFunc, fArgNone_t addFunc)
 {
-    static IDirect3DTexture9 **pDefaultTex = nullptr;
     ImGuiStyle& style =  ImGui::GetStyle();
     /*
     	Trying to scale images based on resolutions
@@ -302,7 +391,6 @@ void Widget::ImageList(ResourceStore &store, fArg1_t clickFunc, fRtnArg1_t getNa
     m_ImageSize.x *= screen::GetScreenWidth() / 1366.0f;
     m_ImageSize.y *= screen::GetScreenHeight() / 768.0f;
 
-    int imageCount = 1;
     int imagesInRow = static_cast<int>(ImGui::GetWindowContentRegionWidth() / m_ImageSize.x);
     m_ImageSize.x = ImGui::GetWindowContentRegionWidth() - style.ItemSpacing.x * (imagesInRow-1);
     m_ImageSize.x /= imagesInRow;
@@ -316,7 +404,7 @@ void Widget::ImageList(ResourceStore &store, fArg1_t clickFunc, fRtnArg1_t getNa
     ImGui::Spacing();
 
     // Hide the popup if right clicked again
-    if (ImGui::IsMouseClicked(1))
+    if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
     {
         contextMenu.show = false;
     }
@@ -329,231 +417,34 @@ void Widget::ImageList(ResourceStore &store, fArg1_t clickFunc, fRtnArg1_t getNa
         ImGui::PushStyleVar(ImGuiStyleVar_IndentSpacing, 10.0f);
     }
 
+    if (store.m_bSearchListUpdateRequired)
+    {
+        store.UpdateSearchList(false, getNameFunc, verifyFunc);
+        store.m_bSearchListUpdateRequired = false;
+    }
+
     // Draw images here
     if (ImGui::BeginTabBar("MYTABS"))
     {
         if (ImGui::BeginTabItem(TEXT("Window.Search")))
         {
             ImGui::Spacing();
-            ImGui::PushItemWidth((ImGui::GetWindowContentRegionWidth() - style.ItemSpacing.x)/2);
-            Widget::ListBox("##Categories", store.m_Categories, store.m_Selected);
-            ImGui::SameLine();
-            Filter("##Filter", store.m_Filter, "Search");
-            ImGui::PopItemWidth();
-            ImGui::Spacing();
-            ImGui::BeginChild("DrawImages");
-
-            for (uint i = 0; i < store.m_ImagesList.size(); ++i)
-            {
-                std::string text = store.m_ImagesList[i]->m_FileName;
-                std::string modelName = getNameFunc(text);
-
-                if (store.m_Filter.PassFilter(modelName.c_str())
-                    && (store.m_ImagesList[i]->m_CategoryName == store.m_Selected || store.m_Selected == "All")
-                    && (verifyFunc == nullptr || verifyFunc(text))
-                )
-                {
-                    if (showImages ? RoundedImageButton(store.m_ImagesList[i]->m_pTexture, m_ImageSize, modelName.c_str())
-                        : ImGui::MenuItem(modelName.c_str())
-                    )
-                    {
-                        clickFunc(text);
-                    }
-
-                    // Right click popup
-                    if (ImGui::IsItemClicked(1))
-                    {
-                        contextMenu.show = true;
-                        contextMenu.added = false;
-                        contextMenu.val = text;
-                        contextMenu.key = modelName;
-                    }
-
-                    if (showImages)
-                    {
-                        if (imageCount % imagesInRow != 0)
-                        {
-                            ImGui::SameLine(0.0, style.ItemInnerSpacing.x);
-                        }
-                    }
-                    imageCount++;
-                }
-            }
-            for (auto [k, v] : *store.m_pData->GetTable("Custom"))
-            {
-                if (!pDefaultTex)
-                {
-                    pDefaultTex = gTextureList.FindTextureByName("placeholder");
-                }
-                std::string modelName = std::string(k.str());
-                std::string text = v.as_string()->value_or("0");
-                if (store.m_Filter.PassFilter(modelName.c_str())
-                    && (store.m_Selected == "Custom" || store.m_Selected == "All"))
-                {
-                    if (showImages ? RoundedImageButton(pDefaultTex, m_ImageSize, modelName.c_str(), true)
-                        : ImGui::MenuItem(modelName.c_str())
-                    )
-                    {
-                        clickFunc(text);
-                    }
-
-                    // Right click popup
-                    if (ImGui::IsItemClicked(1))
-                    {
-                        contextMenu.show = true;
-                        contextMenu.added = (addFunc != nullptr);
-                        contextMenu.val = text;
-                        contextMenu.key = modelName;
-                    }
-
-                    if (showImages)
-                    {
-                        if (imageCount % imagesInRow != 0)
-                        {
-                            ImGui::SameLine(0.0, style.ItemInnerSpacing.x);
-                        }
-                    }
-                    imageCount++;
-                }
-            }
-            if (contextMenu.show)
-            {
-                if (ImGui::BeginPopupContextWindow())
-                {
-                    ImGui::Text(contextMenu.key.c_str());
-                    ImGui::Separator();
-                    if (ImGui::MenuItem(TEXT("Menu.Favourites")))
-                    {
-                        store.m_pData->Set(std::format("Favourites.{}", contextMenu.key).c_str(), contextMenu.val);
-                        store.m_pData->Save();
-                        Util::SetMessage(TEXT("Menu.FavouritesText"));
-                    }
-                    if (contextMenu.added && ImGui::MenuItem(TEXT("Menu.Remove")))
-                    {
-                        store.m_pData->RemoveKey("Custom", contextMenu.key.c_str());
-                        store.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
-                        store.m_pData->Save();
-                    }
-                    if (ImGui::MenuItem(TEXT("Menu.Close")))
-                    {
-                        contextMenu.show = false;
-                    }
-
-                    ImGui::EndPopup();
-                }
-            }
-            ImGui::EndChild();
+            DrawClippedImages(store, m_ImageSize, imagesInRow, showImages, false, clickFunc, getNameFunc, verifyFunc);
             ImGui::EndTabItem();
+        }
+        if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
+        {
+            store.UpdateSearchList(false, getNameFunc, verifyFunc);
         }
         if (ImGui::BeginTabItem(TEXT("Window.FavouritesTab")))
         {
             ImGui::Spacing();
-            ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth());
-            Filter("##Filter", store.m_Filter, TEXT("Window.Search"));
-            ImGui::PopItemWidth();
-            ImGui::Spacing();
-            ImGui::BeginChild("DrawFavourites");
-
-            for (auto [k, v] : *store.m_pData->GetTable("Favourites"))
-            {
-                auto str = k.str();
-                bool state = str.find("Added") != std::string::npos;
-                if (state)
-                {
-                    std::string modelName = std::string(k.str());
-                    std::string text = v.as_string()->value_or("0");
-                    if (store.m_Filter.PassFilter(modelName.c_str()))
-                    {
-                        if (showImages ? RoundedImageButton(pDefaultTex, m_ImageSize, modelName.c_str(), true)
-                            : ImGui::MenuItem(modelName.c_str())
-                        )
-                        {
-                            clickFunc(text);
-                        }
-
-                        // Right click popup
-                        if (ImGui::IsItemClicked(1))
-                        {
-                            contextMenu.show = true;
-                            contextMenu.added = false;
-                            contextMenu.val = text;
-                            contextMenu.key = modelName;
-                        }
-
-                        if (showImages)
-                        {
-                            if (imageCount % imagesInRow != 0)
-                            {
-                                ImGui::SameLine(0.0, style.ItemInnerSpacing.x);
-                            }
-                        }
-                        imageCount++;
-                    }
-                }
-                else
-                {
-                    for (uint i = 0; i < store.m_ImagesList.size(); ++i)
-                    {
-                        std::string text = store.m_ImagesList[i]->m_FileName;
-                        std::string modelName = getNameFunc(text);
-
-                        if (modelName == k.str() && store.m_Filter.PassFilter(modelName.c_str()) && (verifyFunc == nullptr || verifyFunc(text)))
-                        {
-                            if (showImages ? RoundedImageButton(store.m_ImagesList[i]->m_pTexture, m_ImageSize, modelName.c_str())
-                                : ImGui::MenuItem(modelName.c_str())
-                            )
-                            {
-                                clickFunc(text);
-                            }
-
-                            // Right click popup
-                            if (ImGui::IsItemClicked(1))
-                            {
-                                contextMenu.show = true;
-                                contextMenu.added = false;
-                                contextMenu.val = text;
-                                contextMenu.key = modelName;
-                            }
-
-                            if (showImages)
-                            {
-                                if (imageCount % imagesInRow != 0)
-                                {
-                                    ImGui::SameLine(0.0, style.ItemInnerSpacing.x);
-                                }
-                            }
-                            imageCount++;
-                        }
-                    }
-                }
-            }
-            if (store.m_pData->GetTable("Favourites")->size() == 0)
-            {
-                Widget::TextCentered(TEXT("Menu.FavouritesNone"));
-            }
-            if (contextMenu.show)
-            {
-                if (ImGui::BeginPopupContextWindow())
-                {
-                    ImGui::Text(contextMenu.key.c_str());
-                    ImGui::Separator();
-                    if (ImGui::MenuItem(TEXT("Menu.FavouritesRemove")))
-                    {
-                        store.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
-                        store.m_pData->Save();
-                        Util::SetMessage(TEXT("Menu.FavouritesRemoveText"));
-                    }
-                    if (ImGui::MenuItem(TEXT("Menu.Close")))
-                    {
-                        contextMenu.show = false;
-                        contextMenu.added = false;
-                    }
-
-                    ImGui::EndPopup();
-                }
-            }
-            ImGui::EndChild();
+            DrawClippedImages(store, m_ImageSize, imagesInRow, showImages, true, clickFunc, getNameFunc, verifyFunc);
             ImGui::EndTabItem();
+        }
+        if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
+        {
+            store.UpdateSearchList(true, getNameFunc, verifyFunc);
         }
         if (addFunc)
         {

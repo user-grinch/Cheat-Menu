@@ -144,45 +144,128 @@ void ResourceStore::LoadTextureResource(std::string&& name)
         }
         while ( pEndDic != (RwTexDictionary*)&pRwTexDictionary->texturesInDict );
     }
+    m_bSearchListUpdateRequired = true;
 }
 
-void ResourceStore::UpdateSearchList(bool favourites)
+void ResourceStore::UpdateSearchList(bool favourites, fRtnArg1_t getNameFunc, fRtnBoolArg1_t verifyFunc)
 {
     m_nSearchList.clear();
     if (favourites)
     {
-        for (auto [key, val] : *m_pData->GetTable("Favourites"))
+        if (m_Type == eResourceType::TYPE_TEXT)
         {
-            std::string label = std::string(key.str());
-            if (m_Filter.PassFilter(label.c_str()))
+            for (auto [key, val] : *m_pData->GetTable("Favourites"))
             {
-                std::string data = val.value_or<std::string>("Unkonwn");
-                m_nSearchList.push_back({std::move(std::string("Favourites")), std::move(label), std::move(data)});
+                ListLookup lookup;
+                lookup.key = std::string(key.str());
+                if (m_Filter.PassFilter(lookup.key.c_str()))
+                {
+                    lookup.cat = "Favourites";
+                    lookup.val = val.value_or<std::string>("Unkonwn");
+                    m_nSearchList.push_back(std::move(lookup));
+                }
+            }
+        }
+        else
+        {
+            for (auto [key, val] : *m_pData->GetTable("Favourites"))
+            {
+                for (uint i = 0; i < m_ImagesList.size(); ++i)
+                {
+                    ImageLookup lookup;
+                    lookup.m_FileName = m_ImagesList[i]->m_FileName;
+                    lookup.m_ModelName = getNameFunc == nullptr ? "" : getNameFunc(lookup.m_FileName);
+
+                    if (lookup.m_ModelName == key.str() && m_Filter.PassFilter(lookup.m_ModelName.c_str()) 
+                    && (verifyFunc == nullptr || verifyFunc(lookup.m_FileName)))
+                    {
+                        lookup.m_bCustom = lookup.m_FileName.find("Added") != std::string::npos;
+                        lookup.m_pTexture = m_ImagesList[i]->m_pTexture;
+                        m_nSearchList.push_back(std::move(lookup));
+                        break;
+                    }
+                }
+
+                if (m_Type == eResourceType::TYPE_IMAGE_TEXT)
+                {
+                    for (auto [key, val] : *m_pData->GetTable("Custom"))
+                    {
+                        ImageLookup lookup;
+                        lookup.m_FileName =  val.as_string()->value_or("0");
+                        lookup.m_ModelName = std::string(key.str());
+                        if (lookup.m_ModelName == key.str() && m_Filter.PassFilter(lookup.m_ModelName.c_str())
+                            && (m_Selected == "Custom" || m_Selected == "All"))
+                        {
+                            lookup.m_bCustom = true;
+                            m_nSearchList.push_back(std::move(lookup));
+                        }
+                    }
+                }
             }
         }
     }
     else
     {
-        for (auto [cat, table] : m_pData->Items())
+        if (m_Type == eResourceType::TYPE_TEXT)
         {
-            // Don't show favourites in "All"
-            if (m_Selected == "All" && cat == "Favourites")
+            for (auto [cat, table] : m_pData->Items())
             {
-                continue;
-            }
-            if (cat.str() == m_Selected || m_Selected == "All")
-            {
-                if (!table.as_table())
+                // Don't show favourites in "All"
+                if (m_Selected == "All" && cat == "Favourites")
                 {
-                    return;
+                    continue;
                 }
-                for (auto [key, val] : *table.as_table()->as_table())
+                if (cat.str() == m_Selected || m_Selected == "All")
                 {
-                    std::string label = std::string(key.str());
-                    if (m_Filter.PassFilter(label.c_str()))
+                    if (!table.as_table())
                     {
-                        std::string data = val.value_or<std::string>("Unkonwn");
-                        m_nSearchList.push_back({std::move(std::string(cat.str())), std::move(label), std::move(data)});
+                        return;
+                    }
+                    for (auto [key, val] : *table.as_table()->as_table())
+                    {
+                        ListLookup lookup;
+                        lookup.key = std::string(key.str());
+                        if (m_Filter.PassFilter(lookup.key.c_str()))
+                        {
+                            lookup.cat = "Favourites";
+                            lookup.val = val.value_or<std::string>("Unkonwn");
+                            m_nSearchList.push_back(std::move(lookup));
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            for (uint i = 0; i < m_ImagesList.size(); ++i)
+            {
+                ImageLookup lookup;
+                lookup.m_FileName = m_ImagesList[i]->m_FileName;
+                lookup.m_ModelName = getNameFunc == nullptr ? "" : getNameFunc(lookup.m_FileName);
+
+                if (m_Filter.PassFilter(lookup.m_ModelName.c_str())
+                    && (m_ImagesList[i]->m_CategoryName == m_Selected || m_Selected == "All")
+                    && (verifyFunc == nullptr || verifyFunc(lookup.m_FileName))
+                )
+                {
+                    lookup.m_bCustom = false;
+                    lookup.m_pTexture = m_ImagesList[i]->m_pTexture;
+                    m_nSearchList.push_back(std::move(lookup));
+                }
+            }
+
+            if (m_Type == eResourceType::TYPE_IMAGE_TEXT)
+            {
+                for (auto [k, v] : *m_pData->GetTable("Custom"))
+                {
+                    ImageLookup lookup;
+                    lookup.m_FileName =  v.as_string()->value_or("0");
+                    lookup.m_ModelName = std::string(k.str());
+                    if (m_Filter.PassFilter(lookup.m_ModelName.c_str())
+                        && (m_Selected == "Custom" || m_Selected == "All"))
+                    {
+                        lookup.m_bCustom = true;
+                        m_nSearchList.push_back(std::move(lookup));
                     }
                 }
             }
