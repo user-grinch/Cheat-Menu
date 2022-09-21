@@ -285,13 +285,13 @@ void DrawClippedImages(ResourceStore& data, ImVec2 imgSz, size_t imagesInRow, bo
     {
         if (Widget::ListBox("##Categories", data.m_Categories, data.m_Selected))
         {
-            data.UpdateSearchList(favourites);
+            data.UpdateSearchList(favourites, getNameFunc, verifyFunc);
         }
         ImGui::SameLine();
     }
     if (Widget::Filter("##Filter", data.m_Filter, TEXT("Window.Search")))
     {
-        data.UpdateSearchList(favourites);
+        data.UpdateSearchList(favourites, getNameFunc, verifyFunc);
     }
     ImGui::PopItemWidth();
 
@@ -302,13 +302,21 @@ void DrawClippedImages(ResourceStore& data, ImVec2 imgSz, size_t imagesInRow, bo
         Widget::TextCentered(TEXT("Menu.FavouritesNone"));
     }
 
-    float itemSz = imgSz.y/(imagesInRow+1);
     int imageCount = 1;
-    ImGuiListClipper clipper(data.m_nSearchList.size(), itemSz);
+    size_t totalSz = data.m_nSearchList.size();
+    ImGuiListClipper clipper((totalSz > 3 ? totalSz/3 : totalSz), imgSz.y);
     while (clipper.Step())
     {
-        for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i)
+        // hack to get clipper working with rowed items
+        size_t start = clipper.DisplayStart * imagesInRow;
+        size_t end = clipper.DisplayEnd * imagesInRow + imagesInRow;
+        for (size_t i = start; i < end; ++i)
         {   
+            if (data.m_nSearchList.size() == i)
+            {
+                break;
+            }
+
             std::string &text = std::get<ImageLookup>(data.m_nSearchList[i]).m_FileName;
             std::string &modelName = std::get<ImageLookup>(data.m_nSearchList[i]).m_ModelName;
             bool custom = std::get<ImageLookup>(data.m_nSearchList[i]).m_bCustom;
