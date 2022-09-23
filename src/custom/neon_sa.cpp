@@ -184,45 +184,42 @@ NeonMgr::NeonMgr()
 {
     Events::vehicleRenderEvent += [this](CVehicle* pVeh)
     {
-        if (m_bEnabled)
+        NeonData* data = &m_VehNeon.Get(pVeh);
+        if (data->m_bNeonInstalled && !pVeh->IsUpsideDown())
         {
-            NeonData* data = &m_VehNeon.Get(pVeh);
-            if (data->m_bNeonInstalled && !pVeh->IsUpsideDown())
+            if (!m_pNeonTexture)
             {
-                if (!m_pNeonTexture)
+                m_pNeonTexture = LoadTextureFromMemory((char*)neon_mask, sizeof(neon_mask));
+            }
+
+            CVector Pos = CModelInfo::GetModelInfo(pVeh->m_nModelIndex)->m_pColModel->m_boundBox.m_vecMin;
+            CVector center = pVeh->TransformFromObjectSpace(CVector(0.0f, 0.0f, 0.0f));
+            CVector up = pVeh->TransformFromObjectSpace(CVector(0.0f, -Pos.y - data->m_fVal, 0.0f)) - center;
+            CVector right = pVeh->TransformFromObjectSpace(CVector(Pos.x + data->m_fVal, 0.0f, 0.0f)) - center;
+            CShadows::StoreShadowToBeRendered(5, m_pNeonTexture, &center, up.x, up.y, right.x, right.y, 180, data->m_Color.r,
+                                            data->m_Color.g, data->m_Color.b, 2.0f, false, 1.0f, 0, true);
+
+            if (data->m_bPulsing)
+            {
+                size_t delta = CTimer::m_snTimeInMilliseconds - CTimer::m_snPreviousTimeInMilliseconds;
+
+                if (data->m_fVal < 0.0f)
                 {
-                    m_pNeonTexture = LoadTextureFromMemory((char*)neon_mask, sizeof(neon_mask));
+                    data->m_bIncrement = true;
                 }
 
-                CVector Pos = CModelInfo::GetModelInfo(pVeh->m_nModelIndex)->m_pColModel->m_boundBox.m_vecMin;
-                CVector center = pVeh->TransformFromObjectSpace(CVector(0.0f, 0.0f, 0.0f));
-                CVector up = pVeh->TransformFromObjectSpace(CVector(0.0f, -Pos.y - data->m_fVal, 0.0f)) - center;
-                CVector right = pVeh->TransformFromObjectSpace(CVector(Pos.x + data->m_fVal, 0.0f, 0.0f)) - center;
-                CShadows::StoreShadowToBeRendered(5, m_pNeonTexture, &center, up.x, up.y, right.x, right.y, 180, data->m_Color.r,
-                                                data->m_Color.g, data->m_Color.b, 2.0f, false, 1.0f, 0, true);
-
-                if (data->m_bPulsing)
+                if (data->m_fVal > 0.3f)
                 {
-                    size_t delta = CTimer::m_snTimeInMilliseconds - CTimer::m_snPreviousTimeInMilliseconds;
+                    data->m_bIncrement = false;
+                }
 
-                    if (data->m_fVal < 0.0f)
-                    {
-                        data->m_bIncrement = true;
-                    }
-
-                    if (data->m_fVal > 0.3f)
-                    {
-                        data->m_bIncrement = false;
-                    }
-
-                    if (data->m_bIncrement)
-                    {
-                        data->m_fVal += 0.0003f * delta;
-                    }
-                    else
-                    {
-                        data->m_fVal -= 0.0003f * delta;
-                    }
+                if (data->m_bIncrement)
+                {
+                    data->m_fVal += 0.0003f * delta;
+                }
+                else
+                {
+                    data->m_fVal -= 0.0003f * delta;
                 }
             }
         }
@@ -268,4 +265,9 @@ void NeonMgr::Install(CVehicle* pVeh, int r, int g, int b)
 void NeonMgr::Remove(CVehicle* pVeh)
 {
     m_VehNeon.Get(pVeh).m_bNeonInstalled = false;
+}
+
+NeonMgr::NeonData NeonMgr::GetData(CVehicle *pVeh)
+{
+    return m_VehNeon.Get(pVeh);
 }

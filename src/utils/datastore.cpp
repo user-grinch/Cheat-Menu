@@ -65,7 +65,11 @@ void DataStore::RemoveKey(const char* key, const char* entry) noexcept
 {
     if (pTable)
     {
-        (*pTable).at_path(key).as_table()->erase(entry);
+        Table *tbl = pTable->at_path(key).as_table();
+        if (tbl)
+        {
+            tbl->erase(entry);
+        }
     }
 }
 

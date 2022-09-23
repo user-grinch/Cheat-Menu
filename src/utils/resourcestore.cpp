@@ -227,7 +227,7 @@ void ResourceStore::UpdateSearchList(bool favourites, fRtnArg1_t getNameFunc, fR
                         lookup.key = std::string(key.str());
                         if (m_Filter.PassFilter(lookup.key.c_str()))
                         {
-                            lookup.cat = "Favourites";
+                            lookup.cat = cat.str();
                             lookup.val = val.value_or<std::string>("Unkonwn");
                             m_nSearchList.push_back(std::move(lookup));
                         }

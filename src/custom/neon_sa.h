@@ -38,6 +38,9 @@ private:
 
 public:
 
+    // Returns internal neon data
+    NeonData GetData(CVehicle *pVeh);
+
     // Installs neons with color
     void Install(CVehicle* veh, int r, int g, int b);
 

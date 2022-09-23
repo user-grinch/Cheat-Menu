@@ -17,7 +17,8 @@ private:
     std::string path;
     
 public:
-    typedef toml::table Table;
+    using Table = toml::table;
+    using Array = toml::array;
 
     DataStore(const char* fileName, bool isPathPredefined = false) noexcept;
 
@@ -59,6 +60,25 @@ public:
             Set(key, defaultVal);
         }
         return defaultVal;
+    }
+
+    Array* GetArray(const char* key) noexcept
+    {
+        if (pTable)
+        {
+            Array *tbl = (*pTable).at_path(key).as_array();
+            if (tbl)
+            {
+                return tbl;
+            }
+            else
+            {
+                pTable->insert(key, Table());
+                return (*pTable).at_path(key).as_array();
+
+            }
+        }
+        return nullptr;
     }
 
     Table* GetTable(const char* key) noexcept

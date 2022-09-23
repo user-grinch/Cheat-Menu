@@ -7,13 +7,8 @@
 #include "utils/widget.h"
 #include "utils/util.h"
 #include "custom/filehandler.h"
-#include "custom/vehpaint.h"
+#include "custom/vehcustmzr.h"
 #include "custom/autodrive.h"
-
-#ifdef GTASA
-#include <tHandlingData.h>
-#include "custom/vehmod_sa.h"
-#endif
 
 VehiclePage& vehiclePage = VehiclePage::Get();
 VehiclePage::VehiclePage()
@@ -591,7 +586,7 @@ void VehiclePage::Draw()
             Widget::CheckboxAddr(TEXT("Vehicle.PerfectHandling"), 0x96914C);
             Widget::CheckboxAddr(TEXT("Vehicle.TankMode"), 0x969164);
 
-            Widget::Checkbox(TEXT("Vehicle.InfNitro"), &VehMod.m_Nitro.m_bEnabled, TEXT("Vehicle.InfNitroTip"));
+            Widget::Checkbox(TEXT("Vehicle.InfNitro"), &VehCustmzr.m_Nitro.m_bEnabled, TEXT("Vehicle.InfNitroTip"));
             if (Widget::Checkbox(TEXT("Vehicle.FlipNoBurn"), &m_bVehFlipNoBurn, TEXT("Vehicle.FlipNoBurnTip")))
             {
                 // MixSets (Link2012)
@@ -1006,18 +1001,28 @@ void VehiclePage::Draw()
         if (pPlayer->m_pVehicle && bPlayerInCar)
         {
             CVehicle* veh = FindPlayerPed()->m_pVehicle;
-            int hveh = CPools::GetVehicleRef(veh);
+            int hveh = CPools::GetVehicleRef(veh);    
+#ifdef GTASA            
+            if (ImGui::BeginTabItem(TEXT("Vehicle.Customize")))
+            {
+                ImGui::Spacing();
+
+                if (ImGui::BeginTabBar("CustomizeTab"))
+                {
+                    VehCustmzr.Draw();
+                    ImGui::EndTabBar();
+                }
+                ImGui::EndTabItem();
+            }
+#else
+            VehCustmzr.Draw();
+#endif
             if (ImGui::BeginTabItem(TEXT("Vehicle.AutoDrive")))
             {
                 ImGui::Spacing();
                 AutoDrive.Draw();
                 ImGui::EndTabItem();
             }
-            
-            VehPaint.Draw();
-#ifdef GTASA
-            VehMod.Draw();
-#endif
         }
         ImGui::EndTabBar();
     }

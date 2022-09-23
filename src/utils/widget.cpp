@@ -146,9 +146,9 @@ void DrawClippedList(ResourceStore& data, fArg3_t clickFunc, bool favourites, bo
             }
             if (!favourites && ImGui::MenuItem(TEXT("Menu.Remove")))
             {
-                if (contextMenu.root == "Custom")
+                if (contextMenu.root == "Custom" || data.m_bAllowRemoveAll)
                 {
-                    data.m_pData->RemoveKey("Custom", contextMenu.key.c_str());
+                    data.m_pData->RemoveKey(contextMenu.root.c_str(), contextMenu.key.c_str());
                     data.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
                     data.m_pData->Save();
                     data.UpdateSearchList();

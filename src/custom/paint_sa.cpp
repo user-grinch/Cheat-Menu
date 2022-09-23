@@ -1,321 +1,293 @@
-// Portion of this source is taken from MoonAdditions https://github.com/THE-FYP/MoonAdditions
-
-// Copyright (c) 2012 DK22Pac
-// Copyright (c) 2017 FYP
-// Copyright (c) 2021 Grinch_
-
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
 #include "pch.h"
 #include "paint_sa.h"
 #include "utils/util.h"
-#include <NodeName.h>
+#include "../../include/kiero/minhook/MinHook.h"
 
-void Paint::InjectHooks()
+PaintMgr& Paint = PaintMgr::Get();
+
+// This works with silentpatch
+static auto oEntityRender = (void(__fastcall*)(CVehicle*))0x534310;
+void __fastcall hkEntityRender(CVehicle* pVeh)
 {
-    static bool init;
-
-    if (init)
+    if (!pVeh || pVeh->m_nType != ENTITY_TYPE_VEHICLE)
     {
+        oEntityRender(pVeh);
         return;
     }
+    auto& data = Paint.GetData(pVeh);
 
-    Events::vehicleRenderEvent.before += [](CVehicle* pVeh)
+    /*
+        Game colors won't ve visible over material colors
+        So reset material colors & apply game colors here
+    */
+    if (pVeh->m_nPrimaryColor != data.m_nCarColors[0] 
+    || pVeh->m_nSecondaryColor != data.m_nCarColors[1])
     {
-        VehData& data = m_VehData.Get(pVeh);
-
-        // reset custom color if color id changed
-        if (pVeh->m_nPrimaryColor != data.primary_color
-                || pVeh->m_nSecondaryColor != data.secondary_color)
+        for (auto& it : data.m_nMapInfoList)
         {
-            for (auto& it : data.materialProperties)
-                data.resetMaterialColor(it.first);
-
-            data.primary_color = pVeh->m_nPrimaryColor;
-            data.secondary_color = pVeh->m_nSecondaryColor;
+            data.ResetMatColor(it.first);
         }
 
-        for (auto& it : data.materialProperties)
+        data.m_nCarColors[0] = pVeh->m_nPrimaryColor;
+        data.m_nCarColors[1] = pVeh->m_nSecondaryColor;
+        data.m_nCarColors[2] = pVeh->m_nTertiaryColor;
+        data.m_nCarColors[3] = pVeh->m_nQuaternaryColor;  
+    }
+
+
+    /*
+        Applying our custom material colors here
+    */
+    for (auto& it : data.m_nMapInfoList)
+    {
+        if (it.second.m_bRecolor)
         {
-            if (it.second._recolor)
+            it.second.m_nOriginalColor = it.first->color;
+            it.first->color = it.second.m_nColor;
+            it.second.m_nOriginalGeometryFlags = it.second.m_pGeometry->flags;
+            it.second.m_pGeometry->flags |= rpGEOMETRYMODULATEMATERIALCOLOR;
+        }
+
+        if (it.second.m_bRetexture)
+        {
+            auto tex = it.second.m_pTexture;
+            if (tex)
             {
-                it.second._originalColor = it.first->color;
-                it.first->color = it.second._color;
-                it.second._originalGeometryFlags = it.second._geometry->flags;
-                it.second._geometry->flags |= rpGEOMETRYMODULATEMATERIALCOLOR;
+                it.second.m_pOriginalTexture = it.first->texture;
+                it.first->texture = tex;
             }
-            if (it.second._retexture)
+            else
             {
-                auto tex = it.second._texture;
-                if (tex)
-                {
-                    it.second._originalTexture = it.first->texture;
-                    it.first->texture = tex;
-                }
-                else
-                {
-                    it.second._retexture = false;
-                }
+                it.second.m_bRetexture = false;
+            }
+        }
+    }
+    oEntityRender(pVeh);
+};
+
+PaintMgr::PaintMgr()
+{
+    MH_Initialize();
+    MH_CreateHook((void*)0x534310, hkEntityRender, (void**)&oEntityRender);
+    MH_EnableHook((void*)0x534310);
+
+    // This doesn't work for helicopters? SilentPatch?
+    static ThiscallEvent<AddressList<0x55332A, H_CALL>, PRIORITY_BEFORE, ArgPickN<CVehicle*, 0>, void(CVehicle*)> vehicleResetAfterRender;
+    vehicleResetAfterRender += [this](CVehicle* pVeh)
+    {
+        PaintData& data = m_VehPaint.Get(pVeh);
+        for (auto& it : data.m_nMapInfoList)
+        {
+            if (it.second.m_bRecolor)
+            {
+                it.first->color = it.second.m_nOriginalColor;
+                it.second.m_pGeometry->flags = it.second.m_nOriginalGeometryFlags;
+            }
+            if (it.second.m_bRetexture)
+            {
+                it.first->texture = it.second.m_pOriginalTexture;
             }
         }
     };
-
-    ThiscallEvent<AddressList<0x55332A, H_CALL>, PRIORITY_BEFORE, ArgPickN<CVehicle*, 0>, void(CVehicle*)> vehicleResetAfterRender;
-    vehicleResetAfterRender += [](CVehicle* pVeh)
-    {
-        for (auto& it : m_VehData.Get(pVeh).materialProperties)
-        {
-            if (it.second._recolor)
-            {
-                it.first->color = it.second._originalColor;
-                it.second._geometry->flags = it.second._originalGeometryFlags;
-            }
-            if (it.second._retexture)
-            {
-                it.first->texture = it.second._originalTexture;
-            }
-        }
-    };
-    init = true;
 }
 
-void Paint::VehData::setMaterialColor(RpMaterial* material, RpGeometry* geometry, RwRGBA color, bool filter_mat)
+void PaintMgr::SetCarcols(CVehicle *pVeh, uint primary, uint secondary, uint tertiary, uint quaternary, bool reset)
 {
-    auto& matProps = materialProperties[material];
+    *(uint8_replacement*)(int(pVeh) + 0x433 + 1) = primary;
+    *(uint8_replacement*)(int(pVeh) + 0x433 + 2) = secondary;
+    *(uint8_replacement*)(int(pVeh) + 0x433 + 3) = tertiary;
+    *(uint8_replacement*)(int(pVeh) + 0x433 + 4) = quaternary;
 
-    if (!filter_mat
-            || (material->color.red == 0x3C && material->color.green == 0xFF && material->color.blue == 0x00)
-            || (material->color.red == 0xFF && material->color.green == 0x00 && material->color.blue == 0xAF))
+    // stop trigger reset
+    if (!reset)
     {
-        matProps._recolor = true;
-        matProps._color = color;
-        matProps._geometry = geometry;
+        auto& data = Paint.GetData(pVeh);
+        data.m_nCarColors[0] = *(uint8_replacement*)(int(pVeh) + 0x433 + 1);
+        data.m_nCarColors[1] = *(uint8_replacement*)(int(pVeh) + 0x433 + 2);
+        data.m_nCarColors[2] = *(uint8_replacement*)(int(pVeh) + 0x433 + 3);
+        data.m_nCarColors[3] = *(uint8_replacement*)(int(pVeh) + 0x433 + 4);
+    }
+    
+}
+
+void PaintMgr::PaintData::SetMatColor(RpMaterial* material, RpGeometry* geometry, RwRGBA color)
+{
+    auto& matInfo = m_nMapInfoList[material];
+    if ((material->color.red == 0x3C && material->color.green == 0xFF && material->color.blue == 0x00)
+    || (material->color.red == 0xFF && material->color.green == 0x00 && material->color.blue == 0xAF))
+    {
+        matInfo.m_bRecolor = true;
+        matInfo.m_nColor = color;
+        matInfo.m_pGeometry = geometry;
     }
 }
 
-void Paint::VehData::setMaterialTexture(RpMaterial* material, RwTexture* texture, bool filter_mat)
+void PaintMgr::PaintData::SetMatTexture(RpMaterial* material, RwTexture* texture)
 {
-    auto& matProps = materialProperties[material];
-
-    if (!filter_mat
-            || (material->color.red == 0x3C && material->color.green == 0xFF && material->color.blue == 0x00)
-            || (material->color.red == 0xFF && material->color.green == 0x00 && material->color.blue == 0xAF))
+    auto& matInfo = m_nMapInfoList[material];
+    if ((material->color.red == 0x3C && material->color.green == 0xFF && material->color.blue == 0x00)
+    || (material->color.red == 0xFF && material->color.green == 0x00 && material->color.blue == 0xAF))
     {
-        matProps._retexture = true;
-        matProps._texture = texture;
+        matInfo.m_bRetexture = true;
+        matInfo.m_pTexture = texture;
     }
 }
 
-void Paint::VehData::resetMaterialColor(RpMaterial* material)
+void PaintMgr::PaintData::ResetMatColor(RpMaterial* material)
 {
-    auto& matProps = materialProperties[material];
-    matProps._recolor = false;
-    matProps._color = {0, 0, 0, 0};
+    auto& matInfo = m_nMapInfoList[material];
+    matInfo.m_bRecolor = false;
+    matInfo.m_nColor = {0, 0, 0, 0};
 }
 
-void Paint::VehData::resetMaterialTexture(RpMaterial* material)
+void PaintMgr::PaintData::ResetMatTexture(RpMaterial* material)
 {
-    auto& matProps = materialProperties[material];
-    matProps._retexture = false;
-    matProps._texture = nullptr;
+    auto& matInfo = m_nMapInfoList[material];
+    matInfo.m_bRetexture = false;
+    matInfo.m_pTexture = nullptr;
 }
 
-void Paint::NodeWrapperRecursive(RwFrame* frame, CVehicle* pVeh, std::function<void(RwFrame*)> func)
+PaintMgr::PaintData& PaintMgr::GetData(CVehicle *pVeh)
+{
+    return m_VehPaint.Get(pVeh);
+}
+
+static void NodeWrapperRecursive(RwFrame* frame, CVehicle* pVeh, std::function<void(RwFrame*)> func)
 {
     if (frame)
     {
         func(frame);
-
         if (RwFrame* newFrame = frame->child)
+        {
             NodeWrapperRecursive(newFrame, pVeh, func);
+        }
         if (RwFrame* newFrame = frame->next)
+        {
             NodeWrapperRecursive(newFrame, pVeh, func);
+        }
     }
     return;
 }
 
-void Paint::GenerateNodeList(CVehicle* pVeh, std::vector<std::string>& names_vec, std::string& selected)
+struct BindData
 {
-    static int vehModel = 0;
-    if (vehModel == pVeh->m_nModelIndex)
-    {
-        return;
-    }
+    void *pData;
+    CRGBA color;
+    RwTexture* pTexture;
+};
 
-    // reset to default
-    names_vec.clear();
-    names_vec.push_back("Default");
-    selected = "Default";
-
-    RwFrame* frame = (RwFrame*)pVeh->m_pRwClump->object.parent;
-
-    NodeWrapperRecursive(frame, pVeh, [&](RwFrame* frame)
-    {
-        const std::string name = GetFrameNodeName(frame);
-        if (!(std::find(names_vec.begin(), names_vec.end(), name) != names_vec.end()))
-        {
-            names_vec.push_back(name);
-        }
-    });
-    vehModel = pVeh->m_nModelIndex;
-}
-
-void Paint::SetNodeColor(CVehicle* pVeh, std::string node_name, CRGBA color, bool filter_mat)
+void PaintMgr::SetColor(CVehicle* pVeh, CRGBA color)
 {
-    RwFrame* frame = (RwFrame*)pVeh->m_pRwClump->object.parent;
-
-    NodeWrapperRecursive(frame, pVeh, [&](RwFrame* frame)
+    RwFrame* pFrame = (RwFrame*)pVeh->m_pRwClump->object.parent;
+    NodeWrapperRecursive(pFrame, pVeh, [&](RwFrame* frame)
     {
-        const std::string name = GetFrameNodeName(frame);
-
-        struct ST
+        BindData bindData { &m_VehPaint.Get(pVeh), color };
+        RwFrameForAllObjects(frame, [](RwObject* object, void* data) -> RwObject*
         {
-            CRGBA _color;
-            bool _filter;
-        } st;
-
-        st._color = color;
-        st._filter = filter_mat;
-
-        if (node_name == "Default" || node_name == name)
-        {
-            RwFrameForAllObjects(frame, [](RwObject* object, void* data) -> RwObject*
+            if (object->type == rpATOMIC)
             {
-                if (object->type == rpATOMIC)
+                RpAtomic* atomic = reinterpret_cast<RpAtomic*>(object);
+
+                BindData* bind = reinterpret_cast<BindData*>(data);
+                CRGBA color = bind->color;
+                PaintData* pData = reinterpret_cast<PaintData*>(bind->pData);
+
+                for (int i = 0; i < atomic->geometry->matList.numMaterials; ++i)
                 {
-                    RpAtomic* atomic = reinterpret_cast<RpAtomic*>(object);
-
-                    ST* st = reinterpret_cast<ST*>(data);
-                    CRGBA* color = &st->_color;
-                    bool filter_mat = st->_filter;
-
-                    VehData& data = m_VehData.Get(FindPlayerPed()->m_pVehicle);
-
-                    for (int i = 0; i < atomic->geometry->matList.numMaterials; ++i)
-                        data.setMaterialColor(atomic->geometry->matList.materials[i], atomic->geometry,
-                    {color->r, color->g, color->b, 255}, filter_mat);
+                    pData->SetMatColor(atomic->geometry->matList.materials[i], atomic->geometry,
+                                        {color.r, color.g, color.b, color.a});
                 }
-                return object;
-            }, &st);
-        }
+            }
+            return object;
+        }, &bindData);
     });
 }
 
-void Paint::SetNodeTexture(CVehicle* pVeh, std::string node_name, std::string texturename, bool filter_mat)
+void PaintMgr::SetTexture(CVehicle* pVeh, std::string name)
 {
-    RwFrame* frame = (RwFrame*)pVeh->m_pRwClump->object.parent;
-    RwTexture* texture = nullptr;
+    RwFrame* pFrame = (RwFrame*)pVeh->m_pRwClump->object.parent;
+    RwTexture* pTexture = nullptr;
 
+    // find the texture
     for (auto const& tex : m_TextureData.m_ImagesList)
     {
-        if (tex.get()->m_FileName == texturename)
+        if (tex.get()->m_FileName == name)
         {
-            texture = tex.get()->m_pRwTexture;
+            pTexture = tex.get()->m_pRwTexture;
             break;
         }
     }
 
-    NodeWrapperRecursive(frame, pVeh, [&](RwFrame* frame)
+    if (!pTexture)
     {
-        const std::string name = GetFrameNodeName(frame);
+        return;
+    }
 
-        struct ST
+    m_VehPaint.Get(pVeh).m_nTextureName = name;
+    NodeWrapperRecursive(pFrame, pVeh, [&](RwFrame* frame)
+    {
+        BindData bindData { &m_VehPaint.Get(pVeh), {}, pTexture };
+        RwFrameForAllObjects(frame, [](RwObject* object, void* data) -> RwObject*
         {
-            RwTexture* _tex;
-            bool _filter;
-        } st;
-
-        st._tex = texture;
-        st._filter = filter_mat;
-
-        if (node_name == "Default" || node_name == name)
-        {
-            RwFrameForAllObjects(frame, [](RwObject* object, void* data) -> RwObject*
+            if (object->type == rpATOMIC)
             {
-                if (object->type == rpATOMIC)
+                RpAtomic* atomic = reinterpret_cast<RpAtomic*>(object);
+
+                BindData* bind = reinterpret_cast<BindData*>(data);
+                RwTexture *pTex = bind->pTexture;
+                PaintData* pData = reinterpret_cast<PaintData*>(bind->pData);
+
+                for (int i = 0; i < atomic->geometry->matList.numMaterials; ++i)
                 {
-                    RpAtomic* atomic = reinterpret_cast<RpAtomic*>(object);
-
-                    ST* st = reinterpret_cast<ST*>(data);
-                    VehData& data = m_VehData.Get(FindPlayerPed()->m_pVehicle);
-
-                    for (int i = 0; i < atomic->geometry->matList.numMaterials; ++i)
-                    {
-                        data.setMaterialTexture(atomic->geometry->matList.materials[i], st->_tex,
-                                                st->_filter);
-                    }
+                    pData->SetMatTexture(atomic->geometry->matList.materials[i], pTex);
                 }
-                return object;
-            }, &st);
-        }
+            }
+            return object;
+        }, &bindData);
     });
 }
 
-void Paint::ResetNodeColor(CVehicle* pVeh, std::string node_name)
+void PaintMgr::ResetColor(CVehicle* pVeh)
 {
     RwFrame* frame = (RwFrame*)pVeh->m_pRwClump->object.parent;
-
     NodeWrapperRecursive(frame, pVeh, [&](RwFrame* frame)
     {
-        const std::string name = GetFrameNodeName(frame);
-
-        if (node_name == "Default" || node_name == name)
+        RwFrameForAllObjects(frame, [](RwObject* object, void* data) -> RwObject*
         {
-            RwFrameForAllObjects(frame, [](RwObject* object, void* data) -> RwObject*
+            if (object->type == rpATOMIC)
             {
-                if (object->type == rpATOMIC)
-                {
-                    RpAtomic* atomic = reinterpret_cast<RpAtomic*>(object);
-                    VehData& data = m_VehData.Get(FindPlayerPed()->m_pVehicle);
+                RpAtomic* pAtomic = reinterpret_cast<RpAtomic*>(object);
+                PaintData* pData = reinterpret_cast<PaintData*>(data);
 
-                    for (int i = 0; i < atomic->geometry->matList.numMaterials; ++i)
-                        data.resetMaterialColor(atomic->geometry->matList.materials[i]);
+                for (int i = 0; i < pAtomic->geometry->matList.numMaterials; ++i)
+                {
+                    pData->ResetMatColor(pAtomic->geometry->matList.materials[i]);
                 }
-                return object;
-            }, nullptr);
-        }
+            }
+            return object;
+        }, &m_VehPaint.Get(pVeh));
     });
 }
 
-void Paint::ResetNodeTexture(CVehicle* pVeh, std::string node_name)
+void PaintMgr::ResetTexture(CVehicle* pVeh)
 {
     RwFrame* frame = (RwFrame*)pVeh->m_pRwClump->object.parent;
-
     NodeWrapperRecursive(frame, pVeh, [&](RwFrame* frame)
     {
-        const std::string name = GetFrameNodeName(frame);
-
-        if (node_name == "Default" || node_name == name)
+        RwFrameForAllObjects(frame, [](RwObject* object, void* data) -> RwObject*
         {
-            RwFrameForAllObjects(frame, [](RwObject* object, void* data) -> RwObject*
+            if (object->type == rpATOMIC)
             {
-                if (object->type == rpATOMIC)
+                RpAtomic* pAtomic = reinterpret_cast<RpAtomic*>(object);
+                PaintData* pData = reinterpret_cast<PaintData*>(data);
+
+                for (int i = 0; i < pAtomic->geometry->matList.numMaterials; ++i)
                 {
-                    RpAtomic* atomic = reinterpret_cast<RpAtomic*>(object);
-
-                    VehData& data = m_VehData.Get(FindPlayerPed()->m_pVehicle);
-
-                    for (int i = 0; i < atomic->geometry->matList.numMaterials; ++i)
-                        data.resetMaterialTexture(atomic->geometry->matList.materials[i]);
+                    pData->ResetMatTexture(pAtomic->geometry->matList.materials[i]);
                 }
-                return object;
-            }, nullptr);
-        }
+            }
+            return object;
+        }, &m_VehPaint.Get(pVeh));
     });
+    m_VehPaint.Get(pVeh).m_nTextureName = "";
 }

@@ -349,12 +349,6 @@ void MenuPage::Draw()
 
                     ImGui::TableNextRow();
                     ImGui::TableNextColumn();
-                    ImGui::Text("DKPac22");
-                    ImGui::TableNextColumn();
-                    ImGui::Text("Plugin SDK, vehicle texture code");
-
-                    ImGui::TableNextRow();
-                    ImGui::TableNextColumn();
                     ImGui::Text("Junior-Djjr");
                     ImGui::TableNextColumn();
                     ImGui::Text("Code & suggestions");

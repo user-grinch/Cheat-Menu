@@ -82,6 +82,7 @@ public:
     eResourceType m_Type;
     ImVec2 m_ImageSize;
     std::vector<std::unique_ptr<TextureResource>> m_ImagesList;
+    bool m_bAllowRemoveAll = false;  // allows removing items from non custom categories
 
     ResourceStore(const char* text, eResourceType type = TYPE_IMAGE, ImVec2 imageSize = ImVec2(64, 64));
 

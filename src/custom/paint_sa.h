@@ -1,85 +1,79 @@
-// Portion of this source is taken from MoonAdditions https://github.com/THE-FYP/MoonAdditions
-
-// Copyright (c) 2012 DK22Pac
-// Copyright (c) 2017 FYP
-// Copyright (c) 2021 Grinch_
-
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
 #pragma once
-#include <vector>
+#include "pch.h"
+#include "interface/icheat.hpp"
+/*
+	Vehicle color & texturring implementation class for GTA: San Andreas
 
-class Paint
+	TODO: Implement for VC & 3 too (maybe)
+	Dunno how it'd work with the d3d8to9 wrapper
+*/
+class PaintMgr : public ICheat<PaintMgr>
 {
 private:
-    // store vehicle specific data
-    struct VehData
+    struct PaintData
     {
-        struct MaterialProperties
+        struct MatInfo
         {
-            MaterialProperties() :
-                _color{0, 0, 0, 0},
-                _recolor(false),
-                _retexture(false),
-                _geometry(nullptr),
-                _originalColor{0, 0, 0, 0},
-                _originalTexture(nullptr),
-                _originalGeometryFlags(0)
-            {
-            }
-
-            RwRGBA _color;
-            RwTexture* _texture;
-            bool _recolor;
-            bool _retexture;
-            RpGeometry* _geometry;
-            RwRGBA _originalColor;
-            RwTexture* _originalTexture;
-            RwInt32 _originalGeometryFlags;
+            bool m_bRecolor = false;
+            bool m_bRetexture = false;
+            RwRGBA m_nColor = {0, 0, 0, 0};
+            RwRGBA m_nOriginalColor = {0, 0, 0, 0};
+            RwTexture* m_pTexture = nullptr;
+            RwTexture* m_pOriginalTexture = nullptr;
+            RpGeometry* m_pGeometry = nullptr;
+            RwInt32 m_nOriginalGeometryFlags = 0;
         };
+        uchar m_nCarColors[4];  // carcols color IDs (primary, secondary, tertiary, quaternary)
+        std::string m_nTextureName = ""; // current applied texture name
 
-        // carcols color id
-        uchar primary_color = 0;
-        uchar secondary_color = 0;
-        std::unordered_map<RpMaterial*, MaterialProperties> materialProperties;
+        std::unordered_map<RpMaterial*, MatInfo> m_nMapInfoList;
 
-        VehData(CVehicle* veh)
+        PaintData(CVehicle* pVeh)
         {
-            primary_color = veh->m_nPrimaryColor;
-            secondary_color = veh->m_nSecondaryColor;
+            m_nCarColors[0] = pVeh->m_nPrimaryColor;
+            m_nCarColors[1] = pVeh->m_nSecondaryColor;
+            m_nCarColors[2] = pVeh->m_nTertiaryColor;
+            m_nCarColors[3] = pVeh->m_nQuaternaryColor; 
         }
 
-        void setMaterialColor(RpMaterial* material, RpGeometry* geometry, RwRGBA color, bool filter_mat = false);
-        void setMaterialTexture(RpMaterial* material, RwTexture* texture, bool filter_mat = false);
-        void resetMaterialColor(RpMaterial* material);
-        void resetMaterialTexture(RpMaterial* material);
+        // Resets applied material colors
+        void ResetMatColor(RpMaterial* pMat);
+
+        // Resets applied material textures
+        void ResetMatTexture(RpMaterial* pMat);
+
+        // Sets the material color to provided value
+        void SetMatColor(RpMaterial* pMat, RpGeometry* pGeo, RwRGBA color);
+
+        // Sets the material to provided texture
+        void SetMatTexture(RpMaterial* pMat, RwTexture* pTex);
     };
-    static inline VehicleExtendedData<VehData> m_VehData;
-    static void NodeWrapperRecursive(RwFrame* frame, CVehicle* pVeh, std::function<void(RwFrame*)> func);
+    VehicleExtendedData<PaintData> m_VehPaint;
+
+    friend class IFeature;
+    PaintMgr();
+    PaintMgr(PaintMgr&);
 
 public:
-    static inline ResourceStore m_TextureData { "textures", eResourceType::TYPE_IMAGE_TEXT, ImVec2(100, 80) };
+    ResourceStore m_TextureData { "textures", eResourceType::TYPE_IMAGE_TEXT, ImVec2(100, 80) };
 
-    static void InjectHooks();
-    static void GenerateNodeList(CVehicle* pVeh, std::vector<std::string>& names_vec, std::string& selected);
-    static void SetNodeColor(CVehicle* pVeh, std::string node_name, CRGBA color, bool filter_mat = false);
-    static void SetNodeTexture(CVehicle* pVeh, std::string node_name, std::string texturename, bool filter_mat = false);
-    static void ResetNodeColor(CVehicle* veh, std::string node_name);
-    static void ResetNodeTexture(CVehicle* pVeh, std::string node_name);
+    // Returns internal data structure
+    PaintData &GetData(CVehicle* pVeh);
+
+    // Resets applied applied colors
+    void ResetColor(CVehicle* pVeh);
+
+    // Resets appllied textures
+    void ResetTexture(CVehicle* pVeh);
+
+    // Applies color to vehicle
+    void SetColor(CVehicle* pVeh, CRGBA color);
+
+    // Sets vehicle carcol colors
+    void SetCarcols(CVehicle *pVeh, uint primary, uint secondary, uint tertiary, uint quaternary, bool reset = true);
+
+    // Applies texture to vehicle
+    void SetTexture(CVehicle* pVeh, std::string name);
 };
+
+extern PaintMgr& Paint;
