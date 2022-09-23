@@ -27,6 +27,7 @@ private:
     VehCustmzrMgr();
     VehCustmzrMgr(const VehCustmzrMgr&);
 
+#ifdef GTASA
     // Add/ Remove vehicle mod
     void AddComponent(const std::string& component, bool displayMessage = true);
     void RemoveComponent(const std::string& component, bool displayMessage = true);
@@ -34,6 +35,7 @@ private:
     // customization
     void ApplyCustomizations(std::string& cat, std::string& key, std::string& val);
     void SaveCustomizations();
+#endif
 
 public:
     struct

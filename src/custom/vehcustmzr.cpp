@@ -33,6 +33,7 @@ static std::vector<std::string> m_ModelFlagNames = // 32 flags
 
 VehCustmzrMgr& VehMod = VehCustmzrMgr::Get();
 
+#ifdef GTASA
 void VehCustmzrMgr::AddComponent(const std::string& component, const bool display_message)
 {
     try
@@ -79,90 +80,6 @@ void VehCustmzrMgr::RemoveComponent(const std::string& component, const bool dis
     }
 }
 
-VehCustmzrMgr& VehCustmzr = VehCustmzrMgr::Get();
-
-VehCustmzrMgr::VehCustmzrMgr()
-{
-    m_CustomizeData.m_bAllowRemoveAll = true;
-    FileHandler::FetchColorData(m_ColorData);
-
-#ifdef GTASA
-    FileHandler::FetchHandlingID(m_VehicleIDE);
-
-    Events::processScriptsEvent += [this]
-    {
-        uint timer = CTimer::m_snTimeInMilliseconds;
-        CPlayerPed* pPlayer = FindPlayerPed();
-        CVehicle* pVeh = BY_GAME(FindPlayerVehicle(-1, false), FindPlayerVehicle(), FindPlayerVehicle());
-
-        if (pPlayer && Util::IsInCar())
-        {
-            if (m_Neon.m_bRainbowEffect && timer - m_Neon.m_nRainbowTimer > 50)
-            {
-                int red, green, blue;
-
-                Util::RainbowValues(red, green, blue, 0.25);
-                Neon.Install(pVeh, red, green, blue);
-                m_Neon.m_nRainbowTimer = timer;
-            }
-        }
-
-        // Traffic neons
-        if (m_Neon.m_bApplyOnTraffic && timer - m_Neon.m_nTrafficTimer > 1000)
-        {
-            for (CVehicle* veh : CPools::ms_pVehiclePool)
-            {
-                int chance = 0;
-
-                if (veh->m_nVehicleClass == CLASS_NORMAL) // Normal
-                {
-                    chance = Random(1, 20);
-                }
-
-                if (veh->m_nVehicleClass == CLASS_RICHFAMILY) // Rich family
-                {
-                    chance = Random(1, 4);
-                }
-
-                if (veh->m_nVehicleClass == CLASS_EXECUTIVE) // Executive
-                {
-                    chance = Random(1, 3);
-                }
-
-                if (chance == 1 && !Neon.IsInstalled(veh) && veh->m_pDriver != pPlayer)
-                {
-                    Neon.Install(veh, Random(0, 255), Random(0, 255), Random(0, 255));
-                }
-            }
-            m_Neon.m_nTrafficTimer = timer;
-        }
-
-        if (m_Nitro.m_bEnabled && FindPlayerVehicle(-1, false)->m_nVehicleSubClass == VEHICLE_AUTOMOBILE)
-        {
-            patch::Set<BYTE>(0x969165, 0, true); // All cars have nitro
-            patch::Set<BYTE>(0x96918B, 0, true); // All taxis have nitro
-
-            if (KeyPressed(VK_LBUTTON))
-            {
-                if (!m_Nitro.m_bCompAdded)
-                {
-                    AddComponent("1010", false);
-                    m_Nitro.m_bCompAdded = true;
-                }
-            }
-            else
-            {
-                if (m_Nitro.m_bCompAdded)
-                {
-                    RemoveComponent("1010", false);
-                    m_Nitro.m_bCompAdded = false;
-                }
-            }
-        }
-    };
-#endif
-}
-
 void VehCustmzrMgr::ApplyCustomizations(std::string& cat, std::string& key, std::string& val)
 {
     CVehicle *pVeh = BY_GAME(FindPlayerVehicle(-1, false), FindPlayerVehicle(), FindPlayerVehicle());
@@ -176,7 +93,10 @@ void VehCustmzrMgr::ApplyCustomizations(std::string& cat, std::string& key, std:
         toml::array *temp = m_CustomizeData.m_pData->GetArray((index + "ColorMat").c_str());
         CRGBA col {static_cast<uchar>(temp->at(0).value_or(0)), static_cast<uchar>(temp->at(1).value_or(0)),
                     static_cast<uchar>(temp->at(2).value_or(0)), static_cast<uchar>(temp->at(3).value_or(0))};
-        Paint.SetColor(pVeh, col);
+        if (col.a != 0)
+        {
+            Paint.SetColor(pVeh, col);
+        }
 
         temp = m_CustomizeData.m_pData->GetArray((index + "ColorCarcols").c_str());
         Paint.SetCarcols(pVeh, temp->at(0).value_or(0), temp->at(1).value_or(0), temp->at(2).value_or(0), temp->at(3).value_or(0), false);
@@ -277,6 +197,91 @@ void VehCustmzrMgr::SaveCustomizations()
         m_CustomizeData.m_pData->Save();
         m_CustomizeData.UpdateSearchList();
     }
+}
+#endif
+
+VehCustmzrMgr& VehCustmzr = VehCustmzrMgr::Get();
+
+VehCustmzrMgr::VehCustmzrMgr()
+{
+    m_CustomizeData.m_bAllowRemoveAll = true;
+    FileHandler::FetchColorData(m_ColorData);
+
+#ifdef GTASA
+    FileHandler::FetchHandlingID(m_VehicleIDE);
+
+    Events::processScriptsEvent += [this]
+    {
+        uint timer = CTimer::m_snTimeInMilliseconds;
+        CPlayerPed* pPlayer = FindPlayerPed();
+        CVehicle* pVeh = BY_GAME(FindPlayerVehicle(-1, false), FindPlayerVehicle(), FindPlayerVehicle());
+
+        if (pPlayer && Util::IsInCar())
+        {
+            if (m_Neon.m_bRainbowEffect && timer - m_Neon.m_nRainbowTimer > 50)
+            {
+                int red, green, blue;
+
+                Util::RainbowValues(red, green, blue, 0.25);
+                Neon.Install(pVeh, red, green, blue);
+                m_Neon.m_nRainbowTimer = timer;
+            }
+        }
+
+        // Traffic neons
+        if (m_Neon.m_bApplyOnTraffic && timer - m_Neon.m_nTrafficTimer > 1000)
+        {
+            for (CVehicle* veh : CPools::ms_pVehiclePool)
+            {
+                int chance = 0;
+
+                if (veh->m_nVehicleClass == CLASS_NORMAL) // Normal
+                {
+                    chance = Random(1, 20);
+                }
+
+                if (veh->m_nVehicleClass == CLASS_RICHFAMILY) // Rich family
+                {
+                    chance = Random(1, 4);
+                }
+
+                if (veh->m_nVehicleClass == CLASS_EXECUTIVE) // Executive
+                {
+                    chance = Random(1, 3);
+                }
+
+                if (chance == 1 && !Neon.IsInstalled(veh) && veh->m_pDriver != pPlayer)
+                {
+                    Neon.Install(veh, Random(0, 255), Random(0, 255), Random(0, 255));
+                }
+            }
+            m_Neon.m_nTrafficTimer = timer;
+        }
+
+        if (m_Nitro.m_bEnabled && FindPlayerVehicle(-1, false)->m_nVehicleSubClass == VEHICLE_AUTOMOBILE)
+        {
+            patch::Set<BYTE>(0x969165, 0, true); // All cars have nitro
+            patch::Set<BYTE>(0x96918B, 0, true); // All taxis have nitro
+
+            if (KeyPressed(VK_LBUTTON))
+            {
+                if (!m_Nitro.m_bCompAdded)
+                {
+                    AddComponent("1010", false);
+                    m_Nitro.m_bCompAdded = true;
+                }
+            }
+            else
+            {
+                if (m_Nitro.m_bCompAdded)
+                {
+                    RemoveComponent("1010", false);
+                    m_Nitro.m_bCompAdded = false;
+                }
+            }
+        }
+    };
+#endif
 }
 
 void VehCustmzrMgr::Draw()
