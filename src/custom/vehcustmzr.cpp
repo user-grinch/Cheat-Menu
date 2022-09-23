@@ -88,6 +88,13 @@ void VehCustmzrMgr::ApplyCustomizations(std::string& cat, std::string& key, std:
         int model = pVeh->m_nModelIndex;
         std::string name = Util::GetCarName(model);
         std::string index = std::format("{}.{}.", name, key);
+        int reqModel = m_CustomizeData.m_pData->Get((index + "Model").c_str(), -1);
+
+        if (model != reqModel)
+        {
+            Util::SetMessage(TEXT("Vehicle.Unsupported"));
+            return;
+        }
 
         // colors
         toml::array *temp = m_CustomizeData.m_pData->GetArray((index + "ColorMat").c_str());
@@ -144,6 +151,7 @@ void VehCustmzrMgr::SaveCustomizations()
         int model = pVeh->m_nModelIndex;
         std::string name = Util::GetCarName(model);
         std::string index = std::format("{}.{} - {}.", name, name, m_nLabel);
+        m_CustomizeData.m_pData->Set((index + "Model").c_str(), model);
 
         // Save colors
         auto paintData = Paint.Get().GetData(pVeh);

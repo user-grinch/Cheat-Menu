@@ -304,19 +304,16 @@ void DrawClippedImages(ResourceStore& data, ImVec2 imgSz, size_t imagesInRow, bo
 
     int imageCount = 1;
     size_t totalSz = data.m_nSearchList.size();
-    ImGuiListClipper clipper((totalSz > 3 ? totalSz/3 : totalSz), imgSz.y);
+    ImGuiListClipper clipper((totalSz > imagesInRow ? totalSz/imagesInRow : totalSz), imgSz.y);
     while (clipper.Step())
     {
         // hack to get clipper working with rowed items
         size_t start = clipper.DisplayStart * imagesInRow;
         size_t end = clipper.DisplayEnd * imagesInRow + imagesInRow;
+        end = (end > totalSz) ? totalSz : end;
+
         for (size_t i = start; i < end; ++i)
         {   
-            if (data.m_nSearchList.size() == i)
-            {
-                break;
-            }
-
             std::string &text = std::get<ImageLookup>(data.m_nSearchList[i]).m_FileName;
             std::string &modelName = std::get<ImageLookup>(data.m_nSearchList[i]).m_ModelName;
             bool custom = std::get<ImageLookup>(data.m_nSearchList[i]).m_bCustom;
