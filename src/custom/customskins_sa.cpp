@@ -8,7 +8,7 @@ CustomSkinsMgr::CustomSkinsMgr()
     std::string path = GAME_PATH((char*)"modloader/");
     if (GetModuleHandle("modloader.asi") && std::filesystem::is_directory(path))
     {
-        path += "CustomSkins/";
+        path += "CustomSkinsLoader/";
         if (std::filesystem::is_directory(path))
         {
             for (auto& p : std::filesystem::recursive_directory_iterator(path))

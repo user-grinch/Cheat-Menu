@@ -209,6 +209,7 @@ CheatMenuMgr::CheatMenuMgr()
 
         ApplyStyle();
         Locale::Init(FILE_NAME "/locale/", "English", "English");
+        Locale::SetLocaleByName(gConfig.Get("Menu.Language", ""));
         Overlay::Init();
 
         // Load menu settings

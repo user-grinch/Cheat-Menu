@@ -10,7 +10,7 @@ PSDK_DIR = os.getenv("PLUGIN_SDK_DIR")
 DX9SDK_DIR = os.getenv("DXSDK_DIR")
 
 if (DX9SDK_DIR == nil) then
-    error("DXSDK_DIR environment variable not set")
+    -- error("DXSDK_DIR environment variable not set")
 end
 
 if (PSDK_DIR == nil) then

@@ -103,14 +103,7 @@ size_t Locale::GetCurrentLocaleIndex()
 
 void Locale::SetDefaultLocale()
 {
-    for (size_t i = 0; i < m_locales.size(); ++i)
-    {
-        if (m_locales[i] == "English")
-        {
-            SetLocale(i);
-            return;
-        }
-    }
+    SetLocaleByName("English");
 }
 
 Locale::eReturnCodes Locale::SetLocale(size_t index)
@@ -129,6 +122,19 @@ Locale::eReturnCodes Locale::SetLocale(size_t index)
     m_pData = new DataStore(localePath.c_str(), true);
     localeIndex = index;
     return eReturnCodes::SUCCESS;
+}
+
+Locale::eReturnCodes Locale::SetLocaleByName(const std::string& name)
+{
+    for (size_t i = 0; i < m_locales.size(); ++i)
+    {
+        if (m_locales[i] == name)
+        {
+            return SetLocale(i);
+        }
+    }
+  
+    return eReturnCodes::NO_LOCALE_FOUND;
 }
 
 std::string Locale::GetText(std::string&& key, std::string&& defaultValue)

@@ -58,6 +58,7 @@ public:
         index is the index of the language in the GetLocaleList() list
     */
     static eReturnCodes SetLocale(size_t index);
+    static eReturnCodes SetLocaleByName(const std::string &name);
 
     /*
         Sets the language back to default (aka English)

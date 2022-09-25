@@ -142,7 +142,6 @@ void DrawClippedList(ResourceStore& data, fArg3_t clickFunc, bool favourites, bo
             {
                 data.m_pData->Set(std::format("Favourites.{}", contextMenu.key).c_str(), contextMenu.val);
                 data.m_pData->Save();
-                Util::SetMessage(TEXT("Menu.FavouritesText"));
             }
             if (!favourites && ImGui::MenuItem(TEXT("Menu.Remove")))
             {
@@ -165,7 +164,6 @@ void DrawClippedList(ResourceStore& data, fArg3_t clickFunc, bool favourites, bo
                 data.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
                 data.m_pData->Save();
                 data.UpdateSearchList(true);
-                Util::SetMessage(TEXT("Menu.FavouritesRemoveText"));
             }
 
             if (ImGui::MenuItem(TEXT("Menu.Close")))
@@ -354,7 +352,6 @@ void DrawClippedImages(ResourceStore& data, ImVec2 imgSz, size_t imagesInRow, bo
             {
                 data.m_pData->Set(std::format("Favourites.{}", contextMenu.key).c_str(), contextMenu.val);
                 data.m_pData->Save();
-                Util::SetMessage(TEXT("Menu.FavouritesText"));
             }
             if (!favourites && contextMenu.added && ImGui::MenuItem(TEXT("Menu.Remove")))
             {
@@ -368,7 +365,6 @@ void DrawClippedImages(ResourceStore& data, ImVec2 imgSz, size_t imagesInRow, bo
                 data.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
                 data.m_pData->Save();
                 data.UpdateSearchList(true, getNameFunc, verifyFunc);
-                Util::SetMessage(TEXT("Menu.FavouritesRemoveText"));
             }
             if (ImGui::MenuItem(TEXT("Menu.Close")))
             {

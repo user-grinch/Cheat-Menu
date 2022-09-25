@@ -266,7 +266,7 @@ Pasos para activar 'Skins personalizadas',
 
 1. Descarga e instala modloader
 
-2. Crea una carpeta dentro de la carpeta 'modloader' con el nombre 'CustomSkins'
+2. Crea una carpeta dentro de la carpeta 'modloader' con el nombre 'CustomSkinsLoader'
 
 3. Descarga skins de peds online (archivos .dff y .txd) y ponlos adentro de la carpeta.
 

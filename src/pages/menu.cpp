@@ -77,6 +77,7 @@ void MenuPage::Draw()
                 {
                     if (Locale::SetLocale(selected) == Locale::eReturnCodes::SUCCESS)
                     {
+                        gConfig.Set("Menu.Language", vec[selected]);
                         // CheatMenu::GenHeaderList();
                     }
                     else

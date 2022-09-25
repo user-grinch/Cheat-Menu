@@ -273,7 +273,7 @@ Etapas para ativar 'Skins personalizadas',
 
 1. Baixe & instale o modloader
 
-2. Crie uma pasta dentro da pasta 'modloader' com o nome 'CustomSkins'
+2. Crie uma pasta dentro da pasta 'modloader' com o nome 'CustomSkinsLoader'
 
 3. Baixe skins online (arquivos .dff & .txd) e coloque-os dentro.
 

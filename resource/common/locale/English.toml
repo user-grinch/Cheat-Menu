@@ -191,8 +191,6 @@ Remove = "Remove"
 Favourites = "Add to favourites"
 FavouritesNone = "You don't have any favourites!"
 FavouritesRemove = "Remove from favourites"
-FavouritesRemoveText = "Removed from favourites"
-FavouritesText = "Added to favourites"
 Close = "Close"
 QuickSSKey = "Quick screenshot"
 QuickTPKey = "Toggle quick teleport"
@@ -331,7 +329,7 @@ Custom skin allows to change player skins without replacing any existing game pe
 Steps to enable 'Custom Skins',
 
 1. Download & install modloader
-2. Create a folder inside 'modloader' folder with the name 'CustomSkins'
+2. Create a folder inside 'modloader' folder with the name 'CustomSkinsLoader'
 3. Download ped skins online ( .dff & .txd files) and put them inside.
 4. Restart your game.
 
