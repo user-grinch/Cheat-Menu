@@ -9,9 +9,9 @@
 class CheatMenuMgr : public IFeature<CheatMenuMgr>
 {
 private:
-    ImVec2 m_fSize;
+    ImVec2 m_fSize, m_fPos;
     bool m_bVisible;      // should the menu be drawn
-    bool m_bSizeUpdated;  // Was menu size change requested
+    bool m_bWindowParamUpdated;  // Was menu size/pos changed
     bool m_bIsOnline;     // SAMP & VCMP flag
 
     friend class IFeature;
@@ -29,7 +29,7 @@ public:
     bool IsVisible();
 
     // Resets the menu height & width to default
-    void ResetSize();
+    void ResetParams();
 };
 
 extern CheatMenuMgr& CheatMenu;

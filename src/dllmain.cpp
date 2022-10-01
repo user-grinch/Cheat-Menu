@@ -5,7 +5,7 @@
 LONG WINAPI CrashHandler(PEXCEPTION_POINTERS pInfo)
 {
     Log::Print<eLogLevel::None>("");
-    Log::Print<eLogLevel::Error>("Game crashed. Unhandled exception at {} (0x{:x})", 
+    Log::Print<eLogLevel::Error>("Unhandled exception at {} (0x{:x})", 
         pInfo->ExceptionRecord->ExceptionAddress, pInfo->ExceptionRecord->ExceptionCode);
     return EXCEPTION_CONTINUE_SEARCH;
 }

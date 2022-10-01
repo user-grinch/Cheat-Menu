@@ -72,7 +72,15 @@ void CheatMenuMgr::Draw()
         bRunning = true;
         if (m_bVisible)
         {
-            ImGui::SetNextWindowSize(m_fSize);
+            ImGui::SetNextWindowSize(m_fSize, ImGuiCond_Once);
+            ImGui::SetNextWindowPos(m_fPos, ImGuiCond_Once);
+
+            if (m_bWindowParamUpdated)
+            {
+                ImGui::SetNextWindowSize(m_fSize);
+                ImGui::SetNextWindowPos(m_fPos);
+                m_bWindowParamUpdated = false;
+            }
 
             if (ImGui::Begin(MENU_TITLE, NULL, ImGuiWindowFlags_NoCollapse || ImGuiWindowFlags_NoTitleBar))
             {
@@ -80,21 +88,17 @@ void CheatMenuMgr::Draw()
                 ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(250, 350));
                 ImGui::PushStyleVar(ImGuiStyleVar_FramePadding,
                                     ImVec2(ImGui::GetWindowWidth() / 85, ImGui::GetWindowHeight() / 200));
-
                 PageHandler::DrawPages();
 
-                if (m_bSizeUpdated)
-                {
-                    m_bSizeUpdated = false;
-                }
-                else
+                if (ImGui::IsWindowHovered())
                 {
                     m_fSize = ImGui::GetWindowSize();
+                    m_fPos = ImGui::GetWindowPos();
+                    gConfig.Set("Window.PosX", m_fPos.x);
+                    gConfig.Set("Window.PosY", m_fPos.y);
+                    gConfig.Set("Window.SizeX", m_fSize.x);
+                    gConfig.Set("Window.SizeY", m_fSize.y);
                 }
-
-                gConfig.Set("Window.SizeX", m_fSize.x);
-                gConfig.Set("Window.SizeY", m_fSize.y);
-
                 ImGui::PopStyleVar(2);
                 ImGui::End();
             }
@@ -215,6 +219,9 @@ CheatMenuMgr::CheatMenuMgr()
         // Load menu settings
         m_fSize.x = gConfig.Get("Window.SizeX", screen::GetScreenWidth() / 4.0f);
         m_fSize.y = gConfig.Get("Window.SizeY", screen::GetScreenHeight() / 1.2f);
+        m_fPos.x = gConfig.Get("Window.PosX", 50.0f);
+        m_fPos.y = gConfig.Get("Window.PosY", 50.0f);
+
         srand(CTimer::m_snTimeInMilliseconds);
     };
 
@@ -322,9 +329,10 @@ void CheatMenuMgr::ApplyStyle()
     style->Colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.20f, 0.20f, 0.20f, 0.6f);
 }
 
-void CheatMenuMgr::ResetSize()
+void CheatMenuMgr::ResetParams()
 {
     m_fSize.x = screen::GetScreenWidth() / 4.0f;
     m_fSize.y = screen::GetScreenHeight() / 1.2f;
-    m_bSizeUpdated = true;
+    m_fPos = {50.0f, 50.0f};
+    m_bWindowParamUpdated = true;
 }

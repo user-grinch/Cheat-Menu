@@ -61,7 +61,7 @@ void MenuPage::Draw()
             ImGui::Spacing();
             if (ImGui::Button(TEXT("Menu.ResetSize"), ImVec2(Widget::CalcSize(2))))
             {
-                CheatMenu.ResetSize();
+                CheatMenu.ResetParams();
             }
             ImGui::SameLine();
             if (ImGui::Button(TEXT("Menu.ReloadFonts"), ImVec2(Widget::CalcSize(2))))
@@ -78,7 +78,6 @@ void MenuPage::Draw()
                     if (Locale::SetLocale(selected) == Locale::eReturnCodes::SUCCESS)
                     {
                         gConfig.Set("Menu.Language", vec[selected]);
-                        // CheatMenu::GenHeaderList();
                     }
                     else
                     {
