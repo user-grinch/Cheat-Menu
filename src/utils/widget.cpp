@@ -273,7 +273,7 @@ static bool RoundedImageButton(ImTextureID textureID, ImVec2& size, const char* 
 void DrawClippedImages(ResourceStore& data, ImVec2 imgSz, size_t imagesInRow, bool showImages, 
                         bool favourites, fArg1_t clickFunc, fRtnArg1_t getNameFunc, fRtnBoolArg1_t verifyFunc)
 {
-    static IDirect3DTexture9 **pDefaultTex = gTextureList.FindTextureByName("placeholder");
+    static IDirect3DTexture9 **pDefaultTex = BY_GAME(gTextureList.FindTextureByName("placeholder"), nullptr, nullptr);
     ImGuiStyle &style = ImGui::GetStyle();
 
     // Category box

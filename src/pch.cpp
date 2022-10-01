@@ -2,7 +2,9 @@
 eRenderer gRenderer = eRenderer::Unknown;
 DataStore gConfig = DataStore(FILE_NAME, true);
 
+#ifdef GTASA
 ResourceStore gTextureList { "misc", eResourceType::TYPE_IMAGE, ImVec2(100, 80) };
+#endif
 Hotkey aimSkinChanger {VK_RETURN, VK_RETURN, "AimSkinChanger"};
 Hotkey freeCam {VK_F6, VK_F6, "Freecam.Toggle"};
 Hotkey freeCamForward {VK_KEY_I, VK_KEY_I, "Freecam.Forward"};;

@@ -212,10 +212,10 @@ VehCustmzrMgr& VehCustmzr = VehCustmzrMgr::Get();
 
 VehCustmzrMgr::VehCustmzrMgr()
 {
-    m_CustomizeData.m_bAllowRemoveAll = true;
     FileHandler::FetchColorData(m_ColorData);
 
 #ifdef GTASA
+    m_CustomizeData.m_bAllowRemoveAll = true;
     FileHandler::FetchHandlingID(m_VehicleIDE);
 
     Events::processScriptsEvent += [this]

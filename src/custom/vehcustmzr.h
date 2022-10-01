@@ -8,8 +8,11 @@
 class VehCustmzrMgr : public IFeature<VehCustmzrMgr>
 {
 private:
+#ifdef GTASA
     ResourceStore m_TuneData { "components", eResourceType::TYPE_IMAGE_TEXT, ImVec2(100, 80) };
     ResourceStore m_CustomizeData { "customizations", eResourceType::TYPE_TEXT };
+#endif
+
     std::vector<std::vector<float>> m_ColorData;    // vehicle color data from carcols.dat
     std::map<int, std::string> m_VehicleIDE;
     char m_nLabel[32] {"Untitled"};

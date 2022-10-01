@@ -111,4 +111,7 @@ extern Hotkey teleportMarker;
 extern Hotkey vehEngine;
 extern Hotkey vehInstantStart;
 extern Hotkey vehInstantStop;
+
+#ifdef GTASA
 extern ResourceStore gTextureList;
+#endif
