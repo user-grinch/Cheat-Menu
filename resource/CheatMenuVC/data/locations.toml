@@ -13,7 +13,7 @@
 [Custom]
 Test = "0, -825, 1168, 10"
 
-[`Hidden Packags`]
+["Hidden Packages"]
 'Hidden Package 1' = '0, -367, -1733, 11'
 'Hidden Package 10' = '0, 321, -774, 22'
 'Hidden Package 100' = '0, -1737, -299, 14'
