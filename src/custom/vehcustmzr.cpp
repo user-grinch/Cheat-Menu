@@ -312,10 +312,12 @@ VehCustmzrMgr::VehCustmzrMgr()
 #endif
 }
 
+#ifdef GTASA
 bool VehCustmzrMgr::IsValidComponent(CVehicle *pVeh, unsigned int compID)
 {
     return CallAndReturn<bool, 0x49B010, int, CVehicle*>(compID, pVeh);
 }
+#endif 
 
 void VehCustmzrMgr::Draw()
 {
