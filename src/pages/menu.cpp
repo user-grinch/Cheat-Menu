@@ -77,7 +77,8 @@ void MenuPage::Draw()
                 {
                     if (Locale::SetLocale(selected) == Locale::eReturnCodes::SUCCESS)
                     {
-                        gConfig.Set("Menu.Language", vec[selected]);
+                        std::string label = vec[selected];
+                        gConfig.Set("Menu.Language", label);
                     }
                     else
                     {
