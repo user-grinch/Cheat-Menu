@@ -80,6 +80,26 @@ void VehCustmzrMgr::RemoveComponent(const std::string& component, const bool dis
     }
 }
 
+bool VehCustmzrMgr::IsSideskirtComponent(unsigned int compID)
+{
+    static int models[] =  
+    {   1007, 1026, 1027, 1030, 1031, 1036, 1039, 1040, 1041, 1042, 1047, 1048, 1051, 1052, 1056, 
+        1057, 1062, 1063, 1069, 1070, 1071, 1072, 1090, 1093, 1094, 1095, 1099, 1101, 1102, 1106, 1107, 1108, 1118, 1119, 
+        1120, 1121, 1122, 1124, 1133, 1134, 1137 
+    };
+    static int maxSize = sizeof(models)/sizeof(models[0]);
+
+    for (int j = 0; j != maxSize; ++j)
+    {
+        if (compID == models[j])
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void VehCustmzrMgr::ApplyCustomizations(std::string& cat, std::string& key, std::string& val)
 {
     CVehicle *pVeh = BY_GAME(FindPlayerVehicle(-1, false), FindPlayerVehicle(), FindPlayerVehicle());
@@ -290,6 +310,11 @@ VehCustmzrMgr::VehCustmzrMgr()
         }
     };
 #endif
+}
+
+bool VehCustmzrMgr::IsValidComponent(CVehicle *pVeh, unsigned int compID)
+{
+    return CallAndReturn<bool, 0x49B010, int, CVehicle*>(compID, pVeh);
 }
 
 void VehCustmzrMgr::Draw()
@@ -505,7 +530,7 @@ void VehCustmzrMgr::Draw()
         },
         [](std::string& str)
         {
-            return ((bool(*)(int, CVehicle*))0x49B010)(std::stoi(str), FindPlayerPed()->m_pVehicle);
+            return VehCustmzr.IsValidComponent(FindPlayerPed()->m_pVehicle, std::stoi(str));
         });
 
         ImGui::EndTabItem();

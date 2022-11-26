@@ -49,6 +49,14 @@ public:
     
     // Draw color, neon & texture tabs
     void Draw();
+
+#ifdef GTASA
+    // Returns true if the component is a sideskirt
+    bool IsSideskirtComponent(unsigned int compID);
+
+    // Returns true if the componenet is supported by the vehicle
+    bool IsValidComponent(CVehicle *pVeh, unsigned int compID);
+#endif
 };
 
 extern VehCustmzrMgr& VehCustmzr;

@@ -357,42 +357,6 @@ void VehiclePage::SpawnVehicle(std::string& smodel)
             pVeh = CPools::GetVehicle(hveh);
             pVeh->SetHeading(player->GetHeading());
             Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
-
-            if (pVeh->m_nVehicleSubClass == VEHICLE_AUTOMOBILE)
-            {
-                static int exceptions[] = {1007, 1026, 1031, 1042, 1047, 1048, 1070, 1090};
-                static int maxSize = sizeof(exceptions)/sizeof(exceptions[0]);
-
-                for (int i = 0; i < 20; ++i)
-                {
-                    unsigned int compID = Random(1000, 1093);
-                    bool skip = false;
-
-                    for (int j = 0; j != maxSize; ++j)
-                    {
-                        if (compID == exceptions[j])
-                        {
-                            skip = true;
-                            break;
-                        }
-                    }
-
-                    if (skip)
-                    {
-                        continue;
-                    }
-
-                    if (CallAndReturn<bool, 0x49B010, int, CVehicle*>(compID, pVeh))
-                    {
-                        CStreaming::RequestModel(compID, eStreamingFlags::PRIORITY_REQUEST);
-                        CStreaming::LoadAllRequestedModels(true);
-                        Log::Print<eLogLevel::Debug>("Adding component {}", compID);
-                        pVeh->AddVehicleUpgrade(compID);
-                        Log::Print<eLogLevel::Debug>("Added component {}", compID);
-                        CStreaming::SetModelIsDeletable(compID);
-                    }
-                }
-            }
             Util::SetCarForwardSpeed(pVeh, speed);
         }
         else
@@ -402,6 +366,29 @@ void VehiclePage::SpawnVehicle(std::string& smodel)
             pVeh = CPools::GetVehicle(hveh);
             pVeh->SetHeading(player->GetHeading() + 55.0f);
         }
+
+        // Add random tunes
+        if (pVeh->m_nVehicleSubClass <= VEHICLE_QUAD)
+        {
+            for (int i = 0; i < 20; ++i)
+            {
+                unsigned int compID = Random(1000, 1093);
+
+                if (VehCustmzr.IsSideskirtComponent(compID))
+                {
+                    continue;
+                }
+
+                if (VehCustmzr.IsValidComponent(pVeh, compID))
+                {
+                    CStreaming::RequestModel(compID, eStreamingFlags::PRIORITY_REQUEST);
+                    CStreaming::LoadAllRequestedModels(true);
+                    pVeh->AddVehicleUpgrade(compID);
+                    CStreaming::SetModelIsDeletable(compID);
+                }
+            }
+        }
+
         pVeh->m_eDoorLock = DOORLOCK_UNLOCKED;
         pVeh->m_nAreaCode = player->m_nAreaCode;
         Command<Commands::MARK_CAR_AS_NO_LONGER_NEEDED>(CPools::GetVehicleRef(pVeh));
