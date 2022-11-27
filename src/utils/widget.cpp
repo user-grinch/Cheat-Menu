@@ -75,7 +75,7 @@ bool Widget::Filter(const char* label, ImGuiTextFilter& filter, const char* hint
     return state;
 }
 
-void DrawClippedList(ResourceStore& data, fArg3_t clickFunc, bool favourites, bool isEditItem)
+void DrawClippedList(ResourceStore& data, fArg3_t clickFunc, bool favourites, bool isEditItem, fArgNone_t contextOptionsFunc)
 {
     // Category box
     ImGui::PushItemWidth(favourites ? ImGui::GetWindowContentRegionWidth() :
@@ -166,6 +166,11 @@ void DrawClippedList(ResourceStore& data, fArg3_t clickFunc, bool favourites, bo
                 data.UpdateSearchList(true);
             }
 
+            if (contextOptionsFunc)
+            {
+                contextOptionsFunc();
+            }
+
             if (ImGui::MenuItem(TEXT("Menu.Close")))
             {
                 contextMenu.show = false;
@@ -176,7 +181,7 @@ void DrawClippedList(ResourceStore& data, fArg3_t clickFunc, bool favourites, bo
     ImGui::EndChild();
 }
 
-void Widget::DataList(ResourceStore& data, fArg3_t clickFunc, fArgNone_t addFunc, bool isEditItem)
+void Widget::DataList(ResourceStore& data, fArg3_t clickFunc, fArgNone_t addFunc, bool isEditItem, fArgNone_t contextOptionsFunc, fArgNone_t tabsFunc)
 {
     if (ImGui::IsMouseClicked(1))
     {
@@ -189,7 +194,7 @@ void Widget::DataList(ResourceStore& data, fArg3_t clickFunc, fArgNone_t addFunc
         if (ImGui::BeginTabItem(TEXT("Window.Search")))
         {
             ImGui::Spacing();
-            DrawClippedList(data, clickFunc, false, isEditItem);
+            DrawClippedList(data, clickFunc, false, isEditItem, contextOptionsFunc);
             ImGui::EndTabItem();
         }
         if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
@@ -199,7 +204,7 @@ void Widget::DataList(ResourceStore& data, fArg3_t clickFunc, fArgNone_t addFunc
         if (ImGui::BeginTabItem(TEXT("Window.FavouritesTab")))
         {
             ImGui::Spacing();
-            DrawClippedList(data, clickFunc, true, isEditItem);
+            DrawClippedList(data, clickFunc, true, isEditItem, contextOptionsFunc);
             ImGui::EndTabItem();
         }
         if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
@@ -218,6 +223,10 @@ void Widget::DataList(ResourceStore& data, fArg3_t clickFunc, fArgNone_t addFunc
                 ImGui::EndChild();
                 ImGui::EndTabItem();
             } 
+        }
+        if (tabsFunc)
+        {
+            tabsFunc();
         }
         ImGui::EndTabBar();
     }
@@ -271,7 +280,7 @@ static bool RoundedImageButton(ImTextureID textureID, ImVec2& size, const char* 
 }
 
 void DrawClippedImages(ResourceStore& data, ImVec2 imgSz, size_t imagesInRow, bool showImages, 
-                        bool favourites, fArg1_t clickFunc, fRtnArg1_t getNameFunc, fRtnBoolArg1_t verifyFunc)
+                        bool favourites, fArg1_t clickFunc, fRtnArg1_t getNameFunc, fRtnBoolArg1_t verifyFunc, fArgNone_t contextOptionsFunc)
 {
     static IDirect3DTexture9 **pDefaultTex = BY_GAME(gTextureList.FindTextureByName("placeholder"), nullptr, nullptr);
     ImGuiStyle &style = ImGui::GetStyle();
@@ -366,6 +375,10 @@ void DrawClippedImages(ResourceStore& data, ImVec2 imgSz, size_t imagesInRow, bo
                 data.m_pData->Save();
                 data.UpdateSearchList(true, getNameFunc, verifyFunc);
             }
+            if (contextOptionsFunc)
+            {
+                contextOptionsFunc();
+            }
             if (ImGui::MenuItem(TEXT("Menu.Close")))
             {
                 contextMenu.show = false;
@@ -381,7 +394,7 @@ void DrawClippedImages(ResourceStore& data, ImVec2 imgSz, size_t imagesInRow, bo
     This direly needs a refactor oof
 */
 void Widget::ImageList(ResourceStore &store, fArg1_t clickFunc, fRtnArg1_t getNameFunc, 
-                        fRtnBoolArg1_t verifyFunc, fArgNone_t addFunc)
+                        fRtnBoolArg1_t verifyFunc, fArgNone_t addFunc, fArgNone_t contextOptionsFunc, fArgNone_t tabsFunc)
 {
     ImGuiStyle& style =  ImGui::GetStyle();
     /*
@@ -430,7 +443,7 @@ void Widget::ImageList(ResourceStore &store, fArg1_t clickFunc, fRtnArg1_t getNa
         if (ImGui::BeginTabItem(TEXT("Window.Search")))
         {
             ImGui::Spacing();
-            DrawClippedImages(store, m_ImageSize, imagesInRow, showImages, false, clickFunc, getNameFunc, verifyFunc);
+            DrawClippedImages(store, m_ImageSize, imagesInRow, showImages, false, clickFunc, getNameFunc, verifyFunc, contextOptionsFunc);
             ImGui::EndTabItem();
         }
         if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
@@ -440,7 +453,7 @@ void Widget::ImageList(ResourceStore &store, fArg1_t clickFunc, fRtnArg1_t getNa
         if (ImGui::BeginTabItem(TEXT("Window.FavouritesTab")))
         {
             ImGui::Spacing();
-            DrawClippedImages(store, m_ImageSize, imagesInRow, showImages, true, clickFunc, getNameFunc, verifyFunc);
+            DrawClippedImages(store, m_ImageSize, imagesInRow, showImages, true, clickFunc, getNameFunc, verifyFunc, contextOptionsFunc);
             ImGui::EndTabItem();
         }
         if (ImGui::IsItemClicked(ImGuiMouseButton_Left))
@@ -474,6 +487,10 @@ void Widget::ImageList(ResourceStore &store, fArg1_t clickFunc, fRtnArg1_t getNa
                 ImGui::EndChild();
                 ImGui::EndTabItem();
             } 
+        }
+        if (tabsFunc)
+        {
+            tabsFunc();
         }
         ImGui::EndTabBar();
     }

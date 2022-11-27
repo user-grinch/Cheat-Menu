@@ -41,7 +41,8 @@ public:
     static bool ColorBtn(int colorId, std::vector<float>& color, ImVec2 size);
 
     // Draws DataStore data in the interface
-    static void DataList(ResourceStore& data, fArg3_t clickFunc = nullptr, fArgNone_t addFunc = nullptr, bool isEditItem = false);
+    static void DataList(ResourceStore& data, fArg3_t clickFunc = nullptr, fArgNone_t addFunc = nullptr, 
+                        bool isEditItem = false, fArgNone_t contextOptionsFunc = nullptr, fArgNone_t tabsFunc = nullptr);
     
     // Draws a dropdown editor for memory address
     template <typename T>
@@ -70,7 +71,8 @@ public:
 
     // Draws ResourceStore images in the interface
     static void ImageList(ResourceStore &store, fArg1_t clickFunc, fRtnArg1_t getNameFunc, 
-                            fRtnBoolArg1_t verifyFunc = nullptr, fArgNone_t addFunc = nullptr);
+                            fRtnBoolArg1_t verifyFunc = nullptr, fArgNone_t addFunc = nullptr, 
+                            fArgNone_t contextOptionsFunc = nullptr, fArgNone_t tabsFunc = nullptr);
 
     // Draws a dropdown listbox
     static bool ListBox(const char* label, VecStr& allItems, int& selected);

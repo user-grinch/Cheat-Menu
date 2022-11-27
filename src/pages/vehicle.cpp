@@ -19,6 +19,7 @@ VehiclePage::VehiclePage()
     {
         m_Spawner.m_bInAir = gConfig.Get("Features.SpawnAircraftInAir", true);
         m_Spawner.m_bAsDriver = gConfig.Get("Features.SpawnInsideVehicle", true);
+        m_Spawner.m_bWithTunes = gConfig.Get("Features.SpawnWithTunes", true);
     };
 
     Events::processScriptsEvent += [this]
@@ -368,7 +369,7 @@ void VehiclePage::SpawnVehicle(std::string& smodel)
         }
 
         // Add random tunes
-        if (pVeh->m_nVehicleSubClass <= VEHICLE_QUAD)
+        if (m_Spawner.m_bWithTunes && pVeh->m_nVehicleSubClass <= VEHICLE_QUAD)
         {
             for (int i = 0; i < 20; ++i)
             {
@@ -1000,19 +1001,6 @@ void VehiclePage::Draw()
         if (ImGui::BeginTabItem(TEXT("Window.SpawnTab")))
         {
             ImGui::Spacing();
-            ImGui::Columns(2, 0, false);
-            if (Widget::Checkbox(TEXT("Vehicle.SpawnInside"), &m_Spawner.m_bAsDriver))
-            {
-                gConfig.Set("Features.SpawnInsideVehicle", m_Spawner.m_bAsDriver);
-            }
-            ImGui::NextColumn();
-            if( Widget::Checkbox(TEXT("Vehicle.SpawnInAir"), &m_Spawner.m_bInAir))
-            {
-                gConfig.Set("Features.SpawnAircraftInAir", m_Spawner.m_bInAir);
-            }
-            ImGui::Columns(1);
-
-            ImGui::Spacing();
 
             int width = ImGui::GetWindowContentRegionWidth() - ImGui::GetStyle().ItemSpacing.x;
 #ifdef GTASA
@@ -1054,9 +1042,36 @@ void VehiclePage::Draw()
             Widget::ImageList(m_Spawner.m_VehData, fArgWrapper(vehiclePage.SpawnVehicle),
             [](std::string& str){
                 return Util::GetCarName(std::stoi(str));
-            }, nullptr, fArgNoneWrapper(vehiclePage.AddNew));
+            }, nullptr, fArgNoneWrapper(vehiclePage.AddNew),
+            []()
+            {
+                if (ImGui::MenuItem(TEXT("Vehicle.SpawnWithTunes"), NULL, &vehiclePage.m_Spawner.m_bWithTunes))
+                {
+                    gConfig.Set("Features.SpawnWithTunes", vehiclePage.m_Spawner.m_bWithTunes);
+                }
+                if (ImGui::MenuItem(TEXT("Vehicle.SpawnInAir"), NULL, &vehiclePage.m_Spawner.m_bInAir))
+                {
+                    gConfig.Set("Features.SpawnAircraftInAir", vehiclePage.m_Spawner.m_bInAir);
+                }
+                if (ImGui::MenuItem(TEXT("Vehicle.SpawnInside"), NULL, &vehiclePage.m_Spawner.m_bAsDriver))
+                {
+                    gConfig.Set("Features.SpawnInsideVehicle", vehiclePage.m_Spawner.m_bAsDriver);
+                }
+            });
 #else
-            Widget::DataList(m_Spawner.m_VehData, fArg3Wrapper(vehiclePage.SpawnVehicle), fArgNoneWrapper(vehiclePage.AddNew));
+            Widget::DataList(m_Spawner.m_VehData, fArg3Wrapper(vehiclePage.SpawnVehicle), fArgNoneWrapper(vehiclePage.AddNew),
+            false, 
+            []()
+            {
+                if (ImGui::MenuItem(TEXT("Vehicle.SpawnInAir"), NULL, &vehiclePage.m_Spawner.m_bInAir))
+                {
+                    gConfig.Set("Features.SpawnAircraftInAir", vehiclePage.m_Spawner.m_bInAir);
+                }
+                if (ImGui::MenuItem(TEXT("Vehicle.SpawnInside"), NULL, &vehiclePage.m_Spawner.m_bAsDriver))
+                {
+                    gConfig.Set("Features.SpawnInsideVehicle", vehiclePage.m_Spawner.m_bAsDriver);
+                }
+            });
 #endif
             ImGui::EndTabItem();
         }

@@ -228,6 +228,46 @@ void PlayerPage::SetCloth(std::string& name)
     }
     CClothes::RebuildPlayer(player, false);
 }
+
+void PlayerPage::RemoveClothesTab()
+{
+    if (ImGui::BeginTabItem(TEXT("Player.RemoveClothesTab")))
+    {
+        ImGui::TextWrapped(TEXT("Player.ClothesTip"));
+        ImGui::Spacing();
+
+        ImGui::BeginChild("ClothesRemove");
+        if (ImGui::Button(TEXT("Player.RemoveAll"), ImVec2(Widget::CalcSize(2))))
+        {
+            CPlayerPed* player = FindPlayerPed();
+            for (uint i = 0; i < 18; i++)
+            {
+                player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(0u, 0u, i);
+            }
+            CClothes::RebuildPlayer(player, false);
+        }
+        ImGui::SameLine();
+        size_t count = 0;
+        for (auto [k, v] : m_ClothData.m_pData->Items())
+        {
+            if (ImGui::Button(std::string(k.str()).c_str(), ImVec2(Widget::CalcSize(2))))
+            {
+                CPlayerPed* player = FindPlayerPed();
+                player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(0u, 0u, std::stoi(v.value_or<std::string>("0")));
+                CClothes::RebuildPlayer(player, false);
+            }
+
+            if (count % 2 != 0)
+            {
+                ImGui::SameLine();
+            }
+            ++count;
+        }
+
+        ImGui::EndChild();
+        ImGui::EndTabItem();
+    }
+}
 #endif
 
 #ifdef GTASA
@@ -774,7 +814,7 @@ void PlayerPage::Draw()
                             getline(ss, temp, '$');
 
                             return temp;
-                        });
+                        }, nullptr, nullptr, nullptr, fArgNoneWrapper(playerPage.RemoveClothesTab));
                     }
                     else
                     {
@@ -787,43 +827,6 @@ void PlayerPage::Draw()
                             Util::ClearCharTasksCarCheck(pPlayer);
                         }
                     }
-                    ImGui::EndTabItem();
-                }
-                if (pPlayer->m_nModelIndex == 0
-                && ImGui::BeginTabItem(TEXT("Player.RemoveClothesTab")))
-                {
-                    ImGui::TextWrapped(TEXT("Player.ClothesTip"));
-                    ImGui::Spacing();
-
-                    ImGui::BeginChild("ClothesRemove");
-                    if (ImGui::Button(TEXT("Player.RemoveAll"), ImVec2(Widget::CalcSize(2))))
-                    {
-                        CPlayerPed* player = FindPlayerPed();
-                        for (uint i = 0; i < 18; i++)
-                        {
-                            player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(0u, 0u, i);
-                        }
-                        CClothes::RebuildPlayer(player, false);
-                    }
-                    ImGui::SameLine();
-                    size_t count = 0;
-                    for (auto [k, v] : m_ClothData.m_pData->Items())
-                    {
-                        if (ImGui::Button(std::string(k.str()).c_str(), ImVec2(Widget::CalcSize(2))))
-                        {
-                            CPlayerPed* player = FindPlayerPed();
-                            player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(0u, 0u, std::stoi(v.value_or<std::string>("0")));
-                            CClothes::RebuildPlayer(player, false);
-                        }
-
-                        if (count % 2 != 0)
-                        {
-                            ImGui::SameLine();
-                        }
-                        ++count;
-                    }
-
-                    ImGui::EndChild();
                     ImGui::EndTabItem();
                 }
                 if (ImGui::BeginTabItem(TEXT("Player.PedSkinsTab")))

@@ -517,6 +517,19 @@ void VehCustmzrMgr::Draw()
     if (ImGui::BeginTabItem(TEXT("Vehicle.TuneTab")))
     {
         ImGui::Spacing();
+        if (ImGui::Button(TEXT("Vehicle.RemoveTune"), ImVec2(Widget::CalcSize())))
+        {
+            for (int i = 0; i != 15; ++i)
+            {
+                int compID = pVeh->GetUpgrade(i);
+                if (compID > -1)
+                {
+                    pVeh->RemoveVehicleUpgrade(compID);
+                }
+            }
+            Util::SetMessage(TEXT("Vehicle.RemoveTuneMSG"));
+        }
+        ImGui::Spacing();
         Widget::ImageList(m_TuneData,
         [this](std::string& str)
         {

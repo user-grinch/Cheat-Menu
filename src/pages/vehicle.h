@@ -28,6 +28,7 @@ private:
                                     eResourceType::TYPE_TEXT), ImVec2(100, 75)};
         bool m_bAsDriver = true;
         bool m_bInAir = true;
+        bool m_bWithTunes = true;
         char m_nLicenseText[9];
     } m_Spawner;
 
