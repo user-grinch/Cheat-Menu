@@ -48,6 +48,7 @@ public:
     static inline bool m_bLocName;
     static inline bool m_bMemUsage;
     static inline bool m_bModelInfo;
+    static inline bool m_bPlaytime;
     static inline bool m_bPedTasks;
     static inline bool m_bTransparent;
     static inline bool m_bVehHealth;

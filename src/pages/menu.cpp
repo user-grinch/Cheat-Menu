@@ -166,11 +166,16 @@ void MenuPage::Draw()
                 gConfig.Set("Overlay.ShowLocationName", Overlay::m_bLocName);
             }
 
-            ImGui::NextColumn();
-
             if (ImGui::Checkbox(TEXT("Menu.ShowModelInfo"), &Overlay::m_bModelInfo))
             {
                 gConfig.Set("Overlay.ShowModelInfo", Overlay::m_bModelInfo);
+            }
+
+            ImGui::NextColumn();
+
+            if (ImGui::Checkbox(TEXT("Menu.ShowPlaytime"), &Overlay::m_bPlaytime))
+            {
+                gConfig.Set("Overlay.ShowPlaytime", Overlay::m_bPlaytime);
             }
 
             if (ImGui::Checkbox(TEXT("Menu.ShowPedTasks"), &Overlay::m_bPedTasks))

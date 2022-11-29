@@ -526,7 +526,19 @@ void VehCustmzrMgr::Draw()
                 {
                     pVeh->RemoveVehicleUpgrade(compID);
                 }
+            } 
+
+            /*
+                Remove leftover comps
+                Nitro, wheels, hydralics
+            */
+            int comps[] = {1008, 1009, 1010, 1025, 1073, 1074, 1075, 1076, 1077, 1078, 1079, 1080, 1081, 1082, 1083, 1084, 1085, 1086, 1087};
+            int maxSize = sizeof(comps)/sizeof(comps[0]);
+            for (int i = 0; i < maxSize; ++i)
+            {
+                pVeh->RemoveVehicleUpgrade(comps[i]);
             }
+
             Util::SetMessage(TEXT("Vehicle.RemoveTuneMSG"));
         }
         ImGui::Spacing();

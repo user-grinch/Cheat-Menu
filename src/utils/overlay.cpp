@@ -15,6 +15,7 @@ void Overlay::Init()
     m_bFPS = gConfig.Get("Overlay.ShowFPS", false);
     m_bLocName = gConfig.Get("Overlay.ShowLocationName", false);
     m_bModelInfo = gConfig.Get("Overlay.ShowModelInfo", false);
+    m_bPlaytime = gConfig.Get("Overlay.ShowPlaytime", false);
     m_bPedTasks = gConfig.Get("Overlay.ShowPedTasks", false);
     m_bTransparent = gConfig.Get("Overlay.Transparent", false);
     m_bMemUsage = gConfig.Get("Overlay.ShowMemoryUsage", false);
@@ -460,6 +461,30 @@ void Overlay::ProcessInfoBox()
             if (m_bLocName)
             {
                 ImGui::Text(TEXT("Menu.Location"), Util::GetLocationName(&pos).c_str());
+            }  
+
+            if (m_bPlaytime)
+            {
+                int timer = CTimer::m_snTimeInMilliseconds / 1000;
+                int h = timer / 3600;
+                int m = timer / 60 - h*60;
+                int s = timer - m*60;
+
+                if (h == 0)
+                {
+                    if (m == 0)
+                    {
+                        ImGui::Text((TEXT_S("Menu.Playtime") + "%d seconds").c_str(), s);
+                    }
+                    else
+                    {
+                        ImGui::Text((TEXT_S("Menu.Playtime") + "%d min %d sec").c_str(), m, s);
+                    }
+                }
+                else
+                {
+                    ImGui::Text((TEXT_S("Menu.Playtime") + "%d hour %d min %d sec").c_str(), h, m, s);
+                }
             }
 
             if (m_bMemUsage)
