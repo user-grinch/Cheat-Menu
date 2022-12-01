@@ -542,6 +542,15 @@ void VehCustmzrMgr::Draw()
             Util::SetMessage(TEXT("Vehicle.RemoveTuneMSG"));
         }
         ImGui::Spacing();
+
+        static CVehicle *prevVeh = nullptr;
+        CVehicle *curVeh = FindPlayerPed()->m_pVehicle;
+        if (prevVeh != curVeh)
+        {
+            m_TuneData.m_bSearchListUpdateRequired = true;
+            prevVeh = curVeh;
+        }
+
         Widget::ImageList(m_TuneData,
         [this](std::string& str)
         {
