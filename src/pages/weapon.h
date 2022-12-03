@@ -58,6 +58,12 @@ public:
     void GiveWeaponToPlayer(std::string& weaponType);
 #else
     void GiveWeaponToPlayer(std::string& rootkey, std::string& model, std::string& name);
+
+    // Returns weapon model from weaponType
+    int GetWeaponModel(eWeaponType weaponType);
+
+    // Returns weaponType from model
+    eWeaponType GetWeaponType(int weaponModel);
 #endif
 };
 

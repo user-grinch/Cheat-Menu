@@ -143,17 +143,19 @@ static void ClearPlayerWeapon(eWeaponType weaponType)
     }
 }
 
+int WeaponPage::GetWeaponModel(eWeaponType weaponType)
+{
+    int rtn = CallAndReturn<int, BY_GAME(NULL, 0x4418B0, 0x430690)>(weaponType); // int __cdecl CPickups::ModelForWeapon(int a1)
+    return rtn;
+}
+
 // Implementation of opcode 0x605 (CLEO)
-static eWeaponType GetWeaponTypeFromModel(int model)
+eWeaponType WeaponPage::GetWeaponType(int model)
 {
     eWeaponType weaponType = WEAPONTYPE_UNARMED;
-
     for (size_t i = 0; i < 37; i++)
     {
-
-        int temp = CallAndReturn<int, BY_GAME(NULL, 0x4418B0, 0x430690)>(i); // int __cdecl CPickups::ModelForWeapon(int a1)
-
-        if (temp == model)
+        if (GetWeaponModel(static_cast<eWeaponType>(i)) == model)
         {
             weaponType = (eWeaponType)i;
             break;
@@ -217,7 +219,7 @@ void WeaponPage::GiveWeaponToPlayer(std::string& rootkey, std::string& name, std
     CStreaming::RequestModel(iModel, PRIORITY_REQUEST);
     CStreaming::LoadAllRequestedModels(false);
 
-    eWeaponType weaponType = GetWeaponTypeFromModel(iModel);
+    eWeaponType weaponType = GetWeaponType(iModel);
     Command<Commands::GIVE_WEAPON_TO_CHAR>(hplayer, weaponType, m_nAmmoCount);
     Command<Commands::MARK_MODEL_AS_NO_LONGER_NEEDED>(iModel);
 #ifdef GTA3

@@ -228,16 +228,25 @@ void PedPage::SpawnPed(std::string& cat, std::string& name, std::string& model)
         ped->m_nPedFlags.bPedIsBleeding = m_Spawner.m_bPedBleed;
         ped->m_nWeaponAccuracy = m_Spawner.m_nAccuracy;
         ped->m_fHealth = m_Spawner.m_nPedHealth;
-#ifdef GTASA
+
         if (m_Spawner.m_nWeaponId != 0)
         {
             int model = 0;
+#ifdef GTASA
             Command<Commands::GET_WEAPONTYPE_MODEL>(m_Spawner.m_nWeaponId, &model);
+#else
+            model = static_cast<int>(m_Spawner.m_nWeaponId);
+            m_Spawner.m_nWeaponId = weaponPage.GetWeaponType(model);
+#endif
             CStreaming::RequestModel(model, PRIORITY_REQUEST);
             CStreaming::LoadAllRequestedModels(false);
             Command<Commands::GIVE_WEAPON_TO_CHAR>(hplayer, m_Spawner.m_nWeaponId, 999);
-        }
+
+            Command<Commands::MARK_MODEL_AS_NO_LONGER_NEEDED>(model);
+#ifdef GTA3
+    Command<Commands::SET_CURRENT_PLAYER_WEAPON>(0, weaponType);
 #endif
+        }
     }
 }
 
