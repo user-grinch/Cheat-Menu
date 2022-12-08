@@ -376,7 +376,7 @@ void GamePage::Draw()
             ImGui::Spacing();
             ImGui::BeginChild("##Menus");
 #ifdef GTASA
-            if (ImGui::CollapsingHeader(TEXT("Game.CameraZoom")))
+            if (ImGui::CollapsingHeader((TEXT_S("Game.CameraZoom") + "##HEADER").c_str()))
             {
                 ImGui::Spacing();
                 if (Freecam.GetState())

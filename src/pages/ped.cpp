@@ -244,7 +244,7 @@ void PedPage::SpawnPed(std::string& cat, std::string& name, std::string& model)
 
             Command<Commands::MARK_MODEL_AS_NO_LONGER_NEEDED>(model);
 #ifdef GTA3
-    Command<Commands::SET_CURRENT_PLAYER_WEAPON>(0, weaponType);
+        Command<Commands::SET_CURRENT_PLAYER_WEAPON>(0, m_Spawner.m_nWeaponId);
 #endif
         }
     }
