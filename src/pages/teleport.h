@@ -16,6 +16,7 @@ private:
     bool m_bInsertCoord;
     bool m_bTeleportMarker;
     bool m_bQuickTeleport;
+    bool m_bSpawnUnderwater;
     ImVec2 m_fMapSize;
 #ifdef GTASA
 

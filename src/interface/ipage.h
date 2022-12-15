@@ -59,11 +59,24 @@ private:
     bool m_bHasHeader;      // Does the page has a header button
     std::string m_NameKey;  // A key to the page name string
 
+protected:
+    // Loads data from toml file
+    // virtual void ImportSaveData();
+
+    // // Saves data to toml file
+    // virtual void ExportSaveData();
+
 public:
     IPage(ePageID page, const std::string& key, bool header)
     : m_eID(page), m_NameKey(key), m_bHasHeader(header)
     {
         PageHandler::AddPage(reinterpret_cast<PagePtr>(this), static_cast<size_t>(m_eID));
+        // ImportSaveData();
+    }
+
+    ~IPage()
+    {
+        // ExportSaveData();
     }
 
     // Page drawing code goes here
@@ -75,16 +88,15 @@ public:
         return m_eID;
     }
 
-    // Returns true if the page has a visible header button
-    virtual bool HasHeaderButton() final
-    {
-        return m_bHasHeader;
-    }
-
     // Returns the page name key
     virtual std::string GetPageKey() final
     {
         return m_NameKey;
     }
 
+    // Returns true if the page has a visible header button
+    virtual bool HasHeaderButton() final
+    {
+        return m_bHasHeader;
+    }
 };

@@ -424,6 +424,8 @@ LocationHint = "Groove Street"
 LocationRemoved = "Location removed"
 QuickTeleport = "Quick teleport"
 QuickTeleportHint = "Open quick teleport using "
+SpawnUnderwater = "Spawn underwater"
+SpawnUnderwaterHint = "Spawn under the surface with quick teleport"
 TeleportMarkerHint = """
 Teleport to the location of your radar
 target blip using """

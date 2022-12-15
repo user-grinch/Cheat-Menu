@@ -49,6 +49,7 @@ TeleportPage::TeleportPage()
     {
         m_bTeleportMarker = gConfig.Get("Features.TeleportMarker", false);
         m_bQuickTeleport = gConfig.Get("Features.QuickTeleport", false);
+        m_bSpawnUnderwater = gConfig.Get("Features.SpawnUnderwater", false);
         m_fMapSize.x = gConfig.Get("Game.MapSizeX", 6000.0f);
         m_fMapSize.y = gConfig.Get("Game.MapSizeY", 6000.0f);
     };
@@ -147,8 +148,20 @@ void TeleportPage::WarpPlayer(CVector pos, int interiorID)
 
     if (Type == eTeleportType::Marker || Type == eTeleportType::MapPosition)
     {   
+        float ground, water;
         CEntity* pPlayerEntity = FindPlayerEntity(-1);
-        pos.z = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, nullptr, &pPlayerEntity) + 1.0f;
+        ground = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, nullptr, &pPlayerEntity) + 1.0f;
+
+        if (m_bSpawnUnderwater)
+        {
+            pos.z = ground;
+        }
+        else
+        {
+            Command<Commands::GET_WATER_HEIGHT_AT_COORDS>(pos.x, pos.y, true, &water);
+            pos.z = ground > water ? ground : water;
+        }
+        
     }
 
     if (pVeh && pPlayer->m_nPedFlags.bInVehicle)
@@ -282,6 +295,11 @@ void TeleportPage::Draw()
                     gConfig.Set("Features.QuickTeleport", m_bQuickTeleport);
                 }
                 ImGui::NextColumn();
+                if (Widget::Checkbox(TEXT("Teleport.SpawnUnderwater"), &m_bSpawnUnderwater,
+                                        TEXT("Teleport.SpawnUnderwaterHint")))
+                {
+                    gConfig.Set("Features.SpawnUnderwater", m_bSpawnUnderwater);
+                }
                 if (Widget::Checkbox(TEXT("Teleport.TeleportMarker"), &m_bTeleportMarker,
                                         std::string(TEXT_S("Teleport.TeleportMarkerHint") 
                                                     + teleportMarker.GetNameString()).c_str()))
