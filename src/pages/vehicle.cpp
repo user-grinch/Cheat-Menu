@@ -451,7 +451,9 @@ void VehiclePage::SpawnVehicle(std::string& rootkey, std::string& vehName, std::
             player->GetOrientation(x, y, z);
             veh->SetOrientation(x, y, z);
 #endif
+            CWorld::Remove(player);
             Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
+            CWorld::Add(player);
             Util::SetCarForwardSpeed(veh, speed);
         }
         else

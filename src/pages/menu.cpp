@@ -166,10 +166,12 @@ void MenuPage::Draw()
                 gConfig.Set("Overlay.ShowLocationName", Overlay::m_bLocName);
             }
 
+#ifndef GTA3
             if (ImGui::Checkbox(TEXT("Menu.ShowModelInfo"), &Overlay::m_bModelInfo))
             {
                 gConfig.Set("Overlay.ShowModelInfo", Overlay::m_bModelInfo);
             }
+#endif
 
             ImGui::NextColumn();
 
