@@ -1,6 +1,6 @@
 
 <p align="center">
-  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/logo.png">
+  <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/logo.png" width="700" height="180">
   </p>
 <p align="center">  
   Press <kbd>Left Ctrl</kbd> + <kbd>M</kbd> to open the menu. Doesn't work in multiplayer
