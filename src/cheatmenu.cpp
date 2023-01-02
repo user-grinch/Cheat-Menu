@@ -206,12 +206,6 @@ CheatMenuMgr::CheatMenuMgr()
             return;
         }
 
-        if (!D3dHook::Init(fArgNoneWrapper(CheatMenu.Draw)))
-        {
-            return;
-        }
-
-        ApplyStyle();
         Locale::Init(FILE_NAME "/locale/", "English", "English");
         Locale::SetLocaleByName(gConfig.Get("Menu.Language", ""));
         Overlay::Init();
@@ -223,6 +217,17 @@ CheatMenuMgr::CheatMenuMgr()
         m_fPos.y = gConfig.Get("Window.PosY", 50.0f);
 
         srand(CTimer::m_snTimeInMilliseconds);
+    };
+
+    // Doesn't work with ThirteenAG's windowed mode while inside initRwEvent
+    Events::initGameEvent += [this]() 
+    {
+        if (!D3dHook::Init(fArgNoneWrapper(CheatMenu.Draw)))
+        {
+            return;
+        }
+
+        ApplyStyle();
     };
 
     Events::processScriptsEvent += [this]()

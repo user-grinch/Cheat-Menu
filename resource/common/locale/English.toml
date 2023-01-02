@@ -338,7 +338,8 @@ Steps to enable 'Custom Skins',
 Limitations:
 
 1. Your .dff & .txd file names must not exceed 8 characters.
-2. Do not rename them while the game is running
+2. Do NOT rename them while the game is running
+3. Do NOT name your files to existing ped names
 
 Doing so will crash your game."""
 CycleJump = "Higher cycle jumps"

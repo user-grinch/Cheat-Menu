@@ -5,35 +5,38 @@
 CustomSkinsMgr& CustomSkins = CustomSkinsMgr::Get();
 CustomSkinsMgr::CustomSkinsMgr()
 {
-    std::string path = GAME_PATH((char*)"modloader/");
-    if (GetModuleHandle("modloader.asi") && std::filesystem::is_directory(path))
+    Events::initRwEvent += [this]()
     {
-        path += "CustomSkinsLoader/";
-        if (std::filesystem::is_directory(path))
+        std::string path = GAME_PATH((char*)"modloader/");
+        if (GetModuleHandle("modloader.asi") && std::filesystem::is_directory(path))
         {
-            for (auto& p : std::filesystem::recursive_directory_iterator(path))
+            path += "CustomSkinsLoader/";
+            if (std::filesystem::is_directory(path))
             {
-                if (p.path().extension() == ".dff")
+                for (auto& p : std::filesystem::recursive_directory_iterator(path))
                 {
-                    std::string file_name = p.path().stem().string();
+                    if (p.path().extension() == ".dff")
+                    {
+                        std::string file_name = p.path().stem().string();
 
-                    if (file_name.size() < 9)
-                    {
-                        m_List.push_back(file_name);
-                    }
-                    else
-                    {
-                        Log::Print<eLogLevel::Error>("Custom Skin longer than 8 characters {}", file_name);
+                        if (file_name.size() < 9)
+                        {
+                            m_List.push_back(file_name);
+                        }
+                        else
+                        {
+                            Log::Print<eLogLevel::Error>("Custom Skin longer than 8 characters {}", file_name);
+                        }
                     }
                 }
             }
+            else
+            {
+                std::filesystem::create_directory(path);
+            }
+            m_bInit = true;
         }
-        else
-        {
-            std::filesystem::create_directory(path);
-        }
-        m_bInit = true;
-    }
+    };
 }
 
 void CustomSkinsMgr::SetSkin(const std::string& name)
