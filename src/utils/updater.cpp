@@ -52,9 +52,7 @@ void Updater::Process()
             sscanf(buf, "[{\"name\": \"%f\",", &version);
             if (version != 0.0f)
             {
-                std::stringstream ss;
-                ss << std::fixed << std::setprecision(2) << version;
-                latestVer = ss.str();
+                latestVer = std::format("{}", version);
                 break;
             }
         }

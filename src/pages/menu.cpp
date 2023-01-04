@@ -11,7 +11,9 @@ MenuPage& menuPage = MenuPage::Get();
 MenuPage::MenuPage()
 : IPage<MenuPage>(ePageID::Menu, "Window.MenuPage", true)
 {
-    Events::initGameEvent += [this]()
+    // This needs to run before initRwEvent
+    // Updates are checked in m_bAutoCheckUpdate
+    Events::initRwEvent.before += [this]()
     {
         m_bDiscordRPC = gConfig.Get("Menu.DiscordRPC", false);
         m_bAutoCheckUpdate = gConfig.Get("Menu.AutoCheckUpdate", true);

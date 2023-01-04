@@ -286,7 +286,7 @@ VehCustmzrMgr::VehCustmzrMgr()
             m_Neon.m_nTrafficTimer = timer;
         }
 
-        if (m_Nitro.m_bEnabled && FindPlayerVehicle(-1, false)->m_nVehicleSubClass == VEHICLE_AUTOMOBILE)
+        if (m_Nitro.m_bEnabled && pVeh && pVeh->m_nVehicleSubClass == VEHICLE_AUTOMOBILE)
         {
             patch::Set<BYTE>(0x969165, 0, true); // All cars have nitro
             patch::Set<BYTE>(0x96918B, 0, true); // All taxis have nitro
