@@ -15,7 +15,8 @@ void FileHandler::GenerateHandlingFile(tHandlingData *pHandling, std::map<int, s
     float tractionMultiplier = pHandling->m_fTractionMultiplier;
     float tractionLoss = pHandling->m_fTractionLoss;
     float tractionBias = pHandling->m_fTractionBias;
-    float engineAcceleration = pHandling->m_transmissionData.m_fEngineAcceleration * 12500;
+    float engineAcceleration = pHandling->m_transmissionData.m_fEngineAcceleration * 25000.0f;
+    engineAcceleration /= pHandling->m_transmissionData.m_nDriveType == 52 ? 4.0f : 2.0f;
     float engineInertia = pHandling->m_transmissionData.m_fEngineInertia;
     int driveType = pHandling->m_transmissionData.m_nDriveType;
     int engineType = pHandling->m_transmissionData.m_nEngineType;

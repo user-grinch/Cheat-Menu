@@ -9,6 +9,7 @@
 #include "custom/filehandler.h"
 #include "custom/vehcustmzr.h"
 #include "custom/autodrive.h"
+#include <CMatrix.h>
 
 VehiclePage& vehiclePage = VehiclePage::Get();
 VehiclePage::VehiclePage()
@@ -446,20 +447,21 @@ void VehiclePage::SpawnVehicle(std::string& rootkey, std::string& vehName, std::
             float x,y,z;
             player->m_placement.GetOrientation(x, y, z);
             veh->m_placement.SetOrientation(x, y, z);
+            Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
 #else
             float x,y,z;
             player->GetOrientation(x, y, z);
+            player->SetObjective(OBJECTIVE_ENTER_CAR_AS_DRIVER);
+            player->WarpPedIntoCar(veh);
             veh->SetOrientation(x, y, z);
 #endif
-            CWorld::Remove(player);
-            Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
-            CWorld::Add(player);
+            
             Util::SetCarForwardSpeed(veh, speed);
         }
         else
         {
             player->TransformFromObjectSpace(pos);
-            Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 3.0f, &hveh);
+            Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 4.0f, &hveh);
             veh = CPools::GetVehicle(hveh);
 #ifdef GTAVC
             float x,y,z;

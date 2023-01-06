@@ -639,9 +639,11 @@ void VehCustmzrMgr::Draw()
         Widget::EditRadioBtnAddr(TEXT("Vehicle.DriveType"), (int)&pHandlingData->m_transmissionData.m_nDriveType, drive_type);
 
         // Engine acceleration calculation
-        float fEngineAcceleration = pHandlingData->m_transmissionData.m_fEngineAcceleration * 12500;
-        Widget::EditAddr(TEXT("Vehicle.EngineAccel"), (int)&fEngineAcceleration, 0.0f, 0.0f, 49.0f, 12500.0f);
-        pHandlingData->m_transmissionData.m_fEngineAcceleration = fEngineAcceleration / 12500;
+        float fEngineAcceleration = pHandlingData->m_transmissionData.m_fEngineAcceleration * 25000.0f;
+        fEngineAcceleration /= pHandlingData->m_transmissionData.m_nDriveType == 52 ? 4.0f : 2.0f;
+        Widget::EditAddr(TEXT("Vehicle.EngineAccel"), (int)&fEngineAcceleration, 0.0f, 0.0f, 49.0f, 1.0f);
+        fEngineAcceleration *= pHandlingData->m_transmissionData.m_nDriveType == 52 ? 4.0f : 2.0f;
+        pHandlingData->m_transmissionData.m_fEngineAcceleration = fEngineAcceleration / 25000.0f;
 
 
         Widget::EditAddr(TEXT("Vehicle.EngineInertia"), (int)&pHandlingData->m_transmissionData.m_fEngineInertia, 0.1f, 0.1f, 400.0f);
@@ -664,7 +666,7 @@ void VehCustmzrMgr::Draw()
         Widget::EditBits(TEXT("Vehicle.HandlingFlags"), (int)&pHandlingData->m_nHandlingFlags, m_HandlingFlagNames);
 
         Widget::EditAddr(TEXT("Vehicle.HighSpeedDamping"), (int)&pHandlingData->m_fSuspensionDampingLevel, -10.0f, -10.0f, 10.0f); // test later
-        Widget::EditAddr(TEXT("Vehicle.LowerKimit"), (int)&pHandlingData->m_fSuspensionLowerLimit, -10.0f, -10.0f, 10.0f); // test later
+        Widget::EditAddr(TEXT("Vehicle.LowerLimit"), (int)&pHandlingData->m_fSuspensionLowerLimit, -10.0f, -10.0f, 10.0f); // test later
         Widget::EditAddr(TEXT("Vehicle.Mass"), (int)&pHandlingData->m_fMass, 1.0f, 1.0f, 50000.0f);
 
         // Max Velocity calculation
