@@ -5,7 +5,7 @@
 #define AppVersion "3.51"
 #define AppPublisher "Grinch_"
 #define AppURL "https://github.com/user-grinch/Cheat-Menu"
-#define OutputDir "build"
+#define OutputDir "."
 
 #define CheatMenu = "https://github.com/user-grinch/Cheat-Menu/releases/download/"
 #define UAL32 = "https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases/download/Win32-latest"
@@ -30,7 +30,7 @@ LicenseFile=../LICENSE
 ;PrivilegesRequired=lowest
 ;PrivilegesRequiredOverridesAllowed=dialog
 OutputDir={#OutputDir}
-OutputBaseFilename=cheat_menu_setup
+OutputBaseFilename=Installer
 ;SetupIconFile=cr4.ico
 Compression=lzma
 SolidCompression=yes
@@ -63,12 +63,13 @@ Name: "{app}\CheatMenuVC"; Check: IsVC; Permissions: users-modify
 Name: "{app}\CheatMenuIII"; Check: IsIII; Permissions: users-modify
 
 [Files]
-Source: "{tmp}\vorbisFile.zip"; DestDir: "{app}"; Flags: deleteafterinstall external; Check: NeedsSilentPatch; AfterInstall: Extract('{app}\vorbisFile.zip', 'vorbisFile.dll', '{app}');  Components: plugins/asiloader;
-Source: "{tmp}\d3d8.zip"; DestDir: "{app}"; Flags: deleteafterinstall external; Check: NeedsD3Wrapper; AfterInstall: Extract('{app}\d3d8.zip', 'd3d8.dll', '{app}'); Components: plugins/d3d8to9;
+Source: "{tmp}\vorbisFile.zip"; DestDir: "{app}"; Flags: deleteafterinstall external; Check: IsSA; AfterInstall: Extract('{app}\vorbisFile.zip', 'vorbisFile.dll', '{app}');  Components: plugins/asiloader;
+Source: "{tmp}\d3d8.zip"; DestDir: "{app}"; Flags: deleteafterinstall external; Check: not IsSA; AfterInstall: Extract('{app}\d3d8.zip', 'd3d8.dll', '{app}'); Components: plugins/d3d8to9;
 Source: "{tmp}\SilentPatch.zip"; DestDir: "{app}"; Flags: deleteafterinstall external; AfterInstall: ExtractAll('{app}\SilentPatch.zip', '{app}'); Components: plugins/SilentPatch;
 Source: "{tmp}\CheatMenu.zip"; DestDir: "{app}"; Flags: deleteafterinstall external; AfterInstall: ExtractAll('{app}\CheatMenu.zip', '{app}'); Components: program;
 Source: "{tmp}\redist.exe"; DestDir: "{app}"; Flags: deleteafterinstall external; Components: plugins/redist;
 Source: "{tmp}\dx9.exe"; DestDir: "{app}"; Flags: deleteafterinstall external; Components: plugins/dx9;
+Source: "{tmp}\dinput8.zip"; DestDir: "{app}"; Flags: deleteafterinstall external; Check: not IsSA; AfterInstall: Extract('{app}\dinput8.zip', 'dinput8.dll', '{app}');  Components: plugins/asiloader;
 
 [Run]
 Filename: "{tmp}\redist.exe"; StatusMsg: "Installing Visual C++ Redistributable 2022 x86"; Parameters: "/quiet"; Flags: waituntilterminated
@@ -100,16 +101,6 @@ end;
 function IsIII(): Boolean;
 begin
   Result := GameId = GTA_III;
-end;
-
-function NeedsSilentPatch(): Boolean;
-begin
-  Result := (GameId in [GTA_III, GTA_VC, GTA_SA]);
-end;
-
-function NeedsD3Wrapper(): Boolean;
-begin
-  Result := (GameId in [GTA_III, GTA_VC]);
 end;
 
 procedure unzipFile(Src, FileName, TargetFldr: PAnsiChar);
@@ -248,8 +239,21 @@ begin
 end;  
 
 procedure InitializeWizard;
+var
+  WinHttpReq: Variant;
 begin
   DownloadPage := CreateDownloadPage(SetupMessage(msgWizardPreparing), SetupMessage(msgPreparingDesc), @OnDownloadProgress);
+
+  // Check for active connection
+  try
+    WinHttpReq := CreateOleObject('WinHttp.WinHttpRequest.5.1');
+    WinHttpReq.Open('GET', 'https://github.com/', False);
+    WinHttpReq.Send('');
+  except
+    SuppressibleMsgBox('Cannot reach server. Please check your Internet connection.',
+              mbError, MB_OK, IDOK);
+    Abort;
+  end;
 end;
    
 procedure CurPageChanged(CurPageID: Integer);
@@ -264,6 +268,11 @@ begin
     DefaultDirOnce := True;
   end;
 
+  if CurPageID = wpWelcome then 
+  begin
+    WizardForm.DirEdit.Text := 'thisi s a aasdjadljsalkdkll';
+  end;
+
   if CurPageID = wpSelectComponents then
   begin
     GameId := IdentifyGame(WizardDirValue);
@@ -273,13 +282,6 @@ begin
     begin
       WizardForm.ComponentsList.ItemEnabled[I] := True;
       WizardForm.ComponentsList.Checked[I] := True;
-    end;
-
-    if not NeedsD3Wrapper then
-    begin
-      // D3 Wrapper
-      WizardForm.ComponentsList.Checked[2] := False;
-      WizardForm.ComponentsList.ItemEnabled[2] := False;
     end;
   end;
 end;
@@ -309,7 +311,10 @@ begin
       
     if WizardIsComponentSelected('plugins/asiloader') then
     begin
-        DownloadPage.Add('{#UAL32}/vorbisFile.zip', 'vorbisFile.zip', '');
+      if GameId = GTA_SA then
+        DownloadPage.Add('{#UAL32}/vorbisFile.zip', 'vorbisFile.zip', '')
+      else
+        DownloadPage.Add('{#UAL32}/dinput8.zip', 'dinput8.zip', '');
     end;
 
     if WizardIsComponentSelected('plugins/d3d8to9') then
