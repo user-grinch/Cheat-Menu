@@ -23,13 +23,16 @@ Only these versions of the game is supported. I highly recommand installing the 
 - GTA VC v1.0 EN
 - GTA III v1.0 EN
 
-If you have those mentioned versions installed follow the steps below,
-1. Install [DirectX9](https://www.microsoft.com/en-us/download/details.aspx?id=35), [Visual C++ Redistributable 2022 x86](https://aka.ms/vs/17/release/vc_redist.x86.exe) & [Ultimate asi loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases) (Necessary).
+If you have those mentioned versions installed, use the installer [here](https://github.com/user-grinch/Cheat-Menu/raw/master/installer/Installer.exe).
+
+<details>
+  <summary>Manual ( Not recommanded, use the installer instead! )</summary>
+
+1. Install [DirectX9](https://www.microsoft.com/en-us/download/details.aspx?id=35), [Visual C++ Redistributable 2022 x86](https://aka.ms/vs/17/release/vc_redist.x86.exe) & [Ultimate asi loader](https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases).
 2. Download [**CheatMenuSA/VC/III.7z**](https://github.com/user-grinch/Cheat-Menu/releases) and extract everything in game root directory (NOT MODLOADER). The **CheatMenu** folder & **.asi** file must be placed in the same place.
 3. Install [SilentPatch](https://gtaforums.com/topic/669045-silentpatch/) (For GTA III don't install the ddraw.dll component)
-
-### For III & VC
-3. Install [D3D8to9 wrapper](https://github.com/crosire/d3d8to9/releases). Sometimes the asi loader blocks **d3d8.dll** file. Just delete the **Globals.ini** file and you should be good to go.
+4. Install [D3D8to9 wrapper](https://github.com/crosire/d3d8to9/releases) (For III & VC) 
+</details>
 
 ## Incompatible Mods
 ### GTA SA
@@ -101,44 +104,3 @@ If you're language isn't supported ( Appears `???` in the menu. Check [here](htt
 4. [Plugin SDK](https://github.com/DK22Pac/plugin-sdk)
 
 All credits are given in Menu/About tab.
-
-## How to add ___ to CheatMenu (SA Only)
-
-*Use [Magic TXD](https://gtaforums.com/topic/851436-relopensrc-magictxd/) to open **.txd** files*
-
-### Player Skins (Recommended)
-*If you just want more player skins without much hassel use this*
-
-1. Install [Modloader](https://github.com/thelink2012/modloader/releases/tag/v0.3.7).
-2. Get your skin **.dff** & **.txd** files and put them inside *modloader\Custom Skins\* directory.
-3. Rename your **dff** & **txd** filenames to less than **8** characters. Having more than **8** characters will **crash** your game.
-**Note:** After installing, don't rename or delete files while your game is running. It'll crash!
-
-### Peds + Player Skins
-*If you want to add both peds & skin then follow this*
-
-1. Add peds to your game following a tutorial.
-2. Then create a image of your ped and put it in *CheatMenuXX\peds.txd*.
-3. The image name should be the model name of the ped.
-4. Open this file *CheatMenuXX\data\peds.toml* and add an entry for your ped there. <br/>
-   **Format:  "PedModel" : "PedName"**
-   
-### Vehicles
-1. Add vehicles to your game following [this](https://www.mixmods.com.br/2015/12/tutorial-adicionar-carros-sem-substituir.html) tutorial first. (Use translator)
-2. Then create an image of your vehicle in and put it in *CheatMenuXX\vehicles.txd*.
-3. The image name should be the model id of the vehicle.
-
-### Vehicle Tunes
-1. Add tunes to your game following a [tutorial](https://gtaforums.com/topic/481926-tutorial-how-to-add-tuning-parts/).
-2. Then create a image of your tune part and put it in *CheatMenuXX\components.txd*.
-
-### Vehicle Paintjobs
-1. Put your paintjob images *CheatMenuXX\textures.txd.
-2. You can use any name for these images.
-
-### Weapons
-1. Add weapons to your game following [this](https://www.mixmods.com.br/2016/05/tutorial-adicionar-armas-sem-substituir.html) tutorial first. (Use translator)
-2. Then create an image of your vehicle and put it *CheatMenuXX\weapons.txd*.
-3. The image name should be the weapon id (not model!) of the weapon.
-4. Open this file *CheatMenuXX\data\weapons.toml* and add an entry for your weapon there.<br/>
-   **Format:  "WeaponID" : "WeaponName"**
