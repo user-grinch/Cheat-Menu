@@ -26,7 +26,7 @@ exit
 :copyFiles
 set "asiPath="..\build\bin\%~1.asi""
 set "folderpath="..\resource\%~1""
-set "archivePath="..\archive\%~1.7z""
+set "archivePath="..\archive\%~1.zip""
 
 @REM Remove existing files
 rd /S /Q "pack" /Q
@@ -39,6 +39,8 @@ xcopy /s %folderpath% "pack\%~1\" /K /D /H /Y
 xcopy /s "..\resource\common\" "pack\%~1\" /K /D /H /Y
 
 @REM Guessing we have 7zip installed already, well I have 
-"C:\Program Files\7-Zip\7z.exe" a -t7z %archivePath% ".\pack\*" -mx=9
+@REM "C:\Program Files\7-Zip\7z.exe" a -t7z %archivePath% ".\pack\*" -mx=9
+"C:\Program Files\7-Zip\7z.exe" a -tzip %archivePath% ".\pack\*" -mx=9
+
 
 @REM  ------------------------------------------------------

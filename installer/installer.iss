@@ -2,7 +2,7 @@
 ; https://github.com/cleolibrary/CLEO-Redux
 
 #define AppName "Cheat Menu"
-#define AppVersion "3.51"
+#define AppVersion "3.52"
 #define AppPublisher "Grinch_"
 #define AppURL "https://github.com/user-grinch/Cheat-Menu"
 #define OutputDir "."
