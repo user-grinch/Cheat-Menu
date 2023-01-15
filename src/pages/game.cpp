@@ -81,6 +81,7 @@ GamePage::GamePage()
         {
             if (quickSceenShot.Pressed())
             {
+                injector::WriteMemory<BYTE>(0xBA6830, 1, true);
                 Command<Commands::TAKE_PHOTO>();
                 Util::SetMessage(TEXT("Game.ScreenshotTaken"));
             }

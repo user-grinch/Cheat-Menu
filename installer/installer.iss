@@ -72,8 +72,8 @@ Source: "{tmp}\dx9.exe"; DestDir: "{app}"; Flags: deleteafterinstall external; C
 Source: "{tmp}\dinput8.zip"; DestDir: "{app}"; Flags: deleteafterinstall external; Check: not IsSA; AfterInstall: Extract('{app}\dinput8.zip', 'dinput8.dll', '{app}');  Components: plugins/asiloader;
 
 [Run]
-Filename: "{tmp}\redist.exe"; StatusMsg: "Installing Visual C++ Redistributable 2022 x86"; Parameters: "/quiet"; Flags: waituntilterminated
-Filename: "{tmp}\dx9.exe"; StatusMsg: "Installing DirectX End-User Runtime"; Flags: waituntilterminated
+Filename: "{tmp}\redist.exe"; StatusMsg: "Installing Visual C++ Redistributable 2022 x86"; Check: WizardIsComponentSelected('plugins/redist'); Parameters: "/quiet"; Flags: waituntilterminated
+Filename: "{tmp}\dx9.exe"; StatusMsg: "Installing DirectX End-User Runtime"; Check: WizardIsComponentSelected('plugins/dx9'); Flags: waituntilterminated
 
 [Code]
 const
