@@ -4910,9 +4910,10 @@ void ImGui::Render()
             AddDrawListToDrawData(&viewport->DrawDataBuilder.Layers[0], GetBackgroundDrawList(viewport));
     }
 
+    // CM
     // Draw modal/window whitening backgrounds
-    if (first_render_of_frame)
-        RenderDimmedBackgrounds();
+    // if (first_render_of_frame)
+    //     RenderDimmedBackgrounds();
 
     // Add ImDrawList to render
     ImGuiWindow* windows_to_render_top_most[2];
@@ -11514,9 +11515,10 @@ static void ImGui::NavEndFrame()
 {
     ImGuiContext& g = *GImGui;
 
+    // CM
     // Show CTRL+TAB list window
-    if (g.NavWindowingTarget != NULL)
-        NavUpdateWindowingOverlay();
+    // if (g.NavWindowingTarget != NULL)
+    //     NavUpdateWindowingOverlay();
 
     // Perform wrap-around in menus
     // FIXME-NAV: Wrap may need to apply a weight bias on the other axis. e.g. 4x4 grid with 2 last items missing on last item won't handle LoopY/WrapY correctly.

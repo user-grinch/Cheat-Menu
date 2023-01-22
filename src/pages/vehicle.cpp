@@ -1018,7 +1018,11 @@ void VehiclePage::Draw()
                 try{
                     int model = std::stoi(smodel);
 
-                    if (CModelInfo::IsCarModel(model))
+                    if (CModelInfo::IsVehicleModelType(model) == -1)
+                    {
+                        Util::SetMessage(TEXT("Vehicle.InvalidID"));
+                    }
+                    else
                     {
                         std::string str = std::string(smodel);
 #ifdef GTASA
@@ -1027,10 +1031,6 @@ void VehiclePage::Draw()
                         std::string temp = "";
                         SpawnVehicle(temp, temp, str);
 #endif
-                    }
-                    else
-                    {
-                        Util::SetMessage(TEXT("Vehicle.InvalidID"));
                     }
                 }
                 catch(...)
