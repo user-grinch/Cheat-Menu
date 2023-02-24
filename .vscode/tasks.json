@@ -256,6 +256,34 @@
             }
         },
         {
+            "label": "Package all (7z)",
+            "type": "shell",
+            "command": "${workspaceFolder}/tools/PackAll7z.bat",
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": false,
+                "clear": true
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "windows": {
+                "options": {
+                    "shell": {
+                        "executable": "cmd.exe",
+                        "args": [
+                            "/d",
+                            "/c"
+                        ]
+                    }
+                }
+            }
+        },
+        {
             "label": "Format Code",
             "type": "shell",
             "command": "${workspaceFolder}/tools/FormatCode.bat",

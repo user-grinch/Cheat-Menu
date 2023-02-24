@@ -422,7 +422,8 @@ void PedPage::Draw()
                     },
                     [](std::string& str)
                     {
-                        return str != "-1"; /*Jetpack*/
+                        // Skip jetpack & cell phone
+                        return str != "-1" && str != "-2";
                     });
 #else
                     Widget::DataList(weaponPage.m_WeaponData,

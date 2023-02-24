@@ -21,3 +21,8 @@ FFFD-FFFD,
 0400-052F, # Cyrillic + Cyrillic Supplement
 2DE0-2DFF, # Cyrillic Extended-A
 A640-A69F, # Cyrillic Extended-B
+
+# Turkish
+011E-011F
+0130-0131
+015E-015F
