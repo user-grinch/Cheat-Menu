@@ -683,7 +683,8 @@ void VehiclePage::Draw()
             if (is_driver)
             {
                 ImGui::NewLine();
-                ImGui::TextWrapped(TEXT("Vehicle.ForCurVeh"));
+                ImGui::SeparatorText(TEXT("Vehicle.ForCurVeh"));
+                ImGui::NewLine();
 
                 ImGui::Columns(2, 0, false);
 
