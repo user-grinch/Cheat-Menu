@@ -110,6 +110,9 @@ void CheatMenuMgr::Draw()
 CheatMenuMgr& CheatMenu = CheatMenuMgr::Get();
 CheatMenuMgr::CheatMenuMgr()
 {
+    // Needed to be init here
+    ImGui::CreateContext();
+
     Events::initRwEvent += [this]()
     {
         /*

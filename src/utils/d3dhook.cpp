@@ -271,7 +271,10 @@ bool D3dHook::Init(std::function<void()> pCallback)
         return false;
     }
 
-    ImGui::CreateContext();
+    if (!ImGui::GetCurrentContext())
+    {
+        ImGui::CreateContext();
+    }
 
     /*
         Must check for d3d9 first!

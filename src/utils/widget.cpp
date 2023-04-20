@@ -102,7 +102,8 @@ void DrawClippedList(ResourceStore& data, fArg3_t clickFunc, bool favourites, bo
         Widget::TextCentered(TEXT("Menu.FavouritesNone"));
     }
     ImGui::BeginChild("CliipingLIst");
-    ImGuiListClipper clipper(data.m_nSearchList.size(), ImGui::GetTextLineHeight());
+    ImGuiListClipper clipper;
+    clipper.Begin(data.m_nSearchList.size(), ImGui::GetTextLineHeight());
     while (clipper.Step())
     {
         for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i)
@@ -311,7 +312,8 @@ void DrawClippedImages(ResourceStore& data, ImVec2 imgSz, size_t imagesInRow, bo
 
     int imageCount = 1;
     size_t totalSz = data.m_nSearchList.size();
-    ImGuiListClipper clipper((totalSz > imagesInRow ? totalSz/imagesInRow : totalSz), imgSz.y);
+    ImGuiListClipper clipper;
+    clipper.Begin((totalSz > imagesInRow ? totalSz/imagesInRow : totalSz), imgSz.y);
     while (clipper.Step())
     {
         // hack to get clipper working with rowed items
