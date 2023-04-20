@@ -13,7 +13,7 @@ private:
     bool m_bRunning;          // is cutscene currently running
 
     // backup data
-    int m_nInterior;          // interior player was in 
+    int m_nInterior;          // interior player was in
     CVehicle *m_pLastVeh;     // vehicle player was in
     int m_nVehSeat;           // seat id of player vehicle
 
@@ -24,7 +24,7 @@ private:
 public:
     ResourceStore m_Data{ "cutscenes", eResourceType::TYPE_TEXT }; // names
 
-    // Plays a cutscene 
+    // Plays a cutscene
     void Play(std::string& cat, std::string& key, std::string& val);
 
     // Stops a running cutscene

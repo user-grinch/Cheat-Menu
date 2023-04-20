@@ -47,7 +47,7 @@ public:
     // Handles font downloading
     static void Process();
 
-    // Reloads all the fonts 
+    // Reloads all the fonts
     static void ReloadAll();
 
     // Sets if the font reloading is requried

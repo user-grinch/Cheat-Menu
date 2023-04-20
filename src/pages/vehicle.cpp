@@ -13,7 +13,7 @@
 
 VehiclePage& vehiclePage = VehiclePage::Get();
 VehiclePage::VehiclePage()
-: IPage<VehiclePage>(ePageID::Vehicle, "Window.VehiclePage", true)
+    : IPage<VehiclePage>(ePageID::Vehicle, "Window.VehiclePage", true)
 {
     // Get config data
     Events::initGameEvent += [this]()
@@ -152,27 +152,27 @@ int VehiclePage::GetRandomTrainIdForModel(int model)
         0, 3, 6, 10, 12, 13, // model 537
         1, 5, 15 // model 538
     };
-    int _start = 0, _end = 0;
+    unsigned int start = 0, end = 0;
 
     switch (model)
     {
     case 449:
-        _start = 0;
-        _end = 1;
+        start = 0;
+        end = 1;
         break;
     case 537:
-        _start = 2;
-        _end = 7;
+        start = 2;
+        end = 7;
         break;
     case 538:
-        _start = 8;
-        _end = 10;
+        start = 8;
+        end = 10;
         break;
     default:
         Util::SetMessage("Invalid train model");
         return -1;
     }
-    int id = Random(_start, _end);
+    unsigned int id = Random(start, end);
     return train_ids[id];
 }
 #elif GTAVC
@@ -314,12 +314,12 @@ void VehiclePage::SpawnVehicle(std::string& smodel)
         CStreaming::RequestModel(537, PRIORITY_REQUEST);
         CStreaming::RequestModel(449, PRIORITY_REQUEST);
         CStreaming::LoadAllRequestedModels(false);
-        
+
         CTrain* pTrain = nullptr;
         CTrain* carraige = nullptr;
-        int track = Random(0, 1);
+        int track = static_cast<int>(Random(0U, 1U));
         int node = CTrain::FindClosestTrackNode(pos, &track);
-        CTrain::CreateMissionTrain(pos, (Random(0, 1)) == 1 ? true : false, trainID, &pTrain, &carraige, node, track, false);
+        CTrain::CreateMissionTrain(pos, (Random(0U, 1U)) == 1U ? true : false, trainID, &pTrain, &carraige, node, track, false);
 
         pVeh = (CVehicle*)pTrain;
         hVeh = CPools::GetVehicleRef(pVeh);
@@ -374,7 +374,7 @@ void VehiclePage::SpawnVehicle(std::string& smodel)
         {
             for (int i = 0; i < 20; ++i)
             {
-                unsigned int compID = Random(1000, 1093);
+                unsigned int compID = Random(1000U, 1093U);
 
                 if (VehCustmzr.IsSideskirtComponent(compID))
                 {
@@ -436,50 +436,50 @@ void VehiclePage::SpawnVehicle(std::string& rootkey, std::string& vehName, std::
         }
     }
 
-        CStreaming::RequestModel(imodel, PRIORITY_REQUEST);
-        CStreaming::LoadAllRequestedModels(false);
-        int hveh = 0;
-        if (m_Spawner.m_bAsDriver)
-        {
-            Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 4.0f, &hveh);
-            veh = CPools::GetVehicle(hveh);
+    CStreaming::RequestModel(imodel, PRIORITY_REQUEST);
+    CStreaming::LoadAllRequestedModels(false);
+    int hveh = 0;
+    if (m_Spawner.m_bAsDriver)
+    {
+        Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 4.0f, &hveh);
+        veh = CPools::GetVehicle(hveh);
 #ifdef GTAVC
-            float x,y,z;
-            player->m_placement.GetOrientation(x, y, z);
-            veh->m_placement.SetOrientation(x, y, z);
-            Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
+        float x,y,z;
+        player->m_placement.GetOrientation(x, y, z);
+        veh->m_placement.SetOrientation(x, y, z);
+        Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, hveh);
 #else
-            float x,y,z;
-            player->GetOrientation(x, y, z);
-            player->SetObjective(OBJECTIVE_ENTER_CAR_AS_DRIVER);
-            player->WarpPedIntoCar(veh);
-            veh->SetOrientation(x, y, z);
+        float x,y,z;
+        player->GetOrientation(x, y, z);
+        player->SetObjective(OBJECTIVE_ENTER_CAR_AS_DRIVER);
+        player->WarpPedIntoCar(veh);
+        veh->SetOrientation(x, y, z);
 #endif
-            
-            Util::SetCarForwardSpeed(veh, speed);
-        }
-        else
-        {
-            player->TransformFromObjectSpace(pos);
-            Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 4.0f, &hveh);
-            veh = CPools::GetVehicle(hveh);
+
+        Util::SetCarForwardSpeed(veh, speed);
+    }
+    else
+    {
+        player->TransformFromObjectSpace(pos);
+        Command<Commands::CREATE_CAR>(imodel, pos.x, pos.y, pos.z + 4.0f, &hveh);
+        veh = CPools::GetVehicle(hveh);
 #ifdef GTAVC
-            float x,y,z;
-            player->m_placement.GetOrientation(x, y, z);
-            veh->m_placement.SetOrientation(x, y, z);
+        float x,y,z;
+        player->m_placement.GetOrientation(x, y, z);
+        veh->m_placement.SetOrientation(x, y, z);
 #else
-            float x,y,z;
-            player->GetOrientation(x, y, z);
-            veh->SetOrientation(x, y, z);
+        float x,y,z;
+        player->GetOrientation(x, y, z);
+        veh->SetOrientation(x, y, z);
 #endif
-        }
-        veh->m_eDoorLock = DOORLOCK_UNLOCKED;
+    }
+    veh->m_eDoorLock = DOORLOCK_UNLOCKED;
 #ifdef GTAVC
-        BY_GAME(veh->m_nAreaCode, veh->m_nAreaCode, NULL) = interior;
+    BY_GAME(veh->m_nAreaCode, veh->m_nAreaCode, NULL) = interior;
 #endif
-        Command<Commands::MARK_CAR_AS_NO_LONGER_NEEDED>(CPools::GetVehicleRef(veh));
-        CStreaming::SetModelIsDeletable(imodel);
-        Command<Commands::RESTORE_CAMERA_JUMPCUT>();
+    Command<Commands::MARK_CAR_AS_NO_LONGER_NEEDED>(CPools::GetVehicleRef(veh));
+    CStreaming::SetModelIsDeletable(imodel);
+    Command<Commands::RESTORE_CAMERA_JUMPCUT>();
 }
 #endif
 
@@ -514,9 +514,9 @@ void VehiclePage::Draw()
     }
 
     ImGui::Spacing();
-   
+
     if (ImGui::BeginTabBar("Vehicle", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
-    { 
+    {
         CVehicle* pVeh = pPlayer->m_pVehicle;
         bool is_driver = pVeh && (pPlayer->m_pVehicle->m_pDriver == pPlayer);
 
@@ -562,7 +562,7 @@ void VehiclePage::Draw()
                     pVeh->m_nFlags.bMeleeProof = false;
                     pVeh->m_nFlags.bImmuneToNonPlayerDamage = false;
                     patch::SetRaw(0x614E20, (void*)"\xD9\x9D\x04\x02\x00\x00", 6);
-                    
+
                     // restore tyre burst
                     patch::SetRaw(0x609F30, (void*)"\x53\x56\x57", 3);
                     patch::SetRaw(0x5886A0, (void*)"\x53\x56\x55", 3);
@@ -627,7 +627,7 @@ void VehiclePage::Draw()
 #ifdef GTASA
                     pPlayer->m_nPedFlags.CantBeKnockedOffBike = 1;
 #elif GTAVC
-                    
+
                     patch::PutRetn(0x613920, 0x10);
 #endif
                 }
@@ -636,7 +636,7 @@ void VehiclePage::Draw()
 #ifdef GTASA
                     pPlayer->m_nPedFlags.CantBeKnockedOffBike = 2;
 #elif GTAVC
-                    
+
                     patch::SetRaw(0x613920, (void*)"\x53\x56\x57\x55", 4);
 #endif
                 }
@@ -838,7 +838,7 @@ void VehiclePage::Draw()
                         {
                             ImGui::SameLine();
                         }
-                        
+
                         if (ImGui::Button(std::format("{} {}", TEXT("Vehicle.Passenger"), i+1).c_str(),
                                           ImVec2(Widget::CalcSize(2))))
                         {
@@ -892,7 +892,7 @@ void VehiclePage::Draw()
 #ifdef GTASA
             std::vector<Widget::BindInfo> type
             {
-                {TEXT("Vehicle.Cheap"), 0x96915E}, {TEXT("Vehicle.Country"), 0x96917B}, 
+                {TEXT("Vehicle.Cheap"), 0x96915E}, {TEXT("Vehicle.Country"), 0x96917B},
                 {TEXT("Vehicle.Fast"), 0x96915F}
             };
             Widget::EditRadioBtnAddr(TEXT("Vehicle.TrafficType"), type);
@@ -976,7 +976,7 @@ void VehiclePage::Draw()
                     ImGui::Spacing();
                     ImGui::Separator();
                 }
-#endif          
+#endif
 
                 Widget::EditAddr<float>(TEXT("Menu.VehHealth"), (int)&pVeh->m_fHealth, 0, 0, 1000);
                 if (ImGui::CollapsingHeader(TEXT("Vehicle.SetSpeed")))
@@ -1015,7 +1015,8 @@ void VehiclePage::Draw()
             static char smodel[8];
             if (ImGui::InputTextWithHint("##SpawnID", TEXT("Vehicle.IDSpawnText"), smodel, 8, ImGuiInputTextFlags_EnterReturnsTrue))
             {
-                try{
+                try
+                {
                     int model = std::stoi(smodel);
 
                     if (CModelInfo::IsVehicleModelType(model) == -1)
@@ -1044,7 +1045,8 @@ void VehiclePage::Draw()
             ImGui::InputTextWithHint("##LicenseText", TEXT("Vehicle.PlateText"), m_Spawner.m_nLicenseText, 9);
 
             Widget::ImageList(m_Spawner.m_VehData, fArgWrapper(vehiclePage.SpawnVehicle),
-            [](std::string& str){
+                              [](std::string& str)
+            {
                 return Util::GetCarName(std::stoi(str));
             }, nullptr, fArgNoneWrapper(vehiclePage.AddNew),
             []()
@@ -1064,8 +1066,8 @@ void VehiclePage::Draw()
             });
 #else
             Widget::DataList(m_Spawner.m_VehData, fArg3Wrapper(vehiclePage.SpawnVehicle), fArgNoneWrapper(vehiclePage.AddNew),
-            false, 
-            []()
+                             false,
+                             []()
             {
                 if (ImGui::MenuItem(TEXT("Vehicle.SpawnInAir"), NULL, &vehiclePage.m_Spawner.m_bInAir))
                 {
@@ -1082,8 +1084,8 @@ void VehiclePage::Draw()
         if (pPlayer->m_pVehicle && bPlayerInCar)
         {
             CVehicle* veh = FindPlayerPed()->m_pVehicle;
-            int hveh = CPools::GetVehicleRef(veh);    
-#ifdef GTASA            
+            int hveh = CPools::GetVehicleRef(veh);
+#ifdef GTASA
             if (ImGui::BeginTabItem(TEXT("Vehicle.Customize")))
             {
                 ImGui::Spacing();

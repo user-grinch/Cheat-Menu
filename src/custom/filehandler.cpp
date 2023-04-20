@@ -83,7 +83,7 @@ void FileHandler::FetchHandlingID(std::map<int, std::string>& storeMap)
             {
                 continue;
             }
-            
+
             // replace comma and remove tabs
             uint8_t sz = bufSize;
             for(uint8_t i = 0; i < sz; ++i)
@@ -108,10 +108,10 @@ void FileHandler::FetchHandlingID(std::map<int, std::string>& storeMap)
             char model[32], txd[32], type[32], handling[32];
             if (sscanf(buf, "%d %s %s %s %s", &id, model, txd, type, handling) == 5)
             {
-               storeMap[id] = std::string(handling);
+                storeMap[id] = std::string(handling);
             }
         }
-       fclose(pFile);
+        fclose(pFile);
     }
 }
 #endif
@@ -151,7 +151,7 @@ void FileHandler::FetchColorData(std::vector<std::vector<float>>& storeVec)
                 }
             }
 
-            int r = 0, g = 0, b = 0; 
+            int r = 0, g = 0, b = 0;
             if (sscanf(buf, "%d %d %d", &r, &g, &b) == 3)
             {
                 storeVec.push_back({r / 255.0f, g / 255.0f, b / 255.0f});

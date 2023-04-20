@@ -26,7 +26,7 @@ void AutoDriveMgr::StartDrive(CVehicle *pVeh, const char *buf)
     }
     else
     {
-         if (sscanf(buf, "%f,%f,%f", &pos.x, &pos.y, &pos.z) != 3)
+        if (sscanf(buf, "%f,%f,%f", &pos.x, &pos.y, &pos.z) != 3)
         {
             int dim;
             sscanf(buf, "%d,%f,%f,%f", &dim, &pos.x, &pos.y, &pos.z);
@@ -46,7 +46,7 @@ void AutoDriveMgr::StartDrive(CVehicle *pVeh, const char *buf)
         pVeh->SetPosn(p);
 #elif GTAVC
         pVeh->SetPosition(p);
-#else   
+#else
         pVeh->SetPos(p);
 #endif
         Command<Commands::PLANE_GOTO_COORDS>(hVeh, pos.x, pos.y, 300.0f, 30, 200);
@@ -59,7 +59,7 @@ void AutoDriveMgr::StartDrive(CVehicle *pVeh, const char *buf)
         pVeh->SetPosn(p);
 #elif GTAVC
         pVeh->SetPosition(p);
-#else   
+#else
         pVeh->SetPos(p);
 #endif
         Command<Commands::HELI_GOTO_COORDS>(hVeh, pos.x, pos.y, 300.0f, 30, 200);
@@ -114,10 +114,10 @@ void AutoDriveMgr::Draw()
         if (ImGui::BeginTabItem(TEXT("Teleport.Location")))
         {
             ImGui::Spacing();
-            Widget::DataList(teleportPage.m_locData, 
-            [this, pVeh](std::string& rootkey, std::string& bLocName, std::string& loc)
+            Widget::DataList(teleportPage.m_locData,
+                             [this, pVeh](std::string& rootkey, std::string& bLocName, std::string& loc)
             {
-                StartDrive(pVeh, loc.c_str());       
+                StartDrive(pVeh, loc.c_str());
             });
             ImGui::EndTabItem();
         }

@@ -5,7 +5,7 @@ DataStore::DataStore(const char* fileName, bool isPathPredefined) noexcept
 {
     if (isPathPredefined)
     {
-       path = std::string(fileName) + fileExt; 
+        path = std::string(fileName) + fileExt;
     }
     else
     {
@@ -22,7 +22,7 @@ DataStore::DataStore(const char* fileName, bool isPathPredefined) noexcept
             return;
         }
     }
-    
+
     if (pTable == nullptr)
     {
         pTable = std::make_unique<toml::table>();

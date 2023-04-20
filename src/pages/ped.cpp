@@ -9,24 +9,24 @@
 #include <ePedBones.h>
 
 static const char* pedTypeList = "Civ Male\0Civ Female\0Cop\0Ballas\0Grove Street Families"
-"\0Los Santos Vagos\0San Fierro Rifa\0Da Nang Boys\0Mafia\0Mountain Cloud Triads"
-"\0Varrio Los Aztecas\0Gang 9\0Medic\0Dealer\0Criminal\0Fireman\0Prostitute\0";
+                                 "\0Los Santos Vagos\0San Fierro Rifa\0Da Nang Boys\0Mafia\0Mountain Cloud Triads"
+                                 "\0Varrio Los Aztecas\0Gang 9\0Medic\0Dealer\0Criminal\0Fireman\0Prostitute\0";
 
 #elif GTAVC
 static const char* pedTypeList = "Civ Male\0Civ Female\0Cop (crash)\0Cubans\0Haitians\0Streetwannabe's"
-"\0Diaz' Gang\0Security Guards\0Biker Gang\0Vercetti Gang\0Golfers\0Gang 9\0Emergency\0Fireman"
-"\0Criminal\0Unused\0Prostitute\0Special\0";
+                                 "\0Diaz' Gang\0Security Guards\0Biker Gang\0Vercetti Gang\0Golfers\0Gang 9\0Emergency\0Fireman"
+                                 "\0Criminal\0Unused\0Prostitute\0Special\0";
 
 #else
 static const char* pedTypeList = "Civ Male\0Civ Female\0Cop\0Leones\0Triads\0Diablos\0Yakuza\0Yardies\0Colombians\0"
-"Hoods\0unused\0unused\0Emergency\0Fireman\0Criminal\0unused\0Prostitute\0Special\0";
+                                 "Hoods\0unused\0unused\0Emergency\0Fireman\0Criminal\0unused\0Prostitute\0Special\0";
 
 #endif
 
 PedPage &pedPage = PedPage::Get();
 
 PedPage::PedPage()
- : IPage<PedPage>(ePageID::Ped, "Window.PedPage", true)
+    : IPage<PedPage>(ePageID::Ped, "Window.PedPage", true)
 {
     /*
     	Taken from gta chaos mod by Lordmau5 & _AG
@@ -61,21 +61,21 @@ PedPage::PedPage()
     };
 #elif GTA3
     CdeclEvent <AddressList<0x4CFE12, H_CALL>, PRIORITY_AFTER, ArgPickN<CPed*, 0>, void(CPed*)> onPreRender;
-    
-    onPreRender += [this](CPed* ped) 
+
+    onPreRender += [this](CPed* ped)
     {
         if (!m_bBigHead)
         {
             return;
         }
-        
+
         RwFrame* frame = ped->m_apFrames[2]->m_pFrame;
 
-        if (frame) 
+        if (frame)
         {
             RwMatrix* headMatrix = RwFrameGetMatrix(frame);
 
-            if (headMatrix) 
+            if (headMatrix)
             {
                 CMatrix mat;
                 mat.m_pAttachMatrix = NULL;
@@ -244,7 +244,7 @@ void PedPage::SpawnPed(std::string& cat, std::string& name, std::string& model)
 
             Command<Commands::MARK_MODEL_AS_NO_LONGER_NEEDED>(model);
 #ifdef GTA3
-        Command<Commands::SET_CURRENT_PLAYER_WEAPON>(0, m_Spawner.m_nWeaponId);
+            Command<Commands::SET_CURRENT_PLAYER_WEAPON>(0, m_Spawner.m_nWeaponId);
 #endif
         }
     }
@@ -364,8 +364,8 @@ void PedPage::Draw()
                 {
                     ImGui::Spacing();
 #ifdef GTASA
-                    Widget::ImageList(m_PedData, fArgWrapper(pedPage.SpawnPed), 
-                    [this](str &text)
+                    Widget::ImageList(m_PedData, fArgWrapper(pedPage.SpawnPed),
+                                      [this](str &text)
                     {
                         return m_PedData.m_pData->Get(text.c_str(), "Unknown");
                     },
@@ -411,7 +411,7 @@ void PedPage::Draw()
                     ImGui::Spacing();
 #ifdef GTASA
                     Widget::ImageList(weaponPage.m_WeaponData,
-                    [this](std::string& str)
+                                      [this](std::string& str)
                     {
                         m_Spawner.m_nWeaponId = std::stoi(str);
                         weaponName = weaponPage.m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
@@ -427,7 +427,7 @@ void PedPage::Draw()
                     });
 #else
                     Widget::DataList(weaponPage.m_WeaponData,
-                    [this](std::string& root, std::string& key, std::string& id)
+                                     [this](std::string& root, std::string& key, std::string& id)
                     {
                         m_Spawner.m_nWeaponId = std::stoi(id);
                         weaponName = key;
@@ -490,7 +490,7 @@ void PedPage::Draw()
                         }
                     }
                     ImGui::PopItemWidth();
-                    static bool pluginRequired = (GetModuleHandle("ExGangWars.asi") == 0); 
+                    static bool pluginRequired = (GetModuleHandle("ExGangWars.asi") == 0);
                     if (pluginRequired)
                     {
                         ImGui::Spacing();
@@ -522,10 +522,12 @@ void PedPage::Draw()
 
                     ImGui::Spacing();
 
-                    Widget::ImageList(m_PedData, [this](str &id){
+                    Widget::ImageList(m_PedData, [this](str &id)
+                    {
                         m_Gang.SetModel(m_Gang.m_nSelected, m_Gang.m_nSelectedMember, std::stoi(id));
-                    }, 
-                    [this](str &text){
+                    },
+                    [this](str &text)
+                    {
                         return m_PedData.m_pData->Get(text.c_str(), "Unknown");
                     });
                     ImGui::EndTabItem();

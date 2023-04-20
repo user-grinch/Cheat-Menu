@@ -2,7 +2,7 @@
 #include "interface/ifeature.hpp"
 
 /*
-    VehPaintMgr Class 
+    VehPaintMgr Class
     Handles neon, textures for vehicle
 */
 class VehCustmzrMgr : public IFeature<VehCustmzrMgr>
@@ -46,7 +46,7 @@ public:
         bool m_bEnabled;
         bool m_bCompAdded;
     } m_Nitro;
-    
+
     // Draw color, neon & texture tabs
     void Draw();
 

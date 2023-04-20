@@ -4,7 +4,7 @@
 
 
 /*
-    AutoDriveMgr Class 
+    AutoDriveMgr Class
     Automatically drives vehicle to marker/ coord
 */
 class AutoDriveMgr : public ICheat<AutoDriveMgr>
@@ -12,7 +12,7 @@ class AutoDriveMgr : public ICheat<AutoDriveMgr>
 private:
 
     friend class IFeature;
-    AutoDriveMgr(){};
+    AutoDriveMgr() {};
     AutoDriveMgr(const AutoDriveMgr&);
 
     void StartDrive(CVehicle *pVeh, const char *buf = nullptr);

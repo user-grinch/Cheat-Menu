@@ -44,7 +44,7 @@ void Overlay::Init()
 
     // Directly drawing here seems to crash renderer?
     preRenderEntityEvent += [](CEntity *pEnt)
-    {   
+    {
         CPlayerPed *player = FindPlayerPed();
         if (player != pEnt)
         {
@@ -56,17 +56,17 @@ void Overlay::Init()
             {
                 m_EntityList.push_back(pEnt);
             }
-    #ifdef GTAVC
+#ifdef GTAVC
             if (CModelInfo::GetModelInfo(pEnt->m_nModelIndex)->m_nNum2dEffects > 0)
             {
                 pEnt->ProcessLightsForEntity();
             }
-    #elif GTA3
-        // if (CModelInfo::ms_modelInfoPtrs[pEnt->m_nModelIndex]->m_nNum2dEffects > 0)
-        // {
-        //     pEnt->ProcessLightsForEntity();
-        // }
-    #endif
+#elif GTA3
+            // if (CModelInfo::ms_modelInfoPtrs[pEnt->m_nModelIndex]->m_nNum2dEffects > 0)
+            // {
+            //     pEnt->ProcessLightsForEntity();
+            // }
+#endif
         }
     };
 }
@@ -78,7 +78,7 @@ void Overlay::ProcessModelInfo()
         ImDrawList *pDrawList = ImGui::GetWindowDrawList();
         CPlayerPed *player = FindPlayerPed();
         for (CEntity *pEnt : m_EntityList)
-        {   
+        {
             if (pEnt == player)
             {
                 continue;
@@ -89,12 +89,12 @@ void Overlay::ProcessModelInfo()
             RwV3d screen;
             CVector2D size;
             if (distance < m_fMaxDistance &&
-#ifdef GTASA                
-            CSprite::CalcScreenCoors(coord.ToRwV3d(), &screen, &size.x, &size.y, true, true)
-#else 
-            CSprite::CalcScreenCoors(coord.ToRwV3d(), &screen, &size.x, &size.y, true)
+#ifdef GTASA
+                    CSprite::CalcScreenCoors(coord.ToRwV3d(), &screen, &size.x, &size.y, true, true)
+#else
+                    CSprite::CalcScreenCoors(coord.ToRwV3d(), &screen, &size.x, &size.y, true)
 #endif
-)
+               )
             {
                 bool skip = false;
                 uint model = pEnt->m_nModelIndex;
@@ -132,7 +132,7 @@ void Overlay::ProcessPedTasks()
         ImDrawList *pDrawList = ImGui::GetWindowDrawList();
         CPlayerPed *player = FindPlayerPed();
         for (CEntity *pEnt : m_EntityList)
-        {   
+        {
             if (pEnt == player || pEnt->m_nType != ENTITY_TYPE_PED)
             {
                 continue;
@@ -142,8 +142,8 @@ void Overlay::ProcessPedTasks()
             float distance = DistanceBetweenPoints(coord, player->GetPosition());
             RwV3d screen;
             CVector2D size;
-            if (distance < m_fMaxDistance 
-            && CSprite::CalcScreenCoors(coord.ToRwV3d(), &screen, &size.x, &size.y, true, true))
+            if (distance < m_fMaxDistance
+                    && CSprite::CalcScreenCoors(coord.ToRwV3d(), &screen, &size.x, &size.y, true, true))
             {
                 ImU32 col = ImGui::ColorConvertFloat4ToU32(distance < m_fMaxDistance/2 ? ImVec4(1.0f, 1.0f, 1.0f, 1.00f) : ImVec4(0.35f, 0.33f, 0.3f, 1.00f));
                 float height = ImGui::GetTextLineHeight();
@@ -183,9 +183,9 @@ void Overlay::Draw()
         return;
     }
 
-    ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove 
-                            | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoNavFocus
-                            | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing;
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoMove
+                             | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoNavFocus
+                             | ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoFocusOnAppearing;
     ImGui::SetNextWindowPos(ImVec2(0, 0));
     ImGui::SetNextWindowSize(ImVec2(screen::GetScreenWidth(), screen::GetScreenHeight()));
     ImGui::SetNextWindowBgAlpha(0.0f);
@@ -216,8 +216,8 @@ void Overlay::ProcessCmdBar()
         ImGui::SetNextWindowSize(ImVec2(resX, 40));
 
         ImGuiWindowFlags flags = ImGuiWindowFlags_NoDecoration + ImGuiWindowFlags_AlwaysAutoResize +
-                                ImGuiWindowFlags_NoSavedSettings
-                                + ImGuiWindowFlags_NoMove;
+                                 ImGuiWindowFlags_NoSavedSettings
+                                 + ImGuiWindowFlags_NoMove;
         if (ImGui::Begin("CmdBar", nullptr, flags))
         {
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(ImGui::GetStyle().FramePadding.x, resY / 130));
@@ -461,7 +461,7 @@ void Overlay::ProcessInfoBox()
             if (m_bLocName)
             {
                 ImGui::Text(TEXT("Menu.Location"), Util::GetLocationName(&pos).c_str());
-            }  
+            }
 
             if (m_bPlaytime)
             {

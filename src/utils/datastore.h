@@ -9,13 +9,13 @@
     Stores & loads data from disk
     TOML format
 */
-class DataStore 
+class DataStore
 {
 private:
     static inline const char* fileExt = ".toml";
     std::unique_ptr<toml::table> pTable;
     std::string path;
-    
+
 public:
     using Table = toml::table;
     using Array = toml::array;
@@ -34,7 +34,7 @@ public:
                 return option.value();
             }
         }
-        
+
         if (writeOnNone)
         {
             Set(key, std::string(defaultVal));
@@ -54,7 +54,7 @@ public:
                 return option.value();
             }
         }
-        
+
         if (writeOnNone)
         {
             Set(key, defaultVal);
@@ -99,7 +99,7 @@ public:
         }
         return nullptr;
     }
-    
+
 
     // Adds data to the structure
     template <typename T>

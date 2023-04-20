@@ -15,7 +15,7 @@ private:
     friend class IFeature;
     RandomCheatsMgr();
     RandomCheatsMgr(const RandomCheatsMgr&);
-    
+
     // Process the RandomCheat each frame & draw progress bar
     void DrawPages();
 

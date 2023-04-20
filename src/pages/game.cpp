@@ -41,7 +41,7 @@ static void RealTimeClock()
 GamePage& gamePage = GamePage::Get();
 
 GamePage::GamePage()
- : IPage<GamePage>(ePageID::Game, "Window.GamePage", true)
+    : IPage<GamePage>(ePageID::Game, "Window.GamePage", true)
 {
 #ifdef GTASA
 
@@ -352,8 +352,8 @@ void GamePage::Draw()
                 }
             }
             Widget::Checkbox(TEXT("Game.Screenshot"), &m_bScreenShot,
-                                std::format("{} {}", TEXT("Game.ScreenshotTip"),
-                                quickSceenShot.GetNameString()).c_str());
+                             std::format("{} {}", TEXT("Game.ScreenshotTip"),
+                                         quickSceenShot.GetNameString()).c_str());
             Widget::Checkbox(TEXT("Game.SolidWater"), &m_bSolidWater, TEXT("Game.SolidWaterText"));
 #endif
             if (ImGui::Checkbox(TEXT("Game.SyncSystemTime"), &m_bSyncTime))

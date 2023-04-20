@@ -30,7 +30,7 @@ void PageHandler::DrawPages()
     if (Updater::IsUpdateAvailable())
     {
         for (PagePtr ptr : m_PageList)
-        {   
+        {
             IPageStatic* page = reinterpret_cast<IPageStatic*>(ptr);
             if (page->GetPageID() == ePageID::Update)
             {
@@ -39,7 +39,7 @@ void PageHandler::DrawPages()
             }
         }
     }
-    
+
     // Check once if it's anniversary day
     static bool checked;
     if (!checked)
@@ -77,7 +77,7 @@ void PageHandler::DrawPages()
     ImDrawList *pDrawList = ImGui::GetWindowDrawList();
     size_t count = 0;
     for (PagePtr ptr : m_PageList)
-    {   
+    {
         IPageStatic* pg = reinterpret_cast<IPageStatic*>(ptr);
         if (!pg->HasHeaderButton())
         {

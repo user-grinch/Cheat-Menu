@@ -9,7 +9,7 @@
 
 MenuPage& menuPage = MenuPage::Get();
 MenuPage::MenuPage()
-: IPage<MenuPage>(ePageID::Menu, "Window.MenuPage", true)
+    : IPage<MenuPage>(ePageID::Menu, "Window.MenuPage", true)
 {
     // This needs to run before initRwEvent
     // Updates are checked in m_bAutoCheckUpdate
@@ -40,12 +40,12 @@ void MenuPage::Draw()
                 Chinese fonts is huge & adds overhead
                 Only download & use it if the user asks for it
             */
-            if (Locale::GetLocaleList()[Locale::GetCurrentLocaleIndex()] == "Chinese" 
-            && !FontMgr::IsSupportPackageInstalled())
+            if (Locale::GetLocaleList()[Locale::GetCurrentLocaleIndex()] == "Chinese"
+                    && !FontMgr::IsSupportPackageInstalled())
             {
                 ImGui::Spacing();
                 ImGui::TextWrapped("Font support package is required to display this language!"
-" This may take a while depending on your internet connection.\n\nIt's recommended NOT to install unless you want to use this language! (Affects game loading time)");
+                                   " This may take a while depending on your internet connection.\n\nIt's recommended NOT to install unless you want to use this language! (Affects game loading time)");
                 ImGui::Spacing();
                 if (ImGui::Button("Install package", ImVec2(Widget::CalcSize(2))))
                 {
@@ -111,12 +111,12 @@ void MenuPage::Draw()
             ImGui::NextColumn();
 
             if (gRenderer == eRenderer::DirectX9
-            && Widget::Checkbox(TEXT("Menu.TextOnlyMode"), &m_bTextOnlyMode, TEXT("Menu.TextOnlyModeHint")))
+                    && Widget::Checkbox(TEXT("Menu.TextOnlyMode"), &m_bTextOnlyMode, TEXT("Menu.TextOnlyModeHint")))
             {
                 gConfig.Set("Menu.TextOnlyMode", m_bTextOnlyMode);
             }
             ImGui::Columns(1);
-            
+
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem(TEXT("Menu.Overlay")))
@@ -124,8 +124,8 @@ void MenuPage::Draw()
             ImGui::Spacing();
             ImGui::Spacing();
             ImGui::SameLine();
-            if (ImGui::Combo(TEXT("Menu.Position"), reinterpret_cast<int*>(&Overlay::m_nSelectedPos), 
-                "Custom\0Top left\0Top right\0Bottom left\0Bottom right\0"))
+            if (ImGui::Combo(TEXT("Menu.Position"), reinterpret_cast<int*>(&Overlay::m_nSelectedPos),
+                             "Custom\0Top left\0Top right\0Bottom left\0Bottom right\0"))
             {
                 gConfig.Set<int>("Overlay.SelectedPosition", static_cast<int>(Overlay::m_nSelectedPos));
             }
@@ -227,7 +227,7 @@ void MenuPage::Draw()
             freeCamRight.DrawUI(TEXT("Menu.FreecamRightKey"));
             quickTeleport.DrawUI(TEXT("Menu.QuickTPKey"));
             teleportMarker.DrawUI(TEXT("Menu.TPMarkerKey"));
-            
+
             ImGui::Dummy(ImVec2(0, 10));
 
             fixVeh.DrawUI(TEXT("Menu.FixVehKey"));
@@ -316,7 +316,7 @@ void MenuPage::Draw()
             {
                 OPEN_LINK(GITHUB_LINK);
             }
-            
+
             ImGui::SameLine();
 
             if (ImGui::Button(TEXT("Menu.Patreon"), ImVec2(Widget::CalcSize(2))))
@@ -350,7 +350,7 @@ void MenuPage::Draw()
                     ImGui::TableSetupColumn(TEXT("Menu.Name"), ImGuiTableColumnFlags_WidthFixed, 100);
                     ImGui::TableSetupColumn(TEXT("Menu.Credits"));
                     ImGui::TableHeadersRow();
-                    
+
                     ImGui::TableNextRow();
                     ImGui::TableNextColumn();
                     ImGui::Text("Codenulls");
@@ -383,6 +383,12 @@ void MenuPage::Draw()
 
                     ImGui::TableNextRow();
                     ImGui::TableNextColumn();
+                    ImGui::Text("Seeman");
+                    ImGui::TableNextColumn();
+                    ImGui::Text("Installer");
+
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
                     ImGui::Text("TsudaKageyu");
                     ImGui::TableNextColumn();
                     ImGui::Text("MinHook");
@@ -398,7 +404,7 @@ void MenuPage::Draw()
                     ImGui::Text(TEXT("Main.TranslatorName"));
                     ImGui::TableNextColumn();
                     ImGui::Text(TEXT("Main.Translator"));
-                    
+
                     ImGui::EndTable();
                 }
 

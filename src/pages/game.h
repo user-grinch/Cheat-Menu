@@ -39,7 +39,7 @@ public:
 #ifdef GTASA
     int m_nCameraZoom = 70.0f;
     bool m_bLockCameraZoom;
-#endif 
+#endif
 
     void Draw();
 };

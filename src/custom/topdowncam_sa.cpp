@@ -19,7 +19,7 @@ TopDownCamera::TopDownCamera()
 	https://github.com/gta-chaos-mod/Trilogy-ASI-Script
 */
 void TopDownCamera::DrawPages()
-{ 
+{
     CPlayerPed *player = FindPlayerPed();
     CVector     pos    = player->GetPosition ();
     float       curOffset = m_nZoom;

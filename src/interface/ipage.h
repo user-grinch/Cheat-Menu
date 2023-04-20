@@ -5,18 +5,18 @@
 enum class ePageID
 {
     Teleport,
-    Player, 
-    Ped, 
-    Scene, 
-    Vehicle, 
-    Weapon, 
-    Game, 
-    Visual, 
-    Menu, 
+    Player,
+    Ped,
+    Scene,
+    Vehicle,
+    Weapon,
+    Game,
+    Visual,
+    Menu,
 
     // Pages without headers
-    Anniversary, 
-    Update, 
+    Anniversary,
+    Update,
     Welcome,
     COUNT,
 };
@@ -29,7 +29,7 @@ using PagePtr = void*;
 class PageHandler
 {
 private:
-    static inline std::vector<PagePtr> m_PageList;  // Contains list of the created pages 
+    static inline std::vector<PagePtr> m_PageList;  // Contains list of the created pages
     static inline PagePtr m_pCurrentPage = nullptr;  // Currently visible menu page
 
 public:
@@ -49,7 +49,7 @@ public:
 
 /*
     Interface class for pages
-    Every page must inherit this 
+    Every page must inherit this
 */
 template<typename T>
 class IPage : public IFeature<T>
@@ -68,7 +68,7 @@ protected:
 
 public:
     IPage(ePageID page, const std::string& key, bool header)
-    : m_eID(page), m_NameKey(key), m_bHasHeader(header)
+        : m_eID(page), m_NameKey(key), m_bHasHeader(header)
     {
         PageHandler::AddPage(reinterpret_cast<PagePtr>(this), static_cast<size_t>(m_eID));
         // ImportSaveData();

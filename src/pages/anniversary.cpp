@@ -9,9 +9,9 @@ void AnniversaryPage::Draw()
     Widget::TextCentered("Happy Anniversary!");
     ImGui::NewLine();
 
-    ImGui::TextWrapped("On this day, in 2019, the first public version of menu was released." 
-    " It's been a blast working on it and I've learned a lot in the process.\n\nThanks to you and everyone who used or" 
-    " contributed to the modification in any shape or form.");
+    ImGui::TextWrapped("On this day, in 2019, the first public version of menu was released."
+                       " It's been a blast working on it and I've learned a lot in the process.\n\nThanks to you and everyone who used or"
+                       " contributed to the modification in any shape or form.");
 
     ImGui::NewLine();
     ImGui::TextWrapped("Feel free to star the GitHub repo or join the discord server and provide feedback, ideas, or suggestions.");
@@ -31,4 +31,4 @@ void AnniversaryPage::Draw()
     {
         OPEN_LINK(PATREON_LINK);
     }
-}   
+}

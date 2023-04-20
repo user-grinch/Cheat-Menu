@@ -20,8 +20,8 @@ void __fastcall hkEntityRender(CVehicle* pVeh)
         Game colors won't ve visible over material colors
         So reset material colors & apply game colors here
     */
-    if (pVeh->m_nPrimaryColor != data.m_nCarColors[0] 
-    || pVeh->m_nSecondaryColor != data.m_nCarColors[1])
+    if (pVeh->m_nPrimaryColor != data.m_nCarColors[0]
+            || pVeh->m_nSecondaryColor != data.m_nCarColors[1])
     {
         for (auto& it : data.m_nMapInfoList)
         {
@@ -31,7 +31,7 @@ void __fastcall hkEntityRender(CVehicle* pVeh)
         data.m_nCarColors[0] = pVeh->m_nPrimaryColor;
         data.m_nCarColors[1] = pVeh->m_nSecondaryColor;
         data.m_nCarColors[2] = pVeh->m_nTertiaryColor;
-        data.m_nCarColors[3] = pVeh->m_nQuaternaryColor;  
+        data.m_nCarColors[3] = pVeh->m_nQuaternaryColor;
     }
 
 
@@ -107,14 +107,14 @@ void PaintMgr::SetCarcols(CVehicle *pVeh, uint primary, uint secondary, uint ter
         data.m_nCarColors[2] = *(uint8_replacement*)(int(pVeh) + 0x433 + 3);
         data.m_nCarColors[3] = *(uint8_replacement*)(int(pVeh) + 0x433 + 4);
     }
-    
+
 }
 
 void PaintMgr::PaintData::SetMatColor(RpMaterial* material, RpGeometry* geometry, RwRGBA color)
 {
     auto& matInfo = m_nMapInfoList[material];
     if ((material->color.red == 0x3C && material->color.green == 0xFF && material->color.blue == 0x00)
-    || (material->color.red == 0xFF && material->color.green == 0x00 && material->color.blue == 0xAF))
+            || (material->color.red == 0xFF && material->color.green == 0x00 && material->color.blue == 0xAF))
     {
         matInfo.m_bRecolor = true;
         matInfo.m_nColor = color;
@@ -126,7 +126,7 @@ void PaintMgr::PaintData::SetMatTexture(RpMaterial* material, RwTexture* texture
 {
     auto& matInfo = m_nMapInfoList[material];
     if ((material->color.red == 0x3C && material->color.green == 0xFF && material->color.blue == 0x00)
-    || (material->color.red == 0xFF && material->color.green == 0x00 && material->color.blue == 0xAF))
+            || (material->color.red == 0xFF && material->color.green == 0x00 && material->color.blue == 0xAF))
     {
         matInfo.m_bRetexture = true;
         matInfo.m_pTexture = texture;
@@ -195,7 +195,7 @@ void PaintMgr::SetColor(CVehicle* pVeh, CRGBA color)
                 for (int i = 0; i < atomic->geometry->matList.numMaterials; ++i)
                 {
                     pData->SetMatColor(atomic->geometry->matList.materials[i], atomic->geometry,
-                                        {color.r, color.g, color.b, color.a});
+                    {color.r, color.g, color.b, color.a});
                 }
             }
             return object;

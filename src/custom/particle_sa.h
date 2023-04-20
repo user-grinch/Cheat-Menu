@@ -12,7 +12,7 @@ private:
     std::vector<int> m_nList;
 
     friend class IFeature;
-    ParticleMgr(){};
+    ParticleMgr() {};
     ParticleMgr(const ParticleMgr&);
 
 public:

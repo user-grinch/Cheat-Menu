@@ -49,14 +49,14 @@ enum eResourceType
 // Lookup table used for DataList
 struct ListLookup
 {
-    std::string cat, key, val;            
+    std::string cat, key, val;
 };
 
 // Lookup table used for ImageList
 struct ImageLookup
 {
     std::string m_FileName;
-    std::string m_ModelName;            
+    std::string m_ModelName;
     void *m_pTexture;
     bool m_bCustom;
 };
@@ -77,7 +77,7 @@ public:
     std::string m_Selected = "All";
     std::string m_FileName;
     std::unique_ptr<DataStore> m_pData;
-    std::vector<std::variant<ListLookup, ImageLookup>> m_nSearchList; 
+    std::vector<std::variant<ListLookup, ImageLookup>> m_nSearchList;
     bool m_bSearchListUpdateRequired = false;
     eResourceType m_Type;
     ImVec2 m_ImageSize;

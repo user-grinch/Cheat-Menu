@@ -4,13 +4,13 @@
 RandomCheatsMgr& RandomCheats = RandomCheatsMgr::Get();
 
 void RandomCheatsMgr::DrawPages()
-{ 
+{
     uint timer = CTimer::m_snTimeInMilliseconds;
     static uint m_nTimer = 0;
 
     if ((timer - m_nTimer) > (static_cast<uint>(m_nInterval) * 1000))
     {
-        int id = Random(0, 91);
+        int id = Random(0U, 91U);
 
         for (int i = 0; i < 92; i++)
         {

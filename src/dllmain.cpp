@@ -10,7 +10,7 @@ LONG WINAPI CrashHandler(PEXCEPTION_POINTERS pInfo)
         Log::Print<eLogLevel::None>("");
         Log::Print<eLogLevel::Error>("Unhandled exception at {} (0x{:x})", pInfo->ExceptionRecord->ExceptionAddress, code);
     }
-   
+
     return EXCEPTION_CONTINUE_SEARCH;
 }
 

@@ -197,7 +197,7 @@ NeonMgr::NeonMgr()
             CVector up = pVeh->TransformFromObjectSpace(CVector(0.0f, -Pos.y - data->m_fVal, 0.0f)) - center;
             CVector right = pVeh->TransformFromObjectSpace(CVector(Pos.x + data->m_fVal, 0.0f, 0.0f)) - center;
             CShadows::StoreShadowToBeRendered(5, m_pNeonTexture, &center, up.x, up.y, right.x, right.y, 180, data->m_Color.r,
-                                            data->m_Color.g, data->m_Color.b, 2.0f, false, 1.0f, 0, true);
+                                              data->m_Color.g, data->m_Color.b, 2.0f, false, 1.0f, 0, true);
 
             if (data->m_bPulsing)
             {

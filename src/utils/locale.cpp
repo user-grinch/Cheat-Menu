@@ -133,7 +133,7 @@ Locale::eReturnCodes Locale::SetLocaleByName(const std::string& name)
             return SetLocale(i);
         }
     }
-  
+
     return eReturnCodes::NO_LOCALE_FOUND;
 }
 

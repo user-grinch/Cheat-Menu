@@ -12,7 +12,7 @@ ImVec2 Util::ConvertScreenToMap(ImVec2 pos, ImVec2 mapSz, ImVec2 screenSz)
     pos.x -= left;
     pos.x -= size/2;
     pos.y -= size/2;
-    
+
     // Convert image space to map space
     pos.x = pos.x / size * mapSz.x;
     pos.y = pos.y / size * mapSz.y;
@@ -30,7 +30,7 @@ ImVec2 Util::ConvertMapToScreen(ImVec2 pos, ImVec2 mapSz, ImVec2 screenSz)
     pos.x = pos.x / mapSz.x * size;
     pos.y = pos.y / mapSz.y * size;
     pos.y *= -1;
-    
+
     pos.x += left;
     pos.x += size/2;
     pos.y += size/2;

@@ -141,7 +141,7 @@ CheatMenuMgr::CheatMenuMgr()
         }
 
         Log::Print<eLogLevel::None>("Starting " MENU_TITLE " (" __DATE__ ")\nAuthor: Grinch_\nDiscord: "
-                                DISCORD_INVITE "\nMore Info: " GITHUB_LINK);
+                                    DISCORD_INVITE "\nMore Info: " GITHUB_LINK);
 
         // date time
         SYSTEMTIME st;
@@ -193,7 +193,7 @@ CheatMenuMgr::CheatMenuMgr()
             Updater::CheckUpdate();
             gConfig.Set("Menu.LastUpdateChecked", st.wDay);
         }
-        
+
         if (Updater::IsUpdateAvailable())
         {
             Log::Print<eLogLevel::Info>("New update available: %s", Updater::GetUpdateVersion().c_str());
@@ -220,7 +220,7 @@ CheatMenuMgr::CheatMenuMgr()
     };
 
     // Doesn't work with ThirteenAG's windowed mode while inside initRwEvent
-    Events::initGameEvent += [this]() 
+    Events::initGameEvent += [this]()
     {
         if (!D3dHook::Init(fArgNoneWrapper(CheatMenu.Draw)))
         {

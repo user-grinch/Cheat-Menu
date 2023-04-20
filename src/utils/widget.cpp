@@ -79,7 +79,7 @@ void DrawClippedList(ResourceStore& data, fArg3_t clickFunc, bool favourites, bo
 {
     // Category box
     ImGui::PushItemWidth(favourites ? ImGui::GetWindowContentRegionWidth() :
-        (ImGui::GetWindowContentRegionWidth() - ImGui::GetStyle().ItemSpacing.x)/2);
+                         (ImGui::GetWindowContentRegionWidth() - ImGui::GetStyle().ItemSpacing.x)/2);
 
     if (!favourites)
     {
@@ -89,7 +89,7 @@ void DrawClippedList(ResourceStore& data, fArg3_t clickFunc, bool favourites, bo
         }
         ImGui::SameLine();
     }
-    
+
     if (Widget::Filter("##Filter", data.m_Filter, TEXT("Window.Search")))
     {
         data.UpdateSearchList(favourites);
@@ -106,7 +106,7 @@ void DrawClippedList(ResourceStore& data, fArg3_t clickFunc, bool favourites, bo
     while (clipper.Step())
     {
         for (int i = clipper.DisplayStart; i < clipper.DisplayEnd; ++i)
-        {   
+        {
             std::string &label = std::get<ListLookup>(data.m_nSearchList[i]).key;
             std::string &cat = std::get<ListLookup>(data.m_nSearchList[i]).cat;
             std::string &val =  std::get<ListLookup>(data.m_nSearchList[i]).val;
@@ -222,7 +222,7 @@ void Widget::DataList(ResourceStore& data, fArg3_t clickFunc, fArgNone_t addFunc
                 addFunc();
                 ImGui::EndChild();
                 ImGui::EndTabItem();
-            } 
+            }
         }
         if (tabsFunc)
         {
@@ -242,7 +242,7 @@ static bool RoundedImageButton(ImTextureID textureID, ImVec2& size, const char* 
     ImVec2 max = ImGui::GetItemRectMax();
     ImDrawList *drawList = ImGui::GetWindowDrawList();
     drawList->AddImageRounded(textureID, min, max, ImVec2(0, 0), ImVec2(1, 1), ImGui::GetColorU32(ImVec4(1, 1, 1, 1)), 5.0f);
-    
+
     // Add selection overlay and stuff on hover
     bool isHovered = ImGui::IsItemHovered();
     if (isHovered || alwaysHovered)
@@ -279,15 +279,15 @@ static bool RoundedImageButton(ImTextureID textureID, ImVec2& size, const char* 
     return ImGui::IsItemClicked(0);
 }
 
-void DrawClippedImages(ResourceStore& data, ImVec2 imgSz, size_t imagesInRow, bool showImages, 
-                        bool favourites, fArg1_t clickFunc, fRtnArg1_t getNameFunc, fRtnBoolArg1_t verifyFunc, fArgNone_t contextOptionsFunc)
+void DrawClippedImages(ResourceStore& data, ImVec2 imgSz, size_t imagesInRow, bool showImages,
+                       bool favourites, fArg1_t clickFunc, fRtnArg1_t getNameFunc, fRtnBoolArg1_t verifyFunc, fArgNone_t contextOptionsFunc)
 {
     static IDirect3DTexture9 **pDefaultTex = BY_GAME(gTextureList.FindTextureByName("placeholder"), nullptr, nullptr);
     ImGuiStyle &style = ImGui::GetStyle();
 
     // Category box
     ImGui::PushItemWidth(favourites ? ImGui::GetWindowContentRegionWidth() :
-        (ImGui::GetWindowContentRegionWidth() - ImGui::GetStyle().ItemSpacing.x)/2);
+                         (ImGui::GetWindowContentRegionWidth() - ImGui::GetStyle().ItemSpacing.x)/2);
     if (!favourites)
     {
         if (Widget::ListBox("##Categories", data.m_Categories, data.m_Selected))
@@ -320,14 +320,14 @@ void DrawClippedImages(ResourceStore& data, ImVec2 imgSz, size_t imagesInRow, bo
         end = (end > totalSz) ? totalSz : end;
 
         for (size_t i = start; i < end; ++i)
-        {   
+        {
             std::string &text = std::get<ImageLookup>(data.m_nSearchList[i]).m_FileName;
             std::string &modelName = std::get<ImageLookup>(data.m_nSearchList[i]).m_ModelName;
             bool custom = std::get<ImageLookup>(data.m_nSearchList[i]).m_bCustom;
             void *pTexture = custom ? pDefaultTex : std::get<ImageLookup>(data.m_nSearchList[i]).m_pTexture;
             if (showImages ? RoundedImageButton(pTexture, imgSz, modelName.c_str(), custom)
-                : ImGui::MenuItem(modelName.c_str())
-            )
+                    : ImGui::MenuItem(modelName.c_str())
+               )
             {
                 clickFunc(text);
             }
@@ -393,8 +393,8 @@ void DrawClippedImages(ResourceStore& data, ImVec2 imgSz, size_t imagesInRow, bo
     Here we go again...
     This direly needs a refactor oof
 */
-void Widget::ImageList(ResourceStore &store, fArg1_t clickFunc, fRtnArg1_t getNameFunc, 
-                        fRtnBoolArg1_t verifyFunc, fArgNone_t addFunc, fArgNone_t contextOptionsFunc, fArgNone_t tabsFunc)
+void Widget::ImageList(ResourceStore &store, fArg1_t clickFunc, fRtnArg1_t getNameFunc,
+                       fRtnBoolArg1_t verifyFunc, fArgNone_t addFunc, fArgNone_t contextOptionsFunc, fArgNone_t tabsFunc)
 {
     ImGuiStyle& style =  ImGui::GetStyle();
     /*
@@ -486,7 +486,7 @@ void Widget::ImageList(ResourceStore &store, fArg1_t clickFunc, fRtnArg1_t getNa
                 }
                 ImGui::EndChild();
                 ImGui::EndTabItem();
-            } 
+            }
         }
         if (tabsFunc)
         {

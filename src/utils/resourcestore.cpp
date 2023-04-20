@@ -25,7 +25,7 @@ ResourceStore::ResourceStore(const char* text, eResourceType type, ImVec2 imageS
         /*
             Textures need to be loaded from main thread
             Loading it directly here doesn't work
-            TODO: 
+            TODO:
                 Maybe enabling a dx9 flag fixes this?
                 Switch to initScriptsEvent
         */
@@ -44,7 +44,8 @@ static IDirect3DTexture9** GetTextureFromRaster(RwTexture* pTexture)
     return (&raster->m_pRenderResource->texture);
 }
 
-RwTexDictionary* LoadTexDictionary(char const* filename) {
+RwTexDictionary* LoadTexDictionary(char const* filename)
+{
     return plugin::CallAndReturnDynGlobal<RwTexDictionary*, char const*>(0x5B3860, filename);
 }
 
@@ -117,7 +118,7 @@ void ResourceStore::LoadTextureResource(std::string&& name)
                     }
                 }
             }
-            else 
+            else
             {
                 m_ImagesList.back().get()->m_CategoryName = str;
             }
@@ -134,12 +135,12 @@ void ResourceStore::LoadTextureResource(std::string&& name)
             }
 
             // Genereate categories
-            if (m_Type != TYPE_TEXT_IMAGE && 
-            !std::count(m_Categories.begin(), m_Categories.end(), m_ImagesList.back().get()->m_CategoryName))
+            if (m_Type != TYPE_TEXT_IMAGE &&
+                    !std::count(m_Categories.begin(), m_Categories.end(), m_ImagesList.back().get()->m_CategoryName))
             {
                 m_Categories.push_back(m_ImagesList.back().get()->m_CategoryName);
             }
-            
+
             pRLL = (RwLinkList*)pEndDic;
         }
         while ( pEndDic != (RwTexDictionary*)&pRwTexDictionary->texturesInDict );
@@ -176,8 +177,8 @@ void ResourceStore::UpdateSearchList(bool favourites, fRtnArg1_t getNameFunc, fR
                     lookup.m_FileName = m_ImagesList[i]->m_FileName;
                     lookup.m_ModelName = getNameFunc == nullptr ? "" : getNameFunc(lookup.m_FileName);
 
-                    if (lookup.m_ModelName == key.str() && m_Filter.PassFilter(lookup.m_ModelName.c_str()) 
-                    && (verifyFunc == nullptr || verifyFunc(lookup.m_FileName)))
+                    if (lookup.m_ModelName == key.str() && m_Filter.PassFilter(lookup.m_ModelName.c_str())
+                            && (verifyFunc == nullptr || verifyFunc(lookup.m_FileName)))
                     {
                         lookup.m_bCustom = lookup.m_FileName.find("Added") != std::string::npos;
                         lookup.m_pTexture = m_ImagesList[i]->m_pTexture;
@@ -194,7 +195,7 @@ void ResourceStore::UpdateSearchList(bool favourites, fRtnArg1_t getNameFunc, fR
                         lookup.m_FileName =  val.as_string()->value_or("0");
                         lookup.m_ModelName = std::string(key.str());
                         if (lookup.m_ModelName == key.str() && m_Filter.PassFilter(lookup.m_ModelName.c_str())
-                            && (m_Selected == "Custom" || m_Selected == "All"))
+                                && (m_Selected == "Custom" || m_Selected == "All"))
                         {
                             lookup.m_bCustom = true;
                             m_nSearchList.push_back(std::move(lookup));
@@ -244,9 +245,9 @@ void ResourceStore::UpdateSearchList(bool favourites, fRtnArg1_t getNameFunc, fR
                 lookup.m_ModelName = getNameFunc == nullptr ? "" : getNameFunc(lookup.m_FileName);
 
                 if (m_Filter.PassFilter(lookup.m_ModelName.c_str())
-                    && (m_ImagesList[i]->m_CategoryName == m_Selected || m_Selected == "All")
-                    && (verifyFunc == nullptr || verifyFunc(lookup.m_FileName))
-                )
+                        && (m_ImagesList[i]->m_CategoryName == m_Selected || m_Selected == "All")
+                        && (verifyFunc == nullptr || verifyFunc(lookup.m_FileName))
+                   )
                 {
                     lookup.m_bCustom = false;
                     lookup.m_pTexture = m_ImagesList[i]->m_pTexture;
@@ -262,7 +263,7 @@ void ResourceStore::UpdateSearchList(bool favourites, fRtnArg1_t getNameFunc, fR
                     lookup.m_FileName =  v.as_string()->value_or("0");
                     lookup.m_ModelName = std::string(k.str());
                     if (m_Filter.PassFilter(lookup.m_ModelName.c_str())
-                        && (m_Selected == "Custom" || m_Selected == "All"))
+                            && (m_Selected == "Custom" || m_Selected == "All"))
                     {
                         lookup.m_bCustom = true;
                         m_nSearchList.push_back(std::move(lookup));

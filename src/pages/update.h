@@ -6,7 +6,7 @@ class UpdatePage : public IPage<UpdatePage>
 {
 private:
     friend class IFeature;
-    UpdatePage() : IPage<UpdatePage>(ePageID::Update, "Update", false){}
+    UpdatePage() : IPage<UpdatePage>(ePageID::Update, "Update", false) {}
     UpdatePage(const UpdatePage&);
 
 public:

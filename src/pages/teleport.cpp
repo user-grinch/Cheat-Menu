@@ -11,7 +11,7 @@ static int maxSprites = *(uint*)0x5D5870;
 
 void TeleportPage::FetchRadarSpriteData()
 {
-    
+
     uint timer = CTimer::m_snTimeInMilliseconds;
     static uint lastUpdated = timer;
 
@@ -43,7 +43,7 @@ bool TeleportPage::IsQuickTeleportActive()
 TeleportPage& teleportPage = TeleportPage::Get();
 
 TeleportPage::TeleportPage()
-: IPage<TeleportPage>(ePageID::Teleport, "Window.TeleportPage", true)
+    : IPage<TeleportPage>(ePageID::Teleport, "Window.TeleportPage", true)
 {
     Events::initGameEvent += [this]()
     {
@@ -64,7 +64,7 @@ TeleportPage::TeleportPage()
 #ifdef GTASA
         if (m_bQuickTeleport && quickTeleport.PressedRealtime())
         {
-            static CSprite2d map; 
+            static CSprite2d map;
             if (!map.m_pTexture)
             {
                 map.m_pTexture = gTextureList.FindRwTextureByName("map");
@@ -78,9 +78,9 @@ TeleportPage::TeleportPage()
             // draw sprites on map
             static float sz = SCREEN_MULTIPLIER(12.5f);
             for (int i = 0; i != maxSprites; ++i)
-            {   
+            {
                 tRadarTrace &trace = ms_RadarTrace[i];
-                
+
                 if (trace.m_nRadarSprite != RADAR_SPRITE_NONE)
                 {
                     CSprite2d &sprite = CRadar::RadarBlipSprites[LOWORD(trace.m_nRadarSprite)];
@@ -140,14 +140,14 @@ void TeleportPage::WarpPlayer(CVector pos, int interiorID)
             return;
         }
         pos = targetBlip.m_vecPos;
-    } 
+    }
 
     CStreaming::LoadScene(&pos);
     CStreaming::LoadSceneCollision(&pos);
     CStreaming::LoadAllRequestedModels(false);
 
     if (Type == eTeleportType::Marker || Type == eTeleportType::MapPosition)
-    {   
+    {
         float ground, water;
         CEntity* pPlayerEntity = FindPlayerEntity(-1);
         ground = CWorld::FindGroundZFor3DCoord(pos.x, pos.y, 1000, nullptr, &pPlayerEntity) + 1.0f;
@@ -161,7 +161,7 @@ void TeleportPage::WarpPlayer(CVector pos, int interiorID)
             Command<Commands::GET_WATER_HEIGHT_AT_COORDS>(pos.x, pos.y, true, &water);
             pos.z = ground > water ? ground : water;
         }
-        
+
     }
 
     if (pVeh && pPlayer->m_nPedFlags.bInVehicle)
@@ -177,7 +177,7 @@ void TeleportPage::WarpPlayer(CVector pos, int interiorID)
             }
 
             pPlayer->Teleport(pos, false);
-        }  
+        }
         else
         {
             pVeh->Teleport(pos, false);
@@ -289,20 +289,20 @@ void TeleportPage::Draw()
                 ImGui::Checkbox(TEXT("Teleport.InsertCoord"), &m_bInsertCoord);
 
                 if (Widget::Checkbox(TEXT("Teleport.QuickTeleport"), &m_bQuickTeleport,
-                                        std::string(TEXT_S("Teleport.QuickTeleportHint") 
-                                                    + quickTeleport.GetNameString()).c_str()))
+                                     std::string(TEXT_S("Teleport.QuickTeleportHint")
+                                                 + quickTeleport.GetNameString()).c_str()))
                 {
                     gConfig.Set("Features.QuickTeleport", m_bQuickTeleport);
                 }
                 ImGui::NextColumn();
                 if (Widget::Checkbox(TEXT("Teleport.SpawnUnderwater"), &m_bSpawnUnderwater,
-                                        TEXT("Teleport.SpawnUnderwaterHint")))
+                                     TEXT("Teleport.SpawnUnderwaterHint")))
                 {
                     gConfig.Set("Features.SpawnUnderwater", m_bSpawnUnderwater);
                 }
                 if (Widget::Checkbox(TEXT("Teleport.TeleportMarker"), &m_bTeleportMarker,
-                                        std::string(TEXT_S("Teleport.TeleportMarkerHint") 
-                                                    + teleportMarker.GetNameString()).c_str()))
+                                     std::string(TEXT_S("Teleport.TeleportMarkerHint")
+                                                 + teleportMarker.GetNameString()).c_str()))
                 {
                     gConfig.Set("Features.TeleportMarker", m_bTeleportMarker);
                 }
@@ -351,7 +351,7 @@ void TeleportPage::Draw()
                 {
                     WarpPlayer<eTeleportType::Coordinate>(CVector(0, 0, 23));
                 }
-#endif          
+#endif
                 ImGui::Dummy(ImVec2(0, 20));
 
                 if (m_bQuickTeleport)
@@ -388,10 +388,10 @@ void TeleportPage::Draw()
         {
 #ifdef GTASA
             FetchRadarSpriteData();
-#endif  
+#endif
             ImGui::Spacing();
-            Widget::DataList(m_locData, fArg3Wrapper(teleportPage.LocationClick), 
-                                fArgNoneWrapper(teleportPage.LocationAddNew));
+            Widget::DataList(m_locData, fArg3Wrapper(teleportPage.LocationClick),
+                             fArgNoneWrapper(teleportPage.LocationAddNew));
             ImGui::EndTabItem();
         }
         ImGui::EndTabBar();

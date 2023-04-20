@@ -82,10 +82,11 @@ void VehCustmzrMgr::RemoveComponent(const std::string& component, const bool dis
 
 bool VehCustmzrMgr::IsSideskirtComponent(unsigned int compID)
 {
-    static int models[] =  
-    {   1007, 1026, 1027, 1030, 1031, 1036, 1039, 1040, 1041, 1042, 1047, 1048, 1051, 1052, 1056, 
-        1057, 1062, 1063, 1069, 1070, 1071, 1072, 1090, 1093, 1094, 1095, 1099, 1101, 1102, 1106, 1107, 1108, 1118, 1119, 
-        1120, 1121, 1122, 1124, 1133, 1134, 1137 
+    static int models[] =
+    {
+        1007, 1026, 1027, 1030, 1031, 1036, 1039, 1040, 1041, 1042, 1047, 1048, 1051, 1052, 1056,
+        1057, 1062, 1063, 1069, 1070, 1071, 1072, 1090, 1093, 1094, 1095, 1099, 1101, 1102, 1106, 1107, 1108, 1118, 1119,
+        1120, 1121, 1122, 1124, 1133, 1134, 1137
     };
     static int maxSize = sizeof(models)/sizeof(models[0]);
 
@@ -119,7 +120,7 @@ void VehCustmzrMgr::ApplyCustomizations(std::string& cat, std::string& key, std:
         // colors
         toml::array *temp = m_CustomizeData.m_pData->GetArray((index + "ColorMat").c_str());
         CRGBA col {static_cast<uchar>(temp->at(0).value_or(0)), static_cast<uchar>(temp->at(1).value_or(0)),
-                    static_cast<uchar>(temp->at(2).value_or(0)), static_cast<uchar>(temp->at(3).value_or(0))};
+                   static_cast<uchar>(temp->at(2).value_or(0)), static_cast<uchar>(temp->at(3).value_or(0))};
         if (col.a != 0)
         {
             Paint.SetColor(pVeh, col);
@@ -190,7 +191,7 @@ void VehCustmzrMgr::SaveCustomizations()
         m_CustomizeData.m_pData->Set((index + "ColorMat").c_str(), ColArr);
 
         toml::array CarcolsArr {paintData.m_nCarColors[0], paintData.m_nCarColors[1],
-                        paintData.m_nCarColors[2], paintData.m_nCarColors[3]};
+                                paintData.m_nCarColors[2], paintData.m_nCarColors[3]};
         m_CustomizeData.m_pData->Set((index + "ColorCarcols").c_str(), CarcolsArr);
         m_CustomizeData.m_pData->Set((index + "Texture").c_str(), paintData.m_nTextureName);
 
@@ -261,26 +262,38 @@ VehCustmzrMgr::VehCustmzrMgr()
         {
             for (CVehicle* veh : CPools::ms_pVehiclePool)
             {
-                int chance = 0;
+                int flag = 0;
+                unsigned int start = 0, end = 0;
 
-                if (veh->m_nVehicleClass == CLASS_NORMAL) // Normal
+                if (veh->m_nVehicleClass == CLASS_NORMAL)
                 {
-                    chance = Random(1, 20);
+                    start = 1;
+                    end = 20;
                 }
 
-                if (veh->m_nVehicleClass == CLASS_RICHFAMILY) // Rich family
+                if (veh->m_nVehicleClass == CLASS_RICHFAMILY) 
                 {
-                    chance = Random(1, 4);
+                    start = 1;
+                    end = 4;
                 }
 
-                if (veh->m_nVehicleClass == CLASS_EXECUTIVE) // Executive
+                if (veh->m_nVehicleClass == CLASS_EXECUTIVE) 
                 {
-                    chance = Random(1, 3);
+                    start = 1;
+                    end = 3;
                 }
 
-                if (chance == 1 && !Neon.IsInstalled(veh) && veh->m_pDriver != pPlayer)
+                if (start != end)
                 {
-                    Neon.Install(veh, Random(0, 255), Random(0, 255), Random(0, 255));
+                    flag = Random(start, end);
+
+                    if (flag == 1 && !Neon.IsInstalled(veh) && veh->m_pDriver != pPlayer)
+                    {
+                        int r = static_cast<int>(Random(0U, 255U));
+                        int g = static_cast<int>(Random(0U, 255U));
+                        int b = static_cast<int>(Random(0U, 255U));
+                        Neon.Install(veh, r, g, b);
+                    }
                 }
             }
             m_Neon.m_nTrafficTimer = timer;
@@ -317,13 +330,13 @@ bool VehCustmzrMgr::IsValidComponent(CVehicle *pVeh, unsigned int compID)
 {
     return CallAndReturn<bool, 0x49B010, int, CVehicle*>(compID, pVeh);
 }
-#endif 
+#endif
 
 void VehCustmzrMgr::Draw()
 {
     CVehicle* pVeh = BY_GAME(FindPlayerVehicle(-1, false), FindPlayerVehicle(), FindPlayerVehicle());
     int hVeh = CPools::GetVehicleRef(pVeh);
-    
+
     if (ImGui::BeginTabItem(TEXT("Vehicle.Color")))
     {
 #ifdef GTASA
@@ -346,7 +359,7 @@ void VehCustmzrMgr::Draw()
 #endif
 
         ImGui::Spacing();
-        
+
         static int colorType = 0;
 #ifdef GTASA
         ImGui::Combo(TEXT("Vehicle.ColorType"), &colorType, "Primary\0Secondary\0Tertiary\0Quaternary\0");
@@ -362,7 +375,7 @@ void VehCustmzrMgr::Draw()
         ImVec2 size = Widget::CalcSize();
         int btnsInRow = ImGui::GetWindowContentRegionWidth() / (size.y * 2);
         int btnSize = (ImGui::GetWindowContentRegionWidth() - int(ImGuiStyleVar_ItemSpacing) * (btnsInRow -
-                        0.6 * btnsInRow)) / btnsInRow;
+                       0.6 * btnsInRow)) / btnsInRow;
 
         ImGui::BeginChild("Colorss");
 
@@ -430,7 +443,7 @@ void VehCustmzrMgr::Draw()
             ImVec2 size = Widget::CalcSize();
             int btnsInRow = ImGui::GetWindowContentRegionWidth() / (size.y * 2);
             int btnSize = (ImGui::GetWindowContentRegionWidth() - int(ImGuiStyleVar_ItemSpacing) * (btnsInRow -
-                            0.6 * btnsInRow)) / btnsInRow;
+                           0.6 * btnsInRow)) / btnsInRow;
 
             ImGui::BeginChild("Neonss");
 
@@ -474,13 +487,13 @@ void VehCustmzrMgr::Draw()
             if (maxpjob > 0)
             {
                 Command<Commands::GET_CURRENT_VEHICLE_PAINTJOB>(hVeh, &curpjob);
-                
+
                 if (ImGui::ArrowButton("Left", ImGuiDir_Left))
                 {
                     curpjob -= 1;
                     if (curpjob < -1)
                     {
-                        curpjob = maxpjob - 1; 
+                        curpjob = maxpjob - 1;
                     }
                     Command<Commands::GIVE_VEHICLE_PAINTJOB>(hVeh, curpjob);
                 }
@@ -492,7 +505,7 @@ void VehCustmzrMgr::Draw()
                     curpjob += 1;
                     if (curpjob > maxpjob)
                     {
-                        curpjob =  -1; 
+                        curpjob =  -1;
                     }
                     Command<Commands::GIVE_VEHICLE_PAINTJOB>(hVeh, curpjob);
                 }
@@ -502,14 +515,14 @@ void VehCustmzrMgr::Draw()
             ImGui::Columns(1);
             ImGui::Spacing();
             Widget::ImageList(Paint.m_TextureData,
-            [this](std::string& str)
+                              [this](std::string& str)
             {
                 Paint.SetTexture(FindPlayerPed()->m_pVehicle, str);
             },
             [](std::string& str)
             {
                 return str;
-            }, nullptr, [](){});
+            }, nullptr, []() {});
 
             ImGui::EndTabItem();
         }
@@ -526,7 +539,7 @@ void VehCustmzrMgr::Draw()
                 {
                     pVeh->RemoveVehicleUpgrade(compID);
                 }
-            } 
+            }
 
             /*
                 Remove leftover comps
@@ -552,7 +565,7 @@ void VehCustmzrMgr::Draw()
         }
 
         Widget::ImageList(m_TuneData,
-        [this](std::string& str)
+                          [this](std::string& str)
         {
             AddComponent(str);
         },
@@ -598,7 +611,7 @@ void VehCustmzrMgr::Draw()
         if (ImGui::Button(TEXT("Vehicle.ReadMore"), ImVec2(Widget::CalcSize(3))))
         {
             ShellExecute(NULL, "open", "https://projectcerbera.com/gta/sa/tutorials/handling", NULL, NULL,
-                                            SW_SHOWNORMAL);
+                         SW_SHOWNORMAL);
         }
 
         ImGui::Spacing();

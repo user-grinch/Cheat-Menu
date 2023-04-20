@@ -7,7 +7,7 @@ class PlayerPage : public IPage<PlayerPage>
 private:
     bool m_bGodMode;
     bool m_bPlayerRegen;
-    struct 
+    struct
     {
         bool m_bEnabled = false;
         CVector m_fPos;

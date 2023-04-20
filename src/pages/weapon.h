@@ -48,12 +48,12 @@ private:
 
 public:
     ResourceStore m_WeaponData { "weapons", BY_GAME(eResourceType::TYPE_IMAGE_TEXT, eResourceType::TYPE_TEXT,
-                                eResourceType::TYPE_TEXT), ImVec2(65, 65) };
+                eResourceType::TYPE_TEXT), ImVec2(65, 65) };
 
     // Add new weapon entry
     void AddNew();
     void Draw();
-    
+
 #ifdef GTASA
     void GiveWeaponToPlayer(std::string& weaponType);
 #else

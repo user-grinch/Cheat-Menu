@@ -23,7 +23,7 @@ private:
 
 public:
     int m_nMul = 1;       // speed multiplier
-    float m_fFOV = 60.0f; // freecam field of view 
+    float m_fFOV = 60.0f; // freecam field of view
 
     void Enable();
     void Disable();

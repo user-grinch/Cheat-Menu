@@ -3,7 +3,7 @@
 #include <pdh.h>
 
 /*
-*   Contains utility functions 
+*   Contains utility functions
 */
 class Util
 {
@@ -23,7 +23,7 @@ public:
     static int GetLargestGangInZone();
     static bool IsOnMission();
 #endif
-    
+
     static ImVec2 ConvertScreenToMap(ImVec2 pos, ImVec2 mapSz, ImVec2 screenSz);
     static ImVec2 ConvertMapToScreen(ImVec2 pos, ImVec2 mapSz, ImVec2 screenSz);
 
@@ -40,7 +40,7 @@ public:
     static void GetCPUUsageInit();
     static double GetCurrentCPUUsage();
     static float RoundFloat(float val);
-    
+
     static std::string GetLocationName(CVector* pos);
     static bool IsOnCutscene();
     static void RainbowValues(int& r, int& g, int& b, float speed);

@@ -7,7 +7,7 @@
 
 WeaponPage& weaponPage = WeaponPage::Get();
 WeaponPage::WeaponPage()
-: IPage<WeaponPage>(ePageID::Weapon, "Window.WeaponPage", true)
+    : IPage<WeaponPage>(ePageID::Weapon, "Window.WeaponPage", true)
 {
     Events::processScriptsEvent += [this]
     {
@@ -132,12 +132,12 @@ static void ClearPlayerWeapon(eWeaponType weaponType)
 #endif
             }
 #ifdef GTA3
-                // This doesn't work for melee weapons aka bats, chainsaw etc
-                pWeapon->m_eWeaponState = WEAPONSTATE_OUT_OF_AMMO;
-                pWeapon->m_nAmmoTotal = 0;
-                pWeapon->m_nAmmoInClip = 0;
+            // This doesn't work for melee weapons aka bats, chainsaw etc
+            pWeapon->m_eWeaponState = WEAPONSTATE_OUT_OF_AMMO;
+            pWeapon->m_nAmmoTotal = 0;
+            pWeapon->m_nAmmoInClip = 0;
 #else
-                pWeapon->Shutdown();
+            pWeapon->Shutdown();
 #endif
         }
     }
@@ -382,7 +382,7 @@ void WeaponPage::Draw()
             }
 #ifdef GTASA
             Widget::ImageList(m_WeaponData, fArgWrapper(weaponPage.GiveWeaponToPlayer),
-            [this](std::string& str)
+                              [this](std::string& str)
             {
                 return m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
             },
@@ -407,10 +407,12 @@ void WeaponPage::Draw()
             ImGui::Text(TEXT("Weapon.CurrentWeapon"), m_WeaponData.m_pData->Get(key.c_str(), "Unknown").c_str());
             ImGui::Spacing();
             Widget::ImageList(m_WeaponData, fArgWrapper(weaponPage.m_Gang.SetWeapon),
-            [this](std::string& str){
+                              [this](std::string& str)
+            {
                 return m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
             },
-            [](std::string& str){
+            [](std::string& str)
+            {
                 return str != "-1"; /*Jetpack*/
             });
             ImGui::EndTabItem();

@@ -43,7 +43,7 @@ ImFont* FontMgr::Load(const char* fontID, const char* path, float fontMul)
     ImGuiIO& io = ImGui::GetIO();
     size_t fontSize = static_cast<int>(screen::GetScreenHeight() / 54.85f) * fontMul;
     ImFont *pFont = io.Fonts->AddFontFromFileTTF(path, fontSize, NULL, GetGlyphRanges());
-    
+
     m_vecFonts.push_back({pFont, fontSize, fontMul, std::string(fontID), std::string(path)});
     io.Fonts->Build();
     return pFont;

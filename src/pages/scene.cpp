@@ -63,7 +63,7 @@ void ScenePage::Draw()
             Widget::Checkbox(TEXT("Menu.ShowPedTasks"), &Overlay::m_bPedTasks);
             ImGui::Spacing();
             if (pPlayer)
-            {   
+            {
                 ImGui::BeginChild("TasksList");
                 ImGui::Text(TEXT("Scene.PrimaryTasks"));
                 ImGui::Separator();

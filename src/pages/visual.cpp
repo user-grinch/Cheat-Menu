@@ -15,7 +15,7 @@
 #define TOTAL_WEATHERS 23
 
 // taken from vHud (_AG)
-static bool IsTouchingRect(CVector2D& point, CRect rect1, CRect rect2) 
+static bool IsTouchingRect(CVector2D& point, CRect rect1, CRect rect2)
 {
     float vroot;
     float v12;
@@ -39,7 +39,7 @@ static bool IsTouchingRect(CVector2D& point, CRect rect1, CRect rect2)
     {
         return false;
     }
-    
+
     w1 = rect1.right - rect1.left;
     h1 = rect1.bottom - rect1.top;
     w2 = rect2.left - rect1.left;
@@ -75,9 +75,9 @@ static bool IsTouchingRect(CVector2D& point, CRect rect1, CRect rect2)
     return true;
 }
 
-static float LimitRadarPoint(CVector2D& point) 
+static float LimitRadarPoint(CVector2D& point)
 {
-    if (FrontEndMenuManager.m_bDrawRadarOrMap) 
+    if (FrontEndMenuManager.m_bDrawRadarOrMap)
     {
         return point.Magnitude();
     }
@@ -88,7 +88,7 @@ static float LimitRadarPoint(CVector2D& point)
     }
 
     CVector2D temp;
-    CRect rect[4] = 
+    CRect rect[4] =
     {
         {-1.0f, 1.0f, 1.0f, 1.0f},
         {-1.0f, 1.0f, -1.0f, -1.0f},
@@ -96,7 +96,7 @@ static float LimitRadarPoint(CVector2D& point)
         {1.0f, 1.0f, 1.0f, -1.0f}
     };
 
-    for (int i = 0; i <= 4; i++) 
+    for (int i = 0; i <= 4; i++)
     {
         if (IsTouchingRect(temp, rect[i], CRect(0.0f, 0.0f, point.x, point.y)))
         {
@@ -105,7 +105,7 @@ static float LimitRadarPoint(CVector2D& point)
             break;
         }
     }
-    
+
     return 1.1f;
 }
 
@@ -115,7 +115,7 @@ static float LimitRadarPoint(CVector2D& point)
 #define TOTAL_WEATHERS 4
 #endif
 
- // Timecyc stuff
+// Timecyc stuff
 static int m_nTimecycHour = 8;
 static std::vector<std::string> m_WeatherNames
 {
@@ -135,7 +135,7 @@ static std::vector<std::string> m_WeatherNames
 
 VisualPage& visualPage = VisualPage::Get();
 VisualPage::VisualPage()
-: IPage<VisualPage>(ePageID::Visual, "Window.VisualPage", true)
+    : IPage<VisualPage>(ePageID::Visual, "Window.VisualPage", true)
 {
 #ifdef GTASA
 
@@ -714,7 +714,7 @@ void VisualPage::Draw()
                 if(m_bNoMoneyZeros)
                 {
                     patch::Set<const char*>(0x58F4C8, pos, true); //positive
-		            patch::Set<const char*>(0x58F50A, neg, true); //negative
+                    patch::Set<const char*>(0x58F50A, neg, true); //negative
                 }
                 else
                 {
@@ -738,11 +738,11 @@ void VisualPage::Draw()
             {
                 // Credits: jeremii (bjeremii.blogspot.com)
                 if (m_bNoRadarRot)
-                { 
+                {
                     patch::Set<float>(0xBA8310, 0.0);
                     patch::Set<float>(0xBA830C, 0.0);
                     patch::Set<float>(0xBA8308, 1.0);
-                    
+
                     // stop map rotation
                     patch::Nop(0x5837FB, 6);
                     patch::Nop(0x583805, 6);
@@ -866,13 +866,13 @@ void VisualPage::Draw()
                 PatchRadar();
                 initPatches = true;
             }
-            
+
             ImGui::Spacing();
             ImGui::SameLine();
             ImGui::TextWrapped(TEXT("Visual.IncompatibleMods"));
             Widget::Tooltip(TEXT("Visual.IncompatibleModsText"));
             ImGui::Spacing();
-            
+
             if (ImGui::BeginChild("VisualsChild"))
             {
 #ifdef GTASA
@@ -898,8 +898,8 @@ void VisualPage::Draw()
                 };
                 Widget::EditRadioBtnAddr(TEXT("Visual.MoneyFontOutline"), 0x58F58D, font_outline);
                 static std::vector<Widget::BindInfo> style
-                { 
-                    {TEXT("Visual.Style1"), 1}, {TEXT("Visual.Style2"), 2}, {TEXT("Visual.DefaultStyle"), 3} 
+                {
+                    {TEXT("Visual.Style1"), 1}, {TEXT("Visual.Style2"), 2}, {TEXT("Visual.DefaultStyle"), 3}
                 };
                 Widget::EditRadioBtnAddr(TEXT("Visual.MoneyFontStyle"), 0x58F57F, style);
                 Widget::EditAddr<float>(TEXT("Visual.RadarHeight"), *(int*)0x5834F6, 0, 76, 999);
@@ -910,8 +910,8 @@ void VisualPage::Draw()
                 ColorPickerAddr(TEXT("Visual.RadioStationColor"), 0xBAB24C, ImVec4(150, 150, 150, 255));
 
                 static std::vector<Widget::BindInfo> star_border
-                { 
-                    {TEXT("Visual.NoBorder"), 0}, {TEXT("Visual.DefaultBorder"), 1}, {TEXT("Visual.BoldBorder"), 2} 
+                {
+                    {TEXT("Visual.NoBorder"), 0}, {TEXT("Visual.DefaultBorder"), 1}, {TEXT("Visual.BoldBorder"), 2}
                 };
                 Widget::EditRadioBtnAddr(TEXT("Visual.WantedStarBorder"), 0x58DD41, star_border);
                 Widget::EditAddr<float>(TEXT("Visual.WantedPosX"), *(int*)0x58DD0F, -999, 29, 999);

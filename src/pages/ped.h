@@ -7,7 +7,7 @@ class PedPage : public IPage<PedPage>
 private:
     bool m_bBigHead;
     bool m_bThinBody;
-    struct 
+    struct
     {
         std::vector<CPed*> m_List;
         int m_nAccuracy = 50;
@@ -42,7 +42,7 @@ private:
 #else
     void SpawnPed(str& cat, str& name, str& model);
 #endif
-    
+
 public:
 #ifdef GTASA
     DataStore m_SpecialPedData {"special_peds"};

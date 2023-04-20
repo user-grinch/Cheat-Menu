@@ -8,13 +8,13 @@
 // discord server ids
 const char* id = BY_GAME("951199292981403669", "951448264195059712", "951457540573655080");
 
-static char asciitolower(char in) 
+static char asciitolower(char in)
 {
     if (in <= 'Z' && in >= 'A')
     {
         return in - ('Z' - 'z');
     }
-    
+
     return in;
 }
 
@@ -74,9 +74,9 @@ void RPC::Process()
     }
 
     static std::string detailsText, stateText, smallImg, smallImgText, largeImg, largeImgText;
-    static size_t curImage = Random(1, 5);
+    static size_t curImage = Random(1U, 5U);
     static size_t timer = CTimer::m_snTimeInMilliseconds;
-    
+
     CPlayerInfo *pInfo = &CWorld::Players[CWorld::PlayerInFocus];
     CPlayerPed *pPed = pInfo->m_pPed;
 
@@ -105,7 +105,7 @@ void RPC::Process()
             if (wantedLevel > 3)
             {
                 stateText = TEXT("RPC.OnRampage");
-            }   
+            }
         }
         else
         {
@@ -118,7 +118,7 @@ void RPC::Process()
             stateText = TEXT("RPC.InsideInterior");
         }
 #endif
-        
+
         if (BY_GAME(pPed->m_nPedFlags.bInVehicle, pPed->m_bInVehicle, pPed->m_bInVehicle))
         {
             std::string name = Util::GetCarName(pPed->m_pVehicle->m_nModelIndex);
@@ -142,7 +142,7 @@ void RPC::Process()
         {
             stateText = TEXT("RPC.Wasted");
         }
-        
+
         if (BY_GAME(pPed->m_nPedFlags.bIsBeingArrested, false, false))
         {
             stateText = TEXT("RPC.Busted");
@@ -150,7 +150,7 @@ void RPC::Process()
 
         largeImgText = std::format("{}: {} - {}: {}", TEXT("Player.Armour"), pPed->m_fArmour, TEXT("Player.Health"), int(pPed->m_fHealth));
         largeImg = std::format("{}{}", BY_GAME("sa", "vc", "3"), curImage);
-        
+
         drpc.details = detailsText.c_str();
         drpc.state = stateText.c_str();
         drpc.smallImageKey = smallImg.c_str();

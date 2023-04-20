@@ -3,11 +3,11 @@
 
 /*
     Widgets Class
-    Contains useful ui utilities 
+    Contains useful ui utilities
 */
 class Widget
 {
-private: 
+private:
     using VecStr = const std::vector<std::string>;
 
 public:
@@ -24,16 +24,16 @@ public:
     static ImVec2 CalcSize(short count = 1, bool spacing = true);
 
     // Regular checkbox with hint support
-    static bool Checkbox(const char* label, bool* state, const char* hint = nullptr, 
-                            bool is_disabled = false);
-    
+    static bool Checkbox(const char* label, bool* state, const char* hint = nullptr,
+                         bool is_disabled = false);
+
     // Checkbox for bool memory address
     static bool CheckboxAddr(const char* label, uint addr, const char* hint = nullptr);
 
     // Checkbox with raw memory input
-    static bool CheckboxAddrRaw(const char* label, uint addr, uint size, const char* enabled, 
-                                    const char* disabled, const char* hint = nullptr);
-    
+    static bool CheckboxAddrRaw(const char* label, uint addr, uint size, const char* enabled,
+                                const char* disabled, const char* hint = nullptr);
+
     // Checkbox for bit fields
     static bool CheckboxBits(const char* label, uint flag, const char* hint = nullptr);
 
@@ -41,14 +41,14 @@ public:
     static bool ColorBtn(int colorId, std::vector<float>& color, ImVec2 size);
 
     // Draws DataStore data in the interface
-    static void DataList(ResourceStore& data, fArg3_t clickFunc = nullptr, fArgNone_t addFunc = nullptr, 
-                        bool isEditItem = false, fArgNone_t contextOptionsFunc = nullptr, fArgNone_t tabsFunc = nullptr);
-    
+    static void DataList(ResourceStore& data, fArg3_t clickFunc = nullptr, fArgNone_t addFunc = nullptr,
+                         bool isEditItem = false, fArgNone_t contextOptionsFunc = nullptr, fArgNone_t tabsFunc = nullptr);
+
     // Draws a dropdown editor for memory address
     template <typename T>
     static void EditAddr(const char* label, uint address, int min = 0, int def = 0, int max = 100);
-    static void EditAddr(const char* label, uint address, float min = 0.0f, float def = 0.0f, 
-                            float max = 100.0f, float mul = 1, float change = 1.0f);
+    static void EditAddr(const char* label, uint address, float min = 0.0f, float def = 0.0f,
+                         float max = 100.0f, float mul = 1, float change = 1.0f);
 
     // Draws a dropdown editor for memory bits
     static void EditBits(const char* label, int address, VecStr& names);
@@ -70,9 +70,9 @@ public:
     static bool InputInt(const char* label, int *val, int min = -1, int max = -1);
 
     // Draws ResourceStore images in the interface
-    static void ImageList(ResourceStore &store, fArg1_t clickFunc, fRtnArg1_t getNameFunc, 
-                            fRtnBoolArg1_t verifyFunc = nullptr, fArgNone_t addFunc = nullptr, 
-                            fArgNone_t contextOptionsFunc = nullptr, fArgNone_t tabsFunc = nullptr);
+    static void ImageList(ResourceStore &store, fArg1_t clickFunc, fRtnArg1_t getNameFunc,
+                          fRtnBoolArg1_t verifyFunc = nullptr, fArgNone_t addFunc = nullptr,
+                          fArgNone_t contextOptionsFunc = nullptr, fArgNone_t tabsFunc = nullptr);
 
     // Draws a dropdown listbox
     static bool ListBox(const char* label, VecStr& allItems, int& selected);

@@ -12,9 +12,9 @@ private:
     friend class IFeature;
     TopDownCamera();
     TopDownCamera(const TopDownCamera&);
-    
+
 public:
-    int m_nZoom = 40; 
+    int m_nZoom = 40;
 
     // Process cheat each frame
     void DrawPages();

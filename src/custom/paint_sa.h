@@ -33,7 +33,7 @@ private:
             m_nCarColors[0] = pVeh->m_nPrimaryColor;
             m_nCarColors[1] = pVeh->m_nSecondaryColor;
             m_nCarColors[2] = pVeh->m_nTertiaryColor;
-            m_nCarColors[3] = pVeh->m_nQuaternaryColor; 
+            m_nCarColors[3] = pVeh->m_nQuaternaryColor;
         }
 
         // Resets applied material colors

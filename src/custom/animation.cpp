@@ -211,7 +211,7 @@ void AnimationMgr::AddNew()
 {
     static char animBuf[INPUT_BUFFER_SIZE];
     static char ifpBuf[INPUT_BUFFER_SIZE];
-    
+
     ImGui::InputTextWithHint(TEXT("Scene.IFPName"), "ped", ifpBuf, INPUT_BUFFER_SIZE);
     ImGui::InputTextWithHint(TEXT("Scene.AnimName"), "cower", animBuf, INPUT_BUFFER_SIZE);
     ImGui::Spacing();

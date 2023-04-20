@@ -41,7 +41,7 @@ public:
         {
 #ifdef _GTA_
             pLog = std::make_unique<std::ofstream>(FILE_NAME ".log");
-#else 
+#else
             pLog = std::make_unique<std::ofstream>(name);
 #endif
         }
@@ -57,7 +57,7 @@ public:
         {
 #ifdef _GTA_
             pLog = std::make_unique<std::ofstream>(FILE_NAME ".log");
-#else 
+#else
             pLog = std::make_unique<std::ofstream>(name);
 #endif
         }

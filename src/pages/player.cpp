@@ -31,7 +31,7 @@ static inline void PlayerModelBrokenFix()
 
 PlayerPage &playerPage = PlayerPage::Get();
 PlayerPage::PlayerPage()
- : IPage<PlayerPage>(ePageID::Player, "Window.PlayerPage", true)
+    : IPage<PlayerPage>(ePageID::Player, "Window.PlayerPage", true)
 {
 #ifdef GTASA
 //	Fix player model being broken after rebuild
@@ -80,7 +80,7 @@ PlayerPage::PlayerPage()
                         prevVal = player->m_fHealth;
                     }
                     else
-                    {   
+                    {
                         // Only give armour if player has some already
                         if (player->m_fArmour >= 1)
                         {
@@ -88,7 +88,7 @@ PlayerPage::PlayerPage()
                             prevVal = player->m_fArmour;
                         }
                     }
-                  
+
                     lastTimer = timer;
                 }
             }
@@ -457,7 +457,7 @@ void PlayerPage::Draw()
 #else
             Widget::CheckboxAddr(TEXT("Player.InfSprint"), (int)&pInfo->m_bInfiniteSprint);
 #endif
-            #ifdef GTAVC
+#ifdef GTAVC
             if (Widget::Checkbox(TEXT("Player.NoUndress"), &m_bNoUndress, TEXT("Player.NoUndressTip")))
             {
                 if (m_bNoUndress)
@@ -489,7 +489,7 @@ void PlayerPage::Draw()
                     patch::SetRaw(0x42C3B2, (void*)"\x0F\xB6\x05\xFB\x0A\xA1", 6);
                 }
             }
-#endif      
+#endif
             if (Widget::Checkbox(TEXT("Game.KeepStuff"), &m_bKeepStuff, TEXT("Game.KeepStuffText")))
             {
 #ifdef GTASA
@@ -804,8 +804,8 @@ void PlayerPage::Draw()
                 {
                     if (pPlayer->m_nModelIndex == 0)
                     {
-                        Widget::ImageList(m_ClothData, fArgWrapper(playerPage.SetCloth), 
-                        [](std::string& str)
+                        Widget::ImageList(m_ClothData, fArgWrapper(playerPage.SetCloth),
+                                          [](std::string& str)
                         {
                             std::stringstream ss(str);
                             std::string temp;
@@ -832,7 +832,7 @@ void PlayerPage::Draw()
                 if (ImGui::BeginTabItem(TEXT("Player.PedSkinsTab")))
                 {
                     Widget::ImageList(pedPage.m_PedData, fArgWrapper(playerPage.SetModel),
-                    [](std::string& str)
+                                      [](std::string& str)
                     {
                         return pedPage.m_PedData.m_pData->Get(str.c_str(), "Unknown");
                     });

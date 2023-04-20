@@ -72,7 +72,7 @@ void FreecamMgr::DrawPages()
     {
         speed *= 2;
     }
-        
+
     if (freeCamForward.PressedRealtime() || freeCamBackward.PressedRealtime())
     {
         if (freeCamBackward.PressedRealtime())

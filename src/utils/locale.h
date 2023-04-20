@@ -24,15 +24,15 @@ public:
         DIR_NOT_FOUND = 0,          // Failed to find the language directory
         NO_LOCALE_FOUND = 1,        // Failed to find language files
         INVALID_INDEX = 2,          // Invalid langauge index for GetLocaleList()
-        SUCCESS = 3,          
-        DEF_LOCALE_NOT_FOUND = 3,          
+        SUCCESS = 3,
+        DEF_LOCALE_NOT_FOUND = 3,
     };
 
     Locale() = delete;
     Locale(Locale const&) = delete;
     void operator=(Locale const&) = delete;
 
-    /* 
+    /*
         Loads json files from the locale directory
         Calling it multiple times will unload previous data
     */
