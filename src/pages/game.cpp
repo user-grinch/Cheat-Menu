@@ -234,7 +234,7 @@ void GamePage::Draw()
                 }
                 else
                 {
-                    patch::SetUChar(BY_GAME(0x460500, 0x624EC0, 0x593170), 0x80);
+                    patch::SetUChar(BY_GAME(0x460500, 0x624EC0, 0x593170), BY_GAME(0xA0, 0x80, 0x80));
                 }
             }
 
