@@ -659,6 +659,7 @@ void VehiclePage::Draw()
                 // MixSets (Link2012)
                 if (m_bVehFlipNoBurn)
                 {
+                    pVeh->ExtinguishCarFire();
                     // Patch ped vehicles damage when flipped
                     patch::SetRaw(0x6A776B, (void*)"\xD8\xDD\x00\x00\x00\x00", 6); // fstp st0, nop 4
 
