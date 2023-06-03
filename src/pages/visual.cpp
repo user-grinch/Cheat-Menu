@@ -686,7 +686,7 @@ void VisualPage::Draw()
                 Command<Commands::DISPLAY_CAR_NAMES>(!CHud::bScriptDontDisplayVehicleName);
             }
 
-            Widget::CheckboxAddrRaw(TEXT("Visual.HideWantedLevel"), 0x58DD1B, 1, "\x90", "\x01");
+            Widget::CheckboxAddrRaw(TEXT("Visual.HideWantedLevel"), 0x58DD1B, 1, "\x90", "\x7E");
             Widget::CheckboxAddr(TEXT("Visual.InfraredVision"), 0xC402B9);
             if (Widget::Checkbox(TEXT("Visual.InvisibleWater"), &m_bInvisibleWater))
             {
