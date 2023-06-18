@@ -149,7 +149,7 @@ std::string Locale::GetText(std::string&& key, std::string&& defaultValue)
     {
         defaultValue = "#" + key;
     }
-
+    
     std::string rtn = m_pData->Get(key.c_str(), defaultValue);
 
     if (rtn == defaultValue)

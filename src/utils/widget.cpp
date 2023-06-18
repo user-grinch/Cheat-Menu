@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "widget.h"
 #include "pages/menu.h"
+#include "savemgr.h"
 
 static struct
 {
@@ -621,6 +622,9 @@ bool Widget::CheckboxAddr(const char* label, uint addr, const char* hint)
     {
         patch::Set<bool>(addr, state);
         rtn = true;
+
+        SaveMgr::SaveData(label, addr, state ? SaveMgr::eCheatState::Enabled 
+            : SaveMgr::eCheatState::Disabled, 1, 0);
     }
 
     return rtn;

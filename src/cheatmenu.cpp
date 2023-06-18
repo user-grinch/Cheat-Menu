@@ -8,6 +8,7 @@
 #include "interface/ipage.h"
 #include "pages/teleport.h"
 #include "pages/menu.h"
+#include "utils/savemgr.h"
 
 static bool DrawTitleBar()
 {
@@ -262,6 +263,17 @@ CheatMenuMgr::CheatMenuMgr()
             {
                 D3dHook::SetMouseState(true);
             }
+        }
+    };
+
+    Events::drawRadarEvent += [] {
+
+        static bool t = false;
+
+        if (!t)
+        {
+            SaveMgr::InitAndLoad();
+            t = true;
         }
     };
 }

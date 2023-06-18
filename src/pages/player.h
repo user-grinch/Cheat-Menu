@@ -40,8 +40,6 @@ private:
 public:
 
     void Draw();
-    void ImportSaveData();
-    void ExportSaveData();
 };
 
 extern PlayerPage &playerPage;
