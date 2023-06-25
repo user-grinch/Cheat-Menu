@@ -8,7 +8,7 @@
 #define OutputDir "."
 
 #define CheatMenu = "https://github.com/user-grinch/Cheat-Menu/releases/download/"
-#define UAL32 = "https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases/download/Win32-latest"
+#define UAL32 = "https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases/tag/Win32-latest"
 #define D3D8to9Wrapper = "https://github.com/user-grinch/ImGuiRedux/releases/download/Win64-latest/d3d8.zip"
 #define SilentPatchIII = "https://silent.rockstarvision.com/uploads/SilentPatchIII.zip"
 #define SilentPatchVC = "https://silent.rockstarvision.com/uploads/SilentPatchVC.zip"
@@ -74,6 +74,9 @@ Source: "{tmp}\dinput8.zip"; DestDir: "{app}"; Flags: deleteafterinstall externa
 [Run]
 Filename: "{tmp}\redist.exe"; StatusMsg: "Installing Visual C++ Redistributable 2022 x86"; Check: WizardIsComponentSelected('plugins/redist'); Parameters: "/quiet"; Flags: waituntilterminated
 Filename: "{tmp}\dx9.exe"; StatusMsg: "Installing DirectX End-User Runtime"; Check: WizardIsComponentSelected('plugins/dx9'); Flags: waituntilterminated
+
+[InstallDelete]
+Name: "{app}\Scripts\Globals.ini"; Type: files
 
 [Code]
 const
@@ -320,7 +323,7 @@ begin
     if WizardIsComponentSelected('plugins/d3d8to9') then
       DownloadPage.Add('{#D3D8to9Wrapper}', 'd3d8.zip', '');
 
-    if WizardIsComponentSelected('plugins/SilentPatch') then
+    if (GameId <> UNKNOWN) and (WizardIsComponentSelected('plugins/SilentPatch')) then
     begin
       if GameId = GTA_III then
         DownloadPage.Add('{#SilentPatchIII}', 'SilentPatch.zip', '');
