@@ -613,23 +613,6 @@ bool Widget::Checkbox(const char* label, bool* v, const char* hint, bool is_disa
     return pressed;
 }
 
-bool Widget::CheckboxAddr(const char* label, uint addr, const char* hint)
-{
-    bool rtn = false;
-    bool state = patch::Get<bool>(addr);
-
-    if (Checkbox(label, &state, hint) && addr != NULL)
-    {
-        patch::Set<bool>(addr, state);
-        rtn = true;
-
-        SaveMgr::SaveData(label, addr, state ? SaveMgr::eCheatState::Enabled 
-            : SaveMgr::eCheatState::Disabled, 1, 0);
-    }
-
-    return rtn;
-}
-
 bool Widget::CheckboxAddrRaw(const char* label, uint addr, size_t size, const char* enabled, const char* disabled, const char* hint)
 {
     bool rtn = false;
@@ -643,12 +626,12 @@ bool Widget::CheckboxAddrRaw(const char* label, uint addr, size_t size, const ch
         if (state)
         {
             patch::SetRaw(addr, const_cast<char*>(enabled), size);
-            // SaveMgr::SaveData(label, addr, SaveMgr::eCheatState::Enabled, enabled, disabled);
+            SaveMgr::SaveData(label, addr, SaveMgr::eCheatState::Enabled, enabled, disabled);
         }
         else
         {
             patch::SetRaw(addr, const_cast<char*>(disabled), size);
-            // SaveMgr::SaveData(label, addr, SaveMgr::eCheatState::Disabled, 0, 0);
+            SaveMgr::SaveData(label, addr, SaveMgr::eCheatState::Disabled, 0, 0);
         }
         rtn = true;
     }

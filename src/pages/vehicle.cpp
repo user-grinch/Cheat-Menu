@@ -528,19 +528,19 @@ void VehiclePage::Draw()
             ImGui::BeginChild("CheckboxesChild");
             ImGui::Columns(2, 0, false);
 #ifdef GTASA
-            Widget::CheckboxAddr(TEXT("Vehicle.AimDrive"), 0x969179);
-            Widget::CheckboxAddr(TEXT("Vehicle.AllNitro"), 0x969165);
+            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.AimDrive"), 0x969179);
+            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.AllNitro"), 0x969165);
 #endif
 
             Widget::Checkbox(TEXT("Vehicle.AutoUnflip"), &m_bAutoUnflip);
 
 #ifndef GTA3
-            Widget::CheckboxAddr(TEXT("Vehicle.AggroDriver"), BY_GAME(0x96914F,0xA10B47, NULL));
-            Widget::CheckboxAddr(TEXT("Vehicle.AllTaxiNitro"), BY_GAME(0x96918B,0xA10B3A, NULL));
+            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.AggroDriver"), BY_GAME(0x96914F,0xA10B47, NULL));
+            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.AllTaxiNitro"), BY_GAME(0x96918B,0xA10B3A, NULL));
             Widget::Checkbox(TEXT("Vehicle.BikeFly"), &m_bBikeFly);
-            Widget::CheckboxAddr(TEXT("Vehicle.BoatFly"), BY_GAME(0x969153, 0xA10B11, NULL));
+            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.BoatFly"), BY_GAME(0x969153, 0xA10B11, NULL));
 #endif
-            Widget::CheckboxAddr(TEXT("Vehicle.CarFly"), BY_GAME(0x969160, 0xA10B28, 0x95CD75));
+            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.CarFly"), BY_GAME(0x969160, 0xA10B28, 0x95CD75));
             Widget::Checkbox(TEXT("Vehicle.CarHeavy"), &m_bVehHeavy);
             if (Widget::Checkbox(TEXT("Vehicle.DmgProof"), &m_bNoDamage, TEXT("Vehicle.DmgProofTip")))
             {
@@ -579,8 +579,8 @@ void VehiclePage::Draw()
                 }
             }
 #ifdef GTASA
-            Widget::CheckboxAddrRaw(TEXT("Vehicle.LockTrainCam"), 0x52A52F, 1, "\xAB", "\x06");
-            Widget::CheckboxAddr(TEXT("Vehicle.LessTraffic"), 0x96917A);
+            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.LockTrainCam"), 0x52A52F, " ", 0xAB, 0x6);
+            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.LessTraffic"), 0x96917A);
             if (Widget::Checkbox(TEXT("Vehicle.NoDerail"), &m_bNoDerail))
             {
                 if (m_bNoDerail)
@@ -641,17 +641,17 @@ void VehiclePage::Draw()
 #endif
                 }
             }
-            Widget::CheckboxAddr(TEXT("Vehicle.DriveWater"), BY_GAME(0x969152, 0xA10B81, NULL));
+            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.DriveWater"), BY_GAME(0x969152, 0xA10B81, NULL));
 #endif
 #ifdef GTASA
-            Widget::CheckboxAddr(TEXT("Vehicle.FloatOnHit"), 0x969166);
+            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.FloatOnHit"), 0x969166);
 #endif
 #ifndef GTA3
-            Widget::CheckboxAddr(TEXT("Vehicle.GreenLights"), BY_GAME(0x96914E, 0xA10ADC, NULL));
+            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.GreenLights"), BY_GAME(0x96914E, 0xA10ADC, NULL));
 #endif
 #ifdef GTASA
-            Widget::CheckboxAddr(TEXT("Vehicle.PerfectHandling"), 0x96914C);
-            Widget::CheckboxAddr(TEXT("Vehicle.TankMode"), 0x969164);
+            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.PerfectHandling"), 0x96914C);
+            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.TankMode"), 0x969164);
 
             Widget::Checkbox(TEXT("Vehicle.InfNitro"), &VehCustmzr.m_Nitro.m_bEnabled, TEXT("Vehicle.InfNitroTip"));
             if (Widget::Checkbox(TEXT("Vehicle.FlipNoBurn"), &m_bVehFlipNoBurn, TEXT("Vehicle.FlipNoBurnTip")))
@@ -675,10 +675,10 @@ void VehiclePage::Draw()
             }
 
 #elif GTA3
-            Widget::CheckboxAddr(TEXT("Vehicle.PerfectHandling"), 0x95CD66);
+            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.PerfectHandling"), 0x95CD66);
 #endif
             Widget::Checkbox(TEXT("Vehicle.Watertight"), &m_bVehWatertight, TEXT("Vehicle.WatertightTip"));
-            Widget::CheckboxAddr(TEXT("Vehicle.OnlyWheels"), BY_GAME(0x96914B, 0xA10B70, 0x95CD78));
+            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.OnlyWheels"), BY_GAME(0x96914B, 0xA10B70, 0x95CD78));
             ImGui::Columns(1);
 
             if (is_driver)

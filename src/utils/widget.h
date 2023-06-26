@@ -29,7 +29,9 @@ public:
                          bool is_disabled = false);
 
     // Checkbox for bool memory address
-    static bool CheckboxAddr(const char* label, uint addr, const char* hint = nullptr);
+    template <typename T>
+    static bool CheckboxAddr(const char* label, uint addr, const char* hint = nullptr,
+                                T enabled = 1, T disabled = 0);
 
     // Checkbox with raw memory input
     static bool CheckboxAddrRaw(const char* label, uint addr, uint size, const char* enabled,
@@ -85,6 +87,23 @@ public:
     // Displays a popup with helpful text
     static void Tooltip(const char* text);
 };
+
+template <typename T>
+bool Widget::CheckboxAddr(const char* label, uint addr, const char* hint, T enabled, T disabled)
+{
+    bool rtn = false;
+    bool state = patch::Get<T>(addr) == enabled;
+
+    if (Checkbox(label, &state, hint))
+    {
+        patch::Set<T>(addr, state ? enabled : disabled);
+        SaveMgr::SaveData(label, addr, state ? SaveMgr::eCheatState::Enabled 
+            : SaveMgr::eCheatState::Disabled, enabled, disabled);
+        rtn = true;
+    }
+
+    return rtn;
+}
 
 template <typename T>
 void Widget::EditAddr(const char* label, uint address, int min, int def, int max)

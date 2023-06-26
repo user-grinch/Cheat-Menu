@@ -325,7 +325,7 @@ void WeaponPage::Draw()
             }
 
 #ifdef GTASA
-            Widget::CheckboxAddr(TEXT("Weapon.InfiniteAmmo"), 0x969178);
+            Widget::CheckboxAddr<int8_t>(TEXT("Weapon.InfiniteAmmo"), 0x969178);
             ImGui::NextColumn();
 #else
             ImGui::NextColumn();

@@ -362,7 +362,7 @@ void PlayerPage::Draw()
             ImGui::Columns(2, 0, false);
 
 #ifdef GTASA
-            Widget::CheckboxAddr(TEXT("Player.BountyYourself"), 0x96913F);
+            Widget::CheckboxAddr<int8_t>(TEXT("Player.BountyYourself"), 0x96913F);
 
             ImGui::BeginDisabled(TopDownCam.GetState());
             if (Widget::Checkbox(TEXT("Player.DrunkEffect"), &m_bDrunkEffect))
@@ -378,7 +378,7 @@ void PlayerPage::Draw()
             }
             ImGui::EndDisabled();
 #endif
-            Widget::CheckboxAddr(TEXT("Player.FreeHealthcare"), (int)&pInfo->m_bGetOutOfHospitalFree);
+            Widget::CheckboxAddr<int8_t>(TEXT("Player.FreeHealthcare"), (int)&pInfo->m_bGetOutOfHospitalFree);
 
             if (Widget::Checkbox(TEXT("Player.FreezeWL"), &m_bFreezeWantedLevel))
             {
@@ -447,15 +447,15 @@ void PlayerPage::Draw()
 #endif
             }
 #ifdef GTASA
-            Widget::CheckboxAddr(TEXT("Player.CycleJump"), 0x969161);
-            Widget::CheckboxAddr(TEXT("Player.InfO2"), 0x96916E);
+            Widget::CheckboxAddr<int8_t>(TEXT("Player.CycleJump"), 0x969161);
+            Widget::CheckboxAddr<int8_t>(TEXT("Player.InfO2"), 0x96916E);
             if (Widget::CheckboxBits(TEXT("Player.InvisPlayer"), pPlayer->m_nPedFlags.bDontRender))
             {
                 pPlayer->m_nPedFlags.bDontRender = !pPlayer->m_nPedFlags.bDontRender;
             }
-            Widget::CheckboxAddr(TEXT("Player.InfSprint"), 0xB7CEE4);
+            Widget::CheckboxAddr<int8_t>(TEXT("Player.InfSprint"), 0xB7CEE4);
 #else
-            Widget::CheckboxAddr(TEXT("Player.InfSprint"), (int)&pInfo->m_bInfiniteSprint);
+            Widget::CheckboxAddr<int8_t>(TEXT("Player.InfSprint"), (int)&pInfo->m_bInfiniteSprint);
 #endif
 #ifdef GTAVC
             if (Widget::Checkbox(TEXT("Player.NoUndress"), &m_bNoUndress, TEXT("Player.NoUndressTip")))
@@ -530,10 +530,10 @@ void PlayerPage::Draw()
             {
                 pad->bPlayerSafe = !pad->bPlayerSafe;
             }
-            Widget::CheckboxAddrRaw(TEXT("Player.MaxAppeal"), 0x969180, 1, "\x01", "\x00");
-            Widget::CheckboxAddr(TEXT("Player.MegaJump"), 0x96916C);
-            Widget::CheckboxAddr(TEXT("Player.MegaPunch"), 0x969173);
-            Widget::CheckboxAddr(TEXT("Player.NeverGetHungry"), 0x969174);
+            Widget::CheckboxAddr<int8_t>(TEXT("Player.MaxAppeal"), 0x969180, "",  0x1, 0x0);
+            Widget::CheckboxAddr<int8_t>(TEXT("Player.MegaJump"), 0x96916C);
+            Widget::CheckboxAddr<int8_t>(TEXT("Player.MegaPunch"), 0x969173);
+            Widget::CheckboxAddr<int8_t>(TEXT("Player.NeverGetHungry"), 0x969174);
 
             bool never_wanted = patch::Get<bool>(0x969171, false);
             if (Widget::Checkbox(TEXT("Player.NeverWanted"), &never_wanted))
@@ -570,7 +570,7 @@ void PlayerPage::Draw()
                 }
             }
 #endif
-            Widget::CheckboxAddr(TEXT("Player.NoFee"), (int)&pInfo->m_bGetOutOfJailFree);
+            Widget::CheckboxAddr<int8_t>(TEXT("Player.NoFee"), (int)&pInfo->m_bGetOutOfJailFree);
 
             Widget::Checkbox(TEXT("Player.RespawnDieLoc"), &m_RespawnDieLoc.m_bEnabled, TEXT("Player.RespawnDieLocTip"));
             Widget::Checkbox(TEXT("Player.PlayerRegen"), &m_bPlayerRegen, TEXT("Player.PlayerRegenTip"));

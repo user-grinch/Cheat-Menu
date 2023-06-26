@@ -263,24 +263,24 @@ void PedPage::Draw()
             Widget::Checkbox(TEXT("Ped.BigHead"), &m_bBigHead);
 #endif
 #ifdef GTASA
-            Widget::CheckboxAddr(TEXT("Ped.ElvisEverywhere"), 0x969157);
-            Widget::CheckboxAddr(TEXT("Ped.EveryoneArmed"), 0x969140);
-            Widget::CheckboxAddr(TEXT("Ped.GangsControl"), 0x96915B);
-            Widget::CheckboxAddr(TEXT("Ped.GangsEverywhere"), 0x96915A);
+            Widget::CheckboxAddr<int8_t>(TEXT("Ped.ElvisEverywhere"), 0x969157);
+            Widget::CheckboxAddr<int8_t>(TEXT("Ped.EveryoneArmed"), 0x969140);
+            Widget::CheckboxAddr<int8_t>(TEXT("Ped.GangsControl"), 0x96915B);
+            Widget::CheckboxAddr<int8_t>(TEXT("Ped.GangsEverywhere"), 0x96915A);
             Widget::Checkbox(TEXT("Ped.GangWars"), &CGangWars::bGangWarsActive);
 
             ImGui::NextColumn();
 
-            Widget::CheckboxAddr(TEXT("Ped.PedsMayhem"), 0x96913E);
-            Widget::CheckboxAddr(TEXT("Ped.PedsAtkRocket"), 0x969158);
-            Widget::CheckboxAddr(TEXT("Ped.PedsRiot"), 0x969175);
-            Widget::CheckboxAddr(TEXT("Ped.SlutMagnet"), 0x96915D);
+            Widget::CheckboxAddr<int8_t>(TEXT("Ped.PedsMayhem"), 0x96913E);
+            Widget::CheckboxAddr<int8_t>(TEXT("Ped.PedsAtkRocket"), 0x969158);
+            Widget::CheckboxAddr<int8_t>(TEXT("Ped.PedsRiot"), 0x969175);
+            Widget::CheckboxAddr<int8_t>(TEXT("Ped.SlutMagnet"), 0x96915D);
             Widget::Checkbox(TEXT("Ped.ThinBody"), &m_bThinBody);
 #elif GTAVC
-            Widget::CheckboxAddr(TEXT("Ped.NoProstitutes"), 0xA10B99);
-            Widget::CheckboxAddr(TEXT("Ped.SlutMagnet"), 0xA10B5F);
+            Widget::CheckboxAddr<int8_t>(TEXT("Ped.NoProstitutes"), 0xA10B99);
+            Widget::CheckboxAddr<int8_t>(TEXT("Ped.SlutMagnet"), 0xA10B5F);
             ImGui::NextColumn();
-            Widget::CheckboxAddr(TEXT("Ped.WeaponAll"), 0xA10AB3);
+            Widget::CheckboxAddr<int8_t>(TEXT("Ped.WeaponAll"), 0xA10AB3);
 #else
             // Bad idea lol
             static bool pedsMayhem;
@@ -294,8 +294,8 @@ void PedPage::Draw()
                 Call<0x491270>();
             }
             ImGui::NextColumn();
-            Widget::CheckboxAddr(TEXT("Ped.NastyLimbs"), 0x95CD44);
-            Widget::CheckboxAddr(TEXT("Ped.WeaponAll"), 0x95CCF6);
+            Widget::CheckboxAddr<int8_t>(TEXT("Ped.NastyLimbs"), 0x95CD44);
+            Widget::CheckboxAddr<int8_t>(TEXT("Ped.WeaponAll"), 0x95CCF6);
 #endif
             ImGui::Columns(1);
             ImGui::EndChild();

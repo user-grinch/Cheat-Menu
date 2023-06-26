@@ -238,20 +238,20 @@ void GamePage::Draw()
                 }
             }
 
-            Widget::CheckboxAddr(TEXT("Game.FasterClock"), BY_GAME(0x96913B, 0xA10B87, 0x95CDBB));
+            Widget::CheckboxAddr<int8_t>(TEXT("Game.FasterClock"), BY_GAME(0x96913B, 0xA10B87, 0x95CDBB));
 #ifdef GTASA
             if (Widget::Checkbox(TEXT("Game.ForbiddenWantedLevel"), &m_bForbiddenArea, TEXT("Game.ForbiddenWantedLevelText")))
             {
                 patch::Set<BYTE>(0x441770, m_bForbiddenArea ? 0x83 : 0xC3);
             }
-            Widget::CheckboxAddr(TEXT("Game.FreePNS"), 0x96C009);
+            Widget::CheckboxAddr<int8_t>(TEXT("Game.FreePNS"), 0x96C009);
 #endif
 
 #ifdef GTAVC
             ImGui::NextColumn();
 #endif
 #ifdef GTASA
-            Widget::CheckboxAddr(TEXT("Game.FreezeGame"), 0xA10B48);
+            Widget::CheckboxAddr<int8_t>(TEXT("Game.FreezeGame"), 0xA10B48);
 #endif
             if (ImGui::Checkbox(TEXT("Game.FreezeGameTime"), &m_bFreezeTime))
             {
