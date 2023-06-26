@@ -775,6 +775,7 @@ void GamePage::Draw()
             {
                 for (size_t i = 69; i != 80; ++i)
                 {
+                    gConfig.Set(std::format("Stats.{}", i).c_str(), 1000);
                     CStats::SetStatValue((unsigned short)i, 1000);
                 }
                 CHud::GetRidOfAllHudMessages(true);
@@ -784,9 +785,13 @@ void GamePage::Draw()
             if (ImGui::Button(TEXT("Game.MaxVehSkills"), Widget::CalcSize(2)))
             {
                 CStats::SetStatValue(160, 1000);
+                gConfig.Set("Stats.160", 1000);
                 CStats::SetStatValue(223, 1000);
+                gConfig.Set("Stats.223", 1000);
                 CStats::SetStatValue(229, 1000);
+                gConfig.Set("Stats.229", 1000);
                 CStats::SetStatValue(230, 1000);
+                gConfig.Set("Stats.230", 1000);
                 CHud::GetRidOfAllHudMessages(true);
                 Util::SetMessage(TEXT("Game.MaxVehSkillsText"));
             }

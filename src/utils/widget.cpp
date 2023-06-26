@@ -827,7 +827,7 @@ void Widget::EditStat(const char* label, const int stat_id, const int min, const
     if (ImGui::CollapsingHeader(label))
     {
         int val = static_cast<int>(CStats::GetStatValue(stat_id));
-
+        bool val_updated = false;
         ImGui::Columns(3, nullptr, false);
         ImGui::Text("Min: %d", min);
         ImGui::NextColumn();
@@ -840,28 +840,38 @@ void Widget::EditStat(const char* label, const int stat_id, const int min, const
 
         if (ImGui::InputInt(("Set value##" + std::string(label)).c_str(), &val))
         {
-            CStats::SetStatValue(stat_id, static_cast<float>(val));
+            val_updated =  true;
         }
 
         ImGui::Spacing();
 
         if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), CalcSize(3)))
         {
-            CStats::SetStatValue(stat_id, static_cast<float>(min));
+            val_updated =  true;
+            val = min;
         }
 
         ImGui::SameLine();
 
         if (ImGui::Button(("Default##" + std::string(label)).c_str(), CalcSize(3)))
         {
-            CStats::SetStatValue(stat_id, static_cast<float>(def));
+            val_updated =  true;
+            val = def;
         }
 
         ImGui::SameLine();
 
         if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), CalcSize(3)))
         {
-            CStats::SetStatValue(stat_id, static_cast<float>(max));
+            val_updated =  true;
+            val = max;
+        }
+
+        if (val_updated)
+        {
+            float fval = static_cast<float>(val);
+            CStats::SetStatValue(stat_id, fval);
+            gConfig.Set(std::format("Stats.{}", stat_id).c_str(), val);
         }
 
         ImGui::Spacing();
@@ -932,6 +942,7 @@ void Widget::EditRadioBtnAddr(const char* label, std::vector<BindInfo>& addrInfo
             {
                 patch::Set<bool>(addrInfo[i].val, false);
             }
+            SaveMgr::SaveData(label, 0, SaveMgr::eCheatState::Disabled, true, false);
         }
 
         for (size_t i = 0; i < addrInfo.size(); i++)
@@ -946,6 +957,7 @@ void Widget::EditRadioBtnAddr(const char* label, std::vector<BindInfo>& addrInfo
                 }
 
                 patch::Set<bool>(addrInfo[i].val, true);
+                SaveMgr::SaveData(label, addrInfo[i].val, SaveMgr::eCheatState::Enabled, true, false);
             }
 
             if (i == btnsInColumn)
@@ -965,15 +977,15 @@ void Widget::EditRadioBtnAddr(const char* label, uint addr, std::vector<BindInfo
     {
         size_t btnsInColumn = valInfo.size() / 2;
         ImGui::Columns(2, nullptr, false);
-
-        int mem_val = 0;
-        patch::GetRaw(addr, &mem_val, 1, false);
+        int mem_val = patch::Get<int8_t>(addr);
 
         for (size_t i = 0; i < valInfo.size(); i++)
         {
             if (ImGui::RadioButton(valInfo[i].name.c_str(), &mem_val, valInfo[i].val))
             {
-                patch::SetRaw(addr, &valInfo[i].val, 1, false);
+                patch::Set<int8_t>(addr, valInfo[i].val);
+                SaveMgr::SaveData(label, static_cast<int>(addr), SaveMgr::eCheatState::Enabled, 
+                    static_cast<int8_t>(valInfo[i].val), static_cast<int8_t>(0));
             }
 
             if (i == btnsInColumn)
