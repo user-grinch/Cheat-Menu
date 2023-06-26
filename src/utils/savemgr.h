@@ -1,7 +1,7 @@
 #pragma once
 #include "string"
 #include "datastore.h"
-#include <../injector/injector.hpp>
+#include <Patch.h>
 #include <type_traits>
 
 extern DataStore gConfig;
@@ -17,8 +17,8 @@ public:
     // Defines the possible states of a cheat
     enum class eCheatState 
     {
-        Enabled,
         Disabled,
+        Enabled,
         Unknown
     };
 
@@ -44,9 +44,9 @@ public:
             {
                 int addr = v.as_table()->at_path("Address").value_or<int>(0);
                 eAddrType type = static_cast<eAddrType>(v.as_table()->at_path("Type").value_or<int>(0));
-                eCheatState state = static_cast<eCheatState>(v.as_table()->at_path("State").value_or<int>(0));
+                eCheatState state = v.as_table()->at_path("State").value_or<int>(0) == 1 ? eCheatState::Enabled : eCheatState::Disabled;
 
-                if (state != eCheatState::Enabled)
+                if (addr == 0 || state != eCheatState::Enabled)
                 {
                     continue;
                 }
@@ -56,6 +56,25 @@ public:
                     case eAddrType::Bool:
                     {
                         injector::WriteMemory<bool>(addr, state == eCheatState::Enabled, true);
+                        break;
+                    }
+                    case eAddrType::Int:
+                    {
+                        int val = v.as_table()->at_path("Enabled").value_or<int>(0);
+                        plugin::patch::SetInt(addr, val);  
+                        break;
+                    }
+                    case eAddrType::Float:
+                    {
+                        float val = v.as_table()->at_path("Enabled").value_or<float>(0.0f);
+                        plugin::patch::SetFloat(addr, val);
+                        break;
+                    }
+                    case eAddrType::String:
+                    {
+                        std::string val = v.as_table()->at_path("Enabled").value_or<std::string>("0");
+                        patch::SetRaw(addr, const_cast<char*>(val.c_str()), val.size()-1);
+                        break;
                     }
                     default:
                     {
@@ -67,7 +86,7 @@ public:
     }
 
     template<typename T>
-    static void SaveData(std::string&& key, int addr, eCheatState state, T&& enabled, T&& disabled)
+    static void SaveData(std::string&& key, int addr, eCheatState state, T enabled, T disabled)
     {
         eAddrType type = eAddrType::Unknown;
 
@@ -75,7 +94,7 @@ public:
         if (std::is_same<short, T>::value) type = eAddrType::Short;
         if (std::is_same<int, T>::value) type = eAddrType::Int;
         if (std::is_same<float, T>::value) type = eAddrType::Float;
-        if (std::is_same<std::string, T>::value) type = eAddrType::String;
+        if (std::is_same<const char*, T>::value) type = eAddrType::String;
 
         gConfig.Set(std::string(key + ".Address").c_str(), addr);
         gConfig.Set(std::string(key + ".Type").c_str(), static_cast<int>(type));

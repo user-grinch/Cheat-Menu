@@ -10,6 +10,8 @@
 #include "pages/menu.h"
 #include "utils/savemgr.h"
 
+static bool gameStartFlag = true;
+
 static bool DrawTitleBar()
 {
     bool hovered, held;
@@ -234,8 +236,21 @@ CheatMenuMgr::CheatMenuMgr()
         ApplyStyle();
     };
 
+
+    Events::initScriptsEvent.before += [this]() 
+    {
+        gameStartFlag = true;
+    };
+
     Events::processScriptsEvent += [this]()
     {
+        // run this once every new game/ load game
+        if (gameStartFlag)
+        {
+            SaveMgr::InitAndLoad();
+            gameStartFlag = false;
+        }
+
         if (!FrontEndMenuManager.m_bMenuActive)
         {
             if (menuOpen.Pressed())
@@ -263,17 +278,6 @@ CheatMenuMgr::CheatMenuMgr()
             {
                 D3dHook::SetMouseState(true);
             }
-        }
-    };
-
-    Events::drawRadarEvent += [] {
-
-        static bool t = false;
-
-        if (!t)
-        {
-            SaveMgr::InitAndLoad();
-            t = true;
         }
     };
 }

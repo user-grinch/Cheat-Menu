@@ -1,5 +1,6 @@
 #pragma once
 #include "pch.h"
+#include "savemgr.h"
 
 /*
     Widgets Class
@@ -125,14 +126,16 @@ void Widget::EditAddr(const char* label, uint address, int min, int def, int max
             {
                 val = max;
             }
-            patch::Set<T>(address, val, false);
+            patch::Set<T>(address, val);
+            SaveMgr::SaveData<T>(label, address, SaveMgr::eCheatState::Enabled, static_cast<T>(val), 0);
         }
 
         ImGui::Spacing();
 
         if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), CalcSize(items)))
         {
-            patch::Set<T>(address, min, false);
+            patch::Set<T>(address, min);
+            SaveMgr::SaveData<T>(label, address, SaveMgr::eCheatState::Enabled, static_cast<T>(min), 0);
         }
 
         if (items == 3)
@@ -141,7 +144,8 @@ void Widget::EditAddr(const char* label, uint address, int min, int def, int max
 
             if (ImGui::Button(("Default##" + std::string(label)).c_str(), CalcSize(3)))
             {
-                patch::Set<T>(address, def, false);
+                patch::Set<T>(address, def);
+                SaveMgr::SaveData<T>(label, address, SaveMgr::eCheatState::Disabled, static_cast<T>(def), 0);
             }
         }
 
@@ -149,7 +153,8 @@ void Widget::EditAddr(const char* label, uint address, int min, int def, int max
 
         if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), CalcSize(items)))
         {
-            patch::Set<T>(address, max, false);
+            patch::Set<T>(address, max);
+            SaveMgr::SaveData<T>(label, address, SaveMgr::eCheatState::Enabled, static_cast<T>(max), 0);
         }
 
         ImGui::Spacing();

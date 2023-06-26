@@ -643,10 +643,12 @@ bool Widget::CheckboxAddrRaw(const char* label, uint addr, size_t size, const ch
         if (state)
         {
             patch::SetRaw(addr, const_cast<char*>(enabled), size);
+            // SaveMgr::SaveData(label, addr, SaveMgr::eCheatState::Enabled, enabled, disabled);
         }
         else
         {
             patch::SetRaw(addr, const_cast<char*>(disabled), size);
+            // SaveMgr::SaveData(label, addr, SaveMgr::eCheatState::Disabled, 0, 0);
         }
         rtn = true;
     }
@@ -754,12 +756,14 @@ void Widget::EditAddr(const char* label, uint address, float min, float def, flo
         if (InputFloat(std::format("Set##{}", label).c_str(), &val, change, min, max))
         {
             patch::SetFloat(address, val / mul);
+            SaveMgr::SaveData(label, address, SaveMgr::eCheatState::Enabled, min / mul, 0.0f);
         }
         ImGui::Spacing();
 
         if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), CalcSize(items)))
         {
             patch::Set<float>(address, min / mul);
+            SaveMgr::SaveData(label, address, SaveMgr::eCheatState::Enabled, min / mul, 0.0f);
         }
 
         if (items == 3)
@@ -769,6 +773,7 @@ void Widget::EditAddr(const char* label, uint address, float min, float def, flo
             if (ImGui::Button(("Default##" + std::string(label)).c_str(), CalcSize(items)))
             {
                 patch::Set<float>(address, def / mul);
+                SaveMgr::SaveData(label, 0.0f, SaveMgr::eCheatState::Disabled, 0.0f, 0.0f);
             }
         }
 
@@ -777,6 +782,7 @@ void Widget::EditAddr(const char* label, uint address, float min, float def, flo
         if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), CalcSize(items)))
         {
             patch::Set<float>(address, max / mul);
+            SaveMgr::SaveData(label, address, SaveMgr::eCheatState::Enabled, max / mul, 0.0f);
         }
 
         ImGui::Spacing();
