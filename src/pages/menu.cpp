@@ -363,6 +363,12 @@ void MenuPage::Draw()
 
                     ImGui::TableNextRow();
                     ImGui::TableNextColumn();
+                    ImGui::Text("cmdwtf");
+                    ImGui::TableNextColumn();
+                    ImGui::Text("ImGui toggles");
+
+                    ImGui::TableNextRow();
+                    ImGui::TableNextColumn();
                     ImGui::Text("Junior-Djjr");
                     ImGui::TableNextColumn();
                     ImGui::Text("Code & suggestions");

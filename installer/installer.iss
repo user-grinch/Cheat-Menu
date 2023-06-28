@@ -8,7 +8,7 @@
 #define OutputDir "."
 
 #define CheatMenu = "https://github.com/user-grinch/Cheat-Menu/releases/download/"
-#define UAL32 = "https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases/tag/Win32-latest"
+#define UAL32 = "https://github.com/ThirteenAG/Ultimate-ASI-Loader/releases/download/Win32-latest"
 #define D3D8to9Wrapper = "https://github.com/user-grinch/ImGuiRedux/releases/download/Win64-latest/d3d8.zip"
 #define SilentPatchIII = "https://silent.rockstarvision.com/uploads/SilentPatchIII.zip"
 #define SilentPatchVC = "https://silent.rockstarvision.com/uploads/SilentPatchVC.zip"
