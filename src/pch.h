@@ -53,6 +53,7 @@
 
 #include "fla/IDaccess.h"
 #include "imgui/imgui.h"
+#include"fonts.hpp"
 
 #include "defines.h"
 #include "utils/log.h"

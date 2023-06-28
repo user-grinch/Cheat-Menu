@@ -13,7 +13,7 @@
 
 VehiclePage& vehiclePage = VehiclePage::Get();
 VehiclePage::VehiclePage()
-    : IPage<VehiclePage>(ePageID::Vehicle, "Window.VehiclePage", true)
+    : IPage<VehiclePage>(ePageID::Vehicle, ICON_FA_CAR, true)
 {
     // Get config data
     Events::initGameEvent += [this]()
@@ -524,8 +524,8 @@ void VehiclePage::Draw()
 
         if (ImGui::BeginTabItem(TEXT("Window.CheckboxTab")))
         {
-            ImGui::Spacing();
             ImGui::BeginChild("CheckboxesChild");
+            ImGui::Spacing();
             ImGui::Columns(2, 0, false);
 #ifdef GTASA
             Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.AimDrive"), 0x969179);
@@ -685,8 +685,7 @@ void VehiclePage::Draw()
             {
                 ImGui::NewLine();
                 ImGui::SeparatorText(TEXT("Vehicle.ForCurVeh"));
-                ImGui::NewLine();
-
+                ImGui::Spacing();
                 ImGui::Columns(2, 0, false);
 
                 bool state = false;

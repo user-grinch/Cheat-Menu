@@ -7,7 +7,7 @@
 
 WeaponPage& weaponPage = WeaponPage::Get();
 WeaponPage::WeaponPage()
-    : IPage<WeaponPage>(ePageID::Weapon, "Window.WeaponPage", true)
+    : IPage<WeaponPage>(ePageID::Weapon, ICON_FA_HAMMER, true)
 {
     Events::processScriptsEvent += [this]
     {
@@ -295,12 +295,12 @@ void WeaponPage::Draw()
     {
         if (ImGui::BeginTabItem(TEXT("Window.CheckboxTab")))
         {
-            ImGui::Spacing();
             ImGui::BeginChild("CheckboxesChild");
             ImGui::Spacing();
+            ImGui::Spacing();
             ImGui::SameLine();
-            ImGui::Text(TEXT("Window.Info"));
-            Widget::Tooltip(TEXT("Weapon.WeaponTweaksText"));
+            ImGui::Text(TEXT("Weapon.WeaponTweaksText"));
+            ImGui::Spacing();
             ImGui::Columns(2, 0, false);
 #ifdef GTASA
             Widget::Checkbox(TEXT("Weapon.FastAim"), &m_bAutoAim, TEXT("Weapon.FastAimText"));
@@ -399,8 +399,14 @@ void WeaponPage::Draw()
         if (ImGui::BeginTabItem(TEXT("Weapon.GangWeaponEditor")))
         {
             ImGui::Spacing();
-            ImGui::Combo(TEXT("Weapon.SelectGang"), &m_Gang.m_nSelected, pedPage.m_GangList);
-            ImGui::Combo(TEXT("Ped.SelectWeapon"), &m_Gang.m_nSelectedWeapon, "Weapon 1\0Weapon 2\0Weapon 3\0");
+            float width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
+            ImGui::Columns(2, NULL, false);
+            ImGui::SetNextItemWidth(width/3);
+            ImGui::Combo("##Weapon.SelectGang", &m_Gang.m_nSelected, pedPage.m_GangList);
+            ImGui::NextColumn();
+            ImGui::SetNextItemWidth(width/3);
+            ImGui::Combo("##Ped.SelectWeapon", &m_Gang.m_nSelectedWeapon, "Weapon 1\0Weapon 2\0Weapon 3\0");
+            ImGui::Columns(1);
             ImGui::Spacing();
 
             std::string key = std::to_string(m_Gang.m_WeaponList[m_Gang.m_nSelected][m_Gang.m_nSelectedWeapon]);

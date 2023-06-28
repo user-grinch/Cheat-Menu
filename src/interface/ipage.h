@@ -31,6 +31,7 @@ class PageHandler
 private:
     static inline std::vector<PagePtr> m_PageList;  // Contains list of the created pages
     static inline PagePtr m_pCurrentPage = nullptr;  // Currently visible menu page
+    static inline uint m_nPagesWithHeaders = 0; // number of pages that contain headers
 
 public:
 
@@ -38,11 +39,12 @@ public:
     PageHandler(const PageHandler&) = delete;
 
     // Process the menu pages & draw them
-    static void DrawPages();
+    static bool DrawPages();
 
     // Add a new page
-    static void AddPage(PagePtr page, size_t index);
+    static void AddPage(PagePtr page, size_t index, bool headers = true);
     static PagePtr FindPagePtr(ePageID id);
+    static uint GetPageCount();
     static void SetCurrentPage(PagePtr page);
 
 };
@@ -70,7 +72,7 @@ public:
     IPage(ePageID page, const std::string& key, bool header)
         : m_eID(page), m_NameKey(key), m_bHasHeader(header)
     {
-        PageHandler::AddPage(reinterpret_cast<PagePtr>(this), static_cast<size_t>(m_eID));
+        PageHandler::AddPage(reinterpret_cast<PagePtr>(this), static_cast<size_t>(m_eID), header);
         // ImportSaveData();
     }
 

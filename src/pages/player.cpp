@@ -31,7 +31,7 @@ static inline void PlayerModelBrokenFix()
 
 PlayerPage &playerPage = PlayerPage::Get();
 PlayerPage::PlayerPage()
-    : IPage<PlayerPage>(ePageID::Player, "Window.PlayerPage", true)
+    : IPage<PlayerPage>(ePageID::Player, ICON_FA_WALKING, true)
 {
 #ifdef GTASA
 //	Fix player model being broken after rebuild
@@ -237,7 +237,7 @@ void PlayerPage::RemoveClothesTab()
         ImGui::Spacing();
 
         ImGui::BeginChild("ClothesRemove");
-        if (ImGui::Button(TEXT("Player.RemoveAll"), ImVec2(Widget::CalcSize(2))))
+        if (ImGui::Button(TEXT("Player.RemoveAll"), ImVec2(Widget::CalcSize(3))))
         {
             CPlayerPed* player = FindPlayerPed();
             for (uint i = 0; i < 18; i++)
@@ -247,17 +247,17 @@ void PlayerPage::RemoveClothesTab()
             CClothes::RebuildPlayer(player, false);
         }
         ImGui::SameLine();
-        size_t count = 0;
+        size_t count = 1;
         for (auto [k, v] : m_ClothData.m_pData->Items())
         {
-            if (ImGui::Button(std::string(k.str()).c_str(), ImVec2(Widget::CalcSize(2))))
+            if (ImGui::Button(std::string(k.str()).c_str(), ImVec2(Widget::CalcSize(3))))
             {
                 CPlayerPed* player = FindPlayerPed();
                 player->m_pPlayerData->m_pPedClothesDesc->SetTextureAndModel(0u, 0u, std::stoi(v.value_or<std::string>("0")));
                 CClothes::RebuildPlayer(player, false);
             }
 
-            if (count % 2 != 0)
+            if (count % 3 != 0)
             {
                 ImGui::SameLine();
             }
@@ -335,7 +335,8 @@ void PlayerPage::Draw()
 #endif
     CPlayerInfo *pInfo = &CWorld::Players[CWorld::PlayerInFocus];
 
-    if (ImGui::Button(TEXT("Player.CopyCoordinates"), ImVec2(Widget::CalcSize(2))))
+    ImVec2 btn_sz = ImVec2(Widget::CalcSize(3));
+    if (ImGui::Button(TEXT("Player.CopyCoordinates"), btn_sz))
     {
         CVector pos = pPlayer->GetPosition();
         std::string text = std::to_string(pos.x) + ", " + std::to_string(pos.y) + ", " + std::to_string(pos.z);
@@ -344,7 +345,13 @@ void PlayerPage::Draw()
         Util::SetMessage(TEXT("Player.CoordCopied"));
     }
     ImGui::SameLine();
-    if (ImGui::Button(TEXT("Player.Suicide"), ImVec2(Widget::CalcSize(2))))
+    if (ImGui::Button(TEXT("Player.RefreshHealthArmour"), btn_sz))
+    {
+        pPlayer->m_fHealth = 150;
+        pPlayer->m_fArmour = 100;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button(TEXT("Player.Suicide"), btn_sz))
     {
         pPlayer->m_fHealth = 0.0;
     }
@@ -355,12 +362,14 @@ void PlayerPage::Draw()
     {
         if (ImGui::BeginTabItem(TEXT("Window.CheckboxTab")))
         {
-            ImGui::Spacing();
-
             ImGui::BeginChild("CheckboxesChild");
-
+            ImGui::Spacing();
             ImGui::Columns(2, 0, false);
-
+            
+            if (Widget::Checkbox(TEXT("Player.AimSkinChanger"), &m_bAimSkinChanger, (TEXT_S("Player.AimSkinChangerTip") + aimSkinChanger.GetNameString()).c_str()))
+            {
+                gConfig.Set("Features.AimSkinChanger", m_bAimSkinChanger);
+            }
 #ifdef GTASA
             Widget::CheckboxAddr<int8_t>(TEXT("Player.BountyYourself"), 0x96913F);
 
@@ -490,6 +499,7 @@ void PlayerPage::Draw()
                 }
             }
 #endif
+            ImGui::NextColumn();
             if (Widget::Checkbox(TEXT("Game.KeepStuff"), &m_bKeepStuff, TEXT("Game.KeepStuffText")))
             {
 #ifdef GTASA
@@ -523,8 +533,6 @@ void PlayerPage::Draw()
                 }
 #endif
             }
-            ImGui::NextColumn();
-
 #ifdef GTASA
             if (Widget::CheckboxBits(TEXT("Player.LockControl"), pad->bPlayerSafe))
             {
@@ -591,7 +599,8 @@ void PlayerPage::Draw()
             ImGui::Columns(1);
 
             ImGui::NewLine();
-            ImGui::TextWrapped(TEXT("Player.PlayerFlags"));
+            ImGui::SeparatorText(TEXT("Player.PlayerFlags"));
+            ImGui::Spacing();
 
             ImGui::Columns(2, 0, false);
 
@@ -792,12 +801,6 @@ void PlayerPage::Draw()
 #ifdef GTASA
         if (ImGui::BeginTabItem(TEXT("Player.AppearanceTab")))
         {
-            ImGui::Spacing();
-
-            if (Widget::Checkbox(TEXT("Player.AimSkinChanger"), &m_bAimSkinChanger, (TEXT_S("Player.AimSkinChangerTip") + aimSkinChanger.GetNameString()).c_str()))
-            {
-                gConfig.Set("Features.AimSkinChanger", m_bAimSkinChanger);
-            }
             if (ImGui::BeginTabBar("AppearanceTabBar"))
             {
                 if (ImGui::BeginTabItem(TEXT("Player.ClothesTab")))

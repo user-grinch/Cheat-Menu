@@ -38,13 +38,42 @@ const ImWchar* FontMgr::GetGlyphRanges()
     return &ranges[0];
 }
 
-ImFont* FontMgr::Load(const char* fontID, const char* path, float fontMul)
+const ImWchar* FontMgr::GetIconGlyphRanges()
+{
+    static const ImWchar ranges[] =
+    {
+        // FontAwesome icons
+        ICON_MIN_FA, ICON_MAX_FA,
+        0,
+    };
+    return &ranges[0];
+}
+
+ImFont* FontMgr::LoadFromFile(const char* fontID, const char* path, float fontMul)
 {
     ImGuiIO& io = ImGui::GetIO();
     size_t fontSize = static_cast<int>(screen::GetScreenHeight() / 54.85f) * fontMul;
     ImFont *pFont = io.Fonts->AddFontFromFileTTF(path, fontSize, NULL, GetGlyphRanges());
 
-    m_vecFonts.push_back({pFont, fontSize, fontMul, std::string(fontID), std::string(path)});
+    m_vecFonts.push_back({pFont, eFontType::File, fontSize, fontMul, std::string(fontID), 
+                            std::string(path), NULL});
+    io.Fonts->Build();
+    return pFont; 
+}
+
+ImFont* FontMgr::LoadFromMemory(const char* fontID, const unsigned char *func, float fontMul)
+{
+    ImGuiIO& io = ImGui::GetIO();
+    size_t fontSize = static_cast<int>(screen::GetScreenHeight() / 54.85f) * fontMul;
+    
+    ImFontConfig config;
+    config.MergeMode = false;
+    config.GlyphMinAdvanceX = 13.0f; // Use if you want to make the icon monospaced
+    ImFont *pFont = io.Fonts->AddFontFromMemoryTTF(const_cast<void*>(static_cast<const void*>(func)),
+                     fontSize, fontSize, &config, GetIconGlyphRanges());
+
+    m_vecFonts.push_back({pFont, eFontType::Memory, fontSize, fontMul, std::string(fontID), "", 
+                const_cast<void*>(static_cast<const void*>(func))});
     io.Fonts->Build();
     return pFont;
 }
@@ -52,7 +81,7 @@ ImFont* FontMgr::Load(const char* fontID, const char* path, float fontMul)
 void FontMgr::UnloadAll()
 {
     ImGuiIO& io = ImGui::GetIO();
-    io.Fonts->Clear();
+    // io.Fonts->Clear();
     io.Fonts->ClearFonts();
 }
 
@@ -64,7 +93,20 @@ void FontMgr::ReloadAll()
     for (auto &data : m_vecFonts)
     {
         size_t fontSize = static_cast<int>(screen::GetScreenHeight() / 54.85f) * data.m_fMul;
-        data.m_pFont = io.Fonts->AddFontFromFileTTF(data.m_path.c_str(), data.m_nSize, NULL, GetGlyphRanges());
+
+        if (data.m_nType == eFontType::File)
+        {
+            data.m_pFont = io.Fonts->AddFontFromFileTTF(data.m_path.c_str(), data.m_nSize, NULL, 
+                            GetGlyphRanges());
+        }
+        else
+        {
+            ImFontConfig config;
+            config.MergeMode = false;
+            config.GlyphMinAdvanceX = data.m_nSize; // Use if you want to make the icon monospaced
+            data.m_pFont = io.Fonts->AddFontFromMemoryTTF(data.m_pFontData, data.m_nSize, data.m_nSize,
+                             &config, GetIconGlyphRanges());
+        }
     }
     io.FontDefault = Get("text");
     io.Fonts->Build();

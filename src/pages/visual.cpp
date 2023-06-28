@@ -135,7 +135,7 @@ static std::vector<std::string> m_WeatherNames
 
 VisualPage& visualPage = VisualPage::Get();
 VisualPage::VisualPage()
-    : IPage<VisualPage>(ePageID::Visual, "Window.VisualPage", true)
+    : IPage<VisualPage>(ePageID::Visual, ICON_FA_DESKTOP, true)
 {
 #ifdef GTASA
 
@@ -607,9 +607,9 @@ void VisualPage::Draw()
     {
         if (ImGui::BeginTabItem(TEXT("Window.CheckboxTab")))
         {
+            ImGui::BeginChild("VisualCHild");
             ImGui::Spacing();
             ImGui::Columns(2, nullptr, false);
-
 #ifdef GTASA
             Widget::CheckboxAddr<int8_t>(TEXT("Visual.ArmourBorder"), 0x589123);
             Widget::CheckboxAddr<int8_t>(TEXT("Visual.ArmourPercentage"), 0x589125);
@@ -856,6 +856,7 @@ void VisualPage::Draw()
             Widget::Checkbox(TEXT("Visual.LockWeather"), &m_bLockWeather);
 #endif
             ImGui::Columns(1);
+            ImGui::EndChild();
             ImGui::EndTabItem();
         }
         if (ImGui::BeginTabItem(TEXT("Window.MenusTab")))
@@ -966,59 +967,6 @@ void VisualPage::Draw()
             }
             ImGui::Spacing();
 
-            int weather = CWeather::OldWeatherType;
-            if (Widget::ListBox(TEXT("Visual.CurrentWeather"), m_WeatherNames, weather))
-            {
-                CWeather::OldWeatherType = weather;
-            }
-
-            weather = CWeather::NewWeatherType;
-            if (Widget::ListBox(TEXT("Visual.NextWeather"), m_WeatherNames, weather))
-            {
-                CWeather::NewWeatherType = weather;
-            }
-
-            ImGui::Spacing();
-            int hour = CClock::ms_nGameClockHours;
-            int minute = CClock::ms_nGameClockMinutes;
-
-            if (gamePage.m_bSyncTime)
-            {
-                ImGui::BeginDisabled(gamePage.m_bSyncTime);
-            }
-
-            if (ImGui::InputInt(TEXT("Visual.Hour"), &hour) & !gamePage.m_bSyncTime)
-            {
-                if (hour < 0) hour = 23;
-                if (hour > 23) hour = 0;
-                CClock::ms_nGameClockHours = hour;
-            }
-
-            if (ImGui::InputInt(TEXT("Visual.Minute"), &minute) & !gamePage.m_bSyncTime)
-            {
-                if (minute < 0) minute = 59;
-                if (minute > 59) minute = 0;
-                CClock::ms_nGameClockMinutes = minute;
-            }
-
-            if (gamePage.m_bSyncTime)
-            {
-                ImGui::EndDisabled();
-                Widget::Tooltip(TEXT("Visual.SyncTimeEnabled"));
-            }
-
-            if (ImGui::Checkbox(TEXT("Visual.FreezeGameTime"), &gamePage.m_bFreezeTime))
-            {
-                if (gamePage.m_bFreezeTime)
-                {
-                    patch::SetRaw(BY_GAME(0x52CF10, 0x487010, 0x473460), (char *)"\xEB\xEF", 2);
-                }
-                else
-                {
-                    patch::SetRaw(BY_GAME(0x52CF10, 0x487010, 0x473460),
-                                  (char *)BY_GAME("\x56\x8B", "\x6A\x01", "\x6A\x01"), 2);
-                }
-            }
             ImGui::Spacing();
             if (ImGui::BeginTabBar("Timecyc subtab", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
             {
@@ -1070,8 +1018,62 @@ void VisualPage::Draw()
                 if (ImGui::BeginTabItem("Misc"))
                 {
                     ImGui::BeginChild("TimecycMisc");
+                    ImGui::Spacing();
                     ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 2);
+                    int weather = CWeather::OldWeatherType;
+                    if (Widget::ListBox(TEXT("Visual.CurrentWeather"), m_WeatherNames, weather))
+                    {
+                        CWeather::OldWeatherType = weather;
+                    }
 
+                    weather = CWeather::NewWeatherType;
+                    if (Widget::ListBox(TEXT("Visual.NextWeather"), m_WeatherNames, weather))
+                    {
+                        CWeather::NewWeatherType = weather;
+                    }
+
+                    ImGui::Spacing();
+                    int hour = CClock::ms_nGameClockHours;
+                    int minute = CClock::ms_nGameClockMinutes;
+
+                    if (gamePage.m_bSyncTime)
+                    {
+                        ImGui::BeginDisabled(gamePage.m_bSyncTime);
+                    }
+
+                    if (ImGui::InputInt(TEXT("Visual.Hour"), &hour) & !gamePage.m_bSyncTime)
+                    {
+                        if (hour < 0) hour = 23;
+                        if (hour > 23) hour = 0;
+                        CClock::ms_nGameClockHours = hour;
+                    }
+
+                    if (ImGui::InputInt(TEXT("Visual.Minute"), &minute) & !gamePage.m_bSyncTime)
+                    {
+                        if (minute < 0) minute = 59;
+                        if (minute > 59) minute = 0;
+                        CClock::ms_nGameClockMinutes = minute;
+                    }
+
+                    if (gamePage.m_bSyncTime)
+                    {
+                        ImGui::EndDisabled();
+                        Widget::Tooltip(TEXT("Visual.SyncTimeEnabled"));
+                    }
+
+                    if (Widget::Checkbox(TEXT("Visual.FreezeGameTime"), &gamePage.m_bFreezeTime))
+                    {
+                        if (gamePage.m_bFreezeTime)
+                        {
+                            patch::SetRaw(BY_GAME(0x52CF10, 0x487010, 0x473460), (char *)"\xEB\xEF", 2);
+                        }
+                        else
+                        {
+                            patch::SetRaw(BY_GAME(0x52CF10, 0x487010, 0x473460),
+                                            (char *)BY_GAME("\x56\x8B", "\x6A\x01", "\x6A\x01"), 2);
+                        }
+                    }
+                    ImGui::Spacing();
 #ifdef GTASA
                     TimecycSlider(TEXT("Visual.CloudAlpha"), m_fCloudAlpha, 0, 255);
                     TimecycSlider(TEXT("Visual.DirectionalMult"), m_nDirectionalMult, 0, 255);

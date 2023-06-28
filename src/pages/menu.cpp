@@ -9,7 +9,7 @@
 
 MenuPage& menuPage = MenuPage::Get();
 MenuPage::MenuPage()
-    : IPage<MenuPage>(ePageID::Menu, "Window.MenuPage", true)
+    : IPage<MenuPage>(ePageID::Menu, ICON_FA_COG, true)
 {
     // This needs to run before initRwEvent
     // Updates are checked in m_bAutoCheckUpdate
@@ -75,6 +75,7 @@ void MenuPage::Draw()
 
             if (vec.size() > 0)
             {
+                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() / 2);
                 if (Widget::ListBox(TEXT("Menu.Language"), vec, selected))
                 {
                     if (Locale::SetLocale(selected) == Locale::eReturnCodes::SUCCESS)
@@ -92,11 +93,11 @@ void MenuPage::Draw()
             ImGui::Spacing();
 
             ImGui::Columns(2, NULL, false);
-            if (ImGui::Checkbox(TEXT("Menu.AutoCheckUpdate"), &m_bAutoCheckUpdate))
+            if (Widget::Checkbox(TEXT("Menu.AutoCheckUpdate"), &m_bAutoCheckUpdate))
             {
                 gConfig.Set("Menu.AutoCheckUpdate", m_bAutoCheckUpdate);
             }
-            if (ImGui::Checkbox(TEXT("Menu.DiscordRPC"), &m_bDiscordRPC))
+            if (Widget::Checkbox(TEXT("Menu.DiscordRPC"), &m_bDiscordRPC))
             {
                 if (m_bDiscordRPC)
                 {
@@ -140,36 +141,36 @@ void MenuPage::Draw()
                 gConfig.Set("Overlay.TextColor.Alpha", Overlay::m_fTextCol[3]);
             }
 
-            ImGui::Spacing();
+            ImGui::Dummy(ImVec2(0, 20));
 
             ImGui::Columns(2, nullptr, false);
-            if (ImGui::Checkbox(TEXT("Menu.NoBG"), &Overlay::m_bTransparent))
+            if (Widget::Checkbox(TEXT("Menu.NoBG"), &Overlay::m_bTransparent))
             {
                 gConfig.Set("Overlay.Transparent", Overlay::m_bTransparent);
             }
 
-            if (ImGui::Checkbox(TEXT("Menu.ShowCoords"), &Overlay::m_bCoord))
+            if (Widget::Checkbox(TEXT("Menu.ShowCoords"), &Overlay::m_bCoord))
             {
                 gConfig.Set("Overlay.ShowCoordinates", Overlay::m_bCoord);
             }
 
-            if (ImGui::Checkbox(TEXT("Menu.ShowCPU"), &Overlay::m_bCpuUsage))
+            if (Widget::Checkbox(TEXT("Menu.ShowCPU"), &Overlay::m_bCpuUsage))
             {
                 gConfig.Set("Overlay.ShowCPUUsage", Overlay::m_bCpuUsage);
             }
 
-            if (ImGui::Checkbox(TEXT("Menu.ShowFPS"), &Overlay::m_bFPS))
+            if (Widget::Checkbox(TEXT("Menu.ShowFPS"), &Overlay::m_bFPS))
             {
                 gConfig.Set("Overlay.ShowFPS", Overlay::m_bFPS);
             }
 
-            if (ImGui::Checkbox(TEXT("Menu.ShowLocation"), &Overlay::m_bLocName))
+            if (Widget::Checkbox(TEXT("Menu.ShowLocation"), &Overlay::m_bLocName))
             {
                 gConfig.Set("Overlay.ShowLocationName", Overlay::m_bLocName);
             }
 
 #ifndef GTA3
-            if (ImGui::Checkbox(TEXT("Menu.ShowModelInfo"), &Overlay::m_bModelInfo))
+            if (Widget::Checkbox(TEXT("Menu.ShowModelInfo"), &Overlay::m_bModelInfo))
             {
                 gConfig.Set("Overlay.ShowModelInfo", Overlay::m_bModelInfo);
             }
@@ -177,27 +178,27 @@ void MenuPage::Draw()
 
             ImGui::NextColumn();
 
-            if (ImGui::Checkbox(TEXT("Menu.ShowPlaytime"), &Overlay::m_bPlaytime))
+            if (Widget::Checkbox(TEXT("Menu.ShowPlaytime"), &Overlay::m_bPlaytime))
             {
                 gConfig.Set("Overlay.ShowPlaytime", Overlay::m_bPlaytime);
             }
 
-            if (ImGui::Checkbox(TEXT("Menu.ShowPedTasks"), &Overlay::m_bPedTasks))
+            if (Widget::Checkbox(TEXT("Menu.ShowPedTasks"), &Overlay::m_bPedTasks))
             {
                 gConfig.Set("Overlay.ShowPedTasks", Overlay::m_bPedTasks);
             }
 
-            if (ImGui::Checkbox(TEXT("Menu.ShowRAM"), &Overlay::m_bMemUsage))
+            if (Widget::Checkbox(TEXT("Menu.ShowRAM"), &Overlay::m_bMemUsage))
             {
                 gConfig.Set("Overlay.ShowMemoryUsage", Overlay::m_bMemUsage);
             }
 
-            if (ImGui::Checkbox(TEXT("Menu.ShowVehHealth"), &Overlay::m_bVehHealth))
+            if (Widget::Checkbox(TEXT("Menu.ShowVehHealth"), &Overlay::m_bVehHealth))
             {
                 gConfig.Set("Overlay.ShowVehicleHealth", Overlay::m_bVehHealth);
             }
 
-            if (ImGui::Checkbox(TEXT("Menu.ShowVehSpeed"), &Overlay::m_bVehSpeed))
+            if (Widget::Checkbox(TEXT("Menu.ShowVehSpeed"), &Overlay::m_bVehSpeed))
             {
                 gConfig.Set("Overlay.ShowVehicleSpeed", Overlay::m_bVehSpeed);
             }
@@ -300,26 +301,29 @@ void MenuPage::Draw()
         {
             ImGui::Spacing();
 
-            if (ImGui::Button(TEXT("Menu.CheckUpdate"), ImVec2(Widget::CalcSize(2))))
+            ImVec2 btn_sz = ImVec2(Widget::CalcSize(4));
+            if (ImGui::Button(TEXT("Menu.CheckUpdate"), btn_sz))
             {
                 Updater::CheckUpdate();
             }
 
             ImGui::SameLine();
 
-            if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Widget::CalcSize(2))))
+            if (ImGui::Button(TEXT("Menu.DiscordServer"), btn_sz))
             {
                 OPEN_LINK(DISCORD_INVITE);
             }
 
-            if (ImGui::Button(TEXT("Menu.GitHubRepo"), ImVec2(Widget::CalcSize(2))))
+            ImGui::SameLine();
+            
+            if (ImGui::Button(TEXT("Menu.GitHubRepo"), btn_sz))
             {
                 OPEN_LINK(GITHUB_LINK);
             }
 
             ImGui::SameLine();
 
-            if (ImGui::Button(TEXT("Menu.Patreon"), ImVec2(Widget::CalcSize(2))))
+            if (ImGui::Button(TEXT("Menu.Patreon"), btn_sz))
             {
                 OPEN_LINK(PATREON_LINK);
             }
@@ -345,7 +349,7 @@ void MenuPage::Draw()
                 Widget::TextCentered(TEXT("Menu.CopyrightDisclaimer"));
 
                 ImGui::Dummy(ImVec2(0, 30));
-                if (ImGui::BeginTable("Hall of Fame", 2, ImGuiTableFlags_ScrollY))
+                if (ImGui::BeginTable("Hall of Fame", 2, NULL))
                 {
                     ImGui::TableSetupColumn(TEXT("Menu.Name"), ImGuiTableColumnFlags_WidthFixed, 100);
                     ImGui::TableSetupColumn(TEXT("Menu.Credits"));

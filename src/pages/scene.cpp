@@ -29,11 +29,12 @@ void ScenePage::Draw()
             }
             ImGui::Spacing();
 
-            ImGui::Columns(2, nullptr, false);
+            ImGui::Columns(BY_GAME(3, 2, 2), nullptr, false);
             Widget::Checkbox(TEXT("Scene.LoopCheckbox"), &Animation.m_Loop, TEXT("Scene.LoopCheckboxText"));
-            Widget::Checkbox(TEXT("Scene.SecondaryCheckbox"), &Animation.m_bSecondary, TEXT("Scene.SecondaryCheckboxText"));
             ImGui::NextColumn();
+            Widget::Checkbox(TEXT("Scene.SecondaryCheckbox"), &Animation.m_bSecondary, TEXT("Scene.SecondaryCheckboxText"));
 #ifdef GTASA
+            ImGui::NextColumn();
             Widget::Checkbox(TEXT("Scene.PedAnim"), &Animation.m_bPedAnim, TEXT("Scene.PedAnimText"));
 #endif
             ImGui::Columns(1);

@@ -27,6 +27,7 @@ private:
 public:
     // Returns true if the menu is being shown
     bool IsVisible();
+    void SetVisibility(bool flag);
 
     // Resets the menu height & width to default
     void ResetParams();

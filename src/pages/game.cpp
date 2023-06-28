@@ -41,7 +41,7 @@ static void RealTimeClock()
 GamePage& gamePage = GamePage::Get();
 
 GamePage::GamePage()
-    : IPage<GamePage>(ePageID::Game, "Window.GamePage", true)
+    : IPage<GamePage>(ePageID::Game, ICON_FA_GAMEPAD, true)
 {
 #ifdef GTASA
 
@@ -195,7 +195,7 @@ void GamePage::Draw()
             ImGui::BeginChild("##Checkbox");
             ImGui::Spacing();
             ImGui::Columns(2, nullptr, false);
-            if (ImGui::Checkbox(TEXT("Game.DisableCheats"), &m_bDisableCheats))
+            if (Widget::Checkbox(TEXT("Game.DisableCheats"), &m_bDisableCheats))
             {
                 if (m_bDisableCheats)
                 {
@@ -226,7 +226,7 @@ void GamePage::Draw()
 #endif
                 }
             }
-            if (ImGui::Checkbox(TEXT("Game.DisableReplay"), &m_bDisableReplay))
+            if (Widget::Checkbox(TEXT("Game.DisableReplay"), &m_bDisableReplay))
             {
                 if (m_bDisableReplay)
                 {
@@ -253,7 +253,7 @@ void GamePage::Draw()
 #ifdef GTASA
             Widget::CheckboxAddr<int8_t>(TEXT("Game.FreezeGame"), 0xA10B48);
 #endif
-            if (ImGui::Checkbox(TEXT("Game.FreezeGameTime"), &m_bFreezeTime))
+            if (Widget::Checkbox(TEXT("Game.FreezeGameTime"), &m_bFreezeTime))
             {
                 if (m_bFreezeTime)
                 {
@@ -268,7 +268,7 @@ void GamePage::Draw()
 #ifdef GTASA
             ImGui::NextColumn();
 #endif
-            if (ImGui::Checkbox("Freeze misson timer", &m_bMissionTimer))
+            if (Widget::Checkbox("Freeze misson timer", &m_bMissionTimer))
             {
                 Command<Commands::FREEZE_ONSCREEN_TIMER>(m_bMissionTimer);
             }
@@ -356,7 +356,7 @@ void GamePage::Draw()
                                          quickSceenShot.GetNameString()).c_str());
             Widget::Checkbox(TEXT("Game.SolidWater"), &m_bSolidWater, TEXT("Game.SolidWaterText"));
 #endif
-            if (ImGui::Checkbox(TEXT("Game.SyncSystemTime"), &m_bSyncTime))
+            if (Widget::Checkbox(TEXT("Game.SyncSystemTime"), &m_bSyncTime))
             {
                 if (m_bSyncTime)
                 {
@@ -495,7 +495,7 @@ void GamePage::Draw()
             if (ImGui::CollapsingHeader(TEXT("Player.TopDownCamera")))
             {
                 bool state = TopDownCam.GetState();
-                if (ImGui::Checkbox(TEXT("Window.Enabled"), &state))
+                if (Widget::Checkbox(TEXT("Window.Enabled"), &state))
                 {
                     Command<Commands::RESTORE_CAMERA_JUMPCUT>();
                     TopDownCam.Toggle();
@@ -806,12 +806,12 @@ void GamePage::Draw()
             ImGui::Columns(2, NULL, false);
 
             bool state = RandomCheats.GetState();
-            if (ImGui::Checkbox(TEXT("Game.Enable"), &state))
+            if (Widget::Checkbox(TEXT("Game.Enable"), &state))
             {
                 RandomCheats.Toggle();
             }
             ImGui::NextColumn();
-            ImGui::Checkbox(TEXT("Game.ProgressBar"), &RandomCheats.m_bProgressBar);
+            Widget::Checkbox(TEXT("Game.ProgressBar"), &RandomCheats.m_bProgressBar);
             ImGui::Columns(1);
             ImGui::Spacing();
 

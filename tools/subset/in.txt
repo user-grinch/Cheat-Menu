@@ -2,27 +2,4 @@
 # Lines starting with # are comments
 
 # Basic latin
-0020-00FF,
-
-# Punctuation
-2000-206F,
-
-# Bengali
-0980-09FF,
-
-# Chinease
-3000-30FF,
-31F0-31FF,
-FF00-FFEF,
-FFFD-FFFD,
-4E00-9FAF,
-
-# Russian
-0400-052F, # Cyrillic + Cyrillic Supplement
-2DE0-2DFF, # Cyrillic Extended-A
-A640-A69F, # Cyrillic Extended-B
-
-# Turkish
-011E-011F
-0130-0131
-015E-015F
+f000-f950,

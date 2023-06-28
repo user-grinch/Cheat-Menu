@@ -43,7 +43,7 @@ bool TeleportPage::IsQuickTeleportActive()
 TeleportPage& teleportPage = TeleportPage::Get();
 
 TeleportPage::TeleportPage()
-    : IPage<TeleportPage>(ePageID::Teleport, "Window.TeleportPage", true)
+    : IPage<TeleportPage>(ePageID::Teleport, ICON_FA_MAP_MARKER_ALT, true)
 {
     Events::initGameEvent += [this]()
     {
@@ -284,9 +284,10 @@ void TeleportPage::Draw()
             ImGui::Spacing();
             if (ImGui::BeginChild("Teleport Child"))
             {
+                ImGui::Spacing();
 #ifdef GTASA
                 ImGui::Columns(2, nullptr, false);
-                ImGui::Checkbox(TEXT("Teleport.InsertCoord"), &m_bInsertCoord);
+                Widget::Checkbox(TEXT("Teleport.InsertCoord"), &m_bInsertCoord);
 
                 if (Widget::Checkbox(TEXT("Teleport.QuickTeleport"), &m_bQuickTeleport,
                                      std::string(TEXT_S("Teleport.QuickTeleportHint")
@@ -310,7 +311,7 @@ void TeleportPage::Draw()
 #else
                 ImGui::Spacing();
                 ImGui::SameLine();
-                ImGui::Checkbox(TEXT("Teleport.InsertCoord"), &m_bInsertCoord);
+                Widget::Checkbox(TEXT("Teleport.InsertCoord"), &m_bInsertCoord);
 #endif
                 ImGui::Spacing();
 
@@ -327,7 +328,8 @@ void TeleportPage::Draw()
 
                 ImGui::Spacing();
 
-                if (ImGui::Button(TEXT("Teleport.TeleportToCoord"), Widget::CalcSize(2)))
+                ImVec2 btn_sz = Widget::CalcSize(BY_GAME(3, 2, 2));
+                if (ImGui::Button(TEXT("Teleport.TeleportToCoord"), btn_sz))
                 {
                     CVector pos{0, 0, 10};
                     if (sscanf(m_InBuf,"%f,%f,%f", &pos.x, &pos.y, &pos.z) == 3)
@@ -342,16 +344,16 @@ void TeleportPage::Draw()
                 }
                 ImGui::SameLine();
 #ifdef GTASA
-                if (ImGui::Button((TEXT_S("Teleport.TeleportMarker") + "##Btn").c_str(), Widget::CalcSize(2)))
+                if (ImGui::Button((TEXT_S("Teleport.TeleportMarker") + "##Btn").c_str(), btn_sz))
                 {
                     WarpPlayer<eTeleportType::Marker>();
                 }
-#else
-                if (ImGui::Button(TEXT("Teleport.TeleportCenter"), Widget::CalcSize(2)))
-                {
-                    WarpPlayer<eTeleportType::Coordinate>(CVector(0, 0, 23));
-                }
+                ImGui::SameLine();
 #endif
+                if (ImGui::Button(TEXT("Teleport.TeleportCenter"), btn_sz))
+                {
+                    WarpPlayer<eTeleportType::Coordinate>(CVector(0, 0, BY_GAME(3, 23, 23)));
+                }
                 ImGui::Dummy(ImVec2(0, 20));
 
                 if (m_bQuickTeleport)
