@@ -421,6 +421,7 @@ void Overlay::ProcessInfoBox()
 
         ImGui::SetNextWindowBgAlpha(m_bTransparent ? 0.0f : 0.5f);
         ImGui::PushStyleColor(ImGuiCol_Text, *(ImVec4*)&m_fTextCol);
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
         if (m_bShowMenu && ImGui::Begin("Overlay", nullptr, window_flags))
         {
             CVector pos{0,0,0};
@@ -511,6 +512,7 @@ void Overlay::ProcessInfoBox()
 
             ImGui::End();
         }
+        ImGui::PopStyleVar();
         ImGui::PopStyleColor();
     }
 }

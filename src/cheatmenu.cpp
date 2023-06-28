@@ -247,17 +247,17 @@ void CheatMenuMgr::ApplyStyle()
     style->FrameBorderSize = 0.0f;
     style->WindowBorderSize = 0.00f;
     style->PopupBorderSize = 0.0f;
-    style->ScrollbarRounding = 0.0f;
-    style->TabRounding = 3.0f;
+    style->ScrollbarRounding = 5.0f;
+    style->TabRounding = 5.0f;
     style->TabBorderSize = 0.0f;
-    style->WindowRounding = 6;
-    style->ChildRounding = 6;
-    style->FrameRounding = 2;
-    style->GrabRounding = 2;
-    style->PopupRounding = 2; 
+    style->WindowRounding = 5;
+    style->ChildRounding = 5;
+    style->FrameRounding = 5;
+    style->GrabRounding = 5;
+    style->PopupRounding = 5; 
     style->ScrollbarSize = 3;
-    style->FramePadding = ImVec2(2, 2);
-    style->WindowPadding = ImVec2(2, 2);
+    style->FramePadding = ImVec2(5, 5);
+    style->WindowPadding = ImVec2(5, 5);
     style->ItemSpacing = ImVec2(2, 2);
 
     style->Colors[ImGuiCol_WindowBg] = ImColor(0, 0, 0, 215);
