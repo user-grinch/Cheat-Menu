@@ -26,7 +26,7 @@ static const char* pedTypeList = "Civ Male\0Civ Female\0Cop\0Leones\0Triads\0Dia
 PedPage &pedPage = PedPage::Get();
 
 PedPage::PedPage()
-    : IPage<PedPage>(ePageID::Ped, ICON_FA_USERS, true)
+    : IPage<PedPage>(ePageID::Ped, ICON_FA_PEOPLE_ROBBERY, true)
 {
     /*
     	Taken from gta chaos mod by Lordmau5 & _AG
@@ -260,22 +260,22 @@ void PedPage::Draw()
             ImGui::Spacing();
             ImGui::Columns(2, 0, false);
 #ifndef GTAVC
-            Widget::Checkbox(TEXT("Ped.BigHead"), &m_bBigHead);
+            Widget::Toggle(TEXT("Ped.BigHead"), &m_bBigHead);
 #endif
 #ifdef GTASA
-            Widget::CheckboxAddr<int8_t>(TEXT("Ped.ElvisEverywhere"), 0x969157);
-            Widget::CheckboxAddr<int8_t>(TEXT("Ped.EveryoneArmed"), 0x969140);
-            Widget::CheckboxAddr<int8_t>(TEXT("Ped.GangsControl"), 0x96915B);
-            Widget::CheckboxAddr<int8_t>(TEXT("Ped.GangsEverywhere"), 0x96915A);
-            Widget::Checkbox(TEXT("Ped.GangWars"), &CGangWars::bGangWarsActive);
+            Widget::ToggleAddr<int8_t>(TEXT("Ped.ElvisEverywhere"), 0x969157);
+            Widget::ToggleAddr<int8_t>(TEXT("Ped.EveryoneArmed"), 0x969140);
+            Widget::ToggleAddr<int8_t>(TEXT("Ped.GangsControl"), 0x96915B);
+            Widget::ToggleAddr<int8_t>(TEXT("Ped.GangsEverywhere"), 0x96915A);
+            Widget::Toggle(TEXT("Ped.GangWars"), &CGangWars::bGangWarsActive);
 
             ImGui::NextColumn();
 
-            Widget::CheckboxAddr<int8_t>(TEXT("Ped.PedsMayhem"), 0x96913E);
-            Widget::CheckboxAddr<int8_t>(TEXT("Ped.PedsAtkRocket"), 0x969158);
-            Widget::CheckboxAddr<int8_t>(TEXT("Ped.PedsRiot"), 0x969175);
-            Widget::CheckboxAddr<int8_t>(TEXT("Ped.SlutMagnet"), 0x96915D);
-            Widget::Checkbox(TEXT("Ped.ThinBody"), &m_bThinBody);
+            Widget::ToggleAddr<int8_t>(TEXT("Ped.PedsMayhem"), 0x96913E);
+            Widget::ToggleAddr<int8_t>(TEXT("Ped.PedsAtkRocket"), 0x969158);
+            Widget::ToggleAddr<int8_t>(TEXT("Ped.PedsRiot"), 0x969175);
+            Widget::ToggleAddr<int8_t>(TEXT("Ped.SlutMagnet"), 0x96915D);
+            Widget::Toggle(TEXT("Ped.ThinBody"), &m_bThinBody);
 #elif GTAVC
             Widget::CheckboxAddr<int8_t>(TEXT("Ped.NoProstitutes"), 0xA10B99);
             Widget::CheckboxAddr<int8_t>(TEXT("Ped.SlutMagnet"), 0xA10B5F);
@@ -379,9 +379,9 @@ void PedPage::Draw()
                     ImGui::BeginChild("PedCOnfig");
                     ImGui::Spacing();
                     ImGui::Columns(2, 0, false);
-                    Widget::Checkbox(TEXT("Ped.NoMove"), &m_Spawner.m_bPedMove);
+                    Widget::Toggle(TEXT("Ped.NoMove"), &m_Spawner.m_bPedMove);
                     ImGui::NextColumn();
-                    Widget::Checkbox(TEXT("Ped.PedBleed"), &m_Spawner.m_bPedBleed);
+                    Widget::Toggle(TEXT("Ped.PedBleed"), &m_Spawner.m_bPedBleed);
                     ImGui::Columns(1);
 
                     ImGui::Spacing();

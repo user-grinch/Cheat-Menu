@@ -195,7 +195,7 @@ void GamePage::Draw()
             ImGui::BeginChild("##Checkbox");
             ImGui::Spacing();
             ImGui::Columns(2, nullptr, false);
-            if (Widget::Checkbox(TEXT("Game.DisableCheats"), &m_bDisableCheats))
+            if (Widget::Toggle(TEXT("Game.DisableCheats"), &m_bDisableCheats))
             {
                 if (m_bDisableCheats)
                 {
@@ -226,7 +226,7 @@ void GamePage::Draw()
 #endif
                 }
             }
-            if (Widget::Checkbox(TEXT("Game.DisableReplay"), &m_bDisableReplay))
+            if (Widget::Toggle(TEXT("Game.DisableReplay"), &m_bDisableReplay))
             {
                 if (m_bDisableReplay)
                 {
@@ -238,22 +238,22 @@ void GamePage::Draw()
                 }
             }
 
-            Widget::CheckboxAddr<int8_t>(TEXT("Game.FasterClock"), BY_GAME(0x96913B, 0xA10B87, 0x95CDBB));
+            Widget::ToggleAddr<int8_t>(TEXT("Game.FasterClock"), BY_GAME(0x96913B, 0xA10B87, 0x95CDBB));
 #ifdef GTASA
-            if (Widget::Checkbox(TEXT("Game.ForbiddenWantedLevel"), &m_bForbiddenArea, TEXT("Game.ForbiddenWantedLevelText")))
+            if (Widget::Toggle(TEXT("Game.ForbiddenWantedLevel"), &m_bForbiddenArea, TEXT("Game.ForbiddenWantedLevelText")))
             {
                 patch::Set<BYTE>(0x441770, m_bForbiddenArea ? 0x83 : 0xC3);
             }
-            Widget::CheckboxAddr<int8_t>(TEXT("Game.FreePNS"), 0x96C009);
+            Widget::ToggleAddr<int8_t>(TEXT("Game.FreePNS"), 0x96C009);
 #endif
 
 #ifdef GTAVC
             ImGui::NextColumn();
 #endif
 #ifdef GTASA
-            Widget::CheckboxAddr<int8_t>(TEXT("Game.FreezeGame"), 0xA10B48);
+            Widget::ToggleAddr<int8_t>(TEXT("Game.FreezeGame"), 0xA10B48);
 #endif
-            if (Widget::Checkbox(TEXT("Game.FreezeGameTime"), &m_bFreezeTime))
+            if (Widget::Toggle(TEXT("Game.FreezeGameTime"), &m_bFreezeTime))
             {
                 if (m_bFreezeTime)
                 {
@@ -268,11 +268,11 @@ void GamePage::Draw()
 #ifdef GTASA
             ImGui::NextColumn();
 #endif
-            if (Widget::Checkbox("Freeze misson timer", &m_bMissionTimer))
+            if (Widget::Toggle("Freeze misson timer", &m_bMissionTimer))
             {
                 Command<Commands::FREEZE_ONSCREEN_TIMER>(m_bMissionTimer);
             }
-            if (Widget::Checkbox(TEXT("Game.HardMode"), &m_HardMode.m_bEnabled, TEXT("Game.HardModeText")))
+            if (Widget::Toggle(TEXT("Game.HardMode"), &m_HardMode.m_bEnabled, TEXT("Game.HardModeText")))
             {
                 CPlayerPed* player = FindPlayerPed();
 
@@ -301,7 +301,7 @@ void GamePage::Draw()
                 }
             }
 #ifdef GTASA
-            if (Widget::Checkbox(TEXT("Game.MobileRadio"), &m_bMobileRadio))
+            if (Widget::Toggle(TEXT("Game.MobileRadio"), &m_bMobileRadio))
             {
                 // AERadioTrackManager.StartRadio(5, 0, 0, 0);
                 CallMethodAndReturn<int, 0x4EB3C0, int, int, int, int, int>((int)&AERadioTrackManager, 5, 0, 0, 0);
@@ -340,7 +340,7 @@ void GamePage::Draw()
                 //     Call<0x4E9820, int, int, int>((int)&AERadioTrackManager, 0, 0);
                 // }
             }
-            if (Widget::Checkbox(TEXT("Game.NoWaterPhysics"), &m_bNoWaterPhysics))
+            if (Widget::Toggle(TEXT("Game.NoWaterPhysics"), &m_bNoWaterPhysics))
             {
                 if (m_bNoWaterPhysics)
                 {
@@ -351,12 +351,12 @@ void GamePage::Draw()
                     patch::Set<uint8_t>(0x6C2759, 0, true);
                 }
             }
-            Widget::Checkbox(TEXT("Game.Screenshot"), &m_bScreenShot,
+            Widget::Toggle(TEXT("Game.Screenshot"), &m_bScreenShot,
                              std::format("{} {}", TEXT("Game.ScreenshotTip"),
                                          quickSceenShot.GetNameString()).c_str());
-            Widget::Checkbox(TEXT("Game.SolidWater"), &m_bSolidWater, TEXT("Game.SolidWaterText"));
+            Widget::Toggle(TEXT("Game.SolidWater"), &m_bSolidWater, TEXT("Game.SolidWaterText"));
 #endif
-            if (Widget::Checkbox(TEXT("Game.SyncSystemTime"), &m_bSyncTime))
+            if (Widget::Toggle(TEXT("Game.SyncSystemTime"), &m_bSyncTime))
             {
                 if (m_bSyncTime)
                 {
@@ -386,7 +386,7 @@ void GamePage::Draw()
                 }
                 else
                 {
-                    if (Widget::Checkbox(TEXT("Game.CameraZoomLock"), &m_bLockCameraZoom))
+                    if (Widget::Toggle(TEXT("Game.CameraZoomLock"), &m_bLockCameraZoom))
                     {
                         if (!m_bLockCameraZoom)
                         {
@@ -495,7 +495,7 @@ void GamePage::Draw()
             if (ImGui::CollapsingHeader(TEXT("Player.TopDownCamera")))
             {
                 bool state = TopDownCam.GetState();
-                if (Widget::Checkbox(TEXT("Window.Enabled"), &state))
+                if (Widget::Toggle(TEXT("Window.Enabled"), &state))
                 {
                     Command<Commands::RESTORE_CAMERA_JUMPCUT>();
                     TopDownCam.Toggle();
@@ -609,7 +609,7 @@ void GamePage::Draw()
         {
             ImGui::Spacing();
             bool state = Freecam.GetState();
-            if (Widget::Checkbox(TEXT("Game.Enable"), &state))
+            if (Widget::Toggle(TEXT("Game.Enable"), &state))
             {
                 if (Freecam.Toggle())
                 {
@@ -806,12 +806,12 @@ void GamePage::Draw()
             ImGui::Columns(2, NULL, false);
 
             bool state = RandomCheats.GetState();
-            if (Widget::Checkbox(TEXT("Game.Enable"), &state))
+            if (Widget::Toggle(TEXT("Game.Enable"), &state))
             {
                 RandomCheats.Toggle();
             }
             ImGui::NextColumn();
-            Widget::Checkbox(TEXT("Game.ProgressBar"), &RandomCheats.m_bProgressBar);
+            Widget::Toggle(TEXT("Game.ProgressBar"), &RandomCheats.m_bProgressBar);
             ImGui::Columns(1);
             ImGui::Spacing();
 

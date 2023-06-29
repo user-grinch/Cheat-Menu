@@ -25,20 +25,20 @@ public:
     static ImVec2 CalcSize(short count = 1, bool spacing = true);
 
     // Regular checkbox with hint support
-    static bool Checkbox(const char* label, bool* state, const char* hint = nullptr,
+    static bool Toggle(const char* label, bool* state, const char* hint = nullptr,
                          bool is_disabled = false);
 
     // Checkbox for bool memory address
     template <typename T>
-    static bool CheckboxAddr(const char* label, uint addr, const char* hint = nullptr,
+    static bool ToggleAddr(const char* label, uint addr, const char* hint = nullptr,
                                 T enabled = 1, T disabled = 0);
 
     // Checkbox with raw memory input
-    static bool CheckboxAddrRaw(const char* label, uint addr, uint size, const char* enabled,
+    static bool ToggleAddrRaw(const char* label, uint addr, uint size, const char* enabled,
                                 const char* disabled, const char* hint = nullptr);
 
     // Checkbox for bit fields
-    static bool CheckboxBits(const char* label, uint flag, const char* hint = nullptr);
+    static bool ToggleBits(const char* label, uint flag, const char* hint = nullptr);
 
     // Displays a button with specified color id
     static bool ColorBtn(int colorId, std::vector<float>& color, ImVec2 size);
@@ -89,12 +89,12 @@ public:
 };
 
 template <typename T>
-bool Widget::CheckboxAddr(const char* label, uint addr, const char* hint, T enabled, T disabled)
+bool Widget::ToggleAddr(const char* label, uint addr, const char* hint, T enabled, T disabled)
 {
     bool rtn = false;
     bool state = patch::Get<T>(addr) == enabled;
 
-    if (Checkbox(label, &state, hint))
+    if (Toggle(label, &state, hint))
     {
         patch::Set<T>(addr, state ? enabled : disabled);
         SaveMgr::SaveData(label, addr, state ? SaveMgr::eCheatState::Enabled 

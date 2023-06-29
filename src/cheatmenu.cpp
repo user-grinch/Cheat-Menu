@@ -265,8 +265,8 @@ void CheatMenuMgr::ApplyStyle()
     style->Colors[ImGuiCol_Button] = ImColor(33, 34, 45, 255);
     style->Colors[ImGuiCol_ButtonActive] = ImColor(240, 50, 66, 255);
     style->Colors[ImGuiCol_ButtonHovered] = ImColor(30, 30, 40, 255);
-    style->Colors[ImGuiCol_FrameBg] = ImColor(31, 30, 31, 255);
-    style->Colors[ImGuiCol_FrameBgActive] = ImColor(44, 43, 44, 255);
+    style->Colors[ImGuiCol_FrameBg] = ImColor(33, 34, 45, 255);
+    style->Colors[ImGuiCol_FrameBgActive] = ImColor(240, 50, 66, 255);
     style->Colors[ImGuiCol_FrameBgHovered] = ImColor(30, 30, 40, 255);
     style->Colors[ImGuiCol_Text] = ImColor(255, 255, 255, 255);
     style->Colors[ImGuiCol_ChildBg] = ImColor(0, 0, 0, 0);

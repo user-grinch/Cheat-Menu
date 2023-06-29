@@ -527,7 +527,7 @@ bool Widget::ColorBtn(int colorId, std::vector<float>& color, ImVec2 size)
 }
 
 
-bool Widget::Checkbox(const char* label, bool* v, const char* hint, bool is_disabled)
+bool Widget::Toggle(const char* label, bool* v, const char* hint, bool is_disabled)
 {
     ImGuiToggleConfig config =ImGuiTogglePresets::MaterialStyle();
     config.Flags = ImGuiToggleFlags_Animated;
@@ -557,7 +557,7 @@ bool Widget::Checkbox(const char* label, bool* v, const char* hint, bool is_disa
     return pressed;
 }
 
-bool Widget::CheckboxAddrRaw(const char* label, uint addr, size_t size, const char* enabled, const char* disabled, const char* hint)
+bool Widget::ToggleAddrRaw(const char* label, uint addr, size_t size, const char* enabled, const char* disabled, const char* hint)
 {
     bool rtn = false;
     char* buf = new char[size+1];
@@ -565,7 +565,7 @@ bool Widget::CheckboxAddrRaw(const char* label, uint addr, size_t size, const ch
     buf[size] = '\0';
     bool state = !strcmp(buf, enabled);
 
-    if (Checkbox(label, &state, hint))
+    if (Toggle(label, &state, hint))
     {
         if (state)
         {
@@ -584,11 +584,11 @@ bool Widget::CheckboxAddrRaw(const char* label, uint addr, size_t size, const ch
     return rtn;
 }
 
-bool Widget::CheckboxBits(const char* label, uint flag, const char* hint)
+bool Widget::ToggleBits(const char* label, uint flag, const char* hint)
 {
     bool rtn = false;
     bool state = (flag == 1) ? true : false;
-    if (Checkbox(label, &state, hint))
+    if (Toggle(label, &state, hint))
     {
         flag = state ? 1 : 0;
         rtn = true;

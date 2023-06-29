@@ -31,7 +31,7 @@ static inline void PlayerModelBrokenFix()
 
 PlayerPage &playerPage = PlayerPage::Get();
 PlayerPage::PlayerPage()
-    : IPage<PlayerPage>(ePageID::Player, ICON_FA_WALKING, true)
+    : IPage<PlayerPage>(ePageID::Player, ICON_FA_PERSON_WALKING, true)
 {
 #ifdef GTASA
 //	Fix player model being broken after rebuild
@@ -366,30 +366,30 @@ void PlayerPage::Draw()
             ImGui::Spacing();
             ImGui::Columns(2, 0, false);
             
-            if (Widget::Checkbox(TEXT("Player.AimSkinChanger"), &m_bAimSkinChanger, (TEXT_S("Player.AimSkinChangerTip") + aimSkinChanger.GetNameString()).c_str()))
+            if (Widget::Toggle(TEXT("Player.AimSkinChanger"), &m_bAimSkinChanger, (TEXT_S("Player.AimSkinChangerTip") + aimSkinChanger.GetNameString()).c_str()))
             {
                 gConfig.Set("Features.AimSkinChanger", m_bAimSkinChanger);
             }
 #ifdef GTASA
-            Widget::CheckboxAddr<int8_t>(TEXT("Player.BountyYourself"), 0x96913F);
+            Widget::ToggleAddr<int8_t>(TEXT("Player.BountyYourself"), 0x96913F);
 
             ImGui::BeginDisabled(TopDownCam.GetState());
-            if (Widget::Checkbox(TEXT("Player.DrunkEffect"), &m_bDrunkEffect))
+            if (Widget::Toggle(TEXT("Player.DrunkEffect"), &m_bDrunkEffect))
             {
                 if (!m_bDrunkEffect)
                 {
                     Command<eScriptCommands::COMMAND_SET_PLAYER_DRUNKENNESS> (0, 0);
                 }
             }
-            if (Widget::Checkbox(TEXT("Player.FastSprint"), &m_bFastSprint, TEXT("Player.FastSprintTip")))
+            if (Widget::Toggle(TEXT("Player.FastSprint"), &m_bFastSprint, TEXT("Player.FastSprintTip")))
             {
                 patch::Set<float>(0x8D2458, m_bFastSprint ? 0.1f : 5.0f);
             }
             ImGui::EndDisabled();
 #endif
-            Widget::CheckboxAddr<int8_t>(TEXT("Player.FreeHealthcare"), (int)&pInfo->m_bGetOutOfHospitalFree);
+            Widget::ToggleAddr<int8_t>(TEXT("Player.FreeHealthcare"), (int)&pInfo->m_bGetOutOfHospitalFree);
 
-            if (Widget::Checkbox(TEXT("Player.FreezeWL"), &m_bFreezeWantedLevel))
+            if (Widget::Toggle(TEXT("Player.FreezeWL"), &m_bFreezeWantedLevel))
             {
                 static unsigned int chaosLvl;
                 if (m_bFreezeWantedLevel)
@@ -412,7 +412,7 @@ void PlayerPage::Draw()
                 }
             }
 
-            if (Widget::Checkbox(TEXT("Player.GodMode"), &m_bGodMode))
+            if (Widget::Toggle(TEXT("Player.GodMode"), &m_bGodMode))
             {
 #ifdef GTASA
                 patch::Set<bool>(0x96916D, m_bGodMode, false);
@@ -456,13 +456,13 @@ void PlayerPage::Draw()
 #endif
             }
 #ifdef GTASA
-            Widget::CheckboxAddr<int8_t>(TEXT("Player.CycleJump"), 0x969161);
-            Widget::CheckboxAddr<int8_t>(TEXT("Player.InfO2"), 0x96916E);
-            if (Widget::CheckboxBits(TEXT("Player.InvisPlayer"), pPlayer->m_nPedFlags.bDontRender))
+            Widget::ToggleAddr<int8_t>(TEXT("Player.CycleJump"), 0x969161);
+            Widget::ToggleAddr<int8_t>(TEXT("Player.InfO2"), 0x96916E);
+            if (Widget::ToggleBits(TEXT("Player.InvisPlayer"), pPlayer->m_nPedFlags.bDontRender))
             {
                 pPlayer->m_nPedFlags.bDontRender = !pPlayer->m_nPedFlags.bDontRender;
             }
-            Widget::CheckboxAddr<int8_t>(TEXT("Player.InfSprint"), 0xB7CEE4);
+            Widget::ToggleAddr<int8_t>(TEXT("Player.InfSprint"), 0xB7CEE4);
 #else
             Widget::CheckboxAddr<int8_t>(TEXT("Player.InfSprint"), (int)&pInfo->m_bInfiniteSprint);
 #endif
@@ -500,7 +500,7 @@ void PlayerPage::Draw()
             }
 #endif
             ImGui::NextColumn();
-            if (Widget::Checkbox(TEXT("Game.KeepStuff"), &m_bKeepStuff, TEXT("Game.KeepStuffText")))
+            if (Widget::Toggle(TEXT("Game.KeepStuff"), &m_bKeepStuff, TEXT("Game.KeepStuffText")))
             {
 #ifdef GTASA
                 Command<Commands::SWITCH_ARREST_PENALTIES>(m_bKeepStuff);
@@ -534,17 +534,17 @@ void PlayerPage::Draw()
 #endif
             }
 #ifdef GTASA
-            if (Widget::CheckboxBits(TEXT("Player.LockControl"), pad->bPlayerSafe))
+            if (Widget::ToggleBits(TEXT("Player.LockControl"), pad->bPlayerSafe))
             {
                 pad->bPlayerSafe = !pad->bPlayerSafe;
             }
-            Widget::CheckboxAddr<int8_t>(TEXT("Player.MaxAppeal"), 0x969180, "",  0x1, 0x0);
-            Widget::CheckboxAddr<int8_t>(TEXT("Player.MegaJump"), 0x96916C);
-            Widget::CheckboxAddr<int8_t>(TEXT("Player.MegaPunch"), 0x969173);
-            Widget::CheckboxAddr<int8_t>(TEXT("Player.NeverGetHungry"), 0x969174);
+            Widget::ToggleAddr<int8_t>(TEXT("Player.MaxAppeal"), 0x969180, "",  0x1, 0x0);
+            Widget::ToggleAddr<int8_t>(TEXT("Player.MegaJump"), 0x96916C);
+            Widget::ToggleAddr<int8_t>(TEXT("Player.MegaPunch"), 0x969173);
+            Widget::ToggleAddr<int8_t>(TEXT("Player.NeverGetHungry"), 0x969174);
 
             bool never_wanted = patch::Get<bool>(0x969171, false);
-            if (Widget::Checkbox(TEXT("Player.NeverWanted"), &never_wanted))
+            if (Widget::Toggle(TEXT("Player.NeverWanted"), &never_wanted))
             {
                 CCheat::NotWantedCheat();
             }
@@ -578,13 +578,13 @@ void PlayerPage::Draw()
                 }
             }
 #endif
-            Widget::CheckboxAddr<int8_t>(TEXT("Player.NoFee"), (int)&pInfo->m_bGetOutOfJailFree);
+            Widget::ToggleAddr<int8_t>(TEXT("Player.NoFee"), (int)&pInfo->m_bGetOutOfJailFree);
 
-            Widget::Checkbox(TEXT("Player.RespawnDieLoc"), &m_RespawnDieLoc.m_bEnabled, TEXT("Player.RespawnDieLocTip"));
-            Widget::Checkbox(TEXT("Player.PlayerRegen"), &m_bPlayerRegen, TEXT("Player.PlayerRegenTip"));
+            Widget::Toggle(TEXT("Player.RespawnDieLoc"), &m_RespawnDieLoc.m_bEnabled, TEXT("Player.RespawnDieLocTip"));
+            Widget::Toggle(TEXT("Player.PlayerRegen"), &m_bPlayerRegen, TEXT("Player.PlayerRegenTip"));
 #ifdef GTASA
             static bool sprintInt = false;
-            if (Widget::Checkbox(TEXT("Player.SprintEverywhere"), &sprintInt, TEXT("Player.SprintEverywhereTip")))
+            if (Widget::Toggle(TEXT("Player.SprintEverywhere"), &sprintInt, TEXT("Player.SprintEverywhereTip")))
             {
                 if (sprintInt)
                 {
@@ -606,7 +606,7 @@ void PlayerPage::Draw()
 
             bool state = BY_GAME(pPlayer->m_nPhysicalFlags.bBulletProof, pPlayer->m_nFlags.bBulletProof,
                                  pPlayer->m_nFlags.bBulletProof);
-            if (Widget::Checkbox(TEXT("Player.BulletProof"), &state, nullptr, m_bGodMode))
+            if (Widget::Toggle(TEXT("Player.BulletProof"), &state, nullptr, m_bGodMode))
             {
                 BY_GAME(pPlayer->m_nPhysicalFlags.bBulletProof, pPlayer->m_nFlags.bBulletProof,
                         pPlayer->m_nFlags.bBulletProof) = state;
@@ -614,7 +614,7 @@ void PlayerPage::Draw()
 
             state = BY_GAME(pPlayer->m_nPhysicalFlags.bCollisionProof, pPlayer->m_nFlags.bCollisionProof,
                             pPlayer->m_nFlags.bCollisionProof);
-            if (Widget::Checkbox(TEXT("Player.CollisionProof"), &state, nullptr, m_bGodMode))
+            if (Widget::Toggle(TEXT("Player.CollisionProof"), &state, nullptr, m_bGodMode))
             {
                 BY_GAME(pPlayer->m_nPhysicalFlags.bCollisionProof, pPlayer->m_nFlags.bCollisionProof,
                         pPlayer->m_nFlags.bCollisionProof) = state;
@@ -622,7 +622,7 @@ void PlayerPage::Draw()
 
             state = BY_GAME(pPlayer->m_nPhysicalFlags.bExplosionProof, pPlayer->m_nFlags.bExplosionProof,
                             pPlayer->m_nFlags.bExplosionProof);
-            if (Widget::Checkbox(TEXT("Player.ExplosionProof"), &state, nullptr, m_bGodMode))
+            if (Widget::Toggle(TEXT("Player.ExplosionProof"), &state, nullptr, m_bGodMode))
             {
                 BY_GAME(pPlayer->m_nPhysicalFlags.bExplosionProof, pPlayer->m_nFlags.bExplosionProof,
                         pPlayer->m_nFlags.bExplosionProof) = state;
@@ -632,7 +632,7 @@ void PlayerPage::Draw()
 
             state = BY_GAME(pPlayer->m_nPhysicalFlags.bFireProof, pPlayer->m_nFlags.bFireProof,
                             pPlayer->m_nFlags.bFireProof);
-            if (Widget::Checkbox(TEXT("Player.FireProof"), &state, nullptr, m_bGodMode))
+            if (Widget::Toggle(TEXT("Player.FireProof"), &state, nullptr, m_bGodMode))
             {
                 BY_GAME(pPlayer->m_nPhysicalFlags.bFireProof, pPlayer->m_nFlags.bFireProof,
                         pPlayer->m_nFlags.bFireProof) = state;
@@ -640,7 +640,7 @@ void PlayerPage::Draw()
 
             state = BY_GAME(pPlayer->m_nPhysicalFlags.bMeleeProof, pPlayer->m_nFlags.bMeleeProof,
                             pPlayer->m_nFlags.bMeleeProof);
-            if (Widget::Checkbox(TEXT("Vehicle.MeleeProof"), &state, nullptr, m_bGodMode))
+            if (Widget::Toggle(TEXT("Vehicle.MeleeProof"), &state, nullptr, m_bGodMode))
             {
                 BY_GAME(pPlayer->m_nPhysicalFlags.bMeleeProof, pPlayer->m_nFlags.bMeleeProof,
                         pPlayer->m_nFlags.bMeleeProof) = state;

@@ -43,7 +43,7 @@ bool TeleportPage::IsQuickTeleportActive()
 TeleportPage& teleportPage = TeleportPage::Get();
 
 TeleportPage::TeleportPage()
-    : IPage<TeleportPage>(ePageID::Teleport, ICON_FA_MAP_MARKER_ALT, true)
+    : IPage<TeleportPage>(ePageID::Teleport, ICON_FA_MAP_LOCATION_DOT, true)
 {
     Events::initGameEvent += [this]()
     {
@@ -287,21 +287,21 @@ void TeleportPage::Draw()
                 ImGui::Spacing();
 #ifdef GTASA
                 ImGui::Columns(2, nullptr, false);
-                Widget::Checkbox(TEXT("Teleport.InsertCoord"), &m_bInsertCoord);
+                Widget::Toggle(TEXT("Teleport.InsertCoord"), &m_bInsertCoord);
 
-                if (Widget::Checkbox(TEXT("Teleport.QuickTeleport"), &m_bQuickTeleport,
+                if (Widget::Toggle(TEXT("Teleport.QuickTeleport"), &m_bQuickTeleport,
                                      std::string(TEXT_S("Teleport.QuickTeleportHint")
                                                  + quickTeleport.GetNameString()).c_str()))
                 {
                     gConfig.Set("Features.QuickTeleport", m_bQuickTeleport);
                 }
                 ImGui::NextColumn();
-                if (Widget::Checkbox(TEXT("Teleport.SpawnUnderwater"), &m_bSpawnUnderwater,
+                if (Widget::Toggle(TEXT("Teleport.SpawnUnderwater"), &m_bSpawnUnderwater,
                                      TEXT("Teleport.SpawnUnderwaterHint")))
                 {
                     gConfig.Set("Features.SpawnUnderwater", m_bSpawnUnderwater);
                 }
-                if (Widget::Checkbox(TEXT("Teleport.TeleportMarker"), &m_bTeleportMarker,
+                if (Widget::Toggle(TEXT("Teleport.TeleportMarker"), &m_bTeleportMarker,
                                      std::string(TEXT_S("Teleport.TeleportMarkerHint")
                                                  + teleportMarker.GetNameString()).c_str()))
                 {

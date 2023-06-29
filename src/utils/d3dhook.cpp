@@ -52,23 +52,22 @@ void D3dHook::ProcessFrame(void* ptr)
     if (init)
     {
         ProcessMouse();
+        ImGui_ImplWin32_NewFrame();
+        if (gRenderer == eRenderer::DirectX9)
+        {
+            ImGui_ImplDX9_NewFrame();
+        }
+        else
+        {
+            ImGui_ImplDX11_NewFrame();
+        }
 
         // Scale the menu if game resolution changed
         static ImVec2 fScreenSize = ImVec2(-1, -1);
         ImVec2 size(screen::GetScreenWidth(), screen::GetScreenHeight());
         if (fScreenSize.x != size.x && fScreenSize.y != size.y)
         {
-            // FontMgr::ReloadAll();
-
-            if (gRenderer == eRenderer::DirectX9)
-            {
-                ImGui_ImplDX9_InvalidateDeviceObjects();
-            }
-            else
-            {
-                ImGui_ImplDX11_InvalidateDeviceObjects();
-            }
-
+            FontMgr::SetFontReloadRequired(true);
             ImGuiStyle* style = &ImGui::GetStyle();
             float scaleX = size.x / 1366.0f;
             float scaleY = size.y / 768.0f;
@@ -80,16 +79,6 @@ void D3dHook::ProcessFrame(void* ptr)
             style->ItemInnerSpacing = ImVec2(5 * scaleX, 5 * scaleY);
 
             fScreenSize = size;
-        }
-
-        ImGui_ImplWin32_NewFrame();
-        if (gRenderer == eRenderer::DirectX9)
-        {
-            ImGui_ImplDX9_NewFrame();
-        }
-        else
-        {
-            ImGui_ImplDX11_NewFrame();
         }
 
         ImGui::NewFrame();
@@ -113,7 +102,6 @@ void D3dHook::ProcessFrame(void* ptr)
 
         if (FontMgr::IsFontReloadRequired())
         {
-            FontMgr::ReloadAll();
             if (gRenderer == eRenderer::DirectX9)
             {
                 ImGui_ImplDX9_InvalidateDeviceObjects();
@@ -122,6 +110,7 @@ void D3dHook::ProcessFrame(void* ptr)
             {
                 ImGui_ImplDX11_InvalidateDeviceObjects();
             }
+            FontMgr::ReloadAll();
         }
     }
     else
@@ -150,9 +139,11 @@ void D3dHook::ProcessFrame(void* ptr)
         ImGui_ImplWin32_EnableDpiAwareness();
 
         // Loading fonts
-        io.FontDefault = FontMgr::LoadFromFile("text", MENU_DATA_PATH("fonts/text.ttf"), 1.3f);
-        FontMgr::LoadFromFile("title", MENU_DATA_PATH("fonts/title.ttf"), 2.5f);
-        FontMgr::LoadFromMemory("icon", fontAwesome, 1.5f);
+        io.FontDefault = FontMgr::LoadFont("text", FontMgr::eFontMode::Text, MENU_DATA_PATH("fonts/text.ttf"), 1.3f);
+        FontMgr::LoadFont("merge", FontMgr::eFontMode::Merge, MENU_DATA_PATH("fonts/icon.ttf"), 1.0f);
+        FontMgr::LoadFont("title", FontMgr::eFontMode::Text, MENU_DATA_PATH("fonts/title.ttf"), 2.5f);
+        FontMgr::LoadFont("icon", FontMgr::eFontMode::Icon, MENU_DATA_PATH("fonts/icon.ttf"), 1.5f);
+        io.Fonts->Build();
 
         io.IniFilename = nullptr;
         io.LogFilename = nullptr;

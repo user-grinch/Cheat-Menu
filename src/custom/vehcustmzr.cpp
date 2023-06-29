@@ -415,14 +415,14 @@ void VehCustmzrMgr::Draw()
             ImGui::Columns(2, NULL, false);
 
             bool pulsing = Neon.IsPulsingEnabled(pVeh);
-            if (Widget::Checkbox(TEXT("Vehicle.PulsingNeon"), &pulsing))
+            if (Widget::Toggle(TEXT("Vehicle.PulsingNeon"), &pulsing))
             {
                 Neon.SetPulsing(pVeh, pulsing);
             }
 
-            Widget::Checkbox(TEXT("Vehicle.RainbowNeon"), &m_Neon.m_bRainbowEffect, TEXT("Vehicle.RainbowNeonMSG"));
+            Widget::Toggle(TEXT("Vehicle.RainbowNeon"), &m_Neon.m_bRainbowEffect, TEXT("Vehicle.RainbowNeonMSG"));
             ImGui::NextColumn();
-            Widget::Checkbox(TEXT("Vehicle.TrafficNeon"), &m_Neon.m_bApplyOnTraffic, TEXT("Vehicle.TrafficNeonMSG"));
+            Widget::Toggle(TEXT("Vehicle.TrafficNeon"), &m_Neon.m_bApplyOnTraffic, TEXT("Vehicle.TrafficNeonMSG"));
             ImGui::Columns(1);
 
             ImGui::Spacing();

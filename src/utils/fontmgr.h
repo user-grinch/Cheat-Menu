@@ -6,6 +6,14 @@
 */
 class FontMgr
 {
+public:
+    enum class eFontMode 
+    {
+        Text,
+        Icon,
+        Merge,
+    };
+
 private:
     enum class eStates
     {
@@ -13,21 +21,14 @@ private:
         Downloading,
     };
 
-    enum class eFontType
-    {
-        File,
-        Memory,
-    };
-
     struct FontInfo
     {
         ImFont *m_pFont;
-        eFontType m_nType;
+        eFontMode mode;
         size_t m_nSize;
         float m_fMul;
         std::string m_ID;
         std::string m_path;
-        void *m_pFontData;
     };
     static inline std::vector<FontInfo> m_vecFonts;
     static inline eStates curState = eStates::Idle;
@@ -51,10 +52,7 @@ public:
     static bool IsSupportPackageInstalled();
 
     // Loads a font from ttf
-    static ImFont* LoadFromFile(const char* fontID, const char* path = 0, float fontMul = 1.0f);
-
-    // Loads a font from memory
-    static ImFont* LoadFromMemory(const char* fontID, const unsigned char *func, float fontMul = 1.0f);
+    static ImFont* LoadFont(const char* fontID, eFontMode mode, const char* path = 0, float fontMul = 1.0f);
 
     // Handles font downloading
     static void Process();

@@ -49,68 +49,72 @@ const ImWchar* FontMgr::GetIconGlyphRanges()
     return &ranges[0];
 }
 
-ImFont* FontMgr::LoadFromFile(const char* fontID, const char* path, float fontMul)
+ImFont* FontMgr::LoadFont(const char* fontID, eFontMode mode, const char* path, float fontMul)
 {
+    FontInfo data;
+    bool new_font = true;
     ImGuiIO& io = ImGui::GetIO();
     size_t fontSize = static_cast<int>(screen::GetScreenHeight() / 54.85f) * fontMul;
-    ImFont *pFont = io.Fonts->AddFontFromFileTTF(path, fontSize, NULL, GetGlyphRanges());
 
-    m_vecFonts.push_back({pFont, eFontType::File, fontSize, fontMul, std::string(fontID), 
-                            std::string(path), NULL});
-    io.Fonts->Build();
-    return pFont; 
-}
-
-ImFont* FontMgr::LoadFromMemory(const char* fontID, const unsigned char *func, float fontMul)
-{
-    ImGuiIO& io = ImGui::GetIO();
-    size_t fontSize = static_cast<int>(screen::GetScreenHeight() / 54.85f) * fontMul;
-    
     ImFontConfig config;
     config.MergeMode = false;
-    config.GlyphMinAdvanceX = 13.0f; // Use if you want to make the icon monospaced
-    ImFont *pFont = io.Fonts->AddFontFromMemoryTTF(const_cast<void*>(static_cast<const void*>(func)),
-                     fontSize, fontSize, &config, GetIconGlyphRanges());
+    config.GlyphMinAdvanceX = fontSize; // Use if you want to make the icon monospaced
 
-    m_vecFonts.push_back({pFont, eFontType::Memory, fontSize, fontMul, std::string(fontID), "", 
-                const_cast<void*>(static_cast<const void*>(func))});
-    io.Fonts->Build();
-    return pFont;
+    for (FontInfo info : m_vecFonts)
+    {
+        if (!strcmp(info.m_ID.c_str(), fontID))
+        {
+            data = info;
+            new_font = false;
+            break;
+        }
+    }
+
+    if (mode == eFontMode::Text || mode == eFontMode::Merge)
+    {
+        data.m_pFont = io.Fonts->AddFontFromFileTTF(path, fontSize, NULL, GetGlyphRanges());
+    }
+    if (mode == eFontMode::Icon)
+    {
+        data.m_pFont = io.Fonts->AddFontFromFileTTF(path, fontSize, &config, GetIconGlyphRanges());
+    }
+
+    if (mode == eFontMode::Merge)
+    {
+        config.MergeMode = true;
+        io.Fonts->AddFontFromFileTTF(path, fontSize, &config, GetIconGlyphRanges());
+    }
+
+    if (new_font)
+    {
+        data.mode = mode;
+        data.m_nSize = fontSize;
+        data. m_fMul = fontMul;
+        data.m_ID = std::string(fontID);
+        data.m_path = std::string(path);
+        m_vecFonts.push_back(data);
+    }
+    return data.m_pFont; 
 }
 
 void FontMgr::UnloadAll()
 {
     ImGuiIO& io = ImGui::GetIO();
-    // io.Fonts->Clear();
+    io.Fonts->Clear();
     io.Fonts->ClearFonts();
 }
 
 void FontMgr::ReloadAll()
 {
-    UnloadAll();
+    // UnloadAll();
 
-    ImGuiIO& io = ImGui::GetIO();
-    for (auto &data : m_vecFonts)
-    {
-        size_t fontSize = static_cast<int>(screen::GetScreenHeight() / 54.85f) * data.m_fMul;
-
-        if (data.m_nType == eFontType::File)
-        {
-            data.m_pFont = io.Fonts->AddFontFromFileTTF(data.m_path.c_str(), data.m_nSize, NULL, 
-                            GetGlyphRanges());
-        }
-        else
-        {
-            ImFontConfig config;
-            config.MergeMode = false;
-            config.GlyphMinAdvanceX = data.m_nSize; // Use if you want to make the icon monospaced
-            data.m_pFont = io.Fonts->AddFontFromMemoryTTF(data.m_pFontData, data.m_nSize, data.m_nSize,
-                             &config, GetIconGlyphRanges());
-        }
-    }
-    io.FontDefault = Get("text");
-    io.Fonts->Build();
-    m_bFontReloadRequired = false;
+    // ImGuiIO& io = ImGui::GetIO();
+    // for (auto &data : m_vecFonts)
+    // {
+    //     LoadFont(data.m_ID.c_str(), data.mode, data.m_path.c_str(), data.m_fMul);
+    // }
+    // io.FontDefault = Get("text");
+    // m_bFontReloadRequired = false;
 }
 
 void FontMgr::Process()

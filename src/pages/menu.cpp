@@ -9,7 +9,7 @@
 
 MenuPage& menuPage = MenuPage::Get();
 MenuPage::MenuPage()
-    : IPage<MenuPage>(ePageID::Menu, ICON_FA_COG, true)
+    : IPage<MenuPage>(ePageID::Menu, ICON_FA_GEAR, true)
 {
     // This needs to run before initRwEvent
     // Updates are checked in m_bAutoCheckUpdate
@@ -93,11 +93,11 @@ void MenuPage::Draw()
             ImGui::Spacing();
 
             ImGui::Columns(2, NULL, false);
-            if (Widget::Checkbox(TEXT("Menu.AutoCheckUpdate"), &m_bAutoCheckUpdate))
+            if (Widget::Toggle(TEXT("Menu.AutoCheckUpdate"), &m_bAutoCheckUpdate))
             {
                 gConfig.Set("Menu.AutoCheckUpdate", m_bAutoCheckUpdate);
             }
-            if (Widget::Checkbox(TEXT("Menu.DiscordRPC"), &m_bDiscordRPC))
+            if (Widget::Toggle(TEXT("Menu.DiscordRPC"), &m_bDiscordRPC))
             {
                 if (m_bDiscordRPC)
                 {
@@ -112,7 +112,7 @@ void MenuPage::Draw()
             ImGui::NextColumn();
 
             if (gRenderer == eRenderer::DirectX9
-                    && Widget::Checkbox(TEXT("Menu.TextOnlyMode"), &m_bTextOnlyMode, TEXT("Menu.TextOnlyModeHint")))
+                    && Widget::Toggle(TEXT("Menu.TextOnlyMode"), &m_bTextOnlyMode, TEXT("Menu.TextOnlyModeHint")))
             {
                 gConfig.Set("Menu.TextOnlyMode", m_bTextOnlyMode);
             }
@@ -144,33 +144,33 @@ void MenuPage::Draw()
             ImGui::Dummy(ImVec2(0, 20));
 
             ImGui::Columns(2, nullptr, false);
-            if (Widget::Checkbox(TEXT("Menu.NoBG"), &Overlay::m_bTransparent))
+            if (Widget::Toggle(TEXT("Menu.NoBG"), &Overlay::m_bTransparent))
             {
                 gConfig.Set("Overlay.Transparent", Overlay::m_bTransparent);
             }
 
-            if (Widget::Checkbox(TEXT("Menu.ShowCoords"), &Overlay::m_bCoord))
+            if (Widget::Toggle(TEXT("Menu.ShowCoords"), &Overlay::m_bCoord))
             {
                 gConfig.Set("Overlay.ShowCoordinates", Overlay::m_bCoord);
             }
 
-            if (Widget::Checkbox(TEXT("Menu.ShowCPU"), &Overlay::m_bCpuUsage))
+            if (Widget::Toggle(TEXT("Menu.ShowCPU"), &Overlay::m_bCpuUsage))
             {
                 gConfig.Set("Overlay.ShowCPUUsage", Overlay::m_bCpuUsage);
             }
 
-            if (Widget::Checkbox(TEXT("Menu.ShowFPS"), &Overlay::m_bFPS))
+            if (Widget::Toggle(TEXT("Menu.ShowFPS"), &Overlay::m_bFPS))
             {
                 gConfig.Set("Overlay.ShowFPS", Overlay::m_bFPS);
             }
 
-            if (Widget::Checkbox(TEXT("Menu.ShowLocation"), &Overlay::m_bLocName))
+            if (Widget::Toggle(TEXT("Menu.ShowLocation"), &Overlay::m_bLocName))
             {
                 gConfig.Set("Overlay.ShowLocationName", Overlay::m_bLocName);
             }
 
 #ifndef GTA3
-            if (Widget::Checkbox(TEXT("Menu.ShowModelInfo"), &Overlay::m_bModelInfo))
+            if (Widget::Toggle(TEXT("Menu.ShowModelInfo"), &Overlay::m_bModelInfo))
             {
                 gConfig.Set("Overlay.ShowModelInfo", Overlay::m_bModelInfo);
             }
@@ -178,27 +178,27 @@ void MenuPage::Draw()
 
             ImGui::NextColumn();
 
-            if (Widget::Checkbox(TEXT("Menu.ShowPlaytime"), &Overlay::m_bPlaytime))
+            if (Widget::Toggle(TEXT("Menu.ShowPlaytime"), &Overlay::m_bPlaytime))
             {
                 gConfig.Set("Overlay.ShowPlaytime", Overlay::m_bPlaytime);
             }
 
-            if (Widget::Checkbox(TEXT("Menu.ShowPedTasks"), &Overlay::m_bPedTasks))
+            if (Widget::Toggle(TEXT("Menu.ShowPedTasks"), &Overlay::m_bPedTasks))
             {
                 gConfig.Set("Overlay.ShowPedTasks", Overlay::m_bPedTasks);
             }
 
-            if (Widget::Checkbox(TEXT("Menu.ShowRAM"), &Overlay::m_bMemUsage))
+            if (Widget::Toggle(TEXT("Menu.ShowRAM"), &Overlay::m_bMemUsage))
             {
                 gConfig.Set("Overlay.ShowMemoryUsage", Overlay::m_bMemUsage);
             }
 
-            if (Widget::Checkbox(TEXT("Menu.ShowVehHealth"), &Overlay::m_bVehHealth))
+            if (Widget::Toggle(TEXT("Menu.ShowVehHealth"), &Overlay::m_bVehHealth))
             {
                 gConfig.Set("Overlay.ShowVehicleHealth", Overlay::m_bVehHealth);
             }
 
-            if (Widget::Checkbox(TEXT("Menu.ShowVehSpeed"), &Overlay::m_bVehSpeed))
+            if (Widget::Toggle(TEXT("Menu.ShowVehSpeed"), &Overlay::m_bVehSpeed))
             {
                 gConfig.Set("Overlay.ShowVehicleSpeed", Overlay::m_bVehSpeed);
             }

@@ -611,13 +611,13 @@ void VisualPage::Draw()
             ImGui::Spacing();
             ImGui::Columns(2, nullptr, false);
 #ifdef GTASA
-            Widget::CheckboxAddr<int8_t>(TEXT("Visual.ArmourBorder"), 0x589123);
-            Widget::CheckboxAddr<int8_t>(TEXT("Visual.ArmourPercentage"), 0x589125);
-            Widget::CheckboxAddr<int8_t>(TEXT("Visual.BreathBorder"), 0x589207);
-            Widget::CheckboxAddr<int8_t>(TEXT("Visual.BreathPercentage"), 0x589209);
-            Widget::CheckboxAddr<int8_t>(TEXT("Visual.CCTVEffect"), 0xC402C5);
-            Widget::CheckboxAddr<int8_t>(TEXT("Visual.DarknessFilter"), 0xC402C4);
-            if (Widget::Checkbox(TEXT("Visual.DisableHydrant"), &m_bDisableHydrant))
+            Widget::ToggleAddr<int8_t>(TEXT("Visual.ArmourBorder"), 0x589123);
+            Widget::ToggleAddr<int8_t>(TEXT("Visual.ArmourPercentage"), 0x589125);
+            Widget::ToggleAddr<int8_t>(TEXT("Visual.BreathBorder"), 0x589207);
+            Widget::ToggleAddr<int8_t>(TEXT("Visual.BreathPercentage"), 0x589209);
+            Widget::ToggleAddr<int8_t>(TEXT("Visual.CCTVEffect"), 0xC402C5);
+            Widget::ToggleAddr<int8_t>(TEXT("Visual.DarknessFilter"), 0xC402C4);
+            if (Widget::Toggle(TEXT("Visual.DisableHydrant"), &m_bDisableHydrant))
             {
                 if (m_bDisableHydrant)
                 {
@@ -629,8 +629,8 @@ void VisualPage::Draw()
                     patch::SetRaw(0x4A0D70, (char*)"\xE9\x94\x3F\xF6\xFF", 5);
                 }
             }
-            Widget::CheckboxAddr<int8_t>(TEXT("Visual.FogEffect"), 0xC402C6);
-            if (Widget::Checkbox(TEXT("Visual.FullscreenMap"), &m_bFullScreenMap, TEXT("Visual.FullscreenMapTip")))
+            Widget::ToggleAddr<int8_t>(TEXT("Visual.FogEffect"), 0xC402C6);
+            if (Widget::Toggle(TEXT("Visual.FullscreenMap"), &m_bFullScreenMap, TEXT("Visual.FullscreenMapTip")))
             {
                 if (m_bFullScreenMap)
                 {
@@ -667,28 +667,28 @@ void VisualPage::Draw()
                     patch::SetRaw(0x575361, (char*)"\xD8\x0D\x6C\x53\x86\x00", 6);
                 }
             }
-            Widget::CheckboxAddr<int8_t>(TEXT("Visual.GrainEffect"), 0xC402B4);
-            Widget::CheckboxAddr<int8_t>(TEXT("Visual.GrayRadar"), 0xA444A4);
-            Widget::CheckboxAddr<int8_t>(TEXT("Visual.HealthBorder"), 0x589353);
-            Widget::CheckboxAddr<int8_t>(TEXT("Visual.HealthPercentage"), 0x589355);
+            Widget::ToggleAddr<int8_t>(TEXT("Visual.GrainEffect"), 0xC402B4);
+            Widget::ToggleAddr<int8_t>(TEXT("Visual.GrayRadar"), 0xA444A4);
+            Widget::ToggleAddr<int8_t>(TEXT("Visual.HealthBorder"), 0x589353);
+            Widget::ToggleAddr<int8_t>(TEXT("Visual.HealthPercentage"), 0x589355);
 
-            Widget::CheckboxAddr<int8_t>(TEXT("Visual.HeatHazeEffect"), 0xC402BA);
+            Widget::ToggleAddr<int8_t>(TEXT("Visual.HeatHazeEffect"), 0xC402BA);
 
-            if (Widget::Checkbox(TEXT("Visual.HideAreaNames"), &CHud::bScriptDontDisplayAreaName))
+            if (Widget::Toggle(TEXT("Visual.HideAreaNames"), &CHud::bScriptDontDisplayAreaName))
             {
                 Command<Commands::DISPLAY_ZONE_NAMES>(!CHud::bScriptDontDisplayAreaName);
             }
 
             ImGui::NextColumn();
 
-            if (Widget::Checkbox(TEXT("Visual.HideVehNames"), &CHud::bScriptDontDisplayVehicleName))
+            if (Widget::Toggle(TEXT("Visual.HideVehNames"), &CHud::bScriptDontDisplayVehicleName))
             {
                 Command<Commands::DISPLAY_CAR_NAMES>(!CHud::bScriptDontDisplayVehicleName);
             }
 
-            Widget::CheckboxAddr<int8_t>(TEXT("Visual.HideWantedLevel"), 0x58DD1B, "", 0x90, 0x7E);
-            Widget::CheckboxAddr<int8_t>(TEXT("Visual.InfraredVision"), 0xC402B9);
-            if (Widget::Checkbox(TEXT("Visual.InvisibleWater"), &m_bInvisibleWater))
+            Widget::ToggleAddr<int8_t>(TEXT("Visual.HideWantedLevel"), 0x58DD1B, "", 0x90, 0x7E);
+            Widget::ToggleAddr<int8_t>(TEXT("Visual.InfraredVision"), 0xC402B9);
+            if (Widget::Toggle(TEXT("Visual.InvisibleWater"), &m_bInvisibleWater))
             {
                 if (!m_bNoWater)
                 {
@@ -706,9 +706,9 @@ void VisualPage::Draw()
                     }
                 }
             }
-            Widget::Checkbox(TEXT("Visual.LockWeather"), &m_bLockWeather);
-            Widget::CheckboxAddr<int8_t>(TEXT("Visual.NightVision"), 0xC402B8);
-            if (Widget::Checkbox(TEXT("Visual.NoMoneyZeros"), &m_bNoMoneyZeros))
+            Widget::Toggle(TEXT("Visual.LockWeather"), &m_bLockWeather);
+            Widget::ToggleAddr<int8_t>(TEXT("Visual.NightVision"), 0xC402B8);
+            if (Widget::Toggle(TEXT("Visual.NoMoneyZeros"), &m_bNoMoneyZeros))
             {
                 static const char *pos = "$%d", *neg = "-$%d";
                 if(m_bNoMoneyZeros)
@@ -722,7 +722,7 @@ void VisualPage::Draw()
                     patch::SetRaw(0x58F50A, (void*)"\x8C\x6C\x86\x00", 4);
                 }
             }
-            if (Widget::Checkbox(TEXT("Visual.NoParticles"), &m_bNoPartciles))
+            if (Widget::Toggle(TEXT("Visual.NoParticles"), &m_bNoPartciles))
             {
                 if(m_bNoPartciles)
                 {
@@ -733,8 +733,8 @@ void VisualPage::Draw()
                     patch::Set<uint32_t>(0x4AA440, 0x5608EC83, true);
                 }
             }
-            Widget::CheckboxAddr<int8_t>(TEXT("Visual.NoPostFX"), 0xC402CF);
-            if (Widget::Checkbox(TEXT("Visual.NoRadarRot"), &m_bNoRadarRot))
+            Widget::ToggleAddr<int8_t>(TEXT("Visual.NoPostFX"), 0xC402CF);
+            if (Widget::Toggle(TEXT("Visual.NoRadarRot"), &m_bNoRadarRot))
             {
                 // Credits: jeremii (bjeremii.blogspot.com)
                 if (m_bNoRadarRot)
@@ -761,7 +761,7 @@ void VisualPage::Draw()
                     patch::SetRaw(0x5837C6, (void*)"\xD9\x1D\x0C\x83\xBA\x00\xD9\xC0", 8);
                 }
             }
-            if (Widget::Checkbox(TEXT("Visual.NoWater"), &m_bNoWater))
+            if (Widget::Toggle(TEXT("Visual.NoWater"), &m_bNoWater))
             {
                 if (m_bNoWater)
                 {
@@ -783,13 +783,13 @@ void VisualPage::Draw()
                 }
             }
             bool radar_state = (patch::Get<BYTE>(0xBA676C) != 2);
-            if (Widget::Checkbox(TEXT("Visual.ShowRadar"), &radar_state))
+            if (Widget::Toggle(TEXT("Visual.ShowRadar"), &radar_state))
             {
                 patch::Set<BYTE>(0xBA676C, radar_state == true ? 0 : 2);
             }
 
-            Widget::CheckboxAddr<int8_t>(TEXT("Visual.ShowHud"), 0xBA6769);
-            if (Widget::Checkbox(TEXT("Visual.SquareRadar"), &m_bSquareRadar))
+            Widget::ToggleAddr<int8_t>(TEXT("Visual.ShowHud"), 0xBA6769);
+            if (Widget::Toggle(TEXT("Visual.SquareRadar"), &m_bSquareRadar))
             {
                 if (m_bSquareRadar)
                 {
@@ -818,8 +818,8 @@ void VisualPage::Draw()
                 }
             }
 
-            Widget::CheckboxAddr<int8_t>(TEXT("Visual.UnderwaterEffect"), 0xC402D3);
-            Widget::CheckboxAddr<int>(TEXT("Visual.UnfogMap"), 0xBA372C, TEXT("Visual.UnfogMapText") , 0x50, 0x0);
+            Widget::ToggleAddr<int8_t>(TEXT("Visual.UnderwaterEffect"), 0xC402D3);
+            Widget::ToggleAddr<int>(TEXT("Visual.UnfogMap"), 0xBA372C, TEXT("Visual.UnfogMapText") , 0x50, 0x0);
 #elif GTAVC
             Widget::CheckboxAddr<int8_t>(TEXT("Visual.HideRadar"), 0xA10AB6);
             Widget::Checkbox(TEXT("Visual.LockWeather"), &m_bLockWeather);
@@ -1061,7 +1061,7 @@ void VisualPage::Draw()
                         Widget::Tooltip(TEXT("Visual.SyncTimeEnabled"));
                     }
 
-                    if (Widget::Checkbox(TEXT("Visual.FreezeGameTime"), &gamePage.m_bFreezeTime))
+                    if (Widget::Toggle(TEXT("Visual.FreezeGameTime"), &gamePage.m_bFreezeTime))
                     {
                         if (gamePage.m_bFreezeTime)
                         {

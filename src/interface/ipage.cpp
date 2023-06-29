@@ -155,7 +155,7 @@ bool PageHandler::DrawPages()
 
     // draw close btn
     ImGui::PushFont(FontMgr::Get("icon"));
-    if (ImGui::Button(ICON_FA_TIMES, ImVec2(btn_sz, btn_sz)))
+    if (ImGui::Button(ICON_FA_XMARK, ImVec2(btn_sz, btn_sz)))
     {
         rtn = true;
     }

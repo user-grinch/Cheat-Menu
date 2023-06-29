@@ -30,12 +30,12 @@ void ScenePage::Draw()
             ImGui::Spacing();
 
             ImGui::Columns(BY_GAME(3, 2, 2), nullptr, false);
-            Widget::Checkbox(TEXT("Scene.LoopCheckbox"), &Animation.m_Loop, TEXT("Scene.LoopCheckboxText"));
+            Widget::Toggle(TEXT("Scene.LoopCheckbox"), &Animation.m_Loop, TEXT("Scene.LoopCheckboxText"));
             ImGui::NextColumn();
-            Widget::Checkbox(TEXT("Scene.SecondaryCheckbox"), &Animation.m_bSecondary, TEXT("Scene.SecondaryCheckboxText"));
+            Widget::Toggle(TEXT("Scene.SecondaryCheckbox"), &Animation.m_bSecondary, TEXT("Scene.SecondaryCheckboxText"));
 #ifdef GTASA
             ImGui::NextColumn();
-            Widget::Checkbox(TEXT("Scene.PedAnim"), &Animation.m_bPedAnim, TEXT("Scene.PedAnimText"));
+            Widget::Toggle(TEXT("Scene.PedAnim"), &Animation.m_bPedAnim, TEXT("Scene.PedAnimText"));
 #endif
             ImGui::Columns(1);
             ImGui::Spacing();
@@ -61,7 +61,7 @@ void ScenePage::Draw()
         if (ImGui::BeginTabItem(TEXT("Scene.Tasks")))
         {
             ImGui::Spacing();
-            Widget::Checkbox(TEXT("Menu.ShowPedTasks"), &Overlay::m_bPedTasks);
+            Widget::Toggle(TEXT("Menu.ShowPedTasks"), &Overlay::m_bPedTasks);
             ImGui::Spacing();
             if (pPlayer)
             {
@@ -133,7 +133,7 @@ void ScenePage::Draw()
                 Particle.RemoveLatest();
             }
             ImGui::Spacing();
-            if (Widget::CheckboxBits(TEXT("Scene.InvisiblePlayer"), pPlayer->m_nPedFlags.bDontRender))
+            if (Widget::ToggleBits(TEXT("Scene.InvisiblePlayer"), pPlayer->m_nPedFlags.bDontRender))
             {
                 pPlayer->m_nPedFlags.bDontRender = (pPlayer->m_nPedFlags.bDontRender == 1) ? 0 : 1;
             }

@@ -13,7 +13,7 @@
 
 VehiclePage& vehiclePage = VehiclePage::Get();
 VehiclePage::VehiclePage()
-    : IPage<VehiclePage>(ePageID::Vehicle, ICON_FA_CAR, true)
+    : IPage<VehiclePage>(ePageID::Vehicle, ICON_FA_TRUCK_PICKUP, true)
 {
     // Get config data
     Events::initGameEvent += [this]()
@@ -528,21 +528,21 @@ void VehiclePage::Draw()
             ImGui::Spacing();
             ImGui::Columns(2, 0, false);
 #ifdef GTASA
-            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.AimDrive"), 0x969179);
-            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.AllNitro"), 0x969165);
+            Widget::ToggleAddr<int8_t>(TEXT("Vehicle.AimDrive"), 0x969179);
+            Widget::ToggleAddr<int8_t>(TEXT("Vehicle.AllNitro"), 0x969165);
 #endif
 
-            Widget::Checkbox(TEXT("Vehicle.AutoUnflip"), &m_bAutoUnflip);
+            Widget::Toggle(TEXT("Vehicle.AutoUnflip"), &m_bAutoUnflip);
 
 #ifndef GTA3
-            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.AggroDriver"), BY_GAME(0x96914F,0xA10B47, NULL));
-            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.AllTaxiNitro"), BY_GAME(0x96918B,0xA10B3A, NULL));
-            Widget::Checkbox(TEXT("Vehicle.BikeFly"), &m_bBikeFly);
-            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.BoatFly"), BY_GAME(0x969153, 0xA10B11, NULL));
+            Widget::ToggleAddr<int8_t>(TEXT("Vehicle.AggroDriver"), BY_GAME(0x96914F,0xA10B47, NULL));
+            Widget::ToggleAddr<int8_t>(TEXT("Vehicle.AllTaxiNitro"), BY_GAME(0x96918B,0xA10B3A, NULL));
+            Widget::Toggle(TEXT("Vehicle.BikeFly"), &m_bBikeFly);
+            Widget::ToggleAddr<int8_t>(TEXT("Vehicle.BoatFly"), BY_GAME(0x969153, 0xA10B11, NULL));
 #endif
-            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.CarFly"), BY_GAME(0x969160, 0xA10B28, 0x95CD75));
-            Widget::Checkbox(TEXT("Vehicle.CarHeavy"), &m_bVehHeavy);
-            if (Widget::Checkbox(TEXT("Vehicle.DmgProof"), &m_bNoDamage, TEXT("Vehicle.DmgProofTip")))
+            Widget::ToggleAddr<int8_t>(TEXT("Vehicle.CarFly"), BY_GAME(0x969160, 0xA10B28, 0x95CD75));
+            Widget::Toggle(TEXT("Vehicle.CarHeavy"), &m_bVehHeavy);
+            if (Widget::Toggle(TEXT("Vehicle.DmgProof"), &m_bNoDamage, TEXT("Vehicle.DmgProofTip")))
             {
                 if (pVeh && !m_bNoDamage)
                 {
@@ -579,9 +579,9 @@ void VehiclePage::Draw()
                 }
             }
 #ifdef GTASA
-            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.LockTrainCam"), 0x52A52F, " ", 0xAB, 0x6);
-            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.LessTraffic"), 0x96917A);
-            if (Widget::Checkbox(TEXT("Vehicle.NoDerail"), &m_bNoDerail))
+            Widget::ToggleAddr<int8_t>(TEXT("Vehicle.LockTrainCam"), 0x52A52F, " ", 0xAB, 0x6);
+            Widget::ToggleAddr<int8_t>(TEXT("Vehicle.LessTraffic"), 0x96917A);
+            if (Widget::Toggle(TEXT("Vehicle.NoDerail"), &m_bNoDerail))
             {
                 if (m_bNoDerail)
                 {
@@ -620,7 +620,7 @@ void VehiclePage::Draw()
 #endif
             ImGui::NextColumn();
 #ifndef GTA3
-            if (Widget::Checkbox(TEXT("Vehicle.StayOnBike"), &m_bDontFallBike))
+            if (Widget::Toggle(TEXT("Vehicle.StayOnBike"), &m_bDontFallBike))
             {
                 if (m_bDontFallBike)
                 {
@@ -641,20 +641,20 @@ void VehiclePage::Draw()
 #endif
                 }
             }
-            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.DriveWater"), BY_GAME(0x969152, 0xA10B81, NULL));
+            Widget::ToggleAddr<int8_t>(TEXT("Vehicle.DriveWater"), BY_GAME(0x969152, 0xA10B81, NULL));
 #endif
 #ifdef GTASA
-            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.FloatOnHit"), 0x969166);
+            Widget::ToggleAddr<int8_t>(TEXT("Vehicle.FloatOnHit"), 0x969166);
 #endif
 #ifndef GTA3
-            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.GreenLights"), BY_GAME(0x96914E, 0xA10ADC, NULL));
+            Widget::ToggleAddr<int8_t>(TEXT("Vehicle.GreenLights"), BY_GAME(0x96914E, 0xA10ADC, NULL));
 #endif
 #ifdef GTASA
-            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.PerfectHandling"), 0x96914C);
-            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.TankMode"), 0x969164);
+            Widget::ToggleAddr<int8_t>(TEXT("Vehicle.PerfectHandling"), 0x96914C);
+            Widget::ToggleAddr<int8_t>(TEXT("Vehicle.TankMode"), 0x969164);
 
-            Widget::Checkbox(TEXT("Vehicle.InfNitro"), &VehCustmzr.m_Nitro.m_bEnabled, TEXT("Vehicle.InfNitroTip"));
-            if (Widget::Checkbox(TEXT("Vehicle.FlipNoBurn"), &m_bVehFlipNoBurn, TEXT("Vehicle.FlipNoBurnTip")))
+            Widget::Toggle(TEXT("Vehicle.InfNitro"), &VehCustmzr.m_Nitro.m_bEnabled, TEXT("Vehicle.InfNitroTip"));
+            if (Widget::Toggle(TEXT("Vehicle.FlipNoBurn"), &m_bVehFlipNoBurn, TEXT("Vehicle.FlipNoBurnTip")))
             {
                 // MixSets (Link2012)
                 if (m_bVehFlipNoBurn)
@@ -677,8 +677,8 @@ void VehiclePage::Draw()
 #elif GTA3
             Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.PerfectHandling"), 0x95CD66);
 #endif
-            Widget::Checkbox(TEXT("Vehicle.Watertight"), &m_bVehWatertight, TEXT("Vehicle.WatertightTip"));
-            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.OnlyWheels"), BY_GAME(0x96914B, 0xA10B70, 0x95CD78));
+            Widget::Toggle(TEXT("Vehicle.Watertight"), &m_bVehWatertight, TEXT("Vehicle.WatertightTip"));
+            Widget::ToggleAddr<int8_t>(TEXT("Vehicle.OnlyWheels"), BY_GAME(0x96914B, 0xA10B70, 0x95CD78));
             ImGui::Columns(1);
 
             if (is_driver)
@@ -691,38 +691,38 @@ void VehiclePage::Draw()
                 bool state = false;
 #ifdef GTASA
                 state = pVeh->m_nVehicleFlags.bAlwaysSkidMarks;
-                if (Widget::Checkbox(TEXT("Vehicle.SkidMarks"), &state, nullptr))
+                if (Widget::Toggle(TEXT("Vehicle.SkidMarks"), &state, nullptr))
                     pVeh->m_nVehicleFlags.bAlwaysSkidMarks = state;
 #endif
 
                 state = BY_GAME(pVeh->m_nPhysicalFlags.bBulletProof, pVeh->m_nFlags.bBulletProof, pVeh->m_nFlags.bBulletProof);
-                if (Widget::Checkbox(TEXT("Vehicle.BulletProof"), &state, nullptr, m_bNoDamage))
+                if (Widget::Toggle(TEXT("Vehicle.BulletProof"), &state, nullptr, m_bNoDamage))
                 {
                     BY_GAME(pVeh->m_nPhysicalFlags.bBulletProof, pVeh->m_nFlags.bBulletProof, pVeh->m_nFlags.bBulletProof) = state;
                 }
 
                 state = BY_GAME(pVeh->m_nPhysicalFlags.bCollisionProof, pVeh->m_nFlags.bCollisionProof, pVeh->m_nFlags.bCollisionProof);
-                if (Widget::Checkbox(TEXT("Vehicle.ColProof"), &state, nullptr, m_bNoDamage))
+                if (Widget::Toggle(TEXT("Vehicle.ColProof"), &state, nullptr, m_bNoDamage))
                 {
                     BY_GAME(pVeh->m_nPhysicalFlags.bCollisionProof, pVeh->m_nFlags.bCollisionProof, pVeh->m_nFlags.bCollisionProof) = state;
                 }
 
 #ifdef GTASA
                 state = pVeh->m_nVehicleFlags.bDisableParticles;
-                if (Widget::Checkbox(TEXT("Vehicle.NoParticles"), &state, nullptr))
+                if (Widget::Toggle(TEXT("Vehicle.NoParticles"), &state, nullptr))
                 {
                     pVeh->m_nVehicleFlags.bDisableParticles = state;
                 }
 
                 state = pVeh->m_nVehicleFlags.bVehicleCanBeTargetted;
-                if (Widget::Checkbox(TEXT("Vehicle.DriverTarget"), &state))
+                if (Widget::Toggle(TEXT("Vehicle.DriverTarget"), &state))
                 {
                     pVeh->m_nVehicleFlags.bVehicleCanBeTargetted = state;
                 }
 #endif
 
                 state = BY_GAME(!pVeh->m_nVehicleFlags.bEngineBroken, true, true) || pVeh->m_nVehicleFlags.bEngineOn;
-                if (Widget::Checkbox(TEXT("Vehicle.EngineOn"), &state, nullptr, !is_driver))
+                if (Widget::Toggle(TEXT("Vehicle.EngineOn"), &state, nullptr, !is_driver))
                 {
 #ifdef GTASA
                     pVeh->m_nVehicleFlags.bEngineBroken = !state;
@@ -731,13 +731,13 @@ void VehiclePage::Draw()
                 }
 
                 state = BY_GAME(pVeh->m_nPhysicalFlags.bExplosionProof, pVeh->m_nFlags.bExplosionProof, pVeh->m_nFlags.bExplosionProof);
-                if (Widget::Checkbox(TEXT("Vehicle.ExplosionProof"), &state, nullptr, m_bNoDamage))
+                if (Widget::Toggle(TEXT("Vehicle.ExplosionProof"), &state, nullptr, m_bNoDamage))
                 {
                     BY_GAME(pVeh->m_nPhysicalFlags.bExplosionProof, pVeh->m_nFlags.bExplosionProof, pVeh->m_nFlags.bExplosionProof) = state;
                 }
 
                 state = BY_GAME(pVeh->m_nPhysicalFlags.bFireProof, pVeh->m_nFlags.bFireProof, pVeh->m_nFlags.bFireProof);
-                if (Widget::Checkbox(TEXT("Vehicle.FireProof"), &state, nullptr, m_bNoDamage))
+                if (Widget::Toggle(TEXT("Vehicle.FireProof"), &state, nullptr, m_bNoDamage))
                 {
                     BY_GAME(pVeh->m_nPhysicalFlags.bFireProof, pVeh->m_nFlags.bFireProof, pVeh->m_nFlags.bFireProof) = state;
                 }
@@ -746,51 +746,51 @@ void VehiclePage::Draw()
 
 #ifdef GTASA
                 state = pVeh->m_nVehicleFlags.bVehicleCanBeTargettedByHS;
-                if (Widget::Checkbox(TEXT("Vehicle.HSTarget"), &state, TEXT("Vehicle.HSTargetTip")))
+                if (Widget::Toggle(TEXT("Vehicle.HSTarget"), &state, TEXT("Vehicle.HSTargetTip")))
                 {
                     pVeh->m_nVehicleFlags.bVehicleCanBeTargettedByHS = state;
                 }
 #endif
 
                 state = !BY_GAME(pVeh->m_bIsVisible, pVeh->m_nFlags.bIsVisible, pVeh->m_nFlags.bIsVisible);
-                if (Widget::Checkbox(TEXT("Vehicle.InvisCar"), &state, nullptr, !is_driver))
+                if (Widget::Toggle(TEXT("Vehicle.InvisCar"), &state, nullptr, !is_driver))
                 {
                     BY_GAME(pVeh->m_bIsVisible, pVeh->m_nFlags.bIsVisible, pVeh->m_nFlags.bIsVisible) = !state;
                 }
 
                 state = BY_GAME(!pVeh->ms_forceVehicleLightsOff, pVeh->m_nVehicleFlags.bLightsOn, pVeh->m_nVehicleFlags.bLightsOn);
-                if (Widget::Checkbox(TEXT("Vehicle.LightsOn"), &state, nullptr, !is_driver))
+                if (Widget::Toggle(TEXT("Vehicle.LightsOn"), &state, nullptr, !is_driver))
                 {
                     BY_GAME(pVeh->ms_forceVehicleLightsOff, pVeh->m_nVehicleFlags.bLightsOn, pVeh->m_nVehicleFlags.bLightsOn) = state;
                 }
 
                 state = pVeh->m_eDoorLock == DOORLOCK_LOCKED_PLAYER_INSIDE;
-                if (Widget::Checkbox(TEXT("Vehicle.LockDoor"), &state, nullptr, !is_driver))
+                if (Widget::Toggle(TEXT("Vehicle.LockDoor"), &state, nullptr, !is_driver))
                 {
                     pVeh->m_eDoorLock = state ? DOORLOCK_LOCKED_PLAYER_INSIDE : DOORLOCK_UNLOCKED;
                 }
 
                 state = BY_GAME(pVeh->m_nPhysicalFlags.bMeleeProof, pVeh->m_nFlags.bMeleeProof, pVeh->m_nFlags.bMeleeProof);
-                if (Widget::Checkbox(TEXT("Vehicle.MeleeProof"), &state, nullptr, m_bNoDamage))
+                if (Widget::Toggle(TEXT("Vehicle.MeleeProof"), &state, nullptr, m_bNoDamage))
                 {
                     BY_GAME(pVeh->m_nPhysicalFlags.bMeleeProof, pVeh->m_nFlags.bMeleeProof, pVeh->m_nFlags.bMeleeProof) = state;
                 }
 
 #ifdef GTASA
                 state = pVeh->m_nVehicleFlags.bPetrolTankIsWeakPoint;
-                if (Widget::Checkbox(TEXT("Vehicle.PentrolTank"), &state, TEXT("Vehicle.PetrolTankTip")))
+                if (Widget::Toggle(TEXT("Vehicle.PentrolTank"), &state, TEXT("Vehicle.PetrolTankTip")))
                 {
                     pVeh->m_nVehicleFlags.bPetrolTankIsWeakPoint = state;
                 }
 
                 state = pVeh->m_nVehicleFlags.bSirenOrAlarm;
-                if (Widget::Checkbox(TEXT("Vehicle.Siren"), &state))
+                if (Widget::Toggle(TEXT("Vehicle.Siren"), &state))
                 {
                     pVeh->m_nVehicleFlags.bSirenOrAlarm = state;
                 }
 
                 state = pVeh->m_nVehicleFlags.bTakeLessDamage;
-                if (Widget::Checkbox(TEXT("Vehicle.LessDmg"), &state, nullptr))
+                if (Widget::Toggle(TEXT("Vehicle.LessDmg"), &state, nullptr))
                 {
                     pVeh->m_nVehicleFlags.bTakeLessDamage = state;
                 }
@@ -982,7 +982,7 @@ void VehiclePage::Draw()
                 Widget::EditAddr<float>(TEXT("Menu.VehHealth"), (int)&pVeh->m_fHealth, 0, 0, 1000);
                 if (ImGui::CollapsingHeader(TEXT("Vehicle.SetSpeed")))
                 {
-                    Widget::Checkbox(TEXT("Vehicle.LockSpeed"), &m_bLockSpeed);
+                    Widget::Toggle(TEXT("Vehicle.LockSpeed"), &m_bLockSpeed);
                     ImGui::Spacing();
                     Widget::InputFloat(TEXT("Vehicle.Set"), &m_fLockSpeed, 1.0f, 0.0f, 100.0f);
                     ImGui::Spacing();
