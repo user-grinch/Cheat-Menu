@@ -148,16 +148,13 @@ void DrawClippedList(ResourceStore& data, fArg3_t clickFunc, bool favourites, bo
                 data.m_pData->Set(std::format("Favourites.{}", contextMenu.key).c_str(), contextMenu.val);
                 data.m_pData->Save();
             }
-            if (ImGui::MenuItem(TEXT_ICON(ICON_FA_TRASH_CAN,"Menu.Remove")))
+            if (ImGui::MenuItem(TEXT_ICON(ICON_FA_TRASH_CAN, "Menu.Remove")))
             {
                 if (favourites)
                 {
-                    if (ImGui::MenuItem(TEXT_ICON(ICON_FA_XMARK,"Menu.FavouritesRemove")))
-                    {
-                        data.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
-                        data.m_pData->Save();
-                        data.UpdateSearchList(true);
-                    }
+                    data.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
+                    data.m_pData->Save();
+                    data.UpdateSearchList(true);
                 }
                 else
                 {
@@ -180,7 +177,7 @@ void DrawClippedList(ResourceStore& data, fArg3_t clickFunc, bool favourites, bo
                 contextOptionsFunc();
             }
 
-            if (ImGui::MenuItem(TEXT("Menu.Close")))
+            if (ImGui::MenuItem(TEXT_ICON(ICON_FA_XMARK, "Menu.Close")))
             {
                 contextMenu.show = false;
             }
@@ -368,7 +365,7 @@ void DrawClippedImages(ResourceStore& data, ImVec2 imgSz, size_t imagesInRow, bo
         {
             ImGui::Text(contextMenu.key.c_str());
             ImGui::Separator();
-            if (!favourites && ImGui::MenuItem(TEXT("Menu.Favourites")))
+            if (!favourites && ImGui::MenuItem(TEXT_ICON(ICON_FA_STAR,"Menu.Favourites")))
             {
                 data.m_pData->Set(std::format("Favourites.{}", contextMenu.key).c_str(), contextMenu.val);
                 data.m_pData->Save();
@@ -390,7 +387,7 @@ void DrawClippedImages(ResourceStore& data, ImVec2 imgSz, size_t imagesInRow, bo
             {
                 contextOptionsFunc();
             }
-            if (ImGui::MenuItem(TEXT("Menu.Close")))
+            if (ImGui::MenuItem(TEXT_ICON(ICON_FA_XMARK, "Menu.Close")))
             {
                 contextMenu.show = false;
             }
