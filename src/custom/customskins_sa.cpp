@@ -51,7 +51,7 @@ void CustomSkinsMgr::Draw()
 {
     if (m_bInit)
     {
-        Widget::Filter(TEXT("Window.Search"), m_Filter, std::format("{}{}", TEXT("Player.TotalSkins"), m_List.size()).c_str());
+        Widget::Filter(TEXT_ICON(ICON_FA_MAGNIFYING_GLASS, "Window.Search"), m_Filter, std::format("{}{}", TEXT("Player.TotalSkins"), m_List.size()).c_str());
         Widget::Tooltip(TEXT("Player.CustomSkinsDirTip"));
         ImGui::Spacing();
         ImGui::TextWrapped(TEXT("Player.CustomSkinsTip"));

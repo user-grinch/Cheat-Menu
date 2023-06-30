@@ -231,7 +231,7 @@ void PlayerPage::SetCloth(std::string& name)
 
 void PlayerPage::RemoveClothesTab()
 {
-    if (ImGui::BeginTabItem(TEXT("Player.RemoveClothesTab")))
+    if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_TRASH_CAN, "Player.RemoveClothesTab")))
     {
         ImGui::TextWrapped(TEXT("Player.ClothesTip"));
         ImGui::Spacing();
@@ -360,7 +360,7 @@ void PlayerPage::Draw()
 
     if (ImGui::BeginTabBar("Player", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {
-        if (ImGui::BeginTabItem(TEXT("Window.CheckboxTab")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_TOGGLE_ON, "Window.ToggleTab")))
         {
             ImGui::BeginChild("CheckboxesChild");
             ImGui::Spacing();
@@ -650,7 +650,7 @@ void PlayerPage::Draw()
             ImGui::EndTabItem();
         }
 
-        if (ImGui::BeginTabItem(TEXT("Window.MenusTab")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_BARS, "Window.MenusTab")))
         {
             ImGui::BeginChild("PlayerMenus");
 
@@ -799,56 +799,50 @@ void PlayerPage::Draw()
         }
 
 #ifdef GTASA
-        if (ImGui::BeginTabItem(TEXT("Player.AppearanceTab")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_SHIRT, "Player.ClothesTab")))
         {
-            if (ImGui::BeginTabBar("AppearanceTabBar"))
+            if (pPlayer->m_nModelIndex == 0)
             {
-                if (ImGui::BeginTabItem(TEXT("Player.ClothesTab")))
+                Widget::ImageList(m_ClothData, fArgWrapper(playerPage.SetCloth),
+                                    [](std::string& str)
                 {
-                    if (pPlayer->m_nModelIndex == 0)
-                    {
-                        Widget::ImageList(m_ClothData, fArgWrapper(playerPage.SetCloth),
-                                          [](std::string& str)
-                        {
-                            std::stringstream ss(str);
-                            std::string temp;
+                    std::stringstream ss(str);
+                    std::string temp;
 
-                            getline(ss, temp, '$');
-                            getline(ss, temp, '$');
+                    getline(ss, temp, '$');
+                    getline(ss, temp, '$');
 
-                            return temp;
-                        }, nullptr, nullptr, nullptr, fArgNoneWrapper(playerPage.RemoveClothesTab));
-                    }
-                    else
-                    {
-                        ImGui::TextWrapped(TEXT("Player.NeedCJSkin"));
-                        ImGui::Spacing();
-
-                        if (ImGui::Button(TEXT("Player.ChangeToCJ"), ImVec2(Widget::CalcSize(1))))
-                        {
-                            pPlayer->SetModelIndex(0);
-                            Util::ClearCharTasksCarCheck(pPlayer);
-                        }
-                    }
-                    ImGui::EndTabItem();
-                }
-                if (ImGui::BeginTabItem(TEXT("Player.PedSkinsTab")))
-                {
-                    Widget::ImageList(pedPage.m_PedData, fArgWrapper(playerPage.SetModel),
-                                      [](std::string& str)
-                    {
-                        return pedPage.m_PedData.m_pData->Get(str.c_str(), "Unknown");
-                    });
-                    ImGui::EndTabItem();
-                }
-                if (ImGui::BeginTabItem(TEXT("Player.CustomSkinsTab")))
-                {
-                    ImGui::Spacing();
-                    CustomSkins.Draw();
-                    ImGui::EndTabItem();
-                }
-                ImGui::EndTabBar();
+                    return temp;
+                }, nullptr, nullptr, nullptr, fArgNoneWrapper(playerPage.RemoveClothesTab));
             }
+            else
+            {
+                ImGui::TextWrapped(TEXT("Player.NeedCJSkin"));
+                ImGui::Spacing();
+
+                if (ImGui::Button(TEXT("Player.ChangeToCJ"), ImVec2(Widget::CalcSize(1))))
+                {
+                    pPlayer->SetModelIndex(0);
+                    Util::ClearCharTasksCarCheck(pPlayer);
+                }
+            }
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_PERSON_MILITARY_TO_PERSON, "Player.PedSkinsTab")))
+        {
+            Widget::ImageList(pedPage.m_PedData, fArgWrapper(playerPage.SetModel),
+                                [](std::string& str)
+            {
+                return pedPage.m_PedData.m_pData->Get(str.c_str(), "Unknown");
+            });
+            ImGui::EndTabItem();
+        }
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_FOLDER_OPEN, "Player.CustomSkinsTab")))
+        {
+            ImGui::BeginChild("AAA");
+            ImGui::Spacing();
+            CustomSkins.Draw();
+            ImGui::EndChild();
             ImGui::EndTabItem();
         }
 #else

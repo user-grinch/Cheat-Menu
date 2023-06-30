@@ -59,7 +59,7 @@ ImFont* FontMgr::LoadFont(const char* fontID, eFontMode mode, const char* path, 
     ImFontConfig config;
     config.MergeMode = false;
     config.GlyphMinAdvanceX = fontSize; // Use if you want to make the icon monospaced
-
+    
     for (FontInfo info : m_vecFonts)
     {
         if (!strcmp(info.m_ID.c_str(), fontID))
@@ -70,7 +70,7 @@ ImFont* FontMgr::LoadFont(const char* fontID, eFontMode mode, const char* path, 
         }
     }
 
-    if (mode == eFontMode::Text || mode == eFontMode::Merge)
+    if (mode == eFontMode::Text)
     {
         data.m_pFont = io.Fonts->AddFontFromFileTTF(path, fontSize, NULL, GetGlyphRanges());
     }
@@ -81,8 +81,9 @@ ImFont* FontMgr::LoadFont(const char* fontID, eFontMode mode, const char* path, 
 
     if (mode == eFontMode::Merge)
     {
+        data.m_pFont = io.Fonts->AddFontFromFileTTF(path, fontSize, NULL, GetGlyphRanges());
         config.MergeMode = true;
-        io.Fonts->AddFontFromFileTTF(path, fontSize, &config, GetIconGlyphRanges());
+        io.Fonts->AddFontFromFileTTF(MENU_DATA_PATH("fonts/icon.ttf"), fontSize, &config, GetIconGlyphRanges());
     }
 
     if (new_font)

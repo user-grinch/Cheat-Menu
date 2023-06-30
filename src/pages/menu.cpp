@@ -30,7 +30,7 @@ void MenuPage::Draw()
 {
     if (ImGui::BeginTabBar("Menu", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {
-        if (ImGui::BeginTabItem(TEXT("Menu.Config")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_GEAR, "Menu.Config")))
         {
             static int selected = Locale::GetCurrentLocaleIndex();
             static std::vector<std::string>& vec = Locale::GetLocaleList();
@@ -61,15 +61,15 @@ void MenuPage::Draw()
             }
 
             ImGui::Spacing();
-            if (ImGui::Button(TEXT("Menu.ResetSize"), ImVec2(Widget::CalcSize(2))))
+            if (ImGui::Button(TEXT("Menu.ResetSize"), ImVec2(Widget::CalcSize(1))))
             {
                 CheatMenu.ResetParams();
             }
-            ImGui::SameLine();
-            if (ImGui::Button(TEXT("Menu.ReloadFonts"), ImVec2(Widget::CalcSize(2))))
-            {
-                FontMgr::SetFontReloadRequired(true);
-            }
+            // ImGui::SameLine();
+            // if (ImGui::Button(TEXT("Menu.ReloadFonts"), ImVec2(Widget::CalcSize(2))))
+            // {
+            //     FontMgr::SetFontReloadRequired(true);
+            // }
 
             ImGui::Spacing();
 
@@ -120,7 +120,7 @@ void MenuPage::Draw()
 
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT("Menu.Overlay")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_WINDOW_RESTORE, "Menu.Overlay")))
         {
             ImGui::Spacing();
             ImGui::Spacing();
@@ -207,7 +207,7 @@ void MenuPage::Draw()
 
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT("Menu.Hotkeys")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_KEYBOARD, "Menu.Hotkeys")))
         {
             ImGui::Spacing();
             ImGui::Text(TEXT("Menu.Usage"));
@@ -243,7 +243,7 @@ void MenuPage::Draw()
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT("Menu.Commands")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_TERMINAL, "Menu.Commands")))
         {
             if (ImGui::BeginChild("CommandsChild"))
             {
@@ -297,7 +297,7 @@ void MenuPage::Draw()
             }
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT("Menu.About")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_INFO, "Menu.About")))
         {
             ImGui::Spacing();
 

@@ -522,7 +522,7 @@ void VehiclePage::Draw()
 
         ImGui::Spacing();
 
-        if (ImGui::BeginTabItem(TEXT("Window.CheckboxTab")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_TOGGLE_ON, "Window.ToggleTab")))
         {
             ImGui::BeginChild("CheckboxesChild");
             ImGui::Spacing();
@@ -802,7 +802,7 @@ void VehiclePage::Draw()
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT("Window.MenusTab")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_BARS, "Window.MenusTab")))
         {
             ImGui::Spacing();
             ImGui::BeginChild("MenusChild");
@@ -1003,7 +1003,7 @@ void VehiclePage::Draw()
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT("Window.SpawnTab")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_TRUCK_PICKUP, "Window.SpawnTab")))
         {
             ImGui::Spacing();
 

@@ -118,11 +118,14 @@ ImGuiToggleConfig ImGuiTogglePresets::MaterialStyle(float size_scale /*= 1.0f*/)
     const ImVec2 material_size(37 * size_scale, 16 * size_scale);
     const float material_inset = -2.5f * size_scale;
 
-    static ImGuiTogglePalette material_palette_on;
-    material_palette_on.Frame = {0.9411f, 0.1961f, 0.2588f, 1.00f};
-    material_palette_on.FrameHover = {0.8411f, 0.1961f, 0.2588f, 1.00f};
-    material_palette_on.Knob = White;
-    material_palette_on.KnobHover = White;
+    static ImGuiTogglePalette material_palette_on, material_palette_off;
+    material_palette_on.Frame = {0.9411f, 0.1961f, 0.2588f, 1.00f}; // red
+    material_palette_on.FrameHover = {0.8411f, 0.1961f, 0.2588f, 1.00f}; // red
+    material_palette_on.Knob = {1.0f, 1.0f, 1.0f, 1.0f}; 
+    material_palette_on.KnobHover = {1.0f, 1.0f, 1.0f, 1.0f};
+
+    material_palette_off.Frame = {0.1294f, 0.1333f, 0.1764f, 1.0f};
+    material_palette_off.FrameHover = {0.1176f, 0.1176f, 0.1569f, 1.0f};
 
     // setup config
     ImGuiToggleConfig config;
@@ -131,6 +134,7 @@ ImGuiToggleConfig ImGuiTogglePresets::MaterialStyle(float size_scale /*= 1.0f*/)
     config.On.KnobInset = config.Off.KnobInset = material_inset;
     config.On.KnobOffset = config.Off.KnobOffset = ImVec2(-material_inset, 0);
     config.On.Palette = &material_palette_on;
+    config.Off.Palette = &material_palette_off;
 
     return config;
 }

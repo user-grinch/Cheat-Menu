@@ -605,7 +605,7 @@ void VisualPage::Draw()
 {
     if (ImGui::BeginTabBar("Visual", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {
-        if (ImGui::BeginTabItem(TEXT("Window.CheckboxTab")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_TOGGLE_ON, "Window.ToggleTab")))
         {
             ImGui::BeginChild("VisualCHild");
             ImGui::Spacing();
@@ -859,7 +859,7 @@ void VisualPage::Draw()
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT("Window.MenusTab")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_BARS, "Window.MenusTab")))
         {
             static bool initPatches = false;
             if (!initPatches)
@@ -948,9 +948,10 @@ void VisualPage::Draw()
         }
 
 #ifdef GTASA
-        if (m_nTimecycHour == 8 ? ImGui::BeginTabItem(TEXT("Visual.TimecycTab")) : ImGui::BeginTabItem(TEXT("Visual.Timecyc24hTab")))
+        if (m_nTimecycHour == 8 ? ImGui::BeginTabItem(TEXT_ICON(ICON_FA_CALENDAR_DAY, "Visual.TimecycTab")) 
+        : ImGui::BeginTabItem(TEXT_ICON(ICON_FA_CALENDAR_DAY, "Visual.Timecyc24hTab")))
 #else
-        if (ImGui::BeginTabItem(TEXT("Visual.TimecycTab")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_CALENDAR_DAY, "Visual.TimecycTab")))
 #endif
         {
             ImGui::Spacing();
@@ -970,7 +971,7 @@ void VisualPage::Draw()
             ImGui::Spacing();
             if (ImGui::BeginTabBar("Timecyc subtab", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
             {
-                if (ImGui::BeginTabItem(TEXT("Visual.ColorsTab")))
+                if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_PALETTE , "Visual.ColorsTab")))
                 {
                     ImGui::BeginChild("TimecycColors");
                     ImGui::Spacing();
@@ -1015,7 +1016,7 @@ void VisualPage::Draw()
                     ImGui::EndChild();
                     ImGui::EndTabItem();
                 }
-                if (ImGui::BeginTabItem("Misc"))
+                if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_CARET_DOWN, "Visual.Miscellaneous")))
                 {
                     ImGui::BeginChild("TimecycMisc");
                     ImGui::Spacing();

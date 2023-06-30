@@ -26,7 +26,7 @@ static const char* pedTypeList = "Civ Male\0Civ Female\0Cop\0Leones\0Triads\0Dia
 PedPage &pedPage = PedPage::Get();
 
 PedPage::PedPage()
-    : IPage<PedPage>(ePageID::Ped, ICON_FA_PEOPLE_ROBBERY, true)
+    : IPage<PedPage>(ePageID::Ped, ICON_FA_PEOPLE_GROUP, true)
 {
     /*
     	Taken from gta chaos mod by Lordmau5 & _AG
@@ -254,7 +254,7 @@ void PedPage::Draw()
 {
     if (ImGui::BeginTabBar("Ped", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {
-        if (ImGui::BeginTabItem(TEXT("Window.CheckboxTab")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_TOGGLE_ON, "Window.ToggleTab")))
         {
             ImGui::BeginChild("CheckboxesChild");
             ImGui::Spacing();
@@ -302,7 +302,7 @@ void PedPage::Draw()
 
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT("Window.MenusTab")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_BARS, "Window.MenusTab")))
         {
             ImGui::Spacing();
             ImGui::BeginChild("MenusChild");
@@ -343,13 +343,13 @@ void PedPage::Draw()
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT("Window.SpawnTab")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_PEOPLE_GROUP, "Window.SpawnTab")))
         {
             if (ImGui::BeginTabBar("SpawnPedBar"))
             {
                 ImGui::Spacing();
 
-                if (ImGui::BeginTabItem(TEXT("Window.Search")))
+                if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_MAGNIFYING_GLASS, "Window.Search")))
                 {
                     ImGui::Spacing();
 #ifdef GTASA
@@ -439,7 +439,7 @@ void PedPage::Draw()
             ImGui::EndTabItem();
         }
 #ifdef GTASA
-        if (ImGui::BeginTabItem(TEXT("Ped.GangWars")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_PERSON_RIFLE, "Ped.GangWars")))
         {
             ImGui::Spacing();
             if (ImGui::Button(TEXT("Ped.StartWar"), ImVec2(Widget::CalcSize(2))))
@@ -496,7 +496,7 @@ void PedPage::Draw()
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT("Ped.GangModelEditor")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_PEOPLE_ARROWS, "Ped.GangModelEditor")))
         {
             ImGui::Spacing();
             if (ImGui::Button(TEXT("Ped.ResetModels"), Widget::CalcSize(1)))

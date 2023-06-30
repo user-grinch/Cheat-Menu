@@ -279,7 +279,7 @@ void TeleportPage::Draw()
     if (ImGui::BeginTabBar("Teleport", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {
         ImGui::Spacing();
-        if (ImGui::BeginTabItem(TEXT("Window.TeleportPage")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_MAP_LOCATION_DOT, "Window.TeleportPage")))
         {
             ImGui::Spacing();
             if (ImGui::BeginChild("Teleport Child"))
@@ -386,7 +386,7 @@ void TeleportPage::Draw()
             ImGui::EndTabItem();
         }
 
-        if (ImGui::BeginTabItem(TEXT("Window.LocationsTab")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_MAGNIFYING_GLASS_LOCATION, "Window.LocationsTab")))
         {
 #ifdef GTASA
             FetchRadarSpriteData();

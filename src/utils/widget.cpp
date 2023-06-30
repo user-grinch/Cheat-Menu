@@ -93,7 +93,7 @@ void DrawClippedList(ResourceStore& data, fArg3_t clickFunc, bool favourites, bo
         ImGui::SameLine();
     }
 
-    if (Widget::Filter("##Filter", data.m_Filter, TEXT("Window.Search")))
+    if (Widget::Filter("##Filter", data.m_Filter, TEXT_ICON(ICON_FA_MAGNIFYING_GLASS, "Window.Search")))
     {
         data.UpdateSearchList(favourites);
     }
@@ -137,39 +137,44 @@ void DrawClippedList(ResourceStore& data, fArg3_t clickFunc, bool favourites, bo
 
     if (contextMenu.show)
     {
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(8, 8));
         if (ImGui::BeginPopupContextWindow())
         {
             ImGui::Text(contextMenu.key.c_str());
             ImGui::Separator();
 
-            if (!favourites && ImGui::MenuItem(TEXT("Menu.Favourites")))
+            if (!favourites && ImGui::MenuItem(TEXT_ICON(ICON_FA_STAR,"Menu.Favourites")))
             {
                 data.m_pData->Set(std::format("Favourites.{}", contextMenu.key).c_str(), contextMenu.val);
                 data.m_pData->Save();
             }
-            if (!favourites && ImGui::MenuItem(TEXT("Menu.Remove")))
+            if (ImGui::MenuItem(TEXT_ICON(ICON_FA_TRASH_CAN,"Menu.Remove")))
             {
-                if (contextMenu.root == "Custom" || data.m_bAllowRemoveAll)
+                if (favourites)
                 {
-                    data.m_pData->RemoveKey(contextMenu.root.c_str(), contextMenu.key.c_str());
-                    data.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
-                    data.m_pData->Save();
-                    data.UpdateSearchList();
-                    Util::SetMessage(TEXT("Window.RemoveEntry"));
+                    if (ImGui::MenuItem(TEXT_ICON(ICON_FA_XMARK,"Menu.FavouritesRemove")))
+                    {
+                        data.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
+                        data.m_pData->Save();
+                        data.UpdateSearchList(true);
+                    }
                 }
                 else
                 {
-                    Util::SetMessage(TEXT("Window.CustomRemoveOnly"));
+                    if (contextMenu.root == "Custom" || data.m_bAllowRemoveAll)
+                    {
+                        data.m_pData->RemoveKey(contextMenu.root.c_str(), contextMenu.key.c_str());
+                        data.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
+                        data.m_pData->Save();
+                        data.UpdateSearchList();
+                        Util::SetMessage(TEXT("Window.RemoveEntry"));
+                    }
+                    else
+                    {
+                        Util::SetMessage(TEXT("Window.CustomRemoveOnly"));
+                    }
                 }
             }
-
-            if (favourites &&ImGui::MenuItem(TEXT("Menu.FavouritesRemove")))
-            {
-                data.m_pData->RemoveKey("Favourites", contextMenu.key.c_str());
-                data.m_pData->Save();
-                data.UpdateSearchList(true);
-            }
-
             if (contextOptionsFunc)
             {
                 contextOptionsFunc();
@@ -181,6 +186,7 @@ void DrawClippedList(ResourceStore& data, fArg3_t clickFunc, bool favourites, bo
             }
             ImGui::EndPopup();
         }
+        ImGui::PopStyleVar();
     }
     ImGui::EndChild();
 }
@@ -195,7 +201,7 @@ void Widget::DataList(ResourceStore& data, fArg3_t clickFunc, fArgNone_t addFunc
     // Drawing the list here
     if (ImGui::BeginTabBar("MYTABS"))
     {
-        if (ImGui::BeginTabItem(TEXT("Window.Search")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_MAGNIFYING_GLASS, "Window.Search")))
         {
             ImGui::Spacing();
             DrawClippedList(data, clickFunc, false, isEditItem, contextOptionsFunc);
@@ -205,7 +211,7 @@ void Widget::DataList(ResourceStore& data, fArg3_t clickFunc, fArgNone_t addFunc
         {
             data.UpdateSearchList();
         }
-        if (ImGui::BeginTabItem(TEXT("Window.FavouritesTab")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_STAR, "Window.FavouritesTab")))
         {
             ImGui::Spacing();
             DrawClippedList(data, clickFunc, true, isEditItem, contextOptionsFunc);
@@ -217,7 +223,7 @@ void Widget::DataList(ResourceStore& data, fArg3_t clickFunc, fArgNone_t addFunc
         }
         if (addFunc)
         {
-            if (ImGui::BeginTabItem(TEXT("Window.AddNew")))
+            if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_PLUS, "Window.AddNew")))
             {
                 ImGui::Spacing();
                 ImGui::BeginChild("AddNew2");
@@ -300,7 +306,7 @@ void DrawClippedImages(ResourceStore& data, ImVec2 imgSz, size_t imagesInRow, bo
         }
         ImGui::SameLine();
     }
-    if (Widget::Filter("##Filter", data.m_Filter, TEXT("Window.Search")))
+    if (Widget::Filter("##Filter", data.m_Filter, TEXT_ICON(ICON_FA_MAGNIFYING_GLASS, "Window.Search")))
     {
         data.UpdateSearchList(favourites, getNameFunc, verifyFunc);
     }
@@ -445,7 +451,7 @@ void Widget::ImageList(ResourceStore &store, fArg1_t clickFunc, fRtnArg1_t getNa
     // Draw images here
     if (ImGui::BeginTabBar("MYTABS"))
     {
-        if (ImGui::BeginTabItem(TEXT("Window.Search")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_MAGNIFYING_GLASS, "Window.Search")))
         {
             ImGui::Spacing();
             DrawClippedImages(store, m_ImageSize, imagesInRow, showImages, false, clickFunc, getNameFunc, verifyFunc, contextOptionsFunc);
@@ -455,7 +461,7 @@ void Widget::ImageList(ResourceStore &store, fArg1_t clickFunc, fRtnArg1_t getNa
         {
             store.UpdateSearchList(false, getNameFunc, verifyFunc);
         }
-        if (ImGui::BeginTabItem(TEXT("Window.FavouritesTab")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_STAR, "Window.FavouritesTab")))
         {
             ImGui::Spacing();
             DrawClippedImages(store, m_ImageSize, imagesInRow, showImages, true, clickFunc, getNameFunc, verifyFunc, contextOptionsFunc);
@@ -467,7 +473,7 @@ void Widget::ImageList(ResourceStore &store, fArg1_t clickFunc, fRtnArg1_t getNa
         }
         if (addFunc)
         {
-            if (ImGui::BeginTabItem(TEXT("Window.AddNew")))
+            if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_PLUS, "Window.AddNew")))
             {
                 ImGui::Spacing();
                 ImGui::TextWrapped(TEXT("Window.AddNewTip"));
@@ -477,7 +483,7 @@ void Widget::ImageList(ResourceStore &store, fArg1_t clickFunc, fRtnArg1_t getNa
                 addFunc();
 
                 ImGui::Dummy(ImVec2(0.0f, 10.0f));
-                if (ImGui::CollapsingHeader(TEXT("Window.AddNewCustomImg")))
+                if (ImGui::CollapsingHeader(TEXT("Window.GBe")))
                 {
                     ImGui::Spacing();
                     ImGui::TextWrapped(std::vformat(TEXT("Window.AddNewTip2"), std::make_format_args(store.m_FileName)).c_str());
