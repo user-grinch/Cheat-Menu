@@ -1,7 +1,7 @@
 // File: 'text.ttf' (168260 bytes)
 // Exported using binary_to_compressed_c.cpp
-static const unsigned int text_compressed_size = 117336;
-static const unsigned int text_compressed_data[117336/4] =
+static const unsigned int textFontSize = 117336;
+static const unsigned int textFont[117336/4] =
 {
     0x0000bc57, 0x00000000, 0x44910200, 0x00000400, 0x00010025, 0x82120000, 0x043e0804, 0x44472000, 0x42b44645, 0x020082b0, 0x0000841b, 0x50476202, 
     0x6dcb534f, 0x0200363f, 0x0000e81d, 0x5347cc5d, 0x817a4255, 0x02007785, 0x0000b47b, 0x534f9015, 0x8297322f, 0x0200a8b1, 0x45826c09, 0x6d63603c, 

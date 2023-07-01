@@ -35,31 +35,6 @@ void MenuPage::Draw()
             static int selected = Locale::GetCurrentLocaleIndex();
             static std::vector<std::string>& vec = Locale::GetLocaleList();
 
-
-            /*
-                Chinese fonts is huge & adds overhead
-                Only download & use it if the user asks for it
-            */
-            if (Locale::GetLocaleList()[Locale::GetCurrentLocaleIndex()] == "Chinese"
-                    && !FontMgr::IsSupportPackageInstalled())
-            {
-                ImGui::Spacing();
-                ImGui::TextWrapped("Font support package is required to display this language!"
-                                   " This may take a while depending on your internet connection.\n\nIt's recommended NOT to install unless you want to use this language! (Affects game loading time)");
-                ImGui::Spacing();
-                if (ImGui::Button("Install package", ImVec2(Widget::CalcSize(2))))
-                {
-                    FontMgr::StartOptionalFontDownload();
-                }
-                ImGui::SameLine();
-                if (ImGui::Button("Switch to English", ImVec2(Widget::CalcSize(2))))
-                {
-                    Locale::SetDefaultLocale();
-                    selected = Locale::GetCurrentLocaleIndex();
-                    // CheatMenu::GenHeaderList();
-                }
-            }
-
             ImGui::Spacing();
             if (ImGui::Button(TEXT("Menu.ResetSize"), ImVec2(Widget::CalcSize(1))))
             {

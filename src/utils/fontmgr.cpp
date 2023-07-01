@@ -19,83 +19,89 @@ const ImWchar* FontMgr::GetGlyphRanges()
     static const ImWchar ranges[] =
     {
         0x0020, 0x00FF, // Basic Latin + Latin Supplement
-        0x0980, 0x09FF, // Bengali
+        // 0x0980, 0x09FF, // Bengali
         0x2000, 0x206F, // General Punctuation
 
         // Chinease
-        0x3000, 0x30FF, // CJK Symbols and Punctuations, Hiragana, Katakana
-        0x31F0, 0x31FF, // Katakana Phonetic Extensions
-        0xFF00, 0xFFEF, // Half-width characters
-        0xFFFD, 0xFFFD, // Invalid
-        0x4E00, 0x9FAF, // CJK Ideograms
+        // 0x3000, 0x30FF, // CJK Symbols and Punctuations, Hiragana, Katakana
+        // 0x31F0, 0x31FF, // Katakana Phonetic Extensions
+        // 0xFF00, 0xFFEF, // Half-width characters
+        // 0xFFFD, 0xFFFD, // Invalid
+        // 0x4E00, 0x9FAF, // CJK Ideograms
 
-        // Russian
-        0x0400, 0x052F, // Cyrillic + Cyrillic Supplement
-        0x2DE0, 0x2DFF, // Cyrillic Extended-A
-        0xA640, 0xA69F, // Cyrillic Extended-B
+        // // Russian
+        // 0x0400, 0x052F, // Cyrillic + Cyrillic Supplement
+        // 0x2DE0, 0x2DFF, // Cyrillic Extended-A
+        // 0xA640, 0xA69F, // Cyrillic Extended-B
+
+        // font awesome icons
+        0x002b, // ICON_FA_PLUS,
+        0xe068, // ICON_FA_PEOPLE_ARROWS, 
+        0xe19b, // ICON_FA_GUN,
+        0xe535, // ICON_FA_PEOPLE_PULLING,
+        0xe54c, // ICON_FA_PERSON_MILITARY_TO_PERSON, 
+        0xe54e, // ICON_FA_PERSON_RIFLE,
+        0xf002, // ICON_FA_MAGNIFYING_GLASS,
+        0xf005, // ICON_FA_STAR,
+        0xf008, // ICON_FA_FILM, 
+        0xf00d, // ICON_FA_XMARK
+        0xf013, // ICON_FA_GEAR,
+        0xf030, // ICON_FA_CAMERA 
+        0xf03d, // ICON_FA_VIDEO,
+        0xf07c, // ICON_FA_FOLDER_OPEN, 
+        0xf0ae, // ICON_FA_LIST_CHECK, 
+        0xf0c9, // ICON_FA_BARS,
+        0xf0cb, // ICON_FA_LIST_OL 
+        0xf0d7, // ICON_FA_CARET_DOWN,
+        0xf11b, // ICON_FA_GAMEPAD
+        0xf11c, // ICON_FA_KEYBOARD, 
+        0xf120, // ICON_FA_TERMINAL, 
+        0xf129, // ICON_FA_INFO,
+        0xf205, // ICON_FA_TOGGLE_ON,
+        0xf2d2, // ICON_FA_WINDOW_RESTORE, 
+        0xf2ed, // ICON_FA_TRASH_CAN
+        0xf2ed, // ICON_FA_TRASH_CAN,
+        0xf390, // ICON_FA_DESKTOP,
+        0xf533, // ICON_FA_PEOPLE_GROUP
+        0xf53f, // ICON_FA_PALETTE ,
+        0xf550, // ICON_FA_BARS_STAGGERED, 
+        0xf553, // ICON_FA_SHIRT, 
+        0xf554, // ICON_FA_PERSON_WALKING, 
+        0xf5a0, // ICON_FA_MAP_LOCATION_DOT,
+        0xf5bd, // ICON_FA_SPRAY_CAN, 
+        0xf630, // ICON_FA_MASKS_THEATER, 
+        0xf63c, // ICON_FA_TRUCK_PICKUP,
+        0xf689, // ICON_FA_MAGNIFYING_GLASS_LOCATION,
+        0xf70c, // ICON_FA_PERSON_RUNNING, 
+        0xf783, // ICON_FA_CALENDAR_DAY,
         0,
     };
     return &ranges[0];
 }
 
-const ImWchar* FontMgr::GetIconGlyphRanges()
+ImFont* FontMgr::LoadFont(const char* fontID, const unsigned int* func, unsigned int size, bool withIcons, float fontMul)
 {
-    static const ImWchar ranges[] =
-    {
-        // FontAwesome icons
-        ICON_MIN_FA, ICON_MAX_FA,
-        0,
-    };
-    return &ranges[0];
-}
-
-ImFont* FontMgr::LoadFont(const char* fontID, eFontMode mode, const char* path, float fontMul)
-{
-    FontInfo data;
-    bool new_font = true;
+    ImFont* font;
     ImGuiIO& io = ImGui::GetIO();
+    ImFontConfig config;
+    config.OversampleH = 1;
+    config.OversampleV = 1;
+    config.PixelSnapH = 1;
+
     size_t fontSize = static_cast<int>(screen::GetScreenHeight() / 54.85f) * fontMul;
 
-    ImFontConfig config;
-    config.MergeMode = false;
-    config.GlyphMinAdvanceX = fontSize; // Use if you want to make the icon monospaced
-    
-    for (FontInfo info : m_vecFonts)
+    font = io.Fonts->AddFontFromMemoryCompressedTTF(func, fontSize, fontSize, &config, GetGlyphRanges());
+
+    if (withIcons)
     {
-        if (!strcmp(info.m_ID.c_str(), fontID))
-        {
-            data = info;
-            new_font = false;
-            break;
-        }
+        config.MergeMode = withIcons;
+        io.Fonts->AddFontFromMemoryCompressedTTF(iconFont, iconFontSize, fontSize, &config, GetGlyphRanges());
     }
 
-    if (mode == eFontMode::Text)
-    {
-        data.m_pFont = io.Fonts->AddFontFromFileTTF(path, fontSize, NULL, GetGlyphRanges());
-    }
-    if (mode == eFontMode::Icon)
-    {
-        data.m_pFont = io.Fonts->AddFontFromFileTTF(path, fontSize, &config, GetIconGlyphRanges());
-    }
+    m_vecFonts.push_back({font, fontSize, fontMul, std::string(fontID), func});
+    io.Fonts->Build();
 
-    if (mode == eFontMode::Merge)
-    {
-        data.m_pFont = io.Fonts->AddFontFromFileTTF(path, fontSize, NULL, GetGlyphRanges());
-        config.MergeMode = true;
-        io.Fonts->AddFontFromFileTTF(MENU_DATA_PATH("fonts/icon.ttf"), fontSize, &config, GetIconGlyphRanges());
-    }
-
-    if (new_font)
-    {
-        data.mode = mode;
-        data.m_nSize = fontSize;
-        data. m_fMul = fontMul;
-        data.m_ID = std::string(fontID);
-        data.m_path = std::string(path);
-        m_vecFonts.push_back(data);
-    }
-    return data.m_pFont; 
+    return font; 
 }
 
 void FontMgr::UnloadAll()
@@ -136,11 +142,6 @@ void FontMgr::Process()
 
     m_bFontReloadRequired = true;
     curState = eStates::Idle;
-}
-
-bool FontMgr::IsSupportPackageInstalled()
-{
-    return std::filesystem::file_size(MENU_DATA_PATH("fonts/text.ttf")) > 1000000; // 1 MB
 }
 
 bool FontMgr::IsFontReloadRequired()

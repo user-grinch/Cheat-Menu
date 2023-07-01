@@ -137,7 +137,6 @@ CheatMenuMgr::CheatMenuMgr()
         bool modloader = GetModuleHandle("modloader.asi");
         const char *path = PLUGIN_PATH((char*)"");
         Log::Print<eLogLevel::None>("Install location: {}", modloader && strstr(path, "modloader") ? "Modloader" : "Game directory");
-        Log::Print<eLogLevel::None>("Font support package: {}", FontMgr::IsSupportPackageInstalled() ? "True" : "False");
         Log::Print<eLogLevel::None>("FLA installed: {}", GetModuleHandle("$fastman92limitAdjuster.asi") ? "True" : "False");
         Log::Print<eLogLevel::None>("Modloader installed: {}", modloader ? "True" : "False");
         Log::Print<eLogLevel::None>("OLA installed: {}", GetModuleHandle("III.VC.SA.LimitAdjuster.asi") ? "True" : "False");
@@ -243,7 +242,6 @@ void CheatMenuMgr::ApplyStyle()
     ImGuiStyle *style = &ImGui::GetStyle();
     ImVec4* colors = style->Colors;
     
-    style->AntiAliasedLines = true;
     style->FrameBorderSize = 0.0f;
     style->WindowBorderSize = 0.00f;
     style->PopupBorderSize = 0.0f;

@@ -5,6 +5,8 @@
 #include "imgui/imgui_impl_dx9.h"
 #include "imgui/imgui_impl_dx11.h"
 #include "imgui/imgui_impl_win32.h"
+#include "../include/fonts/text.hpp"
+#include "../include/fonts/title.hpp"
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -139,10 +141,9 @@ void D3dHook::ProcessFrame(void* ptr)
         ImGui_ImplWin32_EnableDpiAwareness();
 
         // Loading fonts
-        io.FontDefault = FontMgr::LoadFont("text", FontMgr::eFontMode::Merge, MENU_DATA_PATH("fonts/text.ttf"), 1.3f);
-        FontMgr::LoadFont("title", FontMgr::eFontMode::Text, MENU_DATA_PATH("fonts/title.ttf"), 2.5f);
-        FontMgr::LoadFont("icon", FontMgr::eFontMode::Icon, MENU_DATA_PATH("fonts/icon.ttf"), 1.5f);
-        io.Fonts->Build();
+        io.FontDefault = FontMgr::LoadFont("text", textFont, textFontSize, true, 1.3f);
+        FontMgr::LoadFont("title", titleFont, titleFontSize, false, 2.5f);
+        FontMgr::LoadFont("icon", iconFont, iconFontSize, false, 1.5f);
 
         io.IniFilename = nullptr;
         io.LogFilename = nullptr;

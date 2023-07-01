@@ -1,1 +1,1 @@
-binary_to_compressed_c.exe -base85 text.otf text > text.cpp
+binary_to_compressed_c.exe text.ttf text > text.cpp
