@@ -1087,7 +1087,7 @@ void VehiclePage::Draw()
             CVehicle* veh = FindPlayerPed()->m_pVehicle;
             int hveh = CPools::GetVehicleRef(veh);
 #ifdef GTASA
-            if (ImGui::BeginTabItem(TEXT("Vehicle.Customize")))
+            if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_SWATCHBOOK, "Vehicle.Customize")))
             {
                 ImGui::Spacing();
 
@@ -1101,7 +1101,7 @@ void VehiclePage::Draw()
 #else
             VehCustmzr.Draw();
 #endif
-            if (ImGui::BeginTabItem(TEXT("Vehicle.AutoDrive")))
+            if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_TAXI, "Vehicle.AutoDrive")))
             {
                 ImGui::Spacing();
                 AutoDrive.Draw();

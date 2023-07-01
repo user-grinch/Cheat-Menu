@@ -90,7 +90,7 @@ void AutoDriveMgr::Draw()
     ImGui::Spacing();
     if (ImGui::BeginTabBar("PassTabaBar"))
     {
-        if (ImGui::BeginTabItem(TEXT("Teleport.Coordinates")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_MAP_LOCATION_DOT, "Teleport.Coordinates")))
         {
             static char buf[INPUT_BUFFER_SIZE];
             ImGui::Spacing();
@@ -111,7 +111,7 @@ void AutoDriveMgr::Draw()
 #endif
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT("Teleport.Location")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_MAGNIFYING_GLASS_LOCATION, "Teleport.Location")))
         {
             ImGui::Spacing();
             Widget::DataList(teleportPage.m_locData,

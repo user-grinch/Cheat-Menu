@@ -337,7 +337,7 @@ void VehCustmzrMgr::Draw()
     CVehicle* pVeh = BY_GAME(FindPlayerVehicle(-1, false), FindPlayerVehicle(), FindPlayerVehicle());
     int hVeh = CPools::GetVehicleRef(pVeh);
 
-    if (ImGui::BeginTabItem(TEXT("Vehicle.Color")))
+    if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_PALETTE, "Vehicle.Color")))
     {
 #ifdef GTASA
         ImGui::Spacing();
@@ -401,7 +401,7 @@ void VehCustmzrMgr::Draw()
     {
         CVehicle* pVeh = BY_GAME(FindPlayerVehicle(-1, false), FindPlayerVehicle(), FindPlayerVehicle());
 
-        if (ImGui::BeginTabItem(TEXT("Vehicle.NeonsTab")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_LIGHTBULB,"Vehicle.NeonsTab")))
         {
             int model = pVeh->m_nModelIndex;
             ImGui::Spacing();
@@ -469,7 +469,7 @@ void VehCustmzrMgr::Draw()
             ImGui::EndTabItem();
         }
 
-        if (ImGui::BeginTabItem(TEXT("Vehicle.TextureTab")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_PAINT_ROLLER, "Vehicle.TextureTab")))
         {
             ImGui::Spacing();
             if (ImGui::Button(TEXT("Vehicle.ResetTexture"), ImVec2(Widget::CalcSize())))
@@ -527,7 +527,7 @@ void VehCustmzrMgr::Draw()
             ImGui::EndTabItem();
         }
     }
-    if (ImGui::BeginTabItem(TEXT("Vehicle.TuneTab")))
+    if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_WRENCH, "Vehicle.TuneTab")))
     {
         ImGui::Spacing();
         if (ImGui::Button(TEXT("Vehicle.RemoveTune"), ImVec2(Widget::CalcSize())))
@@ -584,7 +584,7 @@ void VehCustmzrMgr::Draw()
 
         ImGui::EndTabItem();
     }
-    if (ImGui::BeginTabItem(TEXT("Vehicle.HandlingTab")))
+    if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_TRUCK_PICKUP, "Vehicle.HandlingTab")))
     {
         ImGui::Spacing();
         // https://github.com/multitheftauto/mtasa-blue/blob/16769b8d1c94e2b9fe6323dcba46d1305f87a190/Client/game_sa/CModelInfoSA.h#L213
@@ -708,7 +708,7 @@ void VehCustmzrMgr::Draw()
 
         ImGui::EndTabItem();
     }
-    if (ImGui::BeginTabItem(TEXT("Vehicle.Save")))
+    if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_FLOPPY_DISK, "Vehicle.Save")))
     {
         ImGui::Spacing();
         ImGui::InputText(TEXT("Menu.Name"), m_nLabel, IM_ARRAYSIZE(m_nLabel));

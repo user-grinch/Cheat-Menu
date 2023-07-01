@@ -49,14 +49,18 @@ const ImWchar* FontMgr::GetGlyphRanges()
         0xf030, // ICON_FA_CAMERA 
         0xf03d, // ICON_FA_VIDEO,
         0xf07c, // ICON_FA_FOLDER_OPEN, 
+        0xf0ad, // ICON_FA_WRENCH
         0xf0ae, // ICON_FA_LIST_CHECK, 
+        0xf0c7, // ICON_FA_FLOPPY_DISK
         0xf0c9, // ICON_FA_BARS,
         0xf0cb, // ICON_FA_LIST_OL 
         0xf0d7, // ICON_FA_CARET_DOWN,
+        0xf0eb, // ICON_FA_LIGHTBULB
         0xf11b, // ICON_FA_GAMEPAD
         0xf11c, // ICON_FA_KEYBOARD, 
         0xf120, // ICON_FA_TERMINAL, 
         0xf129, // ICON_FA_INFO,
+        0xf1ba, // ICON_FA_TAXI
         0xf205, // ICON_FA_TOGGLE_ON,
         0xf2d2, // ICON_FA_WINDOW_RESTORE, 
         0xf2ed, // ICON_FA_TRASH_CAN
@@ -68,7 +72,9 @@ const ImWchar* FontMgr::GetGlyphRanges()
         0xf553, // ICON_FA_SHIRT, 
         0xf554, // ICON_FA_PERSON_WALKING, 
         0xf5a0, // ICON_FA_MAP_LOCATION_DOT,
+        0xf5aa, // ICON_FA_PAINT_ROLLER
         0xf5bd, // ICON_FA_SPRAY_CAN, 
+        0Xf5c3, // ICON_FA_SWATCHBOOK
         0xf630, // ICON_FA_MASKS_THEATER, 
         0xf63c, // ICON_FA_TRUCK_PICKUP,
         0xf689, // ICON_FA_MAGNIFYING_GLASS_LOCATION,
