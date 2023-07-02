@@ -329,7 +329,7 @@ void WeaponPage::Draw()
             ImGui::NextColumn();
 #else
             ImGui::NextColumn();
-            Widget::Checkbox(TEXT("Weapon.InfiniteAmmo"), &m_bInfiniteAmmo);
+            Widget::Toggle(TEXT("Weapon.InfiniteAmmo"), &m_bInfiniteAmmo);
 #endif
             if (Widget::Toggle(TEXT("Weapon.LongRange"), &m_bLongRange))
             {

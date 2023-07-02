@@ -119,8 +119,8 @@ ImGuiToggleConfig ImGuiTogglePresets::MaterialStyle(float size_scale /*= 1.0f*/)
     const float material_inset = -2.5f * size_scale;
 
     static ImGuiTogglePalette material_palette_on, material_palette_off;
-    material_palette_on.Frame = {0.9411f, 0.1961f, 0.2588f, 1.00f}; // red
-    material_palette_on.FrameHover = {0.8411f, 0.1961f, 0.2588f, 1.00f}; // red
+    material_palette_on.Frame = ImGui::GetStyle().Colors[ImGuiCol_ButtonActive];
+    material_palette_on.FrameHover = ImGui::GetStyle().Colors[ImGuiCol_ButtonActive];
     material_palette_on.Knob = {1.0f, 1.0f, 1.0f, 1.0f}; 
     material_palette_on.KnobHover = {1.0f, 1.0f, 1.0f, 1.0f};
 

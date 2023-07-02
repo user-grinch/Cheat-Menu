@@ -365,12 +365,11 @@ void PlayerPage::Draw()
             ImGui::BeginChild("CheckboxesChild");
             ImGui::Spacing();
             ImGui::Columns(2, 0, false);
-            
+#ifdef GTASA
             if (Widget::Toggle(TEXT("Player.AimSkinChanger"), &m_bAimSkinChanger, (TEXT_S("Player.AimSkinChangerTip") + aimSkinChanger.GetNameString()).c_str()))
             {
                 gConfig.Set("Features.AimSkinChanger", m_bAimSkinChanger);
             }
-#ifdef GTASA
             Widget::ToggleAddr<int8_t>(TEXT("Player.BountyYourself"), 0x96913F);
 
             ImGui::BeginDisabled(TopDownCam.GetState());
@@ -464,10 +463,10 @@ void PlayerPage::Draw()
             }
             Widget::ToggleAddr<int8_t>(TEXT("Player.InfSprint"), 0xB7CEE4);
 #else
-            Widget::CheckboxAddr<int8_t>(TEXT("Player.InfSprint"), (int)&pInfo->m_bInfiniteSprint);
+            Widget::ToggleAddr<int8_t>(TEXT("Player.InfSprint"), (int)&pInfo->m_bInfiniteSprint);
 #endif
 #ifdef GTAVC
-            if (Widget::Checkbox(TEXT("Player.NoUndress"), &m_bNoUndress, TEXT("Player.NoUndressTip")))
+            if (Widget::Toggle(TEXT("Player.NoUndress"), &m_bNoUndress, TEXT("Player.NoUndressTip")))
             {
                 if (m_bNoUndress)
                 {
@@ -550,7 +549,7 @@ void PlayerPage::Draw()
             }
 #else
             static bool neverWanted = false;
-            if (Widget::Checkbox(TEXT("Player.NeverWanted"), &neverWanted))
+            if (Widget::Toggle(TEXT("Player.NeverWanted"), &neverWanted))
             {
                 if (neverWanted)
                 {
@@ -846,7 +845,7 @@ void PlayerPage::Draw()
             ImGui::EndTabItem();
         }
 #else
-        if (ImGui::BeginTabItem(TEXT("Player.SkinsTab")))
+        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_PERSON_MILITARY_TO_PERSON, "Player.SkinsTab")))
         {
             ImGui::Spacing();
 #ifdef GTA3

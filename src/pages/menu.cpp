@@ -18,6 +18,11 @@ MenuPage::MenuPage()
         m_bDiscordRPC = gConfig.Get("Menu.DiscordRPC", false);
         m_bAutoCheckUpdate = gConfig.Get("Menu.AutoCheckUpdate", true);
         m_bTextOnlyMode = gConfig.Get("Menu.TextOnlyMode", false);
+
+        m_fAccentColor[0] = gConfig.Get("Menu.AccentColor.Red", 0.9412f);
+        m_fAccentColor[1] = gConfig.Get("Menu.AccentColor.Green", 0.1961f);
+        m_fAccentColor[2] = gConfig.Get("Menu.AccentColor.Blue", 0.2588f);
+        CheatMenu.UpdateAccentColor(m_fAccentColor);
     };
 
     if (m_bDiscordRPC)
@@ -50,7 +55,7 @@ void MenuPage::Draw()
 
             if (vec.size() > 0)
             {
-                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() / 2);
+                ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 3);
                 if (Widget::ListBox(TEXT("Menu.Language"), vec, selected))
                 {
                     if (Locale::SetLocale(selected) == Locale::eReturnCodes::SUCCESS)
@@ -63,9 +68,19 @@ void MenuPage::Draw()
                         Util::SetMessage(TEXT("Menu.LanguageChangeFailed"));
                     }
                 }
+
+                if (ImGui::ColorEdit3(TEXT("Menu.SelectAccentColor"), m_fAccentColor))
+                {
+                    gConfig.Set("Menu.AccentColor.Red", m_fAccentColor[0]);
+                    gConfig.Set("Menu.AccentColor.Green", m_fAccentColor[1]);
+                    gConfig.Set("Menu.AccentColor.Blue", m_fAccentColor[2]);
+                    CheatMenu.UpdateAccentColor(m_fAccentColor);
+                }
+
+                ImGui::PopItemWidth();
             }
 
-            ImGui::Spacing();
+            ImGui::Dummy(ImVec2(0, 20));
 
             ImGui::Columns(2, NULL, false);
             if (Widget::Toggle(TEXT("Menu.AutoCheckUpdate"), &m_bAutoCheckUpdate))

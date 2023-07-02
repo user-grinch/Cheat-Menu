@@ -821,17 +821,17 @@ void VisualPage::Draw()
             Widget::ToggleAddr<int8_t>(TEXT("Visual.UnderwaterEffect"), 0xC402D3);
             Widget::ToggleAddr<int>(TEXT("Visual.UnfogMap"), 0xBA372C, TEXT("Visual.UnfogMapText") , 0x50, 0x0);
 #elif GTAVC
-            Widget::CheckboxAddr<int8_t>(TEXT("Visual.HideRadar"), 0xA10AB6);
-            Widget::Checkbox(TEXT("Visual.LockWeather"), &m_bLockWeather);
-            Widget::CheckboxAddr<int8_t>(TEXT("Visual.ShowHud"), 0x86963A);
+            Widget::ToggleAddr<int8_t>(TEXT("Visual.HideRadar"), 0xA10AB6);
+            Widget::Toggle(TEXT("Visual.LockWeather"), &m_bLockWeather);
+            Widget::ToggleAddr<int8_t>(TEXT("Visual.ShowHud"), 0x86963A);
 
             ImGui::NextColumn();
 
-            Widget::CheckboxAddr<int8_t>(TEXT("Visual.GreenScanlines"), 0xA10B69);
-            Widget::CheckboxAddr<int8_t>(TEXT("Visual.WhiteScanlines"), 0xA10B68);
+            Widget::ToggleAddr<int8_t>(TEXT("Visual.GreenScanlines"), 0xA10B69);
+            Widget::ToggleAddr<int8_t>(TEXT("Visual.WhiteScanlines"), 0xA10B68);
 #else
             static bool hideHud, hideRadar;
-            if (Widget::Checkbox(TEXT("Visual.HideHud"), &hideHud))
+            if (Widget::Toggle(TEXT("Visual.HideHud"), &hideHud))
             {
                 if (hideHud)
                 {
@@ -842,7 +842,7 @@ void VisualPage::Draw()
                     patch::SetRaw(0x48E420, (char*)"\xE8\x7B\x6E\x07\x00", 5);
                 }
             }
-            if (Widget::Checkbox(TEXT("Visual.HideRadar"), &hideRadar))
+            if (Widget::Toggle(TEXT("Visual.HideRadar"), &hideRadar))
             {
                 if (hideHud)
                 {
@@ -853,7 +853,7 @@ void VisualPage::Draw()
                     patch::SetRaw(0x50838D, (char*)"\xE8\x6E\xBE\xF9\xFF", 5);
                 }
             }
-            Widget::Checkbox(TEXT("Visual.LockWeather"), &m_bLockWeather);
+            Widget::Toggle(TEXT("Visual.LockWeather"), &m_bLockWeather);
 #endif
             ImGui::Columns(1);
             ImGui::EndChild();

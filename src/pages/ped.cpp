@@ -277,25 +277,25 @@ void PedPage::Draw()
             Widget::ToggleAddr<int8_t>(TEXT("Ped.SlutMagnet"), 0x96915D);
             Widget::Toggle(TEXT("Ped.ThinBody"), &m_bThinBody);
 #elif GTAVC
-            Widget::CheckboxAddr<int8_t>(TEXT("Ped.NoProstitutes"), 0xA10B99);
-            Widget::CheckboxAddr<int8_t>(TEXT("Ped.SlutMagnet"), 0xA10B5F);
+            Widget::ToggleAddr<int8_t>(TEXT("Ped.NoProstitutes"), 0xA10B99);
+            Widget::ToggleAddr<int8_t>(TEXT("Ped.SlutMagnet"), 0xA10B5F);
             ImGui::NextColumn();
-            Widget::CheckboxAddr<int8_t>(TEXT("Ped.WeaponAll"), 0xA10AB3);
+            Widget::ToggleAddr<int8_t>(TEXT("Ped.WeaponAll"), 0xA10AB3);
 #else
             // Bad idea lol
             static bool pedsMayhem;
-            if (Widget::Checkbox(TEXT("Ped.PedsMayhem"), &pedsMayhem))
+            if (Widget::Toggle(TEXT("Ped.PedsMayhem"), &pedsMayhem))
             {
                 Call<0x4911C0>();
             }
             static bool everyoneAttacksPlayer;
-            if (Widget::Checkbox(TEXT("Ped.EveryoneAtk"), &everyoneAttacksPlayer))
+            if (Widget::Toggle(TEXT("Ped.EveryoneAtk"), &everyoneAttacksPlayer))
             {
                 Call<0x491270>();
             }
             ImGui::NextColumn();
-            Widget::CheckboxAddr<int8_t>(TEXT("Ped.NastyLimbs"), 0x95CD44);
-            Widget::CheckboxAddr<int8_t>(TEXT("Ped.WeaponAll"), 0x95CCF6);
+            Widget::ToggleAddr<int8_t>(TEXT("Ped.NastyLimbs"), 0x95CD44);
+            Widget::ToggleAddr<int8_t>(TEXT("Ped.WeaponAll"), 0x95CCF6);
 #endif
             ImGui::Columns(1);
             ImGui::EndChild();

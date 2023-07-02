@@ -594,7 +594,7 @@ void VehiclePage::Draw()
                     patch::SetRaw(0x6F8C2A, (void*)"\x8A\x46\x36\xA8\xF8\xD8\x8E", 7);
                 }
             }
-            // if (Widget::Checkbox(TEXT("Vehicle.NoColl"), &m_bDisableColDetection))
+            // if (Widget::Toggle(TEXT("Vehicle.NoColl"), &m_bDisableColDetection))
             // {
             // 	if (m_bDisableColDetection)
             // 	{
@@ -675,7 +675,7 @@ void VehiclePage::Draw()
             }
 
 #elif GTA3
-            Widget::CheckboxAddr<int8_t>(TEXT("Vehicle.PerfectHandling"), 0x95CD66);
+            Widget::ToggleAddr<int8_t>(TEXT("Vehicle.PerfectHandling"), 0x95CD66);
 #endif
             Widget::Toggle(TEXT("Vehicle.Watertight"), &m_bVehWatertight, TEXT("Vehicle.WatertightTip"));
             Widget::ToggleAddr<int8_t>(TEXT("Vehicle.OnlyWheels"), BY_GAME(0x96914B, 0xA10B70, 0x95CD78));

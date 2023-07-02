@@ -17,6 +17,11 @@ void CheatMenuMgr::Draw()
     ImGuiIO& io = ImGui::GetIO();
     static bool bRunning = true;
 
+    if (m_bUpdateColors)
+    {
+        ApplyStyle(m_Color);
+        m_bUpdateColors = false;
+    }
     if (FrontEndMenuManager.m_bMenuActive)
     {
         if (bRunning)
@@ -59,9 +64,16 @@ void CheatMenuMgr::Draw()
     }
     Overlay::Draw();
 }
+
 void CheatMenuMgr::SetVisibility(bool flag) 
 {
     m_bVisible = flag;
+}
+
+void CheatMenuMgr::UpdateAccentColor(float *col) 
+{
+    m_Color = {int(col[0] * 255), int(col[1] * 255), int(col[2] * 255), 255};
+    m_bUpdateColors = true;
 }
 
 CheatMenuMgr& CheatMenu = CheatMenuMgr::Get();
@@ -237,7 +249,7 @@ bool CheatMenuMgr::IsVisible()
     return m_bVisible;
 }
 
-void CheatMenuMgr::ApplyStyle()
+void CheatMenuMgr::ApplyStyle(ImColor accent_col)
 {
     ImGuiStyle *style = &ImGui::GetStyle();
     ImVec4* colors = style->Colors;
@@ -261,19 +273,19 @@ void CheatMenuMgr::ApplyStyle()
     style->Colors[ImGuiCol_WindowBg] = ImColor(0, 0, 0, 215);
     style->Colors[ImGuiCol_Border] = ImColor(33, 34, 45, 255);
     style->Colors[ImGuiCol_Button] = ImColor(33, 34, 45, 255);
-    style->Colors[ImGuiCol_ButtonActive] = ImColor(240, 50, 66, 255);
+    style->Colors[ImGuiCol_ButtonActive] = accent_col;
     style->Colors[ImGuiCol_ButtonHovered] = ImColor(30, 30, 40, 255);
     style->Colors[ImGuiCol_ScrollbarGrab] = ImColor(33, 34, 45, 255);
-    style->Colors[ImGuiCol_ScrollbarGrabActive] = ImColor(240, 50, 66, 255);
+    style->Colors[ImGuiCol_ScrollbarGrabActive] = accent_col;
     style->Colors[ImGuiCol_ScrollbarGrabHovered] = ImColor(30, 30, 40, 255);
     style->Colors[ImGuiCol_FrameBg] = ImColor(33, 34, 45, 255);
-    style->Colors[ImGuiCol_FrameBgActive] = ImColor(240, 50, 66, 255);
+    style->Colors[ImGuiCol_FrameBgActive] = accent_col;
     style->Colors[ImGuiCol_FrameBgHovered] = ImColor(30, 30, 40, 255);
     style->Colors[ImGuiCol_Text] = ImColor(255, 255, 255, 255);
     style->Colors[ImGuiCol_ChildBg] = ImColor(0, 0, 0, 0);
-    style->Colors[ImGuiCol_CheckMark] = ImColor(240, 50, 66, 255);
+    style->Colors[ImGuiCol_CheckMark] = accent_col;
     style->Colors[ImGuiCol_SliderGrab] = ImColor(240, 74, 88, 255);
-    style->Colors[ImGuiCol_SliderGrabActive] = ImColor(240, 50, 66, 255);
+    style->Colors[ImGuiCol_SliderGrabActive] = accent_col;
     style->Colors[ImGuiCol_Header] = ImColor(0, 0, 0, 0);
     style->Colors[ImGuiCol_HeaderHovered] = ImColor(30, 30, 40, 255);
     style->Colors[ImGuiCol_HeaderActive] = ImColor(30, 30, 40, 255);
@@ -281,8 +293,8 @@ void CheatMenuMgr::ApplyStyle()
     style->Colors[ImGuiCol_ResizeGripHovered] = ImColor(30, 30, 40, 255);
     style->Colors[ImGuiCol_ResizeGripActive] = ImColor(240, 50, 66, 0);
     style->Colors[ImGuiCol_SeparatorHovered] = ImColor(30, 30, 40, 255);
-    style->Colors[ImGuiCol_SeparatorActive] = ImColor(240, 50, 66, 255);
-    style->Colors[ImGuiCol_TitleBgActive] = ImColor(240, 50, 66, 255);
+    style->Colors[ImGuiCol_SeparatorActive] = accent_col;
+    style->Colors[ImGuiCol_TitleBgActive] = accent_col;
     style->Colors[ImGuiCol_Tab] = ImColor(0, 0, 0, 0);
     style->Colors[ImGuiCol_TabActive] = ImColor(33, 34, 45, 255);
     style->Colors[ImGuiCol_TabHovered] = ImColor(30, 31, 42, 255);

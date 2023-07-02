@@ -222,7 +222,7 @@ void TeleportPage::WarpPlayer(CVector pos, int interiorID)
 #endif
     CStreaming::LoadAllRequestedModels(false);
 
-    if (pVeh && pPlayer->m_pVehicle)
+    if (pVeh && pPlayer->m_pVehicle && pPlayer->m_bInVehicle)
     {
 #ifdef GTAVC
         pVeh->m_nAreaCode = interiorID;
@@ -311,7 +311,7 @@ void TeleportPage::Draw()
 #else
                 ImGui::Spacing();
                 ImGui::SameLine();
-                Widget::Checkbox(TEXT("Teleport.InsertCoord"), &m_bInsertCoord);
+                Widget::Toggle(TEXT("Teleport.InsertCoord"), &m_bInsertCoord);
 #endif
                 ImGui::Spacing();
 
