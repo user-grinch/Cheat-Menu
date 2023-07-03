@@ -344,6 +344,7 @@ void VehiclePage::SpawnVehicle(std::string& smodel)
     }
     else
     {
+        *CVehicleModelInfo::ms_compsToUse = m_nVehicleVariant;
         CStreaming::RequestModel(imodel, PRIORITY_REQUEST);
         CStreaming::LoadAllRequestedModels(false);
 
@@ -435,6 +436,9 @@ void VehiclePage::SpawnVehicle(std::string& rootkey, std::string& vehName, std::
             pos.z -= 5;
         }
     }
+#ifdef GTAVC
+        *CVehicleModelInfo::ms_compsToUse = m_nVehicleVariant;
+#endif
 
     CStreaming::RequestModel(imodel, PRIORITY_REQUEST);
     CStreaming::LoadAllRequestedModels(false);
@@ -663,16 +667,13 @@ void VehiclePage::Draw()
                     {
                         pVeh->ExtinguishCarFire();
                     }
-                    // Patch ped vehicles damage when flipped
-                    patch::Nop(0x6A776B, 6);
 
                     // Patch player vehicle damage when flipped
-                    patch::Nop(0x570E7F, 6);
+                    patch::SetRaw(0x570E7F, (void*)"\xD8\xDD\x90\x90\x90\x90", 6); // fstp st0, nop 4
                 }
                 else
                 {
                     // restore patches
-                    patch::SetRaw(0x6A776B, (void*)"\xD9\x9E\xC0\x04\x00\x00", 6);
                     patch::SetRaw(0x570E7F, (void*)"\xD9\x99\xC0\x04\x00\x00", 6); // fstp dword ptr [ecx+4C0h]
                 }
             }
@@ -1010,12 +1011,8 @@ void VehiclePage::Draw()
         {
             ImGui::Spacing();
 
-            int width = ImGui::GetWindowContentRegionWidth() - ImGui::GetStyle().ItemSpacing.x;
-#ifdef GTASA
-            width /= 2;
-#endif
-
-            ImGui::SetNextItemWidth(width);
+            ImGui::Columns(BY_GAME(3, 2, 1), NULL, false);
+            ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
             static char smodel[8];
             if (ImGui::InputTextWithHint("##SpawnID", TEXT("Vehicle.IDSpawnText"), smodel, 8, ImGuiInputTextFlags_EnterReturnsTrue))
             {
@@ -1044,10 +1041,41 @@ void VehiclePage::Draw()
                 }
             }
 #ifdef GTASA
-            ImGui::SameLine();
-            ImGui::SetNextItemWidth(width);
+            ImGui::NextColumn();
+            ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth());
             ImGui::InputTextWithHint("##LicenseText", TEXT("Vehicle.PlateText"), m_Spawner.m_nLicenseText, 9);
-
+#endif
+#ifndef GTA3
+            ImGui::NextColumn();
+            static char current_variant = 0;
+            
+            if (ImGui::ArrowButton("Left", ImGuiDir_Left))
+            {
+                m_nVehicleVariant -= 1;
+                if (m_nVehicleVariant < 0)
+                {
+                    m_nVehicleVariant = 5;
+                }
+            }
+            ImGui::SameLine();
+            ImGui::Spacing();
+            ImGui::SameLine();
+            ImGui::Text(TEXT("Vehicle.Variant"), m_nVehicleVariant);
+            ImGui::SameLine();
+            ImGui::Spacing();
+            ImGui::SameLine();
+            if (ImGui::ArrowButton("Right", ImGuiDir_Right))
+            {
+                m_nVehicleVariant += 1;
+                if (m_nVehicleVariant > 4)
+                {
+                    m_nVehicleVariant = 0;
+                }
+            }
+            
+#endif
+#ifdef GTASA
+            ImGui::Columns(1);
             Widget::ImageList(m_Spawner.m_VehData, fArgWrapper(vehiclePage.SpawnVehicle),
                               [](std::string& str)
             {

@@ -635,6 +635,7 @@ TurnMass = "Turn mass"
 Type = "Type"
 Unsupported = "This vehicle isn't compatible"
 UpperLimit = "Upper limit"
+Variant = "Vehicle variant: %d"
 Watertight = "Watertight car"
 WatertightTip = """
 Peds inside won't drown if the vehicle

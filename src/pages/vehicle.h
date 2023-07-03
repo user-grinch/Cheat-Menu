@@ -22,6 +22,10 @@ private:
     bool m_bNoDerail;
 #endif
 
+#ifndef GTA3
+    int m_nVehicleVariant = 0;
+#endif
+
     struct
     {
         ResourceStore m_VehData { "vehicles", BY_GAME(eResourceType::TYPE_IMAGE_TEXT, eResourceType::TYPE_TEXT,
