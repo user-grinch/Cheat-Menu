@@ -5,7 +5,7 @@
 0020-00FF,
 
 # Punctuation
-2000-206F,
+#2000-206F,
 
 # Bengali
 #0980-09FF,

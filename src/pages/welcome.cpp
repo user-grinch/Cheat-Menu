@@ -10,9 +10,7 @@ void WelcomePage::Draw()
 
     Widget::TextCentered(TEXT("Menu.WelcomeMSG"));
     Widget::TextCentered(std::format("{}: Grinch_",TEXT("Menu.Author")));
-
-    ImGui::NewLine();
-    ImGui::TextWrapped(TEXT("Menu.EnsureLatest"));
+    ImGui::Spacing();
     if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Widget::CalcSize(3))))
     {
         OPEN_LINK(DISCORD_INVITE);
@@ -27,6 +25,7 @@ void WelcomePage::Draw()
     {
         OPEN_LINK(PATREON_LINK);
     }
+
     ImGui::NewLine();
     ImGui::TextWrapped(TEXT("Menu.BugDisclaimer"));
     ImGui::Dummy(ImVec2(0, 20));

@@ -268,7 +268,7 @@ void CheatMenuMgr::ApplyStyle(ImColor accent_col)
     style->ScrollbarSize = 3;
     style->FramePadding = ImVec2(5, 5);
     style->WindowPadding = ImVec2(5, 5);
-    style->ItemSpacing = ImVec2(2, 2);
+    style->ItemSpacing = ImVec2(5, 5);
 
     style->Colors[ImGuiCol_WindowBg] = ImColor(0, 0, 0, 215);
     style->Colors[ImGuiCol_Border] = ImColor(33, 34, 45, 255);

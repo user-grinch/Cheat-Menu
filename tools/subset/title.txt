@@ -1,0 +1,13 @@
+# Title Font
+
+# Numbers
+0030-0039,
+
+# Capital Letters
+0041-005A,
+
+# Small Letters
+0061-007A,
+
+0020, # Space
+002E, # Dot
