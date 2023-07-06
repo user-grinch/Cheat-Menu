@@ -41,7 +41,7 @@ static void RealTimeClock()
 GamePage& gamePage = GamePage::Get();
 
 GamePage::GamePage()
-    : IPage<GamePage>(ePageID::Game, ICON_FA_GAMEPAD, true)
+    : IPage<GamePage>(ePageID::Game, "Game", true)
 {
 #ifdef GTASA
 
@@ -190,7 +190,7 @@ void GamePage::Draw()
 
     if (ImGui::BeginTabBar("Game", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_TOGGLE_ON, "Window.ToggleTab")))
+        if (ImGui::BeginTabItem(TEXT( "Window.ToggleTab")))
         {
             ImGui::BeginChild("##Checkbox");
             ImGui::Spacing();
@@ -372,7 +372,7 @@ void GamePage::Draw()
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_BARS, "Window.MenusTab")))
+        if (ImGui::BeginTabItem(TEXT( "Window.MenusTab")))
         {
             ImGui::Spacing();
             ImGui::BeginChild("##Menus");
@@ -605,7 +605,7 @@ void GamePage::Draw()
             ImGui::EndTabItem();
         }
 #ifdef GTASA
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_CAMERA, "Game.Freecam")))
+        if (ImGui::BeginTabItem(TEXT( "Game.Freecam")))
         {
             ImGui::Spacing();
             bool state = Freecam.GetState();
@@ -736,7 +736,7 @@ void GamePage::Draw()
             ImGui::EndTabItem();
         }
 #endif
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_LIST_OL, "Game.Missions")))
+        if (ImGui::BeginTabItem(TEXT( "Game.Missions")))
         {
             ImGui::Spacing();
 
@@ -767,7 +767,7 @@ void GamePage::Draw()
             ImGui::EndTabItem();
         }
 #ifdef GTASA
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_BARS_STAGGERED, "Game.Stats")))
+        if (ImGui::BeginTabItem(TEXT( "Game.Stats")))
         {
             ImGui::Spacing();
 
@@ -800,7 +800,7 @@ void GamePage::Draw()
             Widget::DataList(m_StatData, nullptr, nullptr, true);
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_MASKS_THEATER, "Game.RandomCheats")))
+        if (ImGui::BeginTabItem(TEXT( "Game.RandomCheats")))
         {
             ImGui::Spacing();
             ImGui::Columns(2, NULL, false);

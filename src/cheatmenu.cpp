@@ -53,10 +53,10 @@ void CheatMenuMgr::Draw()
                 {
                     m_fSize = ImGui::GetWindowSize();
                     m_fPos = ImGui::GetWindowPos();
-                    gConfig.Set("Window.PosX", m_fPos.x);
-                    gConfig.Set("Window.PosY", m_fPos.y);
-                    gConfig.Set("Window.SizeX", m_fSize.x);
-                    gConfig.Set("Window.SizeY", m_fSize.y);
+                    gConfig.Set("Window.Pos.X", m_fPos.x);
+                    gConfig.Set("Window.Pos.Y", m_fPos.y);
+                    gConfig.Set("Window.Size.X", m_fSize.x);
+                    gConfig.Set("Window.Size.Y", m_fSize.y);
                 }
                 ImGui::End();
             }
@@ -96,22 +96,6 @@ CheatMenuMgr::CheatMenuMgr()
             return;
         }
 
-        /*
-            Need SilentPatch since all gta games have issues with mouse input
-            Implementing mouse fix is a headache anyway
-        */
-        if (!GetModuleHandle(BY_GAME("SilentPatchSA.asi","SilentPatchVC.asi","SilentPatchIII.asi")))
-        {
-            Log::Print<eLogLevel::Error>("SilentPatch not found. Please install it from here https://gtaforums.com/topic/669045-silentpatch/");
-            int msgID = MessageBox(NULL, "SilentPatch not found. Do you want to install Silent Patch? (Game restart required)", FILE_NAME, MB_OKCANCEL | MB_DEFBUTTON1);
-
-            if (msgID == IDOK)
-            {
-                OPEN_LINK("https://gtaforums.com/topic/669045-silentpatch/");
-            };
-            return;
-        }
-
         Log::Print<eLogLevel::None>("Starting " MENU_TITLE " (" __DATE__ ")\nAuthor: Grinch_\nDiscord: "
                                     DISCORD_INVITE "\nMore Info: " GITHUB_LINK);
 
@@ -120,31 +104,6 @@ CheatMenuMgr::CheatMenuMgr()
         GetSystemTime(&st);
         Log::Print<eLogLevel::None>("Date: {}-{}-{} Time: {}:{}\n", st.wYear, st.wMonth, st.wDay,
                                     st.wHour, st.wMinute);
-
-        /*
-            TODO: Find a better way
-            Since you could still name it something else
-        */
-#ifdef GTASA
-        if (GetModuleHandle("SAMP.dll") || GetModuleHandle("SAMP.asi"))
-        {
-            Log::Print<eLogLevel::Error>(FILE_NAME " doesn't support SAMP");
-            MessageBox(RsGlobal.ps->window, "SAMP detected. Exiting...", FILE_NAME, MB_ICONERROR);
-            exit(EXIT_FAILURE);
-        }
-        CFastman92limitAdjuster::Init();
-        Log::Print<eLogLevel::None>("Game detected: GTA San Andreas 1.0 US");
-#elif GTAVC
-        if (GetModuleHandle("vcmp-proxy.dll") || GetModuleHandle("vcmp-proxy.asi"))
-        {
-            Log::Print<eLogLevel::Error>(FILE_NAME " doesn't support VCMP");
-            MessageBox(RsGlobal.ps->window, "VCMP detected. Exiting...", FILE_NAME, MB_ICONERROR);
-            exit(EXIT_FAILURE);
-        }
-        Log::Print<eLogLevel::None>("Game detected: GTA Vice City 1.0 EN");
-#else
-        Log::Print<eLogLevel::None>("Game detected: GTA III 1.0 EN");
-#endif
 
         bool modloader = GetModuleHandle("modloader.asi");
         const char *path = PLUGIN_PATH((char*)"");
@@ -155,6 +114,7 @@ CheatMenuMgr::CheatMenuMgr()
 #ifdef GTASA
         Log::Print<eLogLevel::None>("Renderhook installed: {}", GetModuleHandle("_gtaRenderHook.asi") ? "True" : "False");
 #endif
+        Log::Print<eLogLevel::None>("");
         // Checking for updates once a day
         if (menuPage.m_bAutoCheckUpdate && gConfig.Get("Menu.LastUpdateChecked", 0) != st.wDay)
         {
@@ -179,10 +139,10 @@ CheatMenuMgr::CheatMenuMgr()
         Overlay::Init();
 
         // Load menu settings
-        m_fSize.x = gConfig.Get("Window.SizeX", screen::GetScreenWidth() / 2.2f);
-        m_fSize.y = gConfig.Get("Window.SizeY", screen::GetScreenHeight() / 1.7f);
-        m_fPos.x = gConfig.Get("Window.PosX", 50.0f);
-        m_fPos.y = gConfig.Get("Window.PosY", 50.0f);
+        m_fSize.x = gConfig.Get("Window.Size.X", screen::GetScreenWidth() / 2.0f);
+        m_fSize.y = gConfig.Get("Window.Size.Y", screen::GetScreenHeight() / 1.7f);
+        m_fPos.x = gConfig.Get("Window.Pos.X", 50.0f);
+        m_fPos.y = gConfig.Get("Window.Pos.Y", 50.0f);
 
         srand(CTimer::m_snTimeInMilliseconds);
     };
@@ -202,6 +162,48 @@ CheatMenuMgr::CheatMenuMgr()
     Events::initScriptsEvent.before += [this]() 
     {
         gameStartFlag = true;
+
+
+        /*
+            Need SilentPatch since all gta games have issues with mouse input
+            Implementing mouse fix is a headache anyway
+        */
+        if (!GetModuleHandle(BY_GAME("SilentPatchSA.asi","SilentPatchVC.asi","SilentPatchIII.asi")))
+        {
+            Log::Print<eLogLevel::Error>("SilentPatch not found. Please install it from here https://gtaforums.com/topic/669045-silentpatch/");
+            int msgID = MessageBox(NULL, "SilentPatch not found. Do you want to install Silent Patch? (Game restart required)", FILE_NAME, MB_OKCANCEL | MB_DEFBUTTON1);
+
+            if (msgID == IDOK)
+            {
+                OPEN_LINK("https://gtaforums.com/topic/669045-silentpatch/");
+            };
+            return;
+        }
+        
+        /*
+            TODO: Find a better way
+            Since you could still name it something else
+        */
+#ifdef GTASA
+        if (GetModuleHandle("SAMP.dll") || GetModuleHandle("SAMP.asi"))
+        {
+            Log::Print<eLogLevel::Error>(FILE_NAME " doesn't support SAMP");
+            MessageBox(RsGlobal.ps->window, "SAMP detected. Exiting...", FILE_NAME, MB_ICONERROR);
+            exit(EXIT_FAILURE);
+        }
+        CFastman92limitAdjuster::Init();
+        Log::Print<eLogLevel::None>("Game detected: GTA San Andreas 1.0 US");
+#elif GTAVC
+        if (GetModuleHandle("vcmp-proxy.dll") || GetModuleHandle("vcmp-proxy.asi"))
+        {
+            Log::Print<eLogLevel::Error>(FILE_NAME " doesn't support VCMP");
+            MessageBox(RsGlobal.ps->window, "VCMP detected. Exiting...", FILE_NAME, MB_ICONERROR);
+            exit(EXIT_FAILURE);
+        }
+        Log::Print<eLogLevel::None>("Game detected: GTA Vice City 1.0 EN");
+#else
+        Log::Print<eLogLevel::None>("Game detected: GTA III 1.0 EN");
+#endif
     };
 
     Events::processScriptsEvent += [this]()
@@ -258,14 +260,14 @@ void CheatMenuMgr::ApplyStyle(ImColor accent_col)
     style->WindowBorderSize = 0.00f;
     style->PopupBorderSize = 0.0f;
     style->ScrollbarRounding = 5.0f;
-    style->TabRounding = 5.0f;
+    style->TabRounding = 0.0f;
     style->TabBorderSize = 0.0f;
-    style->WindowRounding = 5;
-    style->ChildRounding = 5;
-    style->FrameRounding = 5;
-    style->GrabRounding = 5;
-    style->PopupRounding = 5; 
-    style->ScrollbarSize = 3;
+    style->WindowRounding = 0;
+    style->ChildRounding = 0;
+    style->FrameRounding = 0;
+    style->GrabRounding = 0;
+    style->PopupRounding = 0; 
+    style->ScrollbarSize = 0;
     style->FramePadding = ImVec2(5, 5);
     style->WindowPadding = ImVec2(5, 5);
     style->ItemSpacing = ImVec2(5, 5);
@@ -291,7 +293,7 @@ void CheatMenuMgr::ApplyStyle(ImColor accent_col)
     style->Colors[ImGuiCol_HeaderActive] = ImColor(30, 30, 40, 255);
     style->Colors[ImGuiCol_ResizeGrip] = ImColor(220, 50, 66, 0);
     style->Colors[ImGuiCol_ResizeGripHovered] = ImColor(30, 30, 40, 255);
-    style->Colors[ImGuiCol_ResizeGripActive] = ImColor(240, 50, 66, 0);
+    style->Colors[ImGuiCol_ResizeGripActive] = accent_col;
     style->Colors[ImGuiCol_SeparatorHovered] = ImColor(30, 30, 40, 255);
     style->Colors[ImGuiCol_SeparatorActive] = accent_col;
     style->Colors[ImGuiCol_TitleBgActive] = accent_col;
@@ -302,7 +304,7 @@ void CheatMenuMgr::ApplyStyle(ImColor accent_col)
 
 void CheatMenuMgr::ResetParams()
 {
-    m_fSize.x = screen::GetScreenWidth() / 2.2f;
+    m_fSize.x = screen::GetScreenWidth() / 2.0f;
     m_fSize.y = screen::GetScreenHeight() / 1.7f;
     m_fPos = {50.0f, 50.0f};
     m_bWindowParamUpdated = true;

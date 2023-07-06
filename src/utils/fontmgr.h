@@ -6,14 +6,6 @@
 */
 class FontMgr
 {
-public:
-    enum class eFontMode 
-    {
-        Text,
-        Icon,
-        Merge,
-    };
-
 private:
     enum class eStates
     {
@@ -47,7 +39,7 @@ public:
     static bool IsFontReloadRequired();
 
     // Loads a font from ttf
-    static ImFont* LoadFont(const char* fontID, const unsigned int* func, unsigned int size, bool withIcons = false, float fontMul = 1.0f);
+    static ImFont* LoadFont(const char* fontID, const unsigned int* func, unsigned int size, float fontMul = 1.0f);
 
     // Handles font downloading
     static void Process();

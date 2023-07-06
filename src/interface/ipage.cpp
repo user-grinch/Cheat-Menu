@@ -34,13 +34,8 @@ using IPageStatic = IPage<WelcomePage>; // dummy class
 bool PageHandler::DrawPages()
 {
     bool rtn = false;
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 30.0f);
-    ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(5, 5));
     // ------------------------------ Left Side ------------------------------ 
     // Pages
-
-    ImVec2 size = Widget::CalcSize(3, false);
-    ImGuiStyle &style = ImGui::GetStyle();
 
     if (Updater::IsUpdateAvailable())
     {
@@ -89,16 +84,19 @@ bool PageHandler::DrawPages()
     }
 
     // Button styling
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(10, 10));
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
     ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.1294f, 0.1333f, 0.1765f, 0.8431f));
+    ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_ButtonHovered));
+
     float width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
     float height = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y;
-    uint p = GetPageCount();
-    float btn_sz = (height - ImGui::GetStyle().ItemSpacing.y * (p-1)) / p;
-    ImGui::BeginChild("PagesChild", ImVec2(btn_sz, height));
+    float child_width = width/9;
+    ImGui::BeginChild("PagesChild", ImVec2(child_width, height));
+    height = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y;
+    float btn_height = height/GetPageCount();
+    float btn_width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
 
     // Draw header buttons
-    ImGui::PushFont(FontMgr::Get("icon"));
     ImDrawList *pDrawList = ImGui::GetWindowDrawList();
     for (PagePtr ptr : m_PageList)
     {
@@ -112,11 +110,11 @@ bool PageHandler::DrawPages()
         if (pg == m_pCurrentPage)
         {
             ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
-            flag = true;
             ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImGui::GetStyleColorVec4(ImGuiCol_ButtonActive));
+            flag = true;
         }
         
-        if (ImGui::Button(pg->GetPageKey().c_str(), ImVec2(btn_sz, btn_sz)))
+        if (ImGui::Button(pg->GetPageKey().c_str(), ImVec2(btn_width, btn_height)))
         {
             m_pCurrentPage = pg;
             size_t id = static_cast<size_t>(pg->GetPageID());
@@ -128,47 +126,43 @@ bool PageHandler::DrawPages()
         {
             ImGui::PopStyleColor(2);
         }
-
     }
-    ImGui::PopFont();
     ImGui::EndChild();
-    ImGui::PopStyleColor();
+    ImGui::PopStyleColor(2);
     ImGui::PopStyleVar();
-
     ImGui::SameLine();
-
     // ------------------------------ Right Side ------------------------------ 
     ImGui::BeginGroup();
 
     // Title
-    float rs_width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x 
-                        - btn_sz - ImGui::GetStyle().ItemSpacing.x;
-    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0, 0, 0, 0));
-    ImGui::BeginChild("TitleChild", ImVec2(rs_width - ImGui::GetStyle().ItemSpacing.x - btn_sz, btn_sz));
     ImGui::PushFont(FontMgr::Get("title"));
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 30.0f);
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0, 0, 0, 0));
+    float rs_width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x 
+                        - btn_width - ImGui::GetStyle().ItemSpacing.x;
+
+    ImVec2 child_sz = {rs_width + ImGui::GetStyle().ItemSpacing.x - btn_height, btn_height};
+    ImGui::BeginChild("TitleChild", child_sz);
     Widget::TextCentered(MENU_TITLE);
-    ImGui::PopFont();
     ImGui::EndChild();
-    ImGui::PopStyleColor();
     
     ImGui::SameLine();
-
-    // draw close btn
-    ImGui::PushFont(FontMgr::Get("icon"));
-    if (ImGui::Button(ICON_FA_XMARK, ImVec2(btn_sz, btn_sz)))
+    float close_sz = ImGui::GetTextLineHeightWithSpacing();
+    if (ImGui::Button("X", ImVec2(close_sz, close_sz)))
     {
         rtn = true;
     }
+    ImGui::PopStyleColor();
+    ImGui::PopStyleVar();
     ImGui::PopFont();
-    ImGui::PopStyleVar(2);
+    
     float content_height = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y 
-                        - btn_sz - ImGui::GetStyle().ItemSpacing.y;
+                        - btn_height - ImGui::GetStyle().ItemSpacing.y;
     
     ImGui::BeginChild("ContentChild", ImVec2(rs_width, content_height));
-    if (m_pCurrentPage != nullptr && ImGui::BeginChild("HEADERCONTENT"))
+    if (m_pCurrentPage != nullptr)
     {
         reinterpret_cast<IPageStatic*>(m_pCurrentPage)->Draw();
-        ImGui::EndChild();
     }
     ImGui::EndChild();
     ImGui::EndGroup();

@@ -141,7 +141,7 @@ TranslatorName = "Grinch_"
 
 [Menu]
 About = "About"
-Author = "by"
+Author = "Author"
 AutoCheckUpdate = "Check for updates"
 BugDisclaimer = "Join the discord server for beta updates, provide suggestions and to inform me about bugs"
 Build = "Build"
@@ -634,7 +634,7 @@ TurnMass = "Turn mass"
 Type = "Type"
 Unsupported = "This vehicle isn't compatible"
 UpperLimit = "Upper limit"
-Variant = "Vehicle variant: %d"
+Variant = "Variant: %d"
 Watertight = "Watertight car"
 WatertightTip = """
 Peds inside won't drown if the vehicle

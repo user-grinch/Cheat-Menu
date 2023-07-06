@@ -20,7 +20,7 @@ void ScenePage::Draw()
         CPlayerPed* pPlayer = FindPlayerPed();
         int hPlayer = CPools::GetPedRef(pPlayer);
 
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_PEOPLE_PULLING, "Scene.AnimationTab")))
+        if (ImGui::BeginTabItem(TEXT( "Scene.AnimationTab")))
         {
             ImGui::Spacing();
             if (ImGui::Button(TEXT("Scene.StopAnimation"), Widget::CalcSize()))
@@ -58,7 +58,7 @@ void ScenePage::Draw()
             ImGui::EndTabItem();
         }
 #ifdef GTASA
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_LIST_CHECK, "Scene.Tasks")))
+        if (ImGui::BeginTabItem(TEXT( "Scene.Tasks")))
         {
             ImGui::Spacing();
             Widget::Toggle(TEXT("Menu.ShowPedTasks"), &Overlay::m_bPedTasks);
@@ -103,7 +103,7 @@ void ScenePage::Draw()
             }
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_FILM, "Scene.CutsceneTab")))
+        if (ImGui::BeginTabItem(TEXT( "Scene.CutsceneTab")))
         {
             ImGui::Spacing();
             if (ImGui::Button(TEXT("Scene.StopCutscene"), Widget::CalcSize()))
@@ -120,7 +120,7 @@ void ScenePage::Draw()
             }
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_SPRAY_CAN, "Scene.ParticleTab")))
+        if (ImGui::BeginTabItem(TEXT( "Scene.ParticleTab")))
         {
             ImGui::Spacing();
             if (ImGui::Button(TEXT("Scene.RemoveAll"), Widget::CalcSize(2)))
@@ -147,7 +147,7 @@ void ScenePage::Draw()
             }
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_PERSON_RUNNING, "Scene.Styles")))
+        if (ImGui::BeginTabItem(TEXT( "Scene.Styles")))
         {
             ImGui::Spacing();
 

@@ -9,7 +9,7 @@ class ScenePage : public IPage<ScenePage>
 {
 private:
     friend class IFeature;
-    ScenePage() : IPage<ScenePage>(ePageID::Scene, ICON_FA_VIDEO, true) {}
+    ScenePage() : IPage<ScenePage>(ePageID::Scene, "Scene", true) {}
     ScenePage(const ScenePage&);
 
 public:

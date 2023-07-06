@@ -7,7 +7,7 @@
 
 WeaponPage& weaponPage = WeaponPage::Get();
 WeaponPage::WeaponPage()
-    : IPage<WeaponPage>(ePageID::Weapon, ICON_FA_GUN, true)
+    : IPage<WeaponPage>(ePageID::Weapon, "Weapon", true)
 {
     Events::processScriptsEvent += [this]
     {
@@ -293,7 +293,7 @@ void WeaponPage::Draw()
 
     if (ImGui::BeginTabBar("Ped", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_TOGGLE_ON, "Window.ToggleTab")))
+        if (ImGui::BeginTabItem(TEXT( "Window.ToggleTab")))
         {
             ImGui::BeginChild("CheckboxesChild");
             ImGui::Spacing();
@@ -372,7 +372,7 @@ void WeaponPage::Draw()
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_GUN, "Window.SpawnTab")))
+        if (ImGui::BeginTabItem(TEXT( "Window.SpawnTab")))
         {
             ImGui::Spacing();
             if (ImGui::InputInt(TEXT("Weapon.Ammo"), &m_nAmmoCount))
@@ -396,7 +396,7 @@ void WeaponPage::Draw()
             ImGui::EndTabItem();
         }
 #ifdef GTASA
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_PERSON_RIFLE, "Weapon.GangWeaponEditor")))
+        if (ImGui::BeginTabItem(TEXT( "Weapon.GangWeaponEditor")))
         {
             ImGui::Spacing();
             float width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;

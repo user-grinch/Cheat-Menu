@@ -31,7 +31,7 @@ static inline void PlayerModelBrokenFix()
 
 PlayerPage &playerPage = PlayerPage::Get();
 PlayerPage::PlayerPage()
-    : IPage<PlayerPage>(ePageID::Player, ICON_FA_PERSON_WALKING, true)
+    : IPage<PlayerPage>(ePageID::Player, "Player", true)
 {
 #ifdef GTASA
 //	Fix player model being broken after rebuild
@@ -231,7 +231,7 @@ void PlayerPage::SetCloth(std::string& name)
 
 void PlayerPage::RemoveClothesTab()
 {
-    if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_TRASH_CAN, "Player.RemoveClothesTab")))
+    if (ImGui::BeginTabItem(TEXT( "Player.RemoveClothesTab")))
     {
         ImGui::TextWrapped(TEXT("Player.ClothesTip"));
         ImGui::Spacing();
@@ -360,7 +360,7 @@ void PlayerPage::Draw()
 
     if (ImGui::BeginTabBar("Player", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_TOGGLE_ON, "Window.ToggleTab")))
+        if (ImGui::BeginTabItem(TEXT( "Window.ToggleTab")))
         {
             ImGui::BeginChild("CheckboxesChild");
             ImGui::Spacing();
@@ -537,7 +537,7 @@ void PlayerPage::Draw()
             {
                 pad->bPlayerSafe = !pad->bPlayerSafe;
             }
-            Widget::ToggleAddr<int8_t>(TEXT("Player.MaxAppeal"), 0x969180, "",  0x1, 0x0);
+            Widget::ToggleAddr<int8_t>(TEXT("Player.MaxAppeal"), 0x969180, nullptr,  0x1, 0x0);
             Widget::ToggleAddr<int8_t>(TEXT("Player.MegaJump"), 0x96916C);
             Widget::ToggleAddr<int8_t>(TEXT("Player.MegaPunch"), 0x969173);
             Widget::ToggleAddr<int8_t>(TEXT("Player.NeverGetHungry"), 0x969174);
@@ -649,7 +649,7 @@ void PlayerPage::Draw()
             ImGui::EndTabItem();
         }
 
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_BARS, "Window.MenusTab")))
+        if (ImGui::BeginTabItem(TEXT( "Window.MenusTab")))
         {
             ImGui::BeginChild("PlayerMenus");
 
@@ -798,7 +798,7 @@ void PlayerPage::Draw()
         }
 
 #ifdef GTASA
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_SHIRT, "Player.ClothesTab")))
+        if (ImGui::BeginTabItem(TEXT( "Player.ClothesTab")))
         {
             if (pPlayer->m_nModelIndex == 0)
             {
@@ -827,7 +827,7 @@ void PlayerPage::Draw()
             }
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_PERSON_MILITARY_TO_PERSON, "Player.PedSkinsTab")))
+        if (ImGui::BeginTabItem(TEXT( "Player.PedSkinsTab")))
         {
             Widget::ImageList(pedPage.m_PedData, fArgWrapper(playerPage.SetModel),
                                 [](std::string& str)
@@ -836,7 +836,7 @@ void PlayerPage::Draw()
             });
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_FOLDER_OPEN, "Player.CustomSkinsTab")))
+        if (ImGui::BeginTabItem(TEXT( "Player.CustomSkinsTab")))
         {
             ImGui::BeginChild("AAA");
             ImGui::Spacing();
@@ -845,7 +845,7 @@ void PlayerPage::Draw()
             ImGui::EndTabItem();
         }
 #else
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_PERSON_MILITARY_TO_PERSON, "Player.SkinsTab")))
+        if (ImGui::BeginTabItem(TEXT( "Player.SkinsTab")))
         {
             ImGui::Spacing();
 #ifdef GTA3

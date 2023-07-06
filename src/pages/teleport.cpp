@@ -43,7 +43,7 @@ bool TeleportPage::IsQuickTeleportActive()
 TeleportPage& teleportPage = TeleportPage::Get();
 
 TeleportPage::TeleportPage()
-    : IPage<TeleportPage>(ePageID::Teleport, ICON_FA_MAP_LOCATION_DOT, true)
+    : IPage<TeleportPage>(ePageID::Teleport, "Teleport", true)
 {
     Events::initGameEvent += [this]()
     {
@@ -279,7 +279,7 @@ void TeleportPage::Draw()
     if (ImGui::BeginTabBar("Teleport", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
     {
         ImGui::Spacing();
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_MAP_LOCATION_DOT, "Window.TeleportPage")))
+        if (ImGui::BeginTabItem(TEXT( "Window.TeleportPage")))
         {
             ImGui::Spacing();
             if (ImGui::BeginChild("Teleport Child"))
@@ -386,7 +386,7 @@ void TeleportPage::Draw()
             ImGui::EndTabItem();
         }
 
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_MAGNIFYING_GLASS_LOCATION, "Window.LocationsTab")))
+        if (ImGui::BeginTabItem(TEXT( "Window.LocationsTab")))
         {
 #ifdef GTASA
             FetchRadarSpriteData();

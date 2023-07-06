@@ -102,18 +102,18 @@ void D3dHook::ProcessFrame(void* ptr)
             ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
         }
 
-        if (FontMgr::IsFontReloadRequired())
-        {
-            if (gRenderer == eRenderer::DirectX9)
-            {
-                ImGui_ImplDX9_InvalidateDeviceObjects();
-            }
-            else
-            {
-                ImGui_ImplDX11_InvalidateDeviceObjects();
-            }
-            FontMgr::ReloadAll();
-        }
+        // if (FontMgr::IsFontReloadRequired())
+        // {
+        //     if (gRenderer == eRenderer::DirectX9)
+        //     {
+        //         ImGui_ImplDX9_InvalidateDeviceObjects();
+        //     }
+        //     else
+        //     {
+        //         ImGui_ImplDX11_InvalidateDeviceObjects();
+        //     }
+        //     FontMgr::ReloadAll();
+        // }
     }
     else
     {
@@ -141,9 +141,8 @@ void D3dHook::ProcessFrame(void* ptr)
         ImGui_ImplWin32_EnableDpiAwareness();
 
         // Loading fonts
-        io.FontDefault = FontMgr::LoadFont("text", textFont, textFontSize, true, 1.4f);
-        FontMgr::LoadFont("title", titleFont, titleFontSize, false, 2.5f);
-        FontMgr::LoadFont("icon", iconFont, iconFontSize, false, 1.5f);
+        io.FontDefault = FontMgr::LoadFont("text", textFont, textFontSize, 1.4f);
+        FontMgr::LoadFont("title", titleFont, titleFontSize, 2.5f);
 
         io.IniFilename = nullptr;
         io.LogFilename = nullptr;

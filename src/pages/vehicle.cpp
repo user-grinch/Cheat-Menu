@@ -13,7 +13,7 @@
 
 VehiclePage& vehiclePage = VehiclePage::Get();
 VehiclePage::VehiclePage()
-    : IPage<VehiclePage>(ePageID::Vehicle, ICON_FA_TRUCK_PICKUP, true)
+    : IPage<VehiclePage>(ePageID::Vehicle, "Vehicle", true)
 {
     // Get config data
     Events::initGameEvent += [this]()
@@ -526,7 +526,7 @@ void VehiclePage::Draw()
 
         ImGui::Spacing();
 
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_TOGGLE_ON, "Window.ToggleTab")))
+        if (ImGui::BeginTabItem(TEXT( "Window.ToggleTab")))
         {
             ImGui::BeginChild("CheckboxesChild");
             ImGui::Spacing();
@@ -806,7 +806,7 @@ void VehiclePage::Draw()
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_BARS, "Window.MenusTab")))
+        if (ImGui::BeginTabItem(TEXT( "Window.MenusTab")))
         {
             ImGui::Spacing();
             ImGui::BeginChild("MenusChild");
@@ -1007,7 +1007,7 @@ void VehiclePage::Draw()
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_TRUCK_PICKUP, "Window.SpawnTab")))
+        if (ImGui::BeginTabItem(TEXT( "Window.SpawnTab")))
         {
             ImGui::Spacing();
 
@@ -1118,7 +1118,7 @@ void VehiclePage::Draw()
             CVehicle* veh = FindPlayerPed()->m_pVehicle;
             int hveh = CPools::GetVehicleRef(veh);
 #ifdef GTASA
-            if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_SWATCHBOOK, "Vehicle.Customize")))
+            if (ImGui::BeginTabItem(TEXT( "Vehicle.Customize")))
             {
                 ImGui::Spacing();
 
@@ -1132,7 +1132,7 @@ void VehiclePage::Draw()
 #else
             VehCustmzr.Draw();
 #endif
-            if (ImGui::BeginTabItem(TEXT_ICON(ICON_FA_TAXI, "Vehicle.AutoDrive")))
+            if (ImGui::BeginTabItem(TEXT( "Vehicle.AutoDrive")))
             {
                 ImGui::Spacing();
                 AutoDrive.Draw();

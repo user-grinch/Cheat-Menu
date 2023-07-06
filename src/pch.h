@@ -53,7 +53,6 @@
 
 #include "fla/IDaccess.h"
 #include "imgui/imgui.h"
-#include "fonts/icon.hpp"
 
 #include "defines.h"
 #include "utils/log.h"
@@ -66,7 +65,6 @@
 
 #define TEXT(x) Locale::GetText(x).c_str()
 #define TEXT_S(x) Locale::GetText(x)
-#define TEXT_ICON(x, y) std::format("{} {}", x, Locale::GetText(y)).c_str()
 
 using namespace plugin;
 
