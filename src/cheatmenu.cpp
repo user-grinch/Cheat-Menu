@@ -257,17 +257,17 @@ void CheatMenuMgr::ApplyStyle(ImColor accent_col)
     ImVec4* colors = style->Colors;
     
     style->FrameBorderSize = 0.0f;
-    style->WindowBorderSize = 0.00f;
+    style->WindowBorderSize = 0.0f;
     style->PopupBorderSize = 0.0f;
-    style->ScrollbarRounding = 5.0f;
-    style->TabRounding = 0.0f;
+    style->ScrollbarRounding = 3.0f;
+    style->TabRounding = 3.0f;
     style->TabBorderSize = 0.0f;
-    style->WindowRounding = 0;
-    style->ChildRounding = 0;
-    style->FrameRounding = 0;
-    style->GrabRounding = 0;
-    style->PopupRounding = 0; 
-    style->ScrollbarSize = 0;
+    style->WindowRounding = 3.0f;
+    style->ChildRounding = 3.0f;
+    style->FrameRounding = 3.0f;
+    style->GrabRounding = 3.0f;
+    style->PopupRounding = 3.0f; 
+    style->ScrollbarSize = 3.0f;
     style->FramePadding = ImVec2(5, 5);
     style->WindowPadding = ImVec2(5, 5);
     style->ItemSpacing = ImVec2(5, 5);

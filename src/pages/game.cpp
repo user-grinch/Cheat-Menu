@@ -49,12 +49,12 @@ GamePage::GamePage()
     {
         if (bSaveGameFlag)
         {
-            FrontEndMenuManager.m_nCurrentMenuPage = MENUPAGE_GAME_SAVE;
+            FrontEndMenuManager.m_nCurrentMenuPage = MENUPAGE_CHOOSE_SAVE_SLOT;
             bSaveGameFlag = false;
         }
     };
 #endif
-
+    
     Events::processScriptsEvent += [this]
     {
         uint timer = CTimer::m_snTimeInMilliseconds;
@@ -182,7 +182,7 @@ void GamePage::Draw()
 #ifdef GTASA
     if (ImGui::Button(TEXT("Game.SaveGame"), Widget::CalcSize()))
     {
-        FrontEndMenuManager.m_bActivateMenuNextFrame = true;
+        FrontEndMenuManager.m_bStartUpFrontEndRequested = true;
         bSaveGameFlag = true;
     }
     ImGui::Spacing();

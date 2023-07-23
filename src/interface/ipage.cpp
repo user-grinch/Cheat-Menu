@@ -141,17 +141,30 @@ bool PageHandler::DrawPages()
     float rs_width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x 
                         - btn_width - ImGui::GetStyle().ItemSpacing.x;
 
-    ImVec2 child_sz = {rs_width + ImGui::GetStyle().ItemSpacing.x - btn_height, btn_height};
+    ImVec2 child_sz = {rs_width + ImGui::GetStyle().ItemSpacing.x - btn_height/1.5f, btn_height};
     ImGui::BeginChild("TitleChild", child_sz);
     Widget::TextCentered(MENU_TITLE);
     ImGui::EndChild();
     
-    ImGui::SameLine();
-    float close_sz = ImGui::GetTextLineHeightWithSpacing();
-    if (ImGui::Button("X", ImVec2(close_sz, close_sz)))
+    if (ImGui::IsWindowHovered(ImGuiHoveredFlags_RootWindow | ImGuiHoveredFlags_ChildWindows
+                                | ImGuiHoveredFlags_AllowWhenBlockedByPopup | 
+                                ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
     {
-        rtn = true;
+        static bool closeHovered = false;
+        ImGui::SameLine();
+
+        if (closeHovered) 
+        {
+            ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "X");
+        } 
+        else 
+        {
+            ImGui::Text("X");
+        }
+        closeHovered = ImGui::IsItemHovered();
+        rtn = ImGui::IsItemClicked(ImGuiMouseButton_Left);
     }
+
     ImGui::PopStyleColor();
     ImGui::PopStyleVar();
     ImGui::PopFont();

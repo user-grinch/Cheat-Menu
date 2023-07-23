@@ -8,10 +8,10 @@
             "name": "Launch SA",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "D:/GTASanAndreas/gta_sa.exe",
+            "program": "F:/GTA San Andreas/gta_sa.exe",
             "args": [],
             "stopAtEntry": false,
-            "cwd": "D:/GTASanAndreas/",
+            "cwd": "F:/GTA San Andreas/",
             "environment": [],
             "console": "internalConsole"
         },
