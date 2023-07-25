@@ -78,6 +78,7 @@
         "csignal": "cpp",
         "coroutine": "cpp",
         "any": "cpp",
-        "variant": "cpp"
+        "variant": "cpp",
+        "codecvt": "cpp"
     }
 }

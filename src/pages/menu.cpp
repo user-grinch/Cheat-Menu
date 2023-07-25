@@ -19,9 +19,9 @@ MenuPage::MenuPage()
         m_bAutoCheckUpdate = gConfig.Get("Menu.AutoCheckUpdate", true);
         m_bTextOnlyMode = gConfig.Get("Menu.TextOnlyMode", false);
 
-        m_fAccentColor[0] = gConfig.Get("Menu.AccentColor.Red", 0.9412f);
-        m_fAccentColor[1] = gConfig.Get("Menu.AccentColor.Green", 0.1961f);
-        m_fAccentColor[2] = gConfig.Get("Menu.AccentColor.Blue", 0.2588f);
+        m_fAccentColor[0] = gConfig.Get("Menu.AccentColor.Red", 0.0392f);
+        m_fAccentColor[1] = gConfig.Get("Menu.AccentColor.Green", 0.2784f);
+        m_fAccentColor[2] = gConfig.Get("Menu.AccentColor.Blue", 0.6078f);
         CheatMenu.UpdateAccentColor(m_fAccentColor);
     };
 

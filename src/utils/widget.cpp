@@ -239,7 +239,7 @@ void Widget::DataList(ResourceStore& data, fArg3_t clickFunc, fArgNone_t addFunc
     }
 }
 
-static bool RoundedImageButton(ImTextureID textureID, ImVec2& size, const char* hoverText, bool alwaysHovered = false)
+static bool CustomImgageButton(ImTextureID textureID, ImVec2& size, const char* hoverText, bool alwaysHovered = false)
 {
     // Default to using texture ID as ID. User can still push string/integer prefixes.
 
@@ -248,7 +248,8 @@ static bool RoundedImageButton(ImTextureID textureID, ImVec2& size, const char* 
     ImVec2 min = ImGui::GetItemRectMin();
     ImVec2 max = ImGui::GetItemRectMax();
     ImDrawList *drawList = ImGui::GetWindowDrawList();
-    drawList->AddImageRounded(textureID, min, max, ImVec2(0, 0), ImVec2(1, 1), ImGui::GetColorU32(ImVec4(1, 1, 1, 1)), 5.0f);
+    float rounding = ImGui::GetStyle().FrameRounding;
+    drawList->AddImageRounded(textureID, min, max, ImVec2(0, 0), ImVec2(1, 1), ImGui::GetColorU32(ImVec4(1, 1, 1, 1)), rounding);
 
     // Add selection overlay and stuff on hover
     bool isHovered = ImGui::IsItemHovered();
@@ -256,7 +257,7 @@ static bool RoundedImageButton(ImTextureID textureID, ImVec2& size, const char* 
     {
         if (isHovered)
         {
-            drawList->AddRectFilled(min, max, ImGui::GetColorU32(ImGuiCol_ModalWindowDimBg), 5.6f);
+            drawList->AddRectFilled(min, max, ImGui::GetColorU32(ImGuiCol_ModalWindowDimBg), rounding);
         }
 
         // Calculating and drawing text over the image
@@ -333,7 +334,7 @@ void DrawClippedImages(ResourceStore& data, ImVec2 imgSz, size_t imagesInRow, bo
             std::string &modelName = std::get<ImageLookup>(data.m_nSearchList[i]).m_ModelName;
             bool custom = std::get<ImageLookup>(data.m_nSearchList[i]).m_bCustom;
             void *pTexture = custom ? pDefaultTex : std::get<ImageLookup>(data.m_nSearchList[i]).m_pTexture;
-            if (showImages ? RoundedImageButton(pTexture, imgSz, modelName.c_str(), custom)
+            if (showImages ? CustomImgageButton(pTexture, imgSz, modelName.c_str(), custom)
                     : ImGui::MenuItem(modelName.c_str())
                )
             {

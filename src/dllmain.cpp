@@ -20,10 +20,10 @@ void MenuThread(void* param)
     AddVectoredExceptionHandler(0, CrashHandler);
     while (true)
     {
-        FontMgr::Process();
+        // FontMgr::Process();
         RPC::Process();
         Updater::Process();
-        Sleep(1000);
+        Sleep(2000);
     }
 }
 

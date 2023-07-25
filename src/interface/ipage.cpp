@@ -36,7 +36,7 @@ bool PageHandler::DrawPages()
     bool rtn = false;
     // ------------------------------ Left Side ------------------------------ 
     // Pages
-
+    const ImGuiStyle style = ImGui::GetStyle();
     if (Updater::IsUpdateAvailable())
     {
         for (PagePtr ptr : m_PageList)
@@ -83,18 +83,53 @@ bool PageHandler::DrawPages()
         checked = true;
     }
 
-    // Button styling
-    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.1294f, 0.1333f, 0.1765f, 0.8431f));
-    ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_ButtonHovered));
 
     float width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
     float height = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y;
-    float child_width = width/9;
-    ImGui::BeginChild("PagesChild", ImVec2(child_width, height));
-    height = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y;
-    float btn_height = height/GetPageCount();
-    float btn_width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
+
+
+    // Title bar
+    ImGui::PushFont(FontMgr::Get("title"));
+    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 30.0f);
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0, 0, 0, 0));
+    float titleBarHeight = ImGui::GetTextLineHeightWithSpacing();
+    ImVec2 child_sz = {width + style.ItemSpacing.x - ImGui::CalcTextSize("X").x * 2, titleBarHeight};
+    Widget::TextCentered(MENU_TITLE);
+    
+    if (ImGui::IsWindowHovered(ImGuiHoveredFlags_RootWindow | ImGuiHoveredFlags_ChildWindows
+                                | ImGuiHoveredFlags_AllowWhenBlockedByPopup | 
+                                ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
+    {
+        static bool closeHovered = false;
+
+        float spacing = ImGui::GetWindowContentRegionWidth() * 0.98f;
+        ImGui::SameLine(spacing);
+
+        if (closeHovered) 
+        {
+            ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "X");
+        } 
+        else 
+        {
+            ImGui::Text("X");
+        }
+        closeHovered = ImGui::IsItemHovered();
+        rtn = ImGui::IsItemClicked(ImGuiMouseButton_Left);
+    }
+
+    ImGui::PopStyleColor();
+    ImGui::PopStyleVar();
+    ImGui::PopFont();
+
+
+    // Draw pages
+    ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0.1294f, 0.1333f, 0.1765f, 0.8431f));
+    ImGui::PushStyleColor(ImGuiCol_Button, ImGui::GetStyleColorVec4(ImGuiCol_ButtonHovered));
+    float pageTotalHeight = (height -  titleBarHeight - style.ItemSpacing.y/2) / GetPageCount();
+    float pageWidth = width / 9;
+    ImGui::Columns(2, NULL, false);
+    ImGui::SetColumnWidth(0, pageWidth);
 
     // Draw header buttons
     ImDrawList *pDrawList = ImGui::GetWindowDrawList();
@@ -114,7 +149,7 @@ bool PageHandler::DrawPages()
             flag = true;
         }
         
-        if (ImGui::Button(pg->GetPageKey().c_str(), ImVec2(btn_width, btn_height)))
+        if (ImGui::Button(pg->GetPageKey().c_str(), ImVec2(pageWidth, pageTotalHeight)))
         {
             m_pCurrentPage = pg;
             size_t id = static_cast<size_t>(pg->GetPageID());
@@ -127,58 +162,21 @@ bool PageHandler::DrawPages()
             ImGui::PopStyleColor(2);
         }
     }
-    ImGui::EndChild();
     ImGui::PopStyleColor(2);
     ImGui::PopStyleVar();
-    ImGui::SameLine();
+    
+    ImGui::NextColumn();
     // ------------------------------ Right Side ------------------------------ 
-    ImGui::BeginGroup();
 
-    // Title
-    ImGui::PushFont(FontMgr::Get("title"));
-    ImGui::PushStyleVar(ImGuiStyleVar_FrameRounding, 30.0f);
-    ImGui::PushStyleColor(ImGuiCol_ChildBg, ImVec4(0, 0, 0, 0));
-    float rs_width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x 
-                        - btn_width - ImGui::GetStyle().ItemSpacing.x;
-
-    ImVec2 child_sz = {rs_width + ImGui::GetStyle().ItemSpacing.x - btn_height/1.5f, btn_height};
-    ImGui::BeginChild("TitleChild", child_sz);
-    Widget::TextCentered(MENU_TITLE);
-    ImGui::EndChild();
+    float contentHeight = height - titleBarHeight - style.ItemSpacing.y;
+    float contentWidth = width - pageWidth;
     
-    if (ImGui::IsWindowHovered(ImGuiHoveredFlags_RootWindow | ImGuiHoveredFlags_ChildWindows
-                                | ImGuiHoveredFlags_AllowWhenBlockedByPopup | 
-                                ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
-    {
-        static bool closeHovered = false;
-        ImGui::SameLine();
-
-        if (closeHovered) 
-        {
-            ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "X");
-        } 
-        else 
-        {
-            ImGui::Text("X");
-        }
-        closeHovered = ImGui::IsItemHovered();
-        rtn = ImGui::IsItemClicked(ImGuiMouseButton_Left);
-    }
-
-    ImGui::PopStyleColor();
-    ImGui::PopStyleVar();
-    ImGui::PopFont();
-    
-    float content_height = ImGui::GetWindowContentRegionMax().y - ImGui::GetWindowContentRegionMin().y 
-                        - btn_height - ImGui::GetStyle().ItemSpacing.y;
-    
-    ImGui::BeginChild("ContentChild", ImVec2(rs_width, content_height));
+    ImGui::BeginChild("ContentChild", ImVec2(contentWidth, contentHeight));
     if (m_pCurrentPage != nullptr)
     {
         reinterpret_cast<IPageStatic*>(m_pCurrentPage)->Draw();
     }
     ImGui::EndChild();
-    ImGui::EndGroup();
 
     return rtn;
 }

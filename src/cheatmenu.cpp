@@ -97,7 +97,7 @@ CheatMenuMgr::CheatMenuMgr()
         }
 
         Log::Print<eLogLevel::None>("Starting " MENU_TITLE " (" __DATE__ ")\nAuthor: Grinch_\nDiscord: "
-                                    DISCORD_INVITE "\nMore Info: " GITHUB_LINK);
+                                    DISCORD_INVITE "\nPatreon: " PATREON_LINK "\nMore Info: " GITHUB_LINK "\n");
 
         // date time
         SYSTEMTIME st;
@@ -260,19 +260,19 @@ void CheatMenuMgr::ApplyStyle(ImColor accent_col)
     style->WindowBorderSize = 0.0f;
     style->PopupBorderSize = 0.0f;
     style->ScrollbarRounding = 3.0f;
-    style->TabRounding = 3.0f;
+    style->TabRounding = 0.0f;
     style->TabBorderSize = 0.0f;
-    style->WindowRounding = 3.0f;
-    style->ChildRounding = 3.0f;
-    style->FrameRounding = 3.0f;
-    style->GrabRounding = 3.0f;
-    style->PopupRounding = 3.0f; 
-    style->ScrollbarSize = 3.0f;
+    style->WindowRounding = 0.0f;
+    style->ChildRounding = 0.0f;
+    style->FrameRounding = 0.0f;
+    style->GrabRounding = 0.0f;
+    style->PopupRounding = 0.0f; 
+    style->ScrollbarSize = 5.0f;
     style->FramePadding = ImVec2(5, 5);
     style->WindowPadding = ImVec2(5, 5);
     style->ItemSpacing = ImVec2(5, 5);
 
-    style->Colors[ImGuiCol_WindowBg] = ImColor(0, 0, 0, 215);
+    style->Colors[ImGuiCol_WindowBg] = ImColor(0, 0, 0, 240);
     style->Colors[ImGuiCol_Border] = ImColor(33, 34, 45, 255);
     style->Colors[ImGuiCol_Button] = ImColor(33, 34, 45, 255);
     style->Colors[ImGuiCol_ButtonActive] = accent_col;
@@ -286,7 +286,7 @@ void CheatMenuMgr::ApplyStyle(ImColor accent_col)
     style->Colors[ImGuiCol_Text] = ImColor(255, 255, 255, 255);
     style->Colors[ImGuiCol_ChildBg] = ImColor(0, 0, 0, 0);
     style->Colors[ImGuiCol_CheckMark] = accent_col;
-    style->Colors[ImGuiCol_SliderGrab] = ImColor(240, 74, 88, 255);
+    style->Colors[ImGuiCol_SliderGrab] = accent_col;
     style->Colors[ImGuiCol_SliderGrabActive] = accent_col;
     style->Colors[ImGuiCol_Header] = ImColor(0, 0, 0, 0);
     style->Colors[ImGuiCol_HeaderHovered] = ImColor(30, 30, 40, 255);

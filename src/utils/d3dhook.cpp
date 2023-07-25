@@ -44,11 +44,6 @@ HRESULT D3dHook::hkReset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPres
 
 void D3dHook::ProcessFrame(void* ptr)
 {
-    if (!ImGui::GetCurrentContext())
-    {
-        ImGui::CreateContext();
-    }
-
     ImGuiIO& io = ImGui::GetIO();
     static bool init;
     if (init)
@@ -142,7 +137,7 @@ void D3dHook::ProcessFrame(void* ptr)
 
         // Loading fonts
         io.FontDefault = FontMgr::LoadFont("text", textFont, textFontSize, 1.4f);
-        FontMgr::LoadFont("title", titleFont, titleFontSize, 2.5f);
+        FontMgr::LoadFont("title", titleFont, titleFontSize, 2.0f);
 
         io.IniFilename = nullptr;
         io.LogFilename = nullptr;
