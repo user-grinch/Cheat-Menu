@@ -245,6 +245,12 @@ bool Hotkey::DrawUI(const char* label)
         {
             m_key1 = VK_NONE;
             m_key2 = VK_NONE;
+            
+            if (m_ConfigPath != "")
+            {
+                gConfig.Set((m_ConfigPath + ".Key1").c_str(), m_key1);
+                gConfig.Set((m_ConfigPath + ".Key2").c_str(), m_key2);
+            }
         }
         else
         {
