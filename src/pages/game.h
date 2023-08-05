@@ -7,6 +7,7 @@ class GamePage : public IPage<GamePage>
 private:
     ResourceStore m_MissionData{ "missions", eResourceType::TYPE_TEXT };
     bool m_bDisableCheats;
+    bool m_bDisableTutorials;
     bool m_bDisableReplay;
     bool m_bMissionTimer;
     bool m_bMobileRadio;

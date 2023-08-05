@@ -237,7 +237,21 @@ void GamePage::Draw()
                     patch::SetUChar(BY_GAME(0x460500, 0x624EC0, 0x593170), BY_GAME(0xA0, 0x80, 0x80));
                 }
             }
-
+#ifdef GTASA
+            if (Widget::Toggle(TEXT("Game.DisableTutorials"), &m_bDisableTutorials))
+            {
+                if (m_bDisableTutorials)
+                {
+                    // Taken from mixsets
+                    Command<Commands::TERMINATE_ALL_SCRIPTS_WITH_THIS_NAME>("HELP");
+					Command<Commands::REMOVE_PICKUP>((CTheScripts::ScriptSpace + (669 * 4))); //Pickup_Info_Hospital
+					Command<Commands::REMOVE_PICKUP>((CTheScripts::ScriptSpace + (670 * 4))); //Pickup_Info_Hospital_2
+					Command<Commands::REMOVE_PICKUP>((CTheScripts::ScriptSpace + (671 * 4))); //Pickup_Info_Police
+                }
+                *reinterpret_cast<int*>(CTheScripts::ScriptSpace + (119 * 4)) = m_bDisableTutorials; //Help_Wasted_Shown
+                *reinterpret_cast<int*>(CTheScripts::ScriptSpace + (126 * 4)) = m_bDisableTutorials; //Help_Busted_Shown
+            }
+#endif
             Widget::ToggleAddr<int8_t>(TEXT("Game.FasterClock"), BY_GAME(0x96913B, 0xA10B87, 0x95CDBB));
 #ifdef GTASA
             if (Widget::Toggle(TEXT("Game.ForbiddenWantedLevel"), &m_bForbiddenArea, TEXT("Game.ForbiddenWantedLevelText")))

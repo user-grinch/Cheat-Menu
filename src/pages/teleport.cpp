@@ -218,7 +218,11 @@ void TeleportPage::WarpPlayer(CVector pos, int interiorID)
     CStreaming::LoadScene(&pos);
     CStreaming::LoadSceneCollision(&pos);
 #else
-    CStreaming::LoadScene(pos);
+    // SkyGFX Crashes
+    static bool IsSkyGFXInstalled = GetModuleHandle("skygfx.asi");
+    if (!IsSkyGFXInstalled) {
+        CStreaming::LoadScene(pos);
+    }
 #endif
     CStreaming::LoadAllRequestedModels(false);
 
