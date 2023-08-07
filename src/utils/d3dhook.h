@@ -5,9 +5,8 @@
 *   DirectX Hooking Class
 *   Supports DX9 & DX11
 */
-class D3dHook
-{
-private:
+class D3dHook {
+  private:
     using f_EndScene = HRESULT(CALLBACK*)(IDirect3DDevice9*);
     using f_Present = HRESULT(CALLBACK*)(IDXGISwapChain*, UINT, UINT);
     using f_Reset = HRESULT(CALLBACK*)(IDirect3DDevice9*, D3DPRESENT_PARAMETERS*);
@@ -30,7 +29,7 @@ private:
     // DirectX11, Renderhook
     static HRESULT CALLBACK hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags);
 
-public:
+  public:
 
     D3dHook() = delete;
     D3dHook(D3dHook const&) = delete;

@@ -8,19 +8,17 @@
     Loads strings from a json file
     Requires the DataStore class
 */
-class Locale
-{
-private:
+class Locale {
+  private:
     static inline std::vector<std::string> m_locales;
     static inline std::string m_path;
     static inline DataStore *m_pData = nullptr;
     static inline DataStore *m_pCallbackData = nullptr;
     static inline size_t localeIndex;
 
-public:
+  public:
 
-    enum class eReturnCodes
-    {
+    enum class eReturnCodes {
         DIR_NOT_FOUND = 0,          // Failed to find the language directory
         NO_LOCALE_FOUND = 1,        // Failed to find language files
         INVALID_INDEX = 2,          // Invalid langauge index for GetLocaleList()

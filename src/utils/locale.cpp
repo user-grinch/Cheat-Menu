@@ -2,11 +2,9 @@
 #include "locale.h"
 #include <filesystem>
 
-Locale::eReturnCodes Locale::Init(const char* path, const char* def, const char* fallback)
-{
+Locale::eReturnCodes Locale::Init(const char* path, const char* def, const char* fallback) {
     std::string localePath = path;
-    if (localePath.back() != '/')
-    {
+    if (localePath.back() != '/') {
         localePath += '/';
     }
 
@@ -16,8 +14,7 @@ Locale::eReturnCodes Locale::Init(const char* path, const char* def, const char*
     m_path = localePath;
 #endif
 
-    if (!std::filesystem::exists(m_path))
-    {
+    if (!std::filesystem::exists(m_path)) {
 #ifdef _GTA_
         Log::Print<eLogLevel::Error>("Locale directory doesn't exist");
 #endif
@@ -32,22 +29,18 @@ Locale::eReturnCodes Locale::Init(const char* path, const char* def, const char*
 #ifdef _GTA_
     Log::Print<eLogLevel::Info>("Loading languages...");
 #endif
-    for (auto& entry : std::filesystem::directory_iterator(m_path))
-    {
-        if (entry.path().extension() == ".toml")
-        {
+    for (auto& entry : std::filesystem::directory_iterator(m_path)) {
+        if (entry.path().extension() == ".toml") {
             std::string fileName = entry.path().stem().string();
 #ifdef _GTA_
             Log::Print<eLogLevel::Info>("Found locale: {}", fileName);
 #endif
             m_locales.push_back(fileName);
 
-            if (!strcmp(fallback, fileName.c_str()))
-            {
+            if (!strcmp(fallback, fileName.c_str())) {
                 std::string localePath = m_path + fileName;
 
-                if(m_pCallbackData)
-                {
+                if(m_pCallbackData) {
                     delete m_pCallbackData;
                     m_pCallbackData = nullptr;
                 }
@@ -56,8 +49,7 @@ Locale::eReturnCodes Locale::Init(const char* path, const char* def, const char*
         }
     }
 
-    if (sizeof(m_locales) == 0)
-    {
+    if (sizeof(m_locales) == 0) {
 #ifdef _GTA_
         Log::Print<eLogLevel::Error>("No language files found");
 #endif
@@ -69,10 +61,8 @@ Locale::eReturnCodes Locale::Init(const char* path, const char* def, const char*
     std::vector<std::string>& vec = Locale::GetLocaleList();
 
     size_t index = 0;
-    for (std::string& locale : vec)
-    {
-        if (locale == def)
-        {
+    for (std::string& locale : vec) {
+        if (locale == def) {
             Locale::SetLocale(index);
             break;
         }
@@ -80,8 +70,7 @@ Locale::eReturnCodes Locale::Init(const char* path, const char* def, const char*
         index++;
     }
 
-    if(!m_pData)
-    {
+    if(!m_pData) {
 #ifdef _GTA_
         Log::Print<eLogLevel::Error>("Failed to load default language.");
 #endif
@@ -91,31 +80,25 @@ Locale::eReturnCodes Locale::Init(const char* path, const char* def, const char*
     return eReturnCodes::SUCCESS;
 }
 
-std::vector<std::string>& Locale::GetLocaleList()
-{
+std::vector<std::string>& Locale::GetLocaleList() {
     return m_locales;
 }
 
-size_t Locale::GetCurrentLocaleIndex()
-{
+size_t Locale::GetCurrentLocaleIndex() {
     return localeIndex;
 }
 
-void Locale::SetDefaultLocale()
-{
+void Locale::SetDefaultLocale() {
     SetLocaleByName("English");
 }
 
-Locale::eReturnCodes Locale::SetLocale(size_t index)
-{
-    if(m_pData)
-    {
+Locale::eReturnCodes Locale::SetLocale(size_t index) {
+    if(m_pData) {
         delete m_pData;
         m_pData = nullptr;
     }
 
-    if (index < 0 || index >= m_locales.size())
-    {
+    if (index < 0 || index >= m_locales.size()) {
         return eReturnCodes::INVALID_INDEX;
     }
     std::string localePath = m_path + m_locales[index];
@@ -124,12 +107,9 @@ Locale::eReturnCodes Locale::SetLocale(size_t index)
     return eReturnCodes::SUCCESS;
 }
 
-Locale::eReturnCodes Locale::SetLocaleByName(const std::string& name)
-{
-    for (size_t i = 0; i < m_locales.size(); ++i)
-    {
-        if (m_locales[i] == name)
-        {
+Locale::eReturnCodes Locale::SetLocaleByName(const std::string& name) {
+    for (size_t i = 0; i < m_locales.size(); ++i) {
+        if (m_locales[i] == name) {
             return SetLocale(i);
         }
     }
@@ -137,23 +117,19 @@ Locale::eReturnCodes Locale::SetLocaleByName(const std::string& name)
     return eReturnCodes::NO_LOCALE_FOUND;
 }
 
-std::string Locale::GetText(std::string&& key, std::string&& defaultValue)
-{
-    if (m_pData == nullptr)
-    {
+std::string Locale::GetText(std::string&& key, std::string&& defaultValue) {
+    if (m_pData == nullptr) {
         return defaultValue;
     }
 
     // Return keyname if no default value is provided
-    if (defaultValue == "")
-    {
+    if (defaultValue == "") {
         defaultValue = "#" + key;
     }
-    
+
     std::string rtn = m_pData->Get(key.c_str(), defaultValue);
 
-    if (rtn == defaultValue)
-    {
+    if (rtn == defaultValue) {
         return m_pCallbackData->Get(key.c_str(), defaultValue);
     }
 

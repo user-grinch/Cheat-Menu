@@ -6,10 +6,8 @@
 #include "imgui/imgui.h"
 #include "utils/datastore.h"
 
-struct RwD3D9Raster
-{
-    union
-    {
+struct RwD3D9Raster {
+    union {
         IDirect3DTexture9* texture;
         IDirect3DSurface9* surface;
     };
@@ -25,21 +23,18 @@ struct RwD3D9Raster
     HWND* hwnd;
 };
 
-struct RwRasterEx : public RwRaster
-{
+struct RwRasterEx : public RwRaster {
     RwD3D9Raster *m_pRenderResource;
 };
 
-struct TextureResource
-{
+struct TextureResource {
     std::string m_FileName;
     std::string m_CategoryName;
     RwTexture *m_pRwTexture = nullptr;
     void *m_pTexture = nullptr;
 };
 
-enum eResourceType
-{
+enum eResourceType {
     TYPE_IMAGE,
     TYPE_TEXT,
     TYPE_IMAGE_TEXT, // priotizes images
@@ -47,14 +42,12 @@ enum eResourceType
 };
 
 // Lookup table used for DataList
-struct ListLookup
-{
+struct ListLookup {
     std::string cat, key, val;
 };
 
 // Lookup table used for ImageList
-struct ImageLookup
-{
+struct ImageLookup {
     std::string m_FileName;
     std::string m_ModelName;
     void *m_pTexture;
@@ -65,13 +58,12 @@ struct ImageLookup
 	Global Resource Handler Class
 	Handles loading & unloading both text (json) & image files
 */
-class ResourceStore
-{
-private:
+class ResourceStore {
+  private:
     // Loads a image texture from it's path
     void LoadTextureResource(std::string&& path);
 
-public:
+  public:
     ImGuiTextFilter m_Filter = "";
     std::vector<std::string> m_Categories = {"All", "Custom"};
     std::string m_Selected = "All";

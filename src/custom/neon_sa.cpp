@@ -4,8 +4,7 @@
 NeonMgr& Neon = NeonMgr::Get();
 
 // Neon sprite
-const unsigned char neon_mask[1689] =
-{
+const unsigned char neon_mask[1689] = {
     0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00,
     0x0d, 0x49, 0x48, 0x44, 0x52, 0x00, 0x00, 0x00, 0x40, 0x00, 0x00,
     0x00, 0x80, 0x08, 0x06, 0x00, 0x00, 0x00, 0xbb, 0x81, 0x6f, 0x6a,
@@ -163,8 +162,7 @@ const unsigned char neon_mask[1689] =
 };
 
 // Thanks DKPac22
-static RwTexture* LoadTextureFromMemory(char* data, unsigned int size)
-{
+static RwTexture* LoadTextureFromMemory(char* data, unsigned int size) {
     patch::SetChar(0x7CF9CA, rwSTREAMMEMORY);
     RwMemory memoryImage;
     RwInt32 width, height, depth, flags;
@@ -180,15 +178,11 @@ static RwTexture* LoadTextureFromMemory(char* data, unsigned int size)
     return RwTextureCreate(raster);
 }
 
-NeonMgr::NeonMgr()
-{
-    Events::vehicleRenderEvent += [this](CVehicle* pVeh)
-    {
+NeonMgr::NeonMgr() {
+    Events::vehicleRenderEvent += [this](CVehicle* pVeh) {
         NeonData* data = &m_VehNeon.Get(pVeh);
-        if (data->m_bNeonInstalled && !pVeh->IsUpsideDown())
-        {
-            if (!m_pNeonTexture)
-            {
+        if (data->m_bNeonInstalled && !pVeh->IsUpsideDown()) {
+            if (!m_pNeonTexture) {
                 m_pNeonTexture = LoadTextureFromMemory((char*)neon_mask, sizeof(neon_mask));
             }
 
@@ -199,26 +193,20 @@ NeonMgr::NeonMgr()
             CShadows::StoreShadowToBeRendered(5, m_pNeonTexture, &center, up.x, up.y, right.x, right.y, 180, data->m_Color.r,
                                               data->m_Color.g, data->m_Color.b, 2.0f, false, 1.0f, 0, true);
 
-            if (data->m_bPulsing)
-            {
+            if (data->m_bPulsing) {
                 size_t delta = CTimer::m_snTimeInMilliseconds - CTimer::m_snPreviousTimeInMilliseconds;
 
-                if (data->m_fVal < 0.0f)
-                {
+                if (data->m_fVal < 0.0f) {
                     data->m_bIncrement = true;
                 }
 
-                if (data->m_fVal > 0.3f)
-                {
+                if (data->m_fVal > 0.3f) {
                     data->m_bIncrement = false;
                 }
 
-                if (data->m_bIncrement)
-                {
+                if (data->m_bIncrement) {
                     data->m_fVal += 0.0003f * delta;
-                }
-                else
-                {
+                } else {
                     data->m_fVal -= 0.0003f * delta;
                 }
             }
@@ -226,8 +214,7 @@ NeonMgr::NeonMgr()
     };
 }
 
-NeonMgr::~NeonMgr()
-{
+NeonMgr::~NeonMgr() {
     // if (m_pNeonTexture)
     // {
     //     RwTextureDestroy(m_pNeonTexture);
@@ -235,23 +222,19 @@ NeonMgr::~NeonMgr()
     // }
 }
 
-bool NeonMgr::IsInstalled(CVehicle* pVeh)
-{
+bool NeonMgr::IsInstalled(CVehicle* pVeh) {
     return m_VehNeon.Get(pVeh).m_bNeonInstalled;
 }
 
-bool NeonMgr::IsPulsingEnabled(CVehicle* pVeh)
-{
+bool NeonMgr::IsPulsingEnabled(CVehicle* pVeh) {
     return m_VehNeon.Get(pVeh).m_bPulsing;
 }
 
-void NeonMgr::SetPulsing(CVehicle* pVeh, bool state)
-{
+void NeonMgr::SetPulsing(CVehicle* pVeh, bool state) {
     m_VehNeon.Get(pVeh).m_bPulsing = state;
 }
 
-void NeonMgr::Install(CVehicle* pVeh, int r, int g, int b)
-{
+void NeonMgr::Install(CVehicle* pVeh, int r, int g, int b) {
     CRGBA& color = m_VehNeon.Get(pVeh).m_Color;
 
     color.r = r;
@@ -262,12 +245,10 @@ void NeonMgr::Install(CVehicle* pVeh, int r, int g, int b)
     m_VehNeon.Get(pVeh).m_bNeonInstalled = true;
 }
 
-void NeonMgr::Remove(CVehicle* pVeh)
-{
+void NeonMgr::Remove(CVehicle* pVeh) {
     m_VehNeon.Get(pVeh).m_bNeonInstalled = false;
 }
 
-NeonMgr::NeonData NeonMgr::GetData(CVehicle *pVeh)
-{
+NeonMgr::NeonData NeonMgr::GetData(CVehicle *pVeh) {
     return m_VehNeon.Get(pVeh);
 }

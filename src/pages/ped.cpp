@@ -26,34 +26,27 @@ static const char* pedTypeList = "Civ Male\0Civ Female\0Cop\0Leones\0Triads\0Dia
 PedPage &pedPage = PedPage::Get();
 
 PedPage::PedPage()
-    : IPage<PedPage>(ePageID::Ped, "Ped", true)
-{
+    : IPage<PedPage>(ePageID::Ped, "Ped", true) {
     /*
     	Taken from gta chaos mod by Lordmau5 & _AG
     	TODO: Implement in VC too
     */
 #ifdef GTASA
-    Events::pedRenderEvent += [this](CPed *ped)
-    {
+    Events::pedRenderEvent += [this](CPed *ped) {
 
-        if (m_bBigHead)// || m_bThinBody)
-        {
+        if (m_bBigHead) { // || m_bThinBody)
             auto animHier = GetAnimHierarchyFromSkinClump(ped->m_pRwClump);
             auto matrices = RpHAnimHierarchyGetMatrixArray (animHier);
 
             RwV3d scale = {0.7f, 0.7f, 0.7f};
-            if (m_bThinBody)
-            {
-                for (int i = 1; i <= 54; i++)
-                {
+            if (m_bThinBody) {
+                for (int i = 1; i <= 54; i++) {
                     RwMatrixScale (&matrices[RpHAnimIDGetIndex (animHier, i)], &scale, rwCOMBINEPRECONCAT);
                 }
             }
             scale = {3.0f, 3.0f, 3.0f};
-            if (m_bBigHead)
-            {
-                for (int i = 5; i <= 8; i++)
-                {
+            if (m_bBigHead) {
+                for (int i = 5; i <= 8; i++) {
                     RwMatrixScale (&matrices[RpHAnimIDGetIndex (animHier, i)], &scale, rwCOMBINEPRECONCAT);
                 }
             }
@@ -62,21 +55,17 @@ PedPage::PedPage()
 #elif GTA3
     CdeclEvent <AddressList<0x4CFE12, H_CALL>, PRIORITY_AFTER, ArgPickN<CPed*, 0>, void(CPed*)> onPreRender;
 
-    onPreRender += [this](CPed* ped)
-    {
-        if (!m_bBigHead)
-        {
+    onPreRender += [this](CPed* ped) {
+        if (!m_bBigHead) {
             return;
         }
 
         RwFrame* frame = ped->m_apFrames[2]->m_pFrame;
 
-        if (frame)
-        {
+        if (frame) {
             RwMatrix* headMatrix = RwFrameGetMatrix(frame);
 
-            if (headMatrix)
-            {
+            if (headMatrix) {
                 CMatrix mat;
                 mat.m_pAttachMatrix = NULL;
                 mat.Attach(headMatrix, false);
@@ -89,51 +78,42 @@ PedPage::PedPage()
 #endif
 }
 
-void PedPage::AddNewPed()
-{
+void PedPage::AddNewPed() {
     static char name[8];
     static int model = 0;
     ImGui::InputTextWithHint(TEXT("Menu.Name"), "PEDNAME", name, 7);
     Widget::InputInt(TEXT("Ped.Model"), &model, 0, 999999);
     ImGui::Spacing();
     ImVec2 sz = Widget::CalcSize(2);
-    if (ImGui::Button(TEXT("Ped.AddPed"), sz))
-    {
+    if (ImGui::Button(TEXT("Ped.AddPed"), sz)) {
         Command<Commands::REQUEST_MODEL>(model);
         Command<Commands::LOAD_ALL_MODELS_NOW>();
-        if (Command<Commands::IS_MODEL_AVAILABLE>(model))
-        {
+        if (Command<Commands::IS_MODEL_AVAILABLE>(model)) {
             std::string key = std::format("Custom.{} (Added)", name);
             m_PedData.m_pData->Set(key.c_str(), std::to_string(model));
             m_PedData.m_pData->Save();
             Util::SetMessage(TEXT("Ped.AddPedMSG"));
             Command<Commands::MARK_MODEL_AS_NO_LONGER_NEEDED>(model);
-        }
-        else
-        {
+        } else {
             Util::SetMessage(TEXT("Vehicle.InvalidID"));
         }
     }
     ImGui::SameLine();
-    if (ImGui::Button(TEXT("Ped.GetPlayerModel"), sz))
-    {
+    if (ImGui::Button(TEXT("Ped.GetPlayerModel"), sz)) {
         model = FindPlayerPed()->m_nModelIndex;
     }
 }
 #ifdef GTASA
 
-unsigned int PedPage::GangStruct::GetModel(unsigned int gangId, unsigned int memberId)
-{
+unsigned int PedPage::GangStruct::GetModel(unsigned int gangId, unsigned int memberId) {
     return CPopulation::m_PedGroups[42 + static_cast<int>(gangId)][memberId];
 }
 
-void PedPage::GangStruct::SetModel(unsigned int gangId, unsigned int memberId, unsigned int model)
-{
+void PedPage::GangStruct::SetModel(unsigned int gangId, unsigned int memberId, unsigned int model) {
     CPopulation::m_PedGroups[42 + static_cast<int>(gangId)][memberId] = model;
 }
 
-void PedPage::GangStruct::ResetModels()
-{
+void PedPage::GangStruct::ResetModels() {
     CPopulation::LoadPedGroups();
 }
 
@@ -142,14 +122,12 @@ void PedPage::SpawnPed(std::string& model)
 void PedPage::SpawnPed(std::string& cat, std::string& name, std::string& model)
 #endif
 {
-    if (m_Spawner.m_List.size() == SPAWN_PED_LIMIT)
-    {
+    if (m_Spawner.m_List.size() == SPAWN_PED_LIMIT) {
         Util::SetMessage(TEXT("Ped.MaxLimit"));
         return;
     }
 
-    if (BY_GAME(m_PedData.m_pData->Contains(model.c_str()), true, true))
-    {
+    if (BY_GAME(m_PedData.m_pData->Contains(model.c_str()), true, true)) {
         CPlayerPed* player = FindPlayerPed();
         CVector pos = player->GetPosition();
         pos.y += 1;
@@ -159,15 +137,11 @@ void PedPage::SpawnPed(std::string& cat, std::string& name, std::string& model)
         static size_t currentSlot = 1;
 
 #ifdef GTASA
-        if (m_SpecialPedData.Contains(model.c_str()))
-        {
+        if (m_SpecialPedData.Contains(model.c_str())) {
             std::string name;
-            if (m_SpecialPedData.Contains(model.c_str()))
-            {
+            if (m_SpecialPedData.Contains(model.c_str())) {
                 name = m_SpecialPedData.Get(model.c_str(), "Unknown");
-            }
-            else
-            {
+            } else {
                 name = model;
             }
 
@@ -179,14 +153,12 @@ void PedPage::SpawnPed(std::string& cat, std::string& name, std::string& model)
 
             // SA has 10 slots
             ++currentSlot;
-            if (currentSlot > 9)
-            {
+            if (currentSlot > 9) {
                 currentSlot = 1;
             }
         }
 #else
-        if (cat == "Special") // Special model
-        {
+        if (cat == "Special") { // Special model
 #ifdef GTA3
             Util::SetMessage(TEXT("Player.SpecialNotImplement"));
             return;
@@ -198,15 +170,13 @@ void PedPage::SpawnPed(std::string& cat, std::string& name, std::string& model)
             Command<Commands::UNLOAD_SPECIAL_CHARACTER>(currentSlot);
 
             ++currentSlot;
-            if (currentSlot > 21)
-            {
+            if (currentSlot > 21) {
                 currentSlot = 1;
             }
 #endif
         }
 #endif
-        else
-        {
+        else {
             int iModel = std::stoi(model);
             CStreaming::RequestModel(iModel, eStreamingFlags::PRIORITY_REQUEST);
             CStreaming::LoadAllRequestedModels(false);
@@ -217,20 +187,16 @@ void PedPage::SpawnPed(std::string& cat, std::string& name, std::string& model)
 
         ped = CPools::GetPed(hplayer);
 
-        if (m_Spawner.m_bPedMove)
-        {
+        if (m_Spawner.m_bPedMove) {
             m_Spawner.m_List.push_back(ped);
-        }
-        else
-        {
+        } else {
             Command<Commands::MARK_CHAR_AS_NO_LONGER_NEEDED>(hplayer);
         }
         ped->m_nPedFlags.bPedIsBleeding = m_Spawner.m_bPedBleed;
         ped->m_nWeaponAccuracy = m_Spawner.m_nAccuracy;
         ped->m_fHealth = m_Spawner.m_nPedHealth;
 
-        if (m_Spawner.m_nWeaponId != 0)
-        {
+        if (m_Spawner.m_nWeaponId != 0) {
             int model = 0;
 #ifdef GTASA
             Command<Commands::GET_WEAPONTYPE_MODEL>(m_Spawner.m_nWeaponId, &model);
@@ -250,12 +216,9 @@ void PedPage::SpawnPed(std::string& cat, std::string& name, std::string& model)
     }
 }
 
-void PedPage::Draw()
-{
-    if (ImGui::BeginTabBar("Ped", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
-    {
-        if (ImGui::BeginTabItem(TEXT( "Window.ToggleTab")))
-        {
+void PedPage::Draw() {
+    if (ImGui::BeginTabBar("Ped", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll)) {
+        if (ImGui::BeginTabItem(TEXT( "Window.ToggleTab"))) {
             ImGui::BeginChild("CheckboxesChild");
             ImGui::Spacing();
             ImGui::Columns(2, 0, false);
@@ -284,13 +247,11 @@ void PedPage::Draw()
 #else
             // Bad idea lol
             static bool pedsMayhem;
-            if (Widget::Toggle(TEXT("Ped.PedsMayhem"), &pedsMayhem))
-            {
+            if (Widget::Toggle(TEXT("Ped.PedsMayhem"), &pedsMayhem)) {
                 Call<0x4911C0>();
             }
             static bool everyoneAttacksPlayer;
-            if (Widget::Toggle(TEXT("Ped.EveryoneAtk"), &everyoneAttacksPlayer))
-            {
+            if (Widget::Toggle(TEXT("Ped.EveryoneAtk"), &everyoneAttacksPlayer)) {
                 Call<0x491270>();
             }
             ImGui::NextColumn();
@@ -302,16 +263,13 @@ void PedPage::Draw()
 
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT( "Window.MenusTab")))
-        {
+        if (ImGui::BeginTabItem(TEXT( "Window.MenusTab"))) {
             ImGui::Spacing();
             ImGui::BeginChild("MenusChild");
             Widget::EditAddr<float>(TEXT("Ped.PedDensityMul"), reinterpret_cast<uint>(&CPopulation::PedDensityMultiplier), 0, 1, 10);
 #ifdef GTASA
-            if (ImGui::CollapsingHeader(TEXT("Ped.RecruitAnyone")))
-            {
-                static std::vector<Widget::BindInfo> selectWeapon
-                {
+            if (ImGui::CollapsingHeader(TEXT("Ped.RecruitAnyone"))) {
+                static std::vector<Widget::BindInfo> selectWeapon {
                     {"9mm", 0x96917C}, {"AK47", 0x96917D}, {"Rockets", 0x96917E}
                 };
                 Widget::EditRadioBtnAddr(TEXT("Ped.SelectWeapon"), selectWeapon);
@@ -320,19 +278,15 @@ void PedPage::Draw()
             }
 #endif
 
-            if (ImGui::CollapsingHeader(TEXT("Ped.RemovePedsRadius")))
-            {
+            if (ImGui::CollapsingHeader(TEXT("Ped.RemovePedsRadius"))) {
                 static int removeRadius = 5;
                 ImGui::InputInt(TEXT("Ped.Radius"), &removeRadius);
                 ImGui::Spacing();
-                if (ImGui::Button(TEXT("Ped.RemovePeds"), Widget::CalcSize(1)))
-                {
+                if (ImGui::Button(TEXT("Ped.RemovePeds"), Widget::CalcSize(1))) {
                     CPlayerPed* player = FindPlayerPed();
-                    for (CPed* ped : CPools::ms_pPedPool)
-                    {
+                    for (CPed* ped : CPools::ms_pPedPool) {
                         if (DistanceBetweenPoints(ped->GetPosition(), player->GetPosition()) < removeRadius
-                                && ped->m_pVehicle == nullptr && ped != player)
-                        {
+                                && ped->m_pVehicle == nullptr && ped != player) {
                             Command<Commands::DELETE_CHAR>(CPools::GetPedRef(ped));
                         }
                     }
@@ -343,19 +297,15 @@ void PedPage::Draw()
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT( "Window.SpawnTab")))
-        {
-            if (ImGui::BeginTabBar("SpawnPedBar"))
-            {
+        if (ImGui::BeginTabItem(TEXT( "Window.SpawnTab"))) {
+            if (ImGui::BeginTabBar("SpawnPedBar")) {
                 ImGui::Spacing();
 
-                if (ImGui::BeginTabItem(TEXT( "Window.Search")))
-                {
+                if (ImGui::BeginTabItem(TEXT( "Window.Search"))) {
                     ImGui::Spacing();
 #ifdef GTASA
                     Widget::ImageList(m_PedData, fArgWrapper(pedPage.SpawnPed),
-                                      [this](str &text)
-                    {
+                    [this](str &text) {
                         return m_PedData.m_pData->Get(text.c_str(), "Unknown");
                     },
                     nullptr, fArgNoneWrapper(pedPage.AddNewPed));
@@ -364,13 +314,10 @@ void PedPage::Draw()
 #endif
                     ImGui::EndTabItem();
                 }
-                if (ImGui::BeginTabItem(TEXT("Ped.ConfigTab")))
-                {
+                if (ImGui::BeginTabItem(TEXT("Ped.ConfigTab"))) {
                     ImGui::Spacing();
-                    if (ImGui::Button(TEXT("Ped.RemoveFrozen"), Widget::CalcSize(1)))
-                    {
-                        for (CPed* ped : m_Spawner.m_List)
-                        {
+                    if (ImGui::Button(TEXT("Ped.RemoveFrozen"), Widget::CalcSize(1))) {
+                        for (CPed* ped : m_Spawner.m_List) {
                             CWorld::Remove(ped);
                             ped->Remove();
                         }
@@ -386,15 +333,12 @@ void PedPage::Draw()
 
                     ImGui::Spacing();
                     ImGui::SliderInt(TEXT("Ped.Accuracy"), &m_Spawner.m_nAccuracy, 0.0, 100.0);
-                    if (ImGui::InputInt(TEXT("Ped.Health"), &m_Spawner.m_nPedHealth))
-                    {
-                        if (m_Spawner.m_nPedHealth > 1000)
-                        {
+                    if (ImGui::InputInt(TEXT("Ped.Health"), &m_Spawner.m_nPedHealth)) {
+                        if (m_Spawner.m_nPedHealth > 1000) {
                             m_Spawner.m_nPedHealth = 1000;
                         }
 
-                        if (m_Spawner.m_nPedHealth < 0)
-                        {
+                        if (m_Spawner.m_nPedHealth < 0) {
                             m_Spawner.m_nPedHealth = 0;
                         }
                     }
@@ -402,32 +346,27 @@ void PedPage::Draw()
                     ImGui::EndChild();
                     ImGui::EndTabItem();
                 }
-                if (ImGui::BeginTabItem(TEXT("Window.WeaponPage")))
-                {
+                if (ImGui::BeginTabItem(TEXT("Window.WeaponPage"))) {
                     static std::string weaponName = "None";
                     ImGui::Spacing();
                     ImGui::Text(TEXT("Ped.SelectedWeapon"), weaponName.c_str());
                     ImGui::Spacing();
 #ifdef GTASA
                     Widget::ImageList(weaponPage.m_WeaponData,
-                                      [this](std::string& str)
-                    {
+                    [this](std::string& str) {
                         m_Spawner.m_nWeaponId = std::stoi(str);
                         weaponName = weaponPage.m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
                     },
-                    [](std::string& str)
-                    {
+                    [](std::string& str) {
                         return weaponPage.m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
                     },
-                    [](std::string& str)
-                    {
+                    [](std::string& str) {
                         // Skip jetpack & cell phone
                         return str != "-1" && str != "-2";
                     });
 #else
                     Widget::DataList(weaponPage.m_WeaponData,
-                                     [this](std::string& root, std::string& key, std::string& id)
-                    {
+                    [this](std::string& root, std::string& key, std::string& id) {
                         m_Spawner.m_nWeaponId = std::stoi(id);
                         weaponName = key;
                     });
@@ -439,43 +378,34 @@ void PedPage::Draw()
             ImGui::EndTabItem();
         }
 #ifdef GTASA
-        if (ImGui::BeginTabItem(TEXT( "Ped.GangWars")))
-        {
+        if (ImGui::BeginTabItem(TEXT( "Ped.GangWars"))) {
             ImGui::Spacing();
-            if (ImGui::Button(TEXT("Ped.StartWar"), ImVec2(Widget::CalcSize(2))))
-            {
-                if (Util::GetLargestGangInZone() == 1)
-                {
+            if (ImGui::Button(TEXT("Ped.StartWar"), ImVec2(Widget::CalcSize(2)))) {
+                if (Util::GetLargestGangInZone() == 1) {
                     CGangWars::StartDefensiveGangWar();
-                }
-                else
-                {
+                } else {
                     CGangWars::StartOffensiveGangWar();
                 }
                 CGangWars::bGangWarsActive = true;
             }
             ImGui::SameLine();
-            if (ImGui::Button(TEXT("Ped.EndWar"), ImVec2(Widget::CalcSize(2))))
-            {
+            if (ImGui::Button(TEXT("Ped.EndWar"), ImVec2(Widget::CalcSize(2)))) {
                 CGangWars::EndGangWar(true);
             }
 
             ImGui::Spacing();
             ImGui::TextWrapped(TEXT("Ped.ZoneDensity"));
             ImGui::BeginChild("ZoneDensity");
-            static const char* m_GangList[] =
-            {
+            static const char* m_GangList[] = {
                 "Ballas", "Grove street families", "Los santos vagos", "San fierro rifa",
                 "Da nang boys", "Mafia", "Mountain cloud triad", "Varrio los aztecas", "Gang9", "Gang10"
             };
             ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 2);
-            for (int i = 0; i != 10; ++i)
-            {
+            for (int i = 0; i != 10; ++i) {
                 CVector pos = FindPlayerPed()->GetPosition();
                 CZoneInfo* info = CTheZones::GetZoneInfo(&pos, nullptr);
                 int density = info->m_nGangDensity[i];
-                if (ImGui::SliderInt(m_GangList[i], &density, 0, 127))
-                {
+                if (ImGui::SliderInt(m_GangList[i], &density, 0, 127)) {
                     info->m_nGangDensity[i] = static_cast<int8_t>(density);
                     Command<Commands::CLEAR_SPECIFIC_ZONES_TO_TRIGGER_GANG_WAR>();
                     CGangWars::bGangWarsActive = true;
@@ -483,24 +413,20 @@ void PedPage::Draw()
             }
             ImGui::PopItemWidth();
             static bool pluginRequired = (GetModuleHandle("ExGangWars.asi") == 0);
-            if (pluginRequired)
-            {
+            if (pluginRequired) {
                 ImGui::Spacing();
                 ImGui::TextWrapped(TEXT("Ped.ExGangWarsTip"));
                 ImGui::Spacing();
-                if (ImGui::Button(TEXT("Ped.DownloadExGangWars"), Widget::CalcSize(1)))
-                {
+                if (ImGui::Button(TEXT("Ped.DownloadExGangWars"), Widget::CalcSize(1))) {
                     OPEN_LINK("https://gtaforums.com/topic/682194-extended-gang-wars/");
                 }
             }
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT( "Ped.GangModelEditor")))
-        {
+        if (ImGui::BeginTabItem(TEXT( "Ped.GangModelEditor"))) {
             ImGui::Spacing();
-            if (ImGui::Button(TEXT("Ped.ResetModels"), Widget::CalcSize(1)))
-            {
+            if (ImGui::Button(TEXT("Ped.ResetModels"), Widget::CalcSize(1))) {
                 m_Gang.ResetModels();
             }
             ImGui::Spacing();
@@ -521,16 +447,14 @@ void PedPage::Draw()
             ImGui::Columns(1);
             ImGui::Spacing();
 
-           
+
 
             ImGui::Spacing();
 
-            Widget::ImageList(m_PedData, [this](str &id)
-            {
+            Widget::ImageList(m_PedData, [this](str &id) {
                 m_Gang.SetModel(m_Gang.m_nSelected, m_Gang.m_nSelectedMember, std::stoi(id));
             },
-            [this](str &text)
-            {
+            [this](str &text) {
                 return m_PedData.m_pData->Get(text.c_str(), "Unknown");
             });
             ImGui::EndTabItem();

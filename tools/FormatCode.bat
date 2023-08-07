@@ -1,2 +1,2 @@
-start tools/AStyle.exe --style=allman -n --recursive src/*.cpp src/*.h
+tools\\AStyle.exe --style=<tools\\> -n --recursive ../src/*.cpp ../src/*.h
  

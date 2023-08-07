@@ -1,12 +1,9 @@
 #include "pch.h"
 #include "fontmgr.h"
 
-ImFont* FontMgr::Get(const char* fontID)
-{
-    for (auto &data : m_vecFonts)
-    {
-        if (!strcmp(data.m_ID.c_str(), fontID))
-        {
+ImFont* FontMgr::Get(const char* fontID) {
+    for (auto &data : m_vecFonts) {
+        if (!strcmp(data.m_ID.c_str(), fontID)) {
             return data.m_pFont;
         }
     }
@@ -14,10 +11,8 @@ ImFont* FontMgr::Get(const char* fontID)
     return nullptr;
 }
 
-const ImWchar* FontMgr::GetGlyphRanges()
-{
-    static const ImWchar ranges[] =
-    {
+const ImWchar* FontMgr::GetGlyphRanges() {
+    static const ImWchar ranges[] = {
         0x0020, 0x00FF, // Basic Latin + Latin Supplement
         0x2000, 0x206F, // General Punctuation
         0,
@@ -25,8 +20,7 @@ const ImWchar* FontMgr::GetGlyphRanges()
     return &ranges[0];
 }
 
-ImFont* FontMgr::LoadFont(const char* fontID, const unsigned int* func, unsigned int size, float fontMul)
-{
+ImFont* FontMgr::LoadFont(const char* fontID, const unsigned int* func, unsigned int size, float fontMul) {
     ImFont* font;
     ImGuiIO& io = ImGui::GetIO();
     size_t fontSize = static_cast<int>(screen::GetScreenHeight() / 54.85f) * fontMul;
@@ -35,18 +29,16 @@ ImFont* FontMgr::LoadFont(const char* fontID, const unsigned int* func, unsigned
     m_vecFonts.push_back({font, fontSize, fontMul, std::string(fontID), func});
     io.Fonts->Build();
 
-    return font; 
+    return font;
 }
 
-void FontMgr::UnloadAll()
-{
+void FontMgr::UnloadAll() {
     ImGuiIO& io = ImGui::GetIO();
     io.Fonts->Clear();
     io.Fonts->ClearFonts();
 }
 
-void FontMgr::ReloadAll()
-{
+void FontMgr::ReloadAll() {
     // UnloadAll();
 
     // ImGuiIO& io = ImGui::GetIO();
@@ -58,18 +50,15 @@ void FontMgr::ReloadAll()
     m_bFontReloadRequired = false;
 }
 
-void FontMgr::Process()
-{
-    if (curState == eStates::Idle)
-    {
+void FontMgr::Process() {
+    if (curState == eStates::Idle) {
         return;
     }
 
     const char* link = "https://github.com/user-grinch/Cheat-Menu/raw/master/resource/addon/text.ttf";
     HRESULT res = URLDownloadToFile(NULL, link, MENU_DATA_PATH("fonts/text.ttf"), 0, NULL);
 
-    if (res == E_OUTOFMEMORY || res == INET_E_DOWNLOAD_FAILURE)
-    {
+    if (res == E_OUTOFMEMORY || res == INET_E_DOWNLOAD_FAILURE) {
         Util::SetMessage(TEXT("Updater.Failed"));
         return;
     }
@@ -78,20 +67,16 @@ void FontMgr::Process()
     curState = eStates::Idle;
 }
 
-bool FontMgr::IsFontReloadRequired()
-{
+bool FontMgr::IsFontReloadRequired() {
     return m_bFontReloadRequired;
 }
 
-void FontMgr::StartOptionalFontDownload()
-{
-    if (curState == eStates::Idle)
-    {
+void FontMgr::StartOptionalFontDownload() {
+    if (curState == eStates::Idle) {
         curState = eStates::Downloading;
     }
 }
 
-void FontMgr::SetFontReloadRequired(bool state)
-{
+void FontMgr::SetFontReloadRequired(bool state) {
     m_bFontReloadRequired = state;
 }

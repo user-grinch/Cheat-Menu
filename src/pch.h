@@ -68,8 +68,7 @@
 
 using namespace plugin;
 
-enum class eRenderer
-{
+enum class eRenderer {
     DirectX9,
     DirectX11,
     Unknown

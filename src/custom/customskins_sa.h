@@ -12,9 +12,8 @@
         1. Skin names can't be longer than 8 chars
         2. Skins can't be removed while the game is running
 */
-class CustomSkinsMgr : public ICheat<CustomSkinsMgr>
-{
-private:
+class CustomSkinsMgr : public ICheat<CustomSkinsMgr> {
+  private:
     ImGuiTextFilter m_Filter;
     std::vector<std::string> m_List;
     bool m_bInit;
@@ -25,7 +24,7 @@ private:
 
     // Change player to custom skin
     void SetSkin(const std::string& name);
-public:
+  public:
 
     // Draw custom skins handler code
     void Draw();

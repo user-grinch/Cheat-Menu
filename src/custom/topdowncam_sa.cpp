@@ -3,12 +3,9 @@
 
 TopDownCamera& TopDownCam = TopDownCamera::Get();
 
-TopDownCamera::TopDownCamera()
-{
-    Events::processScriptsEvent += [this]()
-    {
-        if (m_bEnabled)
-        {
+TopDownCamera::TopDownCamera() {
+    Events::processScriptsEvent += [this]() {
+        if (m_bEnabled) {
             DrawPages();
         }
     };
@@ -18,8 +15,7 @@ TopDownCamera::TopDownCamera()
 	Taken from gta chaos mod by Lordmau5
 	https://github.com/gta-chaos-mod/Trilogy-ASI-Script
 */
-void TopDownCamera::DrawPages()
-{
+void TopDownCamera::DrawPages() {
     CPlayerPed *player = FindPlayerPed();
     CVector     pos    = player->GetPosition ();
     float       curOffset = m_nZoom;
@@ -30,20 +26,16 @@ void TopDownCamera::DrawPages()
     CVehicle *vehicle = FindPlayerVehicle(-1, false);
 
     // TODO: implement smooth transition
-    if (vehicle)
-    {
+    if (vehicle) {
         float speed = vehicle->m_vecMoveSpeed.Magnitude();
-        if (speed > 1.2f)
-        {
+        if (speed > 1.2f) {
             speed = 1.2f;
         }
-        if (speed * 40.0f > 40.0f)
-        {
+        if (speed * 40.0f > 40.0f) {
             speed = 40.0f;
         }
 
-        if (speed < 0.0f)
-        {
+        if (speed < 0.0f) {
             speed = 0.0f;
         }
         curOffset += speed;
@@ -59,14 +51,11 @@ void TopDownCamera::DrawPages()
 
     if (CWorld::ProcessLineOfSight (playerOffset, cameraPos, outColPoint,
                                     outEntity, true, true, true, true, true,
-                                    true, true, true))
-    {
+                                    true, true, true)) {
         Command<eScriptCommands::COMMAND_SET_FIXED_CAMERA_POSITION> (
             outColPoint.m_vecPoint.x, outColPoint.m_vecPoint.y,
             outColPoint.m_vecPoint.z, 0.0f, 0.0f, 0.0f);
-    }
-    else
-    {
+    } else {
         Command<eScriptCommands::COMMAND_SET_FIXED_CAMERA_POSITION> (
             cameraPos.x, cameraPos.y, cameraPos.z, 0.0f, 0.0f, 0.0f);
     }

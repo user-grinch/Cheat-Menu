@@ -4,11 +4,9 @@
 *	Discord Rich Presence Class
 *	Handles connection with discord
 */
-class RPC
-{
-private:
-    struct DiscordRichPresence
-    {
+class RPC {
+  private:
+    struct DiscordRichPresence {
         const char* state;
         const char* details;
         long long startTimestamp;
@@ -31,7 +29,7 @@ private:
     static inline HMODULE hDll = NULL;
     static inline bool bInit;
 
-public:
+  public:
     RPC() = delete;
     RPC(RPC&) = delete;
 

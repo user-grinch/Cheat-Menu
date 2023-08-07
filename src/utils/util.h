@@ -5,16 +5,15 @@
 /*
 *   Contains utility functions
 */
-class Util
-{
-private:
+class Util {
+  private:
     static inline PDH_HQUERY cpuQuery;
     static inline PDH_HCOUNTER cpuTotal;
     static inline ULARGE_INTEGER lastCPU, lastSysCPU, lastUserCPU;
     static inline int numProcessors;
     static inline HANDLE self;
 
-public:
+  public:
     Util() = delete;
     Util(Util&) = delete;
 

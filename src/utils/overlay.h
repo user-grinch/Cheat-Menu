@@ -8,11 +8,9 @@
     Handles drawing overlay windows on the screen
     This is seprate from the menu window
 */
-class Overlay
-{
-private:
-    enum class eDisplayPos
-    {
+class Overlay {
+  private:
+    enum class eDisplayPos {
         Custom,
         TopLeft,
         TopRight,
@@ -39,7 +37,7 @@ private:
     // Displays fps, health, veh speed etc
     static void ProcessInfoBox();
 
-public:
+  public:
     static inline bool m_bCmdBar;
     static inline bool m_bCoord;
     static inline bool m_bCpuUsage;

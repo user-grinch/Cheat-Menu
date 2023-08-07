@@ -6,14 +6,12 @@
     Widgets Class
     Contains useful ui utilities
 */
-class Widget
-{
-private:
+class Widget {
+  private:
     using VecStr = const std::vector<std::string>;
 
-public:
-    struct BindInfo
-    {
+  public:
+    struct BindInfo {
         std::string name;
         uint val;
     };
@@ -26,16 +24,16 @@ public:
 
     // Regular checkbox with hint support
     static bool Toggle(const char* label, bool* state, const char* hint = nullptr,
-                         bool is_disabled = false);
+                       bool is_disabled = false);
 
     // Checkbox for bool memory address
     template <typename T>
     static bool ToggleAddr(const char* label, uint addr, const char* hint = nullptr,
-                                T enabled = 1, T disabled = 0);
+                           T enabled = 1, T disabled = 0);
 
     // Checkbox with raw memory input
     static bool ToggleAddrRaw(const char* label, uint addr, uint size, const char* enabled,
-                                const char* disabled, const char* hint = nullptr);
+                              const char* disabled, const char* hint = nullptr);
 
     // Checkbox for bit fields
     static bool ToggleBits(const char* label, uint flag, const char* hint = nullptr);
@@ -89,16 +87,14 @@ public:
 };
 
 template <typename T>
-bool Widget::ToggleAddr(const char* label, uint addr, const char* hint, T enabled, T disabled)
-{
+bool Widget::ToggleAddr(const char* label, uint addr, const char* hint, T enabled, T disabled) {
     bool rtn = false;
     bool state = patch::Get<T>(addr) == enabled;
 
-    if (Toggle(label, &state, hint))
-    {
+    if (Toggle(label, &state, hint)) {
         patch::Set<T>(addr, state ? enabled : disabled);
-        SaveMgr::SaveData(label, addr, state ? SaveMgr::eCheatState::Enabled 
-            : SaveMgr::eCheatState::Disabled, enabled, disabled);
+        SaveMgr::SaveData(label, addr, state ? SaveMgr::eCheatState::Enabled
+                          : SaveMgr::eCheatState::Disabled, enabled, disabled);
         rtn = true;
     }
 
@@ -106,24 +102,20 @@ bool Widget::ToggleAddr(const char* label, uint addr, const char* hint, T enable
 }
 
 template <typename T>
-void Widget::EditAddr(const char* label, uint address, int min, int def, int max)
-{
-    if (ImGui::CollapsingHeader(label))
-    {
+void Widget::EditAddr(const char* label, uint address, int min, int def, int max) {
+    if (ImGui::CollapsingHeader(label)) {
         int val = patch::Get<T>(address, false);
 
         int items = 3;
 
-        if (min == def)
-        {
+        if (min == def) {
             items = 2;
         }
 
         ImGui::Columns(items, nullptr, false);
         ImGui::Text(("Min: " + std::to_string(min)).c_str());
 
-        if (items == 3)
-        {
+        if (items == 3) {
             ImGui::NextColumn();
             ImGui::Text(("Def: " + std::to_string(def)).c_str());
         }
@@ -134,15 +126,12 @@ void Widget::EditAddr(const char* label, uint address, int min, int def, int max
 
         ImGui::Spacing();
 
-        if (ImGui::InputInt(("Set value##" + std::string(label)).c_str(), &val))
-        {
-            if (val < min)
-            {
+        if (ImGui::InputInt(("Set value##" + std::string(label)).c_str(), &val)) {
+            if (val < min) {
                 val = min;
             }
 
-            if (val > max)
-            {
+            if (val > max) {
                 val = max;
             }
             patch::Set<T>(address, val);
@@ -151,18 +140,15 @@ void Widget::EditAddr(const char* label, uint address, int min, int def, int max
 
         ImGui::Spacing();
 
-        if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), CalcSize(items)))
-        {
+        if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), CalcSize(items))) {
             patch::Set<T>(address, min);
             SaveMgr::SaveData<T>(label, address, SaveMgr::eCheatState::Enabled, static_cast<T>(min), 0);
         }
 
-        if (items == 3)
-        {
+        if (items == 3) {
             ImGui::SameLine();
 
-            if (ImGui::Button(("Default##" + std::string(label)).c_str(), CalcSize(3)))
-            {
+            if (ImGui::Button(("Default##" + std::string(label)).c_str(), CalcSize(3))) {
                 patch::Set<T>(address, def);
                 SaveMgr::SaveData<T>(label, address, SaveMgr::eCheatState::Disabled, static_cast<T>(def), 0);
             }
@@ -170,8 +156,7 @@ void Widget::EditAddr(const char* label, uint address, int min, int def, int max
 
         ImGui::SameLine();
 
-        if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), CalcSize(items)))
-        {
+        if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), CalcSize(items))) {
             patch::Set<T>(address, max);
             SaveMgr::SaveData<T>(label, address, SaveMgr::eCheatState::Enabled, static_cast<T>(max), 0);
         }

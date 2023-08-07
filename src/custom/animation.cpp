@@ -21,59 +21,45 @@ AnimationMgr& Animation = AnimationMgr::Get();
 #ifdef GTAVC
 // Thanks to codenulls(https://github.com/codenulls/)
 static auto OLD_CStreaming_RemoveModel = (bool(__cdecl*)(int))0x40D6E0;
-static bool NEW_CStreaming_RemoveModel(int modelID)
-{
+static bool NEW_CStreaming_RemoveModel(int modelID) {
     // Check if it's IFP animation block
-    if (modelID >= 7916 && modelID <= 7950)
-    {
+    if (modelID >= 7916 && modelID <= 7950) {
         // Do not unload the animation block
         return true;
     }
     return OLD_CStreaming_RemoveModel(modelID);
 }
 
-bool _LoadAnimationBlock(const char* szBlockName)
-{
+bool _LoadAnimationBlock(const char* szBlockName) {
     CAnimBlock* pAnimBlock = CAnimManager::GetAnimationBlock(szBlockName);
-    if (pAnimBlock)
-    {
-        if (!pAnimBlock->bLoaded)
-        {
+    if (pAnimBlock) {
+        if (!pAnimBlock->bLoaded) {
             int animIndex = ((unsigned char*)pAnimBlock - (unsigned char*)CAnimManager::ms_aAnimBlocks) / 32;
             CStreaming::RequestModel(7916 + animIndex, 0x20 | MISSION_REQUIRED | PRIORITY_REQUEST);
             CStreaming::LoadAllRequestedModels(true);
-            if (pAnimBlock->bLoaded)
-            {
+            if (pAnimBlock->bLoaded) {
                 return true;
             }
-        }
-        else
-        {
+        } else {
             return true;
         }
     }
     return false;
 }
 
-void _PlayAnim(RpClump* pClump, int animGroup, int animID, float blend, bool loop, bool secondary)
-{
-    if (animGroup < CAnimManager::ms_numAnimAssocDefinitions)
-    {
+void _PlayAnim(RpClump* pClump, int animGroup, int animID, float blend, bool loop, bool secondary) {
+    if (animGroup < CAnimManager::ms_numAnimAssocDefinitions) {
         CAnimationStyleDescriptor* pAnimDef = &CAnimManager::ms_aAnimAssocDefinitions[animGroup];
-        if (pAnimDef)
-        {
-            if (!_LoadAnimationBlock(pAnimDef->blockName))
-            {
+        if (pAnimDef) {
+            if (!_LoadAnimationBlock(pAnimDef->blockName)) {
                 return;
             }
         }
     }
 
     CAnimBlendAssociation* pAnimAssoc = RpAnimBlendClumpGetFirstAssociation(pClump);
-    while (pAnimAssoc)
-    {
-        if (pAnimAssoc->m_nAnimId == animID && pAnimAssoc->m_nAnimGroup == animGroup)
-        {
+    while (pAnimAssoc) {
+        if (pAnimAssoc->m_nAnimId == animID && pAnimAssoc->m_nAnimGroup == animGroup) {
             // Destroy the animation
             pAnimAssoc->~CAnimBlendAssociation();
             break;
@@ -83,25 +69,20 @@ void _PlayAnim(RpClump* pClump, int animGroup, int animID, float blend, bool loo
     pAnimAssoc = CAnimManager::BlendAnimation(pClump, animGroup, animID, blend);
     pAnimAssoc->m_nFlags = ANIMATION_STARTED | ANIMATION_MOVEMENT;
 
-    if (loop)
-    {
+    if (loop) {
         pAnimAssoc->m_nFlags |= ANIMATION_LOOPED;
     }
 
-    if (secondary)
-    {
+    if (secondary) {
         pAnimAssoc->m_nFlags |= ANIMATION_PARTIAL;
     }
 }
 #elif GTA3
-void _PlayAnim(RpClump* pClump, int animGroup, int animID, float blend, bool loop, bool secondary)
-{
+void _PlayAnim(RpClump* pClump, int animGroup, int animID, float blend, bool loop, bool secondary) {
     CAnimBlendAssociation* pAnimStaticAssoc = CAnimManager::GetAnimAssociation(animGroup, animID);
     CAnimBlendAssociation* pAnimAssoc = RpAnimBlendClumpGetFirstAssociation(pClump);
-    while (pAnimAssoc)
-    {
-        if (pAnimAssoc->m_nAnimID == pAnimStaticAssoc->m_nAnimID && pAnimAssoc->m_pAnimBlendHierarchy == pAnimStaticAssoc->m_pAnimBlendHierarchy)
-        {
+    while (pAnimAssoc) {
+        if (pAnimAssoc->m_nAnimID == pAnimStaticAssoc->m_nAnimID && pAnimAssoc->m_pAnimBlendHierarchy == pAnimStaticAssoc->m_pAnimBlendHierarchy) {
             // Destroy the animation
             pAnimAssoc->FreeAnimBlendNodeArray();
             break;
@@ -111,32 +92,26 @@ void _PlayAnim(RpClump* pClump, int animGroup, int animID, float blend, bool loo
     pAnimAssoc = CAnimManager::BlendAnimation(pClump, animGroup, animID, blend);
     pAnimAssoc->m_nFlags = 0x1 | 0x20;
 
-    if (loop)
-    {
+    if (loop) {
         pAnimAssoc->m_nFlags |= 0x2;
     }
 
-    if (secondary)
-    {
+    if (secondary) {
         pAnimAssoc->m_nFlags |= 0x10;
     }
 }
 #endif
 
-AnimationMgr::AnimationMgr()
-{
+AnimationMgr::AnimationMgr() {
 #ifdef GTASA
-    Events::processScriptsEvent += [&]
-    {
+    Events::processScriptsEvent += [&] {
         CPlayerPed* pPlayer = FindPlayerPed();
 
-        if (pPlayer && pPlayer->m_pPlayerTargettedPed)
-        {
+        if (pPlayer && pPlayer->m_pPlayerTargettedPed) {
             m_pTarget = pPlayer->m_pPlayerTargettedPed;
         }
 
-        if (m_pTarget && !m_pTarget->IsAlive())
-        {
+        if (m_pTarget && !m_pTarget->IsAlive()) {
             m_pTarget = nullptr;
         }
     };
@@ -151,16 +126,13 @@ AnimationMgr::AnimationMgr()
 
     // Fix crash at 0x4019EA
     static bool hookInjected = false;
-    Events::initGameEvent.before += []()
-    {
-        if (hookInjected)
-        {
+    Events::initGameEvent.before += []() {
+        if (hookInjected) {
             MH_DisableHook((void*)0x40D6E0);
         }
     };
 
-    Events::initGameEvent.after += []()
-    {
+    Events::initGameEvent.after += []() {
         MH_CreateHook((void*)0x40D6E0, NEW_CStreaming_RemoveModel, (void**)&OLD_CStreaming_RemoveModel);
         MH_EnableHook((void*)0x40D6E0);
         hookInjected = true;
@@ -168,35 +140,28 @@ AnimationMgr::AnimationMgr()
 #endif
 }
 
-void AnimationMgr::Play(std::string& cat, std::string& anim, std::string& ifp)
-{
+void AnimationMgr::Play(std::string& cat, std::string& anim, std::string& ifp) {
     CPed *pPed = m_bPedAnim ? m_pTarget : FindPlayerPed();
-    if (!pPed)
-    {
+    if (!pPed) {
         return;
     }
 
 #ifdef GTASA
     int hPed = CPools::GetPedRef(pPed);
 
-    if (ifp != "PED")
-    {
+    if (ifp != "PED") {
         Command<Commands::REQUEST_ANIMATION>(ifp.c_str());
         Command<Commands::LOAD_ALL_MODELS_NOW>();
     }
 
     Command<Commands::CLEAR_CHAR_TASKS>(hPed);
-    if (m_bSecondary)
-    {
+    if (m_bSecondary) {
         Command<Commands::TASK_PLAY_ANIM_SECONDARY>(hPed, anim.c_str(), ifp.c_str(), 4.0, m_Loop, 0, 0, 0, -1);
-    }
-    else
-    {
+    } else {
         Command<Commands::TASK_PLAY_ANIM>(hPed, anim.c_str(), ifp.c_str(), 4.0, m_Loop, 0, 0, 0, -1);
     }
 
-    if (ifp != "PED")
-    {
+    if (ifp != "PED") {
         Command<Commands::REMOVE_ANIMATION>(ifp.c_str());
     }
 
@@ -207,16 +172,14 @@ void AnimationMgr::Play(std::string& cat, std::string& anim, std::string& ifp)
 #endif
 }
 
-void AnimationMgr::AddNew()
-{
+void AnimationMgr::AddNew() {
     static char animBuf[INPUT_BUFFER_SIZE];
     static char ifpBuf[INPUT_BUFFER_SIZE];
 
     ImGui::InputTextWithHint(TEXT("Scene.IFPName"), "ped", ifpBuf, INPUT_BUFFER_SIZE);
     ImGui::InputTextWithHint(TEXT("Scene.AnimName"), "cower", animBuf, INPUT_BUFFER_SIZE);
     ImGui::Spacing();
-    if (ImGui::Button(TEXT("Window.AddEntry"), Widget::CalcSize()))
-    {
+    if (ImGui::Button(TEXT("Window.AddEntry"), Widget::CalcSize())) {
         std::string key = std::string("Custom.") + animBuf;
         m_Data.m_pData->Set(key.c_str(), std::string(ifpBuf));
         m_Data.m_pData->Save();
@@ -224,15 +187,12 @@ void AnimationMgr::AddNew()
     }
 }
 
-bool AnimationMgr::IsTargetFound()
-{
+bool AnimationMgr::IsTargetFound() {
     return m_bPedAnim && !m_pTarget;
 }
 
-void AnimationMgr::StopImmediately(CPed *ped)
-{
-    if (!ped)
-    {
+void AnimationMgr::StopImmediately(CPed *ped) {
+    if (!ped) {
         return;
     }
 

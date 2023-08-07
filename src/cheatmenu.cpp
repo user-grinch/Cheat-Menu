@@ -12,45 +12,35 @@
 
 static bool gameStartFlag = true;
 
-void CheatMenuMgr::Draw()
-{
+void CheatMenuMgr::Draw() {
     ImGuiIO& io = ImGui::GetIO();
     static bool bRunning = true;
 
-    if (m_bUpdateColors)
-    {
+    if (m_bUpdateColors) {
         ApplyStyle(m_Color);
         m_bUpdateColors = false;
     }
-    if (FrontEndMenuManager.m_bMenuActive)
-    {
-        if (bRunning)
-        {
+    if (FrontEndMenuManager.m_bMenuActive) {
+        if (bRunning) {
             gConfig.Save();
             bRunning = false;
             D3dHook::SetMouseState(false);
         }
-    }
-    else
-    {
+    } else {
         bRunning = true;
-        if (m_bVisible)
-        {
+        if (m_bVisible) {
             ImGui::SetNextWindowSize(m_fSize, ImGuiCond_Once);
             ImGui::SetNextWindowPos(m_fPos, ImGuiCond_Once);
 
-            if (m_bWindowParamUpdated)
-            {
+            if (m_bWindowParamUpdated) {
                 ImGui::SetNextWindowSize(m_fSize);
                 ImGui::SetNextWindowPos(m_fPos);
                 m_bWindowParamUpdated = false;
             }
-            
-            if (ImGui::Begin(MENU_TITLE, NULL, ImGuiWindowFlags_NoCollapse || ImGuiWindowFlags_NoTitleBar))
-            {   
+
+            if (ImGui::Begin(MENU_TITLE, NULL, ImGuiWindowFlags_NoCollapse || ImGuiWindowFlags_NoTitleBar)) {
                 m_bVisible = !PageHandler::DrawPages();
-                if (ImGui::IsWindowHovered())
-                {
+                if (ImGui::IsWindowHovered()) {
                     m_fSize = ImGui::GetWindowSize();
                     m_fPos = ImGui::GetWindowPos();
                     gConfig.Set("Window.Pos.X", m_fPos.x);
@@ -65,31 +55,26 @@ void CheatMenuMgr::Draw()
     Overlay::Draw();
 }
 
-void CheatMenuMgr::SetVisibility(bool flag) 
-{
+void CheatMenuMgr::SetVisibility(bool flag) {
     m_bVisible = flag;
 }
 
-void CheatMenuMgr::UpdateAccentColor(float *col) 
-{
+void CheatMenuMgr::UpdateAccentColor(float *col) {
     m_Color = {int(col[0] * 255), int(col[1] * 255), int(col[2] * 255), 255};
     m_bUpdateColors = true;
 }
 
 CheatMenuMgr& CheatMenu = CheatMenuMgr::Get();
-CheatMenuMgr::CheatMenuMgr()
-{
+CheatMenuMgr::CheatMenuMgr() {
     // Needed to be init here
     ImGui::CreateContext();
 
-    Events::initRwEvent += [this]()
-    {
+    Events::initRwEvent += [this]() {
         /*
             Had to put this in place since some people put the folder in root
             directory and the asi in modloader. Why??
         */
-        if (!std::filesystem::is_directory(PLUGIN_PATH((char*)FILE_NAME)))
-        {
+        if (!std::filesystem::is_directory(PLUGIN_PATH((char*)FILE_NAME))) {
             std::string msg = std::format("{} folder not found. You need to put both '{}.asi' & '{}' folder in the same directory", FILE_NAME, FILE_NAME, FILE_NAME);
             Log::Print<eLogLevel::Error>(msg.c_str());
             MessageBox(NULL, msg.c_str(), FILE_NAME, MB_ICONERROR);
@@ -116,20 +101,17 @@ CheatMenuMgr::CheatMenuMgr()
 #endif
         Log::Print<eLogLevel::None>("");
         // Checking for updates once a day
-        if (menuPage.m_bAutoCheckUpdate && gConfig.Get("Menu.LastUpdateChecked", 0) != st.wDay)
-        {
+        if (menuPage.m_bAutoCheckUpdate && gConfig.Get("Menu.LastUpdateChecked", 0) != st.wDay) {
             Updater::CheckUpdate();
             gConfig.Set("Menu.LastUpdateChecked", st.wDay);
         }
 
-        if (Updater::IsUpdateAvailable())
-        {
+        if (Updater::IsUpdateAvailable()) {
             Log::Print<eLogLevel::Info>("New update available: %s", Updater::GetUpdateVersion().c_str());
         }
 
         m_fSize = ImVec2(screen::GetScreenWidth() / 4, screen::GetScreenHeight() / 1.2);
-        if (!std::filesystem::exists(PLUGIN_PATH((char*)FILE_NAME)))
-        {
+        if (!std::filesystem::exists(PLUGIN_PATH((char*)FILE_NAME))) {
             Log::Print<eLogLevel::Error>("Failed to find CheatMenu directory!");
             return;
         }
@@ -148,10 +130,8 @@ CheatMenuMgr::CheatMenuMgr()
     };
 
     // Doesn't work with ThirteenAG's windowed mode while inside initRwEvent
-    Events::initGameEvent += [this]()
-    {
-        if (!D3dHook::Init(fArgNoneWrapper(CheatMenu.Draw)))
-        {
+    Events::initGameEvent += [this]() {
+        if (!D3dHook::Init(fArgNoneWrapper(CheatMenu.Draw))) {
             return;
         }
 
@@ -159,34 +139,14 @@ CheatMenuMgr::CheatMenuMgr()
     };
 
 
-    Events::initScriptsEvent.before += [this]() 
-    {
+    Events::initScriptsEvent.before += [this]() {
         gameStartFlag = true;
-
-
-        /*
-            Need SilentPatch since all gta games have issues with mouse input
-            Implementing mouse fix is a headache anyway
-        */
-        if (!GetModuleHandle(BY_GAME("SilentPatchSA.asi","SilentPatchVC.asi","SilentPatchIII.asi")))
-        {
-            Log::Print<eLogLevel::Error>("SilentPatch not found. Please install it from here https://gtaforums.com/topic/669045-silentpatch/");
-            int msgID = MessageBox(NULL, "SilentPatch not found. Do you want to install Silent Patch? (Game restart required)", FILE_NAME, MB_OKCANCEL | MB_DEFBUTTON1);
-
-            if (msgID == IDOK)
-            {
-                OPEN_LINK("https://gtaforums.com/topic/669045-silentpatch/");
-            };
-            return;
-        }
-        
         /*
             TODO: Find a better way
             Since you could still name it something else
         */
 #ifdef GTASA
-        if (GetModuleHandle("SAMP.dll") || GetModuleHandle("SAMP.asi"))
-        {
+        if (GetModuleHandle("SAMP.dll") || GetModuleHandle("SAMP.asi")) {
             Log::Print<eLogLevel::Error>(FILE_NAME " doesn't support SAMP");
             MessageBox(RsGlobal.ps->window, "SAMP detected. Exiting...", FILE_NAME, MB_ICONERROR);
             exit(EXIT_FAILURE);
@@ -194,8 +154,7 @@ CheatMenuMgr::CheatMenuMgr()
         CFastman92limitAdjuster::Init();
         Log::Print<eLogLevel::None>("Game detected: GTA San Andreas 1.0 US");
 #elif GTAVC
-        if (GetModuleHandle("vcmp-proxy.dll") || GetModuleHandle("vcmp-proxy.asi"))
-        {
+        if (GetModuleHandle("vcmp-proxy.dll") || GetModuleHandle("vcmp-proxy.asi")) {
             Log::Print<eLogLevel::Error>(FILE_NAME " doesn't support VCMP");
             MessageBox(RsGlobal.ps->window, "VCMP detected. Exiting...", FILE_NAME, MB_ICONERROR);
             exit(EXIT_FAILURE);
@@ -206,56 +165,46 @@ CheatMenuMgr::CheatMenuMgr()
 #endif
     };
 
-    Events::processScriptsEvent += [this]()
-    {
+    Events::processScriptsEvent += [this]() {
         // run this once every new game/ load game
-        if (gameStartFlag)
-        {
+        if (gameStartFlag) {
             SaveMgr::InitAndLoad();
             gameStartFlag = false;
         }
 
-        if (!FrontEndMenuManager.m_bMenuActive)
-        {
-            if (menuOpen.Pressed())
-            {
+        if (!FrontEndMenuManager.m_bMenuActive) {
+            if (menuOpen.Pressed()) {
                 m_bVisible = !m_bVisible;
             }
 
-            if (commandWindow.Pressed())
-            {
+            if (commandWindow.Pressed()) {
                 Overlay::m_bCmdBar = !Overlay::m_bCmdBar;
             }
 
             bool mouseState = D3dHook::GetMouseState();
-            if (mouseState != m_bVisible)
-            {
-                if (mouseState) // Only write when the menu closes
-                {
+            if (mouseState != m_bVisible) {
+                if (mouseState) { // Only write when the menu closes
                     gConfig.Save();
                 }
 
                 D3dHook::SetMouseState(m_bVisible);
             }
 
-            if (teleportPage.IsQuickTeleportActive() && quickTeleport.PressedRealtime())
-            {
+            if (teleportPage.IsQuickTeleportActive() && quickTeleport.PressedRealtime()) {
                 D3dHook::SetMouseState(true);
             }
         }
     };
 }
 
-bool CheatMenuMgr::IsVisible()
-{
+bool CheatMenuMgr::IsVisible() {
     return m_bVisible;
 }
 
-void CheatMenuMgr::ApplyStyle(ImColor accent_col)
-{
+void CheatMenuMgr::ApplyStyle(ImColor accent_col) {
     ImGuiStyle *style = &ImGui::GetStyle();
     ImVec4* colors = style->Colors;
-    
+
     style->FrameBorderSize = 0.0f;
     style->WindowBorderSize = 0.0f;
     style->PopupBorderSize = 0.0f;
@@ -266,7 +215,7 @@ void CheatMenuMgr::ApplyStyle(ImColor accent_col)
     style->ChildRounding = 0.0f;
     style->FrameRounding = 0.0f;
     style->GrabRounding = 0.0f;
-    style->PopupRounding = 0.0f; 
+    style->PopupRounding = 0.0f;
     style->ScrollbarSize = 5.0f;
     style->FramePadding = ImVec2(5, 5);
     style->WindowPadding = ImVec2(5, 5);
@@ -302,8 +251,7 @@ void CheatMenuMgr::ApplyStyle(ImColor accent_col)
     style->Colors[ImGuiCol_TabHovered] = ImColor(30, 31, 42, 255);
 }
 
-void CheatMenuMgr::ResetParams()
-{
+void CheatMenuMgr::ResetParams() {
     m_fSize.x = screen::GetScreenWidth() / 2.0f;
     m_fSize.y = screen::GetScreenHeight() / 1.7f;
     m_fPos = {50.0f, 50.0f};

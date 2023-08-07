@@ -7,9 +7,8 @@
     Cutscene Player Class for SA
     Plays mission cutscenes
 */
-class CutsceneMgr : public ICheat<CutsceneMgr>
-{
-private:
+class CutsceneMgr : public ICheat<CutsceneMgr> {
+  private:
     bool m_bRunning;          // is cutscene currently running
 
     // backup data
@@ -21,7 +20,7 @@ private:
     CutsceneMgr();
     CutsceneMgr(const CutsceneMgr&);
 
-public:
+  public:
     ResourceStore m_Data{ "cutscenes", eResourceType::TYPE_TEXT }; // names
 
     // Plays a cutscene

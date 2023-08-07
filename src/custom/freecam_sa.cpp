@@ -4,8 +4,7 @@
 static CVector gTotalMouse;
 FreecamMgr& Freecam = FreecamMgr::Get();
 
-void FreecamMgr::Enable()
-{
+void FreecamMgr::Enable() {
     CPlayerPed* player = FindPlayerPed();
     Command<Commands::SET_EVERYONE_IGNORE_PLAYER>(0, true);
 
@@ -35,8 +34,7 @@ void FreecamMgr::Enable()
     Command<Commands::CAMERA_PERSIST_FOV>(true);
 }
 
-void FreecamMgr::DrawPages()
-{
+void FreecamMgr::DrawPages() {
     int delta = (CTimer::m_snTimeInMilliseconds - CTimer::m_snPreviousTimeInMilliseconds);
     int ratio = 1 / (1 + (delta * m_nMul));
     int speed = m_nMul + m_nMul * ratio * delta;
@@ -48,8 +46,7 @@ void FreecamMgr::DrawPages()
     gTotalMouse.x = gTotalMouse.x > 150 ? 150 : gTotalMouse.x;
     gTotalMouse.x = gTotalMouse.x < -150 ? -150 : gTotalMouse.x;
 
-    if (freeCamTeleport.Pressed())
-    {
+    if (freeCamTeleport.Pressed()) {
         CPlayerPed* player = FindPlayerPed();
         CVector pos = m_pPed->GetPosition();
 
@@ -63,46 +60,36 @@ void FreecamMgr::DrawPages()
         Util::SetMessage(TEXT("Game.PlayerTeleported"));
     }
 
-    if (KeyPressed(VK_MENU) && m_nMul > 1)
-    {
+    if (KeyPressed(VK_MENU) && m_nMul > 1) {
         speed /= 2;
     }
 
-    if (KeyPressed(VK_SHIFT))
-    {
+    if (KeyPressed(VK_SHIFT)) {
         speed *= 2;
     }
 
-    if (freeCamForward.PressedRealtime() || freeCamBackward.PressedRealtime())
-    {
-        if (freeCamBackward.PressedRealtime())
-        {
+    if (freeCamForward.PressedRealtime() || freeCamBackward.PressedRealtime()) {
+        if (freeCamBackward.PressedRealtime()) {
             speed *= -1;
         }
 
         float angle;
         Command<Commands::GET_CHAR_HEADING>(m_nPed, &angle);
 
-        if (KeyPressed(VK_CONTROL))
-        {
+        if (KeyPressed(VK_CONTROL)) {
             pos.z += speed * sin(90.0f / 3 * 3.14159f / 180.0f);
-        }
-        else
-        {
+        } else {
             pos.x += speed * cos(angle * 3.14159f / 180.0f);
             pos.y += speed * sin(angle * 3.14159f / 180.0f);
 
-            if (!KeyPressed(VK_SPACE))
-            {
+            if (!KeyPressed(VK_SPACE)) {
                 pos.z += speed * 2 * sin(gTotalMouse.y / 3 * 3.14159f / 180.0f);
             }
         }
     }
 
-    if (freeCamLeft.PressedRealtime() || freeCamRight.PressedRealtime())
-    {
-        if (freeCamLeft.PressedRealtime())
-        {
+    if (freeCamLeft.PressedRealtime() || freeCamRight.PressedRealtime()) {
+        if (freeCamLeft.PressedRealtime()) {
             speed *= -1;
         }
 
@@ -114,44 +101,32 @@ void FreecamMgr::DrawPages()
         pos.y += speed * sin(angle * 3.14159f / 180.0f);
     }
 
-    if (CPad::NewMouseControllerState.wheelUp)
-    {
-        if (KeyPressed(VK_CONTROL))
-        {
-            if (m_fFOV > 10.0f)
-            {
+    if (CPad::NewMouseControllerState.wheelUp) {
+        if (KeyPressed(VK_CONTROL)) {
+            if (m_fFOV > 10.0f) {
                 m_fFOV -= 2.0f * speed;
             }
 
             TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_fFOV, 250, true);
             Command<Commands::CAMERA_PERSIST_FOV>(true);
-        }
-        else
-        {
-            if (m_nMul < 10)
-            {
+        } else {
+            if (m_nMul < 10) {
                 ++m_nMul;
                 Util::SetMessage(std::format("Speed: {}", m_nMul).c_str());
             }
         }
     }
 
-    if (CPad::NewMouseControllerState.wheelDown)
-    {
-        if (KeyPressed(VK_CONTROL))
-        {
-            if (m_fFOV < 115.0f)
-            {
+    if (CPad::NewMouseControllerState.wheelDown) {
+        if (KeyPressed(VK_CONTROL)) {
+            if (m_fFOV < 115.0f) {
                 m_fFOV += 2.0f * speed;
             }
 
             TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_fFOV, 250, true);
             Command<Commands::CAMERA_PERSIST_FOV>(true);
-        }
-        else
-        {
-            if (m_nMul > 1)
-            {
+        } else {
+            if (m_nMul > 1) {
                 --m_nMul;
                 Util::SetMessage(std::to_string(m_nMul).c_str());
                 Util::SetMessage(std::format("Speed: {}", m_nMul).c_str());
@@ -165,8 +140,7 @@ void FreecamMgr::DrawPages()
     plugin::Call<0x4045B0>(&pos); // CIPLStore::AddIplsNeededAtPosn(CVector)
 }
 
-void FreecamMgr::Disable()
-{
+void FreecamMgr::Disable() {
     Command<Commands::SET_EVERYONE_IGNORE_PLAYER>(0, false);
     patch::Set<BYTE>(BY_GAME(0xBA6769, 0x86963A, NULL), m_bHudState); // hud
     patch::Set<BYTE>(BY_GAME(0xBA676C, 0xA10AB6, NULL), m_bRadarState); // radar
@@ -177,12 +151,9 @@ void FreecamMgr::Disable()
     Command<Commands::RESTORE_CAMERA_JUMPCUT>();
 }
 
-FreecamMgr::FreecamMgr()
-{
-    Events::processScriptsEvent += [this]()
-    {
-        if (m_bEnabled)
-        {
+FreecamMgr::FreecamMgr() {
+    Events::processScriptsEvent += [this]() {
+        if (m_bEnabled) {
             DrawPages();
         }
     };

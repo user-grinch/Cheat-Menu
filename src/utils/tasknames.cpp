@@ -1,7 +1,6 @@
 #include "pch.h"
 
-const char* taskNames[1802] =
-{
+const char* taskNames[1802] = {
     "Player on foot\0",
     "Player in car\0",
     "Unknown 2\0",

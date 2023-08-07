@@ -2,9 +2,8 @@
 #include "pch.h"
 #include "interface/ipage.h"
 
-class VisualPage : public IPage<VisualPage>
-{
-private:
+class VisualPage : public IPage<VisualPage> {
+  private:
     bool m_bLockWeather;
 
 #ifdef GTASA
@@ -31,7 +30,7 @@ private:
     template <typename T>
     void TimecycSlider(const char* label, T* data, int min, int max);
 
-public:
+  public:
     void Draw();
 
     // Patches the radar for visual changes

@@ -2,11 +2,9 @@
 #include "utils/updater.h"
 #include "utils/rpc.h"
 
-LONG WINAPI CrashHandler(PEXCEPTION_POINTERS pInfo)
-{
+LONG WINAPI CrashHandler(PEXCEPTION_POINTERS pInfo) {
     DWORD code = pInfo->ExceptionRecord->ExceptionCode;
-    if (code > 0x80000000)
-    {
+    if (code > 0x80000000) {
         Log::Print<eLogLevel::None>("");
         Log::Print<eLogLevel::Error>("Unhandled exception at {} (0x{:x})", pInfo->ExceptionRecord->ExceptionAddress, code);
     }
@@ -14,12 +12,10 @@ LONG WINAPI CrashHandler(PEXCEPTION_POINTERS pInfo)
     return EXCEPTION_CONTINUE_SEARCH;
 }
 
-void MenuThread(void* param)
-{
+void MenuThread(void* param) {
     // SetUnhandledExceptionFilter can get replaced by other dlls
     AddVectoredExceptionHandler(0, CrashHandler);
-    while (true)
-    {
+    while (true) {
         // FontMgr::Process();
         RPC::Process();
         Updater::Process();
@@ -27,10 +23,8 @@ void MenuThread(void* param)
     }
 }
 
-BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
-{
-    if (nReason == DLL_PROCESS_ATTACH)
-    {
+BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved) {
+    if (nReason == DLL_PROCESS_ATTACH) {
         uint gameVer = GetGameVersion();
 
 #ifdef GTASA
@@ -40,9 +34,7 @@ BOOL WINAPI DllMain(HINSTANCE hDllHandle, DWORD nReason, LPVOID Reserved)
 #endif
         {
             CreateThread(nullptr, NULL, (LPTHREAD_START_ROUTINE)&MenuThread, nullptr, NULL, nullptr);
-        }
-        else
-        {
+        } else {
             Log::Print<eLogLevel::Error>("Unknown game version. GTA " BY_GAME("SA v1.0 US Hoodlum or Compact", "VC v1.0 EN", "III v1.0 EN") " is required.");
             MessageBox(HWND_DESKTOP, "Unknown game version. GTA " BY_GAME("SA v1.0 US Hoodlum or Compact", "VC v1.0 EN", "III v1.0 EN") " is required.", FILE_NAME, MB_ICONERROR);
         }

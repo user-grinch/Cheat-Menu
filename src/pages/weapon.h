@@ -2,9 +2,8 @@
 #include "pch.h"
 #include "interface/ipage.h"
 
-class WeaponPage : public IPage<WeaponPage>
-{
-private:
+class WeaponPage : public IPage<WeaponPage> {
+  private:
     bool m_bFastReload;
     bool m_bHugeDamage;
     bool m_bLongRange;
@@ -17,12 +16,10 @@ private:
     bool m_bMoveAim;
     bool m_bMoveFire;
     bool m_bNoSpread;
-    struct GangStruct
-    {
+    struct GangStruct {
         int m_nSelected;
         int m_nSelectedWeapon;
-        int m_WeaponList[10][3] =
-        {
+        int m_WeaponList[10][3] = {
             {WEAPON_PISTOL, WEAPON_MICRO_UZI, WEAPON_UNARMED},      // Ballas
             {WEAPON_PISTOL, WEAPON_UNARMED, WEAPON_UNARMED},        // Grove
             {WEAPON_PISTOL, WEAPON_UNARMED, WEAPON_UNARMED},        // Vagos
@@ -46,7 +43,7 @@ private:
     WeaponPage();
     WeaponPage(const WeaponPage&);
 
-public:
+  public:
     ResourceStore m_WeaponData { "weapons", BY_GAME(eResourceType::TYPE_IMAGE_TEXT, eResourceType::TYPE_TEXT,
                 eResourceType::TYPE_TEXT), ImVec2(65, 65) };
 

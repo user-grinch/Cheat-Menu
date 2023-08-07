@@ -15,8 +15,7 @@
 #define TOTAL_WEATHERS 23
 
 // taken from vHud (_AG)
-static bool IsTouchingRect(CVector2D& point, CRect rect1, CRect rect2)
-{
+static bool IsTouchingRect(CVector2D& point, CRect rect1, CRect rect2) {
     float vroot;
     float v12;
     float v13;
@@ -30,13 +29,11 @@ static bool IsTouchingRect(CVector2D& point, CRect rect1, CRect rect2)
     float w;
     float h;
 
-    if (rect1.right == rect1.left && rect1.bottom == rect1.top || rect2.right == rect2.left && rect2.bottom == rect2.top)
-    {
+    if (rect1.right == rect1.left && rect1.bottom == rect1.top || rect2.right == rect2.left && rect2.bottom == rect2.top) {
         return false;
     }
 
-    if (rect2.left == rect1.left && rect2.top == rect1.top || rect2.left == rect1.right && rect2.top == rect1.bottom || rect2.right == rect1.left && rect2.bottom == rect1.top || rect2.right == rect1.right && rect2.bottom == rect1.bottom)
-    {
+    if (rect2.left == rect1.left && rect2.top == rect1.top || rect2.left == rect1.right && rect2.top == rect1.bottom || rect2.right == rect1.left && rect2.bottom == rect1.top || rect2.right == rect1.right && rect2.bottom == rect1.bottom) {
         return false;
     }
 
@@ -52,21 +49,18 @@ static bool IsTouchingRect(CVector2D& point, CRect rect1, CRect rect2)
     v19 = h1 / vroot * h2 + w1 / vroot * w2;
     v14 = h * (w1 / vroot) - w * (h1 / vroot);
 
-    if (v12 < 0.0f && v14 < 0.0f || v12 >= 0.0f && v14 >= 0.0f)
-    {
+    if (v12 < 0.0f && v14 < 0.0f || v12 >= 0.0f && v14 >= 0.0f) {
         return false;
     }
 
     v13 = h1 / vroot * h + w1 / vroot * w;
     v15 = v13 + (v19 - v13) * v14 / (v14 - v12);
 
-    if (v15 < 0.0f)
-    {
+    if (v15 < 0.0f) {
         return false;
     }
 
-    if (v15 > vroot)
-    {
+    if (v15 > vroot) {
         return false;
     }
 
@@ -75,31 +69,25 @@ static bool IsTouchingRect(CVector2D& point, CRect rect1, CRect rect2)
     return true;
 }
 
-static float LimitRadarPoint(CVector2D& point)
-{
-    if (FrontEndMenuManager.m_bDrawRadarOrMap)
-    {
+static float LimitRadarPoint(CVector2D& point) {
+    if (FrontEndMenuManager.m_bDrawRadarOrMap) {
         return point.Magnitude();
     }
 
-    if (point.x >=  -1.0f && point.x <= 1.0f && point.y >= -1.0f && point.y <= 1.0f)
-    {
+    if (point.x >=  -1.0f && point.x <= 1.0f && point.y >= -1.0f && point.y <= 1.0f) {
         return 0.99f;
     }
 
     CVector2D temp;
-    CRect rect[4] =
-    {
+    CRect rect[4] = {
         {-1.0f, 1.0f, 1.0f, 1.0f},
         {-1.0f, 1.0f, -1.0f, -1.0f},
         {-1.0f, -1.0f, 1.0f, -1.0f},
         {1.0f, 1.0f, 1.0f, -1.0f}
     };
 
-    for (int i = 0; i <= 4; i++)
-    {
-        if (IsTouchingRect(temp, rect[i], CRect(0.0f, 0.0f, point.x, point.y)))
-        {
+    for (int i = 0; i <= 4; i++) {
+        if (IsTouchingRect(temp, rect[i], CRect(0.0f, 0.0f, point.x, point.y))) {
             point.x = temp.x;
             point.y = temp.y;
             break;
@@ -117,8 +105,7 @@ static float LimitRadarPoint(CVector2D& point)
 
 // Timecyc stuff
 static int m_nTimecycHour = 8;
-static std::vector<std::string> m_WeatherNames
-{
+static std::vector<std::string> m_WeatherNames {
 #ifdef GTASA
     "EXTRASUNNY LA", "SUNNY LA", "EXTRASUNNY SMOG LA", "SUNNY SMOG LA", "CLOUDY LA", "SUNNY SF", "EXTRASUNNY SF",
     "CLOUDY SF", "RAINY SF", "FOGGY SF",
@@ -135,35 +122,28 @@ static std::vector<std::string> m_WeatherNames
 
 VisualPage& visualPage = VisualPage::Get();
 VisualPage::VisualPage()
-    : IPage<VisualPage>(ePageID::Visual, "Visual", true)
-{
+    : IPage<VisualPage>(ePageID::Visual, "Visual", true) {
 #ifdef GTASA
 
-    if (GetModuleHandle("timecycle24.asi"))
-    {
+    if (GetModuleHandle("timecycle24.asi")) {
         m_nTimecycHour = 24;
     }
 #endif
 
-    Events::processScriptsEvent += [this]
-    {
+    Events::processScriptsEvent += [this] {
         // TODO: Needs improvement
         static short m_nBacWeatherType;
-        if (m_bLockWeather)
-        {
+        if (m_bLockWeather) {
             CWeather::OldWeatherType = m_nBacWeatherType;
             CWeather::NewWeatherType = m_nBacWeatherType;
-        }
-        else
-        {
+        } else {
             m_nBacWeatherType = CWeather::OldWeatherType;
         }
     };
 }
 
 template <typename T>
-int GetTCVal(T* addr, int index)
-{
+int GetTCVal(T* addr, int index) {
 #ifdef GTASA
     T* arr = static_cast<T*>(patch::GetPointer(int(addr)));
 #else
@@ -172,41 +152,29 @@ int GetTCVal(T* addr, int index)
     return static_cast<int>(arr[index]);
 }
 
-static void GenerateTimecycFile()
-{
+static void GenerateTimecycFile() {
 #ifdef GTASA
     std::ofstream file;
     std::string buffer;
-    if (m_nTimecycHour == 24)
-    {
+    if (m_nTimecycHour == 24) {
         file = std::ofstream("timecyc_24h.dat");
-    }
-    else
-    {
+    } else {
         file = std::ofstream("timecyc.dat");
     }
 
-    for (uint i = 0; i < m_WeatherNames.size(); ++i)
-    {
+    for (uint i = 0; i < m_WeatherNames.size(); ++i) {
         buffer += "\n// " + m_WeatherNames[i] + "\n";
         buffer += "//	Amb					Amb Obj 				Dir 					Sky top				Sky bot				SunCore					SunCorona			SunSz	SprSz	SprBght		Shdw	LightShd	PoleShd		FarClp		FogSt	LightOnGround	LowCloudsRGB	BottomCloudRGB		WaterRGBA				ARGB1					ARGB2			CloudAlpha		IntensityLimit		WaterFogAlpha	DirMult";
 
         file << buffer << std::endl;
-        for (int j = 0; j < m_nTimecycHour; ++j)
-        {
-            if (m_nTimecycHour == 24)
-            {
-                if (j < 12)
-                {
+        for (int j = 0; j < m_nTimecycHour; ++j) {
+            if (m_nTimecycHour == 24) {
+                if (j < 12) {
                     buffer = std::format("// {} AM\n", j);
-                }
-                else
-                {
+                } else {
                     buffer = std::format("// {} PM\n", j);
                 }
-            }
-            else
-            {
+            } else {
                 if (j == 0) buffer = "// Midnight\n";
                 if (j == 1) buffer = "// 5 AM\n";
                 if (j == 2) buffer = "// 6 AM\n";
@@ -242,11 +210,9 @@ static void GenerateTimecycFile()
 #else
     std::ofstream file = std::ofstream("timecyc.dat");
 
-    for (uint i = 0; i < TOTAL_WEATHERS; ++i)
-    {
+    for (uint i = 0; i < TOTAL_WEATHERS; ++i) {
         std::string buffer;
-        switch(i)
-        {
+        switch(i) {
         case 0:
             buffer =  "\n// SUNNY\n";
             break;
@@ -275,35 +241,26 @@ static void GenerateTimecycFile()
 #endif
         file << buffer << std::endl;
 
-        for (size_t j = 0; j < 24; ++j)
-        {
+        for (size_t j = 0; j < 24; ++j) {
 
 #ifdef GTAVC
-            if (i == 6) //EXTRA COLORS
-            {
+            if (i == 6) { //EXTRA COLORS
                 buffer = "// Extra Color " + std::to_string(j);
 
-                static std::string intNames[] =
-                {
+                static std::string intNames[] = {
                     "Maibu Club", "Strip Club", "Hotel", "Bank", "Police HQ", "Mall", "Rifle Range", "Mansion", "Dirtring", "Blood ring",
                     "Hotring", "Concert Hall", "Auntie Poulets", "Intro at Docks", "Biker Bar", "Intro Cafe Dark Room", "Studio"
                 };
 
-                if (j < 18)
-                {
+                if (j < 18) {
                     buffer += "(" + intNames[j] + ")";
                 }
-            }
-            else
-            {
+            } else {
 #endif
                 buffer = "// " + std::to_string(j) + " ";
-                if (j < 12)
-                {
+                if (j < 12) {
                     buffer += "AM\n";
-                }
-                else
-                {
+                } else {
                     buffer += "PM\n";
                 }
 #ifdef GTAVC
@@ -355,17 +312,13 @@ static void GenerateTimecycFile()
 #endif
 }
 
-int CalcArrayIndex()
-{
+int CalcArrayIndex() {
     int hour = CClock::ms_nGameClockHours;
 
 #ifdef GTASA
-    if (m_nTimecycHour == 24)
-    {
+    if (m_nTimecycHour == 24) {
         hour = hour;
-    }
-    else
-    {
+    } else {
         if (hour < 5)
             hour = 0;
         if (hour == 5)
@@ -388,8 +341,7 @@ int CalcArrayIndex()
 }
 
 template <typename T>
-void TimecycSlider(const char* label, T* ptr, int min, int max)
-{
+void TimecycSlider(const char* label, T* ptr, int min, int max) {
     int val = CalcArrayIndex();
 #ifdef GTASA
     // Compatable with 24h TimeCyc
@@ -404,8 +356,7 @@ void TimecycSlider(const char* label, T* ptr, int min, int max)
 }
 
 template<typename T>
-bool VisualPage::TimeCycColorEdit3(const char* label, T* r, T* g, T* b, ImGuiColorEditFlags flags)
-{
+bool VisualPage::TimeCycColorEdit3(const char* label, T* r, T* g, T* b, ImGuiColorEditFlags flags) {
     bool rtn = false;
     int val = CalcArrayIndex();
 
@@ -421,8 +372,7 @@ bool VisualPage::TimeCycColorEdit3(const char* label, T* r, T* g, T* b, ImGuiCol
 
     float col[3] { red[val] / 255.0f, green[val] / 255.0f, blue[val] / 255.0f };
 
-    if (ImGui::ColorEdit3(label, col, flags))
-    {
+    if (ImGui::ColorEdit3(label, col, flags)) {
         red[val] = col[0] * 255;
         green[val] = col[1] * 255;
         blue[val] = col[2] * 255;
@@ -433,8 +383,7 @@ bool VisualPage::TimeCycColorEdit3(const char* label, T* r, T* g, T* b, ImGuiCol
 }
 
 template <typename T>
-void VisualPage::TimecycSlider(const char* label, T* ptr, int min, int max)
-{
+void VisualPage::TimecycSlider(const char* label, T* ptr, int min, int max) {
     int val = CalcArrayIndex();
 #ifdef GTASA
     // Compatable with 24h TimeCyc
@@ -449,8 +398,7 @@ void VisualPage::TimecycSlider(const char* label, T* ptr, int min, int max)
 }
 
 template <typename T>
-bool VisualPage::TimeCycColorEdit4(const char* label, T* r, T* g, T* b, T* a, ImGuiColorEditFlags flags)
-{
+bool VisualPage::TimeCycColorEdit4(const char* label, T* r, T* g, T* b, T* a, ImGuiColorEditFlags flags) {
     bool rtn = false;
     int val = CalcArrayIndex();
 
@@ -468,8 +416,7 @@ bool VisualPage::TimeCycColorEdit4(const char* label, T* r, T* g, T* b, T* a, Im
 
     float col[4] { red[val] / 255.0f, green[val] / 255.0f, blue[val] / 255.0f, alpha[val] / 255.0f };
 
-    if (ImGui::ColorEdit4(label, col, flags))
-    {
+    if (ImGui::ColorEdit4(label, col, flags)) {
         red[val] = col[0] * 255;
         green[val] = col[1] * 255;
         blue[val] = col[2] * 255;
@@ -481,10 +428,8 @@ bool VisualPage::TimeCycColorEdit4(const char* label, T* r, T* g, T* b, T* a, Im
 }
 
 
-static void ColorPickerAddr(const char* label, int addr, ImVec4&& default_color)
-{
-    if (ImGui::CollapsingHeader(label))
-    {
+static void ColorPickerAddr(const char* label, int addr, ImVec4&& default_color) {
+    if (ImGui::CollapsingHeader(label)) {
         float cur_color[4];
         cur_color[0] = patch::Get<BYTE>(addr, false);
         cur_color[1] = patch::Get<BYTE>(addr + 1, false);
@@ -497,8 +442,7 @@ static void ColorPickerAddr(const char* label, int addr, ImVec4&& default_color)
         cur_color[2] /= 255;
         cur_color[3] /= 255;
 
-        if (ImGui::ColorPicker4(std::string("Pick color##" + std::string(label)).c_str(), cur_color))
-        {
+        if (ImGui::ColorPicker4(std::string("Pick color##" + std::string(label)).c_str(), cur_color)) {
             // 0-1 -> 0-255
             cur_color[0] *= 255;
             cur_color[1] *= 255;
@@ -512,8 +456,7 @@ static void ColorPickerAddr(const char* label, int addr, ImVec4&& default_color)
         }
         ImGui::Spacing();
 
-        if (ImGui::Button("Reset to default", Widget::CalcSize()))
-        {
+        if (ImGui::Button("Reset to default", Widget::CalcSize())) {
             patch::Set<BYTE>(addr, default_color.x, false);
             patch::Set<BYTE>(addr + 1, default_color.y, false);
             patch::Set<BYTE>(addr + 2, default_color.z, false);
@@ -525,8 +468,7 @@ static void ColorPickerAddr(const char* label, int addr, ImVec4&& default_color)
     }
 }
 
-void VisualPage::PatchRadar()
-{
+void VisualPage::PatchRadar() {
 #ifdef GTASA
     static float clockPosX = *(float*)*(int*)0x58EC16;
     static float clockPosY = *(float*)*(int*)0x58EC04;
@@ -601,12 +543,9 @@ void VisualPage::PatchRadar()
 #endif
 }
 
-void VisualPage::Draw()
-{
-    if (ImGui::BeginTabBar("Visual", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
-    {
-        if (ImGui::BeginTabItem(TEXT( "Window.ToggleTab")))
-        {
+void VisualPage::Draw() {
+    if (ImGui::BeginTabBar("Visual", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll)) {
+        if (ImGui::BeginTabItem(TEXT( "Window.ToggleTab"))) {
             ImGui::BeginChild("VisualCHild");
             ImGui::Spacing();
             ImGui::Columns(2, nullptr, false);
@@ -617,23 +556,17 @@ void VisualPage::Draw()
             Widget::ToggleAddr<int8_t>(TEXT("Visual.BreathPercentage"), 0x589209);
             Widget::ToggleAddr<int8_t>(TEXT("Visual.CCTVEffect"), 0xC402C5);
             Widget::ToggleAddr<int8_t>(TEXT("Visual.DarknessFilter"), 0xC402C4);
-            if (Widget::Toggle(TEXT("Visual.DisableHydrant"), &m_bDisableHydrant))
-            {
-                if (m_bDisableHydrant)
-                {
+            if (Widget::Toggle(TEXT("Visual.DisableHydrant"), &m_bDisableHydrant)) {
+                if (m_bDisableHydrant) {
                     // don't call Fx_c::TriggerWaterHydrant
                     patch::Nop(0x4A0D70, 5);
-                }
-                else
-                {
+                } else {
                     patch::SetRaw(0x4A0D70, (char*)"\xE9\x94\x3F\xF6\xFF", 5);
                 }
             }
             Widget::ToggleAddr<int8_t>(TEXT("Visual.FogEffect"), 0xC402C6);
-            if (Widget::Toggle(TEXT("Visual.FullscreenMap"), &m_bFullScreenMap, TEXT("Visual.FullscreenMapTip")))
-            {
-                if (m_bFullScreenMap)
-                {
+            if (Widget::Toggle(TEXT("Visual.FullscreenMap"), &m_bFullScreenMap, TEXT("Visual.FullscreenMapTip"))) {
+                if (m_bFullScreenMap) {
                     // NOP CSprite2d::DrawRect calls
                     patch::Nop(0x575BF6, 5);
                     patch::Nop(0x575C40, 5);
@@ -649,9 +582,7 @@ void VisualPage::Draw()
                     patch::Nop(0x575537, 6);
                     patch::Nop(0x575311, 6);
                     patch::Nop(0x575361, 6);
-                }
-                else
-                {
+                } else {
                     // restore
                     patch::SetRaw(0x575BF6, (char*)"\xE8\x65\x1F\x1B\x00", 5);
                     patch::SetRaw(0x575C40, (char*)"\xE8\x1B\x1F\x1B\x00", 5);
@@ -674,32 +605,25 @@ void VisualPage::Draw()
 
             Widget::ToggleAddr<int8_t>(TEXT("Visual.HeatHazeEffect"), 0xC402BA);
 
-            if (Widget::Toggle(TEXT("Visual.HideAreaNames"), &CHud::bScriptDontDisplayAreaName))
-            {
+            if (Widget::Toggle(TEXT("Visual.HideAreaNames"), &CHud::bScriptDontDisplayAreaName)) {
                 Command<Commands::DISPLAY_ZONE_NAMES>(!CHud::bScriptDontDisplayAreaName);
             }
 
             ImGui::NextColumn();
 
-            if (Widget::Toggle(TEXT("Visual.HideVehNames"), &CHud::bScriptDontDisplayVehicleName))
-            {
+            if (Widget::Toggle(TEXT("Visual.HideVehNames"), &CHud::bScriptDontDisplayVehicleName)) {
                 Command<Commands::DISPLAY_CAR_NAMES>(!CHud::bScriptDontDisplayVehicleName);
             }
 
             Widget::ToggleAddr<int8_t>(TEXT("Visual.HideWantedLevel"), 0x58DD1B, "", 0x90, 0x7E);
             Widget::ToggleAddr<int8_t>(TEXT("Visual.InfraredVision"), 0xC402B9);
-            if (Widget::Toggle(TEXT("Visual.InvisibleWater"), &m_bInvisibleWater))
-            {
-                if (!m_bNoWater)
-                {
-                    if (m_bInvisibleWater)
-                    {
+            if (Widget::Toggle(TEXT("Visual.InvisibleWater"), &m_bInvisibleWater)) {
+                if (!m_bNoWater) {
+                    if (m_bInvisibleWater) {
                         // don't call CWaterLevel::RenderWater()
                         patch::Nop(0x53E004, 5);
                         patch::Nop(0x53E142, 5);
-                    }
-                    else
-                    {
+                    } else {
                         // restore call CWaterLevel::RenderWater()
                         patch::SetRaw(0x53E004, (char*)"\xE8\x47\x16\x1B\x00", 5);
                         patch::SetRaw(0x53E142, (char*)"\xE8\x09\x15\x1B\x00", 5);
@@ -708,37 +632,27 @@ void VisualPage::Draw()
             }
             Widget::Toggle(TEXT("Visual.LockWeather"), &m_bLockWeather);
             Widget::ToggleAddr<int8_t>(TEXT("Visual.NightVision"), 0xC402B8);
-            if (Widget::Toggle(TEXT("Visual.NoMoneyZeros"), &m_bNoMoneyZeros))
-            {
+            if (Widget::Toggle(TEXT("Visual.NoMoneyZeros"), &m_bNoMoneyZeros)) {
                 static const char *pos = "$%d", *neg = "-$%d";
-                if(m_bNoMoneyZeros)
-                {
+                if(m_bNoMoneyZeros) {
                     patch::Set<const char*>(0x58F4C8, pos, true); //positive
                     patch::Set<const char*>(0x58F50A, neg, true); //negative
-                }
-                else
-                {
+                } else {
                     patch::SetRaw(0x58F4C8, (void*)"\x94\x6C\x86\x00", 4);
                     patch::SetRaw(0x58F50A, (void*)"\x8C\x6C\x86\x00", 4);
                 }
             }
-            if (Widget::Toggle(TEXT("Visual.NoParticles"), &m_bNoPartciles))
-            {
-                if(m_bNoPartciles)
-                {
+            if (Widget::Toggle(TEXT("Visual.NoParticles"), &m_bNoPartciles)) {
+                if(m_bNoPartciles) {
                     patch::Set<uint32_t>(0x4AA440, 0x000020C2, true);
-                }
-                else
-                {
+                } else {
                     patch::Set<uint32_t>(0x4AA440, 0x5608EC83, true);
                 }
             }
             Widget::ToggleAddr<int8_t>(TEXT("Visual.NoPostFX"), 0xC402CF);
-            if (Widget::Toggle(TEXT("Visual.NoRadarRot"), &m_bNoRadarRot))
-            {
+            if (Widget::Toggle(TEXT("Visual.NoRadarRot"), &m_bNoRadarRot)) {
                 // Credits: jeremii (bjeremii.blogspot.com)
-                if (m_bNoRadarRot)
-                {
+                if (m_bNoRadarRot) {
                     patch::Set<float>(0xBA8310, 0.0);
                     patch::Set<float>(0xBA830C, 0.0);
                     patch::Set<float>(0xBA8308, 1.0);
@@ -750,9 +664,7 @@ void VisualPage::Draw()
                     patch::Nop(0x5837D6, 6);
                     patch::Nop(0x5837D0, 6);
                     patch::Nop(0x5837C6, 8);
-                }
-                else
-                {
+                } else {
                     patch::SetRaw(0x5837FB, (void*)"\xD9\x15\x10\x83\xBA\x00", 6);
                     patch::SetRaw(0x583805, (void*)"\xD9\x1D\x0C\x83\xBA\x00", 6);
                     patch::SetRaw(0x58380D, (void*)"\xD9\x1D\x08\x83\xBA\x00", 6);
@@ -761,19 +673,15 @@ void VisualPage::Draw()
                     patch::SetRaw(0x5837C6, (void*)"\xD9\x1D\x0C\x83\xBA\x00\xD9\xC0", 8);
                 }
             }
-            if (Widget::Toggle(TEXT("Visual.NoWater"), &m_bNoWater))
-            {
-                if (m_bNoWater)
-                {
+            if (Widget::Toggle(TEXT("Visual.NoWater"), &m_bNoWater)) {
+                if (m_bNoWater) {
                     // don't call CWaterLevel::RenderWater()
                     patch::Nop(0x53E004, 5);
                     patch::Nop(0x53E142, 5);
 
                     // rtn CWaterLevel::GetWaterLevelNoWaves
                     patch::SetRaw(0x6E8580, (char*)"\x32\xC0\xC3", 3);
-                }
-                else
-                {
+                } else {
                     // restore call CWaterLevel::RenderWater()
                     patch::SetRaw(0x53E004, (char*)"\xE8\x47\x16\x1B\x00", 5);
                     patch::SetRaw(0x53E142, (char*)"\xE8\x09\x15\x1B\x00", 5);
@@ -783,16 +691,13 @@ void VisualPage::Draw()
                 }
             }
             bool radar_state = (patch::Get<BYTE>(0xBA676C) != 2);
-            if (Widget::Toggle(TEXT("Visual.ShowRadar"), &radar_state))
-            {
+            if (Widget::Toggle(TEXT("Visual.ShowRadar"), &radar_state)) {
                 patch::Set<BYTE>(0xBA676C, radar_state == true ? 0 : 2);
             }
 
             Widget::ToggleAddr<int8_t>(TEXT("Visual.ShowHud"), 0xBA6769);
-            if (Widget::Toggle(TEXT("Visual.SquareRadar"), &m_bSquareRadar))
-            {
-                if (m_bSquareRadar)
-                {
+            if (Widget::Toggle(TEXT("Visual.SquareRadar"), &m_bSquareRadar)) {
+                if (m_bSquareRadar) {
                     static float var = 0.000001f;
                     static CSprite2d sprite;
                     sprite.m_pTexture =  gTextureList.FindRwTextureByName("radardisc");
@@ -805,9 +710,7 @@ void VisualPage::Draw()
 
                     patch::Set(0x58585C, &var);
                     patch::ReplaceFunction(0x401EC5, &LimitRadarPoint);
-                }
-                else
-                {
+                } else {
                     patch::Set(0x58A8C9, 0xBAB208);
                     patch::Set(0x58A973, 0xBAB208);
                     patch::Set(0x58AA21, 0xBAB208);
@@ -819,7 +722,7 @@ void VisualPage::Draw()
             }
 
             Widget::ToggleAddr<int8_t>(TEXT("Visual.UnderwaterEffect"), 0xC402D3);
-            Widget::ToggleAddr<int>(TEXT("Visual.UnfogMap"), 0xBA372C, TEXT("Visual.UnfogMapText") , 0x50, 0x0);
+            Widget::ToggleAddr<int>(TEXT("Visual.UnfogMap"), 0xBA372C, TEXT("Visual.UnfogMapText"), 0x50, 0x0);
 #elif GTAVC
             Widget::ToggleAddr<int8_t>(TEXT("Visual.HideRadar"), 0xA10AB6);
             Widget::Toggle(TEXT("Visual.LockWeather"), &m_bLockWeather);
@@ -831,25 +734,17 @@ void VisualPage::Draw()
             Widget::ToggleAddr<int8_t>(TEXT("Visual.WhiteScanlines"), 0xA10B68);
 #else
             static bool hideHud, hideRadar;
-            if (Widget::Toggle(TEXT("Visual.HideHud"), &hideHud))
-            {
-                if (hideHud)
-                {
+            if (Widget::Toggle(TEXT("Visual.HideHud"), &hideHud)) {
+                if (hideHud) {
                     patch::Nop(0x48E420, 5); // CHud::Draw
-                }
-                else
-                {
+                } else {
                     patch::SetRaw(0x48E420, (char*)"\xE8\x7B\x6E\x07\x00", 5);
                 }
             }
-            if (Widget::Toggle(TEXT("Visual.HideRadar"), &hideRadar))
-            {
-                if (hideHud)
-                {
+            if (Widget::Toggle(TEXT("Visual.HideRadar"), &hideRadar)) {
+                if (hideHud) {
                     patch::Nop(0x50838D, 5); // CRadar::Draw
-                }
-                else
-                {
+                } else {
                     patch::SetRaw(0x50838D, (char*)"\xE8\x6E\xBE\xF9\xFF", 5);
                 }
             }
@@ -859,11 +754,9 @@ void VisualPage::Draw()
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT( "Window.MenusTab")))
-        {
+        if (ImGui::BeginTabItem(TEXT( "Window.MenusTab"))) {
             static bool initPatches = false;
-            if (!initPatches)
-            {
+            if (!initPatches) {
                 PatchRadar();
                 initPatches = true;
             }
@@ -874,8 +767,7 @@ void VisualPage::Draw()
             Widget::Tooltip(TEXT("Visual.IncompatibleModsText"));
             ImGui::Spacing();
 
-            if (ImGui::BeginChild("VisualsChild"))
-            {
+            if (ImGui::BeginChild("VisualsChild")) {
 #ifdef GTASA
                 ColorPickerAddr(TEXT("Visual.ArmourbarColor"), *(int*)0x5890FC, ImVec4(225, 225, 225, 255));
                 Widget::EditAddr<float>(TEXT("Visual.ArmourbarPosX"), 0x866B78, -999, 94, 999);
@@ -893,13 +785,11 @@ void VisualPage::Draw()
                 ColorPickerAddr(TEXT("Visual.MoneyColor"), 0xBAB230, ImVec4(54, 104, 44, 255));
                 Widget::EditAddr<float>(TEXT("Visual.MoneyPosX"), *(int*)0x58F5FC, -999, 32, 999);
                 Widget::EditAddr<float>(TEXT("Visual.MoneyPosY"), 0x866C88, -999, 89, 999);
-                static std::vector<Widget::BindInfo> font_outline
-                {
+                static std::vector<Widget::BindInfo> font_outline {
                     {TEXT("Visual.NoOutline"), 0}, {TEXT("Visual.ThinOutline"), 1}, {TEXT("Visual.DefaultOutline"), 2}
                 };
                 Widget::EditRadioBtnAddr(TEXT("Visual.MoneyFontOutline"), 0x58F58D, font_outline);
-                static std::vector<Widget::BindInfo> style
-                {
+                static std::vector<Widget::BindInfo> style {
                     {TEXT("Visual.Style1"), 1}, {TEXT("Visual.Style2"), 2}, {TEXT("Visual.DefaultStyle"), 3}
                 };
                 Widget::EditRadioBtnAddr(TEXT("Visual.MoneyFontStyle"), 0x58F57F, style);
@@ -910,8 +800,7 @@ void VisualPage::Draw()
                 Widget::EditAddr<int>(TEXT("Visual.RadarZoom"), 0xA444A3, 0, 0, 170);
                 ColorPickerAddr(TEXT("Visual.RadioStationColor"), 0xBAB24C, ImVec4(150, 150, 150, 255));
 
-                static std::vector<Widget::BindInfo> star_border
-                {
+                static std::vector<Widget::BindInfo> star_border {
                     {TEXT("Visual.NoBorder"), 0}, {TEXT("Visual.DefaultBorder"), 1}, {TEXT("Visual.BoldBorder"), 2}
                 };
                 Widget::EditRadioBtnAddr(TEXT("Visual.WantedStarBorder"), 0x58DD41, star_border);
@@ -948,31 +837,27 @@ void VisualPage::Draw()
         }
 
 #ifdef GTASA
-        if (m_nTimecycHour == 8 ? ImGui::BeginTabItem(TEXT( "Visual.TimecycTab")) 
-        : ImGui::BeginTabItem(TEXT( "Visual.Timecyc24hTab")))
+        if (m_nTimecycHour == 8 ? ImGui::BeginTabItem(TEXT( "Visual.TimecycTab"))
+                : ImGui::BeginTabItem(TEXT( "Visual.Timecyc24hTab")))
 #else
         if (ImGui::BeginTabItem(TEXT( "Visual.TimecycTab")))
 #endif
         {
             ImGui::Spacing();
-            if (ImGui::Button(TEXT("Visual.GenerateFile"), Widget::CalcSize(2)))
-            {
+            if (ImGui::Button(TEXT("Visual.GenerateFile"), Widget::CalcSize(2))) {
                 GenerateTimecycFile();
                 Util::SetMessage(TEXT("Visual.FileGenerated"));
             }
             ImGui::SameLine();
-            if (ImGui::Button(TEXT("Visual.ResetTimecyc"), Widget::CalcSize(2)))
-            {
+            if (ImGui::Button(TEXT("Visual.ResetTimecyc"), Widget::CalcSize(2))) {
                 CTimeCycle::Initialise();
                 Util::SetMessage(TEXT("Visual.TimecycReset"));
             }
             ImGui::Spacing();
 
             ImGui::Spacing();
-            if (ImGui::BeginTabBar("Timecyc subtab", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
-            {
-                if (ImGui::BeginTabItem(TEXT( "Visual.ColorsTab")))
-                {
+            if (ImGui::BeginTabBar("Timecyc subtab", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll)) {
+                if (ImGui::BeginTabItem(TEXT( "Visual.ColorsTab"))) {
                     ImGui::BeginChild("TimecycColors");
                     ImGui::Spacing();
 
@@ -1016,20 +901,17 @@ void VisualPage::Draw()
                     ImGui::EndChild();
                     ImGui::EndTabItem();
                 }
-                if (ImGui::BeginTabItem(TEXT( "Visual.Miscellaneous")))
-                {
+                if (ImGui::BeginTabItem(TEXT( "Visual.Miscellaneous"))) {
                     ImGui::BeginChild("TimecycMisc");
                     ImGui::Spacing();
                     ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 2);
                     int weather = CWeather::OldWeatherType;
-                    if (Widget::ListBox(TEXT("Visual.CurrentWeather"), m_WeatherNames, weather))
-                    {
+                    if (Widget::ListBox(TEXT("Visual.CurrentWeather"), m_WeatherNames, weather)) {
                         CWeather::OldWeatherType = weather;
                     }
 
                     weather = CWeather::NewWeatherType;
-                    if (Widget::ListBox(TEXT("Visual.NextWeather"), m_WeatherNames, weather))
-                    {
+                    if (Widget::ListBox(TEXT("Visual.NextWeather"), m_WeatherNames, weather)) {
                         CWeather::NewWeatherType = weather;
                     }
 
@@ -1037,41 +919,33 @@ void VisualPage::Draw()
                     int hour = CClock::ms_nGameClockHours;
                     int minute = CClock::ms_nGameClockMinutes;
 
-                    if (gamePage.m_bSyncTime)
-                    {
+                    if (gamePage.m_bSyncTime) {
                         ImGui::BeginDisabled(gamePage.m_bSyncTime);
                     }
 
-                    if (ImGui::InputInt(TEXT("Visual.Hour"), &hour) & !gamePage.m_bSyncTime)
-                    {
+                    if (ImGui::InputInt(TEXT("Visual.Hour"), &hour) & !gamePage.m_bSyncTime) {
                         if (hour < 0) hour = 23;
                         if (hour > 23) hour = 0;
                         CClock::ms_nGameClockHours = hour;
                     }
 
-                    if (ImGui::InputInt(TEXT("Visual.Minute"), &minute) & !gamePage.m_bSyncTime)
-                    {
+                    if (ImGui::InputInt(TEXT("Visual.Minute"), &minute) & !gamePage.m_bSyncTime) {
                         if (minute < 0) minute = 59;
                         if (minute > 59) minute = 0;
                         CClock::ms_nGameClockMinutes = minute;
                     }
 
-                    if (gamePage.m_bSyncTime)
-                    {
+                    if (gamePage.m_bSyncTime) {
                         ImGui::EndDisabled();
                         Widget::Tooltip(TEXT("Visual.SyncTimeEnabled"));
                     }
 
-                    if (Widget::Toggle(TEXT("Visual.FreezeGameTime"), &gamePage.m_bFreezeTime))
-                    {
-                        if (gamePage.m_bFreezeTime)
-                        {
+                    if (Widget::Toggle(TEXT("Visual.FreezeGameTime"), &gamePage.m_bFreezeTime)) {
+                        if (gamePage.m_bFreezeTime) {
                             patch::SetRaw(BY_GAME(0x52CF10, 0x487010, 0x473460), (char *)"\xEB\xEF", 2);
-                        }
-                        else
-                        {
+                        } else {
                             patch::SetRaw(BY_GAME(0x52CF10, 0x487010, 0x473460),
-                                            (char *)BY_GAME("\x56\x8B", "\x6A\x01", "\x6A\x01"), 2);
+                                          (char *)BY_GAME("\x56\x8B", "\x6A\x01", "\x6A\x01"), 2);
                         }
                     }
                     ImGui::Spacing();

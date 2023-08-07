@@ -7,24 +7,17 @@
 
 WeaponPage& weaponPage = WeaponPage::Get();
 WeaponPage::WeaponPage()
-    : IPage<WeaponPage>(ePageID::Weapon, "Weapon", true)
-{
-    Events::processScriptsEvent += [this]
-    {
+    : IPage<WeaponPage>(ePageID::Weapon, "Weapon", true) {
+    Events::processScriptsEvent += [this] {
         CPlayerPed* player = FindPlayerPed();
 
 #ifdef GTASA
-        if (m_bAutoAim)
-        {
-            if (CPad::NewMouseControllerState.x == 0 && CPad::NewMouseControllerState.y == 0)
-            {
-                if (KeyPressed(2))
-                {
+        if (m_bAutoAim) {
+            if (CPad::NewMouseControllerState.x == 0 && CPad::NewMouseControllerState.y == 0) {
+                if (KeyPressed(2)) {
                     CCamera::m_bUseMouse3rdPerson = false;
                 }
-            }
-            else
-            {
+            } else {
                 CCamera::m_bUseMouse3rdPerson = true;
             }
         }
@@ -32,8 +25,7 @@ WeaponPage::WeaponPage()
 
         static uint8_t curWeaponSlot;
         uint8_t slot = BY_GAME(player->m_nActiveWeaponSlot, player->m_nSelectedWepSlot, player->m_nSelectedWepSlot);
-        if (curWeaponSlot != slot)
-        {
+        if (curWeaponSlot != slot) {
             eWeaponType weaponType = player->m_aWeapons[slot].m_eWeaponType;
 
 #ifdef GTASA
@@ -41,19 +33,16 @@ WeaponPage::WeaponPage()
 #else
             CWeaponInfo* pWeaponInfo = CWeaponInfo::GetWeaponInfo(weaponType);
 
-            if(m_bInfiniteAmmo)
-            {
+            if(m_bInfiniteAmmo) {
                 Command<Commands::SET_PLAYER_AMMO>(0, weaponType, 999999);
             }
 #endif
 
-            if (m_bHugeDamage)
-            {
+            if (m_bHugeDamage) {
                 pWeaponInfo->m_nDamage = 1000;
             }
 
-            if (m_bLongRange)
-            {
+            if (m_bLongRange) {
 #ifdef GTASA
                 pWeaponInfo->m_fTargetRange = 1000.0f;
                 pWeaponInfo->m_fWeaponRange = 1000.0f;
@@ -65,29 +54,24 @@ WeaponPage::WeaponPage()
             }
 
 #ifdef GTASA
-            if (m_bRapidFire && weaponType != WEAPON_FTHROWER && weaponType != WEAPON_MINIGUN) // mingun & flamethrower doesn't work with rapidfire
-            {
+            if (m_bRapidFire && weaponType != WEAPON_FTHROWER && weaponType != WEAPON_MINIGUN) { // mingun & flamethrower doesn't work with rapidfire
                 pWeaponInfo->m_nFlags.bContinuosFire = true;
             }
 
             if (m_bDualWeild && (weaponType == WEAPON_PISTOL || weaponType == WEAPON_MICRO_UZI || weaponType ==
-                                 WEAPON_TEC9 || weaponType == WEAPON_SAWNOFF))
-            {
+                                 WEAPON_TEC9 || weaponType == WEAPON_SAWNOFF)) {
                 pWeaponInfo->m_nFlags.bTwinPistol = true;
             }
 
-            if (m_bMoveAim)
-            {
+            if (m_bMoveAim) {
                 pWeaponInfo->m_nFlags.bMoveAim = true;
             }
 
-            if (m_bNoSpread)
-            {
+            if (m_bNoSpread) {
                 pWeaponInfo->m_fAccuracy = 100.0f;
             }
 
-            if (m_bMoveFire)
-            {
+            if (m_bMoveFire) {
                 pWeaponInfo->m_nFlags.bMoveFire = true;
             }
 #endif
@@ -97,16 +81,14 @@ WeaponPage::WeaponPage()
 }
 
 #ifdef GTASA
-void WeaponPage::GangStruct::SetWeapon(std::string& weaponType)
-{
+void WeaponPage::GangStruct::SetWeapon(std::string& weaponType) {
     m_WeaponList[m_nSelected][m_nSelectedWeapon] = std::stoi(weaponType);
     CGangs::SetGangWeapons(m_nSelected, m_WeaponList[m_nSelected][0], m_WeaponList[m_nSelected][1],
                            m_WeaponList[m_nSelected][2]);
 }
 #else
 // Implementation of SA opcode 0x555
-static void ClearPlayerWeapon(eWeaponType weaponType)
-{
+static void ClearPlayerWeapon(eWeaponType weaponType) {
     CPlayerPed *pPlayer = FindPlayerPed();
 
 #ifdef GTA3
@@ -115,15 +97,12 @@ static void ClearPlayerWeapon(eWeaponType weaponType)
     int weaponSlot = CWeaponInfo::GetWeaponInfo(weaponType)->m_WeaponSlot;
 #endif
 
-    if ( weaponSlot != -1 )
-    {
+    if ( weaponSlot != -1 ) {
         CWeapon *pWeapon = &pPlayer->m_aWeapons[weaponSlot];
 
 
-        if (pWeapon->m_eWeaponType == weaponType)
-        {
-            if (pPlayer->m_nCurrentWeapon == weaponSlot)
-            {
+        if (pWeapon->m_eWeaponType == weaponType) {
+            if (pPlayer->m_nCurrentWeapon == weaponSlot) {
 #ifdef GTA3
                 Command<Commands::SET_CURRENT_PLAYER_WEAPON>(0, WEAPONTYPE_UNARMED);
 #else
@@ -143,20 +122,16 @@ static void ClearPlayerWeapon(eWeaponType weaponType)
     }
 }
 
-int WeaponPage::GetWeaponModel(eWeaponType weaponType)
-{
+int WeaponPage::GetWeaponModel(eWeaponType weaponType) {
     int rtn = CallAndReturn<int, BY_GAME(NULL, 0x4418B0, 0x430690)>(weaponType); // int __cdecl CPickups::ModelForWeapon(int a1)
     return rtn;
 }
 
 // Implementation of opcode 0x605 (CLEO)
-eWeaponType WeaponPage::GetWeaponType(int model)
-{
+eWeaponType WeaponPage::GetWeaponType(int model) {
     eWeaponType weaponType = WEAPONTYPE_UNARMED;
-    for (size_t i = 0; i < 37; i++)
-    {
-        if (GetWeaponModel(static_cast<eWeaponType>(i)) == model)
-        {
+    for (size_t i = 0; i < 37; i++) {
+        if (GetWeaponModel(static_cast<eWeaponType>(i)) == model) {
             weaponType = (eWeaponType)i;
             break;
         }
@@ -167,26 +142,20 @@ eWeaponType WeaponPage::GetWeaponType(int model)
 #endif
 
 #ifdef GTASA
-void WeaponPage::GiveWeaponToPlayer(std::string& weapon_type)
-{
+void WeaponPage::GiveWeaponToPlayer(std::string& weapon_type) {
     CPlayerPed* player = FindPlayerPed();
     int hplayer = CPools::GetPedRef(player);
 
-    if (weapon_type == "-1") // Jetpack
-    {
+    if (weapon_type == "-1") { // Jetpack
         Command<Commands::TASK_JETPACK>(hplayer);
-    }
-    else if (weapon_type == "-2") // CellPhone
-    {
+    } else if (weapon_type == "-2") { // CellPhone
         CStreaming::RequestModel(330, PRIORITY_REQUEST);
         CStreaming::LoadAllRequestedModels(false);
         player->ClearWeaponTarget();
         player->SetCurrentWeapon(WEAPON_UNARMED);
         player->AddWeaponModel(330);
         Command<Commands::MARK_MODEL_AS_NO_LONGER_NEEDED>(330);
-    }
-    else
-    {
+    } else {
         int iweapon_type = std::stoi(weapon_type);
 
         int model = NULL;
@@ -194,16 +163,14 @@ void WeaponPage::GiveWeaponToPlayer(std::string& weapon_type)
 
         CStreaming::RequestModel(model, PRIORITY_REQUEST);
 
-        if (model == 363) // remote bomb
-        {
+        if (model == 363) { // remote bomb
             CStreaming::RequestModel(364, PRIORITY_REQUEST); // detonator
         }
 
         CStreaming::LoadAllRequestedModels(false);
         Command<Commands::GIVE_WEAPON_TO_CHAR>(hplayer, iweapon_type, m_nAmmoCount);
 
-        if (model == 363) // remote bomb
-        {
+        if (model == 363) { // remote bomb
             Command<Commands::MARK_MODEL_AS_NO_LONGER_NEEDED>(364); // detonator
         }
 
@@ -211,8 +178,7 @@ void WeaponPage::GiveWeaponToPlayer(std::string& weapon_type)
     }
 }
 #else
-void WeaponPage::GiveWeaponToPlayer(std::string& rootkey, std::string& name, std::string& model)
-{
+void WeaponPage::GiveWeaponToPlayer(std::string& rootkey, std::string& name, std::string& model) {
     CPlayerPed* player = FindPlayerPed();
     int hplayer = CPools::GetPedRef(player);
     int iModel = std::stoi(model);
@@ -228,16 +194,14 @@ void WeaponPage::GiveWeaponToPlayer(std::string& rootkey, std::string& name, std
 }
 #endif
 
-void WeaponPage::AddNew()
-{
+void WeaponPage::AddNew() {
     static char name[INPUT_BUFFER_SIZE];
     static int model = 0;
     ImGui::InputTextWithHint(TEXT("Menu.Name"), "Minigun", name, INPUT_BUFFER_SIZE);
     Widget::InputInt(TEXT("Weapon.WeaponType"), &model, 0, 999999);
     ImGui::Spacing();
     ImVec2 sz = Widget::CalcSize(1);
-    if (ImGui::Button(TEXT("Window.AddEntry"), sz))
-    {
+    if (ImGui::Button(TEXT("Window.AddEntry"), sz)) {
         std::string key = std::format("Custom.{} (Added)", name);
         m_WeaponData.m_pData->Set(key.c_str(), std::to_string(model));
         m_WeaponData.m_pData->Save();
@@ -245,20 +209,17 @@ void WeaponPage::AddNew()
     }
 }
 
-void WeaponPage::Draw()
-{
+void WeaponPage::Draw() {
     CPlayerPed* pPlayer = FindPlayerPed();
     uint hplayer = CPools::GetPedRef(pPlayer);
 
     ImGui::Spacing();
-    if (ImGui::Button(TEXT("Weapon.DropWeapon"), Widget::CalcSize(3)))
-    {
+    if (ImGui::Button(TEXT("Weapon.DropWeapon"), Widget::CalcSize(3))) {
         float x, y, z;
         Command<Commands::GET_OFFSET_FROM_CHAR_IN_WORLD_COORDS>(hplayer, 0.0, 3.0, 0.0, &x, &y, &z);
 
         eWeaponType weaponType = pPlayer->m_aWeapons[BY_GAME(pPlayer->m_nActiveWeaponSlot, pPlayer->m_nSelectedWepSlot, pPlayer->m_nSelectedWepSlot)].m_eWeaponType;
-        if (weaponType)
-        {
+        if (weaponType) {
             int model = 0, pickup = 0;
 #ifdef GTASA
             Command<Commands::GET_WEAPONTYPE_MODEL>(weaponType, &model);
@@ -275,14 +236,12 @@ void WeaponPage::Draw()
         }
     }
     ImGui::SameLine();
-    if (ImGui::Button(TEXT("Weapon.DropAll"), Widget::CalcSize(3)))
-    {
+    if (ImGui::Button(TEXT("Weapon.DropAll"), Widget::CalcSize(3))) {
         pPlayer->ClearWeapons();
     }
 
     ImGui::SameLine();
-    if (ImGui::Button(TEXT("Weapon.DropCurrent"), Widget::CalcSize(3)))
-    {
+    if (ImGui::Button(TEXT("Weapon.DropCurrent"), Widget::CalcSize(3))) {
 #ifdef GTASA
         Command<Commands::REMOVE_WEAPON_FROM_CHAR>(hplayer, pPlayer->m_aWeapons[pPlayer->m_nActiveWeaponSlot].m_eWeaponType);
 #else
@@ -291,10 +250,8 @@ void WeaponPage::Draw()
     }
     ImGui::Spacing();
 
-    if (ImGui::BeginTabBar("Ped", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll))
-    {
-        if (ImGui::BeginTabItem(TEXT( "Window.ToggleTab")))
-        {
+    if (ImGui::BeginTabBar("Ped", ImGuiTabBarFlags_NoTooltip + ImGuiTabBarFlags_FittingPolicyScroll)) {
+        if (ImGui::BeginTabItem(TEXT( "Window.ToggleTab"))) {
             ImGui::BeginChild("CheckboxesChild");
             ImGui::Spacing();
             ImGui::Spacing();
@@ -304,23 +261,18 @@ void WeaponPage::Draw()
             ImGui::Columns(2, 0, false);
 #ifdef GTASA
             Widget::Toggle(TEXT("Weapon.FastAim"), &m_bAutoAim, TEXT("Weapon.FastAimText"));
-            if (Widget::Toggle(TEXT("Weapon.DualWeild"), &m_bDualWeild,TEXT("Weapon.DualWeildText")))
-            {
-                if (!m_bDualWeild)
-                {
+            if (Widget::Toggle(TEXT("Weapon.DualWeild"), &m_bDualWeild,TEXT("Weapon.DualWeildText"))) {
+                if (!m_bDualWeild) {
                     CWeaponInfo::LoadWeaponData();
                 }
             }
 #endif
-            if (Widget::Toggle(TEXT("Weapon.HugeDamage"), &m_bHugeDamage, TEXT("Weapon.HugeDamageText")))
-            {
-                if (!m_bHugeDamage)
-                {
+            if (Widget::Toggle(TEXT("Weapon.HugeDamage"), &m_bHugeDamage, TEXT("Weapon.HugeDamageText"))) {
+                if (!m_bHugeDamage) {
                     CWeaponInfo::LoadWeaponData();
                 }
             }
-            if (Widget::Toggle(TEXT("Weapon.FastReload"), &m_bFastReload))
-            {
+            if (Widget::Toggle(TEXT("Weapon.FastReload"), &m_bFastReload)) {
                 Command<Commands::SET_PLAYER_FAST_RELOAD>(hplayer, m_bFastReload);
             }
 
@@ -331,39 +283,29 @@ void WeaponPage::Draw()
             ImGui::NextColumn();
             Widget::Toggle(TEXT("Weapon.InfiniteAmmo"), &m_bInfiniteAmmo);
 #endif
-            if (Widget::Toggle(TEXT("Weapon.LongRange"), &m_bLongRange))
-            {
-                if (!m_bLongRange)
-                {
+            if (Widget::Toggle(TEXT("Weapon.LongRange"), &m_bLongRange)) {
+                if (!m_bLongRange) {
                     CWeaponInfo::LoadWeaponData();
                 }
             }
 #ifdef GTASA
-            if (Widget::Toggle(TEXT("Weapon.MoveWhenAiming"), &m_bMoveAim))
-            {
-                if (!m_bMoveAim)
-                {
+            if (Widget::Toggle(TEXT("Weapon.MoveWhenAiming"), &m_bMoveAim)) {
+                if (!m_bMoveAim) {
                     CWeaponInfo::LoadWeaponData();
                 }
             }
-            if (Widget::Toggle(TEXT("Weapon.MoveWhenFiring"), &m_bMoveFire))
-            {
-                if (!m_bMoveFire)
-                {
+            if (Widget::Toggle(TEXT("Weapon.MoveWhenFiring"), &m_bMoveFire)) {
+                if (!m_bMoveFire) {
                     CWeaponInfo::LoadWeaponData();
                 }
             }
-            if (Widget::Toggle(TEXT("Weapon.NoSpread"), &m_bNoSpread))
-            {
-                if (!m_bNoSpread)
-                {
+            if (Widget::Toggle(TEXT("Weapon.NoSpread"), &m_bNoSpread)) {
+                if (!m_bNoSpread) {
                     CWeaponInfo::LoadWeaponData();
                 }
             }
-            if (Widget::Toggle(TEXT("Weapon.RapidFire"), &m_bRapidFire))
-            {
-                if (!m_bRapidFire)
-                {
+            if (Widget::Toggle(TEXT("Weapon.RapidFire"), &m_bRapidFire)) {
+                if (!m_bRapidFire) {
                     CWeaponInfo::LoadWeaponData();
                 }
             }
@@ -372,22 +314,18 @@ void WeaponPage::Draw()
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT( "Window.SpawnTab")))
-        {
+        if (ImGui::BeginTabItem(TEXT( "Window.SpawnTab"))) {
             ImGui::Spacing();
-            if (ImGui::InputInt(TEXT("Weapon.Ammo"), &m_nAmmoCount))
-            {
+            if (ImGui::InputInt(TEXT("Weapon.Ammo"), &m_nAmmoCount)) {
                 m_nAmmoCount = (m_nAmmoCount < 0) ? 0 : m_nAmmoCount;
                 m_nAmmoCount = (m_nAmmoCount > 99999) ? 99999 : m_nAmmoCount;
             }
 #ifdef GTASA
             Widget::ImageList(m_WeaponData, fArgWrapper(weaponPage.GiveWeaponToPlayer),
-                              [this](std::string& str)
-            {
+            [this](std::string& str) {
                 return m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
             },
-            [](std::string& str)
-            {
+            [](std::string& str) {
                 return str != "0"; /*Unarmed*/
             }, fArgNoneWrapper(weaponPage.AddNew));
 #else
@@ -396,8 +334,7 @@ void WeaponPage::Draw()
             ImGui::EndTabItem();
         }
 #ifdef GTASA
-        if (ImGui::BeginTabItem(TEXT( "Weapon.GangWeaponEditor")))
-        {
+        if (ImGui::BeginTabItem(TEXT( "Weapon.GangWeaponEditor"))) {
             ImGui::Spacing();
             float width = ImGui::GetWindowContentRegionMax().x - ImGui::GetWindowContentRegionMin().x;
             ImGui::Columns(2, NULL, false);
@@ -413,12 +350,10 @@ void WeaponPage::Draw()
             ImGui::Text(TEXT("Weapon.CurrentWeapon"), m_WeaponData.m_pData->Get(key.c_str(), "Unknown").c_str());
             ImGui::Spacing();
             Widget::ImageList(m_WeaponData, fArgWrapper(weaponPage.m_Gang.SetWeapon),
-                              [this](std::string& str)
-            {
+            [this](std::string& str) {
                 return m_WeaponData.m_pData->Get(str.c_str(), "Unknown");
             },
-            [](std::string& str)
-            {
+            [](std::string& str) {
                 return str != "-1"; /*Jetpack*/
             });
             ImGui::EndTabItem();

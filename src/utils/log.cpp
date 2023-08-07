@@ -1,10 +1,8 @@
 #include "log.h"
 #include "pch.h"
 
-void Log::AppendLogLevel(std::string& text) noexcept
-{
-    switch (level)
-    {
+void Log::AppendLogLevel(std::string& text) noexcept {
+    switch (level) {
     case eLogLevel::Debug:
         text = "[Debug] " + text;
         break;
@@ -22,12 +20,10 @@ void Log::AppendLogLevel(std::string& text) noexcept
     }
 }
 
-void Log::SetName(const char* logName) noexcept
-{
+void Log::SetName(const char* logName) noexcept {
     name = logName;
 }
 
-void Log::SetLogLevel(eLogLevel logLevel) noexcept
-{
+void Log::SetLogLevel(eLogLevel logLevel) noexcept {
     level = logLevel;
 }

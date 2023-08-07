@@ -4,17 +4,14 @@
     Font Manager Class
     Handles loading, fetching, freeing & reloading fonts
 */
-class FontMgr
-{
-private:
-    enum class eStates
-    {
+class FontMgr {
+  private:
+    enum class eStates {
         Idle,
         Downloading,
     };
 
-    struct FontInfo
-    {
+    struct FontInfo {
         ImFont *m_pFont;
         size_t m_nSize;
         float m_fMul;
@@ -25,7 +22,7 @@ private:
     static inline eStates curState = eStates::Idle;
     static inline bool m_bFontReloadRequired = false;
 
-public:
+  public:
     FontMgr() = delete;
     FontMgr(FontMgr&) = delete;
 

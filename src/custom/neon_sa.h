@@ -8,20 +8,17 @@
 	TODO: Implement for VC & 3 too (maybe)
 	Dunno how it'd work with the d3d8to9 wrapper
 */
-class NeonMgr : public ICheat<NeonMgr>
-{
-private:
-    class NeonData
-    {
-    public:
+class NeonMgr : public ICheat<NeonMgr> {
+  private:
+    class NeonData {
+      public:
         CRGBA m_Color;
         bool m_bNeonInstalled;
         float m_fVal;
         bool m_bIncrement;
         bool m_bPulsing;
 
-        NeonData(CVehicle* pVeh)
-        {
+        NeonData(CVehicle* pVeh) {
             m_bNeonInstalled = false;
             m_fVal = 0.0;
             m_bIncrement = true;
@@ -36,7 +33,7 @@ private:
     NeonMgr(NeonMgr&);
     ~NeonMgr();
 
-public:
+  public:
 
     // Returns internal neon data
     NeonData GetData(CVehicle *pVeh);

@@ -2,8 +2,7 @@
 #include "filehandler.h"
 
 #ifdef GTASA
-void FileHandler::GenerateHandlingFile(tHandlingData *pHandling, std::map<int, std::string>& storeMap)
-{
+void FileHandler::GenerateHandlingFile(tHandlingData *pHandling, std::map<int, std::string>& storeMap) {
     FILE* fp = fopen("handling.txt", "w");
 
     std::string handlingId = storeMap[FindPlayerPed()->m_pVehicle->m_nModelIndex];
@@ -58,46 +57,36 @@ void FileHandler::GenerateHandlingFile(tHandlingData *pHandling, std::map<int, s
     fclose(fp);
 }
 
-void FileHandler::FetchHandlingID(std::map<int, std::string>& storeMap)
-{
+void FileHandler::FetchHandlingID(std::map<int, std::string>& storeMap) {
     const char* path = GAME_PATH((char*)"/data/vehicles.ide");
-    if (!std::filesystem::exists(path))
-    {
+    if (!std::filesystem::exists(path)) {
         Log::Print<eLogLevel::Warn>("Vehicle.ide not found");
         return;
     }
 
     FILE *pFile= fopen(path, "r");
-    if (pFile != NULL)
-    {
+    if (pFile != NULL) {
         static const uint8_t bufSize = 128;
         char buf[bufSize];
-        while (fgets(buf, bufSize, pFile) != NULL)
-        {
-            if (buf[0] == 'e' && buf[1] == 'n' && buf[2] == 'd')
-            {
+        while (fgets(buf, bufSize, pFile) != NULL) {
+            if (buf[0] == 'e' && buf[1] == 'n' && buf[2] == 'd') {
                 break;
             }
 
-            if (buf[0] < '0' || buf[0] > '9')
-            {
+            if (buf[0] < '0' || buf[0] > '9') {
                 continue;
             }
 
             // replace comma and remove tabs
             uint8_t sz = bufSize;
-            for(uint8_t i = 0; i < sz; ++i)
-            {
-                if (buf[i] == ',')
-                {
+            for(uint8_t i = 0; i < sz; ++i) {
+                if (buf[i] == ',') {
                     buf[i] = ' ';
                     continue;
                 }
 
-                if (buf[i] == ' ' || buf[i] == '\t' )
-                {
-                    for(uint8_t j = i; j < sz; ++j)
-                    {
+                if (buf[i] == ' ' || buf[i] == '\t' ) {
+                    for(uint8_t j = i; j < sz; ++j) {
                         buf[j] = buf[j+1];
                     }
                     --sz;
@@ -106,8 +95,7 @@ void FileHandler::FetchHandlingID(std::map<int, std::string>& storeMap)
 
             int id;
             char model[32], txd[32], type[32], handling[32];
-            if (sscanf(buf, "%d %s %s %s %s", &id, model, txd, type, handling) == 5)
-            {
+            if (sscanf(buf, "%d %s %s %s %s", &id, model, txd, type, handling) == 5) {
                 storeMap[id] = std::string(handling);
             }
         }
@@ -116,44 +104,35 @@ void FileHandler::FetchHandlingID(std::map<int, std::string>& storeMap)
 }
 #endif
 
-void FileHandler::FetchColorData(std::vector<std::vector<float>>& storeVec)
-{
+void FileHandler::FetchColorData(std::vector<std::vector<float>>& storeVec) {
     const char* path = GAME_PATH((char*)"/data/carcols.dat");
-    if (!std::filesystem::exists(path))
-    {
+    if (!std::filesystem::exists(path)) {
         Log::Print<eLogLevel::Warn>("Carcols.dat not found");
         return;
     }
 
     FILE *pFile= fopen(path, "r");
-    if (pFile != NULL)
-    {
+    if (pFile != NULL) {
         static const uint8_t bufSize = 16;
         char buf[bufSize];
-        while (fgets(buf, bufSize, pFile) != NULL)
-        {
-            if (buf[0] == '#' || buf[0] == '\n')
-            {
+        while (fgets(buf, bufSize, pFile) != NULL) {
+            if (buf[0] == '#' || buf[0] == '\n') {
                 continue;
             }
 
-            if (buf[0] == 'e' && buf[1] == 'n' && buf[2] == 'd')
-            {
+            if (buf[0] == 'e' && buf[1] == 'n' && buf[2] == 'd') {
                 break;
             }
 
             // replace comma and dots with spaces
-            for(uint8_t i = 0; i < bufSize; ++i)
-            {
-                if (buf[i] == ',' || buf[i] == '.')
-                {
+            for(uint8_t i = 0; i < bufSize; ++i) {
+                if (buf[i] == ',' || buf[i] == '.') {
                     buf[i] = ' ';
                 }
             }
 
             int r = 0, g = 0, b = 0;
-            if (sscanf(buf, "%d %d %d", &r, &g, &b) == 3)
-            {
+            if (sscanf(buf, "%d %d %d", &r, &g, &b) == 3) {
                 storeVec.push_back({r / 255.0f, g / 255.0f, b / 255.0f});
             }
         }

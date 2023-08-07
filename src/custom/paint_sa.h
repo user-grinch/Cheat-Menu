@@ -7,13 +7,10 @@
 	TODO: Implement for VC & 3 too (maybe)
 	Dunno how it'd work with the d3d8to9 wrapper
 */
-class PaintMgr : public ICheat<PaintMgr>
-{
-private:
-    struct PaintData
-    {
-        struct MatInfo
-        {
+class PaintMgr : public ICheat<PaintMgr> {
+  private:
+    struct PaintData {
+        struct MatInfo {
             bool m_bRecolor = false;
             bool m_bRetexture = false;
             RwRGBA m_nColor = {0, 0, 0, 0};
@@ -28,8 +25,7 @@ private:
 
         std::unordered_map<RpMaterial*, MatInfo> m_nMapInfoList;
 
-        PaintData(CVehicle* pVeh)
-        {
+        PaintData(CVehicle* pVeh) {
             m_nCarColors[0] = pVeh->m_nPrimaryColor;
             m_nCarColors[1] = pVeh->m_nSecondaryColor;
             m_nCarColors[2] = pVeh->m_nTertiaryColor;
@@ -54,7 +50,7 @@ private:
     PaintMgr();
     PaintMgr(PaintMgr&);
 
-public:
+  public:
     ResourceStore m_TextureData { "textures", eResourceType::TYPE_IMAGE_TEXT, ImVec2(100, 80) };
 
     // Returns internal data structure

@@ -2,9 +2,8 @@
 #include "pch.h"
 #include "interface/ipage.h"
 
-class GamePage : public IPage<GamePage>
-{
-private:
+class GamePage : public IPage<GamePage> {
+  private:
     ResourceStore m_MissionData{ "missions", eResourceType::TYPE_TEXT };
     bool m_bDisableCheats;
     bool m_bDisableTutorials;
@@ -12,8 +11,7 @@ private:
     bool m_bMissionTimer;
     bool m_bMobileRadio;
 
-    struct
-    {
+    struct {
         bool m_bEnabled;
         float m_fBacHealth;
         float m_fBacMaxHealth;
@@ -33,7 +31,7 @@ private:
     GamePage();
     GamePage(const GamePage&);
 
-public:
+  public:
     bool m_bFreezeTime;
     bool m_bSyncTime;               // Sync time with system
 

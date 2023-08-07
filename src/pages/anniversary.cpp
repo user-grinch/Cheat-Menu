@@ -4,8 +4,7 @@
 
 AnniversaryPage& anniversaryPage = AnniversaryPage::Get();
 
-void AnniversaryPage::Draw()
-{
+void AnniversaryPage::Draw() {
     Widget::TextCentered("Happy Anniversary!");
     ImGui::NewLine();
 
@@ -17,18 +16,15 @@ void AnniversaryPage::Draw()
     ImGui::TextWrapped("Feel free to star the GitHub repo or join the discord server and provide feedback, ideas, or suggestions.");
     ImGui::NewLine();
 
-    if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Widget::CalcSize(3))))
-    {
+    if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Widget::CalcSize(3)))) {
         OPEN_LINK(DISCORD_INVITE);
     }
     ImGui::SameLine();
-    if (ImGui::Button(TEXT("Menu.GitHubRepo"), ImVec2(Widget::CalcSize(3))))
-    {
+    if (ImGui::Button(TEXT("Menu.GitHubRepo"), ImVec2(Widget::CalcSize(3)))) {
         OPEN_LINK(GITHUB_LINK);
     }
     ImGui::SameLine();
-    if (ImGui::Button(TEXT("Menu.Patreon"), ImVec2(Widget::CalcSize(3))))
-    {
+    if (ImGui::Button(TEXT("Menu.Patreon"), ImVec2(Widget::CalcSize(3)))) {
         OPEN_LINK(PATREON_LINK);
     }
 }

@@ -3,21 +3,16 @@
 
 RandomCheatsMgr& RandomCheats = RandomCheatsMgr::Get();
 
-void RandomCheatsMgr::DrawPages()
-{
+void RandomCheatsMgr::DrawPages() {
     uint timer = CTimer::m_snTimeInMilliseconds;
     static uint m_nTimer = 0;
 
-    if ((timer - m_nTimer) > (static_cast<uint>(m_nInterval) * 1000))
-    {
+    if ((timer - m_nTimer) > (static_cast<uint>(m_nInterval) * 1000)) {
         int id = Random(0U, 91U);
 
-        for (int i = 0; i < 92; i++)
-        {
-            if (i == id)
-            {
-                if (m_EnabledCheats[i][1] == "true")
-                {
+        for (int i = 0; i < 92; i++) {
+            if (i == id) {
+                if (m_EnabledCheats[i][1] == "true") {
                     Call<0x438370>(id); // cheatEnableLegimate(int CheatID)
                     Call<0x69F0B0>((char*)m_EnabledCheats[i][0].c_str(), 2000, 0, false); // CMessages::AddMessage
                     m_nTimer = timer;
@@ -27,8 +22,7 @@ void RandomCheatsMgr::DrawPages()
         }
     }
 
-    if (m_bProgressBar)
-    {
+    if (m_bProgressBar) {
         // Next cheat timer bar
         uint screenWidth = screen::GetScreenWidth();
         uint screenHeight = screen::GetScreenHeight();
@@ -46,32 +40,25 @@ void RandomCheatsMgr::DrawPages()
     }
 }
 
-void RandomCheatsMgr::DrawList()
-{
-    for (std::string* element : m_EnabledCheats)
-    {
+void RandomCheatsMgr::DrawList() {
+    for (std::string* element : m_EnabledCheats) {
         bool selected = (element[1] == "true") ? true : false;
-        if (ImGui::MenuItem(element[0].c_str(), nullptr, selected))
-        {
+        if (ImGui::MenuItem(element[0].c_str(), nullptr, selected)) {
             element[1] = selected ? "false" : "true";
         }
     }
 }
 
-RandomCheatsMgr::RandomCheatsMgr()
-{
+RandomCheatsMgr::RandomCheatsMgr() {
     // Generate enabled cheats vector
-    for (auto [k, v] : m_pData.Items())
-    {
+    for (auto [k, v] : m_pData.Items()) {
         std::string key { k.str() };
         m_EnabledCheats[std::stoi(key)][0] = v.value_or<std::string>("Unknown");
         m_EnabledCheats[std::stoi(key)][1] = "true";
     }
 
-    Events::drawingEvent += [this]()
-    {
-        if (m_bEnabled)
-        {
+    Events::drawingEvent += [this]() {
+        if (m_bEnabled) {
             DrawPages();
         }
     };

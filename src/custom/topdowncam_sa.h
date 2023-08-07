@@ -5,15 +5,14 @@
     TopDown for SA
     Activates/Disactivates cheats randomly
 */
-class TopDownCamera : public ICheat<TopDownCamera>
-{
-private:
+class TopDownCamera : public ICheat<TopDownCamera> {
+  private:
 
     friend class IFeature;
     TopDownCamera();
     TopDownCamera(const TopDownCamera&);
 
-public:
+  public:
     int m_nZoom = 40;
 
     // Process cheat each frame

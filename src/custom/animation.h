@@ -6,16 +6,15 @@
     Animation Player Class
     Plays animatins on player & peds
 */
-class AnimationMgr : public ICheat<AnimationMgr>
-{
-private:
+class AnimationMgr : public ICheat<AnimationMgr> {
+  private:
     CPed *m_pTarget = nullptr;    // target ped pointer
 
     friend class IFeature;
     AnimationMgr();
     AnimationMgr(const AnimationMgr&);
 
-public:
+  public:
     bool m_Loop;                  // keep playing animation in a loop
     bool m_bSecondary;            // play animation alongside another
     bool m_bPedAnim;              // play the animation on a target ped

@@ -7,9 +7,8 @@
     AutoDriveMgr Class
     Automatically drives vehicle to marker/ coord
 */
-class AutoDriveMgr : public ICheat<AutoDriveMgr>
-{
-private:
+class AutoDriveMgr : public ICheat<AutoDriveMgr> {
+  private:
 
     friend class IFeature;
     AutoDriveMgr() {};
@@ -17,7 +16,7 @@ private:
 
     void StartDrive(CVehicle *pVeh, const char *buf = nullptr);
 
-public:
+  public:
 
     // Draw custom skins handler code
     void Draw();

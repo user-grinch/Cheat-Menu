@@ -6,16 +6,15 @@
     Particle Player Class for SA
     Spawns particles in the world
 */
-class ParticleMgr : public ICheat<ParticleMgr>
-{
-private:
+class ParticleMgr : public ICheat<ParticleMgr> {
+  private:
     std::vector<int> m_nList;
 
     friend class IFeature;
     ParticleMgr() {};
     ParticleMgr(const ParticleMgr&);
 
-public:
+  public:
     ResourceStore m_Data{ "particles", eResourceType::TYPE_TEXT }; // names
 
     // Plays a particle

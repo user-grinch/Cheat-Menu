@@ -10,22 +10,18 @@
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
-bool D3dHook::GetMouseState()
-{
+bool D3dHook::GetMouseState() {
     return mouseShown;
 }
 
-void D3dHook::SetMouseState(bool state)
-{
+void D3dHook::SetMouseState(bool state) {
     mouseShown = state;
 }
 
-LRESULT D3dHook::hkWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
+LRESULT D3dHook::hkWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     ImGui_ImplWin32_WndProcHandler(hWnd, uMsg, wParam, lParam);
 
-    if (ImGui::GetIO().WantTextInput)
-    {
+    if (ImGui::GetIO().WantTextInput) {
 #ifdef GTASA
         Call<0x53F1E0>(); // CPad::ClearKeyboardHistory
 #endif
@@ -35,35 +31,28 @@ LRESULT D3dHook::hkWndProc(const HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lPa
     return CallWindowProc(oWndProc, hWnd, uMsg, wParam, lParam);
 }
 
-HRESULT D3dHook::hkReset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters)
-{
+HRESULT D3dHook::hkReset(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters) {
     ImGui_ImplDX9_InvalidateDeviceObjects();
 
     return oReset(pDevice, pPresentationParameters);
 }
 
-void D3dHook::ProcessFrame(void* ptr)
-{
+void D3dHook::ProcessFrame(void* ptr) {
     ImGuiIO& io = ImGui::GetIO();
     static bool init;
-    if (init)
-    {
+    if (init) {
         ProcessMouse();
         ImGui_ImplWin32_NewFrame();
-        if (gRenderer == eRenderer::DirectX9)
-        {
+        if (gRenderer == eRenderer::DirectX9) {
             ImGui_ImplDX9_NewFrame();
-        }
-        else
-        {
+        } else {
             ImGui_ImplDX11_NewFrame();
         }
 
         // Scale the menu if game resolution changed
         static ImVec2 fScreenSize = ImVec2(-1, -1);
         ImVec2 size(screen::GetScreenWidth(), screen::GetScreenHeight());
-        if (fScreenSize.x != size.x && fScreenSize.y != size.y)
-        {
+        if (fScreenSize.x != size.x && fScreenSize.y != size.y) {
             FontMgr::SetFontReloadRequired(true);
             ImGuiStyle* style = &ImGui::GetStyle();
             float scaleX = size.x / 1366.0f;
@@ -80,20 +69,16 @@ void D3dHook::ProcessFrame(void* ptr)
 
         ImGui::NewFrame();
 
-        if (pCallbackFunc != nullptr)
-        {
+        if (pCallbackFunc != nullptr) {
             pCallbackFunc();
         }
 
         ImGui::EndFrame();
         ImGui::Render();
 
-        if (gRenderer == eRenderer::DirectX9)
-        {
+        if (gRenderer == eRenderer::DirectX9) {
             ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
-        }
-        else
-        {
+        } else {
             ImGui_ImplDX11_RenderDrawData(ImGui::GetDrawData());
         }
 
@@ -109,9 +94,7 @@ void D3dHook::ProcessFrame(void* ptr)
         //     }
         //     FontMgr::ReloadAll();
         // }
-    }
-    else
-    {
+    } else {
         init = true;
         ImGui_ImplWin32_Init(RsGlobal.ps->window);
 
@@ -119,12 +102,9 @@ void D3dHook::ProcessFrame(void* ptr)
         patch::Nop(0x00531155, 5); // shift trigger fix
 #endif
 
-        if (gRenderer == eRenderer::DirectX9)
-        {
+        if (gRenderer == eRenderer::DirectX9) {
             ImGui_ImplDX9_Init(reinterpret_cast<IDirect3DDevice9*>(ptr));
-        }
-        else
-        {
+        } else {
             // for dx11 device ptr is swapchain
             reinterpret_cast<IDXGISwapChain*>(ptr)->GetDevice(__uuidof(ID3D11Device), &ptr);
             ID3D11DeviceContext* context;
@@ -146,20 +126,17 @@ void D3dHook::ProcessFrame(void* ptr)
     }
 }
 
-HRESULT D3dHook::hkEndScene(IDirect3DDevice9* pDevice)
-{
+HRESULT D3dHook::hkEndScene(IDirect3DDevice9* pDevice) {
     ProcessFrame(pDevice);
     return oEndScene(pDevice);
 }
 
-HRESULT D3dHook::hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags)
-{
+HRESULT D3dHook::hkPresent(IDXGISwapChain* pSwapChain, UINT SyncInterval, UINT Flags) {
     ProcessFrame(pSwapChain);
     return oPresent(pSwapChain, SyncInterval, Flags);
 }
 
-void D3dHook::ProcessMouse()
-{
+void D3dHook::ProcessMouse() {
     // Disable player controls for controllers
     bool bMouseDisabled = false;
     bool isController = patch::Get<BYTE>(BY_GAME(0xBA6818, 0x86968B, 0x5F03D8));
@@ -168,8 +145,7 @@ void D3dHook::ProcessMouse()
     isController =  !isController;
 #endif
 
-    if (isController && (mouseShown || bMouseDisabled))
-    {
+    if (isController && (mouseShown || bMouseDisabled)) {
 
 #ifdef GTASA
         CPlayerPed *player = FindPlayerPed();
@@ -178,19 +154,15 @@ void D3dHook::ProcessMouse()
         CPad *pad = CPad::GetPad(0);
 #endif
 
-        if (pad)
-        {
-            if (mouseShown)
-            {
+        if (pad) {
+            if (mouseShown) {
                 bMouseDisabled = true;
 #ifdef GTA3
                 pad->DisablePlayerControls = true;
 #else
                 pad->DisablePlayerControls = true;
 #endif
-            }
-            else
-            {
+            } else {
                 bMouseDisabled = false;
 #ifdef GTA3
                 pad->DisablePlayerControls = false;
@@ -202,12 +174,10 @@ void D3dHook::ProcessMouse()
     }
 
     static bool mouseState;
-    if (mouseState != mouseShown)
-    {
+    if (mouseState != mouseShown) {
         ImGui::GetIO().MouseDrawCursor = mouseShown;
 
-        if (mouseShown)
-        {
+        if (mouseShown) {
 
             patch::SetUChar(BY_GAME(0x6194A0, 0x6020A0, 0x580D20), 0xC3); // psSetMousePos
             patch::Nop(BY_GAME(0x541DD7, 0x4AB6CA, 0x49272F), 5); // don't call CPad::UpdateMouse()
@@ -216,9 +186,7 @@ void D3dHook::ProcessMouse()
             patch::SetUChar(0x4EB731, 0xEB); // jz -> jmp, skip mouse checks
             patch::SetUChar(0x4EB75A, 0xEB); // jz -> jmp, skip mouse checks
 #endif
-        }
-        else
-        {
+        } else {
 
             patch::SetUChar(BY_GAME(0x6194A0, 0x6020A0, 0x580D20), BY_GAME(0xE9, 0x53, 0x53));
 #ifdef GTASA
@@ -249,16 +217,13 @@ void D3dHook::ProcessMouse()
     }
 }
 
-bool D3dHook::Init(std::function<void()> pCallback)
-{
+bool D3dHook::Init(std::function<void()> pCallback) {
     static bool hookInjected;
-    if (hookInjected)
-    {
+    if (hookInjected) {
         return false;
     }
 
-    if (!ImGui::GetCurrentContext())
-    {
+    if (!ImGui::GetCurrentContext()) {
         ImGui::CreateContext();
     }
 
@@ -267,19 +232,15 @@ bool D3dHook::Init(std::function<void()> pCallback)
         Seems to crash with nvidia geforce experience overlay
         if anything else is checked before d3d9
     */
-    if (init(kiero::RenderType::D3D9) == kiero::Status::Success)
-    {
+    if (init(kiero::RenderType::D3D9) == kiero::Status::Success) {
         gRenderer = eRenderer::DirectX9;
         kiero::bind(16, (void**)&oReset, hkReset);
         kiero::bind(42, (void**)&oEndScene, hkEndScene);
         pCallbackFunc = pCallback;
         hookInjected = true;
-    }
-    else
-    {
+    } else {
 
-        if (init(kiero::RenderType::D3D11) == kiero::Status::Success)
-        {
+        if (init(kiero::RenderType::D3D11) == kiero::Status::Success) {
             gRenderer = eRenderer::DirectX11;
             kiero::bind(8, (void**)&oPresent, hkPresent);
             pCallbackFunc = pCallback;
@@ -290,8 +251,7 @@ bool D3dHook::Init(std::function<void()> pCallback)
     return hookInjected;
 }
 
-void D3dHook::Shutdown()
-{
+void D3dHook::Shutdown() {
     pCallbackFunc = nullptr;
     SetWindowLongPtr(RsGlobal.ps->window, GWL_WNDPROC, (LRESULT)oWndProc);
     ImGui_ImplDX9_Shutdown();

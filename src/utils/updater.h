@@ -4,11 +4,9 @@
 	Update class
 	Checks for menu updates and provides a way to update the menu.
 */
-class Updater
-{
-private:
-    enum class States
-    {
+class Updater {
+  private:
+    enum class States {
         IDLE,
         CHECKING,
         FOUND
@@ -16,7 +14,7 @@ private:
     static inline States curState = States::IDLE;
     static inline std::string latestVer;
 
-public:
+  public:
 
     Updater() = delete;
     Updater(const Updater&) = delete;

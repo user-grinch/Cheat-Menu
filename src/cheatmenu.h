@@ -6,9 +6,8 @@
 *   Main CheatMenu Class
 *   Handles rendering, resizing, page drawing etc.
 */
-class CheatMenuMgr : public IFeature<CheatMenuMgr>
-{
-private:
+class CheatMenuMgr : public IFeature<CheatMenuMgr> {
+  private:
     ImVec2 m_fSize, m_fPos;
     bool m_bVisible;      // should the menu be drawn
     bool m_bWindowParamUpdated;  // Was menu size/pos changed
@@ -26,7 +25,7 @@ private:
     // Draws the window ui each frame
     void Draw();
 
-public:
+  public:
     float m_fAccentColor[3];
 
     // Returns true if the menu is being shown

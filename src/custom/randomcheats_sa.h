@@ -6,9 +6,8 @@
     RandomCheats for SA
     Activates/Disactivates cheats randomly
 */
-class RandomCheatsMgr : public ICheat<RandomCheatsMgr>
-{
-private:
+class RandomCheatsMgr : public ICheat<RandomCheatsMgr> {
+  private:
     std::string m_EnabledCheats[92][2];
     DataStore m_pData {"cheats"};
 
@@ -19,7 +18,7 @@ private:
     // Process the RandomCheat each frame & draw progress bar
     void DrawPages();
 
-public:
+  public:
     bool m_bProgressBar = true;
     int m_nInterval = 10;           // interval between cheat activation/deactivation
 

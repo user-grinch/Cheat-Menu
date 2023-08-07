@@ -7,9 +7,8 @@
     FileHandler class
     Handles files IO and processing
 */
-class FileHandler
-{
-public:
+class FileHandler {
+  public:
     FileHandler() = delete;
     FileHandler(FileHandler&) = delete;
 

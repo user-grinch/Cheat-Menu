@@ -2,16 +2,14 @@
 #include "pch.h"
 #include "interface/ipage.h"
 
-enum class eTeleportType
-{
+enum class eTeleportType {
     Marker,
     MapPosition,
     Coordinate,
 };
 
-class TeleportPage : public IPage<TeleportPage>
-{
-private:
+class TeleportPage : public IPage<TeleportPage> {
+  private:
     char m_LocBuf[INPUT_BUFFER_SIZE], m_InBuf[INPUT_BUFFER_SIZE];
     bool m_bInsertCoord;
     bool m_bTeleportMarker;
@@ -29,7 +27,7 @@ private:
     void FetchRadarSpriteData();
 #endif
 
-public:
+  public:
     ResourceStore m_locData{"locations", eResourceType::TYPE_TEXT};
 
     friend class IFeature;

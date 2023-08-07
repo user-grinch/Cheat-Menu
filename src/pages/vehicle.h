@@ -2,9 +2,8 @@
 #include "pch.h"
 #include "interface/ipage.h"
 
-class VehiclePage : public IPage<VehiclePage>
-{
-private:
+class VehiclePage : public IPage<VehiclePage> {
+  private:
     bool m_bAutoUnflip;
     bool m_bBikeFly;
     bool m_bDontFallBike;
@@ -26,8 +25,7 @@ private:
     int m_nVehicleVariant = 0;
 #endif
 
-    struct
-    {
+    struct {
         ResourceStore m_VehData { "vehicles", BY_GAME(eResourceType::TYPE_IMAGE_TEXT, eResourceType::TYPE_TEXT,
                     eResourceType::TYPE_TEXT), ImVec2(100, 75)};
         bool m_bAsDriver = true;
@@ -40,7 +38,7 @@ private:
     VehiclePage();
     VehiclePage(const VehiclePage&);
 
-public:
+  public:
     void AddNew();
     void Draw();
 

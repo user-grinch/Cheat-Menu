@@ -5,9 +5,8 @@
     VehPaintMgr Class
     Handles neon, textures for vehicle
 */
-class VehCustmzrMgr : public IFeature<VehCustmzrMgr>
-{
-private:
+class VehCustmzrMgr : public IFeature<VehCustmzrMgr> {
+  private:
 #ifdef GTASA
     ResourceStore m_TuneData { "components", eResourceType::TYPE_IMAGE_TEXT, ImVec2(100, 80) };
     ResourceStore m_CustomizeData { "customizations", eResourceType::TYPE_TEXT };
@@ -17,8 +16,7 @@ private:
     std::map<int, std::string> m_VehicleIDE;
     char m_nLabel[32] {"Untitled"};
 
-    struct
-    {
+    struct {
         float m_fColorPicker[3] { 0, 0, 0 };
         bool m_bRainbowEffect;
         unsigned int m_nRainbowTimer;
@@ -40,9 +38,8 @@ private:
     void SaveCustomizations();
 #endif
 
-public:
-    struct
-    {
+  public:
+    struct {
         bool m_bEnabled;
         bool m_bCompAdded;
     } m_Nitro;

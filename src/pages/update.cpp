@@ -5,8 +5,7 @@
 
 UpdatePage& updatePage = UpdatePage::Get();
 
-void UpdatePage::Draw()
-{
+void UpdatePage::Draw() {
     std::string ver = Updater::GetUpdateVersion();
     ImGui::Dummy(ImVec2(0, 20));
     Widget::TextCentered(TEXT("Menu.NewVersion"));
@@ -18,15 +17,13 @@ void UpdatePage::Draw()
     ImGui::TextWrapped(TEXT("Menu.UpdaterInfo2"));
 
     ImGui::Dummy(ImVec2(0, 5));
-    if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Widget::CalcSize(2))))
-    {
+    if (ImGui::Button(TEXT("Menu.DiscordServer"), ImVec2(Widget::CalcSize(2)))) {
         OPEN_LINK(DISCORD_INVITE);
     }
 
     ImGui::SameLine();
 
-    if (ImGui::Button(TEXT("Menu.DownloadPage"), Widget::CalcSize(2)))
-    {
+    if (ImGui::Button(TEXT("Menu.DownloadPage"), Widget::CalcSize(2))) {
         OPEN_LINK(std::string("https://github.com/user-grinch/Cheat-Menu/releases/tag/" + ver).c_str());
     }
 }

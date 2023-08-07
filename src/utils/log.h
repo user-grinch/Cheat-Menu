@@ -3,8 +3,7 @@
 #include <fstream>
 #include <memory>
 
-enum class eLogLevel
-{
+enum class eLogLevel {
     Debug,
     Info,
     Warn,
@@ -13,9 +12,8 @@ enum class eLogLevel
 };
 
 // Logging Class
-class Log
-{
-private:
+class Log {
+  private:
     static inline eLogLevel level = eLogLevel::Debug;
     static inline std::string name = "Logger.log";
     static inline std::unique_ptr<std::ofstream> pLog = nullptr;
@@ -26,7 +24,7 @@ private:
     // Sets current log level
     static void SetLogLevel(eLogLevel logLevel) noexcept;
 
-public:
+  public:
     Log() = delete;
     Log(Log&) = delete;
 
@@ -34,11 +32,9 @@ public:
 
     // Prints to log with current log level
     template <eLogLevel T, typename... Args>
-    static inline void Print(std::string&& fmt, Args&&... args) noexcept
-    {
+    static inline void Print(std::string&& fmt, Args&&... args) noexcept {
         SetLogLevel(T);
-        if(!pLog)
-        {
+        if(!pLog) {
 #ifdef _GTA_
             pLog = std::make_unique<std::ofstream>(FILE_NAME ".log");
 #else
@@ -50,11 +46,9 @@ public:
     }
 
     template <eLogLevel T>
-    static inline void Print(const char* text) noexcept
-    {
+    static inline void Print(const char* text) noexcept {
         SetLogLevel(T);
-        if (!pLog)
-        {
+        if (!pLog) {
 #ifdef _GTA_
             pLog = std::make_unique<std::ofstream>(FILE_NAME ".log");
 #else

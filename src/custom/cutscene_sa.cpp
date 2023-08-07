@@ -2,35 +2,27 @@
 #include "cutscene_sa.h"
 
 CutsceneMgr& Cutscene = CutsceneMgr::Get();
-CutsceneMgr::CutsceneMgr()
-{
+CutsceneMgr::CutsceneMgr() {
     static CdeclEvent <AddressList<0x5B195F, H_JUMP>, PRIORITY_AFTER,  ArgPickNone, void()> skipCutsceneEvent;
-    skipCutsceneEvent += [this]()
-    {
+    skipCutsceneEvent += [this]() {
         Stop();
     };
 }
 
-void CutsceneMgr::Play(std::string& rootKey, std::string& cutsceneId, std::string& interior)
-{
-    if (CCutsceneMgr::ms_running)
-    {
+void CutsceneMgr::Play(std::string& rootKey, std::string& cutsceneId, std::string& interior) {
+    if (CCutsceneMgr::ms_running) {
         Util::SetMessage(TEXT("Scene.CutsceneRunning"));
         return;
     }
 
     CPlayerPed* pPlayer = FindPlayerPed();
-    if (pPlayer)
-    {
+    if (pPlayer) {
         m_pLastVeh =  pPlayer->m_nPedFlags.bInVehicle ? pPlayer->m_pVehicle : nullptr;
         m_nVehSeat = -1;
 
-        if (m_pLastVeh && m_pLastVeh->m_pDriver != pPlayer)
-        {
-            for (size_t i = 0; i != 8; ++i)
-            {
-                if (m_pLastVeh->m_apPassengers[i] == pPlayer)
-                {
+        if (m_pLastVeh && m_pLastVeh->m_pDriver != pPlayer) {
+            for (size_t i = 0; i != 8; ++i) {
+                if (m_pLastVeh->m_apPassengers[i] == pPlayer) {
                     m_nVehSeat = i;
                     break;
                 }
@@ -47,10 +39,8 @@ void CutsceneMgr::Play(std::string& rootKey, std::string& cutsceneId, std::strin
     }
 }
 
-void CutsceneMgr::Stop()
-{
-    if (CutsceneMgr::m_bRunning)
-    {
+void CutsceneMgr::Stop() {
+    if (CutsceneMgr::m_bRunning) {
         CPlayerPed *pPlayer = FindPlayerPed();
         int hPlayer = CPools::GetPedRef(pPlayer);
 
@@ -61,15 +51,11 @@ void CutsceneMgr::Stop()
         Command<Commands::SET_AREA_VISIBLE>(pPlayer->m_nAreaCode);
 
         // handle vehicle
-        if (CutsceneMgr::m_pLastVeh)
-        {
+        if (CutsceneMgr::m_pLastVeh) {
             int hVeh = CPools::GetVehicleRef(CutsceneMgr::m_pLastVeh);
-            if (CutsceneMgr::m_nVehSeat == -1)
-            {
+            if (CutsceneMgr::m_nVehSeat == -1) {
                 Command<Commands::WARP_CHAR_INTO_CAR>(hPlayer, hVeh);
-            }
-            else
-            {
+            } else {
                 Command<Commands::WARP_CHAR_INTO_CAR_AS_PASSENGER>(hPlayer, hVeh, CutsceneMgr::m_nVehSeat);
             }
         }
