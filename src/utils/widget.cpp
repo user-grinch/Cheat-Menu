@@ -33,6 +33,10 @@ ImVec2 Widget::CalcSize(short count, bool spacing) {
     return ImVec2(x, ImGui::GetFrameHeight() * 1.3f);
 }
 
+ImVec2 Widget::CalcSizeFrame(const char* text) {
+    return ImVec2(ImGui::CalcTextSize(text).x + 2 * ImGui::GetStyle().ItemSpacing.x , ImGui::GetFrameHeight());
+}
+
 void Widget::TextCentered(const std::string& text) {
     ImVec2 size = ImGui::CalcTextSize(text.c_str());
     ImGui::NewLine();
@@ -50,6 +54,44 @@ void Widget::Tooltip(const char* text) {
         ImGui::Text(text);
         ImGui::EndTooltip();
     }
+}
+
+
+void Widget::ColorPickerAddr(const char* label, int addr, ImVec4&& default_color) {
+    float cur_color[4];
+    cur_color[0] = patch::Get<BYTE>(addr, false);
+    cur_color[1] = patch::Get<BYTE>(addr + 1, false);
+    cur_color[2] = patch::Get<BYTE>(addr + 2, false);
+    cur_color[3] = patch::Get<BYTE>(addr + 3, false);
+
+    // 0-255 -> 0-1
+    cur_color[0] /= 255;
+    cur_color[1] /= 255;
+    cur_color[2] /= 255;
+    cur_color[3] /= 255;
+
+    ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X);
+    if (ImGui::ColorEdit4(std::string("##Pick color" + std::string(label)).c_str(), cur_color)) {
+        // 0-1 -> 0-255
+        cur_color[0] *= 255;
+        cur_color[1] *= 255;
+        cur_color[2] *= 255;
+        cur_color[3] *= 255;
+
+        patch::Set<BYTE>(addr, cur_color[0], false);
+        patch::Set<BYTE>(addr + 1, cur_color[1], false);
+        patch::Set<BYTE>(addr + 2, cur_color[2], false);
+        patch::Set<BYTE>(addr + 3, cur_color[3], false);
+    }
+    ImGui::SameLine();
+    if (ImGui::Button((TEXT_S("Menu.ResetToDefault") + "##" + label).c_str(), Widget::CalcSizeFrame(TEXT("Menu.ResetToDefault")))) {
+        patch::Set<BYTE>(addr, default_color.x, false);
+        patch::Set<BYTE>(addr + 1, default_color.y, false);
+        patch::Set<BYTE>(addr + 2, default_color.z, false);
+        patch::Set<BYTE>(addr + 3, default_color.w, false);
+    }
+    ImGui::SameLine();
+    ImGui::Text(label);
 }
 
 bool Widget::Filter(const char* label, ImGuiTextFilter& filter, const char* hint) {
@@ -544,62 +586,20 @@ bool Widget::InputInt(const char* label, int *val, int min, int max) {
 }
 
 void Widget::EditAddr(const char* label, uint address, float min, float def, float max, float mul, float change) {
-    if (ImGui::CollapsingHeader(label)) {
-        float val = patch::Get<float>(address) * mul;
+    float val = patch::Get<float>(address) * mul;
 
-        int items = 3;
-
-        if (min == def) {
-            items = 2;
-        }
-
-        ImGui::Columns(items, nullptr, false);
-
-        ImGui::Text("Min: %f", min);
-
-        if (items == 3) {
-            ImGui::NextColumn();
-            ImGui::Text("Def: %f", def);
-        }
-
-        ImGui::NextColumn();
-        ImGui::Text("Max: %f", max);
-        ImGui::Columns(1);
-
-        ImGui::Spacing();
-
-        int size = ImGui::GetFrameHeight();
-
-        if (InputFloat(std::format("Set##{}", label).c_str(), &val, change, min, max)) {
-            patch::SetFloat(address, val / mul);
-            SaveMgr::SaveData(label, address, SaveMgr::eCheatState::Enabled, min / mul, 0.0f);
-        }
-        ImGui::Spacing();
-
-        if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), CalcSize(items))) {
-            patch::Set<float>(address, min / mul);
-            SaveMgr::SaveData(label, address, SaveMgr::eCheatState::Enabled, min / mul, 0.0f);
-        }
-
-        if (items == 3) {
-            ImGui::SameLine();
-
-            if (ImGui::Button(("Default##" + std::string(label)).c_str(), CalcSize(items))) {
-                patch::Set<float>(address, def / mul);
-                SaveMgr::SaveData(label, 0.0f, SaveMgr::eCheatState::Disabled, 0.0f, 0.0f);
-            }
-        }
-
-        ImGui::SameLine();
-
-        if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), CalcSize(items))) {
-            patch::Set<float>(address, max / mul);
-            SaveMgr::SaveData(label, address, SaveMgr::eCheatState::Enabled, max / mul, 0.0f);
-        }
-
-        ImGui::Spacing();
-        ImGui::Separator();
+    ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X);
+    if (InputFloat(std::format("##Set{}", label).c_str(), &val, change, min, max)) {
+        patch::SetFloat(address, val / mul);
+        SaveMgr::SaveData(label, address, SaveMgr::eCheatState::Enabled, min / mul, 0.0f);
     }
+    ImGui::SameLine();
+    if (ImGui::Button((TEXT_S("Menu.ResetToDefault") + "##" + label).c_str(), Widget::CalcSizeFrame(TEXT("Menu.ResetToDefault")))) {
+        patch::Set<float>(address, def / mul);
+        SaveMgr::SaveData(label, 0.0f, SaveMgr::eCheatState::Disabled, 0.0f, 0.0f);
+    }
+    ImGui::SameLine();
+    ImGui::Text(label);
 }
 
 
@@ -630,52 +630,24 @@ void Widget::EditBits(const char* label, const int address, VecStr& names) {
 
 #ifdef GTASA
 void Widget::EditStat(const char* label, const int stat_id, const int min, const int def, const int max) {
-    if (ImGui::CollapsingHeader(label)) {
-        int val = static_cast<int>(CStats::GetStatValue(stat_id));
-        bool val_updated = false;
-        ImGui::Columns(3, nullptr, false);
-        ImGui::Text("Min: %d", min);
-        ImGui::NextColumn();
-        ImGui::Text("Def: %d", def);
-        ImGui::NextColumn();
-        ImGui::Text("Max: %d", max);
-        ImGui::Columns(1);
+    int val = static_cast<int>(CStats::GetStatValue(stat_id));
+    bool val_updated = false;
+    ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X);
+    if (ImGui::InputInt(("##Set" + std::string(label)).c_str(), &val)) {
+        val_updated =  true;
+    }
+    ImGui::SameLine();
+    if (ImGui::Button((TEXT_S("Menu.ResetToDefault") + "##" + label).c_str(), Widget::CalcSizeFrame(TEXT("Menu.ResetToDefault")))) {
+        val_updated =  true;
+        val = def;
+    }
+    ImGui::SameLine();
+    ImGui::Text(label);
 
-        ImGui::Spacing();
-
-        if (ImGui::InputInt(("Set value##" + std::string(label)).c_str(), &val)) {
-            val_updated =  true;
-        }
-
-        ImGui::Spacing();
-
-        if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), CalcSize(3))) {
-            val_updated =  true;
-            val = min;
-        }
-
-        ImGui::SameLine();
-
-        if (ImGui::Button(("Default##" + std::string(label)).c_str(), CalcSize(3))) {
-            val_updated =  true;
-            val = def;
-        }
-
-        ImGui::SameLine();
-
-        if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), CalcSize(3))) {
-            val_updated =  true;
-            val = max;
-        }
-
-        if (val_updated) {
-            float fval = static_cast<float>(val);
-            CStats::SetStatValue(stat_id, fval);
-            gConfig.Set(std::format("Stats.{}", stat_id).c_str(), val);
-        }
-
-        ImGui::Spacing();
-        ImGui::Separator();
+    if (val_updated) {
+        float fval = static_cast<float>(val);
+        CStats::SetStatValue(stat_id, fval);
+        gConfig.Set(std::format("Stats.{}", stat_id).c_str(), val);
     }
 }
 #endif
@@ -754,24 +726,19 @@ void Widget::EditRadioBtnAddr(const char* label, std::vector<BindInfo>& addrInfo
 }
 
 void Widget::EditRadioBtnAddr(const char* label, uint addr, std::vector<BindInfo>& valInfo) {
-    if (ImGui::CollapsingHeader(label)) {
-        size_t btnsInColumn = valInfo.size() / 2;
-        ImGui::Columns(2, nullptr, false);
-        int mem_val = patch::Get<int8_t>(addr);
-
-        for (size_t i = 0; i < valInfo.size(); i++) {
-            if (ImGui::RadioButton(valInfo[i].name.c_str(), &mem_val, valInfo[i].val)) {
-                patch::Set<int8_t>(addr, valInfo[i].val);
-                SaveMgr::SaveData(label, static_cast<int>(addr), SaveMgr::eCheatState::Enabled,
-                                  static_cast<int8_t>(valInfo[i].val), static_cast<int8_t>(0));
-            }
-
-            if (i == btnsInColumn) {
-                ImGui::NextColumn();
-            }
+    ImGui::Text(label);
+    ImGui::Columns(3, nullptr, false);
+    int mem_val = patch::Get<int8_t>(addr);
+    for (size_t i = 0; i < valInfo.size(); i++) {
+        if (ImGui::RadioButton(valInfo[i].name.c_str(), &mem_val, valInfo[i].val)) {
+            patch::Set<int8_t>(addr, valInfo[i].val);
+            SaveMgr::SaveData(label, static_cast<int>(addr), SaveMgr::eCheatState::Enabled,
+                                static_cast<int8_t>(valInfo[i].val), static_cast<int8_t>(0));
         }
-        ImGui::Columns(1);
-        ImGui::Spacing();
-        ImGui::Separator();
+
+        if (i != 3) {
+            ImGui::NextColumn();
+        }
     }
+    ImGui::Columns(1);
 }

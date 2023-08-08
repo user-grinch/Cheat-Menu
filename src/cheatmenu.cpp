@@ -214,12 +214,13 @@ void CheatMenuMgr::ApplyStyle(ImColor accent_col) {
     style->WindowRounding = 0.0f;
     style->ChildRounding = 0.0f;
     style->FrameRounding = 0.0f;
-    style->GrabRounding = 0.0f;
+    style->GrabRounding = 30.0f;
     style->PopupRounding = 0.0f;
-    style->ScrollbarSize = 5.0f;
-    style->FramePadding = ImVec2(5, 5);
-    style->WindowPadding = ImVec2(5, 5);
-    style->ItemSpacing = ImVec2(5, 5);
+    style->ScrollbarSize = 12.0f;
+    style->FramePadding = ImVec2(4, 4);
+    style->WindowPadding = ImVec2(4, 4);
+    style->ItemSpacing = ImVec2(4, 4);
+    style->ItemInnerSpacing = ImVec2(4, 4);
 
     style->Colors[ImGuiCol_WindowBg] = ImColor(0, 0, 0, 240);
     style->Colors[ImGuiCol_Border] = ImColor(33, 34, 45, 255);

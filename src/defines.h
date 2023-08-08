@@ -25,5 +25,8 @@
 #define MENU_DATA_EXISTS(x) (std::filesystem::exists(MENU_DATA_PATH(x)))
 #define OPEN_LINK(x) ShellExecute(nullptr, "open", x, nullptr, nullptr, SW_SHOWNORMAL)
 
+#define MENU_WIDTH_FACTOR_X 2.5f
+#define MENU_HEIGHT_FACTOR_X 1.0f
+
 
 

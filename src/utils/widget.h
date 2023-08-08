@@ -22,6 +22,12 @@ class Widget {
     // Calculates button size based on window width & spacing flags
     static ImVec2 CalcSize(short count = 1, bool spacing = true);
 
+    // Calculates button size based on frame size
+    static ImVec2 CalcSizeFrame(const char* text);
+
+    // Color Picker from address
+    static void ColorPickerAddr(const char* label, int addr, ImVec4&& default_color);
+
     // Regular checkbox with hint support
     static bool Toggle(const char* label, bool* state, const char* hint = nullptr,
                        bool is_disabled = false);
@@ -103,65 +109,24 @@ bool Widget::ToggleAddr(const char* label, uint addr, const char* hint, T enable
 
 template <typename T>
 void Widget::EditAddr(const char* label, uint address, int min, int def, int max) {
-    if (ImGui::CollapsingHeader(label)) {
-        int val = patch::Get<T>(address, false);
-
-        int items = 3;
-
-        if (min == def) {
-            items = 2;
+    int val = patch::Get<T>(address, false);
+    ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X);
+    if (ImGui::InputInt(("##SetValue" + std::string(label)).c_str(), &val)) {
+        if (val < min) {
+            val = min;
         }
 
-        ImGui::Columns(items, nullptr, false);
-        ImGui::Text(("Min: " + std::to_string(min)).c_str());
-
-        if (items == 3) {
-            ImGui::NextColumn();
-            ImGui::Text(("Def: " + std::to_string(def)).c_str());
+        if (val > max) {
+            val = max;
         }
-
-        ImGui::NextColumn();
-        ImGui::Text(("Max: " + std::to_string(max)).c_str());
-        ImGui::Columns(1);
-
-        ImGui::Spacing();
-
-        if (ImGui::InputInt(("Set value##" + std::string(label)).c_str(), &val)) {
-            if (val < min) {
-                val = min;
-            }
-
-            if (val > max) {
-                val = max;
-            }
-            patch::Set<T>(address, val);
-            SaveMgr::SaveData<T>(label, address, SaveMgr::eCheatState::Enabled, static_cast<T>(val), 0);
-        }
-
-        ImGui::Spacing();
-
-        if (ImGui::Button(("Minimum##" + std::string(label)).c_str(), CalcSize(items))) {
-            patch::Set<T>(address, min);
-            SaveMgr::SaveData<T>(label, address, SaveMgr::eCheatState::Enabled, static_cast<T>(min), 0);
-        }
-
-        if (items == 3) {
-            ImGui::SameLine();
-
-            if (ImGui::Button(("Default##" + std::string(label)).c_str(), CalcSize(3))) {
-                patch::Set<T>(address, def);
-                SaveMgr::SaveData<T>(label, address, SaveMgr::eCheatState::Disabled, static_cast<T>(def), 0);
-            }
-        }
-
-        ImGui::SameLine();
-
-        if (ImGui::Button(("Maximum##" + std::string(label)).c_str(), CalcSize(items))) {
-            patch::Set<T>(address, max);
-            SaveMgr::SaveData<T>(label, address, SaveMgr::eCheatState::Enabled, static_cast<T>(max), 0);
-        }
-
-        ImGui::Spacing();
-        ImGui::Separator();
+        patch::Set<T>(address, val);
+        SaveMgr::SaveData<T>(label, address, SaveMgr::eCheatState::Enabled, static_cast<T>(val), 0);
     }
+    ImGui::SameLine();
+    if (ImGui::Button((TEXT_S("Menu.ResetToDefault") + "##" + label).c_str(), Widget::CalcSizeFrame(TEXT("Menu.ResetToDefault")))) {
+        patch::Set<T>(address, def);
+        SaveMgr::SaveData<T>(label, address, SaveMgr::eCheatState::Disabled, static_cast<T>(def), 0);
+    }
+    ImGui::SameLine();
+    ImGui::Text(label);
 }

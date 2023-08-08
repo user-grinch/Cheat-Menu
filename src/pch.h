@@ -53,6 +53,7 @@
 
 #include "fla/IDaccess.h"
 #include "imgui/imgui.h"
+#include "imgui/slider/slider.h"
 
 #include "defines.h"
 #include "utils/log.h"

@@ -342,7 +342,7 @@ void GamePage::Draw() {
                     if (!m_bLockCameraZoom) {
                         ImGui::BeginDisabled();
                     }
-                    if (ImGui::SliderInt(TEXT("Game.CameraZoom"), &m_nCameraZoom, 5, 120)) {
+                    if (ImGuiExtras::SliderInt(TEXT("Game.CameraZoom"), &m_nCameraZoom, 5, 120)) {
                         TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_nCameraZoom, 250, true);
                         Command<Commands::CAMERA_PERSIST_FOV>(true);
                     }
@@ -429,7 +429,7 @@ void GamePage::Draw() {
                     TopDownCam.Toggle();
                 }
                 ImGui::Spacing();
-                ImGui::SliderInt(TEXT("Player.CameraZoom"), &TopDownCam.m_nZoom, 20, 60);
+                ImGuiExtras::SliderInt(TEXT("Player.CameraZoom"), &TopDownCam.m_nZoom, 20, 60);
                 ImGui::Spacing();
                 ImGui::Separator();
             }
@@ -531,10 +531,10 @@ void GamePage::Draw() {
             }
             ImGui::Spacing();
 
-            if (ImGui::SliderFloat(TEXT("Game.FieldOfView"), &Freecam.m_fFOV, 5.0f, 120.0f) && Freecam.GetState()) {
+            if (ImGuiExtras::SliderFloat(TEXT("Game.FieldOfView"), &Freecam.m_fFOV, 5.0f, 120.0f) && Freecam.GetState()) {
                 TheCamera.LerpFOV(TheCamera.FindCamFOV(), Freecam.m_fFOV, 250, true);
             }
-            ImGui::SliderInt(TEXT("Game.MovementSpeed"), &Freecam.m_nMul, 1, 10);
+            ImGuiExtras::SliderInt(TEXT("Game.MovementSpeed"), &Freecam.m_nMul, 1, 10);
             ImGui::Dummy(ImVec2(0.0f, 20.0f));
 
             ImGui::BeginChild("Conrtls");
@@ -707,7 +707,7 @@ void GamePage::Draw() {
 
             ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 2);
 
-            ImGui::SliderInt(TEXT("Game.ActivateTimer"), &RandomCheats.m_nInterval, 5, 60);
+            ImGuiExtras::SliderInt(TEXT("Game.ActivateTimer"), &RandomCheats.m_nInterval, 5, 60);
             Widget::Tooltip(TEXT("Game.ActivateTimerText"));
 
             ImGui::PopItemWidth();

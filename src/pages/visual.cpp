@@ -351,7 +351,7 @@ void TimecycSlider(const char* label, T* ptr, int min, int max) {
 #endif
     int a = arr[val];
 
-    if (ImGui::SliderInt(label, &a, min, max))
+    if (ImGuiExtras::SliderInt(label, &a, min, max))
         arr[val] = static_cast<T>(a);
 }
 
@@ -393,7 +393,7 @@ void VisualPage::TimecycSlider(const char* label, T* ptr, int min, int max) {
 #endif
     int a = arr[val];
 
-    if (ImGui::SliderInt(label, &a, min, max))
+    if (ImGuiExtras::SliderInt(label, &a, min, max))
         arr[val] = static_cast<T>(a);
 }
 
@@ -425,47 +425,6 @@ bool VisualPage::TimeCycColorEdit4(const char* label, T* r, T* g, T* b, T* a, Im
     }
 
     return rtn;
-}
-
-
-static void ColorPickerAddr(const char* label, int addr, ImVec4&& default_color) {
-    if (ImGui::CollapsingHeader(label)) {
-        float cur_color[4];
-        cur_color[0] = patch::Get<BYTE>(addr, false);
-        cur_color[1] = patch::Get<BYTE>(addr + 1, false);
-        cur_color[2] = patch::Get<BYTE>(addr + 2, false);
-        cur_color[3] = patch::Get<BYTE>(addr + 3, false);
-
-        // 0-255 -> 0-1
-        cur_color[0] /= 255;
-        cur_color[1] /= 255;
-        cur_color[2] /= 255;
-        cur_color[3] /= 255;
-
-        if (ImGui::ColorPicker4(std::string("Pick color##" + std::string(label)).c_str(), cur_color)) {
-            // 0-1 -> 0-255
-            cur_color[0] *= 255;
-            cur_color[1] *= 255;
-            cur_color[2] *= 255;
-            cur_color[3] *= 255;
-
-            patch::Set<BYTE>(addr, cur_color[0], false);
-            patch::Set<BYTE>(addr + 1, cur_color[1], false);
-            patch::Set<BYTE>(addr + 2, cur_color[2], false);
-            patch::Set<BYTE>(addr + 3, cur_color[3], false);
-        }
-        ImGui::Spacing();
-
-        if (ImGui::Button("Reset to default", Widget::CalcSize())) {
-            patch::Set<BYTE>(addr, default_color.x, false);
-            patch::Set<BYTE>(addr + 1, default_color.y, false);
-            patch::Set<BYTE>(addr + 2, default_color.z, false);
-            patch::Set<BYTE>(addr + 3, default_color.w, false);
-        }
-
-        ImGui::Spacing();
-        ImGui::Separator();
-    }
 }
 
 void VisualPage::PatchRadar() {
@@ -754,7 +713,7 @@ void VisualPage::Draw() {
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT( "Window.MenusTab"))) {
+        if (ImGui::BeginTabItem(TEXT( "Window.HUDEditor"))) {
             static bool initPatches = false;
             if (!initPatches) {
                 PatchRadar();
@@ -766,73 +725,91 @@ void VisualPage::Draw() {
             ImGui::TextWrapped(TEXT("Visual.IncompatibleMods"));
             Widget::Tooltip(TEXT("Visual.IncompatibleModsText"));
             ImGui::Spacing();
-
-            if (ImGui::BeginChild("VisualsChild")) {
+            if (ImGui::BeginTabBar("HUDEDITOR")) {
 #ifdef GTASA
-                ColorPickerAddr(TEXT("Visual.ArmourbarColor"), *(int*)0x5890FC, ImVec4(225, 225, 225, 255));
-                Widget::EditAddr<float>(TEXT("Visual.ArmourbarPosX"), 0x866B78, -999, 94, 999);
-                Widget::EditAddr<float>(TEXT("Visual.ArmourbarPosY"), 0x862D38, -999, 48, 999);
-                ColorPickerAddr(TEXT("Visual.BreathbarColor"), *(int*)0x5891EB, ImVec4(172, 203, 241, 255));
-                Widget::EditAddr<float>(TEXT("Visual.BreathbarPosX"), *(int*)0x58F11F, -999, 94, 999);
-                Widget::EditAddr<float>(TEXT("Visual.BreathbarPosY"), *(int*)0x58F100, -999, 62, 999);
-                ColorPickerAddr(TEXT("Visual.ClockColor"), *(int*)0x58EBD1, ImVec4(255, 255, 255, 255));
-                Widget::EditAddr<float>(TEXT("Visual.ClockPosX"), *(int*)0x58EC16, -999, 32, 999);
-                Widget::EditAddr<float>(TEXT("Visual.ClockPosY"), *(int*)0x58EC04, -999, 22, 999);
-                ColorPickerAddr(TEXT("Visual.HealthbarColor"), *(int*)0x589331, ImVec4(180, 25, 29, 255));
-                Widget::EditAddr<float>(TEXT("Visual.HealthbarPosX"), 0x86535C, -999, 141, 999);
-                Widget::EditAddr<float>(TEXT("Visual.HealthbarPosY"), 0x866CA8, -999, 77, 999);
-                ColorPickerAddr(TEXT("Visual.DrawMenuTitle"), 0xBAB240, ImVec4(0, 0, 0, 255));
-                ColorPickerAddr(TEXT("Visual.MoneyColor"), 0xBAB230, ImVec4(54, 104, 44, 255));
-                Widget::EditAddr<float>(TEXT("Visual.MoneyPosX"), *(int*)0x58F5FC, -999, 32, 999);
-                Widget::EditAddr<float>(TEXT("Visual.MoneyPosY"), 0x866C88, -999, 89, 999);
-                static std::vector<Widget::BindInfo> font_outline {
-                    {TEXT("Visual.NoOutline"), 0}, {TEXT("Visual.ThinOutline"), 1}, {TEXT("Visual.DefaultOutline"), 2}
-                };
-                Widget::EditRadioBtnAddr(TEXT("Visual.MoneyFontOutline"), 0x58F58D, font_outline);
-                static std::vector<Widget::BindInfo> style {
-                    {TEXT("Visual.Style1"), 1}, {TEXT("Visual.Style2"), 2}, {TEXT("Visual.DefaultStyle"), 3}
-                };
-                Widget::EditRadioBtnAddr(TEXT("Visual.MoneyFontStyle"), 0x58F57F, style);
-                Widget::EditAddr<float>(TEXT("Visual.RadarHeight"), *(int*)0x5834F6, 0, 76, 999);
-                Widget::EditAddr<float>(TEXT("Visual.RadarWidth"), *(int*)0x5834C2, 0, 94, 999);
-                Widget::EditAddr<float>(TEXT("Visual.RadarPosX"), *(int*)0x5834D4, -999, 40, 999);
-                Widget::EditAddr<float>(TEXT("Visual.RadarPosY"), *(int*)0x583500, -999, 104, 999);
-                Widget::EditAddr<int>(TEXT("Visual.RadarZoom"), 0xA444A3, 0, 0, 170);
-                ColorPickerAddr(TEXT("Visual.RadioStationColor"), 0xBAB24C, ImVec4(150, 150, 150, 255));
-
-                static std::vector<Widget::BindInfo> star_border {
-                    {TEXT("Visual.NoBorder"), 0}, {TEXT("Visual.DefaultBorder"), 1}, {TEXT("Visual.BoldBorder"), 2}
-                };
-                Widget::EditRadioBtnAddr(TEXT("Visual.WantedStarBorder"), 0x58DD41, star_border);
-                Widget::EditAddr<float>(TEXT("Visual.WantedPosX"), *(int*)0x58DD0F, -999, 29, 999);
-                Widget::EditAddr<float>(TEXT("Visual.WantedPosY"), *(int*)0x58DDFC, -999, 114, 999);
-                Widget::EditAddr<float>(TEXT("Visual.WeaponAmmoPosX"), *(int*)0x58FA02, -999, 32, 999);
-                Widget::EditAddr<float>(TEXT("Visual.WeaponAmmoPosY"), *(int*)0x58F9E6, -999, 43, 999);
-                Widget::EditAddr<float>(TEXT("Visual.WeaponIconPosX"), *(int*)0x58F927, -999, 32, 999);
-                Widget::EditAddr<float>(TEXT("Visual.WeaponIconPosY"), *(int*)0x58F913, -999, 20, 999);
-#elif GTAVC
-                static float discLeft = *(float*)0x55A956;
-                static float discRight = *(float*)*(int*)0x55A9AE;
-                static float &posX = *(float*)0x68FD2C;
-                patch::SetPointer(0x55A9AE, &discRight);
-                patch::SetPointer(0x55AAE7, &discRight);
-                patch::SetFloat(0x55A956, discLeft);
-                patch::SetFloat(0x55AA94, discLeft);
-
-                float prevVal = posX;
-                Widget::EditAddr<float>(TEXT("Visual.RadarPosX"), (uint)&posX, -999, 40, 999);
-                float diff = posX - prevVal;
-                discLeft += diff;
-                discRight += diff;
-
-                Widget::EditAddr<float>(TEXT("Visual.RadarPosY"), 0x68FD34, -999, 116, 999);
-                Widget::EditAddr<float>(TEXT("Visual.RadarHeight"), 0x68FD30, -999, 76, 999);
-                Widget::EditAddr<float>(TEXT("Visual.RadarWidth"), 0x68FD24, -999, 94, 999);
+                if (ImGui::BeginTabItem(TEXT( "Visual.ColorsTab"))) {
+                    ImGui::BeginChild("TColors");
+                    ImGui::Spacing();
+                    Widget::ColorPickerAddr(TEXT("Visual.ArmourbarColor"), *(int*)0x5890FC, ImVec4(225, 225, 225, 255));
+                    Widget::ColorPickerAddr(TEXT("Visual.BreathbarColor"), *(int*)0x5891EB, ImVec4(172, 203, 241, 255));
+                    Widget::ColorPickerAddr(TEXT("Visual.ClockColor"), *(int*)0x58EBD1, ImVec4(255, 255, 255, 255));
+                    Widget::ColorPickerAddr(TEXT("Visual.HealthbarColor"), *(int*)0x589331, ImVec4(180, 25, 29, 255));
+                    Widget::ColorPickerAddr(TEXT("Visual.DrawMenuTitle"), 0xBAB240, ImVec4(0, 0, 0, 255));
+                    Widget::ColorPickerAddr(TEXT("Visual.MoneyColor"), 0xBAB230, ImVec4(54, 104, 44, 255));
+                    Widget::ColorPickerAddr(TEXT("Visual.RadioStationColor"), 0xBAB24C, ImVec4(150, 150, 150, 255));
+                    ImGui::EndChild();
+                    ImGui::EndTabItem();
+                }
 #endif
+                if (ImGui::BeginTabItem(TEXT("Visual.PositionsTab"))) {
+                    ImGui::BeginChild("TPositions");
+#ifdef GTASA
+                    Widget::EditAddr<float>(TEXT("Visual.ArmourbarPosX"), 0x866B78, -999, 94, 999);
+                    Widget::EditAddr<float>(TEXT("Visual.ArmourbarPosY"), 0x862D38, -999, 48, 999);
+                    Widget::EditAddr<float>(TEXT("Visual.BreathbarPosX"), *(int*)0x58F11F, -999, 94, 999);
+                    Widget::EditAddr<float>(TEXT("Visual.BreathbarPosY"), *(int*)0x58F100, -999, 62, 999);
+                    Widget::EditAddr<float>(TEXT("Visual.ClockPosX"), *(int*)0x58EC16, -999, 32, 999);
+                    Widget::EditAddr<float>(TEXT("Visual.ClockPosY"), *(int*)0x58EC04, -999, 22, 999);
+                    Widget::EditAddr<float>(TEXT("Visual.HealthbarPosX"), 0x86535C, -999, 141, 999);
+                    Widget::EditAddr<float>(TEXT("Visual.HealthbarPosY"), 0x866CA8, -999, 77, 999);
+                    Widget::EditAddr<float>(TEXT("Visual.MoneyPosX"), *(int*)0x58F5FC, -999, 32, 999);
+                    Widget::EditAddr<float>(TEXT("Visual.MoneyPosY"), 0x866C88, -999, 89, 999);
+                    Widget::EditAddr<float>(TEXT("Visual.RadarHeight"), *(int*)0x5834F6, 0, 76, 999);
+                    Widget::EditAddr<float>(TEXT("Visual.RadarWidth"), *(int*)0x5834C2, 0, 94, 999);
+                    Widget::EditAddr<float>(TEXT("Visual.RadarPosX"), *(int*)0x5834D4, -999, 40, 999);
+                    Widget::EditAddr<float>(TEXT("Visual.RadarPosY"), *(int*)0x583500, -999, 104, 999);
+                    Widget::EditAddr<float>(TEXT("Visual.WantedPosX"), *(int*)0x58DD0F, -999, 29, 999);
+                    Widget::EditAddr<float>(TEXT("Visual.WantedPosY"), *(int*)0x58DDFC, -999, 114, 999);
+                    Widget::EditAddr<float>(TEXT("Visual.WeaponAmmoPosX"), *(int*)0x58FA02, -999, 32, 999);
+                    Widget::EditAddr<float>(TEXT("Visual.WeaponAmmoPosY"), *(int*)0x58F9E6, -999, 43, 999);
+                    Widget::EditAddr<float>(TEXT("Visual.WeaponIconPosX"), *(int*)0x58F927, -999, 32, 999);
+                    Widget::EditAddr<float>(TEXT("Visual.WeaponIconPosY"), *(int*)0x58F913, -999, 20, 999);
+#elif GTAVC
+                    static float discLeft = *(float*)0x55A956;
+                    static float discRight = *(float*)*(int*)0x55A9AE;
+                    static float &posX = *(float*)0x68FD2C;
+                    patch::SetPointer(0x55A9AE, &discRight);
+                    patch::SetPointer(0x55AAE7, &discRight);
+                    patch::SetFloat(0x55A956, discLeft);
+                    patch::SetFloat(0x55AA94, discLeft);
 
-                ImGui::EndChild();
+                    float prevVal = posX;
+                    Widget::EditAddr<float>(TEXT("Visual.RadarPosX"), (uint)&posX, -999, 40, 999);
+                    float diff = posX - prevVal;
+                    discLeft += diff;
+                    discRight += diff;
+
+                    Widget::EditAddr<float>(TEXT("Visual.RadarPosY"), 0x68FD34, -999, 116, 999);
+                    Widget::EditAddr<float>(TEXT("Visual.RadarHeight"), 0x68FD30, -999, 76, 999);
+                    Widget::EditAddr<float>(TEXT("Visual.RadarWidth"), 0x68FD24, -999, 94, 999);
+#endif
+                    ImGui::EndChild();
+                    ImGui::EndTabItem();
+                }
+#ifdef GTASA
+                if (ImGui::BeginTabItem(TEXT( "Visual.Miscellaneous"))) {
+                    ImGui::BeginChild("MiscTab");
+                    ImGui::Spacing();
+                    Widget::EditAddr<int>(TEXT("Visual.RadarZoom"), 0xA444A3, 0, 0, 170);
+                    static std::vector<Widget::BindInfo> font_outline {
+                        {TEXT("Visual.NoOutline"), 0}, {TEXT("Visual.ThinOutline"), 1}, {TEXT("Visual.DefaultOutline"), 2}
+                    };
+                    Widget::EditRadioBtnAddr(TEXT("Visual.MoneyFontOutline"), 0x58F58D, font_outline);
+                    static std::vector<Widget::BindInfo> style {
+                        {TEXT("Visual.Style1"), 1}, {TEXT("Visual.Style2"), 2}, {TEXT("Visual.DefaultStyle"), 3}
+                    };
+                    Widget::EditRadioBtnAddr(TEXT("Visual.MoneyFontStyle"), 0x58F57F, style);
+                    
+                    static std::vector<Widget::BindInfo> star_border {
+                        {TEXT("Visual.NoBorder"), 0}, {TEXT("Visual.DefaultBorder"), 1}, {TEXT("Visual.BoldBorder"), 2}
+                    };
+                    Widget::EditRadioBtnAddr(TEXT("Visual.WantedStarBorder"), 0x58DD41, star_border);
+                    ImGui::EndChild();
+                    ImGui::EndTabItem();
+                }
+#endif
+                ImGui::EndTabBar();
             }
-
             ImGui::EndTabItem();
         }
 
@@ -860,7 +837,7 @@ void VisualPage::Draw() {
                 if (ImGui::BeginTabItem(TEXT( "Visual.ColorsTab"))) {
                     ImGui::BeginChild("TimecycColors");
                     ImGui::Spacing();
-
+                    ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X);
                     TimeCycColorEdit3(TEXT("Visual.Ambient"), m_nAmbientRed, m_nAmbientGreen, m_nAmbientBlue);
 #ifndef GTA3
                     TimeCycColorEdit3(TEXT("Visual.AmbientObj"), m_nAmbientRed_Obj, m_nAmbientGreen_Obj, m_nAmbientBlue_Obj);
@@ -898,47 +875,40 @@ void VisualPage::Draw() {
 #ifndef GTA3
                     TimeCycColorEdit4(TEXT("Visual.Water"), m_fWaterRed, m_fWaterGreen, m_fWaterBlue, m_fWaterAlpha);
 #endif
+                    ImGui::PopItemWidth();
                     ImGui::EndChild();
                     ImGui::EndTabItem();
                 }
                 if (ImGui::BeginTabItem(TEXT( "Visual.Miscellaneous"))) {
                     ImGui::BeginChild("TimecycMisc");
                     ImGui::Spacing();
-                    ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 2);
+                    ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X);
+                    ImGui::Columns(2, NULL, false);
                     int weather = CWeather::OldWeatherType;
                     if (Widget::ListBox(TEXT("Visual.CurrentWeather"), m_WeatherNames, weather)) {
                         CWeather::OldWeatherType = weather;
                     }
+                    int hour = CClock::ms_nGameClockHours;
+                    if (ImGui::InputInt(TEXT("Visual.Hour"), &hour) & !gamePage.m_bSyncTime) {
+                        if (hour < 0) hour = 23;
+                        if (hour > 23) hour = 0;
+                        CClock::ms_nGameClockHours = hour;
+                    }
+                    ImGui::NextColumn();
 
                     weather = CWeather::NewWeatherType;
                     if (Widget::ListBox(TEXT("Visual.NextWeather"), m_WeatherNames, weather)) {
                         CWeather::NewWeatherType = weather;
                     }
 
-                    ImGui::Spacing();
-                    int hour = CClock::ms_nGameClockHours;
                     int minute = CClock::ms_nGameClockMinutes;
-
-                    if (gamePage.m_bSyncTime) {
-                        ImGui::BeginDisabled(gamePage.m_bSyncTime);
-                    }
-
-                    if (ImGui::InputInt(TEXT("Visual.Hour"), &hour) & !gamePage.m_bSyncTime) {
-                        if (hour < 0) hour = 23;
-                        if (hour > 23) hour = 0;
-                        CClock::ms_nGameClockHours = hour;
-                    }
-
                     if (ImGui::InputInt(TEXT("Visual.Minute"), &minute) & !gamePage.m_bSyncTime) {
                         if (minute < 0) minute = 59;
                         if (minute > 59) minute = 0;
                         CClock::ms_nGameClockMinutes = minute;
                     }
-
-                    if (gamePage.m_bSyncTime) {
-                        ImGui::EndDisabled();
-                        Widget::Tooltip(TEXT("Visual.SyncTimeEnabled"));
-                    }
+                    ImGui::Columns(1);
+                    ImGui::Spacing();
 
                     if (Widget::Toggle(TEXT("Visual.FreezeGameTime"), &gamePage.m_bFreezeTime)) {
                         if (gamePage.m_bFreezeTime) {

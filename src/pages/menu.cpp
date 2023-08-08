@@ -47,7 +47,8 @@ void MenuPage::Draw() {
             ImGui::Spacing();
 
             if (vec.size() > 0) {
-                ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 3);
+                ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 3.5);
+                ImGui::Columns(2, NULL, false);
                 if (Widget::ListBox(TEXT("Menu.Language"), vec, selected)) {
                     if (Locale::SetLocale(selected) == Locale::eReturnCodes::SUCCESS) {
                         std::string label = vec[selected];
@@ -56,14 +57,14 @@ void MenuPage::Draw() {
                         Util::SetMessage(TEXT("Menu.LanguageChangeFailed"));
                     }
                 }
-
+                ImGui::NextColumn();
                 if (ImGui::ColorEdit3(TEXT("Menu.SelectAccentColor"), m_fAccentColor)) {
                     gConfig.Set("Menu.AccentColor.Red", m_fAccentColor[0]);
                     gConfig.Set("Menu.AccentColor.Green", m_fAccentColor[1]);
                     gConfig.Set("Menu.AccentColor.Blue", m_fAccentColor[2]);
                     CheatMenu.UpdateAccentColor(m_fAccentColor);
                 }
-
+                ImGui::Columns(1);
                 ImGui::PopItemWidth();
             }
 
@@ -93,21 +94,21 @@ void MenuPage::Draw() {
         }
         if (ImGui::BeginTabItem(TEXT( "Menu.Overlay"))) {
             ImGui::Spacing();
-            ImGui::Spacing();
-            ImGui::SameLine();
+            ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 3.5);
+            ImGui::Columns(2, NULL, false);
             if (ImGui::Combo(TEXT("Menu.Position"), reinterpret_cast<int*>(&Overlay::m_nSelectedPos),
                              "Custom\0Top left\0Top right\0Bottom left\0Bottom right\0")) {
                 gConfig.Set<int>("Overlay.SelectedPosition", static_cast<int>(Overlay::m_nSelectedPos));
             }
-
-            ImGui::Spacing();
-            ImGui::SameLine();
+            ImGui::NextColumn();
             if (ImGui::ColorEdit4(TEXT("Menu.TextColor"), Overlay::m_fTextCol)) {
                 gConfig.Set("Overlay.TextColor.Red", Overlay::m_fTextCol[0]);
                 gConfig.Set("Overlay.TextColor.Green", Overlay::m_fTextCol[1]);
                 gConfig.Set("Overlay.TextColor.Blue", Overlay::m_fTextCol[2]);
                 gConfig.Set("Overlay.TextColor.Alpha", Overlay::m_fTextCol[3]);
             }
+            ImGui::Columns(1);
+            ImGui::PopItemWidth();
 
             ImGui::Dummy(ImVec2(0, 20));
 

@@ -332,7 +332,7 @@ void PedPage::Draw() {
                     ImGui::Columns(1);
 
                     ImGui::Spacing();
-                    ImGui::SliderInt(TEXT("Ped.Accuracy"), &m_Spawner.m_nAccuracy, 0.0, 100.0);
+                    ImGuiExtras::SliderInt(TEXT("Ped.Accuracy"), &m_Spawner.m_nAccuracy, 0.0, 100.0);
                     if (ImGui::InputInt(TEXT("Ped.Health"), &m_Spawner.m_nPedHealth)) {
                         if (m_Spawner.m_nPedHealth > 1000) {
                             m_Spawner.m_nPedHealth = 1000;
@@ -405,7 +405,7 @@ void PedPage::Draw() {
                 CVector pos = FindPlayerPed()->GetPosition();
                 CZoneInfo* info = CTheZones::GetZoneInfo(&pos, nullptr);
                 int density = info->m_nGangDensity[i];
-                if (ImGui::SliderInt(m_GangList[i], &density, 0, 127)) {
+                if (ImGuiExtras::SliderInt(m_GangList[i], &density, 0, 127)) {
                     info->m_nGangDensity[i] = static_cast<int8_t>(density);
                     Command<Commands::CLEAR_SPECIFIC_ZONES_TO_TRIGGER_GANG_WAR>();
                     CGangWars::bGangWarsActive = true;

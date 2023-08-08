@@ -552,45 +552,44 @@ void PlayerPage::Draw() {
             ImGui::EndTabItem();
         }
 
-        if (ImGui::BeginTabItem(TEXT( "Window.MenusTab"))) {
+        if (ImGui::BeginTabItem(TEXT( "Game.Stats"))) {
             ImGui::BeginChild("PlayerMenus");
+#ifdef GTASA
+            if (pPlayer->m_nModelIndex == 0) {
+                ImGui::Text(TEXT("Player.Body"));
+                ImGui::Columns(3, 0, false);
+                static int bodyState = 0;
+                if (ImGui::RadioButton(TEXT("Player.Fat"), &bodyState, 2)) {
+                    CCheat::FatCheat();
+                }
 
+                ImGui::NextColumn();
+
+                if (ImGui::RadioButton(TEXT("Player.Muscle"), &bodyState, 1)) {
+                    CCheat::MuscleCheat();
+                }
+
+                ImGui::NextColumn();
+
+                if (ImGui::RadioButton(TEXT("Player.Skinny"), &bodyState, 0)) {
+                    CCheat::SkinnyCheat();
+                }
+
+                ImGui::Columns(1);
+            } else {
+                ImGui::TextWrapped(TEXT("Player.NeedCJSkin"));
+                ImGui::Spacing();
+
+                if (ImGui::Button(TEXT("Player.ChangeToCJ"), ImVec2(Widget::CalcSize(1)))) {
+                    pPlayer->SetModelIndex(0);
+                    Util::ClearCharTasksCarCheck(pPlayer);
+                }
+            }
+#endif
+            ImGui::Spacing();
+            ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X);
             Widget::EditAddr<float>(TEXT("Player.Armour"), reinterpret_cast<uint>(&pPlayer->m_fArmour), 0, 100, BY_GAME(pInfo->m_nMaxArmour, pInfo->m_nMaxArmour, 100));
 #ifdef GTASA
-            if (ImGui::CollapsingHeader(TEXT("Player.Body"))) {
-                if (pPlayer->m_nModelIndex == 0) {
-                    ImGui::Columns(3, 0, false);
-                    static int bodyState = 0;
-                    if (ImGui::RadioButton(TEXT("Player.Fat"), &bodyState, 2)) {
-                        CCheat::FatCheat();
-                    }
-
-                    ImGui::NextColumn();
-
-                    if (ImGui::RadioButton(TEXT("Player.Muscle"), &bodyState, 1)) {
-                        CCheat::MuscleCheat();
-                    }
-
-                    ImGui::NextColumn();
-
-                    if (ImGui::RadioButton(TEXT("Player.Skinny"), &bodyState, 0)) {
-                        CCheat::SkinnyCheat();
-                    }
-
-                    ImGui::Columns(1);
-                } else {
-                    ImGui::TextWrapped(TEXT("Player.NeedCJSkin"));
-                    ImGui::Spacing();
-
-                    if (ImGui::Button(TEXT("Player.ChangeToCJ"), ImVec2(Widget::CalcSize(1)))) {
-                        pPlayer->SetModelIndex(0);
-                        Util::ClearCharTasksCarCheck(pPlayer);
-                    }
-                }
-                ImGui::Spacing();
-                ImGui::Separator();
-            }
-
             Widget::EditStat(TEXT("Player.Energy"), STAT_ENERGY);
             Widget::EditStat(TEXT("Player.Fat"), STAT_FAT);
 #endif
@@ -614,74 +613,37 @@ void PlayerPage::Draw() {
             Widget::EditStat(TEXT("Player.Respect"), STAT_RESPECT);
             Widget::EditStat(TEXT("Player.Stamina"), STAT_STAMINA);
 #endif
-            if (ImGui::CollapsingHeader(TEXT("Player.WantedLevel"))) {
 #ifdef GTASA
-                int val = pPlayer->m_pPlayerData->m_pWanted->m_nWantedLevel;
-                int max_wl = pPlayer->m_pPlayerData->m_pWanted->MaximumWantedLevel;
-                max_wl = max_wl < 6 ? 6 : max_wl;
+            int val = pPlayer->m_pPlayerData->m_pWanted->m_nWantedLevel;
+            int max_wl = pPlayer->m_pPlayerData->m_pWanted->MaximumWantedLevel;
+            max_wl = max_wl < 6 ? 6 : max_wl;
 #else
-                int val = pPlayer->m_pWanted->m_nWantedLevel;
-                int max_wl = 6;
+            int val = pPlayer->m_pWanted->m_nWantedLevel;
+            int max_wl = 6;
 #endif
 
-                ImGui::Columns(3, 0, false);
-                ImGui::Text("%s: 0", TEXT("Window.Minimum"));
-                ImGui::NextColumn();
-                ImGui::Text("%s: 0", TEXT("Window.Default"));
-                ImGui::NextColumn();
-                ImGui::Text("%s: %d", TEXT("Window.Maximum"), max_wl);
-                ImGui::Columns(1);
-
-                ImGui::Spacing();
-
-                if (ImGui::InputInt(TEXT("Window.SetValue"), &val)) {
+            if (ImGui::InputInt("##SetValue", &val)) {
 #ifdef GTASA
-                    pPlayer->CheatWantedLevel(val);
+                pPlayer->CheatWantedLevel(val);
 #elif GTAVC
-                    pPlayer->m_pWanted->CheatWantedLevel(val);
+                pPlayer->m_pWanted->CheatWantedLevel(val);
 #else
-                    pPlayer->m_pWanted->SetWantedLevel(val);
+                pPlayer->m_pWanted->SetWantedLevel(val);
 #endif
-                }
-
-                ImGui::Spacing();
-                if (ImGui::Button(TEXT("Window.Minimum"), Widget::CalcSize(3))) {
-#ifdef GTASA
-                    pPlayer->CheatWantedLevel(0);
-#elif GTAVC
-                    pPlayer->m_pWanted->CheatWantedLevel(0);
-#else
-                    pPlayer->m_pWanted->SetWantedLevel(0);
-#endif
-                }
-
-                ImGui::SameLine();
-
-                if (ImGui::Button(TEXT("Window.Default"), Widget::CalcSize(3))) {
-#ifdef GTASA
-                    pPlayer->CheatWantedLevel(0);
-#elif GTAVC
-                    pPlayer->m_pWanted->CheatWantedLevel(0);
-#else
-                    pPlayer->m_pWanted->SetWantedLevel(0);
-#endif
-                }
-
-                ImGui::SameLine();
-
-                if (ImGui::Button(TEXT("Window.Maximum"), Widget::CalcSize(3))) {
-#ifdef GTASA
-                    pPlayer->CheatWantedLevel(max_wl);
-#elif GTAVC
-                    pPlayer->m_pWanted->CheatWantedLevel(max_wl);
-#else
-                    pPlayer->m_pWanted->SetWantedLevel(max_wl);
-#endif
-                }
-
-                ImGui::Spacing();
-                ImGui::Separator();
             }
+            ImGui::SameLine();
+            if (ImGui::Button((TEXT_S("Menu.ResetToDefault") + "##WL").c_str(), Widget::CalcSizeFrame(TEXT("Menu.ResetToDefault")))) {
+#ifdef GTASA
+                pPlayer->CheatWantedLevel(0);
+#elif GTAVC
+                pPlayer->m_pWanted->CheatWantedLevel(0);
+#else
+                pPlayer->m_pWanted->SetWantedLevel(0);
+#endif
+            }
+            ImGui::SameLine();
+            ImGui::Text("Wanted level");
+            ImGui::PopItemWidth();
             ImGui::EndChild();
             ImGui::EndTabItem();
         }

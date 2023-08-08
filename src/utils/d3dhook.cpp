@@ -58,11 +58,11 @@ void D3dHook::ProcessFrame(void* ptr) {
             float scaleX = size.x / 1366.0f;
             float scaleY = size.y / 768.0f;
 
-            style->FramePadding = ImVec2(5 * scaleX, 5 * scaleY);
-            style->ItemSpacing = ImVec2(8 * scaleX, 4 * scaleY);
-            style->ScrollbarSize = 12 * scaleX;
-            style->IndentSpacing = 20 * scaleX;
-            style->ItemInnerSpacing = ImVec2(5 * scaleX, 5 * scaleY);
+            style->FramePadding = ImVec2(2 * scaleX, 2 * scaleY);
+            style->ItemSpacing = ImVec2(6 * scaleX, 3 * scaleY);
+            style->ScrollbarSize = 20 * scaleX;
+            style->IndentSpacing = 10 * scaleX;
+            style->ItemInnerSpacing = ImVec2(3 * scaleX, 3 * scaleY);
 
             fScreenSize = size;
         }
