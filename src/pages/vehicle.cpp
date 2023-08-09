@@ -424,7 +424,6 @@ void VehiclePage::SpawnVehicle(std::string& rootkey, std::string& vehName, std::
 #endif
 
 void VehiclePage::Draw() {
-    ImGui::Spacing();
     CPlayerPed* pPlayer = FindPlayerPed();
     int hplayer = CPools::GetPedRef(pPlayer);
     bool bPlayerInCar = Command<Commands::IS_CHAR_IN_ANY_CAR>(hplayer);
@@ -704,177 +703,107 @@ void VehiclePage::Draw() {
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT( "Window.MenusTab"))) {
+        if (ImGui::BeginTabItem(TEXT( "Visual.Miscellaneous"))) {
             ImGui::Spacing();
             ImGui::BeginChild("MenusChild");
-
-#ifdef GTASA
-            Widget::EditAddr<float>(TEXT("Vehicle.DensityMul"), 0x8A5B20, 0, 1, 10);
-#endif
-            if (ImGui::CollapsingHeader(TEXT(bPlayerInCar ? "Vehicle.SwitchSeats" : "Vehicle.EnterNearVeh"))) {
-                CVehicle* pTargetVeh = bPlayerInCar ? pVeh : Util::GetClosestCar();
-
-                if (pTargetVeh) {
-                    int seats = pTargetVeh->m_nMaxPassengers;
-
-                    ImGui::Spacing();
-                    ImGui::Columns(2, 0, false);
-
-                    ImGui::Text(Util::GetCarName(pTargetVeh->m_nModelIndex).c_str());
-                    ImGui::NextColumn();
-                    ImGui::Text(TEXT("Vehicle.TotalSeats"), (seats + 1));
-                    ImGui::Columns(1);
-
-                    ImGui::Spacing();
-                    if (ImGui::Button(TEXT("Vehicle.Driver"), ImVec2(Widget::CalcSize(2)))) {
-                        Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, pTargetVeh);
-                    }
-
 #ifndef GTA3
-                    for (int i = 0; i < seats; ++i) {
-                        if (i % 2 != 1) {
-                            ImGui::SameLine();
-                        }
-
-                        if (ImGui::Button(std::format("{} {}", TEXT("Vehicle.Passenger"), i+1).c_str(),
-                                          ImVec2(Widget::CalcSize(2)))) {
+            ImGui::Columns(2, NULL, false);
+            static std::vector<uint32_t> colorAddr = {BY_GAME(0x969151, 0xA10B82, NULL) , BY_GAME(0x969150, 0xA10B26, NULL)};
+            static const char* keys = "None\0Black\0Pink\0";
+            Widget::ComboBoxAddr(TEXT("Vehicle.TrafficColor"), keys, colorAddr);
+            ImGui::NextColumn();
+#endif
 #ifdef GTASA
-                            Command<Commands::WARP_CHAR_INTO_CAR_AS_PASSENGER>(hplayer, pTargetVeh, i);
-#elif GTAVC
-                            WarpPlayerIntoVehicle(pTargetVeh, i);
+            static std::vector<uint32_t> typeAddr = {0x96915E, 0x96917B, 0x96915F};
+            static const char* keys2 = "None\0Cheap\0Country\0Fast\0";
+            Widget::ComboBoxAddr(TEXT("Vehicle.TrafficType"), keys2, typeAddr);
 #endif
-                        }
-                    }
-#endif
-                } else {
-                    ImGui::Spacing();
-                    Widget::TextCentered(TEXT("Vehicle.NoNearVeh"));
-                }
-
-                ImGui::Spacing();
-                ImGui::Separator();
-            }
-            if (ImGui::CollapsingHeader(TEXT("Vehicle.RemoveVehRadius"))) {
-                static int removeRadius;
-                ImGui::InputInt(TEXT("Vehicle.Radius"), &removeRadius);
-                ImGui::Spacing();
-                if (ImGui::Button(TEXT("Vehicle.RemoveVeh"), Widget::CalcSize(1))) {
-                    CPlayerPed* player = FindPlayerPed();
-                    for (CVehicle* pVeh : CPools::ms_pVehiclePool) {
-                        if (DistanceBetweenPoints(pVeh->GetPosition(), player->GetPosition()) < removeRadius
-                                && player->m_pVehicle != pVeh) {
-                            Command<Commands::DELETE_CAR>(CPools::GetVehicleRef(pVeh));
-                        }
-                    }
-                }
-                ImGui::Spacing();
-                ImGui::Separator();
-            }
-
 #ifndef GTA3
-            std::vector<Widget::BindInfo> color {
-                {TEXT("Vehicle.Black"), BY_GAME(0x969151, 0xA10B82, NULL)},
-                {TEXT("Vehicle.Pink"), BY_GAME(0x969150, 0xA10B26, NULL)}
-            };
-            Widget::EditRadioBtnAddr(TEXT("Vehicle.TrafficColor"), color);
+            ImGui::Columns(1);
+            ImGui::Spacing();
 #endif
 #ifdef GTASA
-            std::vector<Widget::BindInfo> type {
-                {TEXT("Vehicle.Cheap"), 0x96915E}, {TEXT("Vehicle.Country"), 0x96917B},
-                {TEXT("Vehicle.Fast"), 0x96915F}
-            };
-            Widget::EditRadioBtnAddr(TEXT("Vehicle.TrafficType"), type);
-#endif
+            Widget::InputAddr<float>(TEXT("Vehicle.DensityMul"), 0x8A5B20, 0, 1, 10);
             if (pPlayer && pPlayer->m_pVehicle) {
                 CVehicle* pVeh = pPlayer->m_pVehicle;
-                int hVeh = CPools::GetVehicleRef(pVeh);
-
-#ifdef GTASA
-                Widget::EditAddr(TEXT("Vehicle.DirtLvl"), (int)pVeh + 0x4B0, 0, 7.5, 15);
-                if (pVeh->m_nVehicleClass == VEHICLE_AUTOMOBILE && ImGui::CollapsingHeader(TEXT("Vehicle.Doors"))) {
-                    static int m_nDoorMenuButton;
-                    ImGui::Columns(2, 0, false);
-                    ImGui::RadioButton(TEXT("Vehicle.Damage"), &m_nDoorMenuButton, 0);
-                    ImGui::RadioButton(TEXT("Vehicle.Fix"), &m_nDoorMenuButton, 1);
-                    ImGui::NextColumn();
-                    ImGui::RadioButton(TEXT("Vehicle.Open"), &m_nDoorMenuButton, 2);
-                    ImGui::RadioButton(TEXT("Vehicle.Pop"), &m_nDoorMenuButton, 3);
-                    ImGui::Columns(1);
-                    ImGui::Spacing();
-
-                    int seats = pVeh->m_nMaxPassengers + 1; // passenger + driver
-                    int doors = seats == 4 ? 6 : 4;
-                    int hveh = CPools::GetVehicleRef(pVeh);
-
-                    if (ImGui::Button(TEXT("Vehicle.All"), ImVec2(Widget::CalcSize()))) {
-                        for (int i = 0; i < doors; ++i) {
-                            switch (m_nDoorMenuButton) {
-                            case 0:
-                                Command<Commands::DAMAGE_CAR_DOOR>(hveh, i);
-                                break;
-                            case 1:
-                                Command<Commands::FIX_CAR_DOOR>(hveh, i);
-                                break;
-                            case 2:
-                                Command<Commands::OPEN_CAR_DOOR>(hveh, i);
-                                break;
-                            case 3:
-                                Command<Commands::POP_CAR_DOOR>(hveh, i);
-                                break;
-                            default:
-                                break;
-                            }
-                        }
-                    }
-
-                    for (int i = 0; i != doors; ++i) {
-                        if (ImGui::Button(m_DoorNames[i].c_str(), ImVec2(Widget::CalcSize(2)))) {
-                            switch (m_nDoorMenuButton) {
-                            case 0:
-                                Command<Commands::DAMAGE_CAR_DOOR>(hveh, i);
-                                break;
-                            case 1:
-                                Command<Commands::FIX_CAR_DOOR>(hveh, i);
-                                break;
-                            case 2:
-                                Command<Commands::OPEN_CAR_DOOR>(hveh, i);
-                                break;
-                            case 3:
-                                Command<Commands::POP_CAR_DOOR>(hveh, i);
-                                break;
-                            default:
-                                break;
-                            }
-                        }
-
-                        if (i % 2 != 1) {
-                            ImGui::SameLine();
-                        }
-                    }
-
-                    ImGui::Spacing();
-                    ImGui::Separator();
-                }
+                Widget::InputAddr(TEXT("Vehicle.DirtLvl"), (int)pVeh + 0x4B0, 0, 7.5, 15);
+                Widget::InputAddr<float>(TEXT("Menu.VehHealth"), (int)&pVeh->m_fHealth, 0, 0, 1000);
+            }
 #endif
-
-                Widget::EditAddr<float>(TEXT("Menu.VehHealth"), (int)&pVeh->m_fHealth, 0, 0, 1000);
-                if (ImGui::CollapsingHeader(TEXT("Vehicle.SetSpeed"))) {
-                    Widget::Toggle(TEXT("Vehicle.LockSpeed"), &m_bLockSpeed);
-                    ImGui::Spacing();
-                    Widget::InputFloat(TEXT("Vehicle.Set"), &m_fLockSpeed, 1.0f, 0.0f, 100.0f);
-                    ImGui::Spacing();
-
-                    if (ImGui::Button(TEXT("Vehicle.Set"), ImVec2(Widget::CalcSize(2)))) {
-                        Util::SetCarForwardSpeed(pVeh, m_fLockSpeed);
-                    }
-
-                    ImGui::SameLine();
-
-                    if (ImGui::Button(TEXT("Vehicle.InstantStop"), ImVec2(Widget::CalcSize(2)))) {
-                        Util::SetCarForwardSpeed(pVeh, 0.0f);
+            static int removeRadius = 5;
+            ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X);
+            ImGui::InputInt("##Ped.Radius", &removeRadius);
+            ImGui::SameLine();
+            if (ImGui::Button(TEXT("Ped.RemovePeds"), Widget::CalcSizeFrame(TEXT("Ped.RemovePeds")))) {
+                CPlayerPed* player = FindPlayerPed();
+                for (CVehicle* pVeh : CPools::ms_pVehiclePool) {
+                    if (DistanceBetweenPoints(pVeh->GetPosition(), player->GetPosition()) < removeRadius
+                            && player->m_pVehicle != pVeh) {
+                        Command<Commands::DELETE_CAR>(CPools::GetVehicleRef(pVeh));
                     }
                 }
             }
+            ImGui::SameLine();
+            ImGui::Text(TEXT("Vehicle.RemoveVehRadius"));
+            if (pPlayer && pPlayer->m_pVehicle) {
+                CVehicle* pVeh = pPlayer->m_pVehicle;
+                // Widget::Toggle(TEXT("Vehicle.LockSpeed"), &m_bLockSpeed);
+                Widget::InputFloat("##Set", &m_fLockSpeed, 1.0f, 0.0f, 100.0f);
+                ImGui::SameLine();
+                if (ImGui::Button(TEXT("Vehicle.Apply"), ImVec2(Widget::CalcSizeFrame(TEXT("Vehicle.Apply"))))) {
+                    Util::SetCarForwardSpeed(pVeh, m_fLockSpeed);
+                }
+                ImGui::SameLine();
+                if (ImGui::Button(TEXT("Vehicle.InstantStop"), ImVec2(Widget::CalcSizeFrame(TEXT("Vehicle.InstantStop"))))) {
+                    Util::SetCarForwardSpeed(pVeh, 0.0f);
+                }
+                ImGui::SameLine();
+                if (ImGui::Button(TEXT(m_bLockSpeed ? "Vehicle.Unlock" : "Vehicle.Lock"), ImVec2(Widget::CalcSizeFrame(TEXT(m_bLockSpeed ? "Vehicle.Unlock" : "Vehicle.Lock"))))) {
+                    m_bLockSpeed = !m_bLockSpeed;
+                }
+                ImGui::SameLine();
+                ImGui::Text(TEXT("Vehicle.SetSpeed"));
+            }
+
+            ImGui::Spacing();
+            ImGui::SeparatorText(TEXT(bPlayerInCar ? "Vehicle.SwitchSeats" : "Vehicle.EnterNearVeh"));
+            CVehicle* pTargetVeh = bPlayerInCar ? pVeh : Util::GetClosestCar();
+            if (pTargetVeh) {
+                int seats = pTargetVeh->m_nMaxPassengers;
+
+                ImGui::Spacing();
+                ImGui::Columns(2, 0, false);
+                ImGui::Text(Util::GetCarName(pTargetVeh->m_nModelIndex).c_str());
+                ImGui::NextColumn();
+                ImGui::Text(TEXT("Vehicle.TotalSeats"), (seats + 1));
+                ImGui::Columns(1);
+
+                ImGui::Spacing();
+                if (ImGui::Button(TEXT("Vehicle.Driver"), ImVec2(Widget::CalcSize(4)))) {
+                    Command<Commands::WARP_CHAR_INTO_CAR>(hplayer, pTargetVeh);
+                }
+
+#ifndef GTA3
+                for (int i = 0; i < seats; ++i) {
+                    if ((i+1) % 4 != 0) {
+                        ImGui::SameLine();
+                    }
+
+                    if (ImGui::Button(std::format("{} {}", TEXT("Vehicle.Passenger"), i+1).c_str(),
+                                        ImVec2(Widget::CalcSize(4)))) {
+#ifdef GTASA
+                        Command<Commands::WARP_CHAR_INTO_CAR_AS_PASSENGER>(hplayer, pTargetVeh, i);
+#elif GTAVC
+                        WarpPlayerIntoVehicle(pTargetVeh, i);
+#endif
+                    }
+                }
+#endif
+            } else {
+                ImGui::Spacing();
+                Widget::TextCentered(TEXT("Vehicle.NoNearVeh"));
+            }
+                
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
@@ -985,6 +914,71 @@ void VehiclePage::Draw() {
                 AutoDrive.Draw();
                 ImGui::EndTabItem();
             }
+#ifdef GTASA
+            if (pVeh->m_nVehicleClass == VEHICLE_AUTOMOBILE && ImGui::BeginTabItem(TEXT("Vehicle.Doors"))) {
+                static int m_nDoorMenuButton;
+                ImGui::Columns(2, 0, false);
+                ImGui::RadioButton(TEXT("Vehicle.Damage"), &m_nDoorMenuButton, 0);
+                ImGui::RadioButton(TEXT("Vehicle.Fix"), &m_nDoorMenuButton, 1);
+                ImGui::NextColumn();
+                ImGui::RadioButton(TEXT("Vehicle.Open"), &m_nDoorMenuButton, 2);
+                ImGui::RadioButton(TEXT("Vehicle.Pop"), &m_nDoorMenuButton, 3);
+                ImGui::Columns(1);
+                ImGui::Spacing();
+
+                int seats = pVeh->m_nMaxPassengers + 1; // passenger + driver
+                int doors = seats == 4 ? 6 : 4;
+                int hveh = CPools::GetVehicleRef(pVeh);
+
+                if (ImGui::Button(TEXT("Vehicle.All"), ImVec2(Widget::CalcSize()))) {
+                    for (int i = 0; i < doors; ++i) {
+                        switch (m_nDoorMenuButton) {
+                        case 0:
+                            Command<Commands::DAMAGE_CAR_DOOR>(hveh, i);
+                            break;
+                        case 1:
+                            Command<Commands::FIX_CAR_DOOR>(hveh, i);
+                            break;
+                        case 2:
+                            Command<Commands::OPEN_CAR_DOOR>(hveh, i);
+                            break;
+                        case 3:
+                            Command<Commands::POP_CAR_DOOR>(hveh, i);
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+                }
+
+                for (int i = 0; i != doors; ++i) {
+                    if (ImGui::Button(m_DoorNames[i].c_str(), ImVec2(Widget::CalcSize(3)))) {
+                        switch (m_nDoorMenuButton) {
+                        case 0:
+                            Command<Commands::DAMAGE_CAR_DOOR>(hveh, i);
+                            break;
+                        case 1:
+                            Command<Commands::FIX_CAR_DOOR>(hveh, i);
+                            break;
+                        case 2:
+                            Command<Commands::OPEN_CAR_DOOR>(hveh, i);
+                            break;
+                        case 3:
+                            Command<Commands::POP_CAR_DOOR>(hveh, i);
+                            break;
+                        default:
+                            break;
+                        }
+                    }
+
+                    if (i % 3 != 2) {
+                        ImGui::SameLine();
+                    }
+                }
+
+                ImGui::EndTabItem();
+            }
+#endif
         }
         ImGui::EndTabBar();
     }

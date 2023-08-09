@@ -267,12 +267,12 @@ void PedPage::Draw() {
             ImGui::Spacing();
             ImGui::BeginChild("MenusChild");
 #ifdef GTASA
-            static std::vector<Widget::BindInfo> selectWeapon {
-                {"9mm", 0x96917C}, {"AK47", 0x96917D}, {"Rockets", 0x96917E}
-            };
-            Widget::EditRadioBtnAddr(TEXT("Ped.SelectWeapon"), selectWeapon);
+            static std::vector<uint32_t> selectWeapon =  {0x96917C, 0x96917D, 0x96917E};
+            static const char* keys = "None\09mm\0AK 47\0 Rockets\0";
+            ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X);
+            Widget::ComboBoxAddr(TEXT("Ped.SelectWeapon"), keys, selectWeapon);
 #endif
-            Widget::EditAddr<float>(TEXT("Ped.PedDensityMul"), reinterpret_cast<uint>(&CPopulation::PedDensityMultiplier), 0, 1, 10);
+            Widget::InputAddr<float>(TEXT("Ped.PedDensityMul"), reinterpret_cast<uint>(&CPopulation::PedDensityMultiplier), 0, 1, 10);
             static int removeRadius = 5;
             ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X);
             ImGui::InputInt("##Ped.Radius", &removeRadius);

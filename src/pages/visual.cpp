@@ -744,26 +744,26 @@ void VisualPage::Draw() {
                 if (ImGui::BeginTabItem(TEXT("Visual.PositionsTab"))) {
                     ImGui::BeginChild("TPositions");
 #ifdef GTASA
-                    Widget::EditAddr<float>(TEXT("Visual.ArmourbarPosX"), 0x866B78, -999, 94, 999);
-                    Widget::EditAddr<float>(TEXT("Visual.ArmourbarPosY"), 0x862D38, -999, 48, 999);
-                    Widget::EditAddr<float>(TEXT("Visual.BreathbarPosX"), *(int*)0x58F11F, -999, 94, 999);
-                    Widget::EditAddr<float>(TEXT("Visual.BreathbarPosY"), *(int*)0x58F100, -999, 62, 999);
-                    Widget::EditAddr<float>(TEXT("Visual.ClockPosX"), *(int*)0x58EC16, -999, 32, 999);
-                    Widget::EditAddr<float>(TEXT("Visual.ClockPosY"), *(int*)0x58EC04, -999, 22, 999);
-                    Widget::EditAddr<float>(TEXT("Visual.HealthbarPosX"), 0x86535C, -999, 141, 999);
-                    Widget::EditAddr<float>(TEXT("Visual.HealthbarPosY"), 0x866CA8, -999, 77, 999);
-                    Widget::EditAddr<float>(TEXT("Visual.MoneyPosX"), *(int*)0x58F5FC, -999, 32, 999);
-                    Widget::EditAddr<float>(TEXT("Visual.MoneyPosY"), 0x866C88, -999, 89, 999);
-                    Widget::EditAddr<float>(TEXT("Visual.RadarHeight"), *(int*)0x5834F6, 0, 76, 999);
-                    Widget::EditAddr<float>(TEXT("Visual.RadarWidth"), *(int*)0x5834C2, 0, 94, 999);
-                    Widget::EditAddr<float>(TEXT("Visual.RadarPosX"), *(int*)0x5834D4, -999, 40, 999);
-                    Widget::EditAddr<float>(TEXT("Visual.RadarPosY"), *(int*)0x583500, -999, 104, 999);
-                    Widget::EditAddr<float>(TEXT("Visual.WantedPosX"), *(int*)0x58DD0F, -999, 29, 999);
-                    Widget::EditAddr<float>(TEXT("Visual.WantedPosY"), *(int*)0x58DDFC, -999, 114, 999);
-                    Widget::EditAddr<float>(TEXT("Visual.WeaponAmmoPosX"), *(int*)0x58FA02, -999, 32, 999);
-                    Widget::EditAddr<float>(TEXT("Visual.WeaponAmmoPosY"), *(int*)0x58F9E6, -999, 43, 999);
-                    Widget::EditAddr<float>(TEXT("Visual.WeaponIconPosX"), *(int*)0x58F927, -999, 32, 999);
-                    Widget::EditAddr<float>(TEXT("Visual.WeaponIconPosY"), *(int*)0x58F913, -999, 20, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.ArmourbarPosX"), 0x866B78, -999, 94, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.ArmourbarPosY"), 0x862D38, -999, 48, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.BreathbarPosX"), *(int*)0x58F11F, -999, 94, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.BreathbarPosY"), *(int*)0x58F100, -999, 62, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.ClockPosX"), *(int*)0x58EC16, -999, 32, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.ClockPosY"), *(int*)0x58EC04, -999, 22, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.HealthbarPosX"), 0x86535C, -999, 141, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.HealthbarPosY"), 0x866CA8, -999, 77, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.MoneyPosX"), *(int*)0x58F5FC, -999, 32, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.MoneyPosY"), 0x866C88, -999, 89, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.RadarHeight"), *(int*)0x5834F6, 0, 76, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.RadarWidth"), *(int*)0x5834C2, 0, 94, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.RadarPosX"), *(int*)0x5834D4, -999, 40, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.RadarPosY"), *(int*)0x583500, -999, 104, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.WantedPosX"), *(int*)0x58DD0F, -999, 29, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.WantedPosY"), *(int*)0x58DDFC, -999, 114, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.WeaponAmmoPosX"), *(int*)0x58FA02, -999, 32, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.WeaponAmmoPosY"), *(int*)0x58F9E6, -999, 43, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.WeaponIconPosX"), *(int*)0x58F927, -999, 32, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.WeaponIconPosY"), *(int*)0x58F913, -999, 20, 999);
 #elif GTAVC
                     static float discLeft = *(float*)0x55A956;
                     static float discRight = *(float*)*(int*)0x55A9AE;
@@ -790,20 +790,23 @@ void VisualPage::Draw() {
                 if (ImGui::BeginTabItem(TEXT( "Visual.Miscellaneous"))) {
                     ImGui::BeginChild("MiscTab");
                     ImGui::Spacing();
-                    Widget::EditAddr<int>(TEXT("Visual.RadarZoom"), 0xA444A3, 0, 0, 170);
-                    static std::vector<Widget::BindInfo> font_outline {
-                        {TEXT("Visual.NoOutline"), 0}, {TEXT("Visual.ThinOutline"), 1}, {TEXT("Visual.DefaultOutline"), 2}
-                    };
-                    Widget::EditRadioBtnAddr(TEXT("Visual.MoneyFontOutline"), 0x58F58D, font_outline);
-                    static std::vector<Widget::BindInfo> style {
-                        {TEXT("Visual.Style1"), 1}, {TEXT("Visual.Style2"), 2}, {TEXT("Visual.DefaultStyle"), 3}
-                    };
-                    Widget::EditRadioBtnAddr(TEXT("Visual.MoneyFontStyle"), 0x58F57F, style);
-                    
-                    static std::vector<Widget::BindInfo> star_border {
-                        {TEXT("Visual.NoBorder"), 0}, {TEXT("Visual.DefaultBorder"), 1}, {TEXT("Visual.BoldBorder"), 2}
-                    };
-                    Widget::EditRadioBtnAddr(TEXT("Visual.WantedStarBorder"), 0x58DD41, star_border);
+                    ImGui::Columns(2, NULL, false);
+                    ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 5.0f);
+                    static const char* keys = "None\0Thin\0Default\0";
+                    static std::vector<uint32_t> outlineVals = {0, 1, 2};
+                    Widget::ComboBoxAddr(TEXT("Visual.MoneyFontOutline"), 0x58F58D, keys, outlineVals);
+                    static const char* keys2 = "Style 1\0Style 2\0Default\0";
+                    static std::vector<uint32_t> styleVals = {0, 1, 2};
+                    Widget::ComboBoxAddr(TEXT("Visual.MoneyFontStyle"), 0x58F57F, keys2, styleVals);
+                    ImGui::NextColumn();
+                    static const char* keys3 = "None\0Default\0Bold\0";
+                    Widget::ComboBoxAddr(TEXT("Visual.WantedStarBorder"), 0x58DD41, keys3, outlineVals);
+                    ImGui::PopItemWidth();
+                    ImGui::Columns(1);
+                    ImGui::Spacing();
+
+                    ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X);
+                    Widget::InputAddr<int>(TEXT("Visual.RadarZoom"), 0xA444A3, 0, 0, 170);
                     ImGui::EndChild();
                     ImGui::EndTabItem();
                 }

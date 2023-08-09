@@ -11,7 +11,7 @@ class Widget {
     using VecStr = const std::vector<std::string>;
 
   public:
-    struct BindInfo {
+    struct AddrInfo {
         std::string name;
         uint val;
     };
@@ -47,22 +47,22 @@ class Widget {
     // Displays a button with specified color id
     static bool ColorBtn(int colorId, std::vector<float>& color, ImVec2 size);
 
+    // ComboBox with addrs
+    static void ComboBoxAddr(const char* label, const char* keys, std::vector<uint32_t> &addrs);
+    static void ComboBoxAddr(const char* label, uint addr, const char* keys, std::vector<uint32_t> &values);
+
     // Draws DataStore data in the interface
     static void DataList(ResourceStore& data, fArg3_t clickFunc = nullptr, fArgNone_t addFunc = nullptr,
                          bool isEditItem = false, fArgNone_t contextOptionsFunc = nullptr, fArgNone_t tabsFunc = nullptr);
 
     // Draws a dropdown editor for memory address
     template <typename T>
-    static void EditAddr(const char* label, uint address, int min = 0, int def = 0, int max = 100);
-    static void EditAddr(const char* label, uint address, float min = 0.0f, float def = 0.0f,
+    static void InputAddr(const char* label, uint address, int min = 0, int def = 0, int max = 100);
+    static void InputAddr(const char* label, uint address, float min = 0.0f, float def = 0.0f,
                          float max = 100.0f, float mul = 1, float change = 1.0f);
 
     // Draws a dropdown editor for memory bits
     static void EditBits(const char* label, int address, VecStr& names);
-
-    // Draws radio button list from address
-    static void EditRadioBtnAddr(const char* label, std::vector<BindInfo>& addrInfo);
-    static void EditRadioBtnAddr(const char* label, uint addr, std::vector<BindInfo>& valInfo);
 
 #ifdef GTASA
     // Draws a dropdown editor for editing stats, only sa
@@ -108,7 +108,7 @@ bool Widget::ToggleAddr(const char* label, uint addr, const char* hint, T enable
 }
 
 template <typename T>
-void Widget::EditAddr(const char* label, uint address, int min, int def, int max) {
+void Widget::InputAddr(const char* label, uint address, int min, int def, int max) {
     int val = patch::Get<T>(address, false);
     ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X);
     if (ImGui::InputInt(("##SetValue" + std::string(label)).c_str(), &val)) {

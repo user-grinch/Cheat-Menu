@@ -554,52 +554,55 @@ void PlayerPage::Draw() {
 
         if (ImGui::BeginTabItem(TEXT( "Game.Stats"))) {
             ImGui::BeginChild("PlayerMenus");
+            ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X);
 #ifdef GTASA
             if (pPlayer->m_nModelIndex == 0) {
-                ImGui::Text(TEXT("Player.Body"));
-                ImGui::Columns(3, 0, false);
-                static int bodyState = 0;
-                if (ImGui::RadioButton(TEXT("Player.Fat"), &bodyState, 2)) {
-                    CCheat::FatCheat();
+                static const char* keys = "Fat\0Muscle\0Skinny\0Fat & Muscle\0";
+                static int curItem = 2;
+                bool isMuscle = CStats::GetStatValue(23) == 1000;
+                bool isFat = CStats::GetStatValue(21) == 1000;
+
+                if (isMuscle && isFat) {
+                    curItem = 3;
                 }
 
-                ImGui::NextColumn();
-
-                if (ImGui::RadioButton(TEXT("Player.Muscle"), &bodyState, 1)) {
-                    CCheat::MuscleCheat();
+                if (isMuscle) {
+                    curItem = 1;
+                }
+                if (isFat) {
+                    curItem = 0;
                 }
 
-                ImGui::NextColumn();
-
-                if (ImGui::RadioButton(TEXT("Player.Skinny"), &bodyState, 0)) {
-                    CCheat::SkinnyCheat();
+                if (ImGui::Combo(TEXT("Player.Body"), &curItem, keys)) {
+                    if (curItem == 0) {
+                        CStats::SetStatValue(21, 1000.0); // fat
+                        CStats::SetStatValue(23, 0.0); // muscle
+                    } else if (curItem == 1) {
+                        CStats::SetStatValue(23, 1000.0); // muscle
+                        CStats::SetStatValue(21, 0.0); // fat
+                    } else if (curItem == 2) {
+                        CCheat::SkinnyCheat();
+                    } else if (curItem == 3) {
+                        CStats::SetStatValue(23, 1000.0); // muscle
+                        CStats::SetStatValue(21, 1000.0); // fat
+                    }
+                    CClothes::RebuildPlayer(FindPlayerPed(), false);
                 }
-
-                ImGui::Columns(1);
-            } else {
-                ImGui::TextWrapped(TEXT("Player.NeedCJSkin"));
-                ImGui::Spacing();
-
-                if (ImGui::Button(TEXT("Player.ChangeToCJ"), ImVec2(Widget::CalcSize(1)))) {
-                    pPlayer->SetModelIndex(0);
-                    Util::ClearCharTasksCarCheck(pPlayer);
-                }
-            }
+            } 
 #endif
             ImGui::Spacing();
-            ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X);
-            Widget::EditAddr<float>(TEXT("Player.Armour"), reinterpret_cast<uint>(&pPlayer->m_fArmour), 0, 100, BY_GAME(pInfo->m_nMaxArmour, pInfo->m_nMaxArmour, 100));
+            Widget::InputAddr<float>(TEXT("Player.Armour"), reinterpret_cast<uint>(&pPlayer->m_fArmour), 0, 100, BY_GAME(pInfo->m_nMaxArmour, pInfo->m_nMaxArmour, 100));
 #ifdef GTASA
             Widget::EditStat(TEXT("Player.Energy"), STAT_ENERGY);
             Widget::EditStat(TEXT("Player.Fat"), STAT_FAT);
 #endif
-            Widget::EditAddr<float>(TEXT("Player.Health"), reinterpret_cast<uint>(&pPlayer->m_fHealth), 0, 100, BY_GAME(static_cast<int>(pPlayer->m_fMaxHealth), 100, 100));
+            Widget::InputAddr<float>(TEXT("Player.Health"), reinterpret_cast<uint>(&pPlayer->m_fHealth), 0, 100, BY_GAME(static_cast<int>(pPlayer->m_fMaxHealth), 100, 100));
 #ifdef GTASA
             Widget::EditStat(TEXT("Player.LungCapacity"), STAT_LUNG_CAPACITY);
 
-            Widget::EditAddr<uchar>(TEXT("Player.MaxArmour"), reinterpret_cast<uint>(&pInfo->m_nMaxArmour), 0, 100, 255);
+            Widget::InputAddr<uchar>(TEXT("Player.MaxArmour"), reinterpret_cast<uint>(&pInfo->m_nMaxArmour), 0, 100, 255);
             Widget::EditStat(TEXT("Player.MaxHealth"), STAT_MAX_HEALTH, 0, 569, 1450);
-            Widget::EditAddr<int>(TEXT("Player.Money"), 0xB7CE50, -99999999, 0, 99999999);
+            Widget::InputAddr<int>(TEXT("Player.Money"), 0xB7CE50, -99999999, 0, 99999999);
 #else
             int money = pInfo->m_nMoney;
             Widget::EditAddr<int>(TEXT("Player.Money"), (int)&money, -9999999, 0, 99999999);

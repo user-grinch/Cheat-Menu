@@ -288,14 +288,14 @@ void VehCustmzrMgr::Draw() {
     int hVeh = CPools::GetVehicleRef(pVeh);
 
     if (ImGui::BeginTabItem(TEXT( "Vehicle.Color"))) {
+        ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 3.0f);
 #ifdef GTASA
         ImGui::Spacing();
         if (ImGui::Button(TEXT("Vehicle.ResetColor"), ImVec2(Widget::CalcSize()))) {
             Paint.ResetColor(pVeh);
             Util::SetMessage(TEXT("Vehicle.ResetColorMSG"));
         }
-        ImGui::Spacing();
-
+        ImGui::Columns(2, NULL, false);
         static float colpicker[3];
         if (ImGui::ColorEdit3(TEXT("Vehicle.ColorPicker"), colpicker)) {
             uchar r = colpicker[0] * 255;
@@ -303,16 +303,16 @@ void VehCustmzrMgr::Draw() {
             uchar b = colpicker[2] * 255;
             Paint.SetColor(pVeh, { r, g, b, 255 });
         }
+        ImGui::NextColumn();
 #endif
-
-        ImGui::Spacing();
-
         static int colorType = 0;
 #ifdef GTASA
         ImGui::Combo(TEXT("Vehicle.ColorType"), &colorType, "Primary\0Secondary\0Tertiary\0Quaternary\0");
 #else
         ImGui::Combo(TEXT("Vehicle.ColorType"), &colorType, "Primary\0Secondary\0");
 #endif
+        ImGui::Columns(1);
+        ImGui::PopItemWidth();
         ImGui::Spacing();
         ImGui::Text(TEXT("Vehicle.SelectPreset"));
         ImGui::Spacing();
@@ -353,19 +353,20 @@ void VehCustmzrMgr::Draw() {
             }
 
             ImGui::Spacing();
-            ImGui::Columns(2, NULL, false);
+            ImGui::Columns(3, NULL, false);
 
             bool pulsing = Neon.IsPulsingEnabled(pVeh);
             if (Widget::Toggle(TEXT("Vehicle.PulsingNeon"), &pulsing)) {
                 Neon.SetPulsing(pVeh, pulsing);
             }
-
+            ImGui::NextColumn();
             Widget::Toggle(TEXT("Vehicle.RainbowNeon"), &m_Neon.m_bRainbowEffect, TEXT("Vehicle.RainbowNeonMSG"));
             ImGui::NextColumn();
             Widget::Toggle(TEXT("Vehicle.TrafficNeon"), &m_Neon.m_bApplyOnTraffic, TEXT("Vehicle.TrafficNeonMSG"));
             ImGui::Columns(1);
 
             ImGui::Spacing();
+            ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X);
             static float colorPicker[3] {0, 0, 0};
             if (ImGui::ColorEdit3(TEXT("Vehicle.ColorPicker"), colorPicker)) {
                 int r = static_cast<int>(colorPicker[0] * 255);
@@ -529,94 +530,98 @@ void VehCustmzrMgr::Draw() {
         }
 
         ImGui::Spacing();
+        
+        if (ImGui::BeginTabBar("TES")) {
 
-        ImGui::BeginChild("HandlingChild");
+            if (ImGui::BeginTabItem(TEXT("Vehicle.Main"))) {
+                ImGui::BeginChild("MainChild");
+                Widget::ToggleAddr<bool>(TEXT("Vehicle.Abs"), (uint)&pHandlingData->m_bABS);
+                ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 3.0f);
+                ImGui::Columns(2, NULL, false);
+                static const char* keys4 = "Front wheel drive\0Rear wheel drive\0Four wheel drive";
+                static std::vector<uint32_t> driveType = { 70, 82, 52 };
+                Widget::ComboBoxAddr(TEXT("Vehicle.DriveType"), (uint)&pHandlingData->m_transmissionData.m_nDriveType, keys4, driveType);
+                static const char *keys = "Petrol\0Diesel\0Electric\0";
+                static std::vector<uint32_t> engineType { 80, 68, 69 };
+                Widget::ComboBoxAddr(TEXT("Vehicle.EngineType"), (uint)&pHandlingData->m_transmissionData.m_nEngineType, keys, engineType);
+                ImGui::NextColumn();
+                static const char *keys2 = "Long\0Small\0Big\0Tall\0";
+                static std::vector<uint32_t> lights { 0, 1, 2, 3 };
+                Widget::ComboBoxAddr(TEXT("Vehicle.FrontLights"), (uint)&pHandlingData->m_nFrontLights, keys2, lights);
+                Widget::ComboBoxAddr(TEXT("Vehicle.RearLights"), (uint)&pHandlingData->m_nRearLights, keys2, lights);
+                ImGui::Columns(1);
+                ImGui::PopItemWidth();
+                ImGui::Spacing();
 
-        std::vector<Widget::BindInfo> abs{ {TEXT("Vehicle.On"), 1}, {TEXT("Vehicle.Off"), 0} };
-        Widget::EditRadioBtnAddr(TEXT("Vehicle.Abs"), (int)&pHandlingData->m_bABS, abs);
+                Widget::InputAddr(TEXT("Vehicle.ADM"), (int)&pHandlingData->m_fSuspensionAntiDiveMultiplier, 0.0f, 0.0f, 1.0f);
+                Widget::InputAddr<BYTE>(TEXT("Vehicle.AnimGroup"), (int)&pHandlingData->m_nAnimGroup, 0, 0, 20);
+                Widget::InputAddr(TEXT("Vehicle.BrakeBias"), (int)&pHandlingData->m_fBrakeBias, 0.0f, 0.0f, 1.0f);
 
-        Widget::EditAddr(TEXT("Vehicle.ADM"), (int)&pHandlingData->m_fSuspensionAntiDiveMultiplier, 0.0f, 0.0f, 1.0f);
-        Widget::EditAddr<BYTE>(TEXT("Vehicle.AnimGroup"), (int)&pHandlingData->m_nAnimGroup, 0, 0, 20);
-        Widget::EditAddr(TEXT("Vehicle.BrakeBias"), (int)&pHandlingData->m_fBrakeBias, 0.0f, 0.0f, 1.0f);
+                // Brake deceleration calculation
+                float BrakeDeceleration = pHandlingData->m_fBrakeDeceleration * 2500;
+                Widget::InputAddr(TEXT("Vehicle.BrakeDecel"), (int)&pHandlingData->m_fBrakeDeceleration, 0.0f, 0.0f, 20.0f, 2500.0f);
+                pHandlingData->m_fBrakeDeceleration = BrakeDeceleration / 2500;
 
-        // Brake deceleration calculation
-        float BrakeDeceleration = pHandlingData->m_fBrakeDeceleration * 2500;
-        Widget::EditAddr(TEXT("Vehicle.BrakeDecel"), (int)&pHandlingData->m_fBrakeDeceleration, 0.0f, 0.0f, 20.0f, 2500.0f);
-        pHandlingData->m_fBrakeDeceleration = BrakeDeceleration / 2500;
+                Widget::InputAddr(TEXT("Vehicle.CemterMassX"), (int)&pHandlingData->m_vecCentreOfMass.x, -10.0f, -10.0f, 10.0f);
+                Widget::InputAddr(TEXT("Vehicle.CemterMassY"), (int)&pHandlingData->m_vecCentreOfMass.y, -10.0f, -10.0f, 10.0f);
+                Widget::InputAddr(TEXT("Vehicle.CemterMassZ"), (int)&pHandlingData->m_vecCentreOfMass.z, -10.0f, -10.0f, 10.0f);
 
-        Widget::EditAddr(TEXT("Vehicle.CemterMassX"), (int)&pHandlingData->m_vecCentreOfMass.x, -10.0f, -10.0f, 10.0f);
-        Widget::EditAddr(TEXT("Vehicle.CemterMassY"), (int)&pHandlingData->m_vecCentreOfMass.y, -10.0f, -10.0f, 10.0f);
-        Widget::EditAddr(TEXT("Vehicle.CemterMassZ"), (int)&pHandlingData->m_vecCentreOfMass.z, -10.0f, -10.0f, 10.0f);
+                // CDM calculations
+                float factor = (1.0 / pHandlingData->m_fMass);
+                float fCDM = pHandlingData->m_fCollisionDamageMultiplier / (2000.0f * factor);
+                Widget::InputAddr(TEXT("Vehicle.CDM"), (int)&fCDM, 0.0f, 0.0f, 1.0f, 0.3381f);
+                pHandlingData->m_fCollisionDamageMultiplier = factor * fCDM * 2000.0f;
 
-        // CDM calculations
-        float factor = (1.0 / pHandlingData->m_fMass);
-        float fCDM = pHandlingData->m_fCollisionDamageMultiplier / (2000.0f * factor);
-        Widget::EditAddr(TEXT("Vehicle.CDM"), (int)&fCDM, 0.0f, 0.0f, 1.0f, 0.3381f);
-        pHandlingData->m_fCollisionDamageMultiplier = factor * fCDM * 2000.0f;
+                Widget::InputAddr(TEXT("Vehicle.DampingLvl"), (int)&pHandlingData->m_fSuspensionDampingLevel, -10.0f, -10.0f, 10.0f); // test later
+                Widget::InputAddr(TEXT("Vehicle.DragMult"), (int)&pHandlingData->m_fDragMult, 0.0f, 0.0f, 30.0f);
 
-        Widget::EditAddr(TEXT("Vehicle.DampingLvl"), (int)&pHandlingData->m_fSuspensionDampingLevel, -10.0f, -10.0f, 10.0f); // test later
-        Widget::EditAddr(TEXT("Vehicle.DragMult"), (int)&pHandlingData->m_fDragMult, 0.0f, 0.0f, 30.0f);
+                // Engine acceleration calculation
+                float fEngineAcceleration = pHandlingData->m_transmissionData.m_fEngineAcceleration * 25000.0f;
+                fEngineAcceleration /= pHandlingData->m_transmissionData.m_nDriveType == 52 ? 4.0f : 2.0f;
+                Widget::InputAddr(TEXT("Vehicle.EngineAccel"), (int)&fEngineAcceleration, 0.0f, 0.0f, 49.0f, 1.0f);
+                fEngineAcceleration *= pHandlingData->m_transmissionData.m_nDriveType == 52 ? 4.0f : 2.0f;
+                pHandlingData->m_transmissionData.m_fEngineAcceleration = fEngineAcceleration / 25000.0f;
 
-        std::vector<Widget::BindInfo> drive_type {
-            {TEXT("Vehicle.FrontWheelDrive"), 70},
-            {TEXT("Vehicle.RearWheelDrive"), 82},
-            {TEXT("Vehicle.FourWheelDrive"), 52}
-        };
-        Widget::EditRadioBtnAddr(TEXT("Vehicle.DriveType"), (int)&pHandlingData->m_transmissionData.m_nDriveType, drive_type);
+                Widget::InputAddr(TEXT("Vehicle.EngineInertia"), (int)&pHandlingData->m_transmissionData.m_fEngineInertia, 0.1f, 0.1f, 400.0f);
+                Widget::InputAddr(TEXT("Vehicle.ForceLevel"), (int)&pHandlingData->m_fSuspensionForceLevel, -10.0f, -10.0f, 10.0f); // test later
 
-        // Engine acceleration calculation
-        float fEngineAcceleration = pHandlingData->m_transmissionData.m_fEngineAcceleration * 25000.0f;
-        fEngineAcceleration /= pHandlingData->m_transmissionData.m_nDriveType == 52 ? 4.0f : 2.0f;
-        Widget::EditAddr(TEXT("Vehicle.EngineAccel"), (int)&fEngineAcceleration, 0.0f, 0.0f, 49.0f, 1.0f);
-        fEngineAcceleration *= pHandlingData->m_transmissionData.m_nDriveType == 52 ? 4.0f : 2.0f;
-        pHandlingData->m_transmissionData.m_fEngineAcceleration = fEngineAcceleration / 25000.0f;
+                Widget::InputAddr(TEXT("Vehicle.HighSpeedDamping"), (int)&pHandlingData->m_fSuspensionDampingLevel, -10.0f, -10.0f, 10.0f); // test later
+                Widget::InputAddr(TEXT("Vehicle.LowerLimit"), (int)&pHandlingData->m_fSuspensionLowerLimit, -10.0f, -10.0f, 10.0f); // test later
+                Widget::InputAddr(TEXT("Vehicle.Mass"), (int)&pHandlingData->m_fMass, 1.0f, 1.0f, 50000.0f);
 
+                // Max Velocity calculation
+                int MaxVelocity = pHandlingData->m_transmissionData.m_fMaxGearVelocity / *(float*)0xC2B9BC;
+                Widget::InputAddr(TEXT("Vehicle.MaxVelocity"), (int)&MaxVelocity, 1.0f, 1.0f, 1000.0f);
+                pHandlingData->m_transmissionData.m_fMaxGearVelocity = MaxVelocity * (*(float*)0xC2B9BC);
+                Widget::InputAddr<int>(TEXT("Vehicle.MonValue"), (int)&pHandlingData->m_nMonetaryValue, 1, 1, 100000);
+                Widget::InputAddr<BYTE>(TEXT("Vehicle.NumGears"), (int)&pHandlingData->m_transmissionData.m_nNumberOfGears, 1, 1, 10);
+                Widget::InputAddr<BYTE>(TEXT("Vehicle.PercentSubmerged"), (int)&pHandlingData->m_nPercentSubmerged, 10, 10, 120);
 
-        Widget::EditAddr(TEXT("Vehicle.EngineInertia"), (int)&pHandlingData->m_transmissionData.m_fEngineInertia, 0.1f, 0.1f, 400.0f);
-
-        std::vector<Widget::BindInfo> engine_type {
-            {TEXT("Vehicle.Petrol"), 80}, {TEXT("Vehicle.Diesel"), 68}, {TEXT("Vehicle.Electric"), 69}
-        };
-        Widget::EditRadioBtnAddr(TEXT("Vehicle.EngineType"), (int)&pHandlingData->m_transmissionData.m_nEngineType, engine_type);
-
-        std::vector<Widget::BindInfo> lights {
-            {TEXT("Vehicle.Long"), 0}, {TEXT("Vehicle.Small"), 1},
-            {TEXT("Vehicle.Big"), 2}, {TEXT("Vehicle.Tall"), 3}
-        };
-        Widget::EditRadioBtnAddr(TEXT("Vehicle.FrontLights"), (int)&pHandlingData->m_nFrontLights, lights);
-
-        Widget::EditAddr(TEXT("Vehicle.ForceLevel"), (int)&pHandlingData->m_fSuspensionForceLevel, -10.0f, -10.0f, 10.0f); // test later
-
-        Widget::EditBits(TEXT("Vehicle.HandlingFlags"), (int)&pHandlingData->m_nHandlingFlags, m_HandlingFlagNames);
-
-        Widget::EditAddr(TEXT("Vehicle.HighSpeedDamping"), (int)&pHandlingData->m_fSuspensionDampingLevel, -10.0f, -10.0f, 10.0f); // test later
-        Widget::EditAddr(TEXT("Vehicle.LowerLimit"), (int)&pHandlingData->m_fSuspensionLowerLimit, -10.0f, -10.0f, 10.0f); // test later
-        Widget::EditAddr(TEXT("Vehicle.Mass"), (int)&pHandlingData->m_fMass, 1.0f, 1.0f, 50000.0f);
-
-        // Max Velocity calculation
-        int MaxVelocity = pHandlingData->m_transmissionData.m_fMaxGearVelocity / *(float*)0xC2B9BC;
-        Widget::EditAddr(TEXT("Vehicle.MaxVelocity"), (int)&MaxVelocity, 1.0f, 1.0f, 1000.0f);
-        pHandlingData->m_transmissionData.m_fMaxGearVelocity = MaxVelocity * (*(float*)0xC2B9BC);
-
-        Widget::EditBits(TEXT("Vehicle.ModelFlags"), (int)&pHandlingData->m_nModelFlags, m_ModelFlagNames);
-
-        Widget::EditAddr<int>(TEXT("Vehicle.MonValue"), (int)&pHandlingData->m_nMonetaryValue, 1, 1, 100000);
-        Widget::EditAddr<BYTE>(TEXT("Vehicle.NumGears"), (int)&pHandlingData->m_transmissionData.m_nNumberOfGears, 1, 1, 10);
-        Widget::EditAddr<BYTE>(TEXT("Vehicle.PercentSubmerged"), (int)&pHandlingData->m_nPercentSubmerged, 10, 10, 120);
-
-        Widget::EditRadioBtnAddr(TEXT("Vehicle.RearLights"), (int)&pHandlingData->m_nRearLights, lights);
-
-        Widget::EditAddr(TEXT("Vehicle.SeatOffset"), (int)&pHandlingData->m_fSeatOffsetDistance, 0.0f, 0.0f, 1.0f);
-        Widget::EditAddr(TEXT("Vehicle.SteeringLock"), (int)&pHandlingData->m_fSteeringLock, 10.0f, 10.0f, 50.0f);
-        Widget::EditAddr(TEXT("Vehicle.SuspensionBias"), (int)&pHandlingData->m_fSuspensionBiasBetweenFrontAndRear, 0.0f, 0.0f, 1.0f);
-        Widget::EditAddr(TEXT("Vehicle.TractionBias"), (int)&pHandlingData->m_fTractionBias, 0.0f, 0.0f, 1.0f);
-        Widget::EditAddr(TEXT("Vehicle.TractionLoss"), (int)&pHandlingData->m_fTractionLoss, 0.0f, 0.0f, 1.0f);
-        Widget::EditAddr(TEXT("Vehicle.TractionMul"), (int)&pHandlingData->m_fTractionMultiplier, 0.5f, 0.5f, 2.0f);
-        Widget::EditAddr(TEXT("Vehicle.TurnMass"), (int)&pHandlingData->m_fTurnMass, 20.0f, 20.0f, 1000.0f); // test later
-        Widget::EditAddr(TEXT("Vehicle.UpperLimit"), (int)&pHandlingData->m_fSuspensionUpperLimit, -1.0f, -1.0f, 1.0f);
-
-        ImGui::EndChild();
-
+                Widget::InputAddr(TEXT("Vehicle.SeatOffset"), (int)&pHandlingData->m_fSeatOffsetDistance, 0.0f, 0.0f, 1.0f);
+                Widget::InputAddr(TEXT("Vehicle.SteeringLock"), (int)&pHandlingData->m_fSteeringLock, 10.0f, 10.0f, 50.0f);
+                Widget::InputAddr(TEXT("Vehicle.SuspensionBias"), (int)&pHandlingData->m_fSuspensionBiasBetweenFrontAndRear, 0.0f, 0.0f, 1.0f);
+                Widget::InputAddr(TEXT("Vehicle.TractionBias"), (int)&pHandlingData->m_fTractionBias, 0.0f, 0.0f, 1.0f);
+                Widget::InputAddr(TEXT("Vehicle.TractionLoss"), (int)&pHandlingData->m_fTractionLoss, 0.0f, 0.0f, 1.0f);
+                Widget::InputAddr(TEXT("Vehicle.TractionMul"), (int)&pHandlingData->m_fTractionMultiplier, 0.5f, 0.5f, 2.0f);
+                Widget::InputAddr(TEXT("Vehicle.TurnMass"), (int)&pHandlingData->m_fTurnMass, 20.0f, 20.0f, 1000.0f); // test later
+                Widget::InputAddr(TEXT("Vehicle.UpperLimit"), (int)&pHandlingData->m_fSuspensionUpperLimit, -1.0f, -1.0f, 1.0f);
+                ImGui::EndChild();
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem(TEXT("Vehicle.HandlingFlags"))) {
+                ImGui::BeginChild("2HandlingFlags");
+                Widget::EditBits(TEXT("Vehicle.HandlingFlags"), (int)&pHandlingData->m_nHandlingFlags, m_HandlingFlagNames);
+                ImGui::EndChild();
+                ImGui::EndTabItem();
+            }
+            if (ImGui::BeginTabItem(TEXT("Vehicle.ModelFlags"))) {
+                ImGui::BeginChild("23HandlingFlags");
+                Widget::EditBits(TEXT("Vehicle.ModelFlags"), (int)&pHandlingData->m_nModelFlags, m_ModelFlagNames);
+                ImGui::EndChild();
+                ImGui::EndTabItem();
+            }
+            ImGui::EndTabBar();
+        }
         ImGui::EndTabItem();
     }
     if (ImGui::BeginTabItem(TEXT( "Vehicle.Save"))) {

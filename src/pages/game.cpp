@@ -343,11 +343,6 @@ void GamePage::Draw() {
             ImGui::Spacing();
             ImGui::BeginChild("##Menus");
 #ifdef GTASA
-            static std::vector<Widget::BindInfo> themes {
-                {TEXT("Game.Beach"), 0x969159}, {TEXT("Game.Country"), 0x96917D}, {TEXT("Game.FunHouse"), 0x969176}, {TEXT("Game.Ninja"), 0x96915C}
-            };
-            Widget::EditRadioBtnAddr(TEXT("Game.Themes"), themes);
-            ImGui::Spacing();
             ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 3);
             ImGui::Columns(2, NULL, false);
             int day = CClock::CurrentDay - 1;
@@ -381,14 +376,17 @@ void GamePage::Draw() {
                 if (minute > 59) minute = 0;
                 CClock::ms_nGameClockMinutes = minute;
             }
+            static std::vector<uint32_t> themes = { 0x969159, 0x96917D, 0x969176, 0x96915C };
+            static const char* keys = "None\0Beach\0Country\0Fun house\0Ninja\0";
+            Widget::ComboBoxAddr(TEXT("Game.Themes"), keys, themes);
             ImGui::Columns(1);
             ImGui::PopItemWidth();
 #endif
             ImGui::Spacing();
-            Widget::EditAddr<int>(TEXT("Game.DaysPassed"), BY_GAME(0xB79038, 0x97F1F4, 0x8F2BB8), 0, 9999);
-            Widget::EditAddr<int>(TEXT("Game.FPSLimit"), (uint)&(RsGlobal.maxFPS), 1, 30, 999);
-            Widget::EditAddr<float>(TEXT("Game.GameSpeed"), reinterpret_cast<uint>(&CTimer::ms_fTimeScale), 1, 1, 10);
-            Widget::EditAddr(TEXT("Game.Gravity"), BY_GAME(0x863984, 0x68F5F0, 0x5F68D4), -1.0f, 0.008f, 1.0f, 1.0f, 0.01f);
+            Widget::InputAddr<int>(TEXT("Game.DaysPassed"), BY_GAME(0xB79038, 0x97F1F4, 0x8F2BB8), 0, 9999);
+            Widget::InputAddr<int>(TEXT("Game.FPSLimit"), (uint)&(RsGlobal.maxFPS), 1, 30, 999);
+            Widget::InputAddr<float>(TEXT("Game.GameSpeed"), reinterpret_cast<uint>(&CTimer::ms_fTimeScale), 1, 1, 10);
+            Widget::InputAddr(TEXT("Game.Gravity"), BY_GAME(0x863984, 0x68F5F0, 0x5F68D4), -1.0f, 0.008f, 1.0f, 1.0f, 0.01f);
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
@@ -455,14 +453,16 @@ void GamePage::Draw() {
                     }
                 }
             }
-            ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X);
+            ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 3.0f);
+            ImGui::Columns(2, NULL, false);
             if (ImGuiExtras::SliderFloat(TEXT("Game.FieldOfView"), &Freecam.m_fFOV, 5.0f, 120.0f) && Freecam.GetState()) {
                 TheCamera.LerpFOV(TheCamera.FindCamFOV(), Freecam.m_fFOV, 250, true);
             }
+            ImGui::NextColumn();
             ImGuiExtras::SliderInt(TEXT("Game.MovementSpeed"), &Freecam.m_nMul, 1, 10);
+            ImGui::Columns(1);
             ImGui::PopItemWidth();
-            ImGui::Dummy(ImVec2(0.0f, 15.0f));
-
+            ImGui::Spacing();
             ImGui::BeginChild("Conrtls");
             if (ImGui::BeginTable("FreecamCOntorls", 2, ImGuiTableFlags_ScrollY)) {
                 ImGui::TableSetupColumn(TEXT("Game.KeyAction"));

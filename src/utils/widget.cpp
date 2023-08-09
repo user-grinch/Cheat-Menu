@@ -440,7 +440,7 @@ void Widget::ImageList(ResourceStore &store, fArg1_t clickFunc, fRtnArg1_t getNa
                 addFunc();
 
                 ImGui::Dummy(ImVec2(0.0f, 10.0f));
-                if (ImGui::CollapsingHeader(TEXT("Window.GBe"))) {
+                if (ImGui::CollapsingHeader(TEXT("Window.AddNewCustomImg"))) {
                     ImGui::Spacing();
                     ImGui::TextWrapped(std::vformat(TEXT("Window.AddNewTip2"), std::make_format_args(store.m_FileName)).c_str());
                     ImGui::Spacing();
@@ -555,14 +555,14 @@ bool Widget::InputFloat(const char* label, float *val, float change, float min, 
     }
     ImGui::SameLine(0.0, 4.0);
     int size = ImGui::GetFrameHeight();
-    if (ImGui::Button(std::format("-##{}", label).c_str(), ImVec2(size, size))) {
+    if (ImGui::Button(std::format("-##Input{}", label).c_str(), ImVec2(size, size))) {
         if (min != max && (*val - change) > min) {
             *val -= change;
         }
         state = true;
     }
     ImGui::SameLine(0.0, 4.0);
-    if (ImGui::Button(std::format("+##{}", label).c_str(), ImVec2(size, size))) {
+    if (ImGui::Button(std::format("+##Input{}", label).c_str(), ImVec2(size, size))) {
         if (min != max && (*val + change) < max) {
             *val += change;
         }
@@ -583,7 +583,7 @@ bool Widget::InputInt(const char* label, int *val, int min, int max) {
     return state;
 }
 
-void Widget::EditAddr(const char* label, uint address, float min, float def, float max, float mul, float change) {
+void Widget::InputAddr(const char* label, uint address, float min, float def, float max, float mul, float change) {
     float val = patch::Get<float>(address) * mul;
 
     if (InputFloat(std::format("##Set{}", label).c_str(), &val, change, min, max)) {
@@ -602,27 +602,21 @@ void Widget::EditAddr(const char* label, uint address, float min, float def, flo
 
 void Widget::EditBits(const char* label, const int address, VecStr& names) {
     auto mem_val = (int*)address;
+    ImGui::Columns(2, nullptr, false);
 
-    if (ImGui::CollapsingHeader(label)) {
-        ImGui::Columns(2, nullptr, false);
+    for (int i = 0; i < 32; ++i) {
+        int mask = 1 << i;
+        bool state = *mem_val & mask;
 
-        for (int i = 0; i < 32; ++i) {
-            int mask = 1 << i;
-            bool state = *mem_val & mask;
-
-            if (ImGui::Checkbox(names[i].c_str(), &state)) {
-                *mem_val ^= mask;
-            }
-
-            if (i + 1 == 32 / 2) {
-                ImGui::NextColumn();
-            }
+        if (Toggle(names[i].c_str(), &state)) {
+            *mem_val ^= mask;
         }
-        ImGui::Columns(1);
 
-        ImGui::Spacing();
-        ImGui::Separator();
+        if (i + 1 == 32 / 2) {
+            ImGui::NextColumn();
+        }
     }
+    ImGui::Columns(1);
 }
 
 #ifdef GTASA
@@ -679,58 +673,44 @@ bool Widget::ListBox(const char* label, VecStr& allItems, int& selected) {
     return rtn;
 }
 
-void Widget::EditRadioBtnAddr(const char* label, std::vector<BindInfo>& addrInfo) {
-    ImGui::Text(label);
-    ImGui::Columns(3, nullptr, false);
+void Widget::ComboBoxAddr(const char* label, const char* keys, std::vector<uint32_t> &addrs) {
+    int curItem = 0;
 
-    bool state = true;
-
-    for (size_t i = 0; i < addrInfo.size(); i++) {
-        if (patch::Get<bool>(addrInfo[i].val, false)) {
-            state = false;
+    size_t temp = 1; // 0 is None
+    for (auto addr : addrs) {
+        if (patch::Get<bool>(addr, false)) {
+            curItem = temp;
         }
+        ++temp;
     }
 
-    if (ImGui::RadioButton((std::string("None##") + label).c_str(), state)) {
-        for (size_t i = 0; i < addrInfo.size(); i++) {
-            patch::Set<bool>(addrInfo[i].val, false);
+    if (ImGui::Combo(label, &curItem, keys)) {
+        for (auto addr : addrs) {
+            patch::Set<bool>(addr, false);
         }
-        SaveMgr::SaveData(label, 0, SaveMgr::eCheatState::Disabled, true, false);
-    }
-
-    for (size_t i = 0; i < addrInfo.size(); i++) {
-        state = patch::Get<bool>(addrInfo[i].val, false);
-
-        if (ImGui::RadioButton(addrInfo[i].name.c_str(), state)) {
-            for (size_t i = 0; i < addrInfo.size(); i++) {
-                patch::Set<bool>(addrInfo[i].val, false);
-            }
-
-            patch::Set<bool>(addrInfo[i].val, true);
-            SaveMgr::SaveData(label, addrInfo[i].val, SaveMgr::eCheatState::Enabled, true, false);
-        }
-
-        if (i != 3) {
-            ImGui::NextColumn();
+        if (curItem == 0) {
+            SaveMgr::SaveData(label, 0, SaveMgr::eCheatState::Disabled, true, false);
+        } else {
+            patch::Set<bool>(addrs[curItem-1], true);
+            SaveMgr::SaveData(label, addrs[curItem-1], SaveMgr::eCheatState::Enabled, true, false);
         }
     }
-    ImGui::Columns(1);
 }
 
-void Widget::EditRadioBtnAddr(const char* label, uint addr, std::vector<BindInfo>& valInfo) {
-    ImGui::Text(label);
-    ImGui::Columns(3, nullptr, false);
-    int mem_val = patch::Get<int8_t>(addr);
-    for (size_t i = 0; i < valInfo.size(); i++) {
-        if (ImGui::RadioButton(valInfo[i].name.c_str(), &mem_val, valInfo[i].val)) {
-            patch::Set<int8_t>(addr, valInfo[i].val);
-            SaveMgr::SaveData(label, static_cast<int>(addr), SaveMgr::eCheatState::Enabled,
-                                static_cast<int8_t>(valInfo[i].val), static_cast<int8_t>(0));
-        }
+void Widget::ComboBoxAddr(const char* label, uint addr, const char* keys, std::vector<uint32_t> &values) {
+    int memVal = patch::Get<int8_t>(addr);
+    int curItem = -1;
 
-        if (i != 3) {
-            ImGui::NextColumn();
+    for (auto val : values) {
+        ++ curItem;
+        if (val == memVal) {
+            break;
         }
     }
-    ImGui::Columns(1);
+
+    if (ImGui::Combo(label, &curItem, keys)) {
+        patch::Set<int8_t>(addr, values[curItem]);
+        SaveMgr::SaveData(label, static_cast<int>(addr), SaveMgr::eCheatState::Enabled,
+            static_cast<int8_t>(values[curItem]), static_cast<int8_t>(0));
+    }
 }
