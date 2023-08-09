@@ -263,37 +263,31 @@ void PedPage::Draw() {
 
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT( "Window.MenusTab"))) {
+        if (ImGui::BeginTabItem(TEXT( "Visual.Miscellaneous"))) {
             ImGui::Spacing();
             ImGui::BeginChild("MenusChild");
-            Widget::EditAddr<float>(TEXT("Ped.PedDensityMul"), reinterpret_cast<uint>(&CPopulation::PedDensityMultiplier), 0, 1, 10);
 #ifdef GTASA
-            if (ImGui::CollapsingHeader(TEXT("Ped.RecruitAnyone"))) {
-                static std::vector<Widget::BindInfo> selectWeapon {
-                    {"9mm", 0x96917C}, {"AK47", 0x96917D}, {"Rockets", 0x96917E}
-                };
-                Widget::EditRadioBtnAddr(TEXT("Ped.SelectWeapon"), selectWeapon);
-                ImGui::Spacing();
-                ImGui::Separator();
-            }
+            static std::vector<Widget::BindInfo> selectWeapon {
+                {"9mm", 0x96917C}, {"AK47", 0x96917D}, {"Rockets", 0x96917E}
+            };
+            Widget::EditRadioBtnAddr(TEXT("Ped.SelectWeapon"), selectWeapon);
 #endif
-
-            if (ImGui::CollapsingHeader(TEXT("Ped.RemovePedsRadius"))) {
-                static int removeRadius = 5;
-                ImGui::InputInt(TEXT("Ped.Radius"), &removeRadius);
-                ImGui::Spacing();
-                if (ImGui::Button(TEXT("Ped.RemovePeds"), Widget::CalcSize(1))) {
-                    CPlayerPed* player = FindPlayerPed();
-                    for (CPed* ped : CPools::ms_pPedPool) {
-                        if (DistanceBetweenPoints(ped->GetPosition(), player->GetPosition()) < removeRadius
-                                && ped->m_pVehicle == nullptr && ped != player) {
-                            Command<Commands::DELETE_CHAR>(CPools::GetPedRef(ped));
-                        }
+            Widget::EditAddr<float>(TEXT("Ped.PedDensityMul"), reinterpret_cast<uint>(&CPopulation::PedDensityMultiplier), 0, 1, 10);
+            static int removeRadius = 5;
+            ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X);
+            ImGui::InputInt("##Ped.Radius", &removeRadius);
+            ImGui::SameLine();
+            if (ImGui::Button(TEXT("Ped.RemovePeds"), Widget::CalcSizeFrame(TEXT("Ped.RemovePeds")))) {
+                CPlayerPed* player = FindPlayerPed();
+                for (CPed* ped : CPools::ms_pPedPool) {
+                    if (DistanceBetweenPoints(ped->GetPosition(), player->GetPosition()) < removeRadius
+                            && ped->m_pVehicle == nullptr && ped != player) {
+                        Command<Commands::DELETE_CHAR>(CPools::GetPedRef(ped));
                     }
                 }
-                ImGui::Spacing();
-                ImGui::Separator();
             }
+            ImGui::SameLine();
+            ImGui::Text(TEXT("Ped.RemovePedsRadius"));
             ImGui::EndChild();
             ImGui::EndTabItem();
         }

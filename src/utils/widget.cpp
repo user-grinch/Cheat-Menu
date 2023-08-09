@@ -545,8 +545,8 @@ bool Widget::ToggleBits(const char* label, uint flag, const char* hint) {
 
 bool Widget::InputFloat(const char* label, float *val, float change, float min, float max) {
     bool state = false;
-    ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() / 2.0f);
-    if (ImGui::InputFloat(std::format("##{}", label).c_str(), val)) {
+    ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X -2 * (ImGui::GetFrameHeight() + ImGui::GetStyle().ItemInnerSpacing.x));
+    if (ImGui::InputFloat(std::format("##Input{}", label).c_str(), val)) {
         if (min != max) {
             *val = (*val < min) ? min : *val;
             *val = (*val > max) ? max : *val;
@@ -568,8 +568,6 @@ bool Widget::InputFloat(const char* label, float *val, float change, float min, 
         }
         state = true;
     }
-    ImGui::SameLine(0.0, 4.0);
-    ImGui::LabelText(label, "%s", label);
     return state;
 }
 
@@ -588,7 +586,6 @@ bool Widget::InputInt(const char* label, int *val, int min, int max) {
 void Widget::EditAddr(const char* label, uint address, float min, float def, float max, float mul, float change) {
     float val = patch::Get<float>(address) * mul;
 
-    ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X);
     if (InputFloat(std::format("##Set{}", label).c_str(), &val, change, min, max)) {
         patch::SetFloat(address, val / mul);
         SaveMgr::SaveData(label, address, SaveMgr::eCheatState::Enabled, min / mul, 0.0f);
@@ -683,46 +680,41 @@ bool Widget::ListBox(const char* label, VecStr& allItems, int& selected) {
 }
 
 void Widget::EditRadioBtnAddr(const char* label, std::vector<BindInfo>& addrInfo) {
-    if (ImGui::CollapsingHeader(label)) {
-        size_t btnsInColumn = addrInfo.size() / 2 - 1;
+    ImGui::Text(label);
+    ImGui::Columns(3, nullptr, false);
 
-        ImGui::Columns(2, nullptr, false);
+    bool state = true;
 
-        bool state = true;
-
-        for (size_t i = 0; i < addrInfo.size(); i++) {
-            if (patch::Get<bool>(addrInfo[i].val, false)) {
-                state = false;
-            }
+    for (size_t i = 0; i < addrInfo.size(); i++) {
+        if (patch::Get<bool>(addrInfo[i].val, false)) {
+            state = false;
         }
+    }
 
-        if (ImGui::RadioButton((std::string("None##") + label).c_str(), state)) {
+    if (ImGui::RadioButton((std::string("None##") + label).c_str(), state)) {
+        for (size_t i = 0; i < addrInfo.size(); i++) {
+            patch::Set<bool>(addrInfo[i].val, false);
+        }
+        SaveMgr::SaveData(label, 0, SaveMgr::eCheatState::Disabled, true, false);
+    }
+
+    for (size_t i = 0; i < addrInfo.size(); i++) {
+        state = patch::Get<bool>(addrInfo[i].val, false);
+
+        if (ImGui::RadioButton(addrInfo[i].name.c_str(), state)) {
             for (size_t i = 0; i < addrInfo.size(); i++) {
                 patch::Set<bool>(addrInfo[i].val, false);
             }
-            SaveMgr::SaveData(label, 0, SaveMgr::eCheatState::Disabled, true, false);
+
+            patch::Set<bool>(addrInfo[i].val, true);
+            SaveMgr::SaveData(label, addrInfo[i].val, SaveMgr::eCheatState::Enabled, true, false);
         }
 
-        for (size_t i = 0; i < addrInfo.size(); i++) {
-            state = patch::Get<bool>(addrInfo[i].val, false);
-
-            if (ImGui::RadioButton(addrInfo[i].name.c_str(), state)) {
-                for (size_t i = 0; i < addrInfo.size(); i++) {
-                    patch::Set<bool>(addrInfo[i].val, false);
-                }
-
-                patch::Set<bool>(addrInfo[i].val, true);
-                SaveMgr::SaveData(label, addrInfo[i].val, SaveMgr::eCheatState::Enabled, true, false);
-            }
-
-            if (i == btnsInColumn) {
-                ImGui::NextColumn();
-            }
+        if (i != 3) {
+            ImGui::NextColumn();
         }
-        ImGui::Columns(1);
-        ImGui::Spacing();
-        ImGui::Separator();
     }
+    ImGui::Columns(1);
 }
 
 void Widget::EditRadioBtnAddr(const char* label, uint addr, std::vector<BindInfo>& valInfo) {

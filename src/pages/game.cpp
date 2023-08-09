@@ -15,6 +15,21 @@
 static bool bSaveGameFlag = false;
 #endif
 
+static std::vector<std::string> m_WeatherNames {
+#ifdef GTASA
+    "EXTRASUNNY LA", "SUNNY LA", "EXTRASUNNY SMOG LA", "SUNNY SMOG LA", "CLOUDY LA", "SUNNY SF", "EXTRASUNNY SF",
+    "CLOUDY SF", "RAINY SF", "FOGGY SF",
+    "SUNNY VEGAS", "EXTRASUNNY VEGAS", "CLOUDY VEGAS", "EXTRASUNNY COUNTRYSIDE", "SUNNY COUNTRYSIDE",
+    "CLOUDY COUNTRYSIDE", "RAINY COUNTRYSIDE",
+    "EXTRASUNNY DESERT", "SUNNY DESERT", "SANDSTORM DESERT", "UNDERWATER", "EXTRACOLOURS 1", "EXTRACOLOURS 2"
+#else
+    "SUNNY", "CLOUDY", "RAINY", "FOGGY"
+#ifdef GTAVC
+    ,"EXTRA_SUNNY", "HURRICANE", "EXTRACOLORS"
+#endif
+#endif
+};
+
 static void RealTimeClock() {
     time_t tmp = time(nullptr);
     struct tm* now = localtime(&tmp);
@@ -324,202 +339,113 @@ void GamePage::Draw() {
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-        if (ImGui::BeginTabItem(TEXT( "Window.MenusTab"))) {
+        if (ImGui::BeginTabItem(TEXT( "Visual.Miscellaneous"))) {
             ImGui::Spacing();
             ImGui::BeginChild("##Menus");
-#ifdef GTASA
-            if (ImGui::CollapsingHeader((TEXT_S("Game.CameraZoom") + "##HEADER").c_str())) {
-                ImGui::Spacing();
-                if (Freecam.GetState()) {
-                    ImGui::TextWrapped(TEXT("Game.CameraZoomLockFreecam"));
-                } else {
-                    if (Widget::Toggle(TEXT("Game.CameraZoomLock"), &m_bLockCameraZoom)) {
-                        if (!m_bLockCameraZoom) {
-                            Command<Commands::CAMERA_PERSIST_FOV>(false);
-                        }
-                    }
-                    ImGui::Spacing();
-                    if (!m_bLockCameraZoom) {
-                        ImGui::BeginDisabled();
-                    }
-                    if (ImGuiExtras::SliderInt(TEXT("Game.CameraZoom"), &m_nCameraZoom, 5, 120)) {
-                        TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_nCameraZoom, 250, true);
-                        Command<Commands::CAMERA_PERSIST_FOV>(true);
-                    }
-                    ImGui::Spacing();
-                    if (ImGui::Button(TEXT("Game.ResetDefault"), Widget::CalcSize())) {
-                        m_nCameraZoom = 70.0f;
-                        TheCamera.LerpFOV(TheCamera.FindCamFOV(), 70.0f, 250, true);
-                        Command<Commands::CAMERA_PERSIST_FOV>(true);
-                    }
-
-                    if (m_bLockCameraZoom) {
-                        ImGui::TextWrapped(TEXT("Game.CameraZoomLockInfo"));
-                    } else {
-                        ImGui::EndDisabled();
-                    }
-                }
-                ImGui::Spacing();
-                ImGui::Separator();
-            }
-            if (ImGui::CollapsingHeader(TEXT("Game.ChangeRadioStation"))) {
-                static const char* channels =
-                    "Playback FM\0KRose\0KDST\0Bounce FM\0SFUR\0Radio Los Santos\0Radio X\0CSR\0KJah West\0"
-                    "Master Sounds\0WCTR\0User Tracks\0None\0";
-
-                int curStation = Command<Commands::GET_RADIO_CHANNEL>();
-                if (ImGui::Combo(TEXT("Game.CurrentStation"), &curStation, channels)) {
-                    Command<Commands::SET_RADIO_CHANNEL>(curStation);
-                }
-                ImGui::Spacing();
-                ImGui::Separator();
-            }
-            if (ImGui::CollapsingHeader(TEXT("Game.CurrentDay"))) {
-                int day = CClock::CurrentDay - 1;
-                if (ImGui::Combo(TEXT("Game.SelectDay"), &day, "Sunday\0Monday\0Tuesday\0Wednesday\0Thursday\0Friday\0Saturday\0")) {
-                    CClock::CurrentDay = day + 1;
-                }
-
-                ImGui::Spacing();
-                ImGui::Separator();
-            }
-#endif
-            Widget::EditAddr<int>(TEXT("Game.DaysPassed"), BY_GAME(0xB79038, 0x97F1F4, 0x8F2BB8), 0, 9999);
-            Widget::EditAddr<int>(TEXT("Game.FPSLimit"), (uint)&(RsGlobal.maxFPS), 1, 30, 999);
-            Widget::EditAddr<float>(TEXT("Game.GameSpeed"), reinterpret_cast<uint>(&CTimer::ms_fTimeScale), 1, 1, 10);
-            Widget::EditAddr(TEXT("Game.Gravity"), BY_GAME(0x863984, 0x68F5F0, 0x5F68D4), -1.0f, 0.008f, 1.0f, 1.0f, 0.01f);
-
-            if (ImGui::CollapsingHeader(TEXT("Game.SetTime"))) {
-                int hour = CClock::ms_nGameClockHours;
-                int minute = CClock::ms_nGameClockMinutes;
-
-                ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth()/2);
-                if (ImGui::InputInt(TEXT("Game.Hour"), &hour)) {
-                    if (hour < 0) hour = 23;
-                    if (hour > 23) hour = 0;
-                    CClock::ms_nGameClockHours = hour;
-                }
-
-                if (ImGui::InputInt(TEXT("Game.Minute"), &minute)) {
-                    if (minute < 0) minute = 59;
-                    if (minute > 59) minute = 0;
-                    CClock::ms_nGameClockMinutes = minute;
-                }
-#ifdef GTASA
-                static int min = 24;
-                if (ImGui::InputInt(TEXT("Game.TotalMinutesDay"), &min)) {
-                    int val = min * 41.666666667f;
-                    patch::Set<uint32_t>(0x5BA35F, val, true);
-                    patch::Set<uint32_t>(0x53BDEC, val, true);
-                }
-#endif
-                ImGui::PopItemWidth();
-                ImGui::Spacing();
-                ImGui::Separator();
-            }
 #ifdef GTASA
             static std::vector<Widget::BindInfo> themes {
                 {TEXT("Game.Beach"), 0x969159}, {TEXT("Game.Country"), 0x96917D}, {TEXT("Game.FunHouse"), 0x969176}, {TEXT("Game.Ninja"), 0x96915C}
             };
             Widget::EditRadioBtnAddr(TEXT("Game.Themes"), themes);
-            if (ImGui::CollapsingHeader(TEXT("Player.TopDownCamera"))) {
-                bool state = TopDownCam.GetState();
-                if (Widget::Toggle(TEXT("Window.Enabled"), &state)) {
-                    Command<Commands::RESTORE_CAMERA_JUMPCUT>();
-                    TopDownCam.Toggle();
-                }
-                ImGui::Spacing();
-                ImGuiExtras::SliderInt(TEXT("Player.CameraZoom"), &TopDownCam.m_nZoom, 20, 60);
-                ImGui::Spacing();
-                ImGui::Separator();
+            ImGui::Spacing();
+            ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 3);
+            ImGui::Columns(2, NULL, false);
+            int day = CClock::CurrentDay - 1;
+            if (ImGui::Combo(TEXT("Game.SelectDay"), &day, "Sunday\0Monday\0Tuesday\0Wednesday\0Thursday\0Friday\0Saturday\0")) {
+                CClock::CurrentDay = day + 1;
             }
-#endif
-            if (ImGui::CollapsingHeader(TEXT("Game.Weather"))) {
-#ifdef GTASA
-                if (ImGui::Button(TEXT("Game.Foggy"), Widget::CalcSize(3))) {
-                    Call<0x438F80>();
-                }
-
-                ImGui::SameLine();
-                if (ImGui::Button(TEXT("Game.Overcast"), Widget::CalcSize(3))) {
-                    Call<0x438F60>();
-                }
-
-                ImGui::SameLine();
-                if (ImGui::Button(TEXT("Game.Rainy"), Widget::CalcSize(3))) {
-                    Call<0x438F70>();
-                }
-
-                if (ImGui::Button(TEXT("Game.Sandstorm"), Widget::CalcSize(3))) {
-                    Call<0x439590>();
-                }
-
-                ImGui::SameLine();
-                if (ImGui::Button(TEXT("Game.Thunderstorm"), Widget::CalcSize(3))) {
-                    Call<0x439570>();
-                }
-
-                ImGui::SameLine();
-                if (ImGui::Button(TEXT("Game.VerySunny"), Widget::CalcSize(3))) {
-                    Call<0x438F50>();
-                }
-
-                ImGui::Spacing();
-                static int weatherID = 0;
-                if (ImGui::InputInt(TEXT("Game.WeatherID"), &weatherID)) {
-                    if (weatherID < 0) {
-                        weatherID = 255;
-                    }
-
-                    if (weatherID > 255) {
-                        weatherID = 0;
-                    }
-                    CWeather::OldWeatherType = weatherID;
-                    CWeather::NewWeatherType = weatherID;
-                }
-                Widget::Tooltip(TEXT("Game.WeatherIDText"));
-#else
-                if (ImGui::Button(TEXT("Game.Sunny"), Widget::CalcSize(3))) {
-                    CWeather::ForceWeatherNow(0);
-                }
-                ImGui::SameLine();
-                if (ImGui::Button(TEXT("Game.Cloudy"), Widget::CalcSize(3))) {
-                    CWeather::ForceWeatherNow(1);
-                }
-                ImGui::SameLine();
-                if (ImGui::Button(TEXT("Game.Rainy"), Widget::CalcSize(3))) {
-                    CWeather::ForceWeatherNow(2);
-                }
-
-                if (ImGui::Button(TEXT("Game.Foggy"), Widget::CalcSize(3))) {
-                    CWeather::ForceWeatherNow(3);
-                }
-#ifdef GTAVC
-                ImGui::SameLine();
-                if (ImGui::Button(TEXT("Game.ExtraSunny"), Widget::CalcSize(3))) {
-                    CWeather::ForceWeatherNow(4);
-                }
-                ImGui::SameLine();
-                if (ImGui::Button(TEXT("Game.Hurricane"), Widget::CalcSize(3))) {
-                    CWeather::ForceWeatherNow(5);
-                }
-
-                if (ImGui::Button(TEXT("Game.ExtraColors"), Widget::CalcSize(3))) {
-                    CWeather::ForceWeatherNow(6);
-                }
-#endif
-#endif
-                ImGui::Spacing();
-                ImGui::Separator();
+            int hour = CClock::ms_nGameClockHours;
+            if (ImGui::InputInt(TEXT("Game.Hour"), &hour)) {
+                if (hour < 0) hour = 23;
+                if (hour > 23) hour = 0;
+                CClock::ms_nGameClockHours = hour;
             }
+            static int min = 24;
+            if (ImGui::InputInt(TEXT("Game.TotalMinutesDay"), &min)) {
+                int val = min * 41.666666667f;
+                patch::Set<uint32_t>(0x5BA35F, val, true);
+                patch::Set<uint32_t>(0x53BDEC, val, true);
+            }
+            ImGui::NextColumn();
+            static const char* channels =
+                "Playback FM\0KRose\0KDST\0Bounce FM\0SFUR\0Radio Los Santos\0Radio X\0CSR\0KJah West\0"
+                "Master Sounds\0WCTR\0User Tracks\0None\0";
+
+            int curStation = Command<Commands::GET_RADIO_CHANNEL>();
+            if (ImGui::Combo(TEXT("Game.CurrentStation"), &curStation, channels)) {
+                Command<Commands::SET_RADIO_CHANNEL>(curStation);
+            }
+            int minute = CClock::ms_nGameClockMinutes;
+            if (ImGui::InputInt(TEXT("Game.Minute"), &minute)) {
+                if (minute < 0) minute = 59;
+                if (minute > 59) minute = 0;
+                CClock::ms_nGameClockMinutes = minute;
+            }
+            ImGui::Columns(1);
+            ImGui::PopItemWidth();
+#endif
+            ImGui::Spacing();
+            Widget::EditAddr<int>(TEXT("Game.DaysPassed"), BY_GAME(0xB79038, 0x97F1F4, 0x8F2BB8), 0, 9999);
+            Widget::EditAddr<int>(TEXT("Game.FPSLimit"), (uint)&(RsGlobal.maxFPS), 1, 30, 999);
+            Widget::EditAddr<float>(TEXT("Game.GameSpeed"), reinterpret_cast<uint>(&CTimer::ms_fTimeScale), 1, 1, 10);
+            Widget::EditAddr(TEXT("Game.Gravity"), BY_GAME(0x863984, 0x68F5F0, 0x5F68D4), -1.0f, 0.008f, 1.0f, 1.0f, 0.01f);
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-#ifdef GTASA
-        if (ImGui::BeginTabItem(TEXT( "Game.Freecam"))) {
+        if (ImGui::BeginTabItem(TEXT( "Game.Camera"))) {
             ImGui::Spacing();
-            bool state = Freecam.GetState();
-            if (Widget::Toggle(TEXT("Game.Enable"), &state)) {
+            if (Freecam.GetState()) {
+                    ImGui::TextWrapped(TEXT("Game.CameraZoomLockFreecam"));
+            } else {
+                if (Widget::Toggle(TEXT("Game.CameraZoomLock"), &m_bLockCameraZoom)) {
+                    if (!m_bLockCameraZoom) {
+                        Command<Commands::CAMERA_PERSIST_FOV>(false);
+                    }
+                }
+                ImGui::SameLine();
+                if (!m_bLockCameraZoom) {
+                    ImGui::BeginDisabled();
+                }
+                ImVec2 restBtn = Widget::CalcSizeFrame(TEXT("Menu.ResetToDefault"));
+                ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X - restBtn.x);
+                if (ImGuiExtras::SliderInt("##CamZoom", &m_nCameraZoom, 5, 120)) {
+                    TheCamera.LerpFOV(TheCamera.FindCamFOV(), m_nCameraZoom, 250, true);
+                    Command<Commands::CAMERA_PERSIST_FOV>(true);
+                }
+                ImGui::SameLine();
+                if (ImGui::Button((TEXT_S("Menu.ResetToDefault") + "##CamZoom").c_str(), restBtn)) {
+                    m_nCameraZoom = 70.0f;
+                    TheCamera.LerpFOV(TheCamera.FindCamFOV(), 70.0f, 250, true);
+                    Command<Commands::CAMERA_PERSIST_FOV>(true);
+                }
+                ImGui::SameLine();
+                ImGui::Text(TEXT("Game.CameraZoom"));
+
+                if (m_bLockCameraZoom) {
+                    ImGui::TextWrapped(TEXT("Game.CameraZoomLockInfo"));
+                } else {
+                    ImGui::EndDisabled();
+                }
+            }
+#ifdef GTASA
+            bool state = TopDownCam.GetState();
+            if (Widget::Toggle(TEXT("Player.TopDownCamera"), &state)) {
+                Command<Commands::RESTORE_CAMERA_JUMPCUT>();
+                TopDownCam.Toggle();
+            }
+            ImGui::SameLine();
+            ImVec2 restBtn = Widget::CalcSizeFrame(TEXT("Menu.ResetToDefault"));
+            ImGui::SetNextItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X - restBtn.x);
+            ImGuiExtras::SliderInt("##DistanceCam", &TopDownCam.m_nZoom, 20, 60);
+            ImGui::SameLine();
+            if (ImGui::Button((TEXT_S("Menu.ResetToDefault") + "##CamZoom222").c_str(), restBtn)) {
+                TopDownCam.m_nZoom = 35.0f;
+            }
+            ImGui::SameLine();
+            ImGui::Text(TEXT("Game.Distance"));
+
+            state = Freecam.GetState();
+            if (Widget::Toggle(TEXT("Game.Freecam"), &state)) {
                 if (Freecam.Toggle()) {
                     // restore lock camera zoom here
                     if (m_bLockCameraZoom) {
@@ -529,13 +455,13 @@ void GamePage::Draw() {
                     }
                 }
             }
-            ImGui::Spacing();
-
+            ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X);
             if (ImGuiExtras::SliderFloat(TEXT("Game.FieldOfView"), &Freecam.m_fFOV, 5.0f, 120.0f) && Freecam.GetState()) {
                 TheCamera.LerpFOV(TheCamera.FindCamFOV(), Freecam.m_fFOV, 250, true);
             }
             ImGuiExtras::SliderInt(TEXT("Game.MovementSpeed"), &Freecam.m_nMul, 1, 10);
-            ImGui::Dummy(ImVec2(0.0f, 20.0f));
+            ImGui::PopItemWidth();
+            ImGui::Dummy(ImVec2(0.0f, 15.0f));
 
             ImGui::BeginChild("Conrtls");
             if (ImGui::BeginTable("FreecamCOntorls", 2, ImGuiTableFlags_ScrollY)) {
@@ -635,10 +561,10 @@ void GamePage::Draw() {
 
                 ImGui::EndTable();
             }
+#endif
             ImGui::EndChild();
             ImGui::EndTabItem();
         }
-#endif
         if (ImGui::BeginTabItem(TEXT( "Game.Missions"))) {
             ImGui::Spacing();
 
@@ -721,6 +647,97 @@ void GamePage::Draw() {
             ImGui::EndTabItem();
         }
 #endif
+        if (ImGui::BeginTabItem(TEXT("Game.Weather"))) {
+#ifdef GTASA
+            if (ImGui::Button(TEXT("Game.Foggy"), Widget::CalcSize(3))) {
+                Call<0x438F80>();
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Button(TEXT("Game.Overcast"), Widget::CalcSize(3))) {
+                Call<0x438F60>();
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Button(TEXT("Game.Rainy"), Widget::CalcSize(3))) {
+                Call<0x438F70>();
+            }
+
+            if (ImGui::Button(TEXT("Game.Sandstorm"), Widget::CalcSize(3))) {
+                Call<0x439590>();
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Button(TEXT("Game.Thunderstorm"), Widget::CalcSize(3))) {
+                Call<0x439570>();
+            }
+
+            ImGui::SameLine();
+            if (ImGui::Button(TEXT("Game.VerySunny"), Widget::CalcSize(3))) {
+                Call<0x438F50>();
+            }
+
+            ImGui::Spacing();
+            ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X);
+            ImGui::Columns(2, NULL, false);
+            int weather = CWeather::OldWeatherType;
+            if (Widget::ListBox(TEXT("Visual.CurrentWeather"), m_WeatherNames, weather)) {
+                CWeather::OldWeatherType = weather;
+            }
+            static int weatherID = 0;
+            if (ImGui::InputInt(TEXT("Game.WeatherID"), &weatherID)) {
+                if (weatherID < 0) {
+                    weatherID = 255;
+                }
+
+                if (weatherID > 255) {
+                    weatherID = 0;
+                }
+                CWeather::OldWeatherType = weatherID;
+                CWeather::NewWeatherType = weatherID;
+            }
+            Widget::Tooltip(TEXT("Game.WeatherIDText"));
+            ImGui::NextColumn();
+
+            weather = CWeather::NewWeatherType;
+            if (Widget::ListBox(TEXT("Visual.NextWeather"), m_WeatherNames, weather)) {
+                CWeather::NewWeatherType = weather;
+            }
+            ImGui::Columns(1);
+            
+#else
+            if (ImGui::Button(TEXT("Game.Sunny"), Widget::CalcSize(3))) {
+                CWeather::ForceWeatherNow(0);
+            }
+            ImGui::SameLine();
+            if (ImGui::Button(TEXT("Game.Cloudy"), Widget::CalcSize(3))) {
+                CWeather::ForceWeatherNow(1);
+            }
+            ImGui::SameLine();
+            if (ImGui::Button(TEXT("Game.Rainy"), Widget::CalcSize(3))) {
+                CWeather::ForceWeatherNow(2);
+            }
+
+            if (ImGui::Button(TEXT("Game.Foggy"), Widget::CalcSize(3))) {
+                CWeather::ForceWeatherNow(3);
+            }
+#ifdef GTAVC
+            ImGui::SameLine();
+            if (ImGui::Button(TEXT("Game.ExtraSunny"), Widget::CalcSize(3))) {
+                CWeather::ForceWeatherNow(4);
+            }
+            ImGui::SameLine();
+            if (ImGui::Button(TEXT("Game.Hurricane"), Widget::CalcSize(3))) {
+                CWeather::ForceWeatherNow(5);
+            }
+
+            if (ImGui::Button(TEXT("Game.ExtraColors"), Widget::CalcSize(3))) {
+                CWeather::ForceWeatherNow(6);
+            }
+#endif
+#endif
+            ImGui::EndTabItem();
+        }
         ImGui::EndTabBar();
     }
 }

@@ -135,10 +135,13 @@ void ScenePage::Draw() {
                 "sexywoman", "pro", "oldwoman", "fatwoman", "jogwoman", "oldfatwoman", "skate"
             };
 
+            ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / MENU_WIDTH_FACTOR_X);
+            ImGui::Columns(2, NULL, false);
             if (ImGui::Combo(TEXT("Scene.FightingStyle"), &fightStyle, fightStyles)) {
                 Command<Commands::GIVE_MELEE_ATTACK_TO_CHAR>(hPlayer, fightStyle + 4, 6);
                 Util::SetMessage(TEXT("Scene.FightingStyleSet"));
             }
+            ImGui::NextColumn();
             if (Widget::ListBox(TEXT("Scene.WalkingStyle"), walkStyles, walkStyle)) {
                 if (walkStyle == "default") {
                     patch::Set<DWORD>(0x609A4E, 0x4D48689);
@@ -152,6 +155,8 @@ void ScenePage::Draw() {
                 }
                 Util::SetMessage(TEXT("Scene.WalkingStyleSet"));
             }
+            ImGui::Columns(1);
+            ImGui::PopItemWidth();
             ImGui::EndTabItem();
         }
 #endif
