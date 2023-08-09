@@ -298,7 +298,7 @@ void VehiclePage::SpawnVehicle(std::string& smodel) {
         CStreaming::SetModelIsDeletable(449);
     } else {
         *CVehicleModelInfo::ms_compsToUse = m_nVehicleVariant;
-        CStreaming::RequestModel(imodel, PRIORITY_REQUEST);
+        CStreaming::RequestModel(imodel, GAME_REQUIRED);
         CStreaming::LoadAllRequestedModels(false);
 
         if (m_Spawner.m_nLicenseText[0] != '\0') {
@@ -339,6 +339,7 @@ void VehiclePage::SpawnVehicle(std::string& smodel) {
 
         pVeh->m_eDoorLock = DOORLOCK_UNLOCKED;
         pVeh->m_nAreaCode = player->m_nAreaCode;
+        CWorld::Add(pVeh);
         Command<Commands::MARK_CAR_AS_NO_LONGER_NEEDED>(CPools::GetVehicleRef(pVeh));
         CStreaming::SetModelIsDeletable(imodel);
     }
@@ -816,6 +817,7 @@ void VehiclePage::Draw() {
             if (ImGui::InputTextWithHint("##SpawnID", TEXT("Vehicle.IDSpawnText"), smodel, 8, ImGuiInputTextFlags_EnterReturnsTrue)) {
                 try {
                     int model = std::stoi(smodel);
+
 
                     if (CModelInfo::IsVehicleModelType(model) == -1) {
                         Util::SetMessage(TEXT("Vehicle.InvalidID"));

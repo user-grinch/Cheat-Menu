@@ -535,6 +535,7 @@ void VehCustmzrMgr::Draw() {
 
             if (ImGui::BeginTabItem(TEXT("Vehicle.Main"))) {
                 ImGui::BeginChild("MainChild");
+                ImGui::Spacing();
                 Widget::ToggleAddr<bool>(TEXT("Vehicle.Abs"), (uint)&pHandlingData->m_bABS);
                 ImGui::PushItemWidth(ImGui::GetWindowContentRegionWidth() / 3.0f);
                 ImGui::Columns(2, NULL, false);
@@ -610,12 +611,14 @@ void VehCustmzrMgr::Draw() {
             }
             if (ImGui::BeginTabItem(TEXT("Vehicle.HandlingFlags"))) {
                 ImGui::BeginChild("2HandlingFlags");
+                ImGui::Spacing();
                 Widget::EditBits(TEXT("Vehicle.HandlingFlags"), (int)&pHandlingData->m_nHandlingFlags, m_HandlingFlagNames);
                 ImGui::EndChild();
                 ImGui::EndTabItem();
             }
             if (ImGui::BeginTabItem(TEXT("Vehicle.ModelFlags"))) {
                 ImGui::BeginChild("23HandlingFlags");
+                ImGui::Spacing();
                 Widget::EditBits(TEXT("Vehicle.ModelFlags"), (int)&pHandlingData->m_nModelFlags, m_ModelFlagNames);
                 ImGui::EndChild();
                 ImGui::EndTabItem();

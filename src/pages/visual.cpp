@@ -774,14 +774,14 @@ void VisualPage::Draw() {
                     patch::SetFloat(0x55AA94, discLeft);
 
                     float prevVal = posX;
-                    Widget::EditAddr<float>(TEXT("Visual.RadarPosX"), (uint)&posX, -999, 40, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.RadarPosX"), (uint)&posX, -999, 40, 999);
                     float diff = posX - prevVal;
                     discLeft += diff;
                     discRight += diff;
 
-                    Widget::EditAddr<float>(TEXT("Visual.RadarPosY"), 0x68FD34, -999, 116, 999);
-                    Widget::EditAddr<float>(TEXT("Visual.RadarHeight"), 0x68FD30, -999, 76, 999);
-                    Widget::EditAddr<float>(TEXT("Visual.RadarWidth"), 0x68FD24, -999, 94, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.RadarPosY"), 0x68FD34, -999, 116, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.RadarHeight"), 0x68FD30, -999, 76, 999);
+                    Widget::InputAddr<float>(TEXT("Visual.RadarWidth"), 0x68FD24, -999, 94, 999);
 #endif
                     ImGui::EndChild();
                     ImGui::EndTabItem();

@@ -605,7 +605,7 @@ void PlayerPage::Draw() {
             Widget::InputAddr<int>(TEXT("Player.Money"), 0xB7CE50, -99999999, 0, 99999999);
 #else
             int money = pInfo->m_nMoney;
-            Widget::EditAddr<int>(TEXT("Player.Money"), (int)&money, -9999999, 0, 99999999);
+            Widget::InputAddr<int>(TEXT("Player.Money"), (int)&money, -9999999, 0, 99999999);
             pInfo->m_nMoney = money;
             pInfo->m_nDisplayMoney = money;
 #endif

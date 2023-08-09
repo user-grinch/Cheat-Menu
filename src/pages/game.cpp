@@ -392,6 +392,7 @@ void GamePage::Draw() {
         }
         if (ImGui::BeginTabItem(TEXT( "Game.Camera"))) {
             ImGui::Spacing();
+#ifdef GTASA
             if (Freecam.GetState()) {
                     ImGui::TextWrapped(TEXT("Game.CameraZoomLockFreecam"));
             } else {
@@ -425,7 +426,6 @@ void GamePage::Draw() {
                     ImGui::EndDisabled();
                 }
             }
-#ifdef GTASA
             bool state = TopDownCam.GetState();
             if (Widget::Toggle(TEXT("Player.TopDownCamera"), &state)) {
                 Command<Commands::RESTORE_CAMERA_JUMPCUT>();
