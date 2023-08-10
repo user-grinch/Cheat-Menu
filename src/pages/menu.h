@@ -6,6 +6,7 @@ class MenuPage : public IPage<MenuPage> {
     bool m_bAutoCheckUpdate;  // Should updates be checked automatically
     bool m_bDiscordRPC;       // Is the discord rich presence enabled
     bool m_bTextOnlyMode;     // Hide all menu images mode
+    bool m_bExtraConfigSaving; // Saved extra game data to config files
     float m_fAccentColor[3];
 
     friend class IFeature;

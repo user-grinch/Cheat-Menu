@@ -3,6 +3,7 @@
 #include "datastore.h"
 #include <Patch.h>
 #include <type_traits>
+#include "../src/pages/menu.h"
 
 extern DataStore gConfig;
 /*
@@ -35,6 +36,10 @@ class SaveMgr {
 
     // Initializes and loads save data from disk
     static void InitAndLoad() {
+        if (!menuPage.m_bExtraConfigSaving) {
+            return;
+        }
+
         for (auto [k, v] : gConfig.Items()) {
             if (v.is_table()) {
 #ifdef GTASA
@@ -91,6 +96,9 @@ class SaveMgr {
 
     template<typename T>
     static void SaveData(std::string&& key, int addr, eCheatState state, T enabled, T disabled) {
+        if (!menuPage.m_bExtraConfigSaving) {
+            return;
+        }
         eAddrType type = eAddrType::Unknown;
 
         if (std::is_same<bool, T>::value) type = eAddrType::Bool;

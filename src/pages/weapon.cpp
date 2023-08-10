@@ -213,7 +213,6 @@ void WeaponPage::Draw() {
     CPlayerPed* pPlayer = FindPlayerPed();
     uint hplayer = CPools::GetPedRef(pPlayer);
 
-    ImGui::Spacing();
     if (ImGui::Button(TEXT("Weapon.DropWeapon"), Widget::CalcSize(3))) {
         float x, y, z;
         Command<Commands::GET_OFFSET_FROM_CHAR_IN_WORLD_COORDS>(hplayer, 0.0, 3.0, 0.0, &x, &y, &z);

@@ -16,6 +16,7 @@ MenuPage::MenuPage()
         m_bDiscordRPC = gConfig.Get("Menu.DiscordRPC", false);
         m_bAutoCheckUpdate = gConfig.Get("Menu.AutoCheckUpdate", true);
         m_bTextOnlyMode = gConfig.Get("Menu.TextOnlyMode", false);
+        m_bExtraConfigSaving = gConfig.Get("Menu.ExtraConfigSaving", true);
 
         m_fAccentColor[0] = gConfig.Get("Menu.AccentColor.Red", 0.0392f);
         m_fAccentColor[1] = gConfig.Get("Menu.AccentColor.Green", 0.2784f);
@@ -83,7 +84,9 @@ void MenuPage::Draw() {
                 gConfig.Set("Menu.DiscordRPC", m_bDiscordRPC);
             }
             ImGui::NextColumn();
-
+            if (Widget::Toggle(TEXT("Menu.ExtraConfigSaving"), &m_bExtraConfigSaving)) {
+                gConfig.Set("Menu.ExtraConfigSaving", m_bExtraConfigSaving);
+            }
             if (gRenderer == eRenderer::DirectX9
                     && Widget::Toggle(TEXT("Menu.TextOnlyMode"), &m_bTextOnlyMode, TEXT("Menu.TextOnlyModeHint"))) {
                 gConfig.Set("Menu.TextOnlyMode", m_bTextOnlyMode);
@@ -178,11 +181,13 @@ void MenuPage::Draw() {
 
             aimSkinChanger.DrawUI(TEXT("Menu.SkinChangerKey"));
             quickSceenShot.DrawUI(TEXT("Menu.QuickSSKey"));
+#ifdef GTASA
             freeCam.DrawUI(TEXT("Menu.FreecamKey"));
             freeCamForward.DrawUI(TEXT("Menu.FreecamForwardKey"));
             freeCamBackward.DrawUI(TEXT("Menu.FreecamBackwardKey"));
             freeCamLeft.DrawUI(TEXT("Menu.FreecamLeftKey"));
             freeCamRight.DrawUI(TEXT("Menu.FreecamRightKey"));
+#endif
             quickTeleport.DrawUI(TEXT("Menu.QuickTPKey"));
             teleportMarker.DrawUI(TEXT("Menu.TPMarkerKey"));
 

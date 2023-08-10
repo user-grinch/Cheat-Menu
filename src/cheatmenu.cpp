@@ -223,7 +223,7 @@ void CheatMenuMgr::ApplyStyle(ImColor accent_col) {
     style->ItemInnerSpacing = ImVec2(4, 4);
 
     style->Colors[ImGuiCol_WindowBg] = ImColor(0, 0, 0, 240);
-    style->Colors[ImGuiCol_PopupBg] = ImColor(33, 34, 45, 255);
+    style->Colors[ImGuiCol_PopupBg] = ImColor(30, 30, 40, 255);
     style->Colors[ImGuiCol_Border] = ImColor(33, 34, 45, 255);
     style->Colors[ImGuiCol_Button] = ImColor(33, 34, 45, 255);
     style->Colors[ImGuiCol_ButtonActive] = accent_col;
