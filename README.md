@@ -1,3 +1,5 @@
+<h1>This modification has been deprecated in favor of [GrinchTrainer](https://github.com/user-grinch/Grinch-Trainer-GTA3D). Future updates will be available in that repository!</h1>
+
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/user-grinch/Cheat-Menu/master/images/logo.png" width="700" height="180">
