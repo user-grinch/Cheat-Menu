@@ -1,4 +1,4 @@
-# This modification has been deprecated in favor of [GrinchTrainer](https://github.com/user-grinch/Grinch-Trainer-GTA3D). Future updates will be available there!
+# This modification has been deprecated in favor of [GrinchTrainer](https://github.com/user-grinch/GrinchTrainer-III-VC-SA). Future updates will be available there!
 
 
 
